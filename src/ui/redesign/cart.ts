@@ -8,12 +8,13 @@
 // da una cosa y la aldea decide qué hacer con ella.
 //
 // Vive en la misma hoja de papel que la crónica, la gente y la ficha —mismo
-// canto desgarrado, misma cruz, misma columna de 390— porque es una sección más
+// canto desgarrado, mismo cierre legible, misma columna de 390— porque es una sección más
 // (`piel-del-valle` §2, §6, §7). Y **no lleva ni una cifra suelta**: lo que
 // cuesta cada cosa se enseña con los mismos iconos de la cabecera, que es lo
 // que §11.1 pide.
 
 import { renderUiText } from '@engine/chronicle/render';
+import { requestSheetClose } from '../motion';
 import { MEANS_IDS, type MeansId, type VillageStats } from '@engine/state';
 import { CROWN, TIME } from '@engine/balance';
 import { crownRefusal } from '@engine/people/crown';
@@ -33,26 +34,26 @@ const COIN: Readonly<Record<string, string>> = {
 
 const CSS = `
 .valley-cart { position: relative; display: flex; flex-direction: column; gap: 14px; }
-/* **La cruz de cerrar, y por qué la pone el carro y no la carcasa.** La carcasa
+/* El cierre visible va en la cabecera del carro. La carcasa
    monta la suya en la caja de la bandeja, y app.ts vacía esa caja en cada
    navegación (replaceChildren), así que se la lleva por delante: la crónica ya
-   tenía la suya por este mismo motivo (VZ-2). Es la misma pieza —19 px de glifo
-   en un toque de 44, sobre el papel, arriba a la derecha— que el estándar fijó
-   (piel-del-valle §7).
+   tenía la suya por este mismo motivo (VZ-2). Un botón con texto evita que el
+   control se pierda como una cruz suelta encima de la primera tarjeta.
 
    Y sin acentos graves en este comentario a propósito: va dentro de una
    plantilla de texto de TypeScript, y uno solo rompe el build con un TS1005
    que no menciona la causa. Está escrito en la skill y ha vuelto a pasar. */
-.cart-close { position: absolute; top: -4px; right: -4px; z-index: 2;
-  width: var(--ui-tap-min); height: var(--ui-tap-min); display: grid; place-items: center;
-  padding: 0; border: 0; background: transparent; color: var(--skin-ink-faded);
-  font: 400 19px/1 var(--skin-font-voice); cursor: pointer;
+.cart-close { align-self: flex-end; min-width: var(--ui-tap-min); min-height: var(--ui-tap-min);
+  display: grid; place-items: center; padding: 0 14px; border: 1px solid var(--skin-parchment-aged);
+  border-radius: 9px; background: var(--skin-parchment); color: var(--skin-ink-soft);
+  box-shadow: 0 2px 0 rgba(27, 22, 19, .12);
+  font: 700 12px/1 var(--skin-font-voice); letter-spacing: .04em; text-transform: uppercase; cursor: pointer;
   -webkit-tap-highlight-color: transparent; }
-.cart-close:active { color: var(--skin-ink); }
+.cart-close:active { color: var(--skin-ink); transform: translateY(1px); box-shadow: none; }
 .cart-row { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; }
 .cart-row-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.cart-name { margin: 0; }
-.cart-what { margin: 0; color: var(--skin-ink-faded); font: italic 15px/1.35 var(--skin-font-read); }
+.cart-name { margin: 0; font-family: var(--skin-font-heading); font-weight: 600; }
+.cart-what { margin: 0; color: var(--skin-ink-faded); font: 400 15px/1.4 var(--skin-font-voice); }
 .cart-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 /* El precio, con los iconos de la cabecera: una ficha por cosa que se paga. */
 .cart-cost { display: flex; align-items: center; gap: 10px; }
@@ -64,7 +65,7 @@ const CSS = `
 /* Lo que no se puede dar se queda apagado **con su motivo escrito**, que es la
    diferencia entre un botón gris y una respuesta. */
 .cart-give[disabled] { opacity: .45; }
-.cart-why { margin: 0; color: var(--skin-ink-faded); font: italic 14px/1.3 var(--skin-font-read); }
+.cart-why { margin: 0; color: var(--skin-ink-faded); font: 400 14px/1.35 var(--skin-font-voice); }
 /* K-5 · la corona. Una fila por candidato dentro de la fila de la corona: la
    misma tira de pergamino de la lista de la gente, con su medalla, sus
    inviernos, su oficio y hacia dónde tiraría el valle con él. */
@@ -73,7 +74,7 @@ const CSS = `
   padding: 10px 12px; border-top: 1px solid var(--skin-rule); }
 .cart-who-of { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .cart-who-name { font-family: var(--skin-font-voice); font-weight: 600; }
-.cart-who-lean { color: var(--skin-ink-faded); font: italic 14px/1.3 var(--skin-font-read); }
+.cart-who-lean { color: var(--skin-ink-faded); font: 400 14px/1.3 var(--skin-font-voice); }
 .cart-who-traits { color: var(--skin-ink-soft); font: 400 13px/1.3 var(--skin-font-read); }
 .cart-reigns { margin: 0; font-family: var(--skin-font-voice); }
 `;
@@ -135,8 +136,10 @@ export function cartPanel(actions: UiActions): UiPanel {
   close.type = 'button';
   close.className = 'cart-close';
   close.setAttribute('aria-label', renderUiText('app.close'));
-  close.textContent = '×';
-  close.addEventListener('click', () => { actions.navigate({ kind: 'valley' }); });
+  close.textContent = renderUiText('app.close');
+  close.addEventListener('click', () => {
+    requestSheetClose(element, () => actions.navigate({ kind: 'valley' }));
+  });
   element.append(close);
 
   const rows = new Map<MeansId, Row>();

@@ -1,5 +1,5 @@
 // G-23 · Clips de Blender siguiendo el desplazamiento real, sin mover el motor.
-import { AnimationMixer, Group, Mesh, SkinnedMesh, type AnimationAction, type Object3D } from 'three';
+import { AnimationMixer, Group, LoopOnce, Mesh, SkinnedMesh, type AnimationAction, type Object3D } from 'three';
 import type { LoadedAsset } from '../assets';
 import type { Animal } from '@derive/animals';
 
@@ -8,6 +8,11 @@ export class AnimalMotion {
   private readonly mixer: AnimationMixer;
   private readonly idle: AnimationAction | undefined;
   private readonly walk: AnimationAction | undefined;
+  private readonly flight: AnimationAction | undefined;
+  private readonly flee: AnimationAction | undefined;
+  private readonly charge: AnimationAction | undefined;
+  private readonly attack: AnimationAction | undefined;
+  private attackStartedAt: number | undefined;
   private readonly stride: number;
   private previous: { x: number; y: number } | undefined;
   private blend = 0;
@@ -22,10 +27,24 @@ export class AnimalMotion {
     });
     this.mixer = new AnimationMixer(object);
     const idle = asset.clips.find(clip => clip.name === 'idle');
-    const walk = asset.clips.find(clip => clip.name === 'walk');
+    const walk = asset.clips.find(clip => clip.name === 'walk' || clip.name === 'hop');
     this.idle = idle === undefined ? undefined : this.mixer.clipAction(idle).play();
     this.walk = walk === undefined ? undefined : this.mixer.clipAction(walk).play();
-    this.stride = asset.motion.find(clip => clip.name === 'walk')?.strideLength ?? 0.2;
+    this.flight = asset.clips.find(clip => clip.name === 'flight') === undefined ? undefined
+      : this.mixer.clipAction(asset.clips.find(clip => clip.name === 'flight')!).play();
+    this.flee = asset.clips.find(clip => clip.name === 'flee') === undefined ? undefined
+      : this.mixer.clipAction(asset.clips.find(clip => clip.name === 'flee')!).play();
+    this.charge = asset.clips.find(clip => clip.name === 'charge') === undefined ? undefined
+      : this.mixer.clipAction(asset.clips.find(clip => clip.name === 'charge')!).play();
+    const attack = asset.clips.find(clip => clip.name === 'attack');
+    this.attack = attack === undefined ? undefined : this.mixer.clipAction(attack);
+    this.attack?.setLoop(LoopOnce, 1);
+    if (this.attack !== undefined) this.attack.clampWhenFinished = true;
+    const declaredStride = asset.motion.find(clip => clip.name === 'walk' || clip.name === 'hop')?.strideLength ?? 0.2;
+    // Los recursos antiguos del ciervo declaraban 0,2 celdas y ciclaban tan
+    // deprisa que las patas parecían fijas entre fotogramas. La receta nueva
+    // declara 0,55; este mínimo mantiene compatibles las partidas ya abiertas.
+    this.stride = kind === 'deer' ? Math.max(0.55, declaredStride) : declaredStride;
     this.phase = ((Math.imul(id, 2654435761) >>> 0) % 1000) / 1000;
   }
 
@@ -42,17 +61,41 @@ export class AnimalMotion {
       this.group.rotation.y += difference * (1 - Math.exp(-12 * delta));
     }
     this.distance += step;
-    if (delta > 0) this.blend += ((speed > 0.002 ? 1 : 0) - this.blend) * (1 - Math.exp(-10 * delta));
+    if (delta > 0) this.blend += ((animal.action === 'walk' || speed > 0.002 ? 1 : 0) - this.blend)
+      * (1 - Math.exp(-10 * delta));
+    const attacking = animal.action === 'attack' && this.attack !== undefined;
+    const special = animal.action === 'flight' ? this.flight
+      : animal.action === 'flee' ? this.flee
+        : animal.action === 'charge' ? this.charge : undefined;
+    const down = animal.action === 'down';
+    if (attacking && this.attackStartedAt === undefined) {
+      this.attackStartedAt = seconds;
+      this.attack!.reset().play();
+    } else if (!attacking && this.attackStartedAt !== undefined) {
+      this.attack?.stop();
+      this.attackStartedAt = undefined;
+    }
     if (this.idle !== undefined) {
       this.idle.time = (seconds + this.phase * this.idle.getClip().duration) % this.idle.getClip().duration;
-      this.idle.setEffectiveWeight(1 - this.blend);
+      this.idle.setEffectiveWeight(attacking || special !== undefined || down ? 0 : 1 - this.blend);
     }
     if (this.walk !== undefined) {
       this.walk.time = ((this.distance / this.stride + this.phase) % 1) * this.walk.getClip().duration;
-      this.walk.setEffectiveWeight(this.blend);
+      this.walk.setEffectiveWeight(attacking || special !== undefined || down ? 0 : this.blend);
+    }
+    for (const clip of [this.flight, this.flee, this.charge]) {
+      if (clip === undefined) continue;
+      clip.time = (seconds + this.phase * clip.getClip().duration) % clip.getClip().duration;
+      clip.setEffectiveWeight(clip === special ? 1 : 0);
+    }
+    if (attacking) {
+      this.attack!.time = Math.min(this.attack!.getClip().duration - 0.001,
+        Math.max(0, seconds - this.attackStartedAt!));
+      this.attack!.setEffectiveWeight(1);
     }
     this.mixer.update(0);
-    this.group.position.set(animal.x, floor, animal.y);
+    this.group.rotation.z = down ? -Math.PI / 2 : 0;
+    this.group.position.set(animal.x, floor + (animal.altitude ?? 0), animal.y);
     this.previous = { x: animal.x, y: animal.y };
   }
 

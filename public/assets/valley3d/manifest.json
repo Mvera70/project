@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-22T07:06:00.193Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids villager-neighbor",
+  "generatedAt": "2026-09-23T13:47:26.570Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bear-den",
   "assets": [
     {
       "id": "axis-marker",
@@ -876,11 +876,22 @@
     {
       "id": "gate",
       "file": "gate.glb",
-      "sha256": "6A631196325241E1C6C6D53CDA4041D24DADCF6FC4FABF0C437F5CF4631FE679",
+      "sha256": "C5E11188892DE6D2B1735CA36911999F3D8D6E3226CC2B43A5EF7B7F12A9FB81",
       "motion": [],
       "provenance": {
         "kind": "original",
         "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "gate-timber",
+      "file": "gate-timber.glb",
+      "sha256": "6A631196325241E1C6C6D53CDA4041D24DADCF6FC4FABF0C437F5CF4631FE679",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Portón de madera G-24 aprobado previamente para The Valley; conservado para la empalizada.",
         "license": "Project original"
       }
     },
@@ -961,6 +972,211 @@
       "provenance": {
         "kind": "original",
         "source": "Modelado original E2 para The Valley: esclavina corta de lana sobre el adulto base; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "e3b-bastion-joint-candidate",
+      "file": "e3b-bastion-joint-candidate.glb",
+      "sha256": "543DD56F580893F56A5CBD62237C36E0EE1F1D8BB20E9538373D36D7A422536E",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Pasarela E3b, salida lateral y descansillo aceptados visualmente por Vera el 22 sep 2026; derivado de G-27 sin reemplazarlo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "e3b-walkway-entry-candidate",
+      "file": "e3b-walkway-entry-candidate.glb",
+      "sha256": "4792C63B4E279B63089D61F3702DABF2E93162381EA94CC0DB272255D6B49678",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Primer tramo E3b con alivio de 0,25 en pretil, aceptado visualmente por Vera el 22 sep 2026; modelo procedural local.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "e3b-walkway-candidate",
+      "file": "e3b-walkway-candidate.glb",
+      "sha256": "AB541602681C656A6839BC680548AB7DF7956DB3213D03C26AD32C8D46083601",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Tramo recto E3b con ménsulas de piedra, aceptado visualmente por Vera el 22 sep 2026; modelo procedural local.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "deer",
+      "file": "deer.glb",
+      "sha256": "E17C6853030F962CA93A66B55B8032B17CB2215EDA98CA57EB29993E01ACD0F4",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4.041666666666667,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.0416666666666665,
+          "loop": true,
+          "strideLength": 0.2
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Original procedural stag modeled for The Valley on 23 Sep 2026; no external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "bear",
+      "file": "bear.glb",
+      "sha256": "ECA8AA70E7A3D31BFC25DC0B826AA959C5D6E832B3F30075B8DA8B7652416445",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4.041666666666667,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.0416666666666665,
+          "loop": true,
+          "strideLength": 0.22
+        },
+        {
+          "name": "attack",
+          "seconds": 1.5416666666666667,
+          "loop": false,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Original procedural brown bear modeled for The Valley, 23 Sep 2026. No external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "partridge",
+      "file": "partridge.glb",
+      "sha256": "3627E6187D35249E7B09F506CFA95301D13F93B6F4289B8DA1EF5EF2A8DF1478",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4.041666666666667,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.0416666666666667,
+          "loop": true,
+          "strideLength": 0.055
+        },
+        {
+          "name": "flight",
+          "seconds": 0.5416666666666666,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Original low-poly partridge for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "rabbit",
+      "file": "rabbit.glb",
+      "sha256": "FBEA726A5B1F5251B8ADDBD4379A4C9D42F1762FD66B1012721D1428AF302EF6",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4.041666666666667,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "hop",
+          "seconds": 1.375,
+          "loop": true,
+          "strideLength": 0.15
+        },
+        {
+          "name": "flee",
+          "seconds": 0.875,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Original low-poly rabbit for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "boar",
+      "file": "boar.glb",
+      "sha256": "4E215FD0A56B69633826BA7235A9C8888116468A7FEF82331EECD2F860BC09D9",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4.041666666666667,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.0416666666666665,
+          "loop": true,
+          "strideLength": 0.15
+        },
+        {
+          "name": "charge",
+          "seconds": 1.0416666666666667,
+          "loop": true,
+          "strideLength": 0.28
+        },
+        {
+          "name": "attack",
+          "seconds": 1.375,
+          "loop": false,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Original low-poly wild boar for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "sling",
+      "file": "sling.glb",
+      "sha256": "3651FAEB06E7686EB2D8AC2701ADCEF5DB9EEABE5B28154E3B5F318028399E49",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original leather hand sling for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "bear-den",
+      "file": "bear-den.glb",
+      "sha256": "C36938F1E9F4F460C647CF30545D747B1D2D54D73D03E1382665837120FDD3D6",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original procedural exterior bear den for The Valley. 23 Sep 2026. No external provider.",
         "license": "Project original"
       }
     }

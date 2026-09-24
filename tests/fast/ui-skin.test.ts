@@ -20,6 +20,15 @@ import { describe, expect, it } from 'vitest';
 const ROOT = resolve(import.meta.dirname, '..', '..');
 const tokens = readFileSync(resolve(ROOT, 'src/ui/redesign/tokens.css'), 'utf8');
 const skin = readFileSync(resolve(ROOT, 'src/ui/redesign/skin.css'), 'utf8');
+const shellSkin = readFileSync(resolve(ROOT, 'src/ui/redesign/shell.css'), 'utf8');
+const closeSources = [
+  'src/ui/redesign/shell.ts', 'src/ui/redesign/cart.ts',
+  'src/ui/screens/chronicle.ts', 'src/ui/screens/annals.ts',
+].map((file) => readFileSync(resolve(ROOT, file), 'utf8')).join('\n');
+const overlayScreens = [
+  'src/ui/screens/crossroad.ts', 'src/ui/screens/annals.ts',
+  'src/ui/screens/epitaph.ts', 'src/ui/screens/title.ts',
+].map((file) => readFileSync(resolve(ROOT, file), 'utf8')).join('\n');
 
 /** El valor de un token, tal como está escrito en `tokens.css`. */
 function token(name: string): string {
@@ -28,29 +37,24 @@ function token(name: string): string {
   return (match?.[1] ?? '').trim();
 }
 
-describe('UI-V0 · la paleta sale de los prototipos', () => {
+describe('UI-V0 · la paleta sigue la dirección actual del juego', () => {
   /**
-   * Los diecisiete colores muestreados, con su hex exacto.
-   *
-   * **No es una lista congelada de las que `CLAUDE.md` prohíbe**: no guarda
-   * «lo que hay», guarda **lo que se midió en los PNG** del prototipo, que es
-   * una fuente externa y estable. Si un color cambia aquí sin volver a
-   * muestrear, la piel deja de parecerse y nadie se enteraría hasta la
-   * siguiente captura.
+   * La dirección aceptada se aparta de los colores de prototipo que Vera
+   * rechazó: piedra neutra, marfil, tinta oscura, ámbar y navegación oscura.
    */
   const SAMPLED: readonly [string, string][] = [
-    ['--skin-parchment', '#E5D3BB'],
-    ['--skin-parchment-deep', '#D9C2A5'],
-    ['--skin-page', '#EADBC2'],
-    ['--skin-parchment-aged', '#BCA87D'],
-    ['--skin-ink', '#1B1613'],
-    ['--skin-ink-soft', '#3A2E1F'],
-    ['--skin-gold', '#7C5C1F'],
-    ['--skin-gold-lit', '#F1DEAE'],
-    ['--skin-ochre', '#765833'],
-    ['--skin-wood', '#2B1F17'],
-    ['--skin-wood-soft', '#453023'],
-    ['--skin-wood-plaque', '#3A2E24'],
+    ['--skin-parchment', '#F1EBDD'],
+    ['--skin-parchment-deep', '#E7DFD0'],
+    ['--skin-page', '#D8D0C0'],
+    ['--skin-parchment-aged', '#C9B99E'],
+    ['--skin-ink', '#202D33'],
+    ['--skin-ink-soft', '#3C4B50'],
+    ['--skin-gold', '#A36E24'],
+    ['--skin-gold-lit', '#FFF0C7'],
+    ['--skin-ochre', '#9A6725'],
+    ['--skin-wood', '#203740'],
+    ['--skin-wood-soft', '#31525A'],
+    ['--skin-wood-plaque', '#29464E'],
     ['--skin-red', '#6A2521'],
     ['--skin-red-deep', '#5B1A1B'],
     ['--skin-red-ink', '#4E0504'],
@@ -60,13 +64,8 @@ describe('UI-V0 · la paleta sale de los prototipos', () => {
     for (const [name, hex] of SAMPLED) expect(token(name), name).toBe(hex);
   });
 
-  it('y la única excepción es la tinta desvaída, oscurecida por contraste', () => {
-    // La muestra daba `#816D52` y no llegaba al 4,5:1 sobre la bandeja
-    // (2,88:1). Se oscureció manteniendo el tono, y el motivo está escrito en
-    // el propio token. Si alguien lo devuelve a la muestra, esto lo caza.
-    expect(token('--skin-ink-faded')).toBe('#5D4E3B');
-    expect(tokens, 'el motivo de la excepción tiene que seguir escrito')
-      .toContain('#816D52');
+  it('mantiene el secundario legible sobre las superficies claras', () => {
+    expect(token('--skin-ink-faded')).toBe('#596565');
   });
 
   it('los `--ui-*` de UI-R1 siguen existiendo y apuntan a los nuevos', () => {
@@ -79,7 +78,7 @@ describe('UI-V0 · la paleta sale de los prototipos', () => {
 });
 
 describe('UI-V0 · la tipografía va empaquetada, no de red', () => {
-  it('las dos familias se declaran con `@font-face` y ficheros locales', () => {
+  it('las familias narrativas se declaran con `@font-face` y ficheros locales', () => {
     // `CLAUDE.md` prohíbe una fuente de red: la demo abre sin servidor.
     expect(skin).toContain("font-family: 'Cinzel'");
     expect(skin).toContain("font-family: 'EB Garamond'");
@@ -89,12 +88,13 @@ describe('UI-V0 · la tipografía va empaquetada, no de red', () => {
     expect(skin, 'ninguna fuente puede venir de fuera').not.toMatch(/https?:\/\/fonts\./u);
   });
 
-  it('y con una pila de respaldo, para que sin ellas el juego no se descoloque', () => {
+  it('reserva la serif a la narración y usa sans para controles y lectura funcional', () => {
     for (const name of ['--skin-font-voice', '--skin-font-read']) {
       const stack = token(name);
-      expect(stack, name).toMatch(/serif$/u);
+      expect(stack, name).toMatch(/sans-serif$/u);
       expect(stack.split(',').length, `${name} necesita respaldo`).toBeGreaterThan(2);
     }
+    expect(token('--skin-font-story')).toMatch(/serif$/u);
   });
 
   it('se declaran como variables, que es lo que son', () => {
@@ -119,7 +119,7 @@ describe('UI-V0 · las primitivas que las seis rondas van a usar', () => {
     '.skin-rule', '.skin-rule-v', '.skin-capital', '.skin-seal',
     '.skin-medallion', '.skin-chip',
     '.skin-button--wood', '.skin-button--parchment',
-    '.skin-nav', '.skin-nav-tab', '.skin-nav--wood', '.skin-nav--plaque',
+    '.skin-nav', '.skin-nav-tab',
     '.skin-scroll-edge', '.skin-ornament', '.skin-icon',
   ];
 
@@ -127,9 +127,9 @@ describe('UI-V0 · las primitivas que las seis rondas van a usar', () => {
     for (const name of PRIMITIVES) expect(skin, name).toContain(name);
   });
 
-  it('el papel lleva la textura multiplicada, que es lo que la hace grano y no color', () => {
-    expect(skin).toContain('background-blend-mode: multiply');
-    expect(token('--skin-parchment-texture')).toContain('./parchment.png');
+  it('la superficie de lectura usa curvas topográficas tenues y evita el papel envejecido', () => {
+    expect(token('--skin-map-pattern')).toContain('radial-gradient');
+    expect(token('--skin-parchment-texture')).toBe('none');
   });
 
   it('los bordes rasgados están escritos, no calculados en el navegador', () => {
@@ -143,6 +143,28 @@ describe('UI-V0 · las primitivas que las seis rondas van a usar', () => {
   it('y el área táctil mínima de §11.7 sigue en pie', () => {
     expect(token('--ui-tap-min')).toBe('44px');
     expect(skin).toContain('min-height: var(--ui-tap-min)');
+  });
+});
+
+describe('UI-V11 · paneles legibles y cierres visibles', () => {
+  it('la pestaña seleccionada se distingue con su placa, sin una raya sobre el rótulo', () => {
+    expect(skin).not.toContain('.skin-nav-tab[aria-pressed="true"]::after');
+    expect(skin).toContain('.skin-nav-tab[aria-pressed="true"]');
+  });
+
+  it('los paneles laterales no cubren todo el valle en pantallas anchas', () => {
+    expect(shellSkin).toContain('width: min(100%, 760px)');
+    expect(skin).toContain('#root .ui-shell-content:has(.chronicle-scrim)');
+    expect(skin).toContain('background-color: transparent;\n  background-image: none;\n  box-shadow: none;');
+  });
+
+  it('las demás hojas de pantalla también dejan el valle visible en escritorio', () => {
+    expect(overlayScreens.match(/width: min\(100%, 760px\)/gu)?.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it('los cierres muestran su acción con texto en vez de una X diminuta', () => {
+    expect(closeSources).not.toMatch(/textContent\s*=\s*['"]×['"]/u);
+    expect(shellSkin).toContain('min-height: var(--ui-tap-min)');
   });
 });
 

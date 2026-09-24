@@ -1,0 +1,1 @@
+{"extends":"../../../tsconfig.json","include":["combined-source.ts","combined-probe.ts","check-door-only.ts","check-combined-scene.ts","check-source-coverage.ts"]}

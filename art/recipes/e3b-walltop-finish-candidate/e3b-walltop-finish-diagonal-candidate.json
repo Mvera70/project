@@ -1,0 +1,544 @@
+{
+  "schemaVersion": 1,
+  "id": "e3b-walltop-finish-diagonal-candidate",
+  "scale": 1,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "kind": "e3b-walltop-candidate",
+    "footprint": [
+      1.6363961030678928,
+      1.6363961030678928
+    ],
+    "status": "candidate_unexported",
+    "floorY": 1.02,
+    "clearWidth": 0.7,
+    "bodyRadius": 0.32,
+    "parapetTop": 1.2,
+    "condition": "lateral_cells_require_mesh_and_trunk_clearance",
+    "routeXZ": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "replaces": "published stone wall geometry, not an overlay",
+    "unit": "game cell; 1 cell = 3 physical meters",
+    "rotation": "Positive world XZ angle maps to negative Blender Z rotation; quarter-turn variants are rigid rotations about cell center",
+    "finish": "Exact volume partition into ashlar and filled mortar joints; no gaps, added textures or footprint growth.",
+    "sourceRecipe": "art/recipes/e3b-walltop-candidate/e3b-walltop-diagonal-se-candidate.json",
+    "ornamentalMerlonRise": 0.06,
+    "newMerlonTop": 1.26,
+    "referenceMaterial": "public/assets/valley3d/wall.glb",
+    "vertexColorLimit": "Current authoring schema has no vertex-color field. Two static palette materials reproduce the reference without changing the pipeline."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "mortar",
+      "role": "soil",
+      "roughness": 1
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "StoneBody_Ashlar_0_A",
+      "location": [
+        0.24893933982822014,
+        -0.24893933982822014,
+        0.11524999999999996
+      ],
+      "dimensions": [
+        0.7041067811865476,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Joint_0",
+      "location": [
+        0.5,
+        -0.5,
+        0.11524999999999996
+      ],
+      "dimensions": [
+        0.006,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "mortar",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Ashlar_0_B",
+      "location": [
+        0.7510606601717799,
+        -0.7510606601717799,
+        0.11524999999999996
+      ],
+      "dimensions": [
+        0.7041067811865476,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Bed_0",
+      "location": [
+        0.5,
+        -0.5,
+        0.23349999999999999
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.9,
+        0.006000000000000005
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "mortar",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Ashlar_1_A",
+      "location": [
+        0.16893933982822018,
+        -0.16893933982822013,
+        0.35175
+      ],
+      "dimensions": [
+        0.4778326112068524,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Joint_1",
+      "location": [
+        0.34,
+        -0.34,
+        0.35175
+      ],
+      "dimensions": [
+        0.006000000000000005,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "mortar",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Ashlar_1_B",
+      "location": [
+        0.6710606601717799,
+        -0.6710606601717799,
+        0.35175
+      ],
+      "dimensions": [
+        0.9303809511662428,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Bed_1",
+      "location": [
+        0.5,
+        -0.5,
+        0.47
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.9,
+        0.006
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "mortar",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Ashlar_2_A",
+      "location": [
+        0.24893933982822014,
+        -0.24893933982822014,
+        0.5882499999999999
+      ],
+      "dimensions": [
+        0.7041067811865476,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Joint_2",
+      "location": [
+        0.5,
+        -0.5,
+        0.5882499999999999
+      ],
+      "dimensions": [
+        0.006,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "mortar",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Ashlar_2_B",
+      "location": [
+        0.7510606601717799,
+        -0.7510606601717799,
+        0.5882499999999999
+      ],
+      "dimensions": [
+        0.7041067811865476,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Bed_2",
+      "location": [
+        0.5,
+        -0.5,
+        0.7064999999999999
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.9,
+        0.006000000000000005
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "mortar",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Ashlar_3_A",
+      "location": [
+        0.16893933982822018,
+        -0.16893933982822013,
+        0.82475
+      ],
+      "dimensions": [
+        0.4778326112068524,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Joint_3",
+      "location": [
+        0.34,
+        -0.34,
+        0.82475
+      ],
+      "dimensions": [
+        0.006000000000000005,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "mortar",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "StoneBody_Ashlar_3_B",
+      "location": [
+        0.6710606601717799,
+        -0.6710606601717799,
+        0.82475
+      ],
+      "dimensions": [
+        0.9303809511662428,
+        0.9,
+        0.23049999999999998
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Deck",
+      "location": [
+        0.5,
+        -0.5,
+        0.98
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.9,
+        0.08
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ParapetNorth",
+      "location": [
+        0.7828427124746191,
+        -0.21715728752538094,
+        1.11
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.1,
+        0.18
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ParapetSouth",
+      "location": [
+        0.21715728752538094,
+        -0.7828427124746191,
+        1.11
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.1,
+        0.18
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FinishMerlon_ParapetNorth_0",
+      "location": [
+        0.5328427124746191,
+        0.03284271247461906,
+        1.23
+      ],
+      "dimensions": [
+        0.16,
+        0.1,
+        0.06
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FinishMerlon_ParapetNorth_1",
+      "location": [
+        1.0328427124746191,
+        -0.46715728752538094,
+        1.23
+      ],
+      "dimensions": [
+        0.16,
+        0.1,
+        0.06
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FinishMerlon_ParapetSouth_0",
+      "location": [
+        -0.03284271247461906,
+        -0.5328427124746191,
+        1.23
+      ],
+      "dimensions": [
+        0.16,
+        0.1,
+        0.06
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FinishMerlon_ParapetSouth_1",
+      "location": [
+        0.46715728752538094,
+        -1.0328427124746191,
+        1.23
+      ],
+      "dimensions": [
+        0.16,
+        0.1,
+        0.06
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 1000,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0.5,
+      -0.5,
+      0.65
+    ],
+    "orthoScale": 2.3,
+    "worldRole": "sky"
+  }
+}

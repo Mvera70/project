@@ -138,7 +138,7 @@
 
 /** La inscripción: fechas, cifras, ANNO, nombres. Versalitas de Cinzel. */
 .skin-inscription {
-  font-family: var(--skin-font-voice);
+  font-family: var(--skin-font-display);
   font-weight: 600;
   letter-spacing: var(--skin-track-inscription);
   text-transform: uppercase;
@@ -210,7 +210,7 @@
   background: var(--skin-red);
   box-shadow: inset 0 0 0 2px var(--skin-gold);
   color: var(--skin-gold-lit);
-  font-family: var(--skin-font-voice);
+  font-family: var(--skin-font-display);
   font-weight: 700;
   font-size: 34px;
   line-height: 1;
@@ -252,7 +252,7 @@
   background-blend-mode: multiply;
   box-shadow: inset 0 0 0 2px var(--skin-ink), var(--skin-shadow);
   color: var(--skin-ink);
-  font-family: var(--skin-font-voice);
+  font-family: var(--skin-font-display);
   font-weight: 600;
   font-size: 40px;
   line-height: 1;
@@ -298,7 +298,7 @@
   font-family: var(--skin-font-voice);
   font-weight: 600;
   font-size: 15px;
-  letter-spacing: var(--skin-track-inscription);
+  letter-spacing: .035em;
   text-transform: uppercase;
   cursor: pointer;
   box-shadow: var(--skin-shadow);
@@ -321,7 +321,7 @@
   font-family: var(--skin-font-voice);
   font-weight: 600;
   font-size: 15px;
-  letter-spacing: var(--skin-track-inscription);
+  letter-spacing: .035em;
   text-transform: uppercase;
   cursor: pointer;
 }
@@ -335,28 +335,16 @@
 
 /* ----------------------------------------------------------- navegación */
 
-/**
- * La barra de abajo: tres celdas con icono y etiqueta, filetes entre ellas.
- * La activa se marca con subrayado de ocre sobre papel (prototipo 01) o con
- * una placa de madera (prototipos 02 y 03) — las dos variantes existen porque
- * el prototipo usa una u otra según la pantalla, y `plan-piel.md` §3.4 dice
- * cuál va en cada ruta.
- */
+/** La barra de abajo: tres celdas, un fondo oscuro y una selección clara. */
 .skin-nav {
   display: flex;
   align-items: stretch;
   min-height: var(--ui-nav-height);
-  background-color: var(--skin-parchment);
-  background-image: var(--skin-parchment-texture);
-  background-size: 256px 256px;
-  background-blend-mode: multiply;
-  border-top: 1px solid var(--skin-rule-on-paper);
-}
-.skin-nav--wood {
   background-color: var(--skin-wood);
   background-image: none;
   border-top: 1px solid var(--skin-rule-on-wood);
 }
+.skin-nav--wood { background-color: var(--skin-wood); }
 .skin-nav-tab {
   flex: 1;
   display: flex;
@@ -373,27 +361,9 @@
   position: relative;
   -webkit-tap-highlight-color: transparent;
 }
-.skin-nav--wood .skin-nav-tab { color: var(--skin-parchment-deep); }
 .skin-nav-tab .skin-icon { width: 22px; height: 22px; }
-/* El subrayado de la pestaña activa: 40 px de ocre bajo la etiqueta. */
-.skin-nav-tab[aria-pressed="true"]::after {
-  content: '';
-  position: absolute;
-  bottom: 8px;
-  width: 40px;
-  height: 2px;
-  background: var(--skin-ochre);
-}
-.skin-nav--wood .skin-nav-tab[aria-pressed="true"] { color: var(--skin-gold-lit); }
-.skin-nav--wood .skin-nav-tab[aria-pressed="true"]::after { background: var(--skin-gold-lit); }
-/* La placa de madera del prototipo 02, para la pestaña activa sobre papel. */
-.skin-nav--plaque .skin-nav-tab[aria-pressed="true"] {
-  background: var(--skin-wood-plaque);
-  color: var(--skin-gold-lit);
-  border-radius: 6px;
-  margin: 6px 4px;
-}
-.skin-nav--plaque .skin-nav-tab[aria-pressed="true"]::after { display: none; }
+/* La placa ya identifica la pestaña activa; no añadimos una raya que roce
+   o cruce la etiqueta al variar la altura de la barra. */
 .skin-nav-tab:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: -3px; }
 
 /* ------------------------------------------------- borde de la bandeja */
@@ -537,7 +507,12 @@
   place-items: center;
   width: 30px;
   height: 30px;
+  background: transparent;
+  clip-path: none;
 }
+.skin-ornament-art { display: block; object-fit: contain; }
+.skin-ornament-art--leaf { width: 30px; height: 30px; }
+.skin-ornament-art--seal { width: 30px; height: 30px; }
 .skin-ornament--seal .skin-icon {
   width: 20px;
   height: 20px;
@@ -1335,7 +1310,7 @@ html.bare .valley-sound { opacity: .4; }
     bandeja ya se desplaza. */
 .person-story {
   margin: 12px 0 0;
-  padding-top: 12px;
+  padding: 12px 12px 0;
   border-top: 1px solid var(--skin-rule-on-paper);
 }
 .person-story[hidden] { display: none; }
@@ -1349,7 +1324,7 @@ html.bare .valley-sound { opacity: .4; }
   padding-top: 0;
   border-top: 0;
 }
-.person-action-row { display: flex; gap: 10px; }
+.person-action-row { display: flex; gap: 12px; padding-inline: 8px; box-sizing: border-box; }
 /** **Con el selector largo a propósito.** `index.html` (U-01) viste
     `.valley-panel-follow button` —una clase y un elemento— y eso le gana a
     `.skin-button--wood`, que es una clase sola, sin que importe el orden de
@@ -1497,3 +1472,365 @@ html.bare .valley-sound { opacity: .4; }
     pergamino. */
 .ui-shell-message { position: relative; }
 
+/* Base común de interfaz de juego. La crónica conserva su capitular y su
+   sello; los controles frecuentes usan formas regulares y texto directo. */
+.skin-paper,
+.skin-plate,
+.skin-nav,
+.valley-speeds.hud-speeds,
+.person-kin,
+.skin-order-bar button,
+.valley-panel .valley-panel-back {
+  background-image: none;
+}
+/* La lectura tiene suelo de piedra caliza mate, con curvas de nivel en tinta
+   tierra. Evita el verde azulado claro; las tarjetas conservan marfil cálido. */
+#root .skin-paper--page {
+  background-color: var(--skin-page);
+  background-image: var(--skin-map-pattern);
+  background-repeat: no-repeat;
+}
+/* La página de Crónica ya pinta su propia hoja. La bandeja común que la
+   contiene debe quedar transparente para que el hueco superior enseñe el
+   valle desenfocado, sin duplicar una segunda placa de papel. Va después de
+   la regla de papel para prevalecer sobre su selector con #root. */
+#root .ui-shell-content:has(.chronicle-scrim) {
+  width: min(100%, 440px);
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+  scrollbar-width: none;
+}
+#root .ui-shell-content:has(.chronicle-scrim)::-webkit-scrollbar { display: none; }
+#root .chronicle-sheet-wrap {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+#root .chronicle-body {
+  padding-top: 16px;
+  border-radius: 12px 12px 0 0;
+}
+#root .chronicle-close { margin-top: 0; }
+/* La lista y la ficha de Personas comparten la columna de lectura. Los bordes
+   se funden con el valle y el desplazamiento sigue funcionando sin barra. */
+#root .ui-shell-content:has(.people-scrim, .valley-panel, .valley-cart) {
+  width: min(100%, 440px);
+  top: calc(var(--ui-hud-height, 96px) + 22px);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  scrollbar-width: none;
+}
+#root .ui-shell-content:has(.people-scrim, .valley-panel, .valley-cart)::-webkit-scrollbar { display: none; }
+#root .ui-shell-content:has(.people-scrim, .valley-panel) > .ui-shell-content-close { right: 16px; }
+#root .ui-shell-content:has(.valley-cart) > .ui-shell-content-close { display: none; }
+/* El borde difuminado acaba en punta al llegar arriba del carro. Aquí la hoja
+   termina con dos esquinas suaves y una sombra discreta. */
+#root .ui-shell-content:has(.valley-cart) {
+  -webkit-mask-image: none;
+  mask-image: none;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 0 14px rgba(27, 22, 19, .16);
+}
+/* Crónica pinta la hoja dentro; Personas usa la bandeja como hoja. Ambas
+   terminan arriba con las mismas esquinas suaves que el carro del Valle. */
+#root .ui-shell-content:has(.people-scrim) {
+  -webkit-mask-image: none;
+  mask-image: none;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 0 14px rgba(27, 22, 19, .16);
+}
+/* La hoja abierta nace a la altura del documento de decisión (44 % de la
+   pantalla) y termina en la navegación. En móvil deja visible el valle detrás
+   de la cabecera sin encoger las listas largas.
+   Personas, Crónica, ficha y carro comparten una sola medida; el contenido
+   largo se desplaza dentro de la hoja, sin cambiar su altura. */
+#root .ui-shell-content:has(.chronicle-scrim, .people-scrim, .valley-panel, .valley-cart) {
+  top: max(44dvh, calc(var(--ui-hud-height, 96px) + 8px));
+  bottom: calc(var(--ui-nav-height) + env(safe-area-inset-bottom));
+  max-height: none;
+  width: min(100%, 440px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+/* El marco y el tirador quedan quietos; sólo la zona de lectura recibe el
+   scroll. Así la rueda y el dedo actúan igual en escritorio y móvil. */
+#root .ui-shell-content:has(.chronicle-scrim, .people-scrim, .valley-panel, .valley-cart) > .ui-shell-content-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+#root .ui-shell-content:has(.chronicle-scrim, .people-scrim, .valley-panel, .valley-cart) > .ui-shell-content-body::-webkit-scrollbar { display: none; }
+/* La Crónica antes ocupaba todo el viewport mediante un hijo fixed y un
+   espaciador sobre su página. Ahora su único scroll vive dentro de la hoja. */
+#root .ui-shell-content:has(.chronicle-scrim) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--skin-page);
+  background-image: var(--skin-map-pattern);
+  box-shadow: 0 0 14px rgba(27, 22, 19, .16);
+}
+#root .ui-shell-content:has(.chronicle-scrim) .ui-shell-content-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+#root .ui-shell-content .chronicle-scrim {
+  position: relative;
+  inset: auto;
+  height: 100%;
+  padding: 0;
+  overflow-y: auto;
+}
+#root .ui-shell-content .chronicle-fade { display: none; }
+/* El tirador permanece arriba. El scroll central de cada lista sigue siendo
+   independiente del gesto de bajar la hoja. */
+#root .ui-sheet-grip {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  flex: 0 0 30px;
+  height: 30px;
+  margin: 0 calc(-1 * var(--ui-margin-mobile));
+  touch-action: none;
+  cursor: grab;
+}
+#root .ui-sheet-grip::before {
+  content: '';
+  width: 46px;
+  height: 5px;
+  margin-top: 7px;
+  border-radius: 999px;
+  background: var(--skin-ink-faded);
+  opacity: .55;
+}
+#root .ui-shell-content.ui-sheet-dragging { transition: none; }
+#root .ui-shell-content:not(.ui-sheet-dragging) { transition: transform 180ms ease-out; }
+#root .ui-shell-content { transform: translateY(var(--ui-sheet-drag, 0px)); }
+#root .ui-shell-content .ui-shell-content-close { z-index: 6; }
+/* La ficha de seguimiento puede tener parentescos y recuerdos largos. Sus
+   acciones permanecen al alcance mientras se desplaza el resto de la ficha. */
+html.following #root .valley-panel:has(.person-card:not([hidden])) .person-actions {
+  position: sticky;
+  bottom: -1px;
+  z-index: 2;
+  padding: 8px 0 4px;
+  background: var(--skin-page);
+  box-shadow: 0 -8px 12px rgba(226, 218, 201, .85);
+}
+.skin-plate {
+  clip-path: none;
+  border: 1px solid rgba(58, 74, 75, .23);
+  border-radius: var(--ui-radius-control);
+  box-shadow: var(--skin-shadow);
+  filter: none;
+}
+.skin-plate--chip,
+.skin-plate--chip:nth-of-type(n),
+.skin-plate--card,
+.skin-plate--sealed,
+.skin-plate--sheet {
+  clip-path: none;
+  transform: none;
+}
+.skin-plate--chip { border-radius: 9px; }
+.skin-plate--card,
+.skin-plate--sealed,
+.skin-plate--sheet { border-radius: var(--ui-radius-sheet); }
+.skin-plate--round { border-radius: 50%; }
+.skin-torn-top {
+  -webkit-mask-image: none;
+  mask-image: none;
+  padding-top: 0;
+  box-shadow: var(--skin-shadow-sheet);
+}
+
+.skin-inscription {
+  font-family: var(--skin-font-voice);
+  font-weight: 700;
+  letter-spacing: .035em;
+}
+.skin-label,
+.skin-chip {
+  font-weight: 700;
+  letter-spacing: .055em;
+}
+.skin-read { line-height: 1.5; }
+.chronicle-body .skin-read,
+.person-story .skin-read {
+  font-family: var(--skin-font-story);
+}
+.chronicle-body .skin-inscription { font-family: var(--skin-font-display); }
+.skin-capital { border-radius: 9px; }
+.skin-chip {
+  border-radius: 8px;
+  background: var(--skin-page);
+}
+.skin-medallion {
+  background-image: none;
+  box-shadow: inset 0 0 0 2px var(--skin-gold), var(--skin-shadow);
+}
+
+.skin-button--wood,
+.skin-button--parchment {
+  border-radius: var(--ui-radius-control);
+  font-weight: 700;
+  letter-spacing: .02em;
+  box-shadow: 0 3px 0 rgba(21, 40, 45, .24), 0 7px 14px rgba(21, 40, 45, .13);
+}
+.skin-button--wood { border: 1px solid rgba(255, 240, 199, .35); }
+.skin-button--parchment { background-image: none; }
+.skin-button--wood:focus-visible,
+.skin-button--parchment:focus-visible,
+.skin-nav-tab:focus-visible,
+.hud-round-btn:focus-visible {
+  outline: 3px solid var(--skin-gold);
+  outline-offset: 2px;
+}
+.valley-speeds.hud-speeds button:focus-visible,
+.skin-order-bar button:focus-visible,
+.valley-orders-now.hud-say-line:focus-visible,
+.cart-close:focus-visible {
+  outline: 3px solid var(--skin-gold);
+  outline-offset: 2px;
+}
+
+.skin-nav {
+  background-color: var(--skin-wood);
+  background-image: none;
+  border-top: 2px solid var(--skin-gold);
+  box-shadow: 0 -4px 18px rgba(13, 33, 39, .2);
+}
+.skin-nav .skin-nav-tab {
+  margin: 0;
+  border-radius: 0;
+  color: #D3DFD9;
+  font: 700 11px/1.1 var(--skin-font-voice);
+  letter-spacing: .045em;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+.skin-nav-tab .skin-icon { width: 24px; height: 24px; }
+.skin-nav .skin-nav-tab[aria-pressed="true"] {
+  margin: 4px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #31525A, #29464E);
+  box-shadow: inset 0 1px 0 rgba(255, 240, 199, .22), 0 2px 0 rgba(9, 25, 29, .38);
+  color: var(--skin-gold-lit);
+}
+.skin-nav .skin-rule-v { background: rgba(255, 240, 199, .2); }
+.skin-nav-tab .skin-icon { transition: transform 150ms ease; }
+.skin-nav-tab[aria-pressed="true"] .skin-icon { transform: translateY(-1px) scale(1.06); }
+
+/* Cambio de sección: la hoja aparece con un pequeño ascenso y desvanecido,
+   independiente del tiempo simulado y sin tocar el valle 3D. Al despertar de
+   suspensión termina en su estado final porque sólo decora la superficie UI. */
+@keyframes ui-route-arrive {
+  from { opacity: 0; transform: translateY(16px) scale(.99); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ui-shell-content.ui-route-enter { animation: ui-route-arrive 280ms cubic-bezier(.2, .75, .25, 1) both; }
+@keyframes ui-nav-return {
+  from { opacity: .72; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ui-shell-nav.ui-route-return { animation: ui-nav-return 220ms cubic-bezier(.2, .75, .25, 1) both; }
+
+/* La noticia entra dentro de la banda fija: el papel no cambia de altura ni
+   salta por cada tick. La voz de estado queda quieta incluso a velocidad alta. */
+@keyframes ui-voice-arrive {
+  from { opacity: .45; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.valley-voice-line.ui-voice-enter { animation: ui-voice-arrive 180ms ease-out both; }
+
+/* Un máximo de seis filas recibe continuidad al abrir la hoja. Las listas que
+   cambian durante la simulación no vuelven a animarse en cada actualización. */
+@keyframes ui-sheet-item-arrive {
+  from { opacity: .35; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ui-route-enter .people-row:nth-child(-n + 6),
+.ui-route-enter .cart-row:nth-child(-n + 4) {
+  animation: ui-sheet-item-arrive 180ms ease-out backwards;
+}
+.ui-route-enter .people-row:nth-child(2),
+.ui-route-enter .cart-row:nth-child(2) { animation-delay: 16ms; }
+.ui-route-enter .people-row:nth-child(3),
+.ui-route-enter .cart-row:nth-child(3) { animation-delay: 32ms; }
+.ui-route-enter .people-row:nth-child(4),
+.ui-route-enter .cart-row:nth-child(4) { animation-delay: 48ms; }
+.ui-route-enter .people-row:nth-child(5) { animation-delay: 64ms; }
+.ui-route-enter .people-row:nth-child(6) { animation-delay: 80ms; }
+
+.hud-plate-date { border-radius: 10px; }
+.valley-date.hud-date-text { color: var(--skin-ink-soft); }
+.valley-vital.skin-plate--chip { font-weight: 700; }
+.hud-round-btn { border: 1px solid var(--skin-rule-on-paper); }
+.valley-speeds.hud-speeds {
+  clip-path: none;
+  border: 1px solid var(--skin-rule-on-paper);
+  border-radius: 12px;
+}
+.valley-speeds.hud-speeds button { border-radius: 8px; }
+.valley-speeds.hud-speeds button[aria-pressed="true"] {
+  background: var(--skin-wood-plaque);
+  color: var(--skin-gold-lit);
+}
+
+.valley-voice { font: 600 15px/1.4 var(--skin-font-voice); }
+.valley-voice[data-role="hint"] { font-style: normal; }
+.valley-orders-now.hud-say-line {
+  width: min(100%, 390px);
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--skin-gold);
+  border-radius: 10px;
+  background: var(--skin-wood-soft);
+  color: var(--skin-gold-lit);
+  box-shadow: 0 3px 0 rgba(27, 22, 19, .22);
+  font: 700 14px/1.25 var(--skin-font-voice);
+  font-style: normal;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.valley-orders-now.hud-say-line:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(27, 22, 19, .22); }
+.skin-order-bar button {
+  clip-path: none;
+  border: 1px solid var(--skin-rule-on-paper);
+  border-radius: 9px;
+  font-weight: 700;
+}
+.skin-order-bar button:nth-child(n) { clip-path: none; }
+.skin-order-bar button[aria-pressed="true"] { background: var(--skin-wood-plaque); }
+.person-head { transform: none; }
+.person-name { font-family: var(--skin-font-heading); font-weight: 600; }
+.person-role,
+.person-head-text .person-lean,
+.person-kin-name,
+.person-today,
+.valley-panel-follow.person-actions p { font-family: var(--skin-font-voice); }
+.person-kin { clip-path: none; border-radius: 10px; }
+.valley-panel .valley-panel-back {
+  clip-path: none;
+  border-radius: 9px;
+}
+.skin-medallion { font-family: var(--skin-font-voice); font-weight: 700; }
+.person-today,
+.valley-panel-follow.person-actions p {
+  font-style: normal;
+}

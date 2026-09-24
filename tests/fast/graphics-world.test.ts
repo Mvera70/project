@@ -18,7 +18,7 @@ import { ford, run } from '@engine/sim';
 import type { GameState } from '@engine/state';
 import { loadAssets } from '../../src/render3d/assets';
 import { VALLEY_COLOURS } from '../../src/render3d/visual-config';
-import { BoxGeometry, Color, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
+import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
 import type { Actor } from '../../src/render3d/contracts';
 import type { LoadedAsset } from '../../src/render3d/assets';
 import { BUILDINGS } from '@engine/balance';
@@ -252,49 +252,59 @@ describe('G-06 · el plan de escena', () => {
 });
 
 describe('G-06 · el suelo', () => {
+  const vertexAt = (x: number, z: number, width: number): number => z * (width + 1) + x;
+  const cornersOf = (cell: number, width: number): readonly [number, number, number, number] => {
+    const x = cell % width;
+    const z = Math.floor(cell / width);
+    return [
+      vertexAt(x, z, width), vertexAt(x + 1, z, width),
+      vertexAt(x + 1, z + 1, width), vertexAt(x, z + 1, width),
+    ];
+  };
+
   it('tiene un cuadrado por celda y ni uno más', () => {
     const state = village(6);
     const ground = buildGround(state.map, PALETTES.summer);
     const cells = state.map.width * state.map.height;
-    expect(ground.mesh.geometry.getIndex()?.count).toBe(cells * 6);
-    expect(ground.mesh.geometry.getAttribute('position').count).toBe(cells * 4);
+    const geometry = ground.mesh.geometry;
+    const index = geometry.getIndex();
+    expect(index?.count).toBe(cells * 6);
+    expect(geometry.getAttribute('position').count).toBe((state.map.width + 1) * (state.map.height + 1));
+    for (let cell = 0; cell < cells; cell += 1) {
+      const [topLeft, topRight, bottomRight, bottomLeft] = cornersOf(cell, state.map.width);
+      const face = cell * 6;
+      expect(Array.from({ length: 6 }, (_, corner) => index?.getX(face + corner))).toEqual([
+        topLeft, bottomRight, topRight, topLeft, bottomLeft, bottomRight,
+      ]);
+    }
     ground.dispose();
   });
 
   it('el borde de un terreno no es recto, y la malla no se abre', () => {
     // §11.7, v3.58. El valle estaba dibujado con cuadrados perfectos y con
     // arboles y casas en tres dimensiones encima la cuadricula se leia como
-    // papel milimetrado. Las esquinas se mueven de sitio; la condicion es que
-    // **las cuatro celdas que tocan una esquina la muevan igual**, o entre
-    // celda y celda se abre un agujero por el que se ve el cielo.
+    // papel milimetrado. Las esquinas se mueven de sitio, y la rejilla común
+    // mantiene cada unión cerrada.
     const state = village(6);
     const ground = buildGround(state.map, PALETTES.summer);
     const position = ground.mesh.geometry.getAttribute('position');
     const width = state.map.width;
 
-    // La esquina de arriba a la izquierda de cada celda del interior, que es
-    // tambien la de abajo a la derecha de su vecina en diagonal.
-    const cornerOf = (cell: number, vertex: number): [number, number] => {
-      const at = cell * 4 + vertex;
-      return [position.getX(at), position.getZ(at)];
-    };
     let moved = 0;
-    for (let z = 1; z < state.map.height - 1; z += 1) {
-      for (let x = 1; x < width - 1; x += 1) {
-        const cell = z * width + x;
-        const mine = cornerOf(cell, 0);
-        const theirs = cornerOf(cell - width - 1, 2);
-        expect(Math.hypot(mine[0] - theirs[0], mine[1] - theirs[1]),
-          `la esquina ${x},${z} no cuadra entre sus celdas`).toBeLessThan(1e-6);
-        if (Math.hypot(mine[0] - x, mine[1] - z) > 0.02) moved += 1;
+    for (let z = 1; z < state.map.height; z += 1) {
+      for (let x = 1; x < width; x += 1) {
+        const at = vertexAt(x, z, width);
+        const diagonalCorner = cornersOf((z - 1) * width + x - 1, width)[2];
+        expect(at, `la esquina ${x},${z} debe ser compartida`).toBe(diagonalCorner);
+        if (Math.hypot(position.getX(at) - x, position.getZ(at) - z) > 0.02) moved += 1;
       }
     }
     // Y se mueven casi todas: si no, no hay borde irregular que valga.
-    expect(moved).toBeGreaterThan((width - 2) * (state.map.height - 2) * 0.9);
+    expect(moved).toBeGreaterThan((width - 1) * (state.map.height - 1) * 0.9);
 
     // El contorno del valle si es recto: es el limite del mundo.
     for (let x = 0; x < width; x += 1) {
-      expect(position.getZ(x * 4)).toBe(0);
+      expect(position.getZ(vertexAt(x, 0, width))).toBe(0);
     }
     ground.dispose();
   });
@@ -302,41 +312,40 @@ describe('G-06 · el suelo', () => {
   it('la linde entre dos terrenos es un degradado, no un escalon', () => {
     // El tablero de ajedrez: dos celdas vecinas de terreno distinto se
     // encontraban en un salto de color de golpe. Ahora cada esquina lleva algo
-    // del color de las celdas que la tocan, asi que el salto que quedaba entre
-    // dos vertices pegados es menos de la mitad del que hay entre los centros
-    // de las dos celdas.
+    // del color de las celdas que la tocan. La rejilla compartida representa
+    // cada linde con dos vértices comunes a las celdas de ambos lados.
     const state = village(6);
     const ground = buildGround(state.map, PALETTES.summer);
-    const colour = ground.mesh.geometry.getAttribute('color');
+    const geometry = ground.mesh.geometry;
+    const colour = geometry.getAttribute('color');
+    const index = geometry.getIndex();
     const width = state.map.width;
-    const plain = new Color();
-    const other = new Color();
-
     let pairs = 0;
-    let softened = 0;
     for (let z = 1; z < state.map.height - 1; z += 1) {
       for (let x = 1; x < width - 1; x += 1) {
         const cell = z * width + x;
         const right = cell + 1;
         if (state.map.terrain[cell] === state.map.terrain[right]) continue;
-        plain.set(cellColour(state.map, cell, PALETTES.summer));
-        other.set(cellColour(state.map, right, PALETTES.summer));
-        const flat = Math.hypot(plain.r - other.r, plain.g - other.g, plain.b - other.b);
-        // Los dos vertices que se tocan en la linde: el de la derecha de esta
-        // celda y el de la izquierda de la de al lado.
-        const a = cell * 4 + 1;
-        const b = right * 4;
-        const seam = Math.hypot(
-          colour.getX(a) - colour.getX(b),
-          colour.getY(a) - colour.getY(b),
-          colour.getZ(a) - colour.getZ(b),
-        );
+        // Los dos vértices de la linde se comparten y reciben un único color.
+        const leftCorners = cornersOf(cell, width);
+        const rightCorners = cornersOf(right, width);
+        const edgeTop = leftCorners[1];
+        const edgeBottom = leftCorners[2];
+        expect(rightCorners[0]).toBe(edgeTop);
+        expect(rightCorners[3]).toBe(edgeBottom);
+        const leftIndices = Array.from({ length: 6 }, (_, at) => index?.getX(cell * 6 + at));
+        const rightIndices = Array.from({ length: 6 }, (_, at) => index?.getX(right * 6 + at));
+        expect(leftIndices).toContain(edgeTop);
+        expect(leftIndices).toContain(edgeBottom);
+        expect(rightIndices).toContain(edgeTop);
+        expect(rightIndices).toContain(edgeBottom);
         pairs += 1;
-        if (seam < flat * 0.5) softened += 1;
       }
     }
     expect(pairs, 'un valle sin lindes no prueba nada').toBeGreaterThan(50);
-    expect(softened / pairs).toBeGreaterThan(0.95);
+    // La malla tiene un solo color por esquina compartida, así que no puede
+    // interpolar valores distintos a ambos lados de una linde.
+    expect(colour.count).toBe(geometry.getAttribute('position').count);
     ground.dispose();
   });
 
@@ -347,16 +356,26 @@ describe('G-06 · el suelo', () => {
     const state = village(6);
     const ground = buildGround(state.map, PALETTES.summer);
     const position = ground.mesh.geometry.getAttribute('position');
-    const water = state.map.terrain.findIndex((kind) => kind === 2);
-    expect(water).toBeGreaterThanOrEqual(0);
+    const river = state.map.terrain.findIndex((kind) => kind === TERRAIN_CODE.water);
+    const lake = state.map.terrain.findIndex((kind) => kind === TERRAIN_CODE.lake);
+    expect(river).toBeGreaterThanOrEqual(0);
+    expect(lake).toBeGreaterThanOrEqual(0);
     const meadow = state.map.terrain.findIndex((kind) => kind === 0);
 
     const lowest = (cell: number): number => {
       let value = Infinity;
-      for (let vertex = 0; vertex < 4; vertex += 1) value = Math.min(value, position.getY(cell * 4 + vertex));
+      for (const vertex of cornersOf(cell, state.map.width)) value = Math.min(value, position.getY(vertex));
       return value;
     };
-    expect(lowest(water)).toBeLessThan(lowest(meadow));
+    const lowestTerrain = (kind: number): number => {
+      let value = Infinity;
+      for (let cell = 0; cell < state.map.terrain.length; cell += 1) {
+        if (state.map.terrain[cell] === kind) value = Math.min(value, lowest(cell));
+      }
+      return value;
+    };
+    expect(lowest(river)).toBeLessThan(lowest(meadow));
+    expect(lowestTerrain(TERRAIN_CODE.lake)).toBeLessThan(lowestTerrain(TERRAIN_CODE.water));
     ground.dispose();
   });
 
@@ -368,26 +387,37 @@ describe('G-06 · el suelo', () => {
     const ground = buildGround(state.map, PALETTES.summer);
     const position = ground.mesh.geometry.getAttribute('position');
     const { width, terrain } = state.map;
-    let sloped = 0;
+    let slopedRiver = 0;
+    let slopedLake = 0;
     for (let cell = 0; cell < terrain.length; cell += 1) {
-      if (terrain[cell] !== 2) continue;
-      const shore = [-1, 1, -width, width].some((step) => (terrain[cell + step] ?? 2) !== 2);
+      const kind = terrain[cell];
+      if (kind !== TERRAIN_CODE.water && kind !== TERRAIN_CODE.lake) continue;
+      const x = cell % width;
+      const neighbors = [
+        x > 0 ? terrain[cell - 1] : undefined,
+        x < width - 1 ? terrain[cell + 1] : undefined,
+        terrain[cell - width], terrain[cell + width],
+      ];
+      const shore = neighbors.some((other) => other !== kind);
       if (!shore) continue;
       let deep = Infinity;
       let shallow = -Infinity;
-      for (let vertex = 0; vertex < 4; vertex += 1) {
-        deep = Math.min(deep, position.getY(cell * 4 + vertex));
-        shallow = Math.max(shallow, position.getY(cell * 4 + vertex));
+      for (const vertex of cornersOf(cell, width)) {
+        deep = Math.min(deep, position.getY(vertex));
+        shallow = Math.max(shallow, position.getY(vertex));
       }
-      if (shallow > deep) sloped += 1;
+      if (shallow > deep) {
+        if (kind === TERRAIN_CODE.water) slopedRiver += 1;
+        else slopedLake += 1;
+      }
     }
-    expect(sloped).toBeGreaterThan(0);
+    expect(slopedRiver).toBeGreaterThan(0);
+    expect(slopedLake).toBeGreaterThan(0);
     ground.dispose();
   });
 
   it('el agua es una lamina propia, lisa y plana', () => {
-    // Lo que separa el agua de la hierba no es el color, es que brilla. Y es
-    // plana mientras el cauce baja: de esa diferencia sale la ribera.
+    // Río y lago comparten una superficie brillante, pero mantienen su cota.
     const state = village(6);
     const ground = buildGround(state.map, PALETTES.summer);
     const water = ground.water;
@@ -396,16 +426,32 @@ describe('G-06 · el suelo', () => {
     const material = surface.material as unknown as { roughness: number };
     expect(material.roughness).toBeLessThan(0.5);
     const position = surface.geometry.getAttribute('position');
-    const level = position.getY(0);
-    for (let vertex = 1; vertex < position.count; vertex += 1) {
-      expect(position.getY(vertex)).toBeCloseTo(level, 6);
+    const wetCells = [...state.map.terrain.keys()].filter((cell) =>
+      state.map.terrain[cell] === TERRAIN_CODE.water || state.map.terrain[cell] === TERRAIN_CODE.lake,
+    );
+    const riverOffset = wetCells.findIndex((cell) => state.map.terrain[cell] === TERRAIN_CODE.water) * 4;
+    const lakeOffset = wetCells.findIndex((cell) => state.map.terrain[cell] === TERRAIN_CODE.lake) * 4;
+    expect(riverOffset).toBeGreaterThanOrEqual(0);
+    expect(lakeOffset).toBeGreaterThanOrEqual(0);
+    expect(position.count).toBe(wetCells.length * 4);
+    expect(surface.geometry.getIndex()?.count).toBe(wetCells.length * 6);
+    const still = Float32Array.from(position.array);
+    const riverLevel = position.getY(riverOffset);
+    const lakeLevel = position.getY(lakeOffset);
+    expect(lakeLevel).toBeLessThan(riverLevel);
+    for (let index = 0; index < wetCells.length; index += 1) {
+      const cell = wetCells[index] ?? 0;
+      const level = state.map.terrain[cell] === TERRAIN_CODE.lake ? lakeLevel : riverLevel;
+      for (let corner = 0; corner < 4; corner += 1) {
+        expect(position.getY(index * 4 + corner)).toBeCloseTo(level, 6);
+      }
     }
     // Plana en reposo, no quieta: el río corre, y lo que se ve desde arriba no
     // es la ola sino que la luz cambia al inclinarse la superficie.
     ground.ripple(0.8);
     let moved = 0;
     for (let vertex = 0; vertex < position.count; vertex += 1) {
-      if (Math.abs(position.getY(vertex) - level) > 1e-4) moved += 1;
+      if (Math.abs(position.getY(vertex) - (still[vertex * 3 + 1] ?? 0)) > 1e-4) moved += 1;
     }
     expect(moved).toBeGreaterThan(position.count / 2);
     // Y la onda se calcula desde el reposo: si se acumulara sobre el fotograma
@@ -414,7 +460,7 @@ describe('G-06 · el suelo', () => {
     for (let step = 0; step < 200; step += 1) {
       ground.ripple(step * 0.05);
       for (let vertex = 0; vertex < position.count; vertex += 1) {
-        deepest = Math.max(deepest, Math.abs(position.getY(vertex) - level));
+        deepest = Math.max(deepest, Math.abs(position.getY(vertex) - (still[vertex * 3 + 1] ?? 0)));
       }
     }
     expect(deepest).toBeLessThan(0.05);
@@ -460,7 +506,7 @@ describe('G-06 · el suelo', () => {
     const position = ground.mesh.geometry.getAttribute('position');
     const lowest = (cell: number): number => {
       let value = Infinity;
-      for (let vertex = 0; vertex < 4; vertex += 1) value = Math.min(value, position.getY(cell * 4 + vertex));
+      for (const vertex of cornersOf(cell, state.map.width)) value = Math.min(value, position.getY(vertex));
       return value;
     };
     expect(worn).toBeGreaterThanOrEqual(0);

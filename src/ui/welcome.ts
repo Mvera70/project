@@ -10,6 +10,7 @@ import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import type { ChronicleEntry, GameState } from '@engine/state';
 import type { App } from './app';
 import { recogniseGesture, type Point } from './gestures';
+import { retireOverlay } from './motion';
 
 const STYLE_ID = 'valley-welcome-style';
 const STYLE = `
@@ -40,16 +41,15 @@ const STYLE = `
 .welcome { box-sizing: border-box; width: 100%; max-height: 100%; overflow: auto;
   padding: 0 20px max(24px, env(safe-area-inset-bottom));
   background-color: var(--skin-page);
-  background-image: var(--skin-parchment-texture);
-  background-repeat: repeat; background-size: 256px 256px;
-  background-blend-mode: multiply; }
+  background-image: var(--skin-map-pattern); background-repeat: no-repeat;
+  animation: welcome-sheet-arrive 280ms cubic-bezier(.2, .75, .25, 1) both; }
 /* La directriz: la superficie cruza la pantalla, el contenido va en columna. */
 .welcome > * { box-sizing: border-box; width: 100%; max-width: 390px; margin-inline: auto; }
 .welcome h1 { margin: 0 0 16px; padding-top: 4px; text-wrap: balance;
-  color: var(--skin-ink); font: 600 20px/1.2 var(--skin-font-voice);
-  letter-spacing: var(--skin-track-inscription); text-transform: uppercase; }
+  color: var(--skin-ink); font: 600 22px/1.2 var(--skin-font-heading);
+  letter-spacing: .02em; text-transform: uppercase; }
 .welcome p { margin: 10px auto; color: var(--skin-ink-soft); text-wrap: pretty;
-  font: 17px/1.5 var(--skin-font-read); }
+  font: 400 16px/1.5 var(--skin-font-voice); }
 .welcome p.welcome-headline { color: var(--skin-ink); }
 /* Las cifras no son crónica: van en la letra de las cifras y tras un filete,
    igual que en la ficha de la persona. */
@@ -57,6 +57,13 @@ const STYLE = `
   border-top: 1px solid var(--skin-rule-gold); color: var(--skin-ink-faded);
   font: 13px/1.45 var(--skin-font-voice); font-variant-numeric: tabular-nums; }
 .welcome p.welcome-count ~ p.welcome-count { margin-top: 2px; padding-top: 0; border-top: 0; }
+@keyframes welcome-sheet-arrive {
+  from { opacity: .7; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome { animation: none; }
+}
 `;
 
 function ensureStyle(): void {
@@ -142,7 +149,7 @@ export function openWelcome(app: App, digest: Digest): void {
   // parte está abierto, y con ella la bandeja se aparta (`shell.css`).
   document.documentElement.classList.add('welcome-open');
   const close = (): void => {
-    scrim.remove();
+    retireOverlay(scrim, card);
     document.documentElement.classList.remove('welcome-open');
     shown = null;
   };

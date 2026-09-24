@@ -22,6 +22,81 @@
 // comes in `.one` and `.many` forms.
 
 export const BANK: Record<string, string[]> = {
+  'hunt.first.partridge': [
+    'The hunters brought home the valley\'s first partridge.',
+    'The first partridge was taken in year {year}.',
+    'A partridge came back with the hunters for the first time.',
+  ],
+  'hunt.first.rabbit': [
+    'The hunters brought home the valley\'s first rabbit.',
+    'The first rabbit was taken at the woodland edge in year {year}.',
+    'A rabbit came back with the hunters for the first time.',
+  ],
+  'hunt.first.deer': [
+    'The valley took its first deer. The hunters brought it home.',
+    'The hunters brought home the valley\'s first deer in year {year}.',
+    'The first deer came back from the forest with the hunters.',
+  ],
+  'hunt.first.boar': [
+    'The hunters brought home the valley\'s first boar.',
+    'The first boar was taken after a hard fight in year {year}.',
+    'A boar came back with the hunters for the first time.',
+  ],
+  'hunt.first.bear': [
+    'The hunters brought down the bear outside its den.',
+    'The first bear fell at the mouth of its cave in year {year}.',
+    'The hunters faced the bear at its den and brought it home.',
+  ],
+  'hunt.kill.partridge': [
+    'A partridge fell to the {weapon}. The village brought it home.',
+    'The hunters took a partridge in year {year}.',
+    'One partridge came back from the meadow with the hunters.',
+  ],
+  'hunt.kill.rabbit': [
+    'A rabbit fell to the {weapon} near the woodland.',
+    'The hunters brought a rabbit home in year {year}.',
+    'They took a rabbit at the forest edge.',
+  ],
+  'hunt.kill.deer': [
+    'The hunters brought down a deer with the {weapon}.',
+    'A deer was taken in year {year}. Its meat filled the store.',
+    'They followed a deer through the trees and brought it home.',
+  ],
+  'hunt.kill.boar': [
+    'A boar fell after a hard fight. The hunters came back with it.',
+    'The hunters took a boar in year {year}.',
+    'They met a boar at the woodland edge and brought it down.',
+  ],
+  'hunt.kill.bear': [
+    'The bear was brought down outside its den. The hunters returned.',
+    'The bear fell at the mouth of its cave in year {year}.',
+    'The hunters faced the bear at its den and came home.',
+  ],
+  'hunt.escape.partridge': [
+    'A partridge escaped the hunters.',
+    'The partridge rose from the grass and was gone.',
+    'The hunters came back without the partridge.',
+  ],
+  'hunt.escape.rabbit': [
+    'A rabbit escaped into the brush.',
+    'The rabbit found a hollow before the hunters reached it.',
+    'The hunters lost the rabbit among the roots.',
+  ],
+  'hunt.escape.deer': [
+    'The deer reached the trees before the hunters could take it.',
+    'The deer broke away and vanished beyond the clearing.',
+    'The hunters followed the deer to the woodland, then lost its trail.',
+  ],
+  'hunt.escape.boar': [
+    'The boar charged and escaped into the woods.',
+    'The hunters yielded the ground to the boar.',
+    'The boar forced a path through the brush and got away.',
+  ],
+  'hunt.escape.bear': [
+    'The bear withdrew into its den. The hunters left it there.',
+    'The bear drove the hunters back and disappeared into the cave.',
+    'The hunters returned without the bear. Its den went quiet.',
+  ],
   // -------------------------------------------------------------------------
   // The founding
   // -------------------------------------------------------------------------
@@ -2223,6 +2298,20 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
 
 /** Stable interface copy: unlike chronicle prose, labels do not vary by seed. */
 export const UI_BANK: Record<string, string> = {
+  'hunt.prompt.title': 'Hunt',
+  'hunt.prompt.description': 'A {species} is nearby. Choose a weapon.',
+  'hunt.prompt.cancel': 'Cancel',
+  'hunt.action.open': 'Hunt',
+  'hunt.action.throw': 'Throw',
+  'hunt.action.strike': 'Strike',
+  'hunt.species.partridge': 'partridge',
+  'hunt.species.rabbit': 'rabbit',
+  'hunt.species.deer': 'deer',
+  'hunt.species.boar': 'boar',
+  'hunt.species.bear': 'bear',
+  'hunt.weapon.sling': 'Sling',
+  'hunt.weapon.bow': 'Bow',
+  'hunt.weapon.spear': 'Spear',
   'app.valley': 'The valley',
   'app.close': 'Close',
   // E1 · El mando. Las dos únicas cosas que el jugador manda de forma continua,
@@ -2316,6 +2405,7 @@ export const UI_BANK: Record<string, string> = {
   // frases dice qué hará la aldea con ello, porque no se le ordena nada.
   'cart': 'The cart',
   'cart.open': 'What you can give the valley',
+  'cart.open_button': 'Open the cart',
   'cart.nothing': 'Nothing to give yet',
   'cart.some': 'Something to give',
   'cart.give': 'Give',
@@ -2485,7 +2575,7 @@ export const UI_BANK: Record<string, string> = {
   'title.dev.preset.town': 'Walled town · Year {target}',
   // U-11 · el inicio guiado: dos pistas, una vez, después del vuelo de entrada.
   // Se tocan para pasar. No son un tutorial: dicen dónde están los dos mandos.
-  'intro.orders': 'The line below is the standing orders: what to sow, where hands go, what to raise. Tap to change.',
+  'intro.orders': 'Open the cart to see what you can offer the valley. The village will decide how to use it.',
   'intro.time': 'The button at the right sets the pace. The valley goes on by itself; come back whenever you like.',
   'crossroad.waiting': 'A crossroad is waiting',
   // U-07 · el texto visible de la píldora que reemplaza al punto rojo

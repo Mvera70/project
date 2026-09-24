@@ -21,12 +21,18 @@
 
 import { garrisonOf, type Arm, type Post } from '@derive/garrison';
 import { bastionAccessOf } from '@derive/bastion-access';
+import { bastionWalkwayOf, type BastionWalkway } from '@derive/bastion-walkway';
+import type { ElevatedRing } from '@derive/elevated-ring';
 import type { GameState } from '@engine/state';
 import type { Point, Terrain } from './body';
 import { fitsCircle } from './body';
 import { canReach } from './terrain';
-import { elevatedPostOf, type ElevatedPost } from './elevated-post';
+import { elevatedPostOf, elevatedWallRoute, elevatedRingCircuit, type ElevatedPost } from './elevated-post';
 import { OFFERS, placedOffer, type OfferSpec, type Place } from './offers';
+
+/** La escena puede negar una junta cuando un tronco real ocupa su tablero. */
+export type WalkwaySelector = (state: GameState, bastion: GameState['buildings'][number]) => BastionWalkway | null;
+export type RingSelector = (state: GameState, bastion: GameState['buildings'][number]) => ElevatedRing;
 
 /** Un puesto ocupado: el sitio donde se está y lo que se sabe de él. */
 export interface Manned {
@@ -34,8 +40,25 @@ export interface Manned {
   readonly post: Post;
   /** E3a · Acceso privado al bastión; no es una plaza de navegación pública. */
   readonly elevated?: ElevatedPost;
+  /** E3b · Variante elegida una vez; el combate no la deduce por coordenadas. */
+  readonly elevatedVariant?: 'bastion' | 'wall' | 'ring';
+  /** Celdas del circuito acreditado para construir su suelo físico en batalla. */
+  readonly ring?: ElevatedRing;
+  /** Dos celdas de adarve que comparten plataforma física con el bastión. */
+  readonly walkway?: { readonly firstWall: Point; readonly nextWall: Point };
   /** Hacia dónde mira quien está ahí: afuera, que es de donde vienen. */
   readonly facing: Point;
+}
+
+/** Sólo baja a la cota de tablero las celdas de piedra que sostienen una ruta asignada. */
+export function mannedPlatformCells(manned: readonly Manned[]): Point[] {
+  return manned.flatMap(post => post.elevated === undefined
+    ? [] : post.elevatedVariant === 'ring' && post.ring !== undefined
+      // El portón necesita un tablero propio sin tapiar el paso público inferior.
+      ? post.ring.segments.filter(segment => segment.kind !== 'gate').map(segment => segment.cell)
+      : post.elevatedVariant === 'wall' && post.walkway !== undefined
+        ? [{ x: post.post.x, z: post.post.y }, post.walkway.firstWall, post.walkway.nextWall]
+        : [{ x: post.elevated.post.x, z: post.elevated.post.z }]);
 }
 
 /** El radio de un cuerpo, para preguntar si cabe. El mismo de `body.ts`. */
@@ -111,12 +134,36 @@ function offerFor(arm: Arm): OfferSpec {
 export function garrisonPlaces(
   state: GameState, land: Terrain, heart: Point, reach?: Uint8Array,
   ground?: (x: number, z: number) => number,
+  walkwayOf: WalkwaySelector = bastionWalkwayOf,
+  ringOf?: RingSelector,
 ): Manned[] {
   const garrison = garrisonOf(state);
   if (!garrison.manned) return [];
   const manned: Manned[] = [];
   const taken = new Set<number>();
-  for (const post of garrison.posts) {
+  const postKey = (post: Post): string => `${post.x},${post.y}`;
+  const ringCircuits = new Map<string, { route: ElevatedPost; ring: ElevatedRing }>();
+  if (ringOf !== undefined) {
+    for (const post of garrison.posts) {
+      const bastion = state.buildings.find(building => building.kind === 'bastion'
+        && building.lostTick === null && building.x === post.x && building.y === post.y);
+      if (bastion === undefined) continue;
+      const access = bastionAccessOf(state, bastion);
+      if (access === null) continue;
+      const ring = ringOf(state, bastion);
+      if (!ring.geometryReady) continue;
+      const stair = elevatedPostOf(land, reach, { x: bastion.x, z: bastion.y }, access, ground, .65);
+      const circuit = stair === null ? null : elevatedRingCircuit(stair, ring);
+      if (circuit !== null) ringCircuits.set(postKey(post), { route: circuit, ring });
+    }
+  }
+  // La celda del pie puede ser también el sitio preferido de un puesto de
+  // portón. Asignar primero el único acceso al anillo y dar al portón otra
+  // celda pisable; devolver después el orden táctico original de puestos.
+  const order = new Map(garrison.posts.map((post, index) => [postKey(post), index]));
+  const posts = [...garrison.posts].sort((a, b) =>
+    Number(ringCircuits.has(postKey(b))) - Number(ringCircuits.has(postKey(a))));
+  for (const post of posts) {
     // Se busca por el edificio real, no por `post.on`: ambos bastión y
     // atalaya son `tower` para la táctica, pero sólo el primero tiene escalera.
     const bastion = state.buildings.find(building => building.kind === 'bastion'
@@ -124,7 +171,12 @@ export function garrisonPlaces(
     const access = bastion === undefined ? null : bastionAccessOf(state, bastion);
     const elevated = access === null || bastion === undefined
       ? null : elevatedPostOf(land, reach, { x: bastion.x, z: bastion.y }, access, ground);
-    const entry = elevated?.approach;
+    const walkway = elevated === null || bastion === undefined ? null : walkwayOf(state, bastion);
+    const circuit = ringCircuits.get(postKey(post)) ?? null;
+    const route = circuit?.route ?? (elevated === null || bastion === undefined ? null : walkway === null
+      ? elevated
+      : elevatedWallRoute({ x: bastion.x, z: bastion.y }, walkway.access, elevated.approach.y));
+    const entry = route?.approach;
     const entryCell = entry === undefined ? -1 : Math.floor(entry.z) * land.width + Math.floor(entry.x);
     const usingElevated = entry !== undefined && !taken.has(entryCell);
     // `Place` sólo entiende suelo X/Z: la cota queda exclusivamente en la
@@ -141,13 +193,25 @@ export function garrisonPlaces(
     manned.push({
       place: { id: `post:${post.on}:${post.x},${post.y}`, at, offers: [offer] },
       post,
-      ...(elevated === null || !usingElevated ? {} : { elevated }),
-      // Mirando afuera: el puesto está entre quien lo ocupa y el camino, así
-      // que la celda de la muralla **es** la dirección de la amenaza.
-      facing: { x: post.x + 0.5, z: post.y + 0.5 },
+      ...(route === null || !usingElevated ? {} : {
+        elevated: route,
+        elevatedVariant: circuit !== null ? 'ring' : walkway === null ? 'bastion' : 'wall',
+        ...(circuit === null ? {} : { ring: circuit.ring }),
+        ...(walkway === null || circuit !== null ? {} : { walkway: {
+          firstWall: { x: bastion!.x + walkway.side.x, z: bastion!.y + walkway.side.z },
+          nextWall: { x: bastion!.x + walkway.side.x * 2, z: bastion!.y + walkway.side.z * 2 },
+        } }),
+      }),
+      // E3b termina en el segundo muro: desde allí el centro del bastión queda
+      // a la espalda. E3a y el suelo conservan su referencia previa.
+      facing: route !== null && usingElevated && walkway !== null && circuit === null
+        ? { x: route.post.x - walkway.access.x, z: route.post.z - walkway.access.z }
+        // Mirando afuera: el puesto está entre quien lo ocupa y el camino, así
+        // que la celda de la muralla **es** la dirección de la amenaza.
+        : { x: post.x + 0.5, z: post.y + 0.5 },
     });
   }
-  return manned;
+  return manned.sort((a, b) => (order.get(postKey(a.post)) ?? 0) - (order.get(postKey(b.post)) ?? 0));
 }
 
 /** Si un sitio de la jornada es un puesto del cerco. Lo usan `day.ts` y D2. */

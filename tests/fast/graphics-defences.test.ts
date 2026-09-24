@@ -26,6 +26,20 @@ function bastion(id: number, x: number, y: number): Building {
 }
 
 describe('G-21 · conexiones de defensas', () => {
+  it('el portón sigue el material del cerco sin cambiar su edificio ni su eje', () => {
+    const state = foundTwenty(7);
+    const gate: Building = { ...wall(1, 10, 10, 'palisade'), kind: 'gate' };
+    state.buildings = [gate, wall(2, 9, 10, 'palisade'), wall(3, 11, 10, 'palisade')];
+    const timber = planFor(state).buildings.find((building) => building.id === gate.id)!;
+    expect(timber.asset).toBe('gate-timber');
+    state.buildings[1] = wall(2, 9, 10);
+    expect(planFor(state).buildings.find((building) => building.id === gate.id)?.asset).toBe('gate-timber');
+    state.buildings[2] = wall(3, 11, 10);
+    const stone = planFor(state).buildings.find((building) => building.id === gate.id)!;
+    expect(stone.asset).toBe('gate');
+    expect(stone.id).toBe(timber.id);
+    expect(stone.gate).toBe(timber.gate);
+  });
   it('resuelve las 16 combinaciones, mezcla materiales y no cambia la partida', () => {
     for(let mask=0;mask<16;mask++) {
       const buildings=[wall(1,10,10),...DEFENCE_DIRECTIONS.filter(d=>mask&d.bit)
@@ -117,6 +131,68 @@ describe('G-21 · conexiones de defensas', () => {
     const connections = defenceConnections([wall(1, 10, 10), gate]);
     expect(connections.get(1)).toBe(2);
     expect(connections.has(2)).toBe(false);
+  });
+  it('cierra la esquina diagonal del portón de piedra sin invadir su paso', async () => {
+    const state = foundTwenty(91);
+    const gate: Building = { ...wall(71, 33, 40), kind: 'gate', tier: 0 };
+    state.buildings = [gate, wall(198, 34, 39)];
+    const planned = planFor(state).buildings;
+    const gatePlan = planned.find((building) => building.id === 71)!;
+    const wallPlan = planned.find((building) => building.id === 198)!;
+    expect(gatePlan.asset).toBe('gate');
+    expect(gatePlan.gateCornerLinks).toBe(16);
+    expect(wallPlan.connections).toBe(64);
+    const loader = new GLTFLoader();
+    const [gateGltf, wallGltf] = await Promise.all([
+      loader.parseAsync(publishedGlb('gate'), ''), loader.parseAsync(publishedGlb('wall'), ''),
+    ]);
+    const gateModel = buildFromAsset({ ...gatePlan, gate: 'z' }, gateGltf.scene);
+    const wallModel = buildFromAsset(wallPlan, wallGltf.scene);
+    try {
+      const joint = gateModel.object.getObjectByName('GateCornerJoint_16')!;
+      expect(joint).toBeDefined();
+      const bounds = new Box3().setFromObject(joint);
+      expect(bounds.min.x).toBeGreaterThanOrEqual(33.92 - 1e-6);
+      expect(bounds.min.z).toBeLessThan(40.12);
+      expect(bounds.max.z).toBeGreaterThan(40.328);
+      let touchesWallMesh = false;
+      wallModel.object.traverse((node) => {
+        if (node instanceof Mesh && bounds.intersectsBox(new Box3().setFromObject(node))) touchesWallMesh = true;
+      });
+      expect(touchesWallMesh).toBe(true);
+    } finally { gateModel.dispose(); wallModel.dispose(); }
+    state.buildings[1]!.lostTick = 1;
+    expect(planFor(state).buildings.find((building) => building.id === 71)?.gateCornerLinks).toBe(0);
+  });
+  it('mantiene las cuatro esquinas conectadas con el muro en ambos ejes del portón', async () => {
+    const loader = new GLTFLoader();
+    const [gateGltf, wallGltf] = await Promise.all([
+      loader.parseAsync(publishedGlb('gate'), ''), loader.parseAsync(publishedGlb('wall'), ''),
+    ]);
+    for (const axis of ['x', 'z'] as const) for (const direction of DEFENCE_DIAGONALS) {
+      const state = foundTwenty(91);
+      state.buildings = [{ ...wall(1, 10, 10), kind: 'gate', tier: 0 },
+        wall(2, 10 + direction.x, 10 + direction.z)];
+      const planned = planFor(state).buildings;
+      const gatePlan = planned.find((building) => building.id === 1)!;
+      const wallPlan = planned.find((building) => building.id === 2)!;
+      expect(gatePlan.gateCornerLinks).toBe(direction.bit);
+      const gateModel = buildFromAsset({ ...gatePlan, gate: axis }, gateGltf.scene.clone(true));
+      const wallModel = buildFromAsset(wallPlan, wallGltf.scene.clone(true));
+      try {
+        const joint = gateModel.object.getObjectByName(`GateCornerJoint_${direction.bit}`)!;
+        expect(joint).toBeDefined();
+        const bounds = new Box3().setFromObject(joint);
+        const across = axis === 'z' ? 'x' : 'z';
+        // El portón ancho candidato deja 0,84 entre jambas: 10,08..10,92.
+        expect(bounds.max[across] <= 10.08 + 1e-5 || bounds.min[across] >= 10.92 - 1e-5).toBe(true);
+        let touchesWallMesh = false;
+        wallModel.object.traverse((node) => {
+          if (node instanceof Mesh && bounds.intersectsBox(new Box3().setFromObject(node))) touchesWallMesh = true;
+        });
+        expect(touchesWallMesh).toBe(true);
+      } finally { gateModel.dispose(); wallModel.dispose(); }
+    }
   });
   it('une cada cardinal y diagonal del bastión vivo, sin ensamblarlo ni unir su ruina', () => {
     for (const kind of ['wall', 'palisade'] as const) {

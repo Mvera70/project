@@ -1,0 +1,89 @@
+{
+  "recipeSha256": "eb49e09545ea0ccd7e36404ca6129313c5f1f9e8f8181a2b7eae35118022fd55",
+  "deterministic": true,
+  "schema": true,
+  "primitives": 121,
+  "triangles": 1420,
+  "materials": 2,
+  "textures": 0,
+  "bounds": {
+    "min": [
+      -0.818198025226593,
+      6.811957664609736e-10,
+      -2.9802322831784522e-9
+    ],
+    "max": [
+      1,
+      1.3600000143051147,
+      2.6500000953674316
+    ]
+  },
+  "checks": [
+    {
+      "name": "ring",
+      "samples": 67328,
+      "clipped": 6977,
+      "failures": 0,
+      "failedPoints": [],
+      "minDistance": 0.35,
+      "radius035Margin": 0,
+      "pass": true
+    },
+    {
+      "name": "landing",
+      "samples": 41098,
+      "clipped": 3485,
+      "failures": 0,
+      "failedPoints": [],
+      "minDistance": 0.35,
+      "radius035Margin": 0,
+      "pass": true
+    }
+  ],
+  "railContinuity": [
+    {
+      "a": "WestNorthCap",
+      "b": "Parapet_0",
+      "pass": true
+    },
+    {
+      "a": "Parapet_0",
+      "b": "EastNorthParapet",
+      "pass": true
+    },
+    {
+      "a": "EastNorthParapet",
+      "b": "DiagonalOuterParapet",
+      "pass": true
+    },
+    {
+      "a": "WestSouthCap",
+      "b": "LandingWestParapet",
+      "pass": true
+    },
+    {
+      "a": "LandingEastParapet",
+      "b": "DiagonalInnerParapet",
+      "pass": true
+    }
+  ],
+  "stairs": {
+    "count": 14,
+    "maxRiser": 0.07285714285714295,
+    "stairSupportSamples": 882,
+    "shift": 0.65,
+    "width": 0.72,
+    "landingY": 1.02
+  },
+  "negativeControls": {
+    "oldFails": true,
+    "oldFloorFailures": 29501,
+    "plugFails": true
+  },
+  "limitations": [
+    "Discrete CPU surface sampling, not runtime body dynamics.",
+    "Open portal planes clip only disk portions owned by next module.",
+    "Stair tread support checked across width; no capsule stepping/foot IK approval.",
+    "World scene occupancy and next neighbor continuation remain unverified."
+  ]
+}

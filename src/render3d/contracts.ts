@@ -1,9 +1,13 @@
 // G-01 · Public boundary between the simulation, presentation owner and 3D renderer.
 
-import type { GameState, Role, VillagerId } from '../engine/state';
+import type { GameState, PlayerAct, Role, VillagerId } from '../engine/state';
 import type { ClipName } from './clips';
 import type { Occupation } from './world/models';
 import type { Era } from '../derive/era';
+
+type HuntAct = Extract<PlayerAct, { kind: 'hunt' }>;
+type HuntSpecies = HuntAct['species'];
+type HuntWeapon = HuntAct['weapon'];
 
 /**
  * Qué está haciendo una figura, de las seis cosas que el render distingue.
@@ -44,7 +48,7 @@ export interface Actor {
    * deriva de lo que se le dio al valle y el asaltante lo recibe del renderer;
    * no sube al motor ni se guarda.
    */
-  readonly weapon?: 'bow' | 'spear' | null;
+  readonly weapon?: 'bow' | 'spear' | 'sling' | null;
   /** El escudo acompaña a la lanza; separado para no inventar un arma nueva. */
   readonly shield?: boolean;
   /** En qué segundo de su propio clip hay que ponerlo. */
@@ -247,6 +251,15 @@ export interface GraphicsRenderer {
    * entre jornadas: es lo de **esta** jornada, que es la que el jugador vio.
    */
   battle(): BattleReport | null;
+  /** Inicia una cacería física con el arma escogida para esta semana. */
+  startHunt(state: Readonly<GameState>, species: HuntSpecies, weapon: HuntWeapon): boolean;
+  /** Ordena un tiro o golpe en el encuentro activo. */
+  attackHunt(): boolean;
+  /** Parte de la cacería, entregado una sola vez al motor. */
+  hunt(): { sourceTick: number;
+    species: HuntSpecies;
+    weapon: HuntWeapon;
+    hits: number; killed: boolean } | null;
   /**
    * F2 · **Cómo va el asalto mientras pasa**, o `null` si no hay ninguno.
    *
@@ -397,6 +410,9 @@ export interface GraphicsRendererOptions {
    * era sin escribir el estado ni estar expuesto como control de jugador.
    */
   readonly previewEra?: Era;
+  /** P-1a · Hora y cielo sólo para comparar la misma escena en el banco local. */
+  readonly previewPhase?: number;
+  readonly previewSky?: 'clear' | 'rain';
 }
 
 /** Lo que el renderer necesita de una biblioteca de recursos. Ver `assets.ts`. */

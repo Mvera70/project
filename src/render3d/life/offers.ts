@@ -89,6 +89,8 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   work: { id: 'work', reach: 1.6, seats: 6, gives: { duty: 0.9, boredom: -0.2 }, seconds: [20, 45] },
   /** Recoger la cosecha ya resuelta por el motor en su única semana de siega. */
   harvest: { id: 'harvest', reach: 1.6, seats: 6, gives: { duty: 0.9 }, seconds: [6, 10], routineOnly: true },
+  /** Cazar en el bosque: solo el reparto laboral puede iniciar esta rutina. */
+  hunt: { id: 'hunt', reach: 1.2, seats: 4, gives: { duty: 0.6 }, seconds: [12, 24], routineOnly: true },
   gossip: { id: 'gossip', reach: 1.3, seats: 4, gives: { company: 0.9, boredom: 0.4 }, seconds: [6, 18] },
   /** Mirar correr el agua. No calma nada del cuerpo y despeja la cabeza. */
   loiter: { id: 'loiter', reach: 1.5, seats: 3, gives: { boredom: 0.5, irritation: 0.3 }, seconds: [8, 18] },
@@ -353,6 +355,18 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
       const at = { x: store % state.map.width + 0.5, z: Math.floor(store / state.map.width) + 0.5 };
       const offer = placedOffer({ ...OFFERS.deliver!, seats: Math.min(felling, 2) }, at, land);
       if (offer !== null) places.push({ id: `wood-store:${store}`, at, offers: [offer] });
+    }
+  }
+
+  // La caza comparte el reparto agregado del motor; este sitio solo convierte
+  // sus cazadores en plazas visibles. El objetivo usa suelo forestal pisable y
+  // conectado con algún sitio ya alcanzable de la aldea.
+  if (hands.hunters > 0 && tree !== null) {
+    const at = { x: tree % state.map.width + 0.5, z: Math.floor(tree / state.map.width) + 0.5 };
+    const offer = placedOffer({ ...OFFERS.hunt!, seats: Math.ceil(hands.hunters) }, at, land);
+    if (offer !== null && places.some(place => !place.id.startsWith('felling:')
+      && pathTo(land, place.at, offer.at, 0.32) !== null)) {
+      places.push({ id: `hunt:${tree}`, at: offer.at, offers: [offer] });
     }
   }
 

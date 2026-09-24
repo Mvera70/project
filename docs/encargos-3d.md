@@ -58,12 +58,13 @@ fuente propios. Se conserva la aceptación visual de la primera tanda.
 | **La sala del rey** (`hall`, K-4) | La casa del que manda | Una casa más alta con tejado burdeos. Encargo en `docs/historico/plan-rey.md` §8 |
 | **Armas y arcos** (C1) | Lo de arriba | Arco, lanza, flecha y escudo publicados e integrados |
 | ~~**El clan vecino** (E2)~~ · hecho 22 sep | Quien ataca | `villager-neighbor.glb` integrado: aldeano de otro valle, gorro y esclavina de silueta propia, rig y clips del adulto. Reaprovecha arco, lanza y escudo; sin espada solicitada por la conducta actual. [G-28](historico/graphics-rounds/G-28.md) |
-| **El bastión** (`bastion`, A3, 22 sep 2026) | La torre en la línea de muralla | **G-26:** modelo 1×1 aprobado y publicado. **G-27:** variante de 14 peldaños, huella 1×2 y respaldo G-26 si no cabe; el motor prefiere muros accesibles al mejorar, y el GLB se carga en el bundle. La escalera y la junta con muro se leen en captura focal de partida histórica real. La guardia sigue en suelo: faltan subida y adarve navegables. [G-26](historico/graphics-rounds/G-26.md) · [G-27](historico/graphics-rounds/G-27.md) |
+| **El bastión** (`bastion`, A3, 22 sep 2026) | La torre en la línea de muralla | **G-26:** modelo 1×1 aprobado y publicado. **G-27:** variante de 14 peldaños, huella 1×2 y respaldo G-26 si no cabe; el motor prefiere muros accesibles al mejorar, y el GLB se carga en el bundle. **G-29:** la guardia asignada sube, ocupa la plataforma a 1,02 y baja por la ruta privada; conserva colisiones y disparo físico. Queda el adarve continuo sobre la muralla. [G-26](historico/graphics-rounds/G-26.md) · [G-27](historico/graphics-rounds/G-27.md) · [G-29](historico/graphics-rounds/G-29.md) |
+| **Variantes del adarve** (E3b.2) | Continuar la guardia por el anillo de piedra | G-32 publicó entrada y módulo recto. Motor y render comparten selector: la nueva villa semilla 7/año 60 levanta espontáneamente un bastión junto a dos muros despejados y la guarnición tiene puesto sobre el segundo tramo durante aviso con armas. La app abre, aunque el bosque tapa la junta desde el ángulo inicial; falta acreditar su lectura cercana y el recorrido visible. Giro, diagonal y coronación del portón no tienen continuidad; [encargo E3b.2b](encargos/encargo-e3b2b-modelos-candidatos.md) |
 
 **Y las que sí están, para no volver a dudarlo:** `watchtower.glb` y `wall.glb`
 existen y se usan; la atalaya de C1 se levanta y sus puestos se ocupan. Lo que
-falta es apoyo elevado real: hoy la guardia queda detrás del muro, no sobre un
-adarve. **Y `wall.glb` dejó de ser malla muerta el 18 sep** (A4): hasta ese día
+falta es el adarve continuo: E3b deja a un guardia recorrer dos tramos rectos,
+pero no el anillo completo. **Y `wall.glb` dejó de ser malla muerta el 18 sep** (A4): hasta ese día
 ningún valle levantaba una sola pieza de piedra, así que la malla estaba en el
 juego desde G-10 sin aparecer en una partida.
 

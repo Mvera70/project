@@ -16,9 +16,11 @@ import { isHere } from '@engine/people/demography';
 import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
 import { createGraphicsRenderer } from '../../src/render3d/renderer';
-import { createPresentationClock } from '../../src/render3d/presentation-clock';
-import type { GraphicsStats } from '../../src/render3d/contracts';
-import { SCENES, type SceneSpec } from './bench-scenes';
+import { createPresentationClock, dayNumber, SCENIC_DAY_SECONDS } from '../../src/render3d/presentation-clock';
+import type { GraphicsFrame, GraphicsStats } from '../../src/render3d/contracts';
+import { P1_SCENES, SCENES, type P1SceneSpec, type SceneSpec } from './bench-scenes';
+import { TIME } from '@engine/balance';
+import { scenicSecondsAt } from '../../src/derive/clock';
 
 export interface SceneResult {
   readonly id: string;
@@ -34,11 +36,19 @@ export interface SceneResult {
   /** Deriva del tiempo de CPU entre el primer tercio y el último. */
   readonly drift: number;
   readonly memoryMb: number | null;
+  /** Sólo P-1a: condición visual inyectada sin mutar la partida. */
+  readonly condition?: 'day' | 'night';
+  readonly visibleYear?: number;
+  readonly phase?: number;
+  /** Muestra individual, para no esconder variación detrás de una media. */
+  readonly sample: number;
 }
 
 export interface BenchReport {
   readonly schemaVersion: 1;
   readonly generatedAt: string;
+  readonly suite: 'g09' | 'p1';
+  readonly repeats: number;
   readonly device: {
     readonly userAgent: string;
     readonly pixelRatio: number;
@@ -77,9 +87,12 @@ function gpuName(): string | null {
 }
 
 /** Una aldea de la edad que pida la escena, en la semana del año que pida. */
-function villageFor(spec: SceneSpec): GameState {
+function villageFor(spec: SceneSpec | P1SceneSpec): GameState {
   const state = foundGame(spec.seed);
-  run(state, Math.round(spec.years * 48), 'prudent', CATALOG);
+  // P-1a tiene que abrir exactamente como U-10b: el año visible 21 contiene
+  // veinte años ya jugados. `bench` histórico conserva su semántica anterior.
+  const years = 'visibleYear' in spec ? Math.max(0, spec.visibleYear - 1) : spec.years;
+  run(state, Math.round(years * 48), 'prudent', CATALOG);
   run(state, ((spec.week - (state.tick % 48)) + 48) % 48, 'prudent', CATALOG);
   if (spec.crisis) {
     // Una crisis no se simula: se declara. Lo que el banco mide es lo que
@@ -91,12 +104,33 @@ function villageFor(spec: SceneSpec): GameState {
   return state;
 }
 
+function isP1(spec: SceneSpec | P1SceneSpec): spec is P1SceneSpec {
+  return 'visibleYear' in spec;
+}
+
+function p1Frame(state: GameState, phase: number, elapsedSeconds: number, deltaSeconds: number, discontinuity: boolean): GraphicsFrame {
+  // Se conserva el día que el preset ya tenía: `skyAt` seguirá leyendo el mismo
+  // cielo real. Sólo se desplaza la hora dentro de ese día, y los cuatro segundos
+  // de muestra no pueden cruzar amanecer.
+  const scenic = scenicSecondsAt(state.tick, 0, SCENIC_DAY_SECONDS);
+  const day = dayNumber(scenic);
+  const daySeconds = ((phase - TIME.DAY_START_PHASE + 1) % 1) * SCENIC_DAY_SECONDS;
+  const presentationSeconds = day * SCENIC_DAY_SECONDS + daySeconds + elapsedSeconds;
+  return {
+    tickFraction: 0, presentationSeconds,
+    deltaSeconds: Math.min(0.1, deltaSeconds), realDeltaSeconds: Math.min(0.1, deltaSeconds),
+    speed: 1, reducedMotion: false, discontinuity,
+  };
+}
+
 async function measure(
-  canvas: HTMLCanvasElement, spec: SceneSpec, seconds: number, assetBaseUrl: string,
+  canvas: HTMLCanvasElement, spec: SceneSpec | P1SceneSpec, seconds: number, assetBaseUrl: string, sample: number,
 ): Promise<SceneResult> {
   const state = villageFor(spec);
   const renderer = await createGraphicsRenderer({ canvas, assetBaseUrl, quality: 'standard' });
   const clock = createPresentationClock();
+  const p1Started = performance.now();
+  let p1Previous = p1Started;
   const width = window.innerWidth;
   const height = Math.round(window.innerHeight);
   renderer.resize({ widthCss: width, heightCss: height, pixelRatio: window.devicePixelRatio });
@@ -104,10 +138,11 @@ async function measure(
   // Un fotograma de calentamiento antes de medir: el primero compila shaders y
   // sube geometría, y mezclarlo con el resto ensucia la mediana sin decir nada
   // que la carga fría no diga mejor.
-  renderer.paint(state, clock.frame({
+  const initial = isP1(spec) ? p1Frame(state, spec.phase, 0, 0, true) : clock.frame({
     realMs: performance.now(), tick: state.tick, tickFraction: 0.4,
     speed: 1, reducedMotion: false, hidden: false,
-  }));
+  });
+  renderer.paint(state, initial);
   if (spec.close !== 1) renderer.zoom(spec.close, width / 2, height / 2);
 
   const cpu: number[] = [];
@@ -120,10 +155,15 @@ async function measure(
       cadence.push(now - previous);
       previous = now;
       const before = performance.now();
-      renderer.paint(state, clock.frame({
+      const p1Delta = (now - p1Previous) / 1000;
+      p1Previous = now;
+      const frame = isP1(spec)
+        ? p1Frame(state, spec.phase, (now - p1Started) / 1000, p1Delta, false)
+        : clock.frame({
         realMs: now, tick: state.tick, tickFraction: 0.4,
         speed: 1, reducedMotion: false, hidden: false,
-      }));
+        });
+      renderer.paint(state, frame);
       cpu.push(performance.now() - before);
       if (now < until) requestAnimationFrame(step);
       else done();
@@ -163,12 +203,16 @@ async function measure(
     // acumula. Es la forma barata de ver una fuga sin un perfilador.
     drift: mean(cpu.slice(-third)) - mean(cpu.slice(0, third)),
     memoryMb: memory === undefined ? null : Math.round(memory.usedJSHeapSize / 1_048_576),
+    ...(isP1(spec) ? { condition: spec.condition, visibleYear: spec.visibleYear, phase: spec.phase } : {}),
+    sample,
   };
 }
 
 async function main(): Promise<void> {
   const params = new URLSearchParams(location.search);
   const seconds = Number(params.get('seconds') ?? '4');
+  const suite = params.get('suite') === 'p1' ? 'p1' : 'g09';
+  const repeats = Math.max(1, Number(params.get('repeats') ?? '1'));
   const assetBaseUrl = params.get('assets') ?? '/assets/valley3d/';
 
   // Un lienzo da un contexto y sólo uno, y soltarlo lo pierde para siempre. Cada
@@ -201,14 +245,19 @@ async function main(): Promise<void> {
     .reduce((total, entry) => total + ((entry as PerformanceResourceTiming).encodedBodySize || 0), 0);
 
   const scenes: SceneResult[] = [];
-  for (const spec of SCENES) {
-    document.documentElement.dataset.benchScene = spec.id;
-    scenes.push(await measure(stage(), spec, seconds, assetBaseUrl));
+  const selected: readonly (SceneSpec | P1SceneSpec)[] = suite === 'p1' ? P1_SCENES : SCENES;
+  for (const spec of selected) {
+    for (let sample = 1; sample <= repeats; sample += 1) {
+      document.documentElement.dataset.benchScene = `${spec.id}-${sample}`;
+      scenes.push(await measure(stage(), spec, seconds, assetBaseUrl, sample));
+    }
   }
 
   const report: BenchReport = {
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
+    suite,
+    repeats,
     device: {
       userAgent: navigator.userAgent,
       pixelRatio: window.devicePixelRatio,

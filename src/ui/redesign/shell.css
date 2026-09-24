@@ -97,6 +97,8 @@ html.bare .ui-shell-stack { visibility: hidden; }
      pestañas seguidas: «el fondo no es de la misma tonalidad ni textura, no me
      gusta nada». Un solo papel pesa más que la fidelidad de un tono. */
   background-color: var(--skin-page);
+  background-image: var(--skin-map-pattern);
+  background-repeat: no-repeat;
   /* UI-R2 · sin aviso ni pista, este hueco sigue habiendo: `notice.ts` monta su
      banda (oculta con `hidden`) y `app.ts` mete aquí la pista del inicio
      guiado (también oculta) desde el primer pintado, así que el contenedor
@@ -283,7 +285,7 @@ html:has(.ui-shell-content:not([hidden])) .ui-shell-message { display: none; }
     suyo desde UI-V2b — son dos placas con área segura por encima, así que en
     un móvil con muesca mide una cosa y en el portátil otra. Los 8 px de
     respiro son el aire que el prototipo 02 deja entre los chips y el papel. */
-.ui-shell-content { position: fixed; left: 0; right: 0; z-index: 13;
+.ui-shell-content { position: fixed; left: 0; right: 0; width: min(100%, 760px); margin-inline: auto; z-index: 13;
   bottom: calc(var(--ui-nav-height) + env(safe-area-inset-bottom));
   top: calc(var(--ui-hud-height, 96px) + 8px);
   box-sizing: border-box; overflow: auto; pointer-events: auto;
@@ -292,33 +294,22 @@ html:has(.ui-shell-content:not([hidden])) .ui-shell-message { display: none; }
   /* VZ-2 · la esquina redondeada y la sombra se retiran: el canto rasgado es
      el mismo en las tres secciones, y una hoja de papel roto no tiene la
      esquina torneada ni se levanta del valle. */
-  color: var(--ui-paper-ink); }
+  background-color: var(--skin-page);
+  background-image: var(--skin-map-pattern);
+  background-repeat: no-repeat;
+  color: var(--ui-paper-ink);
+  /* El panel de lectura queda centrado; su sombra deja respirar la aldea a
+     los lados en pantallas anchas. */
+  box-shadow: 0 0 0 100vmax rgba(27, 22, 19, .1); }
 .ui-shell-content[hidden] { display: none; }
-/** UI-V10 · **La excepción, y es la que el dueño del diseño pidió con nombre:
-    seguir a alguien baja la ficha.** Sus palabras: «solamente en People tener
-    la posibilidad de, cuando pinche una persona y le das al follow, que se
-    baje hasta abajo y se quede a una altura bajita».
-
-    Y tiene que ser así, porque seguir a alguien **es mirar el valle**: la
-    ficha a pantalla completa tapaba justo al aldeano que se acaba de pedir
-    ver. El 40 % es el tope de antes de esta ronda menos un tercio: con 60 vh
-    la cabeza del seguido caía detrás del papel a 390 × 844.
-
-    La marca la pone `inspect-panel.ts` en la raíz, y la pone donde ya estaba
-    el único punto de escritura de esa ficha sobre el mundo (`setTracking`), no
-    en un segundo sitio que pueda desincronizarse. */
-html.following .ui-shell-content {
-  top: auto;
-  max-height: 40vh;
-}
-.ui-shell-content-close { position: absolute; top: 6px; right: 8px;
-  width: var(--ui-tap-min); height: var(--ui-tap-min); display: grid; place-items: center;
-  padding: 0; border: 0; background: transparent; color: var(--ui-paper-ink-soft);
-  /* VZ-2 · **una cruz pequeñita**, que es lo que pidió el dueño del diseño
-     para cerrar: 19 px de aspa dentro de los 44 de toque. La crónica lleva la
-     misma (`screens/chronicle.ts`), así que las dos secciones se cierran con
-     el mismo gesto y el mismo dibujo. */
-  font: 400 19px/1 var(--ui-font-voice); cursor: pointer; }
+.ui-shell-content-close { position: absolute; top: 8px;
+  right: max(var(--ui-margin-mobile), calc((100vw - 760px) / 2 + 12px));
+  min-width: var(--ui-tap-min); min-height: var(--ui-tap-min); display: grid; place-items: center;
+  padding: 0 14px; border: 1px solid var(--skin-parchment-aged); border-radius: 9px;
+  background: var(--skin-parchment); color: var(--ui-paper-ink-soft);
+  box-shadow: 0 2px 0 rgba(27, 22, 19, .12);
+  font: 700 12px/1 var(--ui-font-plain); letter-spacing: .04em;
+  text-transform: uppercase; cursor: pointer; }
 .ui-shell-content-close:hover { color: var(--ui-paper-ink); }
 .ui-shell-content-close:focus-visible { outline: 2px solid var(--ui-accent-on-paper); outline-offset: 2px; }
 .ui-shell-content-body p { margin: 3px 0; color: var(--ui-paper-ink-soft);
@@ -328,7 +319,7 @@ html.following .ui-shell-content {
    `.valley-panel h2` cuando la hoja de órdenes vivía suelta — sólo cambia el
    selector, para que compita con la nueva superficie y no con la vieja. */
 .ui-shell-content-body h2 { margin: 0 0 6px; text-transform: capitalize;
-  color: var(--ui-paper-ink); font: 600 21px/1.15 var(--ui-font-voice);
+  color: var(--ui-paper-ink); font: 600 21px/1.15 var(--ui-font-heading);
   letter-spacing: .01em; text-wrap: balance; }
 
 /* UI-V7 · **Aquí había un raíl lateral de 360 px para pantallas de 900 o más**,

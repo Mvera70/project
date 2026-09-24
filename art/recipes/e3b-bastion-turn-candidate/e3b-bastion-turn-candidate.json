@@ -1,0 +1,1898 @@
+{
+  "schemaVersion": 1,
+  "id": "e3b-bastion-turn-candidate",
+  "scale": 1,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "kind": "bastion",
+    "status": "candidate_unexported",
+    "cellUnit": 1,
+    "building": 284,
+    "cell": [
+      45,
+      67
+    ],
+    "seed": 23,
+    "tick": 3846,
+    "mask": 6,
+    "incoming": [
+      1,
+      0
+    ],
+    "outgoing": [
+      0,
+      1
+    ],
+    "stairAccess": [
+      0,
+      -1
+    ],
+    "floorY": 1.02,
+    "clearWidth": 0.7,
+    "footprint": [
+      1,
+      2
+    ],
+    "sourceRecipe": "art/recipes/e3b-walltop-finish-candidate/e3b-walltop-finish-bastion295-candidate.json",
+    "note": "Single cardinal turn E to S; north stair. Platform and ashlar retained; three distinct openings. No diagonal connector.",
+    "portals": [
+      {
+        "face": "north",
+        "span": [
+          0.15,
+          0.85
+        ]
+      },
+      {
+        "face": "east",
+        "span": [
+          0.15,
+          0.85
+        ]
+      },
+      {
+        "face": "south",
+        "span": [
+          0.15,
+          0.85
+        ]
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "mortar",
+      "role": "soil",
+      "roughness": 1
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "CornerPier_NE",
+      "location": [
+        0.06,
+        -0.06,
+        0.545
+      ],
+      "dimensions": [
+        0.12,
+        0.12,
+        0.83
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerPier_NW",
+      "location": [
+        0.94,
+        -0.06,
+        0.545
+      ],
+      "dimensions": [
+        0.12,
+        0.12,
+        0.83
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerPier_SE",
+      "location": [
+        0.06,
+        -0.94,
+        0.545
+      ],
+      "dimensions": [
+        0.12,
+        0.12,
+        0.83
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerPier_SW",
+      "location": [
+        0.94,
+        -0.94,
+        0.545
+      ],
+      "dimensions": [
+        0.12,
+        0.12,
+        0.83
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Footing",
+      "location": [
+        0.5,
+        -0.5,
+        0.065
+      ],
+      "dimensions": [
+        1,
+        1,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Core",
+      "location": [
+        0.5,
+        -0.5,
+        0.545
+      ],
+      "dimensions": [
+        0.87,
+        0.87,
+        0.83
+      ],
+      "material": "mortar",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_0_0",
+      "location": [
+        0.2065,
+        -0.05,
+        0.211
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_0_1",
+      "location": [
+        0.5,
+        -0.05,
+        0.211
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_0_2",
+      "location": [
+        0.7935,
+        -0.05,
+        0.211
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_1_0",
+      "location": [
+        0.05,
+        -0.2065,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_1_1",
+      "location": [
+        0.05,
+        -0.5,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_1_2",
+      "location": [
+        0.05,
+        -0.7935,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_2_0",
+      "location": [
+        0.2065,
+        -0.95,
+        0.211
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_2_1",
+      "location": [
+        0.5,
+        -0.95,
+        0.211
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_2_2",
+      "location": [
+        0.7935,
+        -0.95,
+        0.211
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_3_0",
+      "location": [
+        0.95,
+        -0.2065,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_3_1",
+      "location": [
+        0.95,
+        -0.5,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_0_3_2",
+      "location": [
+        0.95,
+        -0.7935,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_0_0",
+      "location": [
+        0.1325,
+        -0.05,
+        0.377
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_0_1",
+      "location": [
+        0.3525,
+        -0.05,
+        0.377
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_0_2",
+      "location": [
+        0.6475,
+        -0.05,
+        0.377
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_0_3",
+      "location": [
+        0.8675,
+        -0.05,
+        0.377
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_1_0",
+      "location": [
+        0.05,
+        -0.1325,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_1_1",
+      "location": [
+        0.05,
+        -0.3525,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_1_2",
+      "location": [
+        0.05,
+        -0.6475,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_1_3",
+      "location": [
+        0.05,
+        -0.8675,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_2_0",
+      "location": [
+        0.1325,
+        -0.95,
+        0.377
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_2_1",
+      "location": [
+        0.3525,
+        -0.95,
+        0.377
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_2_2",
+      "location": [
+        0.6475,
+        -0.95,
+        0.377
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_2_3",
+      "location": [
+        0.8675,
+        -0.95,
+        0.377
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_3_0",
+      "location": [
+        0.95,
+        -0.1325,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_3_1",
+      "location": [
+        0.95,
+        -0.3525,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_3_2",
+      "location": [
+        0.95,
+        -0.6475,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_1_3_3",
+      "location": [
+        0.95,
+        -0.8675,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_0_0",
+      "location": [
+        0.2065,
+        -0.05,
+        0.543
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_0_1",
+      "location": [
+        0.5,
+        -0.05,
+        0.543
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_0_2",
+      "location": [
+        0.7935,
+        -0.05,
+        0.543
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_1_0",
+      "location": [
+        0.05,
+        -0.2065,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_1_1",
+      "location": [
+        0.05,
+        -0.5,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_1_2",
+      "location": [
+        0.05,
+        -0.7935,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_2_0",
+      "location": [
+        0.2065,
+        -0.95,
+        0.543
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_2_1",
+      "location": [
+        0.5,
+        -0.95,
+        0.543
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_2_2",
+      "location": [
+        0.7935,
+        -0.95,
+        0.543
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_3_0",
+      "location": [
+        0.95,
+        -0.2065,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_3_1",
+      "location": [
+        0.95,
+        -0.5,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_2_3_2",
+      "location": [
+        0.95,
+        -0.7935,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_0_0",
+      "location": [
+        0.1325,
+        -0.05,
+        0.709
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_0_1",
+      "location": [
+        0.3525,
+        -0.05,
+        0.709
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_0_2",
+      "location": [
+        0.6475,
+        -0.05,
+        0.709
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_0_3",
+      "location": [
+        0.8675,
+        -0.05,
+        0.709
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_1_0",
+      "location": [
+        0.05,
+        -0.1325,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_1_1",
+      "location": [
+        0.05,
+        -0.3525,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_1_2",
+      "location": [
+        0.05,
+        -0.6475,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_1_3",
+      "location": [
+        0.05,
+        -0.8675,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_2_0",
+      "location": [
+        0.1325,
+        -0.95,
+        0.709
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_2_1",
+      "location": [
+        0.3525,
+        -0.95,
+        0.709
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_2_2",
+      "location": [
+        0.6475,
+        -0.95,
+        0.709
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_2_3",
+      "location": [
+        0.8675,
+        -0.95,
+        0.709
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_3_0",
+      "location": [
+        0.95,
+        -0.1325,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_3_1",
+      "location": [
+        0.95,
+        -0.3525,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_3_2",
+      "location": [
+        0.95,
+        -0.6475,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_3_3_3",
+      "location": [
+        0.95,
+        -0.8675,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_0_0",
+      "location": [
+        0.2065,
+        -0.05,
+        0.875
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_0_1",
+      "location": [
+        0.5,
+        -0.05,
+        0.875
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_0_2",
+      "location": [
+        0.7935,
+        -0.05,
+        0.875
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_1_0",
+      "location": [
+        0.05,
+        -0.2065,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_1_1",
+      "location": [
+        0.05,
+        -0.5,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_1_2",
+      "location": [
+        0.05,
+        -0.7935,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_2_0",
+      "location": [
+        0.2065,
+        -0.95,
+        0.875
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_2_1",
+      "location": [
+        0.5,
+        -0.95,
+        0.875
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_2_2",
+      "location": [
+        0.7935,
+        -0.95,
+        0.875
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_3_0",
+      "location": [
+        0.95,
+        -0.2065,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_3_1",
+      "location": [
+        0.95,
+        -0.5,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ashlar_4_3_2",
+      "location": [
+        0.95,
+        -0.7935,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WallSeat_0",
+      "location": [
+        0.5,
+        -0.025,
+        0.46
+      ],
+      "dimensions": [
+        0.36,
+        0.05,
+        0.66
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WallSeat_1",
+      "location": [
+        0.025,
+        -0.5,
+        0.46
+      ],
+      "dimensions": [
+        0.05,
+        0.36,
+        0.66
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WallSeat_2",
+      "location": [
+        0.5,
+        -0.975,
+        0.46
+      ],
+      "dimensions": [
+        0.36,
+        0.05,
+        0.66
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WallSeat_3",
+      "location": [
+        0.975,
+        -0.5,
+        0.46
+      ],
+      "dimensions": [
+        0.05,
+        0.36,
+        0.66
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Platform_Ashlar_0_A",
+      "location": [
+        0.249,
+        -0.505,
+        0.989
+      ],
+      "dimensions": [
+        0.498,
+        0.99,
+        0.062000000000000055
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Platform_Joint_0",
+      "location": [
+        0.5,
+        -0.505,
+        0.989
+      ],
+      "dimensions": [
+        0.004,
+        0.99,
+        0.062000000000000055
+      ],
+      "material": "mortar",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Platform_Ashlar_0_B",
+      "location": [
+        0.751,
+        -0.505,
+        0.989
+      ],
+      "dimensions": [
+        0.498,
+        0.99,
+        0.062000000000000055
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerMerlon_NE",
+      "location": [
+        0.08,
+        -0.075,
+        1.26
+      ],
+      "dimensions": [
+        0.14,
+        0.15,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerMerlon_SE",
+      "location": [
+        0.08,
+        -0.925,
+        1.26
+      ],
+      "dimensions": [
+        0.14,
+        0.15,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerMerlon_NW",
+      "location": [
+        0.92,
+        -0.075,
+        1.26
+      ],
+      "dimensions": [
+        0.14,
+        0.15,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_01",
+      "location": [
+        0.5,
+        0.9642857142857142,
+        0.03642857142857143
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.07285714285714286
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_02",
+      "location": [
+        0.5,
+        0.8928571428571428,
+        0.07285714285714286
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.1457142857142857
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_03",
+      "location": [
+        0.5,
+        0.8214285714285714,
+        0.10928571428571429
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.21857142857142858
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_04",
+      "location": [
+        0.5,
+        0.75,
+        0.1457142857142857
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.2914285714285714
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_05",
+      "location": [
+        0.5,
+        0.6785714285714286,
+        0.18214285714285713
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.36428571428571427
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_06",
+      "location": [
+        0.5,
+        0.6071428571428572,
+        0.21857142857142858
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.43714285714285717
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_07",
+      "location": [
+        0.5,
+        0.5357142857142856,
+        0.255
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.51
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_08",
+      "location": [
+        0.5,
+        0.4642857142857144,
+        0.2914285714285714
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.5828571428571429
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_09",
+      "location": [
+        0.5,
+        0.3928571428571428,
+        0.32785714285714285
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.6557142857142857
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_10",
+      "location": [
+        0.5,
+        0.3214285714285714,
+        0.36428571428571427
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.7285714285714285
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_11",
+      "location": [
+        0.5,
+        0.25,
+        0.40071428571428575
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.8014285714285715
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_12",
+      "location": [
+        0.5,
+        0.1785714285714286,
+        0.43714285714285717
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.8742857142857143
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_13",
+      "location": [
+        0.5,
+        0.1071428571428572,
+        0.4735714285714286
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.9471428571428572
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InteriorStep_14",
+      "location": [
+        0.5,
+        0.03571428571428559,
+        0.51
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        1.02
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CenteredCap_0_N",
+      "location": [
+        0.075,
+        -0.075,
+        1.11
+      ],
+      "dimensions": [
+        0.15,
+        0.15,
+        0.18
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CenteredCap_0_S",
+      "location": [
+        0.075,
+        -0.925,
+        1.11
+      ],
+      "dimensions": [
+        0.15,
+        0.15,
+        0.18
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CenteredCap_1_N",
+      "location": [
+        0.925,
+        -0.075,
+        1.11
+      ],
+      "dimensions": [
+        0.15,
+        0.15,
+        0.18
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CenteredCap_1_S",
+      "location": [
+        0.925,
+        -0.925,
+        1.11
+      ],
+      "dimensions": [
+        0.15,
+        0.15,
+        0.18
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WestParapet",
+      "location": [
+        0.08,
+        -0.5,
+        1.09
+      ],
+      "dimensions": [
+        0.14,
+        0.7,
+        0.14
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WestMerlon",
+      "location": [
+        0.08,
+        -0.5,
+        1.26
+      ],
+      "dimensions": [
+        0.14,
+        0.2,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NorthStairSeam",
+      "location": [
+        0.5,
+        -0.005,
+        0.989
+      ],
+      "dimensions": [
+        0.72,
+        0.01,
+        0.062
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NorthStairSeamCorbel",
+      "location": [
+        0.5,
+        -0.04,
+        0.879
+      ],
+      "dimensions": [
+        0.72,
+        0.08,
+        0.158
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NorthStairLanding_W",
+      "location": [
+        0.07,
+        0.075,
+        0.989
+      ],
+      "dimensions": [
+        0.14,
+        0.15,
+        0.062
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NorthStairCorbel_W",
+      "location": [
+        0.07,
+        0.045,
+        0.879
+      ],
+      "dimensions": [
+        0.14,
+        0.21,
+        0.158
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NorthStairLanding_E",
+      "location": [
+        0.93,
+        0.075,
+        0.989
+      ],
+      "dimensions": [
+        0.14,
+        0.15,
+        0.062
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NorthStairCorbel_E",
+      "location": [
+        0.93,
+        0.045,
+        0.879
+      ],
+      "dimensions": [
+        0.14,
+        0.21,
+        0.158
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "EastMouthCorbel",
+      "location": [
+        0.91,
+        -0.5,
+        0.879
+      ],
+      "dimensions": [
+        0.18,
+        0.7,
+        0.158
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SouthMouthCorbel",
+      "location": [
+        0.5,
+        -0.91,
+        0.879
+      ],
+      "dimensions": [
+        0.7,
+        0.18,
+        0.158
+      ],
+      "material": "stone",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 1000,
+    "height": 1000,
+    "cameraLocation": [
+      3,
+      -3,
+      2.8
+    ],
+    "cameraTarget": [
+      0.5,
+      -0.5,
+      0.64
+    ],
+    "orthoScale": 2.8,
+    "worldRole": "sky"
+  }
+}

@@ -1,0 +1,222 @@
+[
+  {
+    "seed": 23,
+    "tick": 3846,
+    "bastion": {
+      "id": 283,
+      "kind": "bastion",
+      "x": 36,
+      "y": 41,
+      "w": 1,
+      "h": 1,
+      "builtTick": 1829,
+      "lostTick": null,
+      "tier": 1,
+      "lit": true,
+      "blockedUntil": null
+    },
+    "access": {
+      "x": 0,
+      "z": 1
+    },
+    "extension": {
+      "minX": 36.05,
+      "maxX": 36.95,
+      "minZ": 42,
+      "maxZ": 43.65
+    },
+    "buildings": [],
+    "works": [],
+    "southwest": [
+      {
+        "id": 73,
+        "kind": "palisade",
+        "x": 35,
+        "y": 42,
+        "w": 1,
+        "h": 1,
+        "builtTick": 966,
+        "lostTick": 1577,
+        "tier": 0,
+        "lit": true,
+        "blockedUntil": null
+      },
+      {
+        "id": 192,
+        "kind": "wall",
+        "x": 35,
+        "y": 42,
+        "w": 1,
+        "h": 1,
+        "builtTick": 1577,
+        "lostTick": null,
+        "tier": 1,
+        "lit": true,
+        "blockedUntil": null
+      }
+    ],
+    "east": [
+      {
+        "id": 75,
+        "kind": "palisade",
+        "x": 37,
+        "y": 41,
+        "w": 1,
+        "h": 1,
+        "builtTick": 970,
+        "lostTick": 1587,
+        "tier": 0,
+        "lit": true,
+        "blockedUntil": null
+      },
+      {
+        "id": 194,
+        "kind": "wall",
+        "x": 37,
+        "y": 41,
+        "w": 1,
+        "h": 1,
+        "builtTick": 1587,
+        "lostTick": null,
+        "tier": 1,
+        "lit": true,
+        "blockedUntil": null
+      }
+    ],
+    "trees": [
+      {
+        "cell": 2914,
+        "x": 34.20015959521214,
+        "z": 40.4732258032259,
+        "scale": 0.8581534553963381,
+        "facing": 0.20595663567027672
+      },
+      {
+        "cell": 2986,
+        "x": 34.314137775866726,
+        "z": 41.168669739907806,
+        "scale": 0.952017839464816,
+        "facing": 1.2591125621819237
+      }
+    ],
+    "trunkConflicts": [],
+    "reservedCells": [
+      {
+        "x": 36,
+        "z": 42,
+        "terrain": 0
+      },
+      {
+        "x": 36,
+        "z": 43,
+        "terrain": 0
+      },
+      {
+        "x": 35,
+        "z": 43,
+        "terrain": 0
+      },
+      {
+        "x": 37,
+        "z": 43,
+        "terrain": 0
+      }
+    ]
+  },
+  {
+    "seed": 91,
+    "tick": 3846,
+    "bastion": {
+      "id": 295,
+      "kind": "bastion",
+      "x": 34,
+      "y": 39,
+      "w": 1,
+      "h": 1,
+      "builtTick": 3063,
+      "lostTick": null,
+      "tier": 1,
+      "lit": true,
+      "blockedUntil": null
+    },
+    "access": {
+      "x": 0,
+      "z": 1
+    },
+    "extension": {
+      "minX": 34.05,
+      "maxX": 34.95,
+      "minZ": 40,
+      "maxZ": 41.65
+    },
+    "buildings": [],
+    "works": [],
+    "southwest": [
+      {
+        "id": 71,
+        "kind": "gate",
+        "x": 33,
+        "y": 40,
+        "w": 1,
+        "h": 1,
+        "builtTick": 1161,
+        "lostTick": null,
+        "tier": 0,
+        "lit": true,
+        "blockedUntil": null
+      }
+    ],
+    "east": [
+      {
+        "id": 73,
+        "kind": "palisade",
+        "x": 35,
+        "y": 39,
+        "w": 1,
+        "h": 1,
+        "builtTick": 1165,
+        "lostTick": 2332,
+        "tier": 0,
+        "lit": true,
+        "blockedUntil": null
+      },
+      {
+        "id": 199,
+        "kind": "wall",
+        "x": 35,
+        "y": 39,
+        "w": 1,
+        "h": 1,
+        "builtTick": 2332,
+        "lostTick": null,
+        "tier": 1,
+        "lit": true,
+        "blockedUntil": null
+      }
+    ],
+    "trees": [],
+    "trunkConflicts": [],
+    "reservedCells": [
+      {
+        "x": 34,
+        "z": 40,
+        "terrain": 5
+      },
+      {
+        "x": 34,
+        "z": 41,
+        "terrain": 0
+      },
+      {
+        "x": 33,
+        "z": 41,
+        "terrain": 0
+      },
+      {
+        "x": 35,
+        "z": 41,
+        "terrain": 5
+      }
+    ]
+  }
+]

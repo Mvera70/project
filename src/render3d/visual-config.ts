@@ -107,12 +107,14 @@ export const GROUND_BIAS = 0.002;
  * y más saltan los bordes al girar el sol. Los sesgos evitan que una superficie
  * se auto-sombree por la precisión del depth buffer.
  *
- * TUNE: valores medidos en la escena de 72 × 112 celdas con PCF suave y mapa
- * de 1024; subir el mapa es más caro en móvil y se deja como segunda palanca.
+ * TUNE: escena de 72 × 112 celdas con PCF suave. El mapa sube de 1024 a 2048
+ * tras la revisión en movimiento de S-1: reduce el flicker global sin eliminarlo.
+ * Una comparación rápida de cinco segundos mantuvo la misma cadencia p50/p95/p99.
  */
 export const SUN_SHADOW = {
-  mapSize: 1024,
-  reachMargin: 1.08,
+  mapSize: 2048,
+  /** Aire para que un objeto situado fuera de pantalla todavía proyecte dentro. */
+  focusMargin: 20,
   farMultiplier: 4,
   bias: -0.0002,
   normalBias: 0.02,

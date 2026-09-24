@@ -1,0 +1,2951 @@
+{
+  "schemaVersion": 1,
+  "id": "bear",
+  "scale": 0.42,
+  "mergeByMaterial": true,
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "bear",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Original brown bear. Broad shoulder hump, short rounded ears, plantigrade paws. In-place clips, forward -X in Blender."
+  },
+  "materials": [
+    {
+      "name": "coat",
+      "color": "#62412e",
+      "roughness": 0.95
+    },
+    {
+      "name": "shoulder",
+      "color": "#78543b",
+      "roughness": 0.95
+    },
+    {
+      "name": "muzzle",
+      "color": "#b08c63",
+      "roughness": 0.95
+    },
+    {
+      "name": "dark",
+      "color": "#251e19",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "Barrel",
+      "location": [
+        0.05,
+        0,
+        1.04
+      ],
+      "dimensions": [
+        1.92,
+        0.93,
+        1.04
+      ],
+      "radius": 1,
+      "segments": 12,
+      "rings": 8,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "ShoulderHump",
+      "location": [
+        -0.51,
+        0,
+        1.31
+      ],
+      "dimensions": [
+        0.99,
+        1.02,
+        0.83
+      ],
+      "radius": 1,
+      "segments": 12,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "shoulder",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Rump",
+      "location": [
+        0.69,
+        0,
+        1.05
+      ],
+      "dimensions": [
+        0.84,
+        0.87,
+        0.88
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Neck",
+      "location": [
+        -0.87,
+        0,
+        1.2
+      ],
+      "dimensions": [
+        0.75,
+        0.77,
+        0.74
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "shoulder",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Head",
+      "location": [
+        -1.19,
+        0,
+        1.17
+      ],
+      "dimensions": [
+        0.76,
+        0.65,
+        0.63
+      ],
+      "radius": 1,
+      "segments": 12,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Muzzle",
+      "location": [
+        -1.53,
+        0,
+        1.05
+      ],
+      "dimensions": [
+        0.5,
+        0.4,
+        0.31
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Nose",
+      "location": [
+        -1.76,
+        0,
+        1.1
+      ],
+      "dimensions": [
+        0.16,
+        0.3,
+        0.18
+      ],
+      "radius": 1,
+      "segments": 8,
+      "rings": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "LowerJaw",
+      "location": [
+        -1.49,
+        0,
+        0.95
+      ],
+      "dimensions": [
+        0.4,
+        0.33,
+        0.16
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Tail",
+      "location": [
+        1.02,
+        0,
+        1.04
+      ],
+      "dimensions": [
+        0.23,
+        0.23,
+        0.22
+      ],
+      "radius": 1,
+      "segments": 8,
+      "rings": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Ear_L",
+      "location": [
+        -1.05,
+        -0.29,
+        1.47
+      ],
+      "dimensions": [
+        0.24,
+        0.19,
+        0.27
+      ],
+      "radius": 1,
+      "segments": 8,
+      "rings": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "EarInner_L",
+      "location": [
+        -1.115,
+        -0.29,
+        1.49
+      ],
+      "dimensions": [
+        0.095,
+        0.12,
+        0.15
+      ],
+      "radius": 1,
+      "segments": 8,
+      "rings": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Eye_L",
+      "location": [
+        -1.38,
+        -0.30015,
+        1.24
+      ],
+      "dimensions": [
+        0.075,
+        0.045,
+        0.07
+      ],
+      "radius": 1,
+      "segments": 8,
+      "rings": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreLUpper",
+      "location": [
+        -0.59,
+        -0.32480000000000003,
+        0.72
+      ],
+      "dimensions": [
+        0.48,
+        0.39,
+        0.81
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreLLowerMesh",
+      "location": [
+        -0.605,
+        -0.32480000000000003,
+        0.31
+      ],
+      "dimensions": [
+        0.29,
+        0.3,
+        0.48
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreLPaw",
+      "location": [
+        -0.71,
+        -0.32480000000000003,
+        0.12
+      ],
+      "dimensions": [
+        0.46,
+        0.34,
+        0.24
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreLClaw0",
+      "location": [
+        -0.925,
+        -0.40280000000000005,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreLClaw1",
+      "location": [
+        -0.925,
+        -0.32480000000000003,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreLClaw2",
+      "location": [
+        -0.925,
+        -0.24680000000000002,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindLUpper",
+      "location": [
+        0.64,
+        -0.32480000000000003,
+        0.72
+      ],
+      "dimensions": [
+        0.48,
+        0.39,
+        0.81
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindLLowerMesh",
+      "location": [
+        0.625,
+        -0.32480000000000003,
+        0.31
+      ],
+      "dimensions": [
+        0.29,
+        0.3,
+        0.48
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindLPaw",
+      "location": [
+        0.52,
+        -0.32480000000000003,
+        0.12
+      ],
+      "dimensions": [
+        0.46,
+        0.34,
+        0.24
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindLClaw0",
+      "location": [
+        0.305,
+        -0.40280000000000005,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindLClaw1",
+      "location": [
+        0.305,
+        -0.32480000000000003,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindLClaw2",
+      "location": [
+        0.305,
+        -0.24680000000000002,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Ear_R",
+      "location": [
+        -1.05,
+        0.29,
+        1.47
+      ],
+      "dimensions": [
+        0.24,
+        0.19,
+        0.27
+      ],
+      "radius": 1,
+      "segments": 8,
+      "rings": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "EarInner_R",
+      "location": [
+        -1.115,
+        0.29,
+        1.49
+      ],
+      "dimensions": [
+        0.095,
+        0.12,
+        0.15
+      ],
+      "radius": 1,
+      "segments": 8,
+      "rings": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Eye_R",
+      "location": [
+        -1.38,
+        0.30015,
+        1.24
+      ],
+      "dimensions": [
+        0.075,
+        0.045,
+        0.07
+      ],
+      "radius": 1,
+      "segments": 8,
+      "rings": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreRUpper",
+      "location": [
+        -0.59,
+        0.32480000000000003,
+        0.72
+      ],
+      "dimensions": [
+        0.48,
+        0.39,
+        0.81
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreRLowerMesh",
+      "location": [
+        -0.605,
+        0.32480000000000003,
+        0.31
+      ],
+      "dimensions": [
+        0.29,
+        0.3,
+        0.48
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreRPaw",
+      "location": [
+        -0.71,
+        0.32480000000000003,
+        0.12
+      ],
+      "dimensions": [
+        0.46,
+        0.34,
+        0.24
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreRClaw0",
+      "location": [
+        -0.925,
+        0.24680000000000002,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreRClaw1",
+      "location": [
+        -0.925,
+        0.32480000000000003,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "foreRClaw2",
+      "location": [
+        -0.925,
+        0.40280000000000005,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindRUpper",
+      "location": [
+        0.64,
+        0.32480000000000003,
+        0.72
+      ],
+      "dimensions": [
+        0.48,
+        0.39,
+        0.81
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindRLowerMesh",
+      "location": [
+        0.625,
+        0.32480000000000003,
+        0.31
+      ],
+      "dimensions": [
+        0.29,
+        0.3,
+        0.48
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "coat",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindRPaw",
+      "location": [
+        0.52,
+        0.32480000000000003,
+        0.12
+      ],
+      "dimensions": [
+        0.46,
+        0.34,
+        0.24
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindRClaw0",
+      "location": [
+        0.305,
+        0.24680000000000002,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindRClaw1",
+      "location": [
+        0.305,
+        0.32480000000000003,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "hindRClaw2",
+      "location": [
+        0.305,
+        0.40280000000000005,
+        0.1
+      ],
+      "dimensions": [
+        0.1,
+        0.032,
+        0.035
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "muzzle",
+      "parent": "Root"
+    }
+  ],
+  "referenceRender": {
+    "width": 600,
+    "height": 600,
+    "cameraLocation": [
+      -3.3,
+      -4.2,
+      3
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.85
+    ],
+    "orthoScale": 3.8,
+    "worldColor": "#bec9c0"
+  },
+  "rig": {
+    "bones": [
+      {
+        "name": "root",
+        "head": [
+          0,
+          0,
+          0
+        ],
+        "tail": [
+          0,
+          0,
+          0.1
+        ],
+        "parent": null
+      },
+      {
+        "name": "body",
+        "head": [
+          0,
+          0,
+          0.95
+        ],
+        "tail": [
+          0,
+          0,
+          1.05
+        ],
+        "parent": "root"
+      },
+      {
+        "name": "neck",
+        "head": [
+          -0.65,
+          0,
+          1.13
+        ],
+        "tail": [
+          -0.78,
+          0,
+          1.2
+        ],
+        "parent": "body"
+      },
+      {
+        "name": "head",
+        "head": [
+          -0.97,
+          0,
+          1.18
+        ],
+        "tail": [
+          -1.12,
+          0,
+          1.18
+        ],
+        "parent": "neck"
+      },
+      {
+        "name": "tail",
+        "head": [
+          0.88,
+          0,
+          0.98
+        ],
+        "tail": [
+          1,
+          0,
+          0.98
+        ],
+        "parent": "body"
+      },
+      {
+        "name": "foreL",
+        "head": [
+          -0.59,
+          -0.32480000000000003,
+          0.96
+        ],
+        "tail": [
+          -0.59,
+          -0.32480000000000003,
+          0.82
+        ],
+        "parent": "body"
+      },
+      {
+        "name": "foreLLower",
+        "head": [
+          -0.59,
+          -0.32480000000000003,
+          0.46
+        ],
+        "tail": [
+          -0.59,
+          -0.32480000000000003,
+          0.33
+        ],
+        "parent": "foreL"
+      },
+      {
+        "name": "foreLFoot",
+        "head": [
+          -0.6599999999999999,
+          -0.32480000000000003,
+          0.15
+        ],
+        "tail": [
+          -0.6599999999999999,
+          -0.32480000000000003,
+          0.04999999999999999
+        ],
+        "parent": "foreLLower"
+      },
+      {
+        "name": "hindL",
+        "head": [
+          0.64,
+          -0.32480000000000003,
+          0.96
+        ],
+        "tail": [
+          0.64,
+          -0.32480000000000003,
+          0.82
+        ],
+        "parent": "body"
+      },
+      {
+        "name": "hindLLower",
+        "head": [
+          0.64,
+          -0.32480000000000003,
+          0.46
+        ],
+        "tail": [
+          0.64,
+          -0.32480000000000003,
+          0.33
+        ],
+        "parent": "hindL"
+      },
+      {
+        "name": "hindLFoot",
+        "head": [
+          0.5700000000000001,
+          -0.32480000000000003,
+          0.15
+        ],
+        "tail": [
+          0.5700000000000001,
+          -0.32480000000000003,
+          0.04999999999999999
+        ],
+        "parent": "hindLLower"
+      },
+      {
+        "name": "foreR",
+        "head": [
+          -0.59,
+          0.32480000000000003,
+          0.96
+        ],
+        "tail": [
+          -0.59,
+          0.32480000000000003,
+          0.82
+        ],
+        "parent": "body"
+      },
+      {
+        "name": "foreRLower",
+        "head": [
+          -0.59,
+          0.32480000000000003,
+          0.46
+        ],
+        "tail": [
+          -0.59,
+          0.32480000000000003,
+          0.33
+        ],
+        "parent": "foreR"
+      },
+      {
+        "name": "foreRFoot",
+        "head": [
+          -0.6599999999999999,
+          0.32480000000000003,
+          0.15
+        ],
+        "tail": [
+          -0.6599999999999999,
+          0.32480000000000003,
+          0.04999999999999999
+        ],
+        "parent": "foreRLower"
+      },
+      {
+        "name": "hindR",
+        "head": [
+          0.64,
+          0.32480000000000003,
+          0.96
+        ],
+        "tail": [
+          0.64,
+          0.32480000000000003,
+          0.82
+        ],
+        "parent": "body"
+      },
+      {
+        "name": "hindRLower",
+        "head": [
+          0.64,
+          0.32480000000000003,
+          0.46
+        ],
+        "tail": [
+          0.64,
+          0.32480000000000003,
+          0.33
+        ],
+        "parent": "hindR"
+      },
+      {
+        "name": "hindRFoot",
+        "head": [
+          0.5700000000000001,
+          0.32480000000000003,
+          0.15
+        ],
+        "tail": [
+          0.5700000000000001,
+          0.32480000000000003,
+          0.04999999999999999
+        ],
+        "parent": "hindRLower"
+      }
+    ],
+    "bind": {
+      "Barrel": "body",
+      "ShoulderHump": "body",
+      "Rump": "body",
+      "Neck": "neck",
+      "Head": "head",
+      "Muzzle": "head",
+      "Nose": "head",
+      "LowerJaw": "head",
+      "Tail": "tail",
+      "Ear_L": "head",
+      "EarInner_L": "head",
+      "Eye_L": "head",
+      "foreLUpper": "foreL",
+      "foreLLowerMesh": "foreLLower",
+      "foreLPaw": "foreLFoot",
+      "foreLClaw0": "foreLFoot",
+      "foreLClaw1": "foreLFoot",
+      "foreLClaw2": "foreLFoot",
+      "hindLUpper": "hindL",
+      "hindLLowerMesh": "hindLLower",
+      "hindLPaw": "hindLFoot",
+      "hindLClaw0": "hindLFoot",
+      "hindLClaw1": "hindLFoot",
+      "hindLClaw2": "hindLFoot",
+      "Ear_R": "head",
+      "EarInner_R": "head",
+      "Eye_R": "head",
+      "foreRUpper": "foreR",
+      "foreRLowerMesh": "foreRLower",
+      "foreRPaw": "foreRFoot",
+      "foreRClaw0": "foreRFoot",
+      "foreRClaw1": "foreRFoot",
+      "foreRClaw2": "foreRFoot",
+      "hindRUpper": "hindR",
+      "hindRLowerMesh": "hindRLower",
+      "hindRPaw": "hindRFoot",
+      "hindRClaw0": "hindRFoot",
+      "hindRClaw1": "hindRFoot",
+      "hindRClaw2": "hindRFoot"
+    }
+  },
+  "clips": [
+    {
+      "name": "idle",
+      "frames": 97,
+      "loop": true,
+      "tracks": [
+        {
+          "bone": "root",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "body",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0.5,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                -0.5,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "neck",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                2,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                -2,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "head",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                -2,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                2,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "tail",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                3.5,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                -3.5,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreL",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreLLower",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreLFoot",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreR",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreRLower",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreRFoot",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindL",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindLLower",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindLFoot",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindR",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindRLower",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindRFoot",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 73,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 97,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "walk",
+      "frames": 49,
+      "loop": true,
+      "tracks": [
+        {
+          "bone": "root",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "body",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                -1,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "neck",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                -1,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "head",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0.5,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                -0.5,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "tail",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                4,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                -4,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreL",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                12
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                -12
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreLLower",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                16.8
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                3.84
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreLFoot",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                -7.199999999999999
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreR",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                -12
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                12
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreRLower",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                3.84
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                16.8
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreRFoot",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                -7.199999999999999
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindL",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                -12
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                12
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindLLower",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                3.84
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                16.8
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindLFoot",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                -7.199999999999999
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindR",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                12
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                -12
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindRLower",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                16.8
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                3.84
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                7.199999999999999
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "hindRFoot",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            },
+            {
+              "frame": 13,
+              "rotation": [
+                0,
+                0,
+                -7.199999999999999
+              ]
+            },
+            {
+              "frame": 25,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 49,
+              "rotation": [
+                0,
+                0,
+                -3.84
+              ]
+            }
+          ]
+        }
+      ],
+      "strideLength": 0.55
+    },
+    {
+      "name": "attack",
+      "frames": 37,
+      "loop": false,
+      "tracks": [
+        {
+          "bone": "body",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 12,
+              "rotation": [
+                -4,
+                -5,
+                0
+              ]
+            },
+            {
+              "frame": 20,
+              "rotation": [
+                4,
+                5,
+                0
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "foreL",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 12,
+              "rotation": [
+                -12,
+                0,
+                65
+              ]
+            },
+            {
+              "frame": 20,
+              "rotation": [
+                15,
+                0,
+                -25
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "bone": "head",
+          "keys": [
+            {
+              "frame": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "frame": 12,
+              "rotation": [
+                0,
+                -8,
+                0
+              ]
+            },
+            {
+              "frame": 20,
+              "rotation": [
+                0,
+                12,
+                0
+              ]
+            },
+            {
+              "frame": 37,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "connectors": []
+}

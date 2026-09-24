@@ -151,6 +151,25 @@ export function reachableFrom(land: Terrain, from: Point): Uint8Array {
   return seen;
 }
 
+/** Recupera la orilla del centro aunque el centro geométrico caiga en una casa. */
+export function reachableNear(land: Terrain, from: Point): Uint8Array {
+  const x0 = Math.floor(from.x), z0 = Math.floor(from.z);
+  if (x0 >= 0 && z0 >= 0 && x0 < land.width && z0 < land.height
+    && land.blocked[z0 * land.width + x0] !== 1) return reachableFrom(land, from);
+  for (let ring = 1; ring <= Math.max(land.width, land.height); ring += 1) {
+    for (let dz = -ring; dz <= ring; dz += 1) {
+      for (let dx = -ring; dx <= ring; dx += 1) {
+        if (Math.abs(dx) !== ring && Math.abs(dz) !== ring) continue;
+        const x = x0 + dx, z = z0 + dz;
+        if (x < 0 || z < 0 || x >= land.width || z >= land.height
+          || !fitsCircle(land, x + 0.5, z + 0.5, 0.38)) continue;
+        return reachableFrom(land, { x: x + 0.5, z: z + 0.5 });
+      }
+    }
+  }
+  return new Uint8Array(land.width * land.height);
+}
+
 /** Si desde `from` se puede llegar andando a `to`. */
 export function canReach(land: Terrain, reach: Uint8Array, to: Point): boolean {
   const cx = Math.floor(to.x);

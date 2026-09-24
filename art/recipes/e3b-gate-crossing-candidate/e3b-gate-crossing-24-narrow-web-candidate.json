@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "id": "e3b-gate-crossing-24-narrow-web-candidate",
+  "scale": 1,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "gate-crossing-24-candidate",
+    "footprint": [
+      2,
+      2
+    ],
+    "version": 2,
+    "note": "Current seed 91: gate z, W to NE; explicit variant with no mirrored scale. Web narrowed to 0.20; candidate only."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "GateDeck",
+      "location": [
+        0.5,
+        -0.635,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        1.54,
+        1.27,
+        0.08999999999999997
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "JambPierWest",
+      "location": [
+        0.04,
+        -0.5,
+        0.825
+      ],
+      "dimensions": [
+        0.08,
+        0.34,
+        0.21000000000000008
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "JambPierEast",
+      "location": [
+        0.96,
+        -0.5,
+        0.825
+      ],
+      "dimensions": [
+        0.07999999999999996,
+        0.34,
+        0.21000000000000008
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NorthEastDeck",
+      "location": [
+        1.0,
+        -0.0,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.94,
+        0.08999999999999997
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        45.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "NorthEastWallWeb",
+      "location": [
+        1.25,
+        0.25,
+        0.8425
+      ],
+      "dimensions": [
+        0.7071067811865476,
+        0.2,
+        0.17500000000000004
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        45.0
+      ]
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 1000,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0.5,
+      -0.5,
+      0.85
+    ],
+    "orthoScale": 2.5,
+    "worldRole": "sky"
+  }
+}

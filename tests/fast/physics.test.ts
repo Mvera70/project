@@ -8,10 +8,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { LIFE_STEP } from '../../src/render3d/life/clock';
-import { aimAt } from '../../src/render3d/life/archery';
-import { bastionParapetObstacles, createPhysics, loadPhysics } from '../../src/render3d/life/physics';
+import { aimAt, ELEVATED_BOW_GRIP } from '../../src/render3d/life/archery';
+import { bastionParapetObstacles, bastionWalkwayParapetObstacles, createPhysics, loadPhysics } from '../../src/render3d/life/physics';
 import { indexSolids, type Terrain } from '../../src/render3d/life/body';
 import type { BastionAccess } from '../../src/derive/bastion-access';
+import { elevatedWallRoute } from '../../src/render3d/life/elevated-post';
 
 /** Un valle de juguete con una muralla recta de dos celdas de alto. */
 function land(): Terrain {
@@ -101,6 +102,57 @@ describe('D1 · la capa física', () => {
     const other = world.launch({ x: 8.5, y: 1.3, z: 2 }, { x: 0, y: 0, z: 12 });
     for (let n = 0; n < 40; n += 1) world.step();
     expect(other.at.z, 'ninguna muralla ajena se vuelve atravesable').toBeLessThan(6);
+    world.dispose();
+  });
+
+  it.each([
+    { x: 0, z: 1 }, { x: 1, z: 0 }, { x: 0, z: -1 }, { x: -1, z: 0 },
+  ] as const)('la junta rota las plataformas y deja salir la flecha propia para %o', async (access) => {
+    const width = 12, height = 12;
+    const blocked = new Uint8Array(width * height);
+    blocked[5 * width + 5] = 1;
+    const side = { x: access.z, z: -access.x };
+    const first = { x: 5 + side.x, z: 5 + side.z };
+    const next = { x: 5 + side.x * 2, z: 5 + side.z * 2 };
+    blocked[first.z * width + first.x] = 1;
+    blocked[next.z * width + next.x] = 1;
+    const solids = indexSolids(width, height, [
+      { minX: 5, minZ: 5, maxX: 6, maxZ: 6 },
+      { minX: first.x, minZ: first.z, maxX: first.x + 1, maxZ: first.z + 1 },
+      { minX: next.x, minZ: next.z, maxX: next.x + 1, maxZ: next.z + 1 },
+    ]);
+    const land: Terrain = { width, height, blocked, solids };
+    const world = await createPhysics(land, {
+      platformCells: [{ x: 5, z: 5 }, first, next],
+      obstacles: bastionWalkwayParapetObstacles({ x: 5, z: 5 }, access),
+    });
+    expect(world).not.toBeNull();
+    if (world === null) return;
+    expect(bastionWalkwayParapetObstacles({ x: 5, z: 5 }, access)).toHaveLength(12);
+
+    const post = elevatedWallRoute({ x: 5, z: 5 }, access).post;
+    const yaw = Math.atan2(-access.x, -access.z);
+    const from = {
+      x: post.x + ELEVATED_BOW_GRIP.x * Math.cos(yaw) + ELEVATED_BOW_GRIP.z * Math.sin(yaw),
+      y: post.y + ELEVATED_BOW_GRIP.y,
+      z: post.z - ELEVATED_BOW_GRIP.x * Math.sin(yaw) + ELEVATED_BOW_GRIP.z * Math.cos(yaw),
+    };
+    const own = world.launch(from, { x: -access.x * 10, y: 2.5, z: -access.z * 10 });
+    for (let n = 0; n < 20; n += 1) world.step();
+    const escaped = (own.at.x - from.x) * -access.x + (own.at.z - from.z) * -access.z;
+    expect(escaped, 'la flecha del guardia sale por el pretil abierto').toBeGreaterThan(1);
+
+    const belowFrom = { x: first.x + 0.5 - side.x * 4, y: 0.7, z: first.z + 0.5 - side.z * 4 };
+    const below = world.launch(belowFrom, { x: side.x * 12, y: 0, z: side.z * 12 });
+    for (let n = 0; n < 40; n += 1) world.step();
+    const crossed = (below.at.x - belowFrom.x) * side.x + (below.at.z - belowFrom.z) * side.z;
+    expect(crossed, 'la piedra bajo el primer muro sigue sólida').toBeLessThan(4.2);
+
+    const otherFrom = { x: next.x + 0.5 - side.x * 4, y: 1.3, z: next.z + 0.5 - side.z * 4 };
+    const other = world.launch(otherFrom, { x: side.x * 12, y: 0, z: side.z * 12 });
+    for (let n = 0; n < 40; n += 1) world.step();
+    const otherCrossed = (other.at.x - otherFrom.x) * side.x + (other.at.z - otherFrom.z) * side.z;
+    expect(otherCrossed, 'el siguiente muro conserva su altura').toBeLessThan(4.2);
     world.dispose();
   });
 

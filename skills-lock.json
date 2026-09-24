@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "threejs-game-ui-designer": {
+      "source": "majidmanzarpour/threejs-game-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-game-ui-designer/SKILL.md",
+      "computedHash": "a361316cf0e50a04fd30db9f7d1c361c86935c00397309fa2d43200c95936623"
+    }
+  }
+}

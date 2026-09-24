@@ -1,22 +1,19 @@
 // G-06 · Buildings, added and removed one at a time. design.md D.6, D.8.
 //
-// Placeholder geometry on purpose. The catalogue only holds a villager and two
-// study corners; the house, the field and the tree are G-10's work. Until then
-// a building is a box with a roof, sized and coloured from `visual-config`, so
-// that a real game produces a real village and the scale can be judged against
-// the villager who now stands 0.65 cells high.
+// Los edificios publicados usan su GLB. La caja con tejado sigue siendo el
+// respaldo de tipos pendientes, como la sala del rey, y de bibliotecas parciales.
 //
-// D.8 says as much in order: a minimum coherent set first, variants last. What
-// this must not do is wait for the catalogue, because the thing that has to be
-// judged — whether a valley of these proportions reads from above — does not
-// need the final art to be judged wrong.
+// D.8 conserva el respaldo para que una biblioteca incompleta no deje huecos
+// invisibles ni bloquee una partida mientras llega un recurso.
 
 import {
-  Box3, BoxGeometry, BufferAttribute, BufferGeometry, Color, Group, Mesh, MeshStandardMaterial, Vector3,
+  Box3, BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Group, Mesh, MeshStandardMaterial, Vector3,
   type Material, type Object3D,
 } from 'three';
 import type { BuildingId, BuildingKind } from '@engine/state';
 import type { PlannedBuilding } from './plan';
+import type { ElevatedRingVariant } from '@derive/elevated-ring';
+import { DEFENCE_DIAGONALS } from './defences';
 import { buildDefence } from './defences';
 import { varyHouse } from './house-variation';
 
@@ -121,6 +118,32 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
   hall: 'hall',
 };
 
+/** Sólo el tablero recto de E3b.1 tiene recurso publicado y validado. */
+export const ELEVATED_RING_ASSETS: Partial<Readonly<Record<ElevatedRingVariant, string>>> = {
+  straight: 'e3b-walkway-candidate',
+};
+
+/**
+ * Conserva el pivote y la hoja de un portón sin copiar su fábrica estática.
+ * La unión de bastión y portón posee ya jambas, dintel y tablero propios; si
+ * se deja también el marco antiguo aparecen piedras y suelos superpuestos.
+ */
+export function gateLeafOnly(source: Object3D): Object3D {
+  const model = source.clone(true);
+  const door = model.getObjectByName('gate_door');
+  if (door === undefined) throw new Error('Gate asset has no gate_door pivot');
+  const keep = new Set<Object3D>();
+  for (let node: Object3D | null = door; node !== null; node = node.parent) keep.add(node);
+  const prune = (node: Object3D): void => {
+    for (const child of [...node.children]) {
+      if (keep.has(child) || node === door || child.parent === door) prune(child);
+      else node.remove(child);
+    }
+  };
+  prune(model);
+  return model;
+}
+
 /**
  * Un edificio con su recurso de verdad, colocado sobre su huella.
  *
@@ -129,16 +152,19 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
  * la esquina y nada mas. Una ruina nunca usa recurso: §7.4 la deja en el mapa y
  * lo que tiene que leerse es que ya no es una casa.
  */
-export function buildFromAsset(planned: PlannedBuilding, source: Object3D): BuildingModel {
+export function buildFromAsset(planned: PlannedBuilding, source: Object3D, walkwayEntry?: Object3D, walkwayStraight?: Object3D): BuildingModel {
   // El portón aprobado es una pieza completa, con la hoja `gate_door` separada.
   // No puede pasar por el ensamblador de tramos: aquél sólo toma su material y
   // lo convertía de nuevo en una entrada provisional sin bisagra.
-  if (!planned.ruin && planned.connections !== undefined && planned.kind !== 'gate') return buildDefence(planned, source);
+  if (!planned.ruin && planned.connections !== undefined && planned.kind !== 'gate' && planned.bastionAccess === undefined) {
+    return buildDefence(planned, source);
+  }
   const disposeVariation = !planned.ruin && planned.variant !== undefined
     && (planned.kind === 'house' || planned.kind === 'stone_house')
     ? varyHouse(source, planned.variant) : undefined;
   const group = new Group();
   group.name = `Building_${planned.id}`;
+  const gateJointGeometries: BoxGeometry[] = [];
   // **El fondo de la huella se suma a la Z, y esto es un arreglo, no un ajuste.**
   //
   // Las recetas se escriben en Blender, que tiene la Z arriba; glTF tiene la Y
@@ -156,9 +182,12 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
   // G-26 es la excepción deliberada: su caja local es 0..1 en X/Z, así que
   // sumarle la altura la echaría una celda al sur. No se normaliza el catálogo
   // entero por una pieza nueva; se conserva la colocación validada de cada una.
-  group.position.set(planned.x, 0, planned.asset === 'bastion' || planned.asset === 'bastion-access-candidate' ? planned.z : planned.z + planned.h);
+  group.position.set(planned.x, 0,
+    planned.asset === 'bastion' || planned.asset === 'bastion-access-candidate' || planned.asset === 'e3b-bastion-joint-candidate'
+      ? planned.z : planned.z + planned.h);
   group.userData.buildingId = planned.id;
   let model = source;
+  if (planned.rubbleStage === 'settling') model.scale.y *= 0.55;
   if (planned.ruin && planned.asset?.startsWith('ruin-')) {
     // La misma ruina sustituye parcelas de 1×1, 2×2, 3×2 o 3×3. Ajustar solo
     // su huella evita invadir al vecino; la altura del cascote se conserva.
@@ -174,19 +203,29 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
       model = fitted;
     }
   }
-  model.traverse((object) => {
-    object.userData.buildingId = planned.id;
-    const mesh = object as Object3D & { isMesh?: boolean; castShadow?: boolean; receiveShadow?: boolean };
-    if (mesh.isMesh === true) {
-      // El campo ya lleva hileras facetadas como parte del recurso. Si esas
-      // caras proyectan y reciben sombra a la vez, el shadow map dibuja una
-      // sombra por cada diente y el sembrado parpadea al moverse el sol. Es
-      // suelo trabajado, no un volumen que tenga que oscurecer a la aldea:
-      // dejamos la luz directa y quitamos la auto-sombra de la parcela.
-      mesh.castShadow = planned.kind !== 'field';
-      mesh.receiveShadow = planned.kind !== 'field';
-    }
-  });
+  for (const painted of [model, walkwayEntry, walkwayStraight]) {
+    if (painted === undefined) continue;
+    painted.traverse((object) => {
+      object.userData.buildingId = planned.id;
+      const mesh = object as Object3D & {
+        isMesh?: boolean; castShadow?: boolean; receiveShadow?: boolean; material?: Material | Material[];
+      };
+      if (mesh.isMesh === true) {
+        // El campo ya lleva hileras facetadas como parte del recurso. Si esas
+        // caras proyectan y reciben sombra a la vez, el shadow map dibuja una
+        // sombra por cada diente y el sembrado parpadea al moverse el sol. Es
+        // suelo trabajado, no un volumen que tenga que oscurecer a la aldea:
+        // dejamos la luz directa y quitamos la auto-sombra de la parcela.
+        mesh.castShadow = planned.kind !== 'field';
+        // Los listones finos del tejado se auto-sombrean con el mapa solar y
+        // producen bandas que saltan al girar el sol. El tejado sigue echando
+        // sombra al suelo; sólo deja de recibir la suya sobre cada listón.
+        const roof = mesh.material !== undefined && !Array.isArray(mesh.material)
+          && mesh.material.name.includes('roof');
+        mesh.receiveShadow = planned.kind !== 'field' && !roof;
+      }
+    });
+  }
   if (planned.kind === 'gate' && planned.gate === 'x') {
     // La receta abre en su eje base. `defences.ts` ya giraba los portones que
     // dejan pasar por X; se conserva esa convención, pero alrededor del centro
@@ -205,12 +244,53 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
     anchor.position.set(0.5, 0, 0.5);
     anchor.rotation.y = Math.atan2(planned.bastionAccess.x, planned.bastionAccess.z);
     model.position.set(-0.5, 0, -0.5);
-    anchor.add(model); group.add(anchor);
+    anchor.add(model);
+    if (planned.bastionWalkway !== undefined && walkwayEntry !== undefined) {
+      // Las dos recetas comparten origen y giro: una celda en +X local hace
+      // tocar sus suelos en las cuatro caras sin inventar una transformación.
+      // `model` empieza a -0,5 dentro del anclaje; conservar esa base y sumar
+      // una celda deja el borde de entrada exactamente en el borde del bastión.
+      walkwayEntry.position.set(0.5, 0, -0.5);
+      anchor.add(walkwayEntry);
+      if (walkwayStraight !== undefined) {
+        walkwayStraight.position.set(1.5, 0, -0.5);
+        anchor.add(walkwayStraight);
+      }
+    }
+    group.add(anchor);
   } else group.add(model);
+  }
+  if (planned.kind === 'gate' && planned.asset === 'gate' && planned.gateCornerLinks !== undefined) {
+    let stone: Material | undefined;
+    model.traverse((node) => {
+      if (!(node instanceof Mesh)) return;
+      const materials = Array.isArray(node.material) ? node.material : [node.material];
+      stone ??= materials.find((material) => material.name.includes('stone'));
+    });
+    if (stone !== undefined) {
+      for (const direction of DEFENCE_DIAGONALS) {
+        if ((planned.gateCornerLinks & direction.bit) === 0) continue;
+        // The half-diagonal stops short of the jamb. This short stone joint
+        // closes that seam outside the wide gate candidate's 0.84 passage.
+        const passageAlongZ = planned.gate !== 'x';
+        const geometry = new BoxGeometry(passageAlongZ ? .16 : .28, .72, passageAlongZ ? .28 : .16);
+        gateJointGeometries.push(geometry);
+        const joint = new Mesh(geometry, stone);
+        joint.name = `GateCornerJoint_${direction.bit}`;
+        joint.position.set(passageAlongZ ? (direction.x > 0 ? 1 : 0)
+          : (direction.x > 0 ? .78 : .22), .36,
+        passageAlongZ ? (direction.z > 0 ? -.22 : -.78)
+          : (direction.z > 0 ? 0 : -1));
+        joint.castShadow = true;
+        joint.receiveShadow = true;
+        joint.userData.buildingId = planned.id;
+        group.add(joint);
+      }
+    }
   }
   // La hoja usa material propio; nunca se arranca del material de toda la casa.
   group.updateMatrixWorld(true);
-  const doorMesh = model.getObjectByName(`${planned.asset}_door`);
+  const doorMesh = model.getObjectByName(planned.kind === 'gate' ? 'gate_door' : `${planned.asset}_door`);
   const hinge = new Group();
   if (doorMesh !== undefined) {
     hinge.name = 'DoorHinge';
@@ -261,6 +341,7 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
       // a todas las demas casas del valle. Los materiales de tejado si son
       // nuestros, porque se copiaron para poder nevar sobre ellos.
       for (const roof of roofs) roof.material.dispose();
+      for (const geometry of gateJointGeometries) geometry.dispose();
       roofs.length = 0;
       disposeVariation?.();
       group.clear();
@@ -294,7 +375,7 @@ function buildBuilding(planned: PlannedBuilding): BuildingModel {
     const roof = new Mesh(geometry, material);
     roof.position.set(0, planned.walls, 0);
     roof.castShadow = true;
-    roof.receiveShadow = true;
+    roof.receiveShadow = false;
     roof.userData.buildingId = planned.id;
     group.add(roof);
     owned.push(geometry, material);
@@ -317,6 +398,40 @@ function buildBuilding(planned: PlannedBuilding): BuildingModel {
       for (const thing of owned) thing.dispose();
     },
   };
+}
+
+/** Una cimentación baja conserva legible el solar bloqueado sin cascotes eternos. */
+function buildRuinScar(planned: PlannedBuilding): BuildingModel {
+  const group = new Group();
+  group.name = `Building_${planned.id}`;
+  group.position.set(planned.x, 0, planned.z);
+  group.userData.buildingId = planned.id;
+  const edge = Math.min(0.13, planned.w / 5, planned.h / 5);
+  const positions: number[] = [];
+  const addStrip = (x0: number, z0: number, x1: number, z1: number): void => {
+    const y = 0.025;
+    positions.push(
+      x0, y, z0, x0, y, z1, x1, y, z1,
+      x0, y, z0, x1, y, z1, x1, y, z0,
+    );
+  };
+  addStrip(0, 0, planned.w, edge);
+  addStrip(0, planned.h - edge, planned.w, planned.h);
+  addStrip(0, edge, edge, planned.h - edge);
+  addStrip(planned.w - edge, edge, planned.w, planned.h - edge);
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
+  geometry.computeVertexNormals();
+  const material = new MeshStandardMaterial({
+    color: planned.kind === 'stone_house' ? '#88847b' : '#504d46',
+    roughness: 1, side: DoubleSide,
+  });
+  const outline = new Mesh(geometry, material);
+  outline.name = 'ClearedFoundation';
+  outline.receiveShadow = true;
+  outline.userData.buildingId = planned.id;
+  group.add(outline);
+  return { object: group, weather(): void {}, dispose(): void { geometry.dispose(); material.dispose(); } };
 }
 
 /**
@@ -374,7 +489,25 @@ export class Village {
     // Quien decide el recurso es el plan, no esto: el campo cambia con la
     // cosecha y el plan es quien sabe en que semana estamos.
     const source = planned.asset === null ? undefined : this.instance?.(planned.asset);
-    const model = source === undefined ? buildBuilding(planned) : buildFromAsset(planned, source);
+    const entry = planned.bastionWalkway === undefined ? undefined : this.instance?.('e3b-walkway-entry-candidate');
+    const straight = planned.bastionWalkway === undefined ? undefined : this.instance?.(ELEVATED_RING_ASSETS.straight!);
+    // La junta sólo existe completa. Con una biblioteca parcial se conserva el
+    // acceso E3a si está cargado: perder el segundo recurso no borra una
+    // escalera que el estado todavía puede mostrar. Sólo G-27 queda después.
+    const accessFallback = planned.bastionWalkway === undefined ? undefined : this.instance?.('bastion-access-candidate');
+    const baseFallback = planned.bastionWalkway === undefined ? undefined : this.instance?.('bastion');
+    const accessFallbackPlan = { ...planned };
+    delete accessFallbackPlan.bastionWalkway;
+    accessFallbackPlan.asset = 'bastion-access-candidate';
+    const baseFallbackPlan = { ...accessFallbackPlan };
+    delete baseFallbackPlan.bastionAccess;
+    baseFallbackPlan.asset = 'bastion';
+    const model = planned.rubbleStage === 'scar' ? buildRuinScar(planned)
+      : planned.bastionWalkway !== undefined && (source === undefined || entry === undefined || straight === undefined)
+      ? accessFallback === undefined
+        ? baseFallback === undefined ? buildBuilding(baseFallbackPlan) : buildFromAsset(baseFallbackPlan, baseFallback)
+        : buildFromAsset(accessFallbackPlan, accessFallback)
+      : source === undefined ? buildBuilding(planned) : buildFromAsset(planned, source, entry, straight);
     this.models.set(planned.id, model);
     if (planned.kind === 'gate' && !planned.ruin) {
       // Capa visual local: no mueve la huella ni el obstáculo. Si existe hoja,

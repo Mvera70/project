@@ -18,13 +18,18 @@ import { wardensWanted } from '@engine/subsistence/crows';
 import { TERRAIN_CODE } from '@engine/state';
 import { seasonOf, weekOf } from '@engine/time';
 
-export type AnimalKind = 'hen' | 'pig' | 'cow' | 'crow' | 'wolf' | 'fish';
+export type AnimalKind = 'hen' | 'pig' | 'cow' | 'crow' | 'wolf' | 'fish'
+  | 'partridge' | 'rabbit' | 'deer' | 'boar' | 'bear';
 
 export interface Animal {
   id: number;
   kind: AnimalKind;
   x: number;
   y: number;
+  /** Gesto escénico opcional, sin consecuencia para el motor. */
+  action?: 'walk' | 'attack' | 'charge' | 'flight' | 'flee' | 'down' | undefined;
+  /** Elevación escénica sobre el relieve; sólo la perdiz al huir la usa. */
+  altitude?: number;
 }
 
 /**

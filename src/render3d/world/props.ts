@@ -124,8 +124,8 @@ export class Props {
         const model = sighting.kind === 'bundle' || sighting.kind === 'grain' ? this.instance?.('bundle')
           : sighting.kind === 'stone' ? this.instance?.('rock')
             // M-3 · lo que el jugador dio. Los dos piden su propia malla y, hasta
-            // que exista, se apañan con primitivas: `instance` devuelve nada
-            // cuando el recurso no está publicado, que es hoy el caso de los dos.
+            // que exista, se apañan con primitivas: el arado ya tiene GLB;
+            // el barril sigue sin recurso publicado.
             : sighting.kind === 'barrel' ? this.instance?.('barrel')
               : sighting.kind === 'plough' ? this.instance?.('plough') : undefined;
         const object = model

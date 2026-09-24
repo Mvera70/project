@@ -29,11 +29,11 @@ import { dayPlans, leisurePlaces, type DayPlan } from './day';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
-import { garrisonPlaces, isPost, type Manned } from './garrison';
+import { garrisonPlaces, isPost, mannedPlatformCells, type Manned, type RingSelector, type WalkwaySelector } from './garrison';
 import { advanceElevated, type ElevatedPoint, type ElevatedPost } from './elevated-post';
 import { archersOf, stepArchery, type Archer, type Arrow } from './archery';
 import { fallenDefenders, meleePose, stepMelee, type Defender } from './melee';
-import { bastionParapetObstacles, createPhysics, type Physics, type PhysicsOptions, type PhysicsSnapshot } from './physics';
+import { bastionParapetObstacles, bastionWalkwayParapetObstacles, createPhysics, type Physics, type PhysicsOptions, type PhysicsSnapshot } from './physics';
 import type { RagdollSeed } from '../contracts';
 import { commons } from './places';
 import {
@@ -55,6 +55,8 @@ import {
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
+import { createDeer, deerPositions, stepDeer } from './deer';
+import { bearPosition, createBear, stepBear } from './bear';
 import { beginFlight, stepFlight, type Flight } from './flee';
 import { createSackScene, sackSnapshot, type SackScene, type SackSnapshot } from './sack';
 import { aftermathProps } from './aftermath';
@@ -293,6 +295,9 @@ export interface Village {
    * tipo sólo para esto: una fuente en vivo en vez de la fórmula de siempre.
    */
   readonly wildlife: readonly Animal[];
+  /** Entrada exterior de la guarida; no existe interior navegable. */
+  readonly bearDen: { readonly x: number; readonly z: number;
+    readonly clearingX: number; readonly clearingZ: number; readonly facing: number } | null;
   /**
    * D3 · La partida del valle vecino, si hoy hay una (§1b, fase 4).
    *
@@ -411,6 +416,10 @@ export interface DayOptions {
   readonly physics?: Physics | null;
   /** La misma cota que usa Three para apoyar actores y que Rapier usa de suelo. */
   readonly ground?: (x: number, z: number) => number;
+  /** Mismo selector visual de junta: un árbol adulto corta también la ruta. */
+  readonly walkwayOf?: WalkwaySelector;
+  /** El circuito completo sólo aparece cuando todas sus mallas están aprobadas. */
+  readonly ringOf?: RingSelector;
   /** Captura síncrona de `fall(0)` en la posición exacta del fixed-step. */
   readonly ragdollSeed?: (id: number, bornAt: number,
     placement: { readonly x: number; readonly y?: number; readonly z: number; readonly facing: number }) => RagdollSeed | null;
@@ -590,7 +599,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // día que llegan, porque `garrisonOf` sólo los da entonces. Van después del
   // corazón a propósito: el corazón se calcula con los sitios de la aldea, y una
   // guardia en la muralla no es un sitio donde viva nadie.
-  const manned = garrisonPlaces(state, land, heart, shore, options.ground);
+  const manned = garrisonPlaces(state, land, heart, shore, options.ground, options.walkwayOf, options.ringOf);
   places.push(...manned.map((post) => post.place));
   // **Y sólo cuentan los sitios de esta orilla.** El río no se cruza, así que un
   // sitio del otro lado no es un sitio para esta gente: dejar a alguien allí era
@@ -603,6 +612,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // `decide()` un animal cerca no es distinto de un pozo cerca.
   const preparing = preparationActive(state);
   const beasts = createBeasts(state, land, heart, seed, shore, preparing);
+  const deer = createDeer(state, land, seed, heart);
+  const bear = createBear(state, land, heart);
   // IA-5 · El lobo del corral (§7.10, `wolves_at_the_coop`): si el motor lo
   // soltó esta semana (`wolfRaidToday`, `staging.ts`), hay visita esta
   // jornada, guionizada en `wildlife.ts`. El corral es el ancla de la primera
@@ -937,6 +948,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const wounded = new Map<VillagerId, Defender>();
   const defendedPosts = new Set(manned.map((post) => post.place.id));
   let flightStarted = false;
+  const bearFleeing = new Set<number>();
   let physics: Physics | null = options.physics ?? null;
   let physicsAsked = physics !== null;
   let disposed = false;
@@ -1199,9 +1211,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     },
 
     get wildlife(): readonly Animal[] {
-      return wolf !== null && wolf.phase !== 'gone'
-        ? [{ id: wolf.body.id, kind: 'wolf', x: wolf.body.x, y: wolf.body.z }]
-        : [];
+      return [...deerPositions(deer), ...bearPosition(bear), ...(wolf !== null && wolf.phase !== 'gone'
+        ? [{ id: wolf.body.id, kind: 'wolf' as const, x: wolf.body.x, y: wolf.body.z }]
+        : [])];
+    },
+    get bearDen() {
+      if (bear === null) return null;
+      return { x: bear.den.x, z: bear.den.z,
+        clearingX: bear.clearing.x, clearingZ: bear.clearing.z,
+        facing: Math.atan2(bear.clearing.x - bear.den.x,
+          bear.clearing.z - bear.den.z) };
     },
 
     get threats() {
@@ -2202,10 +2221,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // de C2 y lo que le pasa a quien la recibe lo decide el vuelo (§1b).
       if (physics === null && !physicsAsked && raidersHere(raiders)) {
         physicsAsked = true;
-        const platformCells = manned.flatMap(post => post.elevated === undefined
-          ? [] : [{ x: post.elevated.post.x, z: post.elevated.post.z }]);
+        const platformCells = mannedPlatformCells(manned);
         const obstacles = manned.flatMap(post => post.elevated === undefined ? []
-          : bastionParapetObstacles({ x: post.post.x, z: post.post.y }, post.elevated.access));
+          : post.elevatedVariant === 'wall'
+            ? bastionWalkwayParapetObstacles({ x: post.post.x, z: post.post.y }, post.elevated.access)
+            : bastionParapetObstacles({ x: post.post.x, z: post.post.y }, post.elevated.access));
         const physicsOptions: PhysicsOptions = {
           ...(options.ground === undefined ? {} : { ground: options.ground }),
           ...(platformCells.length === 0 ? {} : { platformCells }),
@@ -2343,6 +2363,33 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           if (active.forced) wildlifeStuck += 1; else wildlifeRecovered += 1;
         }
       }
+
+      if (bear !== null) {
+        stepBear(bear, land, seed, steps, dwellers);
+        if (bear.phase === 'warning' && raiders.length === 0) {
+          for (const dweller of dwellers) {
+            if (indoors(dweller) || dweller.flight !== null || dweller.scene !== null
+              || dweller.quarrel !== null || dweller.holding !== null
+              || dweller.elevated !== undefined || dweller.combat !== undefined
+              || Math.hypot(dweller.body.x - bear.body.x, dweller.body.z - bear.body.z) > 6) continue;
+            const flight = beginFlight(dweller.body, land, bear.body, dweller.home, seed, steps);
+            if (flight === null) continue;
+            dweller.flight = flight;
+            dweller.doing = null;
+            bearFleeing.add(dweller.body.id);
+          }
+        } else if (bear.phase === 'gone' && bearFleeing.size > 0) {
+          for (const dweller of dwellers) {
+            if (!bearFleeing.has(dweller.body.id)) continue;
+            dweller.flight = null;
+            dweller.rethinkAt = steps;
+          }
+          bearFleeing.clear();
+        }
+      }
+      stepDeer(deer, land, seed, steps, dwellers,
+        wolf !== null && wolf.phase !== 'gone' ? wolf.body : null,
+        bear !== null && bear.phase !== 'gone' ? bear.body : null);
 
       // 8 · La cabaña vive su propio paso. V-08.
       //

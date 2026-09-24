@@ -40,6 +40,7 @@ import { seasonOf, weekOf, yearOf } from './time';
 import { count } from './subsistence/building-counts';
 import { allocateLabour, produce } from './subsistence/labour';
 import { forage } from './subsistence/forage';
+import { settleHunt } from './world/hunting';
 import { crowsPeck } from './subsistence/crows';
 import { consume, overwinter } from './subsistence/consumption';
 import { tendHerd, type HerdReport } from './subsistence/herd';
@@ -669,6 +670,18 @@ export function tick(
       state.acts.push({ tick: state.tick, act, done: outcome.crowned });
       crown = outcome;
       for (const entry of outcome.entries) say(entry);
+    } else if (act.kind === 'hunt') {
+      // La presa sólo paga comida si el encuentro de la semana anterior
+      // produjo un impacto real. El parte queda en el guardado para reproducirlo.
+      const firstKill = act.killed && state.flags[`hunt:${act.species}`] !== 0;
+      const done = settleHunt(state, act);
+      state.acts.push({ tick: state.tick, act, done });
+      if (done) say({ kind: 'forage',
+        templateKey: act.killed
+          ? `${firstKill ? 'hunt.first' : 'hunt.kill'}.${act.species}`
+          : `hunt.escape.${act.species}`,
+        params: { year: year(), weapon: act.weapon },
+        weight: firstKill ? 3 : 2 });
     } else {
       // B4 · **lo que el mundo hizo.** El único acto que no hace el jugador: el
       // parte de la batalla física de la semana pasada (§1b). No se aplica

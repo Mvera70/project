@@ -10,7 +10,7 @@ Lo pidió el dueño del diseño con estas palabras: «necesito saber qué es
 prioritario, qué va después y la dificultad de la tarea para así poder
 destinarla a diferentes agentes en función de la dificultad».
 
-**Estado sincronizado el 22 sep 2026.** Las rondas E1–E3 y D6 ya entregaron
+**Estado sincronizado el 23 sep 2026.** Las rondas E1–E3 y D6 ya entregaron
 los siete gestos procedurales, siete modelos publicados, armas en mano,
 visibilidad del frente, huida civil, saqueo, transición terminal, ragdolls y
 escombros. Las filas de arte de abajo describen sólo lo que sigue abierto; la
@@ -139,6 +139,7 @@ procedural; no son nuevos clips embebidos en el GLB.
 | E2 · Modelos del asedio · **hecho, 22 sep 2026** | Arco, flecha, lanza y escudo están integrados. El clan vecino lleva `villager-neighbor`, aldeano de otro valle con gorro y esclavina propios; conserva rig/clips y respaldo al forastero civil. Se verificó en aproximación y puerta del juego real, sin cambiar mecánica. No se añade espada: ninguna conducta actual la pide. La captura no certifica ragdoll visual. [G-28](historico/graphics-rounds/G-28.md) | Hecho | Alta | Astra sólo modelo · Terra integra · Sol revisa | — |
 | E3 · Portón, muralla de piedra, torre · **parcial, 22 sep 2026** | Portón, hoja articulada, rotura procedural, muralla y atalaya están integrados. La escalera G-27 ya es navegable para el guardia asignado: E3a verifica subida, puesto a 1,02, disparo físico y bajada en dos historias con acceso, sin abrir la huella pública. Queda **el adarve continuo**; la segunda historia no demuestra eficacia de flechas (13 lanzadas, 0 impactos). No hace falta otro GLB para el portón roto. [G-27](historico/graphics-rounds/G-27.md) · [G-29](historico/graphics-rounds/G-29.md) | P2 | Media-alta | Sol dirige/revisa; Terra implementa; Astra no intervino en E3a | A2, A3, A4 |
 | E4 · Fuego, humo, gore | Cómo se ve arder una casa en el asalto y cómo se ve morir; **el gore es decisión del dueño** («ya veremos cómo») | P4 | Alta | Dueño → Astra | D5, D6 |
+| E5 · Recogida de escombros | En una ronda futura, aldeanos que acudan a una casa derruida, carguen tablones/piedras y dejen la cimentación limpia. Es una acción escénica ligada al derrumbe y al calendario visual existente, sin generar recursos gratis ni introducir una cuadrilla simulada ahora. Pedida el 24 sep 2026; por ahora sólo envejece el render del montón. | P4 | Media-alta | Por asignar | E4 |
 
 ### F · Interfaz y crónica
 
@@ -187,16 +188,51 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
    rótulo clasificadas 12/12 por otro agente, con contraste moderado entre
    aldea y villa en algunos encuadres. La piedra lisa queda como deuda menor.
    La [revisión espacial](plan-espacial.md) está aceptada localmente.
-2. **Siguiente fase de arte** — E3: **adarve continuo**. E2 quedó integrado
+2. **Cerrado para continuar, 22 sep** — [P-1 rendimiento](plan-rendimiento.md):
+   la app real tiene línea de base de entrada, cadencia y condiciones de
+   día/noche. P-1b.1 mejoró claramente el clic del preset; P-1b.2 se midió y
+   se retiró. Vera considera suficiente el rendimiento actual. El INP anterior
+   de 912–1.144 ms no se reprodujo como INP del navegador y queda anotado para
+   una futura reproducción; el defecto de sombras diurnas es independiente.
+3. **Prioridad actual, después de P-1** — E3: **adarve continuo**. El
+   [brief E3b](encargos/encargo-e3b-adarve-continuo.md) acota geometría,
+   navegación y colisiones del enlace bastión → muro. Primero,
+   el [modelo recto candidato](../art/recipes/e3b-walkway-candidate/README.md)
+   reveló que el pretil lateral de G-27 bloqueaba la unión. La
+   [variante con abertura](../art/recipes/e3b-bastion-joint-candidate/README.md)
+   ya pasa la comprobación geométrica por CPU y la
+   [exportación aislada](historico/graphics-rounds/E3b0-exportacion-candidata.md)
+   pasó Blender, `game-dev asset inspect` y GLTFLoader. Los tres GLB se
+   [publicaron como G-32](historico/graphics-rounds/G-32-e3b-candidatos.md)
+   y E3b.1a añadió un selector y ruta puros con pruebas focales. E3b.1b
+   ensambló selectivamente la primera junta, y E3b.1c añadió navegación y
+   colisiones. La [revisión E3b.1d](historico/graphics-rounds/E3b1d-revision-app.md)
+   observó la subida continua del guardia y flechas en un asalto controlado;
+   la autoría de cada flecha y el defecto previo de sombras no quedan
+   resueltos por esa captura. El [inventario E3b.2a](historico/graphics-rounds/E3b2a-inventario-topologia.md)
+   midió rectas, diagonales, portones y árboles junto al tablero en dos villas;
+   el [encargo E3b.2b](encargos/encargo-e3b2b-modelos-candidatos.md) prepara
+   variantes de giro, diagonal y portón. La [sonda E3b.2b](historico/graphics-rounds/E3b2b-candidatos-y-puertas.md)
+    deja el codo condicionado a sus juntas; la segunda sonda mide el paso
+    diagonal; la primera alma falló 22 de 95 puntos sobre el muro real. Una
+    variante más estrecha con clave de vértice apoya 2.115 de 2.121 puntos,
+    puentea la costura y queda condicional. El GLB del portón deja 0,667 de
+    abertura visual frente a 0,84 de paso lógico. La variante de marco amplio
+    se exportó en aislamiento y
+    pasó geometría estática y giro de hoja, sin aprobarse en partida. El [contrato E3b.2c](encargos/encargo-e3b2c-integracion-selectiva.md)
+   queda preparado, sin despachar integración hasta aprobar geometría.
+   E3b.2 sigue abierta y la tala cercana
+   debe hacer visible el espacio ganado al bosque.
+   E2 quedó integrado
    y observado en partida real (G-28); el puesto elevado navegable E3a está
    cerrado con límites medidos en G-29. La sala del rey es deuda independiente
    en H. Sol dirige software; Astra sólo 3D excepcional y con permiso nuevo.
-3. **Decisiones del dueño** — E4 (fuego y gore) y el nivelado que G ya dejó
+4. **Decisiones del dueño** — E4 (fuego y gore) y el nivelado que G ya dejó
    medido. Ningún agente inventa esos criterios.
-4. **Final del crecimiento** — A3b, sólo después de definir qué significa el
+5. **Final del crecimiento** — A3b, sólo después de definir qué significa el
    techo de la partida y cómo se juega el anillo final.
-5. **Deuda no bloqueante** — rendimiento en móvil, reunión de §11.8, jornadas
-   declaradas y F3f.
+6. **Deuda no bloqueante** — medida adicional en móvil tras P-1, reunión de
+   §11.8, jornadas declaradas y F3f.
 
 ---
 

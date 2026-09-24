@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "id": "e3b-gate-crossing-65-corbel-candidate",
+  "scale": 1,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "gate-crossing-65-candidate",
+    "footprint": [
+      2,
+      2
+    ],
+    "version": 4,
+    "note": "Gate x, N to SW; jamb piers outside public opening. No parapets on turning pad. Web narrowed to 0.20; candidate only. Straight-side parapets stop before the diagonal turn; diagonal-side guards remain unresolved. Corner corbel bears on the wide gate south jamb and overlaps the diagonal web at the vertex."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "GateDeck",
+      "location": [
+        0.635,
+        -0.5,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        1.27,
+        1.54,
+        0.08999999999999997
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "JambPierNorth",
+      "location": [
+        0.5,
+        -0.04,
+        0.825
+      ],
+      "dimensions": [
+        0.34,
+        0.08,
+        0.21000000000000008
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "JambPierSouth",
+      "location": [
+        0.5,
+        -0.96,
+        0.825
+      ],
+      "dimensions": [
+        0.34,
+        0.07999999999999996,
+        0.21000000000000008
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SouthWestDeck",
+      "location": [
+        0.0,
+        -1.0,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.94,
+        0.08999999999999997
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -135.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "SouthWestWallWeb",
+      "location": [
+        -0.25,
+        -1.25,
+        0.8425
+      ],
+      "dimensions": [
+        0.7071067811865476,
+        0.2,
+        0.17500000000000004
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -135.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "EastTurnParapet",
+      "location": [
+        1.21,
+        -0.5,
+        1.11
+      ],
+      "dimensions": [
+        0.1200000000000001,
+        1.54,
+        0.18
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WestEntranceParapet",
+      "location": [
+        0.38,
+        0.135,
+        1.11
+      ],
+      "dimensions": [
+        0.09999999999999998,
+        0.27,
+        0.18
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GateSouthCornerCorbel",
+      "location": [
+        0.21,
+        -1.0,
+        0.825
+      ],
+      "dimensions": [
+        0.58,
+        0.16,
+        0.21
+      ],
+      "material": "stone",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 1000,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0.5,
+      -0.5,
+      0.85
+    ],
+    "orthoScale": 2.5,
+    "worldRole": "sky"
+  }
+}

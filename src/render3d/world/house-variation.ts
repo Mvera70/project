@@ -9,10 +9,28 @@ const FINISHES = [
   { rise: 0.94, roof: '#c5b9a2', wall: '#dad9cf' },
 ] as const;
 
-export function houseVariant(seed: number, x: number, z: number): number {
+function houseHash(seed: number, x: number, z: number): number {
   let hash = Math.imul(seed ^ Math.imul(x, 73856093), 19349663) ^ Math.imul(z, 83492791);
   hash = Math.imul(hash ^ (hash >>> 16), 2246822507);
-  return (hash >>> 0) % FINISHES.length;
+  return hash >>> 0;
+}
+
+export function houseVariant(seed: number, x: number, z: number): number {
+  return houseHash(seed, x, z) % FINISHES.length;
+}
+
+/** La forma se decide por parcela; mejorar madera a piedra conserva su índice. */
+export function houseForm(seed: number, x: number, z: number): number {
+  return houseHash(seed ^ 0x4a71c65d, x, z) % 3;
+}
+
+export const HOUSE_FORM_ASSETS = {
+  house: ['house', 'house-twin-gable', 'house-hip-roof'],
+  stone_house: ['stone-house', 'stone-house-cross-gable', 'stone-house-tower-loft'],
+} as const;
+
+export function houseFormAsset(kind: keyof typeof HOUSE_FORM_ASSETS, seed: number, x: number, z: number): string {
+  return HOUSE_FORM_ASSETS[kind][houseForm(seed, x, z)]!;
 }
 
 /** Copias privadas: no modifica geometría/materiales de la biblioteca GLB. */

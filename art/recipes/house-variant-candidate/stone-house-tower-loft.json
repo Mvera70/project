@@ -1,0 +1,1231 @@
+{
+  "schemaVersion": 1,
+  "id": "stone-house-tower-loft",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "tiled",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "stone-house",
+    "footprint": [
+      2,
+      2
+    ],
+    "note": "Segunda variante original: vivienda compacta con altillo lateral alto y cubierta piramidal independiente, sin almenas ni iconografía militar; tres ventanas y puerta originales."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "roughness": 0.85
+    },
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.95
+    },
+    {
+      "name": "window",
+      "role": "timberDark",
+      "roughness": 1
+    },
+    {
+      "name": "door",
+      "role": "timber",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Stone_Walls",
+      "location": [
+        3,
+        3,
+        1.3
+      ],
+      "dimensions": [
+        5.22,
+        5.22,
+        2.6
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Door",
+      "location": [
+        3,
+        0.25,
+        0.9
+      ],
+      "dimensions": [
+        1.05,
+        0.16,
+        1.8
+      ],
+      "material": "door",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Window_A",
+      "location": [
+        1.4,
+        0.31,
+        1.55
+      ],
+      "dimensions": [
+        0.75,
+        0.12,
+        0.8
+      ],
+      "material": "window",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Window_B",
+      "location": [
+        4.6,
+        0.31,
+        1.55
+      ],
+      "dimensions": [
+        0.75,
+        0.12,
+        0.8
+      ],
+      "material": "window",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Window_C",
+      "location": [
+        0.31,
+        3.5,
+        1.55
+      ],
+      "dimensions": [
+        0.12,
+        0.75,
+        0.8
+      ],
+      "material": "window",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Foundation",
+      "location": [
+        3,
+        3,
+        0.14
+      ],
+      "dimensions": [
+        5.5,
+        5.5,
+        0.28
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_0_4_0_4_0",
+      "location": [
+        0.4,
+        0.4,
+        0.48
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_0_4_0_4_1",
+      "location": [
+        0.4,
+        0.4,
+        0.94
+      ],
+      "dimensions": [
+        0.34,
+        0.52,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_0_4_0_4_2",
+      "location": [
+        0.4,
+        0.4,
+        1.4
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_0_4_0_4_3",
+      "location": [
+        0.4,
+        0.4,
+        1.86
+      ],
+      "dimensions": [
+        0.34,
+        0.52,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_0_4_0_4_4",
+      "location": [
+        0.4,
+        0.4,
+        2.3200000000000003
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_0_4_5_6_0",
+      "location": [
+        0.4,
+        5.6,
+        0.48
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_0_4_5_6_1",
+      "location": [
+        0.4,
+        5.6,
+        0.94
+      ],
+      "dimensions": [
+        0.34,
+        0.52,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_0_4_5_6_2",
+      "location": [
+        0.4,
+        5.6,
+        1.4
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_0_4_5_6_3",
+      "location": [
+        0.4,
+        5.6,
+        1.86
+      ],
+      "dimensions": [
+        0.34,
+        0.52,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_0_4_5_6_4",
+      "location": [
+        0.4,
+        5.6,
+        2.3200000000000003
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_5_6_0_4_0",
+      "location": [
+        5.6,
+        0.4,
+        0.48
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_5_6_0_4_1",
+      "location": [
+        5.6,
+        0.4,
+        0.94
+      ],
+      "dimensions": [
+        0.34,
+        0.52,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_5_6_0_4_2",
+      "location": [
+        5.6,
+        0.4,
+        1.4
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_5_6_0_4_3",
+      "location": [
+        5.6,
+        0.4,
+        1.86
+      ],
+      "dimensions": [
+        0.34,
+        0.52,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_5_6_0_4_4",
+      "location": [
+        5.6,
+        0.4,
+        2.3200000000000003
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_5_6_5_6_0",
+      "location": [
+        5.6,
+        5.6,
+        0.48
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_5_6_5_6_1",
+      "location": [
+        5.6,
+        5.6,
+        0.94
+      ],
+      "dimensions": [
+        0.34,
+        0.52,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_5_6_5_6_2",
+      "location": [
+        5.6,
+        5.6,
+        1.4
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_5_6_5_6_3",
+      "location": [
+        5.6,
+        5.6,
+        1.86
+      ],
+      "dimensions": [
+        0.34,
+        0.52,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Quoin_5_6_5_6_4",
+      "location": [
+        5.6,
+        5.6,
+        2.3200000000000003
+      ],
+      "dimensions": [
+        0.52,
+        0.34,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_DoorSurround_2_4",
+      "location": [
+        2.4,
+        0.23,
+        1.02
+      ],
+      "dimensions": [
+        0.18,
+        0.25,
+        2.04
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_DoorSurround_3_6",
+      "location": [
+        3.6,
+        0.23,
+        1.02
+      ],
+      "dimensions": [
+        0.18,
+        0.25,
+        2.04
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_DoorLintel",
+      "location": [
+        3,
+        0.22,
+        2.05
+      ],
+      "dimensions": [
+        1.4,
+        0.27,
+        0.25
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_DoorStep",
+      "location": [
+        3,
+        0.19,
+        0.065
+      ],
+      "dimensions": [
+        1.44,
+        0.34,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_DoorStrap_0_36",
+      "location": [
+        3,
+        0.155,
+        0.36
+      ],
+      "dimensions": [
+        0.94,
+        0.04,
+        0.095
+      ],
+      "material": "door",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_DoorStrap_1_36",
+      "location": [
+        3,
+        0.155,
+        1.36
+      ],
+      "dimensions": [
+        0.94,
+        0.04,
+        0.095
+      ],
+      "material": "door",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_DoorHandle",
+      "location": [
+        3.34,
+        0.15,
+        0.94
+      ],
+      "dimensions": [
+        0.06,
+        0.05,
+        0.12
+      ],
+      "material": "door",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Sill_0",
+      "location": [
+        1.4,
+        0.245,
+        1.095
+      ],
+      "dimensions": [
+        1.02,
+        0.24,
+        0.12
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Lintel_0",
+      "location": [
+        1.4,
+        0.245,
+        2.02
+      ],
+      "dimensions": [
+        1.02,
+        0.24,
+        0.14
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Shutter_0_L",
+      "location": [
+        0.8799999999999999,
+        0.26,
+        1.55
+      ],
+      "dimensions": [
+        0.22,
+        0.11,
+        0.83
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Shutter_0_R",
+      "location": [
+        1.92,
+        0.26,
+        1.55
+      ],
+      "dimensions": [
+        0.22,
+        0.11,
+        0.83
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Mullion_0",
+      "location": [
+        1.4,
+        0.235,
+        1.55
+      ],
+      "dimensions": [
+        0.065,
+        0.055,
+        0.79
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Sill_1",
+      "location": [
+        4.6,
+        0.245,
+        1.095
+      ],
+      "dimensions": [
+        1.02,
+        0.24,
+        0.12
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Lintel_1",
+      "location": [
+        4.6,
+        0.245,
+        2.02
+      ],
+      "dimensions": [
+        1.02,
+        0.24,
+        0.14
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Shutter_1_L",
+      "location": [
+        4.08,
+        0.26,
+        1.55
+      ],
+      "dimensions": [
+        0.22,
+        0.11,
+        0.83
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Shutter_1_R",
+      "location": [
+        5.119999999999999,
+        0.26,
+        1.55
+      ],
+      "dimensions": [
+        0.22,
+        0.11,
+        0.83
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Mullion_1",
+      "location": [
+        4.6,
+        0.235,
+        1.55
+      ],
+      "dimensions": [
+        0.065,
+        0.055,
+        0.79
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_SideSill",
+      "location": [
+        0.245,
+        3.5,
+        1.095
+      ],
+      "dimensions": [
+        0.24,
+        1.02,
+        0.12
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_SideLintel",
+      "location": [
+        0.245,
+        3.5,
+        2.02
+      ],
+      "dimensions": [
+        0.24,
+        1.02,
+        0.14
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_SideShutter_2_98",
+      "location": [
+        0.26,
+        2.98,
+        1.55
+      ],
+      "dimensions": [
+        0.11,
+        0.22,
+        0.83
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_SideShutter_4_02",
+      "location": [
+        0.26,
+        4.02,
+        1.55
+      ],
+      "dimensions": [
+        0.11,
+        0.22,
+        0.83
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_SideMullion",
+      "location": [
+        0.235,
+        3.5,
+        1.55
+      ],
+      "dimensions": [
+        0.055,
+        0.065,
+        0.79
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Fascia_0_06",
+      "location": [
+        3,
+        0.06,
+        2.6
+      ],
+      "dimensions": [
+        6,
+        0.12,
+        0.18
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Fascia_5_94",
+      "location": [
+        3,
+        5.94,
+        2.6
+      ],
+      "dimensions": [
+        6,
+        0.12,
+        0.18
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_DoorRecess",
+      "location": [
+        3,
+        0.35500000000000004,
+        0.9
+      ],
+      "dimensions": [
+        1.075,
+        0.03,
+        1.815
+      ],
+      "material": "window",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Stone_LowRoof",
+      "location": [
+        3,
+        3,
+        2.6
+      ],
+      "width": 6,
+      "depth": 6,
+      "height": 1.03,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LoftWalls",
+      "location": [
+        4.7,
+        4.7,
+        3.53
+      ],
+      "dimensions": [
+        2.04,
+        2.04,
+        2.14
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LoftBelt",
+      "location": [
+        4.7,
+        4.7,
+        3.62
+      ],
+      "dimensions": [
+        2.16,
+        2.16,
+        0.15
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Stone_LoftRoof",
+      "location": [
+        4.7,
+        4.7,
+        5.114999999999999
+      ],
+      "radius": 1.8384776310850235,
+      "depth": 1.03,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LowRidge",
+      "location": [
+        1.8,
+        3,
+        3.63
+      ],
+      "dimensions": [
+        3.6,
+        0.19,
+        0.13
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_Chimney",
+      "location": [
+        1.4,
+        4.4,
+        3.2
+      ],
+      "dimensions": [
+        0.52,
+        0.52,
+        1.9
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_ChimneyCap",
+      "location": [
+        1.4,
+        4.4,
+        4.14
+      ],
+      "dimensions": [
+        0.68,
+        0.68,
+        0.15
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_ChimneyOpening",
+      "location": [
+        1.4,
+        4.4,
+        4.224
+      ],
+      "dimensions": [
+        0.38,
+        0.38,
+        0.018
+      ],
+      "material": "window",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LowTile_0_6",
+      "location": [
+        3,
+        0.6,
+        2.831
+      ],
+      "dimensions": [
+        5.98,
+        0.09,
+        0.065
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LowTile_1_45",
+      "location": [
+        3,
+        1.45,
+        3.1228333333333333
+      ],
+      "dimensions": [
+        5.98,
+        0.09,
+        0.065
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LowTile_2_3",
+      "location": [
+        3,
+        2.3,
+        3.4146666666666667
+      ],
+      "dimensions": [
+        5.98,
+        0.09,
+        0.065
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LowTile_3_7",
+      "location": [
+        1.82,
+        3.7,
+        3.4146666666666667
+      ],
+      "dimensions": [
+        3.62,
+        0.09,
+        0.065
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LowTile_4_55",
+      "location": [
+        1.82,
+        4.55,
+        3.1228333333333333
+      ],
+      "dimensions": [
+        3.62,
+        0.09,
+        0.065
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LowTile_5_4",
+      "location": [
+        1.82,
+        5.4,
+        2.831
+      ],
+      "dimensions": [
+        3.62,
+        0.09,
+        0.065
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LoftQuoin_3_72_3_72",
+      "location": [
+        3.72,
+        3.72,
+        4.1
+      ],
+      "dimensions": [
+        0.22,
+        0.22,
+        0.65
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LoftQuoin_3_72_5_68",
+      "location": [
+        3.72,
+        5.68,
+        4.1
+      ],
+      "dimensions": [
+        0.22,
+        0.22,
+        0.65
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LoftQuoin_5_68_3_72",
+      "location": [
+        5.68,
+        3.72,
+        4.1
+      ],
+      "dimensions": [
+        0.22,
+        0.22,
+        0.65
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LoftQuoin_5_68_5_68",
+      "location": [
+        5.68,
+        5.68,
+        4.1
+      ],
+      "dimensions": [
+        0.22,
+        0.22,
+        0.65
+      ],
+      "material": "stone",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      3.6,
+      -3.8,
+      3.1
+    ],
+    "cameraTarget": [
+      1,
+      1,
+      0.7
+    ],
+    "orthoScale": 3.7,
+    "worldRole": "sky"
+  }
+}

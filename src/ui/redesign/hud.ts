@@ -614,8 +614,9 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
     // que decir que hay algo, o la puerta mentiría.
     const canGiveSomething = MEANS_IDS.some((id) => refusalFor(state, id) === null)
       || crownRefusal(state) === null;
-    const cartLine = renderUiText(canGiveSomething ? 'cart.some' : 'cart.nothing');
+    const cartLine = renderUiText('cart.open_button');
     if (ordersNow.textContent !== cartLine) ordersNow.textContent = cartLine;
+    ordersNow.setAttribute('aria-label', `${cartLine}. ${renderUiText(canGiveSomething ? 'cart.some' : 'cart.nothing')}`);
     ordersNow.dataset.cart = canGiveSomething ? 'ready' : 'empty';
 
   };

@@ -2,6 +2,484 @@
   "schemaVersion": 1,
   "assets": [
     {
+      "id": "sling",
+      "artifactRound": "G-38",
+      "status": "study",
+      "recipe": "art/recipes/sling/sling.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-23T13-23-43-346Z-4864",
+        "directory": "artifacts/graphics/G-38/approved/3651faeb06e7686e"
+      },
+      "bounds": {
+        "min": [
+          -0.035167,
+          -0.2145,
+          -0.018
+        ],
+        "max": [
+          0.035167,
+          0.022229,
+          0.018
+        ],
+        "size": [
+          0.070333,
+          0.236729,
+          0.036
+        ]
+      },
+      "recipeSha256": "7B8539B061E90C8493A47A401C139063EC70FC45088A8B7C04941CFCF718B304",
+      "materials": [
+        "cord",
+        "leather",
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "grip",
+        "projectile"
+      ],
+      "statistics": {
+        "objects": 6,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 364
+      },
+      "hashes": {
+        "sling.blend": "6766179AF49E8018F77F4B20C534EB73FEECB44D83985BC1AACD0A7E860ED693",
+        "sling.glb": "3651FAEB06E7686EB2D8AC2701ADCEF5DB9EEABE5B28154E3B5F318028399E49",
+        "sling-blender.png": "4DEE84ECCB066736831A983ED79A55CB935C4A3BFDF639D2F1803D8416342720",
+        "capture-1.png": "C0AF47E88283D983BD1C68A9EAB78F2295CBAD89CE1F6481AC10CD368C78F1CE",
+        "capture-1-gray.png": "7FA73B39781CB9F47026D4956A41DB25FB3F95E5541CDA7C250ACAA083320331",
+        "capture.json": "4DC105A845CCA91B28392B4EB1EF9F6832BCB731D2D273DDCB6B29B42C049A6B",
+        "build.json": "5F4EC9D73EBE840891EE76F2C13487C35C57EA5BA32D0F318F2F8AD3C720FE14",
+        "validation.json": "B6F2F35B70437D36C77AF11E90B0EEF51A4A916653C820F56FD7188994D29BAF"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original leather hand sling for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "boar",
+      "artifactRound": "G-37",
+      "status": "study",
+      "recipe": "art/recipes/boar/boar.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-23T12-39-27-760Z-46360",
+        "directory": "artifacts/graphics/G-37/approved/4e215fd0a56b6963"
+      },
+      "bounds": {
+        "min": [
+          -0.430833,
+          0,
+          -0.113333
+        ],
+        "max": [
+          0.301667,
+          0.34455,
+          0.113333
+        ],
+        "size": [
+          0.7325,
+          0.34455,
+          0.226667
+        ]
+      },
+      "recipeSha256": "2480686872F39C1829BC19AC2C7AF4158376A0D829FF27679FB68073CD285952",
+      "materials": [
+        "coat",
+        "mane",
+        "ivory",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "charge",
+        "attack"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4.041666666666667,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.0416666666666665,
+          "loop": true,
+          "strideLength": 0.15
+        },
+        {
+          "name": "charge",
+          "seconds": 1.0416666666666667,
+          "loop": true,
+          "strideLength": 0.28
+        },
+        {
+          "name": "attack",
+          "seconds": 1.375,
+          "loop": false,
+          "strideLength": null
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 23,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1730
+      },
+      "hashes": {
+        "boar.blend": "3095B8E07F0E4F7F453E6BF4BCCC9F812C1BBFD9FE32A56F6ADCDC8200FCFC9A",
+        "boar.glb": "4E215FD0A56B69633826BA7235A9C8888116468A7FEF82331EECD2F860BC09D9",
+        "boar-blender.png": "04DC56CBBBB32866E7F5C7C5E651792041051A15A470A3B58D8DA19CE5830221",
+        "capture-1.png": "C03868F5B6B3506FBE7455772B0AF6A82EEF2C7519BF96D65AF05B23ABFF0605",
+        "capture-1-gray.png": "5FFF662ECD88D5AC1F08DAABC5729A3916B4E0EB32DD5F8996335D2A5CCEBCC4",
+        "capture.json": "C1A544887732B08730F06D0AE9A0FD00C384C7DD06AAF6867F73EDA0B173D301",
+        "build.json": "24228CAEC58D3C579BA150DE538A2EAFE53550FD1EF557DDB8DD18C9F4F2B361",
+        "validation.json": "EC7CB62CE000DAF65201312F7C436BE7A5E4B34D0E6BEEE40552B9464709096C"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original low-poly wild boar for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "rabbit",
+      "artifactRound": "G-36",
+      "status": "study",
+      "recipe": "art/recipes/rabbit/rabbit.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-23T12-35-25-870Z-45160",
+        "directory": "artifacts/graphics/G-36/approved/fbea726a5b1f5251"
+      },
+      "bounds": {
+        "min": [
+          -0.175833,
+          0,
+          -0.072
+        ],
+        "max": [
+          0.136833,
+          0.284954,
+          0.072
+        ],
+        "size": [
+          0.312667,
+          0.284954,
+          0.144
+        ]
+      },
+      "recipeSha256": "6DC087AD0B8CCBFDAE3A278049410A9C4AFB8248E6F751838D9D73807BA93970",
+      "materials": [
+        "coat",
+        "cream",
+        "ear",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "hop",
+        "flee"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4.041666666666667,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "hop",
+          "seconds": 1.375,
+          "loop": true,
+          "strideLength": 0.15
+        },
+        {
+          "name": "flee",
+          "seconds": 0.875,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 20,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1004
+      },
+      "hashes": {
+        "rabbit.blend": "F86609B8B224E91C205DA3B166EA3E03B3539C7DBFFFBA8E74F0EB286BFE2A06",
+        "rabbit.glb": "FBEA726A5B1F5251B8ADDBD4379A4C9D42F1762FD66B1012721D1428AF302EF6",
+        "rabbit-blender.png": "07F2DCAAE0841E07C7A481101D371C5A71CA9BF3F5E290FD44BE6ED927F3741B",
+        "capture-1.png": "E0D1856CAC5FCF339EF16A2F42EEB47478100C984EAB339F10AB424DD017F8EA",
+        "capture-1-gray.png": "ACE906B270A4C6DE10C72CB6987B5B64D638513FF4726014CCFAC49EC92D28F7",
+        "capture.json": "60171385F2CD0F57C6B08C17ACEA00644AD58676C0789F9B7CE4F543F8C9179D",
+        "build.json": "1446873C0AAC460571CD21A8995EE509CA5AE78B449D22F32D46A0297E53AB10",
+        "validation.json": "614B3580232506E6D88530202B6B17AB449A16FD7646D8DF7CB41621D1E282EE"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original low-poly rabbit for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "partridge",
+      "artifactRound": "G-35",
+      "status": "study",
+      "recipe": "art/recipes/partridge/partridge.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-23T12-31-21-894Z-47560",
+        "directory": "artifacts/graphics/G-35/approved/3627e6187d35249e"
+      },
+      "bounds": {
+        "min": [
+          -0.131167,
+          0,
+          -0.068333
+        ],
+        "max": [
+          0.131667,
+          0.190167,
+          0.068333
+        ],
+        "size": [
+          0.262833,
+          0.190167,
+          0.136667
+        ]
+      },
+      "recipeSha256": "F7A0829D29C2892152F4ED2DA70B00AE65208C34B58FC581F979CC1F04D403DE",
+      "materials": [
+        "coat",
+        "cream",
+        "dark",
+        "red"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "flight"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4.041666666666667,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.0416666666666667,
+          "loop": true,
+          "strideLength": 0.055
+        },
+        {
+          "name": "flight",
+          "seconds": 0.5416666666666666,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 17,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 994
+      },
+      "hashes": {
+        "partridge.blend": "7C9DD2D4B63A64864FE30DD5362FA46165A1D5FB763A6E98CAA9E36F7BDD5E43",
+        "partridge.glb": "3627E6187D35249E7B09F506CFA95301D13F93B6F4289B8DA1EF5EF2A8DF1478",
+        "partridge-blender.png": "D4A6EC85170C47A7EE9580863A289E7D32CC3A85DE115D9D6F0815513890590F",
+        "capture-1.png": "60A54014CD6EA772C21DF0E24031B2F0768697FBA1D0D2A6A852F2F446FB9F84",
+        "capture-1-gray.png": "5E53ECB0A720F2B519E6165092EEFA62CDC053E758382EB00921B8393B51D071",
+        "capture.json": "55FDFE4576CF16D12A8B40221272C403464C940B89F302F2DBC4FCBFDD1B79F3",
+        "build.json": "4A83F69C1D0533A9F4BD139BA2301CB1F05C18D688E5B8A7D120FB8A9702350F",
+        "validation.json": "31FE9698E36C8B8AFF753EB43EE75E568C7AED781872B72D8E5C9D88DB879117"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original low-poly partridge for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "bear",
+      "artifactRound": "G-34",
+      "status": "study",
+      "recipe": "art/recipes/bear/bear.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-23T11-09-11-004Z-43780",
+        "directory": "artifacts/graphics/G-34/approved/eca8aa70e7a3d31b"
+      },
+      "bounds": {
+        "min": [
+          -0.7728,
+          0,
+          -0.218316
+        ],
+        "max": [
+          0.4767,
+          0.7245,
+          0.218316
+        ],
+        "size": [
+          1.2495,
+          0.7245,
+          0.436632
+        ]
+      },
+      "recipeSha256": "0EE60D66A1CCF98CE9AF3305AF9AE291E8E5B7F2D077BC8F728F190B34A87BDD",
+      "materials": [
+        "coat",
+        "shoulder",
+        "muzzle",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4.041666666666667,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.0416666666666665,
+          "loop": true,
+          "strideLength": 0.22
+        },
+        {
+          "name": "attack",
+          "seconds": 1.5416666666666667,
+          "loop": false,
+          "strideLength": null
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 23,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 2712
+      },
+      "hashes": {
+        "bear.blend": "3878DC51061AB4008E65F6D3473750D882622E83D1C3A6A8A4C4ABD2C12D35A0",
+        "bear.glb": "ECA8AA70E7A3D31BFC25DC0B826AA959C5D6E832B3F30075B8DA8B7652416445",
+        "bear-blender.png": "5DC122E3365685122A9DFE9F1FCBFF5F3773FE6B88D4BFF4A2002C9081353244",
+        "capture-1.png": "B46878F252ABFA3894E4AAFE21EA8AAE1A15A3A0BC17C088AFF381884205AD50",
+        "capture-1-gray.png": "F9803755F7B396DEEDF9F06B0EEBEC79EFC89F6FD88056F2DF30F4AC12AB3E56",
+        "capture.json": "BD3CC3037A2725D0D7A009ACCE48B7127A66F8E4B7D5B3E68D9B556877DCCD0E",
+        "build.json": "6E8033078820C82CD0EFADCDD66E1946061AB943EAF8AFEF4F684CB51BD492EE",
+        "validation.json": "D14BAB0F53F4F328F58B0D61FBD94F4F59C7AF0BE8265BB8BB81458EFEE7B098"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original procedural brown bear modeled for The Valley, 23 Sep 2026. No external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "deer",
+      "artifactRound": "G-33",
+      "status": "study",
+      "recipe": "art/recipes/deer/deer.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-23T08-46-13-774Z-11776",
+        "directory": "artifacts/graphics/G-33/approved/e17c6853030f962c"
+      },
+      "bounds": {
+        "min": [
+          -0.465833,
+          0,
+          -0.14
+        ],
+        "max": [
+          0.31,
+          0.853333,
+          0.14
+        ],
+        "size": [
+          0.775833,
+          0.853333,
+          0.279999
+        ]
+      },
+      "recipeSha256": "232D25AABE31E94191C0499D915A1DFF5BF55DCE5008FBA8E3C895AA92523532",
+      "materials": [
+        "coat",
+        "warm",
+        "cream",
+        "antler",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4.041666666666667,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.0416666666666665,
+          "loop": true,
+          "strideLength": 0.2
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 24,
+        "meshes": 5,
+        "materials": 5,
+        "triangles": 2972
+      },
+      "hashes": {
+        "deer.blend": "DFAB7016CE246CF100DA122D4BE6C423C8EACD7B47B1B5E92D2673654F874ED8",
+        "deer.glb": "E17C6853030F962CA93A66B55B8032B17CB2215EDA98CA57EB29993E01ACD0F4",
+        "deer-blender.png": "92A6D00C7A186CC8CB5FBBDF3E211D6325A00B1E135C0756DE17280714013129",
+        "capture-1.png": "6BE994B66CBA29DF9976E98509FDAF7C63F16C6D601CE794495919CFF139C388",
+        "capture-1-gray.png": "DD3DC9CF5666FE85EA954F5CDF8EF88B8FCFB130920F50E820A2DABBB3468771",
+        "capture.json": "470DA68FF84BE9FED7AF17965FF55C00CA1E0F5861B2786A6778B01CDD04B641",
+        "build.json": "D05E0722AB3F459CD3F11B8E7882D2B3896754B47E60F7B03B83B20A98D6CCED",
+        "validation.json": "223C95D144F29128D21E033F45AD97DB2763847B27E93263087A7FAC6FD69211"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original procedural stag modeled for The Valley on 23 Sep 2026; no external provider.",
+        "license": "Project original"
+      }
+    },
+    {
       "id": "villager-neighbor",
       "artifactRound": "G-28",
       "status": "study",
@@ -164,12 +642,27 @@
         "directory": "artifacts/graphics/E3-access-candidate"
       },
       "bounds": {
-        "min": [0, 0, 0],
-        "max": [1, 1.36, 2],
-        "size": [1, 1.36, 2]
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          1,
+          1.36,
+          2
+        ],
+        "size": [
+          1,
+          1.36,
+          2
+        ]
       },
       "recipeSha256": "775EB66BB8B2DC754079EE1397B11A4A23EEA4B242B460C3A92F49400EAD7C5D",
-      "materials": ["stone", "mortar"],
+      "materials": [
+        "stone",
+        "mortar"
+      ],
       "clips": [],
       "motion": [],
       "connectors": [],
@@ -185,6 +678,157 @@
       "provenance": {
         "kind": "original",
         "source": "Candidato E3 de escalera interior, aprobado provisionalmente el 22 sep 2026; deriva de G-26 sin sobrescribirlo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "e3b-bastion-joint-candidate",
+      "artifactRound": "G-32",
+      "status": "approved",
+      "recipe": "art/recipes/e3b-bastion-joint-candidate/e3b-bastion-joint-candidate.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-22-e3b-blender-review-01",
+        "directory": "artifacts/graphics/E3b-bastion-joint-candidate/blender-review-01"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          1,
+          1.36,
+          2
+        ],
+        "size": [
+          1,
+          1.36,
+          2
+        ]
+      },
+      "recipeSha256": "FBBBF0C652DB2B5546DD110BE884C3400AF555556DBD915B49F8B88B5B6D4948",
+      "materials": [
+        "stone",
+        "mortar"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 1236
+      },
+      "hashes": {
+        "e3b-bastion-joint-candidate.glb": "543DD56F580893F56A5CBD62237C36E0EE1F1D8BB20E9538373D36D7A422536E"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Pasarela E3b, salida lateral y descansillo aceptados visualmente por Vera el 22 sep 2026; derivado de G-27 sin reemplazarlo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "e3b-walkway-entry-candidate",
+      "artifactRound": "G-32",
+      "status": "approved",
+      "recipe": "art/recipes/e3b-bastion-joint-candidate/e3b-walkway-entry-candidate.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-22-e3b-blender-review-01",
+        "directory": "artifacts/graphics/E3b-bastion-joint-candidate/blender-review-01"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0.36,
+          0.33
+        ],
+        "max": [
+          1,
+          1.2,
+          1.27
+        ],
+        "size": [
+          1,
+          0.84,
+          0.94
+        ]
+      },
+      "recipeSha256": "6BA85FD2B4795B2F8D08C7A214B4737C0CE557CEBFE666E3126D1FE982BB0D50",
+      "materials": [
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 144
+      },
+      "hashes": {
+        "e3b-walkway-entry-candidate.glb": "4792C63B4E279B63089D61F3702DABF2E93162381EA94CC0DB272255D6B49678"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Primer tramo E3b con alivio de 0,25 en pretil, aceptado visualmente por Vera el 22 sep 2026; modelo procedural local.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "e3b-walkway-candidate",
+      "artifactRound": "G-32",
+      "status": "approved",
+      "recipe": "art/recipes/e3b-walkway-candidate/e3b-walkway-candidate.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-22-e3b-blender-review-01",
+        "directory": "artifacts/graphics/E3b-bastion-joint-candidate/blender-review-01"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0.36,
+          0.33
+        ],
+        "max": [
+          1,
+          1.2,
+          1.27
+        ],
+        "size": [
+          1,
+          0.84,
+          0.94
+        ]
+      },
+      "recipeSha256": "8ECEA6C7541B557177153D3508CE4AA320D0C2CBCF4D2AE937E2DF27615C4218",
+      "materials": [
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 144
+      },
+      "hashes": {
+        "e3b-walkway-candidate.glb": "AB541602681C656A6839BC680548AB7DF7956DB3213D03C26AD32C8D46083601"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Tramo recto E3b con ménsulas de piedra, aceptado visualmente por Vera el 22 sep 2026; modelo procedural local.",
         "license": "Project original"
       }
     },
@@ -439,31 +1083,32 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-19T23-14-29-216Z-48516",
-        "directory": "artifacts/graphics/G-24/approved/6a631196325241e1"
+        "runId": "2026-09-22T18-53-44-407Z-30156",
+        "directory": "artifacts/graphics/G-24/approved/c5e11188892de6d2"
       },
       "bounds": {
         "min": [
+          -0.003333,
           0,
-          0,
-          -0.583333
+          -0.671667
         ],
         "max": [
-          1,
-          0.933333,
-          -0.416667
+          1.003333,
+          0.865,
+          -0.32
         ],
         "size": [
-          1,
-          0.933333,
-          0.166667
+          1.006667,
+          0.865,
+          0.351667
         ]
       },
-      "recipeSha256": "C34EA6FE92BEE7D530A1EDE0A61952C31AD8FE8B0039A8AA9E1393EAAB1FCC77",
+      "recipeSha256": "E644ECEF2D6E4BCB16150BB8D708C3ED686B97E4951E3D7DBB143FB3EDD2BD19",
       "materials": [
+        "stone",
         "wood",
-        "iron",
-        "plank"
+        "plank",
+        "iron"
       ],
       "clips": [],
       "motion": [],
@@ -471,20 +1116,20 @@
         "gate_door"
       ],
       "statistics": {
-        "objects": 19,
-        "meshes": 17,
-        "materials": 3,
-        "triangles": 212
+        "objects": 33,
+        "meshes": 31,
+        "materials": 4,
+        "triangles": 380
       },
       "hashes": {
-        "gate.blend": "28A1DE33347EE6312701316E64D2D72B32DE1FBD25B841F560DE63C2A3B55C54",
-        "gate.glb": "6A631196325241E1C6C6D53CDA4041D24DADCF6FC4FABF0C437F5CF4631FE679",
-        "gate-blender.png": "51846C36D07D039A307BB9F64C2457A124A641BBABD0630EDE7075CD236CD8D9",
-        "capture-1.png": "62205272A3DD7E2F66357EAD35EBFBBB7E653DC8406B69AF897DCFCD9DB387C1",
-        "capture-1-gray.png": "18784BDFD536050F4DADD899D3189F39C96035A2437C654FD51AA16E4E8C346A",
-        "capture.json": "9A5ACDD6C86DCEE950F822BE5E32D5DF22D3B80CD71108685A62A9464067D597",
-        "build.json": "7895ABB6D459894A106D8A6351FEA63391F5492F82DC4E197045826A3772DE5E",
-        "validation.json": "242C04BD0DB601D6DF3330755FE067E60D09A8BE121EE537E5868E96CAF5D373"
+        "gate.blend": "D1DF05805512E9E5272CF89C714A702EFDB94F5BA56BDF60C3C8E359BBEC716D",
+        "gate.glb": "C5E11188892DE6D2B1735CA36911999F3D8D6E3226CC2B43A5EF7B7F12A9FB81",
+        "gate-blender.png": "B8FFB8365580564416ED5A925B2B1A860DEFB0B40665292D11DB6951FA816DEE",
+        "capture-1.png": "5542FAF7CE3D58A5A327AE0CE8144DA829289F8E5D220E70C8E99CDA62356166",
+        "capture-1-gray.png": "3E773FC5D6B8BD10E547595A974445DCBC9A299FA0ED129474E9D2F1FD780E35",
+        "capture.json": "30918B256DA05C7E6FE41762BCCD2BB31F1960034092BB17E161D5638D078295",
+        "build.json": "DA1EBCFA35E96848768BA53E225DB20A6D163BE0FF43C01EBEB123A58183163C",
+        "validation.json": "4B1556E0CDD139A48805F3DC951A3CCC538FE66ABF9CCB7692DCFB7AFE428EF3"
       },
       "provenance": {
         "kind": "original",
@@ -4738,6 +5383,66 @@
       "provenance": {
         "kind": "original",
         "source": "Original G-25: monte bajo facetado para The Valley.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "bear-den",
+      "artifactRound": "G-39",
+      "status": "study",
+      "recipe": "art/recipes/bear-den/bear-den.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-23T13-46-32-699Z-38532",
+        "directory": "artifacts/graphics/G-39/approved/c36938f1e9f4f460"
+      },
+      "bounds": {
+        "min": [
+          -1.265062,
+          -0.13,
+          -1.155494
+        ],
+        "max": [
+          1.306497,
+          1.59515,
+          0.933257
+        ],
+        "size": [
+          2.571559,
+          1.72515,
+          2.088751
+        ]
+      },
+      "recipeSha256": "727A67CA43859789630B26627194811B92D363C77953942C093E8FD377B7E4FC",
+      "materials": [
+        "stone",
+        "recess"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "entrance"
+      ],
+      "statistics": {
+        "objects": 4,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 416
+      },
+      "hashes": {
+        "bear-den.blend": "9D58607E5E1C44E5F22D2A0310B295DCBA13AB681F42606CE7F4D7F40E136287",
+        "bear-den.glb": "C36938F1E9F4F460C647CF30545D747B1D2D54D73D03E1382665837120FDD3D6",
+        "bear-den-blender.png": "A812983080FAE27433D6CB7956676A92D827D3ECF3CB340C4827AFC7D4271DF2",
+        "capture-1.png": "F8160B99D0B61FBCD8F1A7727B39D34C2327B320DF22F722E0FE51B3CF906462",
+        "capture-1-gray.png": "B843DB605078407994EFF8AAD7B967B8C53940ECD6F5A550A7D5145DED7C0889",
+        "capture.json": "B9E27143985AEF01C3C8F40C76693B61D8774CDA328D4DDBCA60E1172A98DB92",
+        "build.json": "6A9029B2B396DA4EFF1761DD34C82CFF07539540C84636D1C9C7C30EB93B8172",
+        "validation.json": "C96F9E19E02C6EF65DDAE0693A10B00A8D99CBFE8D0071A47E75F4165CD93566"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original procedural exterior bear den for The Valley. 23 Sep 2026. No external provider.",
         "license": "Project original"
       }
     }

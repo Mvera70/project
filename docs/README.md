@@ -40,6 +40,7 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `changelog.md` | **El porqué de cada revisión.** Antes de deshacer una decisión, se busca aquí |
 | `task-log.md` | **El cuaderno de tareas.** El punto exacto: en vuelo, cifras, abierto |
 | `plan-meta.md` | **El plan hacia la meta** (§1b), con prioridad, dificultad y agente |
+| `plan-rendimiento.md` | **P-1: rendimiento antes de más contenido**; evidencia inicial, medición reproducible y puerta para optimizar |
 | `plan-espacial.md` | Aldea orgánica: caminos, plaza, viviendas y cierre real del recinto; aceptada localmente tras recuperación dirigida por Sol |
 | `plan-disparo-unico.md` | **El brief de Astra** (19 sep): lo que ha pasado en dos días para que lo revise, y la tarea — clips que ocurren en un instante y sostienen su última pose. Desbloquea E1 y con ella el bloque de arte entero |
 | `plan-final.md` | **El final de una partida**: la lápida, la hoja de cuentas y el cronicón (F3), con fases por agente y las decisiones que son del dueño |
@@ -66,6 +67,7 @@ Las herramientas que las produjeron están en `tools/reports/`.
 | `medidas/catalogo-historias-y-encrucijadas.md` | Qué historias tiene el catálogo y cuáles no salen |
 | `medidas/letalidad-por-decision-2026-09-19.md` | **Qué decisiones acumulan la caída (G4)**, por contrafactual: lo que mata es no prepararse para el asedio, y es lo que elige la política prudente |
 | `medidas/banco-de-balance-2026-09-19.md` | **El banco remedido (G2)**: 11 rojas de 37 y 31 minutos, no 19 y 45; las cuatro rojas con su causa; y que el catálogo no tenía contenido muerto, lo tenía el banco que lo medía |
+| `medidas/p1a-rendimiento-seed11-year21-2026-09-22.md` | P-1a: renderer y app real en semilla 11/año 21; comparación controlada de día/noche/lluvia, datos crudos y límites |
 
 ## Encargos de arte abiertos — `docs/encargos/`
 
@@ -89,6 +91,8 @@ propio documento con medidas y presupuesto de triángulos.
 | `encargos/encargo-e3-integracion-bastion.md` | Admisión y conexión visual del bastión E3 aprobado; el adarve navegable queda aparte |
 | `encargos/encargo-e3-acceso-elevado.md` | Contrato de subida real al puesto del bastión; separa ese alcance del adarve continuo sobre toda la muralla |
 | `encargos/encargo-e3-puesto-navegable.md` | Ejecución acotada E3a: ruta privada, cota, arquería y física; cierre en `historico/graphics-rounds/G-29.md` |
+| `encargos/encargo-e3b-adarve-continuo.md` | Brief de E3b: continuidad del adarve y criterio de prueba en el juego |
+| `encargos/encargo-e3b2b-modelos-candidatos.md` | Modelos candidatos pendientes para giro, diagonal y portón; inventario en `historico/graphics-rounds/E3b2a-inventario-topologia.md` |
 | `encargos/encargo-e3-escalera-visual.md` | Integración visual acotada de la escalera aceptada; navegación elevada diferida |
 | `encargos/encargo-e3-emplazamiento-accesible.md` | Selección de muros aptos para que la escalera opcional aparezca en partidas históricas reales |
 | `encargos/encargo-arado.md` | La malla del arado (M-3) |
@@ -111,7 +115,7 @@ una decisión vieja, nunca para saber qué hacer ahora — para eso está
 | `historico/next-plan.md` | Los briefs de la auditoría (15 sep) | **Entregado**: U-10 a U-14 |
 | `historico/brief-reloj.md` | Qué costaba afinar el tick (14 sep) | **Entregado**: v3.72, el reloj con horas |
 | `historico/life-ai-proposal.md` | Propuesta de IA para aldeanos y fauna (16 sep) | **Superada** por las rondas IA-1 a IA-18, que sí están implementadas |
-| `historico/graphics-rounds/` | El informe de cada ronda de gráficos (G-xx) | Cerradas: G-00 a G-31; E3 sigue parcial porque falta el adarve continuo |
+| `historico/graphics-rounds/` | El informe de cada ronda de gráficos (G-xx, E3b) | G-32 publicó candidatos y E3b.2a midió el anillo; E3 sigue parcial porque falta el adarve continuo |
 | `historico/life-rounds/` | El informe de cada ronda de la vida del valle (V-xx, IA-xx) | Cerradas: V-00 a V-14, IA-0 a IA-18 |
 | `historico/sesiones/` | Notas de sesión | — |
 
@@ -122,6 +126,7 @@ una decisión vieja, nunca para saber qué hacer ahora — para eso está
 | `ui-redesign/` | El rediseño de interfaz: plan, piel, rondas, prototipos y capturas | **Está vivo**: sus PNG y sus planes los citan `src/ui/`, treinta pruebas y las skills `piel-del-valle` y `calcar-iconos` |
 | `observations/` | Las observaciones del valle en marcha (OBS-01, OBS-02) | Evidencia reciente, en su propia carpeta desde el principio |
 | `visual-reference/` | La referencia visual del dueño del diseño | Material aprobado, con su propio README y su verificador |
+| `art-direction-mobile-2026-09/` | Capturas fuente, láminas generadas y workflow reproducible para la piel móvil | Material de trabajo vigente de «Diorama vivo + libro de crónica» |
 
 ---
 

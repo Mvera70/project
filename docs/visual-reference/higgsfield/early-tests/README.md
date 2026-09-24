@@ -14,6 +14,8 @@ juego.
 | `scroll-banner.jpg` | Banda de pergamino para títulos |
 | `oak-leaf.jpg` | Hoja de roble ornamental |
 
-La carpeta está deliberadamente separada de `public/ui/art/`: estos recursos
-no deben entrar en producción sin una revisión visual y una integración
-específica.
+La carpeta está separada de `public/ui/art/`: los JPG originales no se sirven
+al juego. El 23 sep 2026 se recortaron la hoja y el sello como PNG transparentes
+(`ornament-oak-leaf.png` y `ornament-tree-seal.png`) y se integraron en la
+bandeja y la decisión. La banderola, la esquina y los dos marcos siguen como
+referencias sin integrar.

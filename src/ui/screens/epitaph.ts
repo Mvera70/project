@@ -5,6 +5,7 @@ import { ledgerFromChronicle } from '@engine/chronicle/ledger';
 import type { ArchivedGame, Ledger } from '@engine/state';
 import { yearOf } from '@engine/time';
 import type { App } from '../app';
+import { retireOverlay } from '../motion';
 import { openChronicle } from './chronicle';
 
 const STYLE_ID = 'valley-epitaph-style';
@@ -23,31 +24,32 @@ const STYLE = `
    de una aldea y la decisión que la pudo salvar se lean como el mismo documento
    no es casualidad: son las dos cosas que ocupan la pantalla entera. */
 .epitaph-scrim { position: fixed; inset: 0; z-index: 12; display: flex;
-  flex-direction: column; justify-content: flex-end;
+  flex-direction: column; align-items: center; justify-content: flex-end;
   background: rgba(27, 22, 19, .18);
   color: var(--skin-ink); font-family: var(--skin-font-read); font-size: 15px; }
 /* VZ-2 · el hueco por el que se ve el valle. Era una franja de fusión con
    degradado; ahora la transición la hace el canto rasgado de la hoja
    (\`.skin-torn-top\`, \`skin.css\`), el mismo de las tres secciones, y esto
    sólo reserva el sitio. */
-.epitaph-fade { flex: 0 0 64px; }
-.epitaph { box-sizing: border-box; width: 100%; max-height: 100%; overflow: auto;
+.epitaph-fade { flex: 0 0 64px; width: min(100%, 760px); margin-inline: auto; }
+.epitaph { box-sizing: border-box; width: min(100%, 760px); margin-inline: auto; max-height: 100%; overflow: auto;
   padding: 0 20px max(28px, env(safe-area-inset-bottom));
   background-color: var(--skin-page);
-  background-image: var(--skin-parchment-texture);
-  background-repeat: repeat; background-size: 256px 256px;
-  background-blend-mode: multiply; }
+  background-image: var(--skin-map-pattern); background-repeat: no-repeat;
+  animation: epitaph-sheet-arrive 280ms cubic-bezier(.2, .75, .25, 1) both; }
 .epitaph > * { box-sizing: border-box; width: 100%; max-width: 390px; margin-inline: auto; }
 .epitaph-head { display: flex; align-items: flex-start; gap: 14px; padding-top: 4px; }
 .epitaph-head .skin-seal { margin-top: 2px; flex: 0 0 auto; }
 .epitaph h1 { margin: 0; flex: 1 1 auto; text-wrap: balance;
-  color: var(--skin-red-ink); font: 600 20px/1.2 var(--skin-font-voice);
-  letter-spacing: var(--skin-track-inscription); text-transform: uppercase; }
+  color: var(--skin-red-ink); font: 600 22px/1.2 var(--skin-font-heading);
+  letter-spacing: .02em; text-transform: uppercase; }
 .epitaph p { margin: 14px auto 0; color: var(--skin-ink); text-wrap: pretty;
-  font: 17px/1.5 var(--skin-font-read); }
+  font: 400 16px/1.5 var(--skin-font-voice); }
 .epitaph-actions { display: grid; gap: 10px; margin-top: 24px; }
 /* §11.7 · el área táctil no se rebaja: los botones de la piel ya miden 52. */
-.epitaph-open .valley-speeds, .epitaph-open .hud-speed-cluster { visibility: hidden; }
+.epitaph-open .valley-hud-right,
+.epitaph-open .valley-speeds,
+.epitaph-open .hud-speed-cluster { visibility: hidden; }
 
 /* F3c · **La lápida.** docs/plan-final.md §1.
  *
@@ -78,25 +80,25 @@ const STYLE = `
 .epitaph-stoned .valley-hud-right,
 .epitaph-stoned .valley-orders-now { visibility: hidden; }
 .epitaph-stone-capital { width: 112px; height: 112px; font-size: 68px;
-  animation: epitaph-seal 620ms cubic-bezier(.2, .9, .25, 1) both; }
+  animation: epitaph-seal 340ms cubic-bezier(.2, .9, .25, 1) both; }
 /* **La inscripción va sobre una banda de pergamino**, que es lo que este juego
    ya hace con el texto que va sobre el valle: la cinta de la fecha de arriba es
    exactamente eso y se lee perfectamente. Lo enseñó la primera captura de F3c
    —tinta roja sobre tejados claros, ilegible— y la arregla el material que ya
    está, no un color nuevo. */
 .epitaph-stone-lines { text-align: center; max-width: min(88vw, 520px);
-  padding: 14px 22px 16px; border-radius: 2px;
+  padding: 14px 22px 16px; border-radius: 14px;
   box-shadow: 0 10px 28px rgba(27, 22, 19, .35); }
 .epitaph-stone-inscription, .epitaph-stone-anno {
   margin: 0; color: var(--skin-red-ink); font-family: var(--skin-font-voice);
   letter-spacing: var(--skin-track-inscription); text-transform: uppercase;
   /* El grabado: se descubre de izquierda a derecha, como se talla. */
-  clip-path: inset(0 100% 0 0); animation: epitaph-carve 900ms steps(22, end) both; }
+  clip-path: inset(0 100% 0 0); animation: epitaph-carve 360ms ease-out both; }
 .epitaph-stone-inscription { font: 600 clamp(19px, 5.4vw, 30px)/1.25 var(--skin-font-voice);
-  text-wrap: balance; animation-delay: 380ms; }
+  text-wrap: balance; animation-delay: 100ms; }
 .epitaph-stone-anno { margin-top: 8px; opacity: .82;
   font: 600 clamp(13px, 3.4vw, 16px)/1.3 var(--skin-font-voice);
-  animation-delay: 900ms; }
+  animation-delay: 220ms; }
 
 @keyframes epitaph-seal {
   from { transform: scale(1.5); opacity: 0; }
@@ -107,7 +109,7 @@ const STYLE = `
 
 /* §2.60 · y quien no quiere movimiento lo ve puesto, no puesto poco a poco. */
 @media (prefers-reduced-motion: reduce) {
-  .epitaph-stone-capital, .epitaph-stone-inscription, .epitaph-stone-anno {
+  .epitaph, .epitaph-stone-capital, .epitaph-stone-inscription, .epitaph-stone-anno {
     animation: none; clip-path: none; }
 }
 
@@ -126,6 +128,9 @@ const STYLE = `
   letter-spacing: var(--skin-track-label); text-transform: uppercase; }
 .epitaph-ledger-big { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .epitaph-ledger-big div { text-align: center; }
+.epitaph-ledger-big div { padding: 12px 6px; border: 1px solid var(--skin-rule-on-paper);
+  border-radius: 11px; background: var(--skin-parchment);
+  box-shadow: 0 2px 0 rgba(32, 55, 64, .12); }
 .epitaph-ledger-big b { display: block;
   font: 600 clamp(26px, 8vw, 34px)/1 var(--skin-font-voice);
   font-variant-numeric: tabular-nums; color: var(--skin-red-ink); }
@@ -139,6 +144,10 @@ const STYLE = `
   font: 13.5px/1.45 var(--skin-font-read); }
 .epitaph-ledger-rows dt { margin: 0; opacity: .85; }
 .epitaph-ledger-rows dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; }
+@keyframes epitaph-sheet-arrive {
+  from { opacity: .7; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 @media (max-width: 400px) {
   .epitaph-ledger-rows { grid-template-columns: 1fr; }
 }
@@ -182,8 +191,8 @@ function raiseStone(game: ArchivedGame): HTMLElement {
   return stone;
 }
 
-/** Lo que dura la lápida antes de que suba la hoja, en milisegundos. */
-const STONE_MS = 2200;
+/** Pausa breve para leer la causa antes de abrir el resumen, en milisegundos. */
+const STONE_MS = 720;
 
 /**
  * F3b · **La hoja de cuentas**: tres cifras grandes y la relación larga.
@@ -289,7 +298,7 @@ export function openEpitaph(app: App, game: ArchivedGame, beginAgain: () => void
   begin.className = 'skin-button skin-button--wood';
   begin.textContent = renderUiText('epitaph.begin');
   begin.addEventListener('click', () => {
-    scrim.remove();
+    retireOverlay(scrim, card);
     shown = null;
     document.documentElement.classList.remove('epitaph-open');
     beginAgain();

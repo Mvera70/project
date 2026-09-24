@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 470" role="img" aria-labelledby="title desc">
+  <title id="title">Sección esquemática del adarve propuesto</title>
+  <desc id="desc">El muro existente mide 0,34 de ancho y corona a 0,76. Una pasarela interior propuesta empalma a 1,02 con el bastión y debe dejar 0,70 de paso libre.</desc>
+  <rect width="980" height="470" fill="#f6f0e3"/>
+  <text x="42" y="48" fill="#302b25" font-family="Arial, sans-serif" font-size="25" font-weight="700">E3b · sección de viabilidad</text>
+  <text x="42" y="77" fill="#665e52" font-family="Arial, sans-serif" font-size="15">Esquema, no modelo aprobado ni colisión implementada</text>
+  <line x1="65" y1="401" x2="915" y2="401" stroke="#66784a" stroke-width="7"/>
+  <text x="73" y="428" fill="#566344" font-family="Arial, sans-serif" font-size="15">Exterior</text>
+  <text x="833" y="428" fill="#566344" font-family="Arial, sans-serif" font-size="15">Interior</text>
+  <rect x="290" y="188" width="120" height="210" fill="#9a9588" stroke="#5e5a52" stroke-width="3"/>
+  <rect x="280" y="178" width="140" height="18" fill="#b4aea0" stroke="#5e5a52" stroke-width="2"/>
+  <text x="140" y="245" fill="#302b25" font-family="Arial, sans-serif" font-size="17">Muro actual</text>
+  <text x="140" y="269" fill="#302b25" font-family="Arial, sans-serif" font-size="15">grosor 0,34</text>
+  <line x1="246" y1="248" x2="288" y2="248" stroke="#302b25" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="260" y1="178" x2="260" y2="400" stroke="#635c51" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="185" y="170" fill="#5d5549" font-family="Arial, sans-serif" font-size="15">corona 0,76</text>
+  <rect x="353" y="105" width="471" height="27" fill="#a88357" stroke="#5a4430" stroke-width="3"/>
+  <path d="M430 134 L430 205 L475 134 M593 134 L593 235 L659 134" fill="none" stroke="#765638" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="508" y="96" fill="#513a25" font-family="Arial, sans-serif" font-size="18" font-weight="700">Pasarela interior candidata</text>
+  <line x1="445" y1="153" x2="740" y2="153" stroke="#30363d" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="521" y="178" fill="#30363d" font-family="Arial, sans-serif" font-size="16">paso libre ≥ 0,70</text>
+  <line x1="786" y1="119" x2="786" y2="400" stroke="#5e5a52" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="799" y="264" fill="#302b25" font-family="Arial, sans-serif" font-size="16">suelo 1,02</text>
+  <path d="M341 156 L371 156" stroke="#a23f33" stroke-width="3"/>
+  <text x="443" y="218" fill="#a23f33" font-family="Arial, sans-serif" font-size="15">0,26 entre corona y plataforma:</text>
+  <text x="443" y="239" fill="#a23f33" font-family="Arial, sans-serif" font-size="15">necesita soporte visible y físico</text>
+  <rect x="824" y="105" width="65" height="296" fill="#c9bba0" stroke="#645848" stroke-width="3"/>
+  <text x="805" y="91" fill="#302b25" font-family="Arial, sans-serif" font-size="16">Bastión</text>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#30363d"/></marker></defs>
+</svg>

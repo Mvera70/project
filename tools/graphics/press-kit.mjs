@@ -29,7 +29,7 @@
 //
 // Los grupos, y se eligen con `--only`:
 //
-//   menu entrada valle horas cronica gente carro encrucijada asedio final
+//   menu annals entrada valle horas cronica gente carro encrucijada asedio final
 //     · las pantallas y sus estados, con la interfaz puesta
 //   crecimiento estaciones escenas cerco
 //     · el metraje del tráiler, sin interfaz
@@ -345,6 +345,22 @@ if (want('menu')) {
   await tab.close();
 }
 
+// -------------------------------------------------------------- el cronicón
+if (want('annals')) {
+  for (const [query, key, description] of [
+    ['annals=3', 'annals-archivo', 'El cronicón con tres valles archivados'],
+    ['annals=0', 'annals-vacio', 'El cronicón antes de guardar una partida'],
+  ]) {
+    const tab = await open(query);
+    await tab.locator('.title-annals').waitFor({ timeout: 8000 }).catch(() => {});
+    await tab.locator('.title-annals').click().catch(() => {});
+    await tab.locator('.annals').waitFor({ timeout: 5000 }).catch(() => {});
+    await tab.waitForTimeout(350);
+    await shot(tab, key, description);
+    await tab.close();
+  }
+}
+
 // ------------------------------------------------- la entrada desde lo alto
 if (want('entrada')) {
   const tab = await open();
@@ -414,6 +430,7 @@ if (want('horas')) {
 if (want('cronica')) {
   const tab = await open();
   await found(tab);
+  await dismiss(tab);
   await tab.locator('.ui-shell-nav button').nth(1).click().catch(() => {});
   await tab.waitForTimeout(1600);
   await shot(tab, 'cronica', 'La crónica, cubriendo la pantalla');
@@ -427,6 +444,7 @@ if (want('cronica')) {
 if (want('gente')) {
   const tab = await open();
   await found(tab);
+  await dismiss(tab);
   await tab.locator('.ui-shell-nav button').nth(2).click().catch(() => {});
   await tab.waitForTimeout(1600);
   await shot(tab, 'gente', 'La gente del valle, los nombrados');
@@ -439,6 +457,9 @@ if (want('gente')) {
   await tab.locator('.person-action').nth(1).click().catch(() => {});
   await tab.waitForTimeout(1200);
   await shot(tab, 'ficha-vida', 'La vida de esa persona, desplegada');
+  await tab.locator('.ui-shell-content-body').evaluate((element) => { element.scrollTop = element.scrollHeight; });
+  await tab.waitForTimeout(300);
+  await shot(tab, 'ficha-vida-final', 'Últimos recuerdos con acciones todavía accesibles');
   await tab.close();
 }
 
@@ -446,6 +467,7 @@ if (want('gente')) {
 if (want('carro')) {
   const tab = await open();
   await found(tab);
+  await dismiss(tab);
   await tab.locator('.valley-orders-now').click().catch(() => {});
   await tab.waitForTimeout(1400);
   await shot(tab, 'carro', 'El carro: lo que se le puede dar al valle y lo que cuesta');
@@ -457,18 +479,20 @@ if (want('carro')) {
 
 // ------------------------------------------------------------- la encrucijada
 if (want('encrucijada')) {
-  const tab = await open();
-  await found(tab);
-  await tab.locator('.valley-speed-badge').click().catch(() => {});
-  await tab.waitForTimeout(400);
-  await tab.getByRole('button', { name: '64×' }).click().catch(() => {});
-  await tab.locator('.crossroad-options button').first().waitFor({ timeout: 120000 }).catch(() => {});
-  await tab.waitForTimeout(900);
+  // La fixture juega semanas reales del motor hasta la primera decisión.
+  // Esperarla a ×64 desde el año 1 puede tardar minutos y bloquear la tanda.
+  const tab = await open(`?debug=1&live=1&seed=${seed}&year=${year}&season=summer&crossroad=1`);
+  await tab.locator('.crossroad-options button').first().waitFor({ timeout: 15000 });
+  await tab.waitForFunction(() => window.__valleyLife?.() !== null && window.__valleyLife?.() !== undefined,
+    null, { timeout: 30000 });
+  await tab.waitForTimeout(5000);
   await shot(tab, 'encrucijada', 'Una decisión, planteada');
   // Y aplazada: se desliza hacia abajo y el sello ocupa el ornamento.
-  await tab.mouse.move(width / 2, height * 0.35);
+  const crossroadHead = await tab.locator('.crossroad-head').boundingBox();
+  await tab.mouse.move(crossroadHead.x + crossroadHead.width / 2,
+    crossroadHead.y + crossroadHead.height / 2);
   await tab.mouse.down();
-  await tab.mouse.move(width / 2, height * 0.9, { steps: 12 });
+  await tab.mouse.move(crossroadHead.x + crossroadHead.width / 2, height * 0.9, { steps: 12 });
   await tab.mouse.up();
   await tab.waitForTimeout(1200);
   await shot(tab, 'decision-aplazada', 'La decisión aplazada: el sello de lacre en la bandeja');

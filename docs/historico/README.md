@@ -28,6 +28,13 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 
 ## Los informes de ronda
 
+- [E3b.2a: topología del anillo y bosque](graphics-rounds/E3b2a-inventario-topologia.md):
+  dos villas maduras, diagonales/portones efectivos y riesgo aproximado de
+  troncos junto al tablero; prepara los modelos candidatos.
+
+- [E3b.1d: primera junta en la app](graphics-rounds/E3b1d-revision-app.md):
+  ascenso del guardia y captura del corredor en un escenario controlado.
+
 - [E0e: ambiente de eras](life-rounds/E0e-ambiente-eras.md): acabado técnico,
   controles de la misma escena y límite de aceptación visual.
 
@@ -58,12 +65,24 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 - [G-28: identidad del clan vecino](graphics-rounds/G-28.md): modelo propio,
   rig compartido e integración local comprobada en aproximación y puerta.
 
+- [P-1a.1: comparación controlada de rendimiento](graphics-rounds/P-1a1-comparacion-controlada.md):
+  nueve muestras de la app real; lluvia nocturna sin sobrecoste consistente en
+  Edge headless, respuesta real y atribución de carga pendientes.
+
+- [P-1a.2: entrada y respuesta](graphics-rounds/P-1a2-entrada-y-respuesta.md):
+  seis muestras en Edge visible; avance síncrono del preset y montaje 3D
+  atribuidos, clics posteriores medidos por Event Timing, INP pendiente.
+
+- [P-1b.1: avance cooperativo del preset](graphics-rounds/P-1b1-avance-cooperativo.md):
+  estado idéntico y clic de entrada mucho más rápido; llegar a 3D tarda
+  unos 0,6 s más, declarado en la comparación fría y caliente.
+
 Uno por ronda, con lo que se midió y en qué quedó. Se citan desde el código y
 desde `design.md` para explicar una decisión concreta.
 
 | Carpeta | Qué hay |
 |---|---|
-| `graphics-rounds/` | Las rondas de gráficos **G-00 a G-28**, con sus prompts, sus traspasos y los encargos de Blender de la aldea y los aldeanos |
+| `graphics-rounds/` | Las rondas de gráficos **G-00 a G-32**, E3b y P-1a/P-1b, con informes, traspasos, encargos de Blender y evidencia de rendimiento |
 | `life-rounds/` | Las rondas de la vida del valle: **V-00 a V-14** (la capa de vida) e **IA-0 a IA-18** (la IA escénica), más la sonda de línea base y la evidencia en capturas |
 | `sesiones/` | Notas de sesión |
 

@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "id": "e3b-gate-crossing-128-candidate",
+  "scale": 1,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "gate-crossing-128-candidate",
+    "footprint": [
+      2,
+      2
+    ],
+    "version": 1,
+    "note": "Gate z/NW endpoint study; second elevated neighbour absent from archived inventory."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "GateDeck",
+      "location": [
+        0.5,
+        -0.635,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        1.54,
+        1.27,
+        0.08999999999999997
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "JambPierWest",
+      "location": [
+        0.04,
+        -0.5,
+        0.825
+      ],
+      "dimensions": [
+        0.08,
+        0.34,
+        0.21000000000000008
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "JambPierEast",
+      "location": [
+        0.96,
+        -0.5,
+        0.825
+      ],
+      "dimensions": [
+        0.07999999999999996,
+        0.34,
+        0.21000000000000008
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NorthWestDeck",
+      "location": [
+        0.0,
+        -0.0,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.94,
+        0.08999999999999997
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        135.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "NorthWestWallWeb",
+      "location": [
+        -0.25,
+        0.25,
+        0.8425
+      ],
+      "dimensions": [
+        0.7071067811865476,
+        0.34,
+        0.17500000000000004
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        135.0
+      ]
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 1000,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0.5,
+      -0.5,
+      0.85
+    ],
+    "orthoScale": 2.5,
+    "worldRole": "sky"
+  }
+}

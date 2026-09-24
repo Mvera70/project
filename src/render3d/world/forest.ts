@@ -87,6 +87,7 @@ export interface Forest {
   readonly revealedCount: number;
   /** Actualiza la oclusión selectiva; una lista vacía restaura el bosque. */
   reveal(camera: Camera, targets: readonly ForestRevealTarget[]): number;
+  season(palette: Palette): void;
   dispose(): void;
 }
 
@@ -263,6 +264,11 @@ export function buildForest(
     stumpCount: stumpCells.length,
     get revealedCount(): number { return scattered.revealedCount; },
     reveal(camera, targets): number { return scattered.reveal(camera, targets); },
+    season(palette): void {
+      scattered.season(palette);
+      conifers?.season(palette);
+      stumpMaterial.color.set(palette.wood);
+    },
     dispose(): void {
       scattered.dispose();
       conifers?.dispose();
@@ -285,7 +291,7 @@ export function buildForest(
  *
  * Sólo toca el follaje, nunca el tronco: la corteza no cambia con el año.
  */
-function tintFoliage(material: Material, palette: Palette): void {
+export function tintFoliage(material: Material, palette: Palette): void {
   const painted = material as Material & { name: string; color?: Color };
   if (painted.color === undefined) return;
   if (painted.name.includes('leaf-light') || painted.name.includes('reed-light')) {
@@ -459,7 +465,10 @@ export function scatterCells(
       if (palette !== undefined) tintFoliage(material, palette);
       const instanced = new InstancedMesh(piece.geometry, material, total);
       instanced.castShadow = true;
-      instanced.receiveShadow = true;
+      // La copa tiene muchas caras pequeñas: recibir su propia sombra hace
+      // parpadear los contornos al girar el sol. Sigue proyectando sombra al
+      // suelo y al tronco, que sí conservan el movimiento de la jornada.
+      instanced.receiveShadow = !piece.material.name.includes('leaf');
       let slot = 0;
       const pieceMatrices: Matrix4[] = [];
       for (const cell of cells) {
@@ -573,6 +582,10 @@ export function scatterCells(
     stumpCount: 0,
     get revealedCount(): number { return revealedCount; },
     reveal,
+    season(palette): void {
+      for (const material of tinted) tintFoliage(material, palette);
+      for (const material of fadedMaterials) tintFoliage(material, palette);
+    },
     dispose(): void {
       for (const instanced of owned) {
         group.remove(instanced);

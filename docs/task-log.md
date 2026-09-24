@@ -1,5 +1,633 @@
 # Cuaderno de tareas — el rework
 
+## 24 sep 2026 · Bastión de acceso del adarve
+
+Las semillas 23 y 91 cierran su anillo sobre un bastión con máscara 66
+(este y suroeste), no sobre las dos bocas cardinales de la antigua fuente295.
+Se prepararon dos fuentes aisladas de ese bastión: sobre muro, y sobre
+portón. La primera supera sondas CPU de suelo, pretiles y catorce peldaños;
+la segunda mantiene libre el vano de 0,84 y la hoja en 91 posiciones, pero
+su tablero se solapa con el conector24 y su apoyo aún no está acreditado.
+Ambas desplazan la escalera 0,65 hacia el interior, así que la ruta privada
+del guardia también deberá cambiar. No hay GLB, publicación ni demo nueva.
+Fuentes y límites: `art/recipes/e3b-bastion-anchor-66-candidate/README.md`.
+
+La fuente combinada posterior sustituye conjuntamente la fábrica estática del
+bastión y del portón24, sin superponer tableros ni pretiles. La sonda CPU mide
+216.737 muestras de circuito, 94.955 de descansillo y 1.702 de borde sin
+huecos; el vano conserva 0,84 y la hoja no tropieza en 91 posiciones. Hay
+contacto geométrico continuo entre dintel, viga y tablero, pero no una prueba
+de resistencia. Se preparó un exportador aislado para la fábrica estática;
+su ejecución y la instalación en escena siguen pendientes. Fuente y límites:
+`art/recipes/e3b-bastion-anchor-66-candidate/COMBINED.md`.
+La hoja del GLB ancho se puede separar del marco: 17 mallas móviles frente a
+31 originales, con gozne y límites de hoja idénticos en tres ángulos. Un
+montaje CPU en la semilla 91 confirma 118 muestras de ruta a la cota 1,02.
+Un inventario de máscaras encontraba archivos para los 104 segmentos de la
+semilla 23 y los 88 de la 91, pero la comprobación de bocas detectó una
+asociación falsa: la antigua fuente bastión296 abre oeste/sureste y la parcela
+real necesita oeste/noreste. La sonda fallaba con la asociación antigua.
+La fuente nueva `e3b-bastion-crossing-24-candidate` corrige ese giro W+NE.
+Su sonda CPU pasa 67.795 muestras de disco y mide dos bocas de 0,70, con
+pretiles cerrados contra las secciones de los vecinos recto y diagonal.
+`check-source-coverage.ts` ya verifica las direcciones de los 104 y 88 tramos
+sin faltantes. Una sonda de huella en seed91 no encuentra edificios, obras ni
+árboles invadidos por la pieza. El paso de radio 0,35 es tangente, sin margen;
+faltan exportación, empalme GLB, colisión real y revisión de la escena.
+La puerta de árboles de la escena ya usa la huella ampliada exacta del cruce
+W+NE, incluida la media celda nordeste que la aproximación genérica omitía.
+El retorno 66 comprueba también el brazo suroeste y la escalera que llega a
+Z local 2,65; el bloqueo genérico sólo llegaba a la celda del bastión.
+Prueba focal de invasión y no invasión, typecheck y ESLint pasan. Se preparó
+un exportador aislado para esa fuente; su ejecución requiere autorización de
+la invocación exacta y no ha ocurrido todavía.
+La jornada E3b de seed91 dejó de usar una escalera ficticia del bastión pasante
+24. La escena sólo permite ofrecer el circuito desde el retorno 66; vida valida
+su nuevo pie a Z local 2,65. Ese acceso competía por la misma celda que el
+puesto del portón: se asigna primero el acceso único y se recoloca el guardia
+del portón en otra celda, devolviendo después el orden táctico original. La
+jornada focal confirma un solo puesto de anillo, subida, vuelta completa y
+descenso del mismo guardia; también conserva al defensor del portón. Esto no
+activa aún los modelos E3b.2 en la demo.
+
+## 23 sep 2026 · Caza física y entrada exterior del oso
+
+La caza se ofrece manualmente con arma elegida: honda o arco para presas
+pequeñas, arco o lanza para ciervo y jabalí, y lanza para el oso final. El
+botón de ataque ordena cada tiro o golpe; los proyectiles usan trayectoria y
+colisión barrida, y la lanza exige alcance real. El motor sólo acredita carne
+y progresión al recibir un parte del encuentro; la crónica registra la presa
+o su huida. Perdiz y conejo son comunes, ciervo y jabalí menos frecuentes, y
+el oso requiere haber superado al jabalí y recibir su avistamiento raro.
+
+La guarida es **únicamente un modelo exterior** de entrada rocosa. El oso sale
+de ella, puede atacar al cazador y, si no cae, vuelve a esconderse. Nadie
+entra en una sala interior. Los nuevos modelos son perdiz, conejo, jabalí,
+honda y entrada de cueva. Capturas de control en
+`artifacts/graphics/hunt-smoke/`; las estampas de crónica quedan pendientes
+en `docs/plan-arte-pendiente.md`.
+
+## 23 sep 2026 · Segundo animal: oso
+
+El oso 3D original (2.712 triángulos, 465 KB, clips de reposo, marcha y
+zarpazo) se integra en la visita del suceso real `bear_in_the_wood`. Un solo
+ejemplar aparece en el borde del bosque mientras dura la bandera de dos
+semanas, recorre un claro, advierte a la gente próxima y se retira. Los
+habitantes próximos pueden huir a casa y el ciervo se aleja. Es vida escénica:
+el motor conserva la pérdida de moral y la crónica, sin atribuir daños ni una
+presa concreta al gesto. Modelo y auditoría en
+`docs/historico/graphics-rounds/G-34-oso.md`.
+
+## 23 sep 2026 · Primer animal completo: ciervo
+
+Se añadió un ciervo 3D original con clips `idle` y `walk` (2.972 triángulos,
+431 KB de GLB). Como máximo aparecen dos por jornada en la linde del bosque,
+con pasto, marcha y huida de personas, cazadores y lobos; la vida escénica no
+escribe en el estado. Los cazadores que calcula `allocateLabour` tienen sitio
+de trabajo visible y su temporada conserva los eventos `forage.hunt` y
+`forage.both` del motor. La captura focal está en
+`artifacts/graphics/G-33/deer-in-game-close.png` y la secuencia con diez
+fotogramas en `artifacts/graphics/G-33/deer-motion/`: la traza confirma dos
+ciervos y pesos de marcha de 0 a 1 sin errores de página. Build, typecheck,
+ESLint focal y pruebas `life-deer`/`life-day` pasan. Queda pendiente medir FPS
+en un móvil real antes de elevar el límite de dos animales.
+
+## 23 sep 2026 · Primera fauna de montaña
+
+Se prueba el lobo animado existente como presencia escénica en las laderas
+exteriores: dos animales como máximo, trayectoria derivada de la semilla y del
+tiempo visual, altura tomada de la sierra y salida por el paisaje lejano. No
+entran en las celdas jugables ni alteran el motor o los guardados. Se acortó la
+separación entre ambos para que la vista panorámica lea una pequeña manada.
+Captura focal en `artifacts/graphics/mountain-wolves-trial/wolves-close.png`;
+prueba focal, typecheck y ESLint pasan. Falta medir fotogramas en un móvil real;
+esta prueba no aprueba nuevas especies ni cambia los lobos del suceso del corral.
+
+## 22 sep 2026 · Nueva dirección para toda la interfaz
+
+Vera aclara que el ajuste tipográfico anterior se queda corto: toda la app se
+siente demasiado antigua. Aporta una pantalla de Clash Royale como ejemplo de
+**sensación de juego**, aunque considera exagerado ese estilo. Se adopta su
+jerarquía rápida, botones legibles y respuesta visual, sin copiar su saturación
+ni cargar The Valley de controles. La ambientación medieval sigue en el mundo,
+la crónica y algunos detalles; el HUD y las acciones deben ser claros, ligeros
+y actuales. La dirección y las fases se registran en
+`docs/ui-redesign/game-ui-direction.md`. Cambio amplio en curso; no se da por
+aprobado con un retoque de fuente ni con una sola pantalla.
+
+Precisión posterior de Vera: la UI debe corresponder al 3D voxel/low poly,
+mantener identidad medieval propia y usar botones y elementos destacados con
+relieve, como juego, con menos exageración que la referencia. **No cambiar el
+reloj del sol.** Vera preparará un mockup del HUD móvil; se le dio un prompt con
+los cinco recursos, los controles y la navegación para que esa imagen fije la
+dirección antes del acabado final.
+
+Primera pasada implementada: tokens de color y fuentes, placas regulares,
+botones con relieve, recursos, navegación, fichas, portada, decisiones, lista
+de gente, crónica, bienvenida, anales y epitafio. No se tocó el reloj del sol.
+En el navegador a 390 × 844 se revisaron portada, valle, crónica, gente y
+cronicón. La acción de fundar queda visible en la portada; las filas de gente
+ya no tienen bordes rasgados. Typecheck, build y `git diff --check` pasan.
+Queda cerrar el acabado visual con el mockup de Vera y revisar las demás rutas
+y estados de la demo antes de dar por terminada la conversión de toda la app.
+
+Corrección posterior de color y movimiento: Vera descarta el verde azulado claro
+de los paneles. Tras revisar la captura, también descarta el matiz oliva que
+quedaba: la superficie pasa a piedra cálida neutra (`#D8D0C0`), con controles
+`#E7DFD0`, borde cálido `#C9B99E` y curvas topográficas en tinta tierra. Las
+tres secciones conservan la misma navegación oscura y la pestaña activa se marca
+con ámbar. La entrada de una sección ahora dura 280 ms, con desvanecido,
+desplazamiento y escala muy leves; sólo anima la hoja de UI, nunca el mundo ni
+el reloj. La portada suma una entrada corta para el velo y el libro, con respeto
+a movimiento reducido. La demo real confirmó la crónica y la barra; queda revisar
+los demás estados al cerrar la ronda visual.
+
+Corrección tras la captura de la crónica: el fondo verdiazul claro tampoco encaja.
+Bienvenida, encrucijada, anales y epitafio se ajustan a la piel compartida y
+reciben la misma entrada breve, respetando movimiento reducido. Typecheck,
+ESLint focal y `git diff --check` pasan. No se recorrieron estas rutas en la
+partida viva para evitar que siguiera avanzando su calendario; se revisaron en
+una copia aislada. La nueva captura queda pendiente tras el ajuste final a piedra
+cálida neutra.
+
+La auditoría de cobertura encontró que la navegación todavía cambiaba de
+pergamino a placa y a madera según la pestaña, pese a la dirección aprobada.
+Las tres usan ahora la misma madera oscura y distinguen la activa con la placa
+ámbar. Al volver a Valle entra la barra en 220 ms sin mover el lienzo; los
+paneles conservan su entrada de 280 ms. También se redujo el cierre del epitafio
+a una transición total menor de un segundo. Se actualizó §11.4 para permitir
+movimiento decorativo de interfaz sin mezclarlo con el tick, cámara o reloj del
+sol. Se capturaron portada, valle, crónica, personas, carro, encrucijada y
+epitafio en navegador aislado; queda repetir la crónica tras el ajuste cálido y
+verificar escalas móviles y escritorio antes del cierre global.
+
+Revisión final de color encontró otro velo verdiazul en el cronicón, más opaco
+que el de las demás pantallas. Se igualó a carbón al 18 % y se añadió una prueba
+focal. Capturas aisladas actualizadas de valle y crónica confirman que el cambio
+de piedra cálida está cargado; no se abrió la partida viva.
+
+Para no dejar el cronicón fuera de futuras revisiones, `press-kit.mjs` incorpora
+el grupo `annals`, con capturas del archivo poblado (`?annals=3`) y vacío
+(`?annals=0`). A 390 px ambas muestran botones sans táctiles y tarjetas claras;
+el velo ya no tiñe de verde azulado el valle de detrás. La crónica a 1280 × 800
+mantiene la columna de lectura sin recortes y la navegación común. Pendientes del
+cierre global: captura visual del parte de bienvenida, más superficies a ancho
+de escritorio y la referencia que Vera ofreció para afinar el fondo, pues la
+última captura sigue dejando mucho papel cálido en pantalla.
+
+## 23 sep 2026 · Correcciones visuales para entregar la demo
+
+Vera señala una raya de selección que pisa «VALLE», un cierre con una X
+demasiado pequeña y paneles de Crónica/Personas que dejan demasiado pergamino a
+la vista. Se retira la raya (la placa ya señala la pestaña activa), los cierres
+de las secciones pasan a botones con el texto «Cerrar», y los paneles quedan
+centrados hasta 760 px para que se vea más valle a los lados. La Crónica suaviza
+el fondo exterior al desenfocarlo levemente; su botón se alinea con la columna de
+lectura. Las acciones de la ficha de persona mantienen margen interior.
+
+Captura aislada de escritorio: la aldea queda visible a ambos lados de los
+paneles y el cierre de Personas se lee con claridad. Se corrigió en el repaso
+una regla común que ensanchaba el botón de cierre de Crónica y se comprobó en
+una segunda captura: ahora ocupa su propio renglón junto a la columna de lectura,
+sin pisar el rótulo del año. También desaparece la raya bajo la pestaña activa.
+Typecheck y ESLint focal pasan; cuatro suites de interfaz focales pasan (36
+pruebas). Capturas de escritorio del archivo y la crónica generadas en
+`artifacts/graphics/ui-redesign-2026-09-23-wide-panels/`; la lectura conserva
+su columna de 390 px y deja más valle visible a ambos lados. La demo local queda
+lista para seguir probándola con Vera; sin commit ni push.
+
+## 22 sep 2026 · Pulido de demo: estaciones, identidad y capítulos
+
+Vera pide abrir la demo para probarla manualmente y reportar errores. El foco
+inmediato es corregir el salto visual entre estaciones: el valle cambia de golpe
+y se ve feo. La presentación debe avanzar de forma gradual; si una transición
+completa resulta costosa, cada cambio de estación necesita una animación. La
+base de transición debe poder reutilizarse después en cambios de era y otros
+cambios visuales. No se retoma el plan amplio mientras se prepara esta base y la
+demo para corregir errores encontrados jugando.
+
+Dirección narrativa para conservar como idea, todavía sin ampliar la lírica:
+organizar la historia en capítulos que enlacen crónica y decisiones. En esta
+etapa importan los cimientos del formato; la escritura se pulirá más adelante.
+
+Dirección de interfaz expresada por Vera: la tipografía actual se siente mal
+para un juego. Mantener el toque medieval como acento, con una UI clara,
+atractiva, ligera y poco cargada; cuidar mucho los pocos detalles que se añadan.
+La prioridad es que se lea y se sienta como un juego.
+
+Estado: primera transición y primer ajuste tipográfico implementados; queda
+revisión manual en la demo. La propuesta de capítulos sigue apuntada como idea.
+
+La causa del salto era doble: el repintado usaba las dos primeras semanas,
+mientras `paletteFor` cambia realmente en `seasonWeek` 10 y 11 al final de la
+estación. La firma y el renderer ahora siguen esos valores y los interpolan en
+0,8 segundos reales; suelo, río, follaje y nieve de tejado comparten la mezcla,
+y el acabado del suelo por era usa el mismo paso. La partida nueva y las
+discontinuidades se pintan directamente para no arrastrar colores de otra
+escena. Typecheck, lint y la prueba focal de la clave estacional pasan. El pase
+de `graphics-world` sigue teniendo un fallo ajeno a esta ronda: `gate-timber`
+está publicado pero no catalogado en los cambios locales existentes.
+
+Primer ajuste tipográfico: sans de sistema para la UI, cifras y acciones;
+Cinzel queda en títulos/inscripciones y EB Garamond en la crónica. Es un punto
+de partida para la revisión manual, no una aprobación final de la piel. La demo
+local está abierta en el menú con los presets de Caserío, Aldea y Villa cerrada;
+falta juzgar visualmente los cambios de estación y la tipografía jugando.
+
+## 22 sep 2026 · Auditoría de trabajo producido pero sin uso
+
+Vera abre expresamente una ronda para buscar e integrar modelos y sistemas ya
+hechos que aún no llegan a la partida. Inventario inicial: 72 GLB publicados;
+el único candidato de juego publicado y ausente de la carga era
+`e3b-walkway-candidate`. `axis-marker` y dos esquinas son estudios, mientras
+`barrel` y `hall` se piden desde código sin GLB publicado. El resto de huecos
+del adarve —giro, diagonal y portón— necesitan modelos que todavía no existen;
+no son activos olvidados.
+
+Se conectó el módulo recto G-32 al segundo muro junto al bastión accesible:
+carga, colocación en las cuatro caras, selector que reserva también el volumen
+interior del segundo muro, ruta privada hasta el centro del módulo, plataforma
+física y pretiles. Pasaron typecheck, ESLint focal y 56 pruebas de geometría,
+ruta, guardia y física. La comprobación descubrió que los bastiones de la villa
+real caían donde el segundo tramo coincidía con campo o casa, así que el GLB
+seguía sin verse. La elección de mejora en el motor ahora **prefiere, entre
+muros válidos, los que admiten la pasarela recta**. La topología pura se comparte
+entre motor y render; número y coste de bastiones no cambian. Al reproducir la
+villa desde fundación (semilla 7/año 60/verano), el bastión 281 nace en
+(30,67), con muros 255 y 256. `planFor` elige la junta E3b; durante aviso con
+armas, `garrisonPlaces` sitúa un puesto en el segundo muro a (28,5;67,21),
+Y=1,02. La app abre esa partida normal y el escenario `e3b=1` ahora sólo
+comprueba su estado: no introduce piezas ficticias. El bosque tapa la junta
+desde el ángulo inicial, de modo que su lectura cercana y la caminata visual
+siguen pendientes de acreditación. Giro, diagonal y portón aún no tienen
+continuidad.
+
+Auditoría adicional del catálogo: `art/catalog.json` contiene 73 entradas;
+dos son estudios de aldeano sin publicación. El manifiesto distribuye 72 GLB.
+De éstos, `axis-marker` y las dos `village-corner` son estudios técnicos;
+los otros 69 se solicitan desde `WANTED`. Una prueba focal mantiene esa
+correspondencia para publicaciones posteriores. `hall` y `barrel` siguen siendo
+respaldos procedurales porque no tienen GLB publicado; no son recursos ya
+producidos que falte activar. La prueba de carga acredita solicitud, no que
+cada pieza aparezca en toda partida ni que cada clip se reproduzca.
+
+El inventario de `public/ui/art/` tiene 47 PNG: 44 constan en el índice de
+crónicas, y `entry.png` y `capital-anno.png` se consumen directamente desde la
+pantalla de crónica. **`title-valley-higgsfield.png` está aprobado como
+dirección visual.** La imagen trae impresos título, lema, `START GAME`,
+`CONTINUE`, idioma y opciones; la pantalla actual dibuja controles reales y
+texto localizable. Se integró sólo su viñeta central como adorno de la portada,
+recortando todos los rótulos y conservando botones accesibles. Comprobada
+visualmente en el menú a 5174. La transición de apertura propuesta en
+`docs/plan-arte-pendiente.md` sigue pendiente; este recorte no la completa.
+
+Se buscaron además todos los GLB de `artifacts/graphics/` contra el manifiesto.
+Los únicos nombres no publicados son `base-comparison` y
+`villager-low-voxel` (experimento G-17), `bastion-access` (export previo a
+`bastion-access-candidate`) y `gate-before-stone` (copia de respaldo de G-24).
+Ninguno constituye otro modelo de juego aprobado esperando conexión. Se
+conservan los archivos y los cambios locales.
+
+Una jornada focal adicional simula la semilla 7 hasta el año 60, lee los tres
+GLB publicados de E3b y verifica que la escena del bastión construido por el
+motor anexa las tres instancias reales. Pasó en 6 s, junto con typecheck y
+ESLint. Es evidencia de ensamblaje sin GPU; la legibilidad de la junta bajo
+el bosque y la marcha visible de la guardia aún requieren revisión visual.
+
+Vera indica que con el inventario actual basta y pide detener la búsqueda de
+recursos desde este punto. No se abren más carpetas ni líneas de auditoría.
+
+Después pide que el título aproveche el fondo texturizado de la portada y
+simule los bordes de un libro. Se añadió una cubierta estática centrada con
+cuero, lomo izquierdo y canto de páginas a la derecha. El pergamino usa la
+textura local con base `#E0C39A`, cercana al PNG aprobado, y mantiene todos
+los controles como HTML. Revisión visual en la demo a 5174: el libro se lee y
+la página desplaza su contenido; la apertura animada no forma parte de este
+arreglo.
+
+La captura panorámica nocturna muestra la sierra exterior como un bloque casi
+negro. Se añadió un reflejo tenue dependiente de la hora y se quitó la recepción
+de sombras de esa malla, que no necesita oscurecimiento de objetos del valle.
+Typecheck y ESLint pasaron. En la app, al zoom panorámico y con noche fijada,
+la sierra conserva una silueta visible contra el cielo; de día mantiene sus
+colores. No demuestra que el flicker general de sombras esté corregido.
+
+## 22 sep 2026 · Demo manual y parada del plan
+
+Vera pide abrir ya la demo por edades y detener el avance del plan. La prueba
+manual se hace con los tres presets existentes del menú de desarrollo: Caserío
+(semilla 7, año 1), Aldea (semilla 11, año 21) y Villa cerrada (semilla 7,
+año 60). Desde este punto sólo se reproducen y corrigen los errores que Vera
+vaya comunicando mediante capturas; no se abren funciones, arte ni fases nuevas.
+
+Primera captura de la demo, villa cerrada: la decisión «Men Over the Ridge»
+mostraba el relato pegado al borde izquierdo y el literal `{count}`. Se corrigió
+el margen horizontal del párrafo y se entrega a su plantilla el tamaño de la
+partida atacante desde `state.threat.comingBand`. Verificación focal: typecheck,
+ESLint y captura 1600×900 de la decisión con «51 men» y relato centrado en la
+misma columna que título y opciones (`artifacts/graphics/ui-crossroad-warning-fixed.png`).
+
+Segunda captura: el río dejaba dos huecos visuales en la muralla de la villa.
+Ahora estacas y muro pueden ocupar agua corriente del anillo; casas y portones
+siguen sin hacerlo y el vado conserva su paso. El cierre exige construir esos
+tramos de río. Prueba focal de cierre/colocación, typecheck y ESLint pasan; la
+partida real semilla 7/año 60 termina con seis muros sobre el agua y anillo
+cerrado. Captura de la escena: `artifacts/graphics/wall-river-closed-scene.png`.
+
+Tercera captura: el portón de madera no se integraba en la muralla de piedra.
+Se rehízo la receta G-24 con jambas, dintel y almenas de piedra, una hoja más
+proporcionada y refuerzos de hierro. Conserva el nodo `gate_door`, su pivote y
+la rotura ya conectada al asedio. El GLB se reconstruyó, validó y sustituyó en
+la demo; se conservó el anterior en `artifacts/graphics/G-24/gate-before-stone.glb`.
+Pasaron typecheck y los ocho tests focales de asset, puerta y retroceso.
+
+Revisión de la fase de madera: el portón anterior se publica además como
+`gate-timber.glb`. El plan usa ese recurso mientras haya empalizada junto al
+paso, y cambia al de piedra al completarse los tramos vecinos. El pivote
+`gate_door` conserva apertura y rotura en ambas variantes. La escena real de
+semilla 7/año 25 contiene 7 estacas, ningún muro de piedra y un portón de
+madera; se abre con `?debug=1&seed=7&year=25&live=1`. Typecheck, ESLint y 14
+tests focales pasan.
+
+## 22 sep 2026 · Corte de alcance antes de la demo
+
+Decisión de Vera: cerrar primero S-1 hasta alcanzar una solución visual
+aceptable, crear después la demo por edades con lo ya construido y **parar**
+para una prueba manual jugando. Hasta recibir ese veredicto no se abren nuevas
+funciones ni rondas de arte. Si la cámara estabilizada actual no basta, queda
+una sola prueba acotada: CSM con dos cascadas de 1024; después se elige entre
+las candidatas y se continúa con la demo. El objetivo inmediato vuelve a ser
+pulir y comprobar el juego completo, sin ampliar el saqueo ni sus sistemas.
+
+**Pulido básico añadido por revisión visual:** apareció un aviso temporal de la
+UI alineado a la izquierda en vez de centrado y con una presentación que no
+cumple la estética de la carcasa; caducó antes de poder capturarlo y todavía no
+está identificado por texto o rol. Antes de la demo hay que
+reproducir los avisos de `voice.ts` (`event`, `milestone`, `offer` y pistas) en
+pantalla ancha y comprobar cuál escapa de `.ui-shell-message` o hereda una piel
+antigua. No se atribuye el defecto a la plaza ni se cambia ninguna mecánica.
+
+## 22 sep 2026 · S-1, flicker global de sombras todavía abierto
+
+El [diagnóstico S-1](historico/graphics-rounds/S-1-flicker-sombras.md)
+reproduce bandas móviles en tejados y copas a ×1. Quitar sólo su auto-sombra
+reduce métricas locales, pero Vera confirma que el parpadeo continúa en toda la
+escena y se ve fatal; la captura fija no permite juzgarlo. VSM 1024 empeora la
+secuencia; 2048 la reduce sin arreglarla y 4096 aporta poco más. Por petición de
+Vera se conserva 2048: una comprobación rápida de 5 s mantuvo exactamente p50
+13,9 ms, p95 14 ms y p99 20,9 ms frente a 1024. S-1 sigue abierta y la demo por
+edades queda pausada. Sin commit ni push.
+
+## 22 sep 2026 · E3b.2a, inventario del anillo y encargo de modelos
+
+El [inventario CPU](historico/graphics-rounds/E3b2a-inventario-topologia.md)
+de dos villas de piedra encuentra 65 enlaces cardinales y 15–16 diagonales
+efectivas; los portones aparecen con enlaces cardinal/diagonal o sólo
+diagonal. El módulo recto G-32 aún no se instancia más allá de la entrada.
+En la semilla 7 quedan 15 árboles adultos visibles contiguos a piedra por
+la heurística interior; cinco tienen posible invasión del voladizo, pendiente
+de medir con orientación y malla reales. Se preparó el
+[encargo E3b.2b](encargos/encargo-e3b2b-modelos-candidatos.md) para las
+variantes de giro, diagonal y portón. E3b.2 continúa abierta. Sin app, GPU,
+Blender, benchmark, commit ni push.
+
+## 22 sep 2026 · E3b.1d, primera junta observada en la app
+
+La [revisión E3b.1d](historico/graphics-rounds/E3b1d-revision-app.md)
+capturó la junta bastión → primer muro en un escenario controlado, con el
+mismo guardia subiendo de Y=0 a 1,02 y ocupando el corredor. Hay flechas
+visibles en asalto, aunque la traza no identifica a su arquero. La máscara
+pública sigue cerrada. Una corrida con SwiftShader forzado dio tres errores
+de shader; otra con WebGL por defecto no dio errores. La tala cercana,
+animación de hachazos, porte y descarga ya están conectadas al objetivo y
+al recurso semanal; falta comprobar su lectura visual mientras se cierra el
+anillo. Sigue E3b.2: rectas, giros, diagonales y portón del anillo completo.
+Sin benchmark, commit ni push.
+
+## 22 sep 2026 · E3b.1c, guardia y física implementados; falta partida real
+
+El [primer enlace navegable](encargos/encargo-e3b1c-navegacion-y-fisica.md)
+lleva al mismo guardia del bastión al corredor del primer muro y de vuelta,
+sin abrir la máscara pública ni crear un puesto adicional. La física de
+combate usa bastión y muro a Y=1,02, respeta la abertura G-32 y prueba el
+origen real de la flecha en cuatro orientaciones. Las cinco suites afectadas
+pasan juntas con **55 pruebas**; typecheck, ESLint focal y `git diff --check`
+también pasan. La implementación aún requiere captura y observación de la
+partida real autorizadas por Vera antes de aceptar E3b.1. E3b.2, el anillo
+continuo con esquinas, diagonales y portón, sigue pendiente. Sin app, GPU,
+commit ni push en esta ronda.
+
+## 22 sep 2026 · E3b.1b, primera junta integrada en el plan visual
+
+El [ensamblado selectivo](encargos/encargo-e3b1b-escena-selectiva.md) coloca
+el bastión abierto y el primer módulo G-32 sólo cuando el selector E3b.1a
+encuentra dos muros rectos de piedra. Gira ambos como una unidad en las cuatro
+caras, conserva el muro original y vuelve a E3a si la junta se pierde o entra
+en obra. Pasan 28 pruebas focales, typecheck, ESLint focal y
+`git diff --check`. No se ha abierto la app; todavía no hay guardia ni física
+de pasarela. Sigue [E3b.1c](encargos/encargo-e3b1c-navegacion-y-fisica.md).
+Sin commit ni push.
+
+## 22 sep 2026 · G-32 publicado y E3b.1a cerrada
+
+Con autorización expresa se publicaron los tres GLB candidatos de la junta
+bastión → muralla. El [recibo G-32](historico/graphics-rounds/G-32-e3b-candidatos.md)
+registra los hashes contrastados y las 68 entradas anteriores conservadas en
+el manifiesto. No se ha sustituido ningún recurso existente ni se ha abierto
+el juego.
+
+La [ronda E3b.1a](encargos/encargo-e3b1a-selector-y-ruta.md) implementó un
+selector puro para dos muros rectos de piedra y una ruta privada desde la
+escalera E3a hasta el primer tramo. Niega también conexiones diagonales que
+`buildDefence` montaría con otra forma y ocupación de la franja interior que
+sobresale 0,27 celdas. Pasan 26 pruebas focales, typecheck,
+ESLint focal y `git diff --check`. Falta E3b.1b: ensamblar los GLB sólo donde
+el selector sea positivo, adaptar colisiones y asignar al mismo guardia antes
+de revisar escena, navegación y combate. E3b sigue abierta. Sin commit ni push.
+
+## 22 sep 2026 · E3b.0, exportación aislada validada
+
+Con permiso específico se ejecutó el diagnóstico de `game-dev` y se
+exportaron las tres recetas candidatas con Blender 5.2.1 a una carpeta nueva.
+`game-dev asset inspect` y GLTFLoader en Node leyeron los GLB; medidas, mallas,
+triángulos y materiales coinciden con las fuentes. La
+[evidencia E3b.0](historico/graphics-rounds/E3b0-exportacion-candidata.md)
+incluye hashes y límites. Las vistas Eevee son de piezas aisladas: falta unión
+en escena, navegación y combate. No se publicó ningún recurso. E3b sigue
+abierto; sin commit ni push.
+
+## 22 sep 2026 · E3b.0, junta lateral abierta como candidata
+
+Vera señaló en la vista oblicua que la unión bastión → adarve debía estar
+abierta. La [variante aislada](../art/recipes/e3b-bastion-joint-candidate/README.md)
+deriva G-27 sin reemplazarlo: abre el lateral este, añade un descansillo y
+ajusta el primer tramo de pasarela. El análisis continuo de cajas encuentra
+0,70 de corredor, suelo a 1,02 y hueco cero en la junta; los 14 peldaños
+permanecen idénticos. Para salvar el giro, los primeros 0,25 de borde exterior
+del tablero quedan sin pretil alto. Las [vistas CPU](../artifacts/graphics/E3b-bastion-joint-candidate/candidate-oblique.png)
+muestran el cambio; falta aceptación visual, exportación, integración y prueba
+en partida real. E3b y E3 siguen abiertos. Sin Blender, app, GPU, commit ni push.
+
+## 22 sep 2026 · E3b abierto: pasarela continua, primero geometría
+
+Tras cerrar P-1 se auditó la costura E3a → muralla sin abrir Blender ni el
+juego. El tramo renderizado tiene grosor 0,34, frente al paso libre 0,70 del
+bastión; su coronación está a 0,76 y el suelo del bastión a 1,02. El portón
+llega a 0,93. `buildDefence` escala y recorta el GLB, de modo que ensanchar
+sólo `wall.glb` no daría una pasarela transitable. El nuevo
+[brief E3b](encargos/encargo-e3b-adarve-continuo.md) separa propuesta
+geométrica, primer enlace navegable y cierre de continuidad sobre rectas,
+giros, diagonales y portón. La
+[auditoría E3b.0](historico/graphics-rounds/E3b0-viabilidad-adarve.md)
+propone una pasarela interior modular separada del muro; sigue pendiente de
+revisión visual. El [encargo de modelo candidato](encargos/encargo-e3b-modelo-candidato.md)
+fue autorizado y entregó el [módulo recto candidato](../art/recipes/e3b-walkway-candidate/README.md)
+con 0,72 de paso libre, suelo a 1,02 y vistas técnicas por CPU. La junta con
+G-27 **no pasa**: pretiles/almenas laterales la bloquean y el solape útil es
+0,57. E3b.1 espera una decisión sobre una variante de acceso del bastión.
+`game-dev` CLI 1.0.2 respondió a versión y capacidades, sin producir ni validar
+un asset. No se modificaron mallas publicadas, escena, física, motor ni
+guardados; sin Blender, GPU, commit ni push.
+
+## 22 sep 2026 · P-1 rendimiento cerrado; sigue E3
+
+Vera considera suficiente el rendimiento actual y pidió cerrar la fase. Cuatro
+corridas secuenciales, tres réplicas cada una, compararon el primer render 3D
+normal con un candidato partido. Éste redujo la mediana de la mayor tarea del
+primer fotograma de 255 a 167 ms en frío y de 237 a 149 ms en caliente, pero
+no aceleró 3D utilizable; en caliente pasó de 1,600 a 1,787 s y el p95 de los
+clics posteriores de 24 a 32 ms. Se retiró el candidato. P-1b.1, el avance
+cooperativo que mejoró claramente la respuesta del clic de entrada, permanece.
+[Informe P-1b.2](historico/graphics-rounds/P-1b2-primer-fotograma.md).
+
+P-1 queda cerrada para continuar la hoja de ruta, con límites declarados: el
+INP previo de 912–1.144 ms no se reprodujo como INP del navegador; no hubo
+medida GPU ni en móvil. El fallo anterior de sombras diurnas sigue aparte.
+La siguiente fase del [plan maestro](plan-meta.md) es E3, adarve continuo.
+No se tocó Blender, el motor ni los guardados. Sin commit ni push.
+
+## 22 sep 2026 · P-1b.2, sonda leída y candidato preparado
+
+La corrida fría de tres réplicas completó la sonda de primer fotograma. Dos
+réplicas tardaron 245–260 ms y la primera 551 ms; suelo y vida costaron ~65–80
+y ~72 ms, y el primer envío a WebGL 88 ms en las dos típicas. Las dos corridas
+calientes se solaparon parcialmente, así que sus 259–333 ms se conservan como
+diagnóstico, no como comparación limpia. Los informes están bajo
+`artifacts/graphics/P-1a-app/2026-09-22T14-14-50-981Z-00/`,
+`2026-09-22T14-23-31-101Z-00/` y `2026-09-22T14-23-59-739Z-00/`.
+
+Se preparó el segundo candidato P-1b: construir la escena en un `paint` y
+enviar el primer fotograma a WebGL en el RAF siguiente. El lienzo permanece
+oculto hasta que se dibuja, sobre el fondo verde existente. Una partida
+terminada se renderiza de inmediato. El banco admite `--first-paint combined`
+como control local y `split` como candidato. Typecheck, ESLint focal y
+`git diff --check` pasan. Faltan comparación secuencial autorizada y revisión
+visual antes de aceptar o retirar el cambio. No se han tocado las sombras,
+Blender, el motor ni los guardados. Sin commit ni push.
+
+## 22 sep 2026 · P-1b.2, sonda de montaje preparada
+
+La lectura del perfil de P-1b.1 muestra una mezcla de trabajo de Three/WebGL
+y `src/render3d/` en la tarea larga restante; una réplica carga además
+`detectGlade`. Antes de modificar la escena se añadieron marcas locales de
+importación, creación y primer fotograma en `backend.ts` y `renderer.ts`.
+`bench-app.ts --stages true` las conserva en el JSON y valida que llegue el
+primer render. Typecheck, ESLint focal y `git diff --check` pasan. Esta sonda
+todavía no se ha ejecutado: requiere permiso para abrir la app y medir el
+equipo. No cambia sombras, motor ni guardados. Sin commit ni push.
+
+## 22 sep 2026 · P-1b.1 cerrada, clic de entrada responde
+
+Por indicación de Vera se partió el avance del preset en grupos de ocho
+semanas que ceden al navegador. El menú conserva «Founding…» durante toda la
+preparación; no hay guardados intermedios ni cambios en `src/engine/`. La prueba
+focal de jornadas verificó igualdad byte a byte de `GameState` frente a la
+ruta síncrona en semilla 11/año 21 y en semilla 31/año 41, que termina antes.
+Vera autorizó tres réplicas frías y tres calientes en Edge visible. Sus
+intentos desde `C:\Users\mvera` terminaron antes de abrir la app porque el
+archivo está en este proyecto; las seis réplicas completas se ejecutaron aquí.
+El Event Timing del clic de entrada cayó de 528–872 ms a 16 ms o menos que el
+umbral de registro. El tiempo mediano hasta 3D utilizable subió ~0,6 s. Los
+clics posteriores y p95 de RAF quedaron en el mismo rango; no se midió INP.
+[Informe P-1b.1](historico/graphics-rounds/P-1b1-avance-cooperativo.md). Se
+acepta el candidato con ese coste de carga declarado. Siguiente P-1b.2:
+examinar la tarea larga restante de montaje 3D. Sin commit ni push.
+
+## 22 sep 2026 · P-1a.2 cerrada para entrada y vista despejada
+
+Con autorización de Vera se ejecutaron tres réplicas frías y tres calientes
+en Edge visible, día despejado, semilla 11/año 21, 48 habitantes. El runner
+guardó el perfil CPU de entrada y seis clics de vista despejada por réplica en
+dos directorios nuevos bajo `artifacts/graphics/P-1a-app/`. Una tentativa
+caliente falló antes de medir porque la preferencia de Desarrollo persistía;
+se corrigió el runner y se repitió la orden aprobada. Sin errores de página en
+las seis muestras finales.
+
+La primera tarea larga de entrada duró 505–531 ms incluso con caché caliente:
+el preset simula 20 años de forma síncrona. La segunda corresponde al montaje
+3D y primer uso de programas WebGL. El clic de entrada dio 528–872 ms en Event
+Timing; los clics posteriores, 16–48 ms. No se midió INP del navegador ni GPU.
+[Informe y límites](historico/graphics-rounds/P-1a2-entrada-y-respuesta.md).
+La ruta medida de P-1a.2 se cierra; P-1a general sigue abierta hasta conocer
+qué interacción dio a Vera 912–1.144 ms de INP. Siguiente candidato P-1b.1:
+trocear el avance sin cambiar un byte del estado final y comprobar su efecto
+sobre la respuesta. Typecheck y ESLint focal pasan; sin commit ni push.
+
+## 22 sep 2026 · P-1a.1 cerrada, comparación controlada de la app real
+
+La app acepta `preview-phase` y `preview-sky` sólo en Vite local de desarrollo,
+como opciones del renderer sin entrar en el motor ni en el guardado.
+`bench-app.ts --condition all` comparó día despejado, noche despejada y noche
+lluviosa, verificó lo observado y rotó el orden de las tres réplicas. Vera
+intentó la orden desde otra carpeta y luego pidió que la lanzásemos; se ejecutó
+desde este proyecto y guardó nueve muestras en una carpeta nueva. Todas abrieron
+el año 21 con 48 habitantes y sin errores. En Edge headless, noche despejada y
+lluviosa dieron ambas p95/p99 de cadencia 7,0/7,1 ms; las tareas largas fueron
+de entrada. La lluvia no mostró sobrecoste consistente aquí. [Datos crudos y
+límites](medidas/p1a-rendimiento-seed11-year21-2026-09-22.md). La comparación
+queda cerrada en [su informe](historico/graphics-rounds/P-1a1-comparacion-controlada.md).
+INP real y atribución de la carga pasan a P-1a.2; P-1a completa no se cierra.
+
+Vera informa además de un defecto visual separado y anterior a P-1a: las
+sombras de día parpadean y se mueven de forma extraña; antes seguían al sol de
+forma realista. La sombra nocturna del cierre sí parece moverse. Hubo una
+revisión superficial previa sin resolverlo. Queda para diagnóstico visual
+propio; no se atribuye a la lluvia ni se cambia en esta ronda.
+
+## 22 sep 2026 · P-1a, primera corrida de la aplicación real
+
+Con autorización de Vera se ejecutó `npx tsx tools/graphics/bench-app.ts
+--repeats 3 --cache cold --seconds 10`. El runner necesitó corregir la
+inicialización del script inyectado por Playwright/tsx; las tentativas fallidas
+terminaron antes de medir. La corrida completa abrió el preset real semilla
+11/año 21 con 48 habitantes, día y lluvia en las tres réplicas de Edge
+headless. El tiempo hasta 3D utilizable fue 1,12–1,97 s; p95 de cadencia,
+7 ms; dos tareas largas de carga por réplica. Event Timing registró el clic de
+entrada con 504–832 ms, pero no se midió INP. Datos crudos, entorno, límites y
+resultados en [la medida P-1a](medidas/p1a-rendimiento-seed11-year21-2026-09-22.md).
+P-1a sigue abierta: faltan controles de clima/hora, condiciones despejadas y
+una medida de respuesta real. Sin cambios de motor, escena Blender, commit,
+push ni despliegue.
+
+## 22 sep 2026 · P-1a parcial, línea de base del renderer; app real pendiente
+
+Vera observa tirones al abrir el preset de aldea semilla 11/año 21 y más con
+lluvia nocturna. Sus capturas muestran LCP 0,69 s pero INP 912–1.144 ms:
+el arranque visible y la respuesta de la partida son problemas distintos.
+Luna auditó carga y caché: el service worker guarda los GLB descargados, no
+su parseo ni los recursos de GPU; la carga de modelos solicitados es
+secuencial. Terra auditó el bucle y la lluvia: hay trabajo repetido por
+fotograma, pero aún no se ha medido la causa del tirón. Sol verificó ambos
+hallazgos y abrió el [brief P-1](plan-rendimiento.md) antes del adarve E3.
+P-1a añadió un modo reproducible al banco y tres muestras 390×844 @ DPR 2 del
+preset real, con día/noche y vida activa. El cielo derivado resultó lluvia en
+ambas: no hay comparación despejado/lluvia ni atribución del tirón. La evidencia
+cruda y sus límites están en [la medida P-1a](medidas/p1a-rendimiento-seed11-year21-2026-09-22.md).
+No se declaró mejora de FPS. Siguiente paso: autorizar y ejecutar la primera
+corrida de la app real; después decidir el control diagnóstico de clima/hora y
+una medición separada de respuesta real/INP.
+Astra no se usó. Runner de app preparado, no ejecutado; clima/hora aún sin control. Sin push ni despliegue.
+
 ## 22 sep 2026 · Accesos rápidos de prueba en Desarrollo
 
 El menú de inicio ya podía abrir una partida real en un año dado, pero había
@@ -1563,3 +2191,15 @@ De diseño, y son las que más valen:
 4. Cerrar con: informe de ronda en `docs/historico/life-rounds/` o
    `docs/ui-redesign/rounds/`, **actualizar este fichero**, y commit con las
    medidas dentro del mensaje.
+
+## 7. Peticiones visuales pendientes del dueño (23 sep 2026)
+
+- Cierre de la última pasada de UI: títulos funcionales de peso medio, controles inferiores de portada con 44 px de toque, foco visible en controles activos y final sin mandos del valle detrás. Capturas móviles y de escritorio, contraste y pruebas en `docs/ui-redesign/rounds/cierre-tipografia-2026-09-23.md`.
+
+- Pasada completa de la interfaz con `threejs-game-ui-designer`: capturas de inicio, archivo, Valle, Crónica, Personas, carro, decisión y final en escritorio y móvil; ficha de seguimiento corregida para mantener las acciones visibles con contenido largo. Evidencia y pruebas en `docs/ui-redesign/rounds/pasada-completa-2026-09-23.md`.
+
+- Dos de los seis grabados de `docs/visual-reference/higgsfield/early-tests/` ya tienen derivados transparentes integrados: hoja de roble en la bandeja y sello del árbol en la decisión. La esquina, los dos marcos y la banderola siguen pendientes. La integración de la hoja aparece en `artifacts/graphics/app-icon-backdrop-review-2.png`.
+- El difuminado lateral de las hojas aún no convence al dueño. En el carro, el remate superior en punta se sustituyó por esquinas suaves y borde limpio; falta su juicio visual. Las otras hojas mantienen por ahora su difuminado.
+- El parpadeo de sombras de día sigue abierto por indicación del dueño. La mejora a 2048 lo atenúa, pero no lo resuelve.
+- Transiciones de estación y de era, con posible presentación por capítulos y crónica: idea anotada; no implementada.
+- Fauna con función jugable (ciervos, jabalíes, castores y lobos nocturnos): idea pendiente. El fondo al alejar la cámara recibió una prueba de silueta y color de la sierra el 23 sep; sigue pendiente la aprobación visual del dueño, pues el macizo lejano todavía puede sentirse demasiado plano.

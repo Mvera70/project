@@ -1,0 +1,29 @@
+.valley-hunt-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 86px;
+  min-height: 46px;
+  padding: 8px 10px;
+  border: 1px solid var(--skin-parchment-aged, #c9b99e);
+  border-radius: 999px;
+  color: var(--skin-ink, #202d33);
+  box-shadow: 0 2px 0 rgba(27, 22, 19, .18);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.valley-hunt-action svg { width: 23px; height: 23px; flex: none; }
+.valley-hunt-action-label { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.valley-hunt-action:hover { filter: brightness(1.06); }
+.valley-hunt-action:active { transform: translateY(2px); box-shadow: none; }
+.valley-hunt-action:focus-visible { outline: 3px solid var(--skin-gold, #a36e24); outline-offset: 3px; }
+.valley-hunt-action[hidden] { display: none; }
+
+html.bare .valley-hunt-action { display: none; }
+
+@media (max-width: 480px) {
+  .valley-hunt-action { min-width: 82px; min-height: 44px; }
+}

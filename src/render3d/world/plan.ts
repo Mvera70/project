@@ -15,14 +15,156 @@ import { defenceGates } from '@derive/defence-gates';
 // nothing. The picture still needs looking at. The bookkeeping does not.
 
 import type { Building, BuildingId, BuildingKind, ConstructionWork, GameState, ValleyMap } from '@engine/state';
-import { TIME } from '@engine/balance';
+import { HOUSE_RUBBLE, TIME } from '@engine/balance';
 import { SEASONS, clockOf, weekOf } from '@engine/time';
 import { BUILDING_ASSETS } from './buildings';
 import { BUILDING_LOOKS, RUIN, type BuildingLook } from '../visual-config';
-import { defenceConnections } from './defences';
-import { forestSignature } from './forest-state';
+import { DEFENCE_DIAGONALS, defenceConnections } from './defences';
+import { forestLooks, forestSignature } from './forest-state';
+import { scatterTransform } from './forest';
 import { houseVariant } from './house-variation';
 import { bastionAccessOf, type BastionAccess } from '@derive/bastion-access';
+import { bastionWalkwayOf, type BastionWalkway } from '@derive/bastion-walkway';
+import { elevatedRingOf, type ElevatedRing, type ElevatedRingSegment, type ElevatedRingVariant, type RingCell } from '@derive/elevated-ring';
+
+/** Radio del tronco adulto de `tree.glb`, medido en la receta E3b.2. */
+const TREE_TRUNK_RADIUS = 0.34 / 3;
+/** Alto máximo de la corteza en `tree.glb`; el plantón completo se escala. */
+const TREE_BARK_TOP = 2.111249152161154;
+/** La cara inferior del tablero de las fuentes nuevas está en esta cota. */
+const RING_DECK_BOTTOM = 0.94;
+
+/** Planta del cruce W+NE; el voladizo llega hasta media celda del muro NE. */
+export function crossing24TreeOnDeck(cell: RingCell, tree: { x: number; z: number; scale: number }): boolean {
+  const r = .5 / Math.SQRT2;
+  const outline = [[0, -.2], [1.5 - r, -.5 - r], [1.5 + r, -.5 + r], [1, 1], [0, 1]]
+    .map(([x, z]) => ({ x: cell.x + x!, z: cell.z + z! }));
+  const trunkRadius = TREE_TRUNK_RADIUS * tree.scale;
+  let inside = true;
+  let closest = Infinity;
+  for (let i = 0; i < outline.length; i++) {
+    const a = outline[i]!, b = outline[(i + 1) % outline.length]!;
+    const dx = b.x - a.x, dz = b.z - a.z;
+    const cross = dx * (tree.z - a.z) - dz * (tree.x - a.x);
+    if (cross < -1e-8) inside = false;
+    const t = Math.max(0, Math.min(1,
+      ((tree.x - a.x) * dx + (tree.z - a.z) * dz) / (dx * dx + dz * dz)));
+    closest = Math.min(closest, Math.hypot(tree.x - a.x - t * dx, tree.z - a.z - t * dz));
+  }
+  return inside || closest <= trunkRadius;
+}
+
+/** El retorno 66 incluye brazo SO y escalera desplazada hasta Z local 2,65. */
+export function return66TreeOnDeck(cell: RingCell, tree: { x: number; z: number; scale: number }): boolean {
+  const x = tree.x - cell.x, z = tree.z - cell.z;
+  const trunk = TREE_TRUNK_RADIUS * tree.scale;
+  const boxDistance = (minX: number, maxX: number, minZ: number, maxZ: number): number =>
+    Math.hypot(Math.max(0, minX - x, x - maxX), Math.max(0, minZ - z, z - maxZ));
+  if (boxDistance(0, 1, 0, 1) <= trunk || boxDistance(.05, .95, 1, 2.65) <= trunk) return true;
+  // El tablero diagonal de anchura 0,90 llega al centro de la celda vecina.
+  const t = Math.max(0, Math.min(1, ((x - .5) * -1 + (z - .5)) / 2));
+  return Math.hypot(x - (.5 - t), z - (.5 + t)) <= .45 + trunk;
+}
+
+/** Huella conservadora del tablero sobre un muro, también en codos y diagonales. */
+function treeOnDeck(segment: ElevatedRingSegment, tree: { x: number; z: number; scale: number },
+  lane: 'inner' | 'center'): boolean {
+  if (lane === 'center') {
+    if (segment.variant === 'bastion-crossing' && segment.mask === 24) {
+      return crossing24TreeOnDeck(segment.cell, tree);
+    }
+    if (segment.variant === 'bastion-return' && segment.mask === 66) {
+      return return66TreeOnDeck(segment.cell, tree);
+    }
+    const center = { x: segment.cell.x + 0.5, z: segment.cell.z + 0.5 };
+    const radius = 0.45 + TREE_TRUNK_RADIUS * tree.scale;
+    // La fábrica nueva sigue dos brazos hasta los puertos; el círculo engloba
+    // también los ingletes del pretil sin depender de la orientación del valle.
+    const arm = (direction: RingCell): boolean => {
+      const vx = direction.x * 0.5, vz = direction.z * 0.5;
+      const lengthSquared = vx * vx + vz * vz;
+      const t = Math.max(0, Math.min(1,
+        ((tree.x - center.x) * vx + (tree.z - center.z) * vz) / lengthSquared));
+      return Math.hypot(tree.x - center.x - vx * t, tree.z - center.z - vz * t) <= radius;
+    };
+    return arm(segment.incoming) || arm(segment.outgoing);
+  }
+  const tangentX = segment.outgoing.x - segment.incoming.x;
+  const tangentZ = segment.outgoing.z - segment.incoming.z;
+  const length = Math.hypot(tangentX, tangentZ);
+  if (length === 0) return false;
+  const alongX = tangentX / length, alongZ = tangentZ / length;
+  const inwardX = -alongZ, inwardZ = alongX;
+  const dx = tree.x - (segment.cell.x + 0.5);
+  const dz = tree.z - (segment.cell.z + 0.5);
+  const u = dx * alongX + dz * alongZ;
+  const v = dx * inwardX + dz * inwardZ;
+  // E3b.1: tablero de una celda en el eje y de 0,33 a 1,27 hacia dentro.
+  // En diagonal se ensancha la prueba, nunca se acredita un tronco que roza.
+  const halfLength = Math.abs(alongX) + Math.abs(alongZ) > 1.01 ? 0.71 : 0.5;
+  return Math.hypot(Math.max(0, -halfLength - u, u - halfLength),
+    Math.max(0, 0.33 - v, v - 1.27)) <= TREE_TRUNK_RADIUS * tree.scale;
+}
+
+/**
+ * Audita los troncos de todos los tableros candidatos, aunque las variantes
+ * aún no estén publicadas. La primera junta sigue siendo la única autorizada
+ * para render y vida hasta validar sus sucesoras en la escena.
+ */
+export function sceneRingOf(state: GameState, bastion: Building,
+  approvedVariants: readonly ElevatedRingVariant[] = ['straight'],
+  lane: 'inner' | 'center' = 'inner'): ElevatedRing {
+  const topology = elevatedRingOf(state, bastion, { approvedVariants: [
+    'straight', 'turn', 'diagonal', 'mixed', 'gate-cardinal', 'gate-diagonal',
+    'gate-mixed', 'bastion-crossing', 'bastion-return',
+  ], lane });
+  const standing = forestLooks(state).flatMap(look => {
+    if (look.stage === 'stump') return [];
+    const tree = scatterTransform(state.map.width, look.cell);
+    const scale = tree.scale * (look.stage === 'regrowth' ? look.size : 1);
+    // Un plantón pequeño cabe bajo el adarve; si su corteza ya llega al
+    // tablero, su tronco visible debe bloquearlo igual que el árbol adulto.
+    return TREE_BARK_TOP * scale < RING_DECK_BOTTOM ? [] : [{ ...tree, scale }];
+  });
+  const treesByCell = new Map<string, typeof standing>();
+  for (const tree of standing) {
+    const key = `${Math.floor(tree.x)},${Math.floor(tree.z)}`;
+    const bucket = treesByCell.get(key) ?? [];
+    bucket.push(tree);
+    treesByCell.set(key, bucket);
+  }
+  const blockedCells = new Set<string>();
+  for (const segment of topology.segments) {
+    let blocked = false;
+    // El tablero y el radio del tronco llegan como mucho a dos celdas del
+    // centro. Consultar sólo esta vecindad evita comparar todo el bosque con
+    // cada módulo del anillo en cada reconstrucción de escena.
+    for (let dz = -2; dz <= 2 && !blocked; dz += 1) {
+      for (let dx = -2; dx <= 2 && !blocked; dx += 1) {
+        const trees = treesByCell.get(`${segment.cell.x + dx},${segment.cell.z + dz}`) ?? [];
+        blocked = trees.some(tree => treeOnDeck(segment, tree, lane));
+      }
+    }
+    if (blocked) blockedCells.add(`${segment.cell.x},${segment.cell.z}`);
+  }
+  const blockedAt = (cell: RingCell): boolean => blockedCells.has(`${cell.x},${cell.z}`);
+  // Sólo el retorno 66 posee hoy escalera y descansillo en las fuentes nuevas.
+  // El cruce 24 es pasante: ofrecerlo como acceso permitiría subir por una
+  // escalera que su modelo no tiene, aunque el grafo lógico cerrase igual.
+  const return66 = topology.segments.at(-1)?.variant === 'bastion-return'
+    && topology.segments.at(-1)?.mask === 66;
+  const approved = lane === 'center' && !return66
+    ? approvedVariants.filter(variant => variant !== 'bastion-return') : approvedVariants;
+  return elevatedRingOf(state, bastion, { approvedVariants: approved, blockedAt, lane });
+}
+
+/** Selector de la primera junta publicada, compartido por escena y vida. */
+export function sceneWalkwayOf(state: GameState, bastion: Building): BastionWalkway | null {
+  const walkway = bastionWalkwayOf(state, bastion);
+  if (walkway === null) return null;
+  const ring = sceneRingOf(state, bastion);
+  return ring.route.length >= 3 && ring.segments[0]?.eligible === true ? walkway : null;
+}
 
 export interface PlannedBuilding {
   readonly id: BuildingId;
@@ -49,11 +191,17 @@ export interface PlannedBuilding {
   readonly asset: string | null;
   /** Vecinos cardinales de una defensa viva; ausente en los demás edificios. */
   readonly connections?: number;
+  /** Corners where a diagonal stone wall must meet the gate frame. */
+  readonly gateCornerLinks?: number;
   readonly gate?: 'x' | 'z';
   /** Acabado estable por parcela, ajeno al estado y al azar del motor. */
   readonly variant?: number;
+  /** Edad visual de los escombros domésticos; no modifica la parcela del motor. */
+  readonly rubbleStage?: 'fresh' | 'settling' | 'scar';
   /** E3 · Variante visual con escalera y la cara que mira al interior. */
   readonly bastionAccess?: BastionAccess;
+  /** E3b · Junta visible con el primer tramo de muro, derivada sin guardarla. */
+  readonly bastionWalkway?: BastionWalkway;
 }
 
 export interface ScenePlan {
@@ -107,6 +255,11 @@ export interface WorkChange {
  * exists, and a field whose only reader is a renderer is exactly the kind of
  * thing D.5 forbids adding.
  */
+/** Las tres paletas que puede mostrar una estación: base, media mezcla y siguiente. */
+export function seasonColourStep(seasonWeek: number): number {
+  return Math.max(0, seasonWeek - 9);
+}
+
 export function groundSignature(map: ValleyMap, tick: number): number {
   let hash = 2_166_136_261;
   for (let index = 0; index < map.terrain.length; index += 1) {
@@ -114,12 +267,12 @@ export function groundSignature(map: ValleyMap, tick: number): number {
     hash = Math.imul(hash ^ (map.path[index] ?? 0), 16_777_619);
   }
   // G-08 · la estación cambia el color del suelo sin cambiar el terreno, y las
-  // dos primeras semanas de cada estación la nueva crece de la vieja (§10.3).
+  // dos últimas semanas de cada estación anticipan la siguiente (§10.3).
   // Sin esto, el valle seguía verde en enero: el suelo sólo se reconstruía
   // cuando alguien talaba un árbol.
   const clock = clockOf(tick);
   hash = Math.imul(hash ^ SEASONS.indexOf(clock.season), 16_777_619);
-  hash = Math.imul(hash ^ Math.min(2, clock.seasonWeek), 16_777_619);
+  hash = Math.imul(hash ^ seasonColourStep(clock.seasonWeek), 16_777_619);
   return hash >>> 0;
 }
 
@@ -150,6 +303,18 @@ const RUIN_ASSETS: Readonly<Record<0 | 1, string>> = {
   1: 'ruin-stone',
 };
 
+/** Los materiales terminan de caer y luego queda sólo la huella del solar. */
+export function houseRubbleStage(building: Building, tick: number): 'fresh' | 'settling' | 'scar' | 'gone' | null {
+  if (building.lostTick === null || (building.kind !== 'house' && building.kind !== 'stone_house')) return null;
+  const age = Math.max(0, tick - building.lostTick);
+  if (age < HOUSE_RUBBLE.FRESH_WEEKS) return 'fresh';
+  if (age < HOUSE_RUBBLE.CLEAR_WEEKS) return 'settling';
+  // La piedra conserva una cimentación visible porque su solar sigue cerrado.
+  // También se marca la madera si el suelo quemado sigue bloqueado.
+  return building.tier === 1 || (building.blockedUntil !== null && building.blockedUntil > tick)
+    ? 'scar' : 'gone';
+}
+
 // G-22 · Variedades visuales estables por parcela, sin azar ni recursos nuevos.
 export const FIELD_CROPS: readonly string[] = ['field', 'field-cabbage', 'field-leeks'];
 
@@ -168,9 +333,10 @@ function assetFor(building: Building, tick: number): string | null {
 
 function plannedFrom(building: Building, tick: number): PlannedBuilding {
   const ruin = building.lostTick !== null;
+  const rubbleStage = houseRubbleStage(building, tick);
   const shape = look(building);
   return {
-    asset: assetFor(building, tick),
+    asset: rubbleStage === 'scar' ? null : assetFor(building, tick),
     id: building.id,
     kind: building.kind,
     x: building.x,
@@ -186,6 +352,7 @@ function plannedFrom(building: Building, tick: number): PlannedBuilding {
     wallColour: ruin ? RUIN.colour : shape.wallColour,
     roofColour: shape.roofColour,
     roofed: ruin ? false : shape.roofed,
+    ...(rubbleStage !== null && rubbleStage !== 'gone' ? { rubbleStage } : {}),
   };
 }
 
@@ -203,21 +370,49 @@ export function planFor(state: GameState): ScenePlan {
     .map((work) => work.upgradeOf!));
   // Sólo la fuente de la sustitución desaparece durante la obra: sus vecinos
   // siguen en el plan para que el ensamblador de defensas abra el hueco real.
-  const visible = visibleBuildings(state).filter((building) => !hiding.has(building.id));
+  const visible = visibleBuildings(state).filter((building) =>
+    !hiding.has(building.id) && houseRubbleStage(building, state.tick) !== 'gone');
   const connections = defenceConnections(visible);
   const gates = defenceGates(state);
+  const gateAsset = (gate: Building): string => {
+    const nearby = visible.filter((building) => building.lostTick === null
+      && Math.abs(building.x - gate.x) <= 1 && Math.abs(building.y - gate.y) <= 1);
+    // Durante la sustitución del cerco, el portón conserva madera mientras
+    // alguna estaca vecina siga en pie. Sin vecinos, manda el material del anillo.
+    if (nearby.some((building) => building.kind === 'palisade')) return 'gate-timber';
+    if (nearby.some((building) => building.kind === 'wall' || building.kind === 'bastion')) return 'gate';
+    return visible.some((building) => building.kind === 'wall' || building.kind === 'bastion')
+      ? 'gate' : 'gate-timber';
+  };
+  const gateCornerLinks = (gate: Building): number => DEFENCE_DIAGONALS.reduce((mask, direction) => {
+    const neighbour = visible.find((building) => building.kind === 'wall' && building.lostTick === null
+      && building.x === gate.x + direction.x && building.y === gate.y + direction.z);
+    if (neighbour === undefined) return mask;
+    const returnBit = DEFENCE_DIAGONALS.find((diagonal) => diagonal.x === -direction.x
+      && diagonal.z === -direction.z)?.bit ?? 0;
+    return (connections.get(neighbour.id) ?? 0) & returnBit ? mask | direction.bit : mask;
+  }, 0);
   return {
     game: `${state.seed}:${state.terrainSeed}`,
     ground: groundSignature(state.map, state.tick),
     forest: forestSignature(state),
-    buildings: visible.map((building) => ({ ...plannedFrom(building, state.tick),
-      ...((building.kind === 'house' || building.kind === 'stone_house') && building.lostTick === null
-        ? { variant: houseVariant(state.seed, building.x, building.y) } : {}),
-      ...(connections.has(building.id) ? { connections: connections.get(building.id)! } : {}),
-      ...(gates.has(building.id) ? { gate: gates.get(building.id)! } : {}),
-      ...(building.kind === 'bastion' && bastionAccessOf(state, building) !== null
-        ? { asset: 'bastion-access-candidate', bastionAccess: bastionAccessOf(state, building)! } : {}),
-    }))
+    buildings: visible.map((building) => {
+      const access = building.kind === 'bastion' ? bastionAccessOf(state, building) : null;
+      const walkway = access === null ? null : sceneWalkwayOf(state, building);
+      return { ...plannedFrom(building, state.tick),
+        ...(building.kind === 'gate' && building.lostTick === null ? {
+          asset: gateAsset(building),
+          gateCornerLinks: gateAsset(building) === 'gate' ? gateCornerLinks(building) : 0,
+        } : {}),
+        ...((building.kind === 'house' || building.kind === 'stone_house') && building.lostTick === null
+          ? { variant: houseVariant(state.seed, building.x, building.y) } : {}),
+        ...(connections.has(building.id) ? { connections: connections.get(building.id)! } : {}),
+        ...(gates.has(building.id) ? { gate: gates.get(building.id)! } : {}),
+        ...(access === null ? {} : walkway === null
+          ? { asset: 'bastion-access-candidate', bastionAccess: access }
+          : { asset: 'e3b-bastion-joint-candidate', bastionAccess: access, bastionWalkway: walkway }),
+      };
+    })
       .sort((a, b) => a.id - b.id),
     works: state.works.map(plannedWork).sort((a, b) => a.id - b.id),
   };
@@ -227,8 +422,14 @@ function same(a: PlannedBuilding, b: PlannedBuilding): boolean {
   return a.kind === b.kind && a.x === b.x && a.z === b.z && a.w === b.w && a.h === b.h
     && a.ruin === b.ruin && a.walls === b.walls && a.roof === b.roof
     && a.wallColour === b.wallColour && a.roofColour === b.roofColour && a.roofed === b.roofed
-    && a.asset === b.asset && a.connections === b.connections && a.gate === b.gate && a.variant === b.variant
-    && a.bastionAccess?.x === b.bastionAccess?.x && a.bastionAccess?.z === b.bastionAccess?.z;
+    && a.asset === b.asset && a.connections === b.connections
+    && a.gateCornerLinks === b.gateCornerLinks && a.gate === b.gate && a.variant === b.variant
+    && a.rubbleStage === b.rubbleStage
+    && a.bastionAccess?.x === b.bastionAccess?.x && a.bastionAccess?.z === b.bastionAccess?.z
+    && a.bastionWalkway?.firstWallId === b.bastionWalkway?.firstWallId
+    && a.bastionWalkway?.nextWallId === b.bastionWalkway?.nextWallId
+    && a.bastionWalkway?.side.x === b.bastionWalkway?.side.x
+    && a.bastionWalkway?.side.z === b.bastionWalkway?.side.z;
 }
 
 function sameWork(a: PlannedWork, b: PlannedWork): boolean {

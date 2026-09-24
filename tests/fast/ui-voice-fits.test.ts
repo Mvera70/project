@@ -78,12 +78,12 @@ describe('VZ-02 · la bandeja mide siempre lo mismo', () => {
     }
   });
 
-  it('la pista del inicio guiado sigue señalando la línea de abajo', () => {
-    // Decisión del dueño del diseño, 17 sep 2026: con la voz encima de las
-    // órdenes, la línea que la pista nombra queda debajo. Si alguien vuelve a
-    // mover la pista de sitio, esta prueba dice que el texto miente.
+  it('la pista del inicio guiado señala el carro sin depender de su posición', () => {
+    // El acceso al carro es ahora una acción explícita; una dirección fija
+    // quedaría obsoleta al variar la composición entre móvil y escritorio.
     const orders = UI_BANK['intro.orders'] ?? '';
-    expect(orders).toContain('below');
+    expect(orders.toLowerCase()).toContain('cart');
     expect(orders).not.toContain('above');
+    expect(orders).not.toContain('below');
   });
 });

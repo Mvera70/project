@@ -15,7 +15,7 @@
 // Antes: `npx tsx tools/graphics/bundle-game.ts` para tener la página al día.
 
 import { chromium } from '@playwright/test';
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 
@@ -64,6 +64,7 @@ if (hasCaptureZoom) {
 // El renderer resuelve el encuadre mediante su hook de diagnóstico; no se
 // permite degradar silenciosamente a la cámara panorámica si el hook falta.
 const lookArg = opt('look', '');
+const traceAnimal = opt('trace-animal', '');
 let lookPoint = null;
 if (lookArg !== '') {
   const parts = lookArg.split(',').map((part) => part.trim());
@@ -133,6 +134,13 @@ const pageBase = /^https?:\/\//u.test(pageArg)
 const pageUrl = new URL(pageBase);
 if (previewEra !== '') pageUrl.searchParams.set('preview-era', previewEra);
 const page = pageUrl.toString();
+// Revisión de un GLB candidato dentro del juego sin sustituir el publicado.
+// Solo se intercepta la petición del portón en esta sesión de captura.
+const gateOverrideArg = opt('override-gate', '');
+const gateOverride = gateOverrideArg === '' ? '' : resolve(gateOverrideArg);
+if (gateOverride !== '' && !existsSync(gateOverride)) {
+  throw new Error(`--override-gate does not exist: ${gateOverride}`);
+}
 
 function browserExe() {
   const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
@@ -162,6 +170,14 @@ const browser = await chromium.launch({
   args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],
 });
 const tab = await browser.newPage({ viewport, deviceScaleFactor: 2 });
+let gateOverrideHits = 0;
+if (gateOverride !== '') {
+  const candidate = readFileSync(gateOverride);
+  await tab.route(/\/assets\/valley3d\/gate\.glb(?:\?|$)/u, async (route) => {
+    gateOverrideHits += 1;
+    await route.fulfill({ status: 200, contentType: 'model/gltf-binary', body: candidate });
+  });
+}
 const errors = [];
 tab.on('pageerror', (e) => errors.push(String(e)));
 tab.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
@@ -186,9 +202,17 @@ if (yearArg !== '') {
 }
 //   --open title   se queda en el menú, para fotografiarlo
 if (open !== 'title') await tab.locator('.title-new').click().catch(() => {});
+// Las fundaciones de años avanzados pueden tardar bastante más que `--settle`.
+// Espera al renderer antes de intentar un encuadre de diagnóstico.
+if (open !== 'title' && (lookPoint !== null || sceneOnly)) {
+  await tab.waitForFunction(() => typeof window.__valleyCapture === 'function', null, { timeout: 180_000 });
+}
 //   --settle S   segundos que se espera tras fundar antes de hacer nada (8 por defecto;
 //                0.5 para ver el vuelo de entrada de U-11 fotograma a fotograma)
 await tab.waitForTimeout(open === 'title' ? 1500 : Number(opt('settle', '8')) * 1000);
+if (gateOverride !== '' && gateOverrideHits === 0) {
+  throw new Error('La captura pidió --override-gate pero no cargó gate.glb; no es prueba del candidato.');
+}
 
 // --advance: el salto. `TIME.REAL_MS_PER_TICK` son 840 000 ms por semana a ×1
 // (§12.1, v3.72), y el motor cobra lo que le deben con `ticksOwed`. Se salta en
@@ -343,6 +367,14 @@ if (lookPoint !== null || sceneOnly) {
     }
     return captured.image;
   }, { point: lookPoint, zoom: captureZoom });
+}
+if (traceAnimal !== '') {
+  const trace = await tab.evaluate((kind) => {
+    const life = window.__valleyLife?.();
+    return { day: life?.day ?? null, steps: life?.steps ?? null,
+      animals: life?.renderedAnimals?.filter((animal) => animal.kind === kind) ?? [] };
+  }, traceAnimal);
+  console.log(`animal ${traceAnimal}: ${JSON.stringify(trace)}`);
 }
 
 if (sequence > 0) {

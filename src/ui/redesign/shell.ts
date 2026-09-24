@@ -19,11 +19,8 @@
 // **UI-V2 · la piel de la bandeja y la navegación** (`docs/ui-redesign/piel/
 // plan-piel.md` §3.4). Los tres iconos de la barra ya no son los trazos de
 // `../icons` (`NAV_ICONS`, U-05): son los mismos cuatro dibujos del sprite
-// grabado de UI-V0 (`public/ui/icons.svg`). Y la navegación
-// cambia de piel según la ruta —papel con subrayado en el valle, placa de
-// madera en la crónica, madera entera en la gente/la ficha—, que es lo que
-// los tres prototipos hacen y `navSkinFor` es esa regla, pura y probada sin
-// DOM como sus vecinas `navTabFor`/`contentRouteFor`.
+// grabado de UI-V0 (`public/ui/icons.svg`). La barra comparte su fondo oscuro
+// en todas las rutas; la pestaña activa se distingue con una placa y ámbar.
 //
 // **Los iconos salen del sprite incrustado en `index.html`.** UI-V2 midió que
 // `<use href="./ui/icons.svg#id">` no carga cuando la página se abre con
@@ -84,21 +81,14 @@ export function contentRouteFor(route: SheetRoute): 'cart' | 'inspect' | 'chroni
 }
 
 /**
- * Qué piel lleva la barra de navegación para esta ruta (plan-piel.md §3.4,
- * §3.2, §3.3): pergamino con el subrayado de ocre por defecto (prototipo 01,
- * el valle y las órdenes, que se abren desde ahí); una placa de madera en la
- * pestaña activa cuando la ruta es la crónica (prototipo 02); y madera
- * entera cuando es la gente o una ficha —de persona o de edificio, el plan no
- * distingue— (prototipo 03). Pura, como `navTabFor`, de la que es vecina.
+ * La navegación comparte el mismo fondo oscuro en todas las rutas. La pestaña
+ * activa ya tiene su placa y acento ámbar propios; cambiar toda la barra al
+ * abrir Crónica o Personas hacía que parecieran tres aplicaciones distintas.
  */
-export type NavSkin = 'default' | 'plaque' | 'wood';
-export function navSkinFor(route: SheetRoute): NavSkin {
-  switch (route.kind) {
-    case 'chronicle': return 'plaque';
-    case 'people':
-    case 'inspect': return 'wood';
-    default: return 'default';
-  }
+export type NavSkin = 'wood';
+export function navSkinFor(_route: SheetRoute): NavSkin {
+  void _route;
+  return 'wood';
 }
 
 /**
@@ -118,8 +108,6 @@ const NAV_TAB_ICON: Record<NavTab, string> = {
   chronicle: 'book',
   people: 'people',
 };
-const OAK_LEAF = 'oak-leaf';
-const SEAL_TREE = 'seal-tree';
 
 /**
  * Un icono del sprite del documento. `id`, no trazos: ver la cabecera.
@@ -176,12 +164,70 @@ export function createShell(actions: UiActions): ShellHandle {
   content.setAttribute('role', 'region');
   content.setAttribute('aria-label', renderUiText('app.sheet'));
 
+  // La franja superior es el único punto que arrastra la hoja. El cuerpo
+  // conserva el gesto vertical para desplazar sus listas y la crónica.
+  const grip = document.createElement('div');
+  grip.className = 'ui-sheet-grip';
+  grip.setAttribute('aria-hidden', 'true');
+  content.append(grip);
+  let dragPointer: number | null = null;
+  let dragOrigin = 0;
+  let dragDistance = 0;
+  let sheetCloseTimer: number | null = null;
+  const finishDrag = (close: boolean): void => {
+    dragPointer = null;
+    content.classList.remove('ui-sheet-dragging');
+    if (!close) {
+      content.style.removeProperty('--ui-sheet-drag');
+      return;
+    }
+    if (sheetCloseTimer !== null) return;
+    // El gesto termina siguiendo al dedo hasta salir por la barra. La ruta
+    // cambia después del tramo visual; otro toque de navegación lo cancela.
+    content.classList.remove('ui-route-enter');
+    content.inert = true;
+    content.style.setProperty('--ui-sheet-drag', `${content.clientHeight + 24}px`);
+    const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
+    sheetCloseTimer = window.setTimeout(() => {
+      sheetCloseTimer = null;
+      actions.navigate({ kind: 'valley' });
+    }, duration);
+  };
+  content.addEventListener('valley:sheet-close', (event) => {
+    event.preventDefault();
+    finishDrag(true);
+  });
+  grip.addEventListener('pointerdown', (event) => {
+    if (content.hidden || event.button !== 0) return;
+    dragPointer = event.pointerId;
+    dragOrigin = event.clientY;
+    dragDistance = 0;
+    content.classList.remove('ui-route-enter');
+    content.classList.add('ui-sheet-dragging');
+    grip.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+  grip.addEventListener('pointermove', (event) => {
+    if (event.pointerId !== dragPointer) return;
+    dragDistance = Math.max(0, event.clientY - dragOrigin);
+    content.style.setProperty('--ui-sheet-drag', `${dragDistance}px`);
+    event.preventDefault();
+  });
+  grip.addEventListener('pointerup', (event) => {
+    if (event.pointerId !== dragPointer) return;
+    grip.releasePointerCapture(event.pointerId);
+    finishDrag(dragDistance >= Math.min(96, content.clientHeight * .25));
+  });
+  grip.addEventListener('pointercancel', (event) => {
+    if (event.pointerId === dragPointer) finishDrag(false);
+  });
+
   const contentClose = document.createElement('button');
   contentClose.type = 'button';
   contentClose.className = 'ui-shell-content-close';
   contentClose.setAttribute('aria-label', renderUiText('app.close'));
-  contentClose.textContent = '×';
-  contentClose.addEventListener('click', () => { actions.navigate({ kind: 'valley' }); });
+  contentClose.textContent = renderUiText('app.close');
+  contentClose.addEventListener('click', () => { finishDrag(true); });
   content.append(contentClose);
 
   const contentBody = document.createElement('div');
@@ -237,11 +283,11 @@ export function createShell(actions: UiActions): ShellHandle {
     if (kind === 'seal') {
       ornament.removeAttribute('aria-hidden');
       ornament.setAttribute('aria-label', renderUiText('crossroad.waiting'));
-      ornament.innerHTML = `<span class="skin-seal" aria-hidden="true">${inlineIcon(SEAL_TREE)}</span>`;
+      ornament.innerHTML = '<span class="skin-seal" aria-hidden="true"><img class="skin-ornament-art skin-ornament-art--seal" src="./ui/art/ornament-tree-seal.png" alt="" /></span>';
     } else {
       ornament.setAttribute('aria-hidden', 'true');
       ornament.removeAttribute('aria-label');
-      ornament.innerHTML = inlineIcon(OAK_LEAF);
+      ornament.innerHTML = '<img class="skin-ornament-art skin-ornament-art--leaf" src="./ui/art/ornament-oak-leaf.png" alt="" />';
     }
   };
   setOrnament('leaf');
@@ -339,7 +385,6 @@ export function createShell(actions: UiActions): ShellHandle {
   // Los filetes verticales entre celdas (plan §3.4): `.skin-rule-v` ya existe
   // en el kit de UI-V0, sólo hacía falta usarlo aquí, entre cada dos botones
   // (dos filetes para tres pestañas, ninguno en los bordes exteriores).
-  const rules: HTMLDivElement[] = [];
   // UI-V7 · **Las tres celdas viven en un envoltorio, y la barra sigue siendo
   // la barra.** En una tablet la barra cruza 1240 px y sus tres pestañas se
   // separaban medio palmo; acotar la barra entera la habría convertido en una
@@ -358,11 +403,13 @@ export function createShell(actions: UiActions): ShellHandle {
       const rule = document.createElement('div');
       rule.className = 'skin-rule-v';
       cells.append(rule);
-      rules.push(rule);
     }
     const button = tapButton(labels[tabName], NAV_TAB_ICON[tabName], 'skin-nav-tab');
     button.setAttribute('aria-pressed', 'false');
-    button.addEventListener('click', () => { actions.navigate({ kind: tabName }); });
+    button.addEventListener('click', () => {
+      if (tabName === 'valley' && !content.hidden) finishDrag(true);
+      else actions.navigate({ kind: tabName });
+    });
     cells.append(button);
     buttons.set(tabName, button);
   });
@@ -401,7 +448,21 @@ export function createShell(actions: UiActions): ShellHandle {
   });
   stackWatcher?.observe(stack);
 
+  content.addEventListener('animationend', (event) => {
+    if (event.target === content && event.animationName === 'ui-route-arrive') {
+      content.classList.remove('ui-route-enter');
+    }
+  });
+
   const paintRoute = (route: SheetRoute): void => {
+    if (sheetCloseTimer !== null) {
+      window.clearTimeout(sheetCloseTimer);
+      sheetCloseTimer = null;
+    }
+    dragPointer = null;
+    content.classList.remove('ui-sheet-dragging');
+    content.inert = false;
+    content.style.removeProperty('--ui-sheet-drag');
     const active = navTabFor(route);
     for (const [tabName, button] of buttons) button.setAttribute('aria-pressed', String(tabName === active));
     // U-14 (design.md §11.2): de toda ruta se sale, y `data-screen` es con lo
@@ -411,13 +472,23 @@ export function createShell(actions: UiActions): ShellHandle {
     document.documentElement.dataset.screen = active;
     const inShell = contentRouteFor(route);
     content.hidden = inShell === null;
-    // UI-V2 · la piel de la navegación sigue a la ruta, no a la pestaña
-    // encendida: `chronicle`/`people`/`inspect` tienen cada una su prototipo
-    // (§3.2, §3.3), y `valley`/`orders` comparten el pergamino por defecto.
-    const skin = navSkinFor(route);
-    nav.classList.toggle('skin-nav--plaque', skin === 'plaque');
-    nav.classList.toggle('skin-nav--wood', skin === 'wood');
-    for (const rule of rules) rule.classList.toggle('skin-rule-v--on-wood', skin === 'wood');
+    content.classList.remove('ui-route-enter');
+    if (inShell !== null) {
+      // La entrada se limita a la superficie de UI: no mueve el canvas, la
+      // cámara ni el reloj de simulación. Forzar el estilo inicial permite
+      // repetirla al cambiar entre rutas aunque la bandeja ya estuviera abierta.
+      void content.offsetWidth;
+      content.classList.add('ui-route-enter');
+    }
+    nav.classList.remove('ui-route-return');
+    if (inShell === null) {
+      // Al volver al valle sólo entra la carcasa; el lienzo y el reloj quedan
+      // quietos. La transición breve da continuidad al cambio de ruta.
+      void nav.offsetWidth;
+      nav.classList.add('ui-route-return');
+    }
+    // La función conserva una sola piel por diseño; sólo cambia la selección.
+    nav.classList.toggle('skin-nav--wood', navSkinFor(route) === 'wood');
   };
   paintRoute({ kind: 'valley' });
 
@@ -435,6 +506,7 @@ export function createShell(actions: UiActions): ShellHandle {
     // se los lleve en cuanto nadie más los referencie. El observador de la
     // altura sí hay que soltarlo: vive fuera del árbol, colgado del elemento.
     dispose(): void {
+      if (sheetCloseTimer !== null) window.clearTimeout(sheetCloseTimer);
       stackWatcher?.disconnect();
       document.documentElement.style.removeProperty('--ui-stack-height');
       element.remove();

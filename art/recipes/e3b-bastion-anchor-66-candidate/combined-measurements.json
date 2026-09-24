@@ -1,0 +1,84 @@
+{
+  "sourceSha256": "b22781f7ac73a89078ae2a8d4ee0a3f8d28af5c45af50a2d3e2907b2f4852d10",
+  "deterministic": true,
+  "triangles": 2156,
+  "parts": 181,
+  "topologyPass": true,
+  "boundaryGuard": {
+    "boundarySamples": 1702,
+    "unguarded": 0,
+    "unguardedAt": []
+  },
+  "coplanarChecks": [
+    {
+      "kind": "Deck",
+      "parts": 13,
+      "overlaps": 0,
+      "maxArea": 0
+    },
+    {
+      "kind": "Parapet",
+      "parts": 65,
+      "overlaps": 0,
+      "maxArea": 6.938893903907228e-18
+    }
+  ],
+  "sweeps": [
+    {
+      "name": "ring",
+      "samples": 216737,
+      "failures": 0,
+      "failuresAt": [],
+      "minClearance": 0.34999999999999987,
+      "radius032Pass": true,
+      "radius035Pass": true
+    },
+    {
+      "name": "landing",
+      "samples": 94955,
+      "failures": 0,
+      "failuresAt": [],
+      "minClearance": 0.35,
+      "radius032Pass": true,
+      "radius035Pass": true
+    }
+  ],
+  "support": {
+    "directSamples": 20463,
+    "bridgeSamples": 6542,
+    "maxDistanceToBearing": 0.4430011286667339,
+    "jambContacts": [
+      {
+        "name": "Gate_Stone_Jamb_L",
+        "area": 0.02506666666666657,
+        "coveredArea": 0.02506666666666657
+      },
+      {
+        "name": "Gate_Stone_Jamb_R",
+        "area": 0.025066666666666695,
+        "coveredArea": 0.025066666666666695
+      }
+    ],
+    "beamBottom": 0.82,
+    "beamTop": 0.94,
+    "frameLintelBottom": 0.63,
+    "frameLintelTop": 0.82
+  },
+  "gate": {
+    "opening": 0.84,
+    "doorSweepPositions": 91,
+    "doorCollisions": 0,
+    "hingeSeatContacts": 116,
+    "maxDoorY": 0.5933333613475167,
+    "sourceClearance": 0.03666663865248332,
+    "lowestOverOpening": 0.63,
+    "publicViolations": 0,
+    "doorSourceIdentical": true
+  },
+  "limitations": [
+    "Contact and bridging measured from source, not a strength/load calculation.",
+    "Combined GLB not exported or imported. Door transform verified using existing wide GLB with identical door source.",
+    "Internal partition faces remain; no duplicate floor or parapet volume.",
+    "Source design replaces old coping/merlons; visual review remains outstanding."
+  ]
+}

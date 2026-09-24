@@ -39,7 +39,7 @@ describe('VZ-04 · el parte y el epitafio llevan la piel, no los tokens de U-01'
     it(`${nombre} se pinta con el papel de la crónica`, () => {
       const css = hoja(fichero);
       expect(css).toContain('var(--skin-page)');
-      expect(css).toContain('var(--skin-parchment-texture)');
+      expect(css).toContain('var(--skin-map-pattern)');
       // Y la tinta y las letras son las de la piel.
       expect(css).toContain('var(--skin-ink');
       expect(css).toContain('var(--skin-font-read)');
@@ -63,7 +63,7 @@ describe('VZ-04 · el parte y el epitafio llevan la piel, no los tokens de U-01'
     });
 
     it(`${nombre} atenúa el valle en vez de taparlo (§11.2)`, () => {
-      // Un velo del 18 %, el mismo de la decisión: §11.2 pide el valle
+      // Un velo carbón del 18 %, el mismo de la decisión: §11.2 pide el valle
       // atenuado y no apagado. El velo de noche que había tapaba la aldea.
       const css = hoja(fichero);
       expect(css).toContain('rgba(27, 22, 19, .18)');
@@ -82,10 +82,17 @@ describe('VZ-04 · el parte y el epitafio llevan la piel, no los tokens de U-01'
       // La franja se queda, sin degradado: sigue reservando el hueco por el
       // que se ve el valle por encima de la página.
       const css = hoja(fichero);
-      expect(css).toContain('-fade { flex: 0 0 64px; }');
+      expect(css).toContain('-fade { flex: 0 0 64px;');
       expect(css).not.toContain('linear-gradient(to bottom, transparent');
     });
   }
+
+  it('el cronicón usa el mismo velo carbón que el resto de superposiciones', () => {
+    const css = hoja('src/ui/screens/annals.ts');
+    expect(css).toContain('rgba(27, 22, 19, .18)');
+    expect(css).toContain('background-color: var(--skin-page)');
+    expect(css).toContain('var(--skin-map-pattern)');
+  });
 
   it('el epitafio usa los botones de la piel y no esquinas de 10 px propias', () => {
     const fuente = readFileSync('src/ui/screens/epitaph.ts', 'utf8');

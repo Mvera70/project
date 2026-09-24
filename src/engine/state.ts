@@ -558,6 +558,10 @@ export type PlayerAct =
   | { kind: 'means'; means: MeansId }
   // K-1 · dar la corona a alguien. Tampoco dice qué hacer: dice **quién**.
   | { kind: 'crown'; who: VillagerId }
+  /** Resultado observable de un encuentro físico de caza de la semana anterior. */
+  | { kind: 'hunt'; sourceTick: number;
+    species: 'partridge' | 'rabbit' | 'deer' | 'boar' | 'bear';
+    weapon: 'sling' | 'bow' | 'spear'; hits: number; killed: boolean }
   /**
    * B4 · **Lo que el mundo hizo**: el parte de una batalla física (§1b).
    *

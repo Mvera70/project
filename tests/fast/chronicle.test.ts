@@ -342,6 +342,7 @@ describe('render', () => {
       pieces: 84,
       // B1 · la cabeza que se lleva un asalto.
       animal: 'cow',
+      weapon: 'sling',
     };
     const keys = bankKeys();
     let rendered = 0;

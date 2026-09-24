@@ -11,6 +11,7 @@ import './redesign/tokens.css';
 // compone, así que si las dos tocan lo mismo manda la de la carcasa.
 import './redesign/skin.css';
 import './redesign/shell.css';
+import './redesign/hunt-action.css';
 import { SKY, TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
@@ -22,7 +23,9 @@ import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
 import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, PlayerAct, SaveFile } from '@engine/state';
+import { huntOpportunity, type HuntOpportunity } from '@engine/world/hunting';
 import { createHud } from './redesign/hud';
+import { showHuntPrompt } from './redesign/hunt-prompt';
 import { createInspectPanel } from './redesign/inspect-panel';
 import { cartPanel } from './redesign/cart';
 import { peoplePanel } from './redesign/people-panel';
@@ -229,8 +232,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
    * mandos— pueda llamarlo sin depender del orden en que se monta la interfaz.
    */
   let dropBareView: () => void = () => {};
+  let closeHuntPrompt: (() => void) | null = null;
 
   function navigate(route: SheetRoute): void {
+    closeHuntPrompt?.();
+    closeHuntPrompt = null;
     currentRoute = route;
     // UI-V10 · **con la pantalla despejada no se abre una hoja.** Sin esto, la
     // crónica se montaría sobre un valle sin cabecera y sin barra de abajo, o
@@ -453,13 +459,53 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     paintBare();
   };
 
+  // H-UI · la ocasión se ofrece como acción voluntaria, nunca como modal
+  // automático. El motor determina la presa disponible; la UI sólo deja elegir.
+  const huntAction = document.createElement('button');
+  huntAction.type = 'button';
+  huntAction.className = 'valley-hunt-action skin-plate skin-plate--round';
+  huntAction.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none"'
+    + ' stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M5 3c9 2 12 8 14 18M5 3c-2 8 2 14 14 18M7 5l12 14"/></svg>'
+    + '<span class="valley-hunt-action-label"></span>';
+  huntAction.setAttribute('aria-label', renderUiText('hunt.action.open'));
+  huntAction.hidden = true;
+  let huntOpportunityTick = -1;
+  let currentHuntOffer: HuntOpportunity | null = null;
+  let huntInProgress = false;
+  let huntWeapon: 'sling' | 'bow' | 'spear' | null = null;
+  let huntPreviousSpeed: Speed | null = null;
+  huntAction.addEventListener('click', () => {
+    if (huntInProgress) { backend.live.attackHunt(); return; }
+    if (currentHuntOffer === null || backend.live.kind !== 'pilot3d') return;
+    const offer = currentHuntOffer;
+    closeHuntPrompt = showHuntPrompt(offer, (weapon) => {
+      closeHuntPrompt = null;
+      if (state.tick !== offer.tick) {
+        huntOpportunityTick = -1;
+        paint(lastFraction);
+        return;
+      }
+      if (backend.live.startHunt(state, offer.species, weapon)) {
+        huntInProgress = true;
+        huntWeapon = weapon;
+        huntPreviousSpeed = speed;
+        app.setSpeed(1);
+        huntAction.setAttribute('aria-label', renderUiText(weapon === 'spear'
+          ? 'hunt.action.strike' : 'hunt.action.throw'));
+        huntAction.querySelector('.valley-hunt-action-label')!.textContent = renderUiText(
+          weapon === 'spear' ? 'hunt.action.strike' : 'hunt.action.throw');
+      }
+    }, () => { closeHuntPrompt = null; });
+  });
+
   const hudRight = document.createElement('div');
   // UI-V2b · la segunda clase es la que sube el rincón por encima de la
   // bandeja (`skin.css`): la regla de `index.html` lo dejaba a 60 px del
   // borde, que era la altura de la barra estrecha de antes del rediseño, y
   // con la bandeja nueva los dos círculos caían dentro de ella.
   hudRight.className = 'valley-hud-right hud-speed-corner';
-  hudRight.append(bareToggle, soundToggle, hud.speedControls, hud.speedBadge);
+  hudRight.append(bareToggle, soundToggle, hud.speedControls, hud.speedBadge, huntAction);
 
   root.append(canvas, hud.header, hudRight, shell.element);
 
@@ -681,6 +727,22 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   let spokenOffer: number | null = null;
   const paint = (fraction: number): void => {
     lastFraction = fraction;
+    if (huntOpportunityTick !== state.tick) {
+      huntOpportunityTick = state.tick;
+      currentHuntOffer = huntOpportunity(state);
+    }
+    const offer = currentHuntOffer;
+    huntAction.hidden = backend.live.kind !== 'pilot3d' || currentRoute.kind !== 'valley'
+      || state.crossroad !== null || state.ended !== null || (offer === null && !huntInProgress) || bare;
+    if (huntInProgress && huntWeapon !== null) {
+      huntAction.setAttribute('aria-label', renderUiText(huntWeapon === 'spear'
+        ? 'hunt.action.strike' : 'hunt.action.throw'));
+      huntAction.querySelector('.valley-hunt-action-label')!.textContent = renderUiText(
+        huntWeapon === 'spear' ? 'hunt.action.strike' : 'hunt.action.throw');
+    } else if (offer !== null) {
+      huntAction.setAttribute('aria-label', `${renderUiText('hunt.action.open')} · ${renderUiText(`hunt.species.${offer.species}`)}`);
+      huntAction.querySelector('.valley-hunt-action-label')!.textContent = renderUiText('hunt.action.open');
+    }
     // U-11 · la altura de la vista, en la raíz, como `data-tick`: es lo único
     // que permite mirar el vuelo de entrada desde una secuencia de capturas o
     // desde un recorrido, sin abrir el renderer.
@@ -795,7 +857,16 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     voice = expire(voice, nowMs);
     const now = speaking(voice, nowMs);
     const text = now?.text ?? '';
-    if (text !== shell.voiceLine.textContent) shell.voiceLine.textContent = text;
+    if (text !== shell.voiceLine.textContent) {
+      shell.voiceLine.textContent = text;
+      // La voz de fondo puede cambiar con cada semana acelerada. Sólo una
+      // noticia, pista, hito u oferta recibe entrada breve al cambiar de frase.
+      shell.voiceLine.classList.remove('ui-voice-enter');
+      if (text !== '' && now?.role !== 'state') {
+        void shell.voiceLine.offsetWidth;
+        shell.voiceLine.classList.add('ui-voice-enter');
+      }
+    }
     // `data-role` es lo que la hoja de estilo lee para el acento del hito (la
     // hoja de roble en oro) y lo que el manejador del toque mira para saber si
     // lo que se está leyendo es la pista. Nadie toca una clase desde aquí.
@@ -812,6 +883,19 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // VZ-4 · la cámara va detrás de quien se sigue, fotograma a fotograma.
     if (trackedId !== null) renderer.track(trackedId);
     renderer.paint(state, fraction);
+    // El resultado físico llega en un fotograma, no al cabo de otra semana
+    // de reloj real. Se entrega al motor justo después de pintar el impacto.
+    if (huntInProgress) {
+      const completed = backend.live.hunt();
+      if (completed !== null) {
+        pendingActs.push({ kind: 'hunt', ...completed });
+        huntInProgress = false;
+        huntWeapon = null;
+        if (huntPreviousSpeed !== null) app.setSpeed(huntPreviousSpeed);
+        huntPreviousSpeed = null;
+        queueMicrotask(() => { runTick(); paint(lastFraction); });
+      }
+    }
     // §11.2's third screen opens itself the moment there is something to
     // answer — including the very first paint, for a save or a debug
     // fast-forward that already lands on a posed crossroad. `openCrossroad`
@@ -1136,6 +1220,8 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const finish = (): void => {
     if (state.ended === null || finishing) return;
     finishing = true;
+    closeHuntPrompt?.();
+    closeHuntPrompt = null;
     loop?.stop();
     loop = undefined;
     // La jornada terminal sigue pasos físicos fijos, pero el último `paint`
@@ -1204,10 +1290,23 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
 
   const runTick = (): void => {
     if (state.ended !== null) return;
+    // La semana espera al encuentro visible: cambiar el estado reconstruiría
+    // la vida y haría desaparecer la presa antes de recibir el parte.
+    if (huntInProgress) {
+      const completed = backend.live.hunt();
+      if (completed === null) return;
+      pendingActs.push({ kind: 'hunt', ...completed });
+      huntInProgress = false;
+      huntWeapon = null;
+      if (huntPreviousSpeed !== null) app.setSpeed(huntPreviousSpeed);
+      huntPreviousSpeed = null;
+    }
     const decision = pendingDecision;
     pendingDecision = undefined;
     const acts = pendingActs;
     pendingActs = [];
+    // H-UI · el resultado físico cruza la misma frontera serializable que las
+    // demás acciones. Sólo el motor añade la carne y registra la resolución.
     // B4 · **Lo que el mundo hizo** (§1b). La semana en que hay un asalto por
     // resolver —la marca la puso el motor al llegar la partida—, se le pregunta
     // a la escena qué pasó en la muralla y entra como un acto más. Si la escena

@@ -56,6 +56,8 @@ async function main(): Promise<void> {
   const width = Number(argument('width', '390'));
   const height = Number(argument('height', '640'));
   const real = argument('real', 'false') === 'true';
+  const suite = argument('suite', 'g09') === 'p1' ? 'p1' : 'g09';
+  const repeats = Math.max(1, Number(argument('repeats', suite === 'p1' ? '3' : '1')));
 
   let server: ViteDevServer | undefined;
   let browser: Browser | undefined;
@@ -84,7 +86,7 @@ async function main(): Promise<void> {
     const problems: string[] = [];
     page.on('pageerror', (error) => problems.push(error.message));
 
-    const query = new URLSearchParams({ seconds: String(seconds), real: String(real) });
+    const query = new URLSearchParams({ seconds: String(seconds), real: String(real), suite, repeats: String(repeats) });
     await page.goto(`${base}tools/graphics/bench.html?${query.toString()}`, {
       waitUntil: 'domcontentloaded', timeout: 60_000,
     });
@@ -99,15 +101,20 @@ async function main(): Promise<void> {
     const report = await page.evaluate(() => window.valleyBenchDone) as BenchReport | undefined;
     if (report === undefined) throw new Error('The bench finished without a report.');
 
-    await mkdir(OUTPUT, { recursive: true });
-    const file = resolve(OUTPUT, 'benchmark.json');
+    // P-1a conserva cada corrida: una base que pisa a la anterior no deja rango
+    // ni permite comprobar un resultado sorprendente. El banco G-09 conserva su
+    // ruta histórica para no alterar sus consumidores.
+    const stamp = new Date().toISOString().replace(/[:.]/gu, '-');
+    const output = suite === 'p1' ? resolve(ROOT, 'artifacts', 'graphics', 'P-1a', stamp) : OUTPUT;
+    await mkdir(output, { recursive: true });
+    const file = resolve(output, 'benchmark.json');
     await writeFile(file, `${JSON.stringify({ ...report, problems }, null, 2)}\n`, 'utf8');
 
     process.stdout.write(
-      `${report.device.gpu ?? 'GPU desconocida'} · ${report.device.cores ?? '?'} nucleos · `
+      `${report.suite} · ${report.device.gpu ?? 'GPU desconocida'} · ${report.device.cores ?? '?'} nucleos · `
       + `${width}x${height} @${report.device.pixelRatio}x\n`
       + `Dispositivo real: ${report.device.realDevice ? 'si' : 'NO — emulacion, D.9 no la acepta para cerrar P3'}\n`
-      + `Carga fria ${report.load.coldMs.toFixed(0)} ms · caliente ${report.load.warmMs.toFixed(0)} ms · `
+      + `Instancia inicial ${report.load.coldMs.toFixed(0)} ms · segunda instancia ${report.load.warmMs.toFixed(0)} ms · `
       + `${(report.load.bytes / 1024).toFixed(0)} KB por red\n\n`,
     );
 

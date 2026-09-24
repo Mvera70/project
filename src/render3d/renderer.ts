@@ -14,13 +14,14 @@ import { PlazaFountain } from './world/plaza';
 // same instant derives the same answer however many times it is asked.
 
 import {
-  Color, DirectionalLight, Fog, Group, HemisphereLight, PCFSoftShadowMap,
+  Color, DirectionalLight, Fog, Group, HemisphereLight, PCFShadowMap,
   ACESFilmicToneMapping,
-  Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type Mesh, type Object3D,
+  Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type BufferAttribute, type MeshStandardMaterial, type Object3D,
 } from 'three';
 import { ford } from '@engine/sim';
 import { clockOf } from '@engine/time';
 import { paletteFor } from '@derive/palette';
+import type { Palette } from '@derive/palette';
 import { moodsFor } from '@derive/moods';
 import { createValleyCamera } from './camera';
 import { TERRAIN_CODE, type GameState, type VillagerId } from '@engine/state';
@@ -31,13 +32,15 @@ import type {
 } from './contracts';
 import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
 import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './world/ground';
-import { buildRidge } from './world/ridge';
+import { buildBackdrop, type Backdrop } from './world/backdrop';
+import { mountainWolves } from './world/mountain-wolves';
+import { ridgeAt } from './world/ridge';
 import { buildFord, type Ford } from './world/ford';
 import {
   buildForest, builtCells, scatterCells, scatterOn, scrubCells, shoreCells, type Forest,
 } from './world/forest';
 import type { ForestRevealTarget } from './world/forest-occlusion';
-import { BUILDING_ASSETS, Village } from './world/buildings';
+import { BUILDING_ASSETS, ELEVATED_RING_ASSETS, Village } from './world/buildings';
 import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
 import { isNight, type HomeRoutine } from './life/home';
 import { fitsCircle, penetration } from './life/body';
@@ -50,6 +53,10 @@ import { boltPlace, boltsInDay, overcastOf, skyAt, type SkyKind } from '../deriv
 import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
+import { createHuntEncounter, type HuntEncounter, type HuntReport } from './life/hunt-encounter';
+import { createBear } from './life/bear';
+import { huntOpportunity, type HuntSpecies, type HuntWeapon } from '@engine/world/hunting';
+import { valleyCore } from '@derive/anchors';
 import type { DayPlan } from './life/day';
 import { arrowsOf, castOf, propsOf } from './life/cast';
 import { Props } from './world/props';
@@ -61,7 +68,7 @@ import { Bubbles, type Bubble } from './effects/bubbles';
 import { Fauna } from './effects/fauna';
 import { Tells } from './effects/tells';
 import { TreeFalls, type TreeFallSighting } from './effects/tree-falls';
-import { FIELD_CROPS, isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
+import { FIELD_CROPS, isQuiet, planChange, planFor, sceneRingOf, sceneWalkwayOf, seasonColourStep, type ScenePlan } from './world/plan';
 import { BattleDebris } from './world/battle-debris';
 import { Works } from './world/works';
 import type { Physics } from './life/physics';
@@ -79,7 +86,8 @@ const FORD = 'ford-stone';
  * Las clases de §7.7, cada una con su recurso. El nombre del recurso es el de
  * la clase: no hay correspondencia que escribir porque no hace falta.
  */
-const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish'] as const;
+const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish',
+  'partridge', 'rabbit', 'deer', 'boar', 'bear'] as const;
 /** Todo lo que el valle sabe pintar hoy. Lo que no este aqui, no se descarga. */
 /**
  * Los recursos que este renderer pide al catalogo.
@@ -97,17 +105,17 @@ export const WANTED = [
   ...VILLAGER_MODELS, TREE, TREE_PINE, ROCK, REED, SCRUB, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
   // G-24 · herramientas de defensa. La flecha se sigue moviendo con Rapier;
   // ésta es sólo su silueta aprobada y las otras cuelgan de los conectores de mano.
-  'bow', 'spear', 'arrow', 'shield',
-  // P-2 · la fuente de la plaza, cuando exista (`docs/encargos/encargo-fuente.md`).
+  'bow', 'spear', 'sling', 'arrow', 'shield', 'bear-den',
+  'gate-timber',
+  // P-2 · la fuente publicada de la plaza.
   'fountain',
-  // M-3 · lo que el jugador mete en el valle. Ninguno de los dos está
-  // publicado todavía —el encargo es `docs/encargos/encargo-arado.md`— y por eso se
-  // piden aquí: `WANTED` es lo que el renderer puede pedir, exista ya o no,
-  // y mientras no exista `world/props.ts` los dibuja con primitivas.
+  // M-3 · el arado ya tiene GLB; el barril sigue usando el respaldo procedural.
+  // `WANTED` puede incluirlo antes de publicarlo para que aparezca al llegar.
   'barrel', 'plough',
   ...FAUNA,
   // E3 · el plan sustituye el bastión por esta variante cuando cabe su escalera.
-  'bastion-access-candidate',
+  'bastion-access-candidate', 'e3b-bastion-joint-candidate', 'e3b-walkway-entry-candidate',
+  ...Object.values(ELEVATED_RING_ASSETS),
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
 
@@ -146,13 +154,12 @@ const MOST_BUBBLES = 3;
 const CORE_SHARE = 0.8;
 
 /**
- * Cuánta sierra alcanza la vista al alejarse del todo, en celdas fuera del mapa.
+ * Cuánto paisaje exterior entra al alejar la vista por completo.
  *
- * TUNE: catorce de las dieciséis que mide la falda (§D.6.8). Alcanzar la cresta
- * entera dejaría la aldea del tamaño de un sello, y lo que cierra el valle no es
- * la cumbre: es la ladera subiendo detrás de los tejados.
+ * TUNE visual: seis celdas. El bosque continúa mucho más allá, pero encuadrar
+ * todo ese decorado reduciría otra vez la aldea a un sello.
  */
-const RIDGE_REACH = 14;
+const RIDGE_REACH = 6;
 
 /**
  * La exposición con la que se revela el valle.
@@ -168,6 +175,10 @@ const TONE_EXPOSURE = 0.62;
 export async function createGraphicsRenderer(
   options: GraphicsRendererOptions,
 ): Promise<GraphicsRenderer> {
+  // P-1b.2 · marcas efímeras del banco local; no cambian la escena ni el reloj.
+  const traceStages = import.meta.env.DEV && new URLSearchParams(window.location.search).get('bench-stages') === '1';
+  const markStage = (name: string): void => { if (traceStages) performance.mark(`valley3d:${name}`); };
+  markStage('renderer:create-start');
   const renderer = new WebGLRenderer({ canvas: options.canvas, antialias: options.quality !== 'low' });
   renderer.outputColorSpace = SRGBColorSpace;
   // **El valle estaba sobreexpuesto, y era la causa de que se viera lavado.**
@@ -189,8 +200,9 @@ export async function createGraphicsRenderer(
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.toneMappingExposure = TONE_EXPOSURE;
   renderer.shadowMap.enabled = options.quality !== 'low';
-  renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.shadowMap.type = PCFShadowMap;
   renderer.setClearColor(new Color(VALLEY_COLOURS.sky));
+  markStage('renderer:context-ready');
 
   const scene = new Scene();
   scene.background = new Color(VALLEY_COLOURS.sky);
@@ -207,6 +219,63 @@ export async function createGraphicsRenderer(
   sun.shadow.normalBias = SUN_SHADOW.normalBias;
   const ambient = new HemisphereLight('#FFF6DF', '#776F62', 1.5);
   scene.add(ambient, sun, sun.target);
+
+  // S-1 · Una sola cascada, pero enfocada y estable. Cubrir siempre el mapa
+  // completo desperdicia la mayor parte de los 2048 texels cuando se está
+  // mirando la aldea. El volumen sigue a lo visible con margen para los
+  // proyectores que quedan justo fuera, y su centro se alinea a la cuadrícula
+  // del mapa de sombras. Así pan y zoom no hacen nadar la proyección entre
+  // texels; el rumbo del sol sigue cambiando de manera continua.
+  const shadowFocus = new Vector3();
+  const shadowSnapped = new Vector3();
+  const shadowDirection = new Vector3();
+  const shadowForward = new Vector3();
+  const shadowRight = new Vector3();
+  const shadowUp = new Vector3();
+  const worldUp = new Vector3(0, 1, 0);
+
+  function stabilizeSunShadow(direction: Readonly<{ x: number; y: number; z: number }>): void {
+    if (mapWidth <= 0 || viewport.widthCss <= 1 || viewport.heightCss <= 1) return;
+    shadowFocus.set(view.view.centre.x, 0, view.view.centre.z);
+    let visibleRadius = 0;
+    for (const [x, y] of [
+      [0, 0], [viewport.widthCss, 0],
+      [0, viewport.heightCss], [viewport.widthCss, viewport.heightCss],
+    ] as const) {
+      const ground = view.groundAt(x, y);
+      visibleRadius = Math.max(visibleRadius, Math.hypot(
+        ground.x - shadowFocus.x, ground.z - shadowFocus.z,
+      ));
+    }
+    const reach = Math.max(1, visibleRadius + SUN_SHADOW.focusMargin);
+    const texel = (reach * 2) / SUN_SHADOW.mapSize;
+
+    // `direction` va del objetivo hacia el sol; la cámara de sombra mira en
+    // sentido contrario. La base rota suavemente con el astro, mientras el
+    // centro sólo puede ocupar coordenadas enteras de texel en esa base.
+    shadowDirection.set(direction.x, Math.max(0.35, direction.y), direction.z).normalize();
+    shadowForward.copy(shadowDirection).multiplyScalar(-1);
+    shadowRight.crossVectors(shadowForward, worldUp).normalize();
+    shadowUp.crossVectors(shadowRight, shadowForward).normalize();
+    const rightStep = Math.round(shadowFocus.dot(shadowRight) / texel) * texel
+      - shadowFocus.dot(shadowRight);
+    const upStep = Math.round(shadowFocus.dot(shadowUp) / texel) * texel
+      - shadowFocus.dot(shadowUp);
+    shadowSnapped.copy(shadowFocus)
+      .addScaledVector(shadowRight, rightStep)
+      .addScaledVector(shadowUp, upStep);
+
+    const mapRadius = Math.hypot(mapWidth, mapHeight) / 2 + 1;
+    sun.target.position.copy(shadowSnapped);
+    sun.position.copy(shadowSnapped).addScaledVector(shadowDirection, mapRadius * 2.2);
+    sun.shadow.camera.left = -reach;
+    sun.shadow.camera.right = reach;
+    sun.shadow.camera.top = reach;
+    sun.shadow.camera.bottom = -reach;
+    sun.shadow.camera.near = 0.5;
+    sun.shadow.camera.far = mapRadius * SUN_SHADOW.farMultiplier;
+    sun.shadow.camera.updateProjectionMatrix();
+  }
 
   /**
    * Lo lejos que hay que estar para que la niebla se coma el valle.
@@ -255,24 +324,19 @@ export async function createGraphicsRenderer(
     ambient.color.set(day.skyColour);
     ambient.groundColor.set(day.groundBounce);
     ambient.intensity = day.ambientIntensity;
+    if (backdrop !== null) {
+      backdrop.light(day.daylight);
+    }
     (scene.background as Color).set(day.background);
     if (scene.fog !== null) (scene.fog as Fog).color.set(day.background);
     renderer.setClearColor(new Color(day.background));
     // El sol gira alrededor del valle, y con el las sombras. Lo que no cambia es
     // a que apunta: alumbra el valle entero y no lo que se ve, asi que
     // acercarse no puede mover una sombra.
-    if (mapWidth > 0) {
-      const centre = new Vector3(mapWidth / 2, 0, mapHeight / 2);
-      const radius = Math.hypot(mapWidth, mapHeight) / 2 + 1;
-      sun.position.copy(centre).add(
-        new Vector3(day.sun.x, Math.max(0.35, day.sun.y), day.sun.z).multiplyScalar(radius * 2.2),
-      );
-      sun.target.position.copy(centre);
-    }
+    stabilizeSunShadow(day.sun);
   }
 
-  // Only the villager, and only because that is all the catalogue holds. Loading
-  // the whole of it to show one asset is the waste D.9 asks the pilot not to do.
+  // Los modelos publicados que pide la escena se cargan antes de crear actores.
   //
   // A library brought by the caller belongs to the caller, so `dispose` leaves
   // it alone: freeing something we were lent would take it out from under
@@ -280,6 +344,7 @@ export async function createGraphicsRenderer(
   const borrowed = options.library !== undefined;
   const library: AssetLibrary = (options.library as AssetLibrary | undefined)
     ?? await loadAssets({ baseUrl: options.assetBaseUrl, wanted: WANTED });
+  markStage('renderer:assets-ready');
   const villager = library.get(VILLAGER);
   if (villager === undefined) throw new Error("The asset manifest has no 'villager'.");
 
@@ -340,7 +405,7 @@ export async function createGraphicsRenderer(
   let crossing: Ford | null = null;
   let plan: ScenePlan | null = null;
   /** La sierra de V-14. Vive con el valle y se rehace sólo si cambia el mapa. */
-  let ridge: Mesh | null = null;
+  let backdrop: Backdrop | null = null;
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   /** Cuanto se sube en pantalla a quien se sigue. Ver `track`. TUNE: 0,14. */
   const TRACK_LIFT = 0.14;
@@ -377,8 +442,16 @@ export async function createGraphicsRenderer(
    */
   let flight: { readonly seconds: number; elapsed: number; readonly from: number; readonly to: number } | null = null;
   let wantedFlight: number | null = null;
+  // Al contestar una decisión, la mirada viaja al lugar cambiado sin tocar
+  // la distancia elegida. Sólo existe mientras dura ese enfoque breve.
+  let focusFlight: {
+    elapsed: number;
+    readonly fromX: number; readonly fromZ: number;
+    readonly toX: number; readonly toZ: number;
+  } | null = null;
 
   function beginFlight(seconds: number): void {
+    focusFlight = null;
     frameCamera();
     view.reset();
     const to = view.view.height;
@@ -411,6 +484,17 @@ export async function createGraphicsRenderer(
       view.reset();
     }
   }
+  function stepFocus(deltaSeconds: number): void {
+    if (focusFlight === null) return;
+    focusFlight.elapsed += deltaSeconds;
+    const t = Math.min(1, focusFlight.elapsed / 0.42);
+    const eased = t * t * (3 - 2 * t);
+    view.look(
+      focusFlight.fromX + (focusFlight.toX - focusFlight.fromX) * eased,
+      focusFlight.fromZ + (focusFlight.toZ - focusFlight.fromZ) * eased,
+    );
+    if (t >= 1) focusFlight = null;
+  }
   // El estado de la jornada, quieto desde anoche. Es lo que se pinta: ver
   // `scenic-state.ts` para por que no se pinta el vivo.
   const scenic = createScenicState();
@@ -424,6 +508,9 @@ export async function createGraphicsRenderer(
    * nada que apagar y se fue con ella.
    */
   let life: LifeVillage | null = null;
+  let denVisual: Object3D | null = null;
+  let huntScene: HuntEncounter | null = null;
+  let huntReport: HuntReport | null = null;
   let lifeDay = -1;
   let lifeState: GameState | null = null;
   let observedState: Readonly<GameState> | null = null;
@@ -462,6 +549,18 @@ export async function createGraphicsRenderer(
    */
   function revealAssault(): number {
     if (forest === null || life === null) return 0;
+    if (huntScene !== null) {
+      const hunter = huntScene.hunter;
+      const targets: ForestRevealTarget[] = [{
+        x: hunter.x, y: groundFloor(hunter.x, hunter.z) + ACTOR_VISUAL_HEIGHT / 2,
+        z: hunter.z, radius: ACTOR_VISUAL_HEIGHT,
+      }];
+      for (const animal of huntScene.animals) targets.push({
+        x: animal.x, y: groundFloor(animal.x, animal.y) + ACTOR_VISUAL_HEIGHT / 2,
+        z: animal.y, radius: ACTOR_VISUAL_HEIGHT,
+      });
+      return forest.reveal(camera, targets);
+    }
     const gate = life.defence.gate;
     if (gate === null) return forest.reveal(camera, []);
     const active = life.raiders.filter(raider => raider.phase !== 'down'
@@ -560,20 +659,8 @@ export async function createGraphicsRenderer(
     };
     view.frame(box, { width: viewport.widthCss, height: viewport.heightCss }, ridgeBox);
 
-    // El sol alumbra el valle entero, no lo que se ve: acercarse no puede
-    // cambiar donde caen las sombras.
     const centre = new Vector3(mapWidth / 2, 0, mapHeight / 2);
-    const radius = Math.hypot(mapWidth, mapHeight) / 2 + 1;
-    sun.target.position.copy(centre);
     fogAround(centre);
-    const reach = radius * SUN_SHADOW.reachMargin;
-    sun.shadow.camera.left = -reach;
-    sun.shadow.camera.right = reach;
-    sun.shadow.camera.top = reach;
-    sun.shadow.camera.bottom = -reach;
-    sun.shadow.camera.near = 0.5;
-    sun.shadow.camera.far = radius * SUN_SHADOW.farMultiplier;
-    sun.shadow.camera.updateProjectionMatrix();
   }
 
   /**
@@ -592,6 +679,88 @@ export async function createGraphicsRenderer(
   let painted = '';
   let paintedGround = '';
   let paintedSteading = '';
+  // La apariencia pertenece al tiempo de presentación; ni el tick ni la velocidad la adelantan.
+  const APPEARANCE_SECONDS = 0.8;
+  const paletteKeys = Object.keys(paletteFor('spring', 0)) as (keyof Palette)[];
+  const tintFrom = new Color();
+  const tintTo = new Color();
+  const blendedPalette: Palette = { ...paletteFor('spring', 0) };
+  const fromPalette: Palette = { ...blendedPalette };
+  let appearancePalette: Palette | null = null;
+  let appearanceFrom: Palette | null = null;
+  let appearanceTarget: Palette | null = null;
+  let appearanceSnow = 0;
+  let snowFrom = 0;
+  let snowTarget = 0;
+  let appearanceElapsed = APPEARANCE_SECONDS;
+  let groundFrom: Float32Array | null = null;
+  let groundTarget: Float32Array | null = null;
+  let waterFrom: Color | null = null;
+  let waterTarget: Color | null = null;
+
+  function stepAppearance(deltaSeconds: number): void {
+    if (appearanceFrom === null || appearanceTarget === null || ground === null || groundFrom === null || groundTarget === null) return;
+    appearanceElapsed = Math.min(APPEARANCE_SECONDS, appearanceElapsed + Math.max(0, deltaSeconds));
+    const t = appearanceElapsed / APPEARANCE_SECONDS;
+    const eased = t * t * (3 - 2 * t);
+    const colours = ground.mesh.geometry.getAttribute('color') as BufferAttribute;
+    const values = colours.array as Float32Array;
+    for (let i = 0; i < values.length; i += 1) values[i] = groundFrom[i]! + (groundTarget[i]! - groundFrom[i]!) * eased;
+    colours.needsUpdate = true;
+    if (ground.water !== null && waterFrom !== null && waterTarget !== null) {
+      (ground.water.material as MeshStandardMaterial).color.lerpColors(waterFrom, waterTarget, eased);
+    }
+    for (const key of paletteKeys) {
+      blendedPalette[key] = `#${tintFrom.set(appearanceFrom[key]).lerp(tintTo.set(appearanceTarget[key]), eased).getHexString()}`;
+    }
+    appearancePalette = blendedPalette;
+    appearanceSnow = snowFrom + (snowTarget - snowFrom) * eased;
+    forest?.season(blendedPalette);
+    backdrop?.season(blendedPalette);
+    village.season(appearanceSnow, blendedPalette.accent);
+    treeFalls.season(blendedPalette);
+    if (t >= 1) {
+      groundFrom = null;
+      groundTarget = null;
+      waterFrom = null;
+      waterTarget = null;
+      appearanceFrom = null;
+      appearanceTarget = null;
+    }
+  }
+
+  function startAppearance(previous: Float32Array | null, previousWater: Color | null,
+    palette: Palette, snow: number, snap: boolean): void {
+    const colours = ground?.mesh.geometry.getAttribute('color') as BufferAttribute | undefined;
+    const values = colours?.array as Float32Array | undefined;
+    if (snap || previous === null || values === undefined || previous.length !== values.length || appearancePalette === null) {
+      groundFrom = null;
+      groundTarget = null;
+      waterFrom = null;
+      waterTarget = null;
+      appearanceFrom = null;
+      appearanceTarget = null;
+      appearancePalette = palette;
+      appearanceSnow = snow;
+      return;
+    }
+    groundFrom = previous;
+    groundTarget = Float32Array.from(values);
+    waterFrom = previousWater;
+    waterTarget = ground?.water === null ? null : (ground?.water?.material as MeshStandardMaterial).color.clone();
+    values.set(previous);
+    colours!.needsUpdate = true;
+    for (const key of paletteKeys) fromPalette[key] = appearancePalette[key];
+    appearanceFrom = fromPalette;
+    appearanceTarget = palette;
+    snowFrom = appearanceSnow;
+    snowTarget = snow;
+    appearanceElapsed = 0;
+    forest?.season(appearancePalette);
+    backdrop?.season(appearancePalette);
+    village.season(appearanceSnow, appearancePalette.accent);
+    treeFalls.season(appearancePalette);
+  }
 
   function rebuildForest(state: GameState, palette: ReturnType<typeof paletteFor>): void {
     if (forest !== null) {
@@ -628,13 +797,14 @@ export async function createGraphicsRenderer(
     // V-14 · la sierra que cierra el valle. Fuera del mapa jugable y por tanto
     // fuera del motor: no cuesta una constante de balance ni un byte de
     // guardado. Se arma una vez con el valle, porque no cambia nunca.
-    if (ridge !== null) {
-      world.remove(ridge);
-      ridge.geometry.dispose();
-      (ridge.material as { dispose(): void }).dispose();
+    if (backdrop !== null) {
+      world.remove(backdrop.group);
+      backdrop.dispose();
     }
-    ridge = buildRidge(state.map, state.terrainSeed);
-    world.add(ridge);
+    // El decorado de las laderas usa pinos; el arbolado de hoja queda en la aldea.
+    backdrop = buildBackdrop(state.map, state.terrainSeed, palette,
+      library.get(TREE_PINE)?.original as Object3D | undefined);
+    world.add(backdrop.group);
 
     // El bosque y los pedregales se replantan con el suelo, que es cuando
     // alguien tala o el terreno cambia.
@@ -696,7 +866,8 @@ export async function createGraphicsRenderer(
     const floor = (x: number, z: number): number => elevationAt(map, x, z);
     groundFloor = floor;
     cast.standOn(floor);
-    fauna.standOn(floor);
+    fauna.standOn((x, z) => x < 0 || x > map.width || z < 0 || z > map.height
+      ? ridgeAt(map, state.terrainSeed, x, z) : floor(x, z));
     treeFalls.standOn(floor);
     mapWidth = state.map.width;
     mapHeight = state.map.height;
@@ -896,7 +1067,7 @@ export async function createGraphicsRenderer(
     // cuerpos de la partida llevan identificador **negativo** a propósito
     // (`raiders.ts`), así que el centinela de «sin seguir a nadie» pasa a ser
     // `-1` exacto y cualquier otro número se busca, del signo que sea.
-    if (follow !== undefined && follow !== NOBODY || zoom !== 1) { flight = null; disturbed = true; }
+    if (follow !== undefined && follow !== NOBODY || zoom !== 1) { flight = null; focusFlight = null; disturbed = true; }
     const person = life?.dwellers.find(dweller => dweller.villager === follow);
     const target = person?.body
       ?? life?.beasts.find(beast => beast.dweller.body.id === follow)?.dweller.body
@@ -905,13 +1076,14 @@ export async function createGraphicsRenderer(
     // El diagnóstico sólo encuadra: la visibilidad es ahora la misma solución
     // selectiva del juego, no el antiguo atajo que apagaba el bosque entero.
     const gate = gateStudy ? life?.defence.gate : null;
-    if (gate !== null && gate !== undefined) { flight = null; disturbed = true; view.look(gate.at.x, gate.at.z); }
+    if (gate !== null && gate !== undefined) { flight = null; focusFlight = null; disturbed = true; view.look(gate.at.x, gate.at.z); }
     // G-27 · Una toma puede señalar coordenadas reales sin fingir que allí hay
     // alguien que seguir. Sólo se acepta un punto finito: este enganche vive
     // en `window` y los scripts pueden saltarse el contrato TypeScript.
     // Va tras el centinela/portón para que la toma explícita sea la pedida.
     if (point !== undefined && Number.isFinite(point.x) && Number.isFinite(point.z)) {
       flight = null;
+      focusFlight = null;
       disturbed = true;
       view.look(point.x, point.z);
     }
@@ -942,6 +1114,7 @@ export async function createGraphicsRenderer(
     } finally { sampling = false; }
   };
 
+  let firstPaintTraced = false;
   const graphics: GraphicsRenderer = {
     resize(next: GraphicsViewport): void {
       if (disposed) return;
@@ -957,9 +1130,13 @@ export async function createGraphicsRenderer(
       if (observing && !sampling) return;
       observedState = state; observedFrame = frame;
       if (disposed) return;
+      const firstPaint = traceStages && !firstPaintTraced;
+      if (firstPaint) markStage('paint:first-start');
       // La hora escenica primero, porque de ella cuelga todo lo demas: es la
       // que dice que jornada se esta pintando y, con ella, que estado.
-      const phase = dayPhase(frame.presentationSeconds);
+      // P-1a · la fase fija sólo cambia la escena de este banco local; el
+      // reloj del motor y la jornada que identifica el clima siguen su curso.
+      const phase = options.previewPhase ?? dayPhase(frame.presentationSeconds);
       paintedPhase = phase;
       const today = dayNumber(frame.presentationSeconds);
       // Un fotograma discontinuo —partida nueva, carga, letargo— trae un estado
@@ -977,12 +1154,16 @@ export async function createGraphicsRenderer(
         && state.flags['assault'] !== undefined;
       const holdingEnding = !frame.discontinuity && sameValley && state.ended?.cause === 'stormed'
         && life !== null && life.sack !== null;
-      const holdPresentation = holdingAssault || holdingEnding;
+      // Un encuentro iniciado por el jugador tampoco puede perder sus cuerpos
+      // al cruzar el anochecer escénico antes de entregar el resultado.
+      const holdPresentation = holdingAssault || holdingEnding
+        || (!frame.discontinuity && sameValley && huntScene !== null);
       const shown = holdPresentation && lifeState !== null
         ? lifeState : scenic.of(state as GameState, phase);
 
       const next = planFor(shown);
       const change = planChange(plan, next);
+      if (firstPaint) markStage('paint:plan-ready');
       let fallingChanged = treeFalls.observe(state.map, frame.discontinuity);
 
       if (change.cleared) {
@@ -1008,11 +1189,10 @@ export async function createGraphicsRenderer(
       }
       const acceptedForest = treeFalls.acceptShown(shown.map);
       // El suelo se rehace cuando cambia el terreno **o cuando cambia la
-      // estación del reloj vivo**, que es lo que le da el color. La clave lleva
-      // la semana dentro de la estación porque §10.3 deshiela mezclando durante
-      // las dos primeras.
+      // estación del reloj vivo**, que es lo que le da el color. §10.3 mezcla
+      // hacia la siguiente estación en las dos últimas semanas (10 y 11).
       const live = clockOf(state.tick);
-      const colour = `${live.season}:${Math.min(2, live.seasonWeek)}`;
+      const colour = `${live.season}:${seasonColourStep(live.seasonWeek)}`;
       // E0e · El override sólo llega desde la herramienta de captura. No toca
       // `shown`, ni las decisiones de vida, ni la cabecera: sirve para aislar
       // el acabado de una misma escena real.
@@ -1022,14 +1202,20 @@ export async function createGraphicsRenderer(
       // recuento puede cambiar en un tick sin que cambie terreno ni estación.
       const steadingKey = `${shown.tick === 0 ? 0 : Math.floor(shown.village.wood / 60)}:${Math.floor(shown.village.grain / 200)}`;
       if (change.cleared || colour !== painted || groundKey !== paintedGround || era !== paintedEra || steadingKey !== paintedSteading) {
+        const previous = ground === null ? null : Float32Array.from((ground.mesh.geometry.getAttribute('color') as BufferAttribute).array);
+        const previousWater = ground?.water === null || ground === null ? null : (ground.water.material as MeshStandardMaterial).color.clone();
         rebuildGround(shown, live, era);
+        startAppearance(previous, previousWater, paletteFor(live.season, live.seasonWeek), live.season === 'winter' ? 0.72 : 0,
+          change.cleared || frame.discontinuity);
         painted = colour;
         paintedGround = groundKey;
         paintedEra = era;
         paintedSteading = steadingKey;
       } else if (change.forest || fallingChanged || acceptedForest) {
-        rebuildForest(shown, paletteFor(live.season, live.seasonWeek));
+        rebuildForest(shown, appearancePalette ?? paletteFor(live.season, live.seasonWeek));
       }
+      stepAppearance(frame.realDeltaSeconds);
+      if (firstPaint) markStage('paint:ground-ready');
       treeFalls.step(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       for (const id of change.removed) village.remove(id);
       for (const building of [...change.added, ...change.changed]) village.add(building);
@@ -1047,6 +1233,7 @@ export async function createGraphicsRenderer(
       // y se veía en la secuencia —tres fotogramas quietos y un salto—, porque
       // ese reloj lleva la velocidad y se para en pausa.
       stepFlight(frame.realDeltaSeconds);
+      stepFocus(frame.realDeltaSeconds);
 
       // La gente se recoloca en cada fotograma porque en cada fotograma se ha
       // movido; la aldea no, porque cambia unas cuantas veces al año.
@@ -1055,13 +1242,28 @@ export async function createGraphicsRenderer(
       // estrena otra con la gente que el motor diga.
       if (frame.discontinuity || (!holdPresentation && (life === null || lifeState !== shown))) {
         const previous = life;
+        huntScene = null;
         clearBattleDebris();
         pendingBrokenGate = null;
         life = createVillage(shown, today, {
           land: solidTerrain(shown, id => library.instance(id)),
           ground: groundFloor,
+          walkwayOf: sceneWalkwayOf,
+          ringOf: sceneRingOf,
           ragdollSeed: (id, bornAt, placement) => cast.captureRagdoll(id, bornAt, placement),
         });
+        if (denVisual !== null) world.remove(denVisual);
+        denVisual = null;
+        if (life.bearDen !== null) {
+          denVisual = library.instance('bear-den') ?? null;
+          if (denVisual !== null) {
+            denVisual.position.set(life.bearDen.x,
+              groundFloor(life.bearDen.x, life.bearDen.z) - 0.13,
+              life.bearDen.z);
+            denVisual.rotation.y = life.bearDen.facing;
+            world.add(denVisual);
+          }
+        }
         // El relevo del estado no recoloca a los supervivientes. Sólo una
         // discontinuidad explícita permite reconstruir toda la presentación.
         if (previous !== null && !frame.discontinuity) {
@@ -1104,6 +1306,7 @@ export async function createGraphicsRenderer(
         lifeState = shown;
         lifeCarry = 0;
       }
+      if (firstPaint) markStage('paint:life-ready');
       // La rama de arriba crea siempre una jornada si faltaba. La guarda hace
       // explícita esa invariante para TypeScript y protege un futuro fallo de
       // construcción sin dejar que medio fotograma lea `null`.
@@ -1152,6 +1355,10 @@ export async function createGraphicsRenderer(
         }
         steppedPhase = stepPhase;
         life.step(stepPhase);
+        if (huntScene !== null) {
+          huntScene.step(life.wildlife);
+          if (huntScene.completed !== null && huntReport === null) huntReport = huntScene.completed;
+        }
         rememberDoors();
         lifeCarry -= LIFE_STEP;
         given += 1;
@@ -1212,10 +1419,21 @@ export async function createGraphicsRenderer(
         const weapon = arms.get(actor.id);
         return weapon === undefined ? actor : { ...actor, weapon, shield: weapon === 'spear' };
       });
+      if (huntScene !== null) {
+        const hunter = huntScene.hunter;
+        const cell = Math.floor(hunter.z) * life.land.width + Math.floor(hunter.x);
+        lastActors.push({ id: hunter.id, x: hunter.x, z: hunter.z, facing: hunter.facing,
+          activity: hunter.clip === 'walk' ? 'walking' : 'resting',
+          clip: hunter.clip, load: null, poseSeconds: frame.presentationSeconds,
+          clipSeconds: frame.presentationSeconds, travelled: hunter.travelled,
+          cell, named: false, age: 30, talking: false, arguing: false,
+          occupation: null, role: 'stranger', weapon: huntScene.completed === null
+            ? huntScene.weapon : null });
+      }
       // V-09b: la pelota, el palo, el cubo, el haz de leña.
       props.update(propsOf(life), groundFloor);
       // D2b · y las flechas, con su altura absoluta: la `y` es del mundo físico.
-      arrows.update(arrowsOf(life));
+      arrows.update([...arrowsOf(life), ...(huntScene?.projectiles ?? [])]);
       plaza.show(plazaOf(shown), groundFloor);
       cast.show(lastActors, life.physics?.ragdolls ?? []);
       // D.7 · sólo el robledal realmente interpuesto ante el encuentro pierde
@@ -1275,10 +1493,12 @@ export async function createGraphicsRenderer(
       ground?.ripple(frame.presentationSeconds);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
       // congelado entre semana y semana sería peor que no tenerlo.
-      // IA-5: y el lobo del corral, si lo hay hoy, viene de la vida
-      // (`life.wildlife`) y no de la fórmula — ver el comentario de `update`
-      // en `effects/fauna.ts` sobre por qué sólo él.
-      fauna.update(shown, phase, [...life.wildlife, ...life.beasts.map(beast => ({
+      // El lobo del corral viene de la vida; los dos de la montaña son solo
+      // paisaje, derivados de la semilla y del tiempo sin tocar el motor.
+      fauna.update(shown, phase, [...life.wildlife.filter(animal => animal.id !== huntScene?.targetId),
+        ...(huntScene?.animals ?? []),
+        ...mountainWolves(shown.map, shown.terrainSeed, frame.presentationSeconds),
+        ...life.beasts.map(beast => ({
         id: beast.dweller.body.id, kind: beast.kind, x: beast.dweller.body.x, y: beast.dweller.body.z,
       }))], frame.presentationSeconds);
       // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
@@ -1286,7 +1506,12 @@ export async function createGraphicsRenderer(
       // **U-13 · el cielo.** Se deriva (`derive/weather.ts`): la fila del clima
       // del año dice cuánto llueve en este valle y un `hash32` de la jornada
       // dice qué toca hoy, sin tocar el motor ni consumir una tirada.
-      const sky = skyAt(shown, today);
+      const naturalSky = skyAt(shown, today);
+      const sky = options.previewSky === 'clear'
+        ? { kind: 'clear' as const, intensity: 0 }
+        : options.previewSky === 'rain'
+          ? { kind: 'rain' as const, intensity: naturalSky.kind === 'rain' ? naturalSky.intensity : 1 }
+          : naturalSky;
       if (sky.kind !== paintedSky) {
         weather.set(sky.kind, sky.intensity);
         paintedSky = sky.kind;
@@ -1303,7 +1528,7 @@ export async function createGraphicsRenderer(
         // antes de mirar, cayeron sin nadie delante.
         boltPhase = phase;
       }
-      for (const [index, at] of boltsInDay(shown, today).entries()) {
+      for (const [index, at] of (options.previewSky === undefined ? boltsInDay(shown, today) : []).entries()) {
         if (at <= boltPhase || at > phase) continue;
         const where = boltPlace(shown, today, index);
         weather.strike(where.x, where.z, index);
@@ -1334,7 +1559,11 @@ export async function createGraphicsRenderer(
       // acercarse metia el pueblo dentro de la bruma.
       if (mapWidth > 0) fogAround(new Vector3(mapWidth / 2, 0, mapHeight / 2));
 
-      if (!sampling && !observingLive) renderer.render(scene, camera);
+      if (!sampling && !observingLive) {
+        if (firstPaint) markStage('paint:submit-start');
+        renderer.render(scene, camera);
+        if (firstPaint) { markStage('paint:submit-end'); firstPaintTraced = true; }
+      }
     },
 
     pick(localXCss: number, localYCss: number): GraphicsTarget | null {
@@ -1397,6 +1626,62 @@ export async function createGraphicsRenderer(
         breached: gate?.entered ?? false,
       };
     },
+    startHunt(state: Readonly<GameState>, species: HuntSpecies, weapon: HuntWeapon): boolean {
+      if (life === null || lifeState === null || huntScene !== null || huntReport !== null) return false;
+      // El valle escénico conserva el terreno de la jornada, pero la oferta y
+      // el tick del parte pertenecen al motor vivo (puede ir semanas por delante).
+      if (state.seed !== lifeState.seed) return false;
+      const offer = huntOpportunity(state);
+      if (offer?.species !== species || !offer.weapons.includes(weapon)) return false;
+      const liveBear = species === 'bear' && life.bearDen === null
+        ? createBear(state as GameState, life.land,
+          (() => { const core = valleyCore(state as GameState); return { x: core.x, z: core.y }; })())
+        : null;
+      const den = life.bearDen ?? (liveBear === null ? null : {
+        x: liveBear.den.x, z: liveBear.den.z,
+        clearingX: liveBear.clearing.x, clearingZ: liveBear.clearing.z,
+        facing: Math.atan2(liveBear.clearing.x - liveBear.den.x,
+          liveBear.clearing.z - liveBear.den.z),
+      });
+      const wildlife = species === 'bear' && den !== null
+        && !life.wildlife.some(animal => animal.kind === 'bear')
+        ? [...life.wildlife, { id: 50_000, kind: 'bear' as const,
+          x: den.clearingX, y: den.clearingZ }]
+        : life.wildlife;
+      const scene = createHuntEncounter(state, life.land, species, weapon,
+        groundFloor, wildlife, state.seed ^ state.tick,
+        den === null ? null : { x: den.x, z: den.z });
+      if (scene === null) return false;
+      if (species === 'bear' && den !== null && denVisual === null) {
+        denVisual = library.instance('bear-den') ?? null;
+        if (denVisual !== null) {
+          denVisual.position.set(den.x, groundFloor(den.x, den.z) - 0.13, den.z);
+          denVisual.rotation.y = den.facing;
+          world.add(denVisual);
+        }
+      }
+      huntScene = scene;
+      const target = scene.animals[0];
+      if (target !== undefined) {
+        flight = null;
+        focusFlight = null;
+        disturbed = true;
+        // La presa ocupa menos de una celda: el plano general la haría
+        // invisible incluso con la cámara apuntando al sitio correcto.
+        view.zoom(Math.min(1, 13 / view.view.height),
+          viewport.widthCss / 2, viewport.heightCss / 2);
+        view.look((target.x + scene.hunter.x) / 2,
+          (target.y + scene.hunter.z) / 2);
+      }
+      return true;
+    },
+    attackHunt(): boolean { return huntScene?.attack() ?? false; },
+    hunt(): HuntReport | null {
+      const report = huntReport;
+      huntReport = null;
+      if (report !== null) huntScene = null;
+      return report;
+    },
 
     // F2 · **y cómo va mientras pasa**, que es lo que la pantalla no tenía.
     // Hermano del de arriba: aquél se entrega al motor al acabar la jornada y
@@ -1438,7 +1723,13 @@ export async function createGraphicsRenderer(
       // `pan` y `zoom` lo hacen.
       flight = null;
       disturbed = true;
-      view.look(x, z);
+      const centre = view.view.centre;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        focusFlight = null;
+        view.look(x, z);
+      } else {
+        focusFlight = { elapsed: 0, fromX: centre.x, fromZ: centre.z, toX: x, toZ: z };
+      }
     },
 
     track(id: number | null): void {
@@ -1450,6 +1741,7 @@ export async function createGraphicsRenderer(
       // esto en cada fotograma desde VZ-4 para que la cámara vaya detrás.
       cast.highlight(id);
       if (id === null) return;
+      focusFlight = null;
       // Seguir a alguien es mirarle, no acercarse a el: la distancia la elige
       // el jugador y no se le quita de las manos.
       const followed = lastActors.find((actor) => actor.id === id);
@@ -1482,6 +1774,7 @@ export async function createGraphicsRenderer(
     zoom(factor: number, atXCss: number, atYCss: number): void {
       if (disposed) return;
       flight = null;
+      focusFlight = null;
       disturbed = true;
       view.zoom(factor, atXCss, atYCss);
     },
@@ -1489,6 +1782,7 @@ export async function createGraphicsRenderer(
     pan(dxCss: number, dyCss: number): void {
       if (disposed) return;
       flight = null;
+      focusFlight = null;
       disturbed = true;
       view.pan(dxCss, dyCss);
     },
@@ -1496,6 +1790,7 @@ export async function createGraphicsRenderer(
     orbit(dYaw: number, dPitch: number): void {
       if (disposed) return;
       flight = null;
+      focusFlight = null;
       disturbed = true;
       view.orbit(dYaw, dPitch);
     },
@@ -1503,6 +1798,7 @@ export async function createGraphicsRenderer(
     resetView(): void {
       if (disposed) return;
       flight = null;
+      focusFlight = null;
       wantedFlight = null;
       disturbed = false;
       frameCamera();
@@ -1538,6 +1834,8 @@ export async function createGraphicsRenderer(
       disposed = true;
       clearBattleDebris();
       life?.dispose();
+      if (denVisual !== null) world.remove(denVisual);
+      denVisual = null;
       life = null;
       weather.dispose();
       tells.dispose();
@@ -1556,6 +1854,11 @@ export async function createGraphicsRenderer(
         ground.dispose();
         ground = null;
       }
+      if (backdrop !== null) {
+        world.remove(backdrop.group);
+        backdrop.dispose();
+        backdrop = null;
+      }
       for (const scattered of [forest, stones, reeds, scrub, crossing]) {
         if (scattered === null) continue;
         world.remove(scattered.group);
@@ -1572,6 +1875,7 @@ export async function createGraphicsRenderer(
       renderer.forceContextLoss();
     },
   };
+  markStage('renderer:objects-ready');
   return graphics;
 }
 
@@ -1681,7 +1985,7 @@ interface LifeSnapshot {
   readonly actors: readonly {
     readonly id: number; readonly y: number; readonly age: number; readonly named: boolean;
     readonly clip: string; readonly load: 'bundle' | 'stone' | 'grain' | null; readonly activity: string;
-    readonly weapon: 'bow' | 'spear' | null; readonly shield: boolean;
+    readonly weapon: 'bow' | 'spear' | 'sling' | null; readonly shield: boolean;
     readonly talking: boolean; readonly arguing: boolean;
     readonly occupation: string | null;
   }[];

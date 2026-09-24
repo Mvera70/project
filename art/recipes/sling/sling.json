@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 1,
+  "id": "sling",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "sling",
+    "footprint": [
+      1,
+      1
+    ]
+  },
+  "materials": [
+    {
+      "name": "cord",
+      "color": "#ad8554",
+      "roughness": 0.95
+    },
+    {
+      "name": "leather",
+      "color": "#68432b",
+      "roughness": 0.95
+    },
+    {
+      "name": "stone",
+      "color": "#b3aaa0",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "grip",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    },
+    {
+      "name": "projectile",
+      "location": [
+        0,
+        -0.007,
+        -0.567
+      ],
+      "parent": "Root"
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "CordL1",
+      "location": [
+        -0.026999999999999996,
+        0,
+        -0.10600000000000001
+      ],
+      "radius": 0.012,
+      "depth": 0.18885973631242844,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        -174.53090502988806,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "CordL2",
+      "location": [
+        -0.0475,
+        0,
+        -0.305
+      ],
+      "radius": 0.012,
+      "depth": 0.2112557691519926,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        -173.74966042221953,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "CordL3",
+      "location": [
+        -0.0755,
+        0,
+        -0.49249999999999994
+      ],
+      "radius": 0.012,
+      "depth": 0.1682676439485619,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        -168.6900675259798,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "PouchTieL",
+      "location": [
+        -0.078,
+        0,
+        -0.585
+      ],
+      "dimensions": [
+        0.055,
+        0.048,
+        0.042
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "material": "leather",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "CordR1",
+      "location": [
+        0.026999999999999996,
+        0,
+        -0.10600000000000001
+      ],
+      "radius": 0.012,
+      "depth": 0.18885973631242844,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        174.53090502988806,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "CordR2",
+      "location": [
+        0.0475,
+        0,
+        -0.305
+      ],
+      "radius": 0.012,
+      "depth": 0.2112557691519926,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        173.74966042221953,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "CordR3",
+      "location": [
+        0.0755,
+        0,
+        -0.49249999999999994
+      ],
+      "radius": 0.012,
+      "depth": 0.1682676439485619,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        168.6900675259798,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "PouchTieR",
+      "location": [
+        0.078,
+        0,
+        -0.585
+      ],
+      "dimensions": [
+        0.055,
+        0.048,
+        0.042
+      ],
+      "radius": 1,
+      "segments": 6,
+      "rings": 3,
+      "material": "leather",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Pouch",
+      "location": [
+        0,
+        0,
+        -0.61
+      ],
+      "dimensions": [
+        0.195,
+        0.108,
+        0.067
+      ],
+      "radius": 1,
+      "segments": 10,
+      "rings": 4,
+      "material": "leather",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Stone",
+      "location": [
+        0,
+        -0.007,
+        -0.568
+      ],
+      "dimensions": [
+        0.115,
+        0.09,
+        0.085
+      ],
+      "radius": 1,
+      "segments": 8,
+      "rings": 4,
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "ReleaseKnot",
+      "location": [
+        0.025,
+        0,
+        -0.0105
+      ],
+      "radius": 0.024,
+      "depth": 0.032202484376209234,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        25.769327624338718,
+        0
+      ],
+      "material": "leather",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "FingerLoop1",
+      "location": [
+        0.0007500000000000015,
+        0,
+        0.04158845726811989
+      ],
+      "radius": 0.01,
+      "depth": 0.03438386249390838,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        -24.942559815694043,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "FingerLoop2",
+      "location": [
+        -0.020999999999999998,
+        0,
+        0.057176914536239784
+      ],
+      "radius": 0.01,
+      "depth": 0.028999999999999998,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        -89.99999999999999,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "FingerLoop3",
+      "location": [
+        -0.042749999999999996,
+        0,
+        0.0415884572681199
+      ],
+      "radius": 0.01,
+      "depth": 0.03438386249390839,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        -155.05744018430596,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "FingerLoop4",
+      "location": [
+        -0.04275000000000001,
+        0,
+        0.01041154273188011
+      ],
+      "radius": 0.01,
+      "depth": 0.034383862493908374,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        155.05744018430596,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "FingerLoop5",
+      "location": [
+        -0.021000000000000008,
+        0,
+        -0.005176914536239786
+      ],
+      "radius": 0.01,
+      "depth": 0.02900000000000002,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        90.00000000000001,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "FingerLoop6",
+      "location": [
+        0.0007500000000000015,
+        0,
+        0.0104115427318801
+      ],
+      "radius": 0.01,
+      "depth": 0.034383862493908374,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        24.94255981569405,
+        0
+      ],
+      "material": "cord",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [
+    "grip",
+    "projectile"
+  ],
+  "referenceRender": {
+    "width": 600,
+    "height": 600,
+    "cameraLocation": [
+      0.75,
+      -1.8,
+      0.4
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      -0.1
+    ],
+    "orthoScale": 0.3,
+    "worldColor": "#bec9c0"
+  }
+}

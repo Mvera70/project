@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "id": "e3b-walltop-gate-cardinal-shell-candidate",
+  "scale": 1,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "kind": "e3b-walltop-candidate",
+    "footprint": [
+      1,
+      1
+    ],
+    "status": "candidate_unexported",
+    "floorY": 1.02,
+    "clearWidth": 0.7,
+    "bodyRadius": 0.32,
+    "parapetTop": 1.2,
+    "condition": "shell_only; door, structural load and existing gate compatibility unapproved",
+    "routeXZ": [
+      [
+        0,
+        0.5
+      ],
+      [
+        1,
+        0.5
+      ]
+    ],
+    "replaces": "published stone wall geometry, not an overlay",
+    "unit": "game cell; 1 cell = 3 physical meters",
+    "rotation": "Positive world XZ angle maps to negative Blender Z rotation; quarter-turn variants are rigid rotations about cell center"
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "WestPier",
+      "location": [
+        0.04,
+        -0.5,
+        0.47
+      ],
+      "dimensions": [
+        0.08,
+        0.9,
+        0.94
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "EastPier",
+      "location": [
+        0.96,
+        -0.5,
+        0.47
+      ],
+      "dimensions": [
+        0.08,
+        0.9,
+        0.94
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Deck",
+      "location": [
+        0.5,
+        -0.5,
+        0.98
+      ],
+      "dimensions": [
+        1,
+        0.9,
+        0.08
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ParapetNorth",
+      "location": [
+        0.5,
+        -0.1,
+        1.11
+      ],
+      "dimensions": [
+        1,
+        0.1,
+        0.18
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ParapetSouth",
+      "location": [
+        0.5,
+        -0.9,
+        1.11
+      ],
+      "dimensions": [
+        1,
+        0.1,
+        0.18
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 1000,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0.5,
+      -0.5,
+      0.65
+    ],
+    "orthoScale": 2.3,
+    "worldRole": "sky"
+  }
+}

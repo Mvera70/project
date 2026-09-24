@@ -50,30 +50,27 @@ const STYLE = `
    lista tiene que seguir siendo una lista. */
 .people-scrim { color: var(--skin-ink); font-family: var(--skin-font-read); font-size: 15px; }
 .people-scrim > h2 { margin: 0 0 4px; color: var(--skin-ink);
-  font: 600 21px/1.15 var(--skin-font-voice); letter-spacing: var(--skin-track-inscription);
+  font: 600 21px/1.15 var(--skin-font-heading); letter-spacing: .02em;
   text-transform: uppercase; }
 .people-scope { margin: 0 0 14px; color: var(--skin-ink-faded);
-  font: italic 13px/1.4 var(--skin-font-read); }
+  font: 400 13px/1.4 var(--skin-font-voice); }
 
 /* La fila: papel con su canto, el medallón a la izquierda y dos líneas a la
    derecha. \`display: flex\` y no \`block\`, que es lo que la hacía un bloque de
    texto con un borde. */
 .people-row { display: flex; align-items: center; gap: 12px; box-sizing: border-box;
   width: 100%; min-height: 56px; margin: 0 0 8px; padding: 8px 12px;
-  border: 0; border-radius: 0; text-align: left; cursor: pointer;
+  border: 1px solid var(--skin-rule-on-paper); border-radius: 11px;
+  text-align: left; cursor: pointer;
   color: var(--skin-ink); font: inherit;
   background-color: var(--skin-parchment-deep);
-  background-image: var(--skin-parchment-texture);
-  background-repeat: repeat; background-size: 256px 256px;
-  background-blend-mode: multiply;
-  clip-path: var(--skin-deckle-chip);
+  background-image: none;
+  box-shadow: 0 2px 5px rgba(19, 36, 42, .1);
   -webkit-tap-highlight-color: transparent; }
 /* Cuatro cantos alternados, el mismo truco que los chips de la cabecera: con
    uno solo, veintisiete filas se leen como veintisiete copias del mismo
    recorte y el borde deja de parecer papel. */
-.people-row:nth-child(4n + 2) { clip-path: var(--skin-deckle-chip-b); }
-.people-row:nth-child(4n + 3) { clip-path: var(--skin-deckle-chip-c); }
-.people-row:nth-child(4n + 4) { clip-path: var(--skin-deckle-chip-d); }
+.people-row:hover { border-color: var(--skin-gold); }
 .people-row:active { background-color: var(--skin-parchment-aged); }
 .people-row:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
 /* El medallón es el mismo de la ficha, en su talla pequeña: tocar una fila
@@ -84,10 +81,10 @@ const STYLE = `
 .people-row b { display: block; color: var(--skin-ink);
   font: 600 16px/1.2 var(--skin-font-voice); letter-spacing: .01em; }
 .people-row span { display: block; margin-top: 2px; color: var(--skin-ink-soft);
-  font: italic 13px/1.35 var(--skin-font-read); }
+  font: 400 13px/1.35 var(--skin-font-voice); }
 .people-row span + span { color: var(--skin-ink-faded); font-style: normal; font-size: 12.5px; }
 .people-empty { margin: 0; color: var(--skin-ink-faded);
-  font: italic 14px/1.4 var(--skin-font-read); }
+  font: 400 14px/1.4 var(--skin-font-voice); }
 
 /* K-8 · **La fila del rey.** Del dueño del diseño, 18 sep 2026: «cuando
    selecciones un rey, tiene que destacar después en la lista. No se ve rey en
@@ -111,7 +108,7 @@ const STYLE = `
      altura— y parecía un desperfecto. El rasgado de placa apenas se sale del
      1 %, así que el filete sale recto y la fila del rey se lee como lo que es:
      una placa entre tiras. */
-  clip-path: var(--skin-deckle-plate); }
+  border-color: var(--skin-gold); }
 .people-row--king b { font-size: 17.5px; }
 .people-row--king .skin-medallion { background-color: var(--skin-red-deep);
   background-image: none; color: var(--skin-gold-lit);
@@ -131,7 +128,7 @@ const STYLE = `
    versalita de Cinzel inclinada parece un error de la fuente. */
 .people-row .people-crown i { font-style: normal; }
 .people-row .people-king-lean { margin-top: 3px; color: var(--skin-ink-soft);
-  font: italic 13px/1.35 var(--skin-font-read); }
+  font: 400 13px/1.35 var(--skin-font-voice); }
 `;
 
 function ensureStyle(): void {

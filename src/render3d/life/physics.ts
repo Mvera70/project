@@ -55,12 +55,50 @@ const BASTION_PARAPETS: readonly {
   { x: 0.92, z: 0.5, y: 1.26, halfX: 0.07, halfZ: 0.1, halfY: 0.1 },
 ];
 
+/**
+ * Los pretiles que quedan tras abrir la salida E3b y los dos del primer
+ * tablero. Se copian de las recetas publicadas G-32: la abertura lateral no
+ * recibe un prisma genérico de bastión, porque cerraría el corredor real.
+ */
+const BASTION_WALKWAY_PARAPETS: readonly {
+  readonly x: number; readonly z: number; readonly y: number;
+  readonly halfX: number; readonly halfZ: number; readonly halfY: number;
+}[] = [
+  { x: 0.5, z: 0.08, y: 1.09, halfX: 0.48, halfZ: 0.07, halfY: 0.07 },
+  { x: 0.08, z: 0.5, y: 1.09, halfX: 0.07, halfZ: 0.34, halfY: 0.07 },
+  { x: 0.92, z: 0.255, y: 1.09, halfX: 0.07, halfZ: 0.095, halfY: 0.07 },
+  { x: 0.08, z: 0.12, y: 1.26, halfX: 0.07, halfZ: 0.11, halfY: 0.1 },
+  { x: 0.08, z: 0.88, y: 1.26, halfX: 0.07, halfZ: 0.11, halfY: 0.1 },
+  { x: 0.92, z: 0.12, y: 1.26, halfX: 0.07, halfZ: 0.11, halfY: 0.1 },
+  { x: 0.5, z: 0.08, y: 1.26, halfX: 0.1, halfZ: 0.07, halfY: 0.1 },
+  { x: 0.08, z: 0.5, y: 1.26, halfX: 0.07, halfZ: 0.1, halfY: 0.1 },
+  // Primer tablero: el exterior comienza en X local 0,25; antes queda la
+  // abertura certificada de la receta. El pretil interior cubre Z 1,15…1,27.
+  { x: 1.625, z: 0.38, y: 1.11, halfX: 0.375, halfZ: 0.05, halfY: 0.09 },
+  { x: 1.5, z: 1.21, y: 1.11, halfX: 0.5, halfZ: 0.06, halfY: 0.09 },
+  // El recto G-32 continúa en X local 2…3 con dos pretiles completos.
+  { x: 2.5, z: 0.38, y: 1.11, halfX: 0.5, halfZ: 0.05, halfY: 0.09 },
+  { x: 2.5, z: 1.21, y: 1.11, halfX: 0.5, halfZ: 0.06, halfY: 0.09 },
+];
+
 /** Los prismas de piedra del bastión accesible, ya rotados alrededor de su celda. */
 export function bastionParapetObstacles(origin: Point, access: BastionAccess): PhysicsObstacle[] {
+  return rotatedParapets(origin, access, BASTION_PARAPETS);
+}
+
+/** Parapetos exactos de la junta abierta y su primer módulo de entrada. */
+export function bastionWalkwayParapetObstacles(origin: Point, access: BastionAccess): PhysicsObstacle[] {
+  return rotatedParapets(origin, access, BASTION_WALKWAY_PARAPETS);
+}
+
+function rotatedParapets(origin: Point, access: BastionAccess, parapets: readonly {
+  readonly x: number; readonly z: number; readonly y: number;
+  readonly halfX: number; readonly halfZ: number; readonly halfY: number;
+}[]): PhysicsObstacle[] {
   const angle = bastionAngle(access);
   const sin = Math.sin(angle), cos = Math.cos(angle);
   const rotation = angle === 0 ? undefined : { x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) };
-  return BASTION_PARAPETS.map((piece) => {
+  return parapets.map((piece) => {
     const u = piece.x - 0.5, v = piece.z - 0.5;
     return {
       at: { x: origin.x + 0.5 + u * cos + v * sin, y: piece.y,

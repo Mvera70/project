@@ -1,36 +1,27 @@
-/* UI-V0 · Los tokens de la interfaz. `docs/ui-redesign/piel/plan-piel.md` §2.
-
-   **Lo que esta ronda corrige, y el motivo escrito porque costó cinco
-   rondas:** la primera versión de este fichero (UI-R1) sembró la paleta
-   copiando lo que ya vestía el juego —«las mismas dos pilas que ya vestían el
-   juego (U-01)», decía— y con esa semilla, cinco rondas fieles a los tokens
-   sólo podían reproducir el juego anterior. La estructura de los prototipos se
-   entregó entera; su aspecto, no. El diagnóstico completo está en
-   `plan-piel.md` §1.
-
-   Ahora los colores **salen de los prototipos**, muestreados de los PNG de
-   `docs/ui-redesign/ui-prototypes/` (mediana de un recuadro sin texto; la
-   tinta, la media del 5 % más oscuro; el oro sobre madera, del 5 % más claro).
-   No se redondean a ojo: el hex de cada uno es el que dio la muestra, y al
-   lado va de qué pieza de qué prototipo sale, para que cualquiera pueda
-   repetir la medida.
-
-   Los `--ui-*` de UI-R1 **se quedan**, apuntando a los nuevos: cinco rondas
-   de interfaz los usan y romperlos sería rehacer trabajo que funciona. */
+/* Tokens comunes de la interfaz. La paleta reúne controles de juego claros,
+   marcos oscuros y acentos cálidos; la crónica conserva su voz medieval.
+   Los alias `--ui-*` siguen activos para las pantallas existentes. */
 
 :root {
   /* ---------------------------------------------------------------- papel */
   /* Pergamino, tres profundidades. El claro es la placa de cabecera, el
      medio los chips y la bandeja, y el envejecido los bordes y las tarjetas
      que el prototipo dibuja más curtidas. */
-  --skin-parchment: #E5D3BB;        /* 01, placa de cabecera */
-  --skin-parchment-deep: #D9C2A5;   /* 01, bandeja inferior y chips */
-  --skin-page: #EADBC2;             /* 02, la página de la crónica */
-  --skin-parchment-aged: #BCA87D;   /* 03, tarjeta superior de la ficha */
+  --skin-parchment: #F1EBDD;        /* tarjetas cálidas sobre el fondo del valle */
+  --skin-parchment-deep: #E7DFD0;   /* controles y bandejas */
+  --skin-page: #D8D0C0;             /* piedra cálida neutra, sin dominante verde azulada */
+  --skin-parchment-aged: #C9B99E;   /* borde cálido y tarjetas */
+  /* Curvas de nivel grabadas, casi transparentes: llenan el espacio sin
+     competir con el valle ni convertir los paneles en mapas ilustrados. */
+  --skin-map-pattern:
+    radial-gradient(ellipse 170px 112px at 2% 4%, transparent 54%, rgba(105, 94, 61, .07) 55%, rgba(105, 94, 61, .07) 55.6%, transparent 56.6% 67%, rgba(105, 94, 61, .045) 68%, rgba(105, 94, 61, .045) 68.6%, transparent 69.6%),
+    radial-gradient(ellipse 210px 142px at 100% 92%, transparent 57%, rgba(105, 94, 61, .065) 58%, rgba(105, 94, 61, .065) 58.6%, transparent 59.6% 70%, rgba(105, 94, 61, .04) 71%, rgba(105, 94, 61, .04) 71.6%, transparent 72.6%),
+    repeating-radial-gradient(ellipse 190px 128px at 50% 50%, transparent 0 42px, rgba(105, 94, 61, .02) 43px 44px, transparent 45px 64px),
+    linear-gradient(135deg, rgba(255, 255, 255, .1), transparent 58%);
 
   /* ---------------------------------------------------------------- tinta */
-  --skin-ink: #1B1613;              /* 02, texto de las entradas */
-  --skin-ink-soft: #3A2E1F;         /* 01, etiquetas de navegación */
+  --skin-ink: #202D33;              /* texto principal */
+  --skin-ink-soft: #3C4B50;         /* controles y etiquetas */
   /* **Éste es el único color que no es el del prototipo, y va con su
      motivo.** La muestra daba `#816D52`, y con él las versalitas de la fecha
      quedan en 3,39:1 sobre la placa y en 2,88:1 sobre la bandeja: por debajo
@@ -39,21 +30,21 @@
      el mínimo que pasa (5,49:1 y 4,66:1), que es lo que dice la regla de
      `tools/ui/contrast.py`: se oscurece la tinta, nunca se aclara el papel,
      porque el papel es lo que hace que se parezca al prototipo. */
-  --skin-ink-faded: #5D4E3B;        /* 01 oscurecido de #816D52 por contraste */
+  --skin-ink-faded: #596565;        /* texto secundario legible */
 
   /* ------------------------------------------------------------ oro y ocre */
-  --skin-gold: #7C5C1F;             /* 02, puntos de la línea de tiempo */
-  --skin-gold-lit: #F1DEAE;         /* 03, etiqueta activa sobre madera */
-  --skin-ochre: #765833;            /* 01, subrayado de la pestaña activa */
+  --skin-gold: #A36E24;             /* acento cálido */
+  --skin-gold-lit: #FFF0C7;         /* texto sobre superficie oscura */
+  --skin-ochre: #9A6725;            /* selección */
   /* El sol y su arco de la placa de fecha, muestreados aparte porque no son
      papel ni tinta: el disco del sol y el trazo del arco del prototipo 01. */
   --skin-sun: #C39A3F;              /* 01, el disco del sol */
   --skin-arc: #9F845D;              /* 01, el trazo del arco, lejos del sol */
 
   /* --------------------------------------------------------------- madera */
-  --skin-wood: #2B1F17;             /* 03, barra de navegación */
-  --skin-wood-soft: #453023;        /* 03, botón FOLLOW */
-  --skin-wood-plaque: #3A2E24;      /* 02, placa de la pestaña activa */
+  --skin-wood: #203740;             /* marco de juego */
+  --skin-wood-soft: #31525A;        /* acción principal */
+  --skin-wood-plaque: #29464E;      /* estado activo */
   /* **El listón de la bandeja es madera clara, y no la de la navegación.**
      Muestreado del prototipo 01 en la banda del canto (y 1493..1505 sobre
      x 120): la cara al sol, el cuerpo y la sombra de debajo. Con
@@ -80,14 +71,14 @@
   --ui-alarm: #9E4A34;
 
   /* Filetes. Sobre papel, tinta al 20 %; sobre madera, oro al 30 %. */
-  --skin-rule-on-paper: rgba(27, 22, 19, .2);
-  --skin-rule-on-wood: rgba(124, 92, 31, .3);
-  --skin-rule-gold: rgba(124, 92, 31, .45);
+  --skin-rule-on-paper: rgba(37, 56, 61, .2);
+  --skin-rule-on-wood: rgba(255, 240, 199, .23);
+  --skin-rule-gold: rgba(163, 110, 36, .4);
 
   /* Sombra de las placas, del plan §2. Dos capas: el papel se levanta poco
      del valle y proyecta lejos, como en el prototipo. */
-  --skin-shadow: 0 2px 4px rgba(27, 22, 19, .25), 0 8px 18px rgba(27, 22, 19, .18);
-  --skin-shadow-sheet: 0 -6px 20px rgba(27, 22, 19, .3);
+  --skin-shadow: 0 2px 6px rgba(19, 36, 42, .2), 0 10px 24px rgba(19, 36, 42, .16);
+  --skin-shadow-sheet: 0 -6px 22px rgba(19, 36, 42, .24);
 
   /* ----------------------------------------------------------- tipografía */
   /* Dos familias empaquetadas, OFL, en `redesign/fonts/` — declaradas con
@@ -95,17 +86,17 @@
      `public/` (§13.4, el subdirectorio de Pages). Son **variables**: un
      fichero cubre todos los pesos, 93 KB los tres.
 
-     `--skin-font-voice` es la inscripción: fechas, cifras, ANNO, nombres,
-     etiquetas. `--skin-font-read` es lo que se lee seguido: la crónica, la
-     frase de la bandeja. Las pilas de respaldo son las de U-01, así que si
-     una fuente no cargara, el juego se ve como ayer y no descolocado. */
-  --skin-font-voice: 'Cinzel', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
-  --skin-font-read: 'EB Garamond', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+     La sans del sistema sirve a la UI; `--skin-font-display` reserva Cinzel
+     para títulos e inscripciones medievales, y `--skin-font-read` acompaña la
+     crónica. Las fuentes locales sólo se necesitan en esas dos últimas capas. */
+  --skin-font-voice: 'Segoe UI', 'Aptos', 'Helvetica Neue', system-ui, sans-serif;
+  --skin-font-heading: 'Segoe UI Variable Display', 'Aptos Display', 'Segoe UI', system-ui, sans-serif;
+  --skin-font-display: 'Cinzel', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --skin-font-read: 'Segoe UI', 'Aptos', 'Helvetica Neue', system-ui, sans-serif;
+  --skin-font-story: 'EB Garamond', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
 
-  /* Versalitas: el prototipo las usa en todas las etiquetas. Cinzel es una
-     capital romana, así que va en mayúsculas con un poco de aire entre letras
-     — sin `letter-spacing` se lee apretada. */
-  --skin-track-label: .12em;
+  /* El aire se reserva para las etiquetas; las inscripciones llevan algo más. */
+  --skin-track-label: .07em;
   --skin-track-inscription: .08em;
 
   /* --------------------------------------------------- textura y rasgados */
@@ -113,7 +104,8 @@
      resuelva igual desde la raíz y desde el subdirectorio de Pages — §13.4.
      Se usa con `background-blend-mode: multiply` sobre el color del token:
      el grano lo da la textura, el tono lo sigue mandando la paleta. */
-  --skin-parchment-texture: url('./parchment.png');
+  --skin-parchment-texture: none;
+  --skin-story-texture: url('./parchment.png');
 
   /* VZ-2 · **El canto rasgado de la hoja**, de `tools/ui/torn-edge.py` (semilla
      fija, como los `deckle`). El dueño del diseño eligió este de las tres
@@ -176,6 +168,7 @@
   --ui-edge-dark: var(--skin-rule-on-wood);
 
   --ui-font-voice: var(--skin-font-voice);
+  --ui-font-heading: var(--skin-font-heading);
   --ui-font-plain: var(--skin-font-read);
 
   /* Tamaños del plan §3, medidos en los prototipos y convertidos a 390 px. */
@@ -201,8 +194,8 @@
 
   --ui-tap-min: 44px;
   --ui-margin-mobile: 12px;
-  --ui-radius-sheet: 16px;
-  --ui-radius-control: 8px;
+  --ui-radius-sheet: 18px;
+  --ui-radius-control: 11px;
 
   /* La franja inferior, con las alturas del plan §3.4: la navegación sube de
      56 a 68 px porque el prototipo pone etiqueta bajo el icono. */

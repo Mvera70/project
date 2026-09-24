@@ -1,5 +1,65 @@
 # The Valley — Registro de cambios
 
+## v4.37 · 23 sep 2026 · Bosque y ribera en el fondo del valle
+
+Revisión: composición longitudinal siguiendo el río, pasos abiertos y dos flancos
+montañosos. Se atenúa el relieve visual de montaña en los extremos para eliminar
+el cuenco. Decorado limitado a 256 árboles, rejilla exterior simplificada lejos
+del mapa y luz lunar común. Tipos de celda y reglas de simulación intactos.
+
+El decorado exterior sustituye la pared oscura por lomas bajas, bosque
+instanciado y continuidad del río. El suelo lejano comparte la paleta de la
+estación para que no asomen esquinas claras al alejar o girar la cámara. El
+motivo es la referencia visual aportada por Vera: cerrar la escena con paisaje,
+sin copiar los colores ni el arte de otro juego. No cambia el mapa jugable.
+
+## v4.36 · 22 sep 2026 · Velo común para el cronicón
+
+El cronicón emplea el mismo velo carbón ligero que las demás superposiciones;
+su fondo y las tarjetas ya usan los tokens compartidos. Se elimina el velo
+verde azulado más opaco que quedaba como una excepción visual.
+
+## v4.35 · 22 sep 2026 · Piedra cálida para las superficies
+
+Vera señaló que el fondo de los paneles aún se veía verde azulado. La superficie
+de lectura y las bandejas pasan a piedra cálida neutra (`#D8D0C0`), con controles
+`#E7DFD0` y borde cálido `#C9B99E`; conserva las curvas topográficas en tinta
+tierra. La navegación común oscura y su selección ámbar se mantienen.
+
+## v4.34 · 22 sep 2026 · Continuidad visual entre rutas
+
+§11.4 separa el movimiento del mundo, que sigue el tick, de las transiciones
+decorativas de interfaz, que pueden usar animaciones breves y respetan el
+movimiento reducido. La navegación conserva el mismo fondo oscuro en Valle,
+Crónica y Personas; al volver al valle entra sólo la barra, sin mover el mundo
+ni el reloj solar. El epitafio abre su resumen tras una pausa de lectura breve.
+Motivo: Vera pidió que toda la app se sienta como un juego y que los cambios de
+ventana no parezcan cargas bruscas, conservando el reloj del sol.
+
+## v4.33 · 22 sep 2026, 22:54 · Interfaz de juego para toda la app
+
+§11.0 actualiza la dirección visual después de que Vera comparase la demo con
+una interfaz de juego actual: el estilo de libro antiguo pesa demasiado en
+controles y paneles. La referencia de Clash Royale se usa para jerarquía,
+botones con relieve y estados claros, con menos saturación y una identidad
+medieval propia que acompañe al valle voxel/low poly. **El reloj del sol se
+conserva.** La crónica retiene un acento narrativo; la información funcional
+prioriza lectura y juego. No cambia el contenido ni el motor.
+
+## v4.32 · 22 sep 2026, 22:24 · Transiciones visuales de estación
+
+§10.3 corrige dónde y cómo cambia la paleta visible. La mezcla estacional llega
+al final de la estación: base en `seasonWeek` 0–9, punto medio en 10 y paleta
+siguiente en 11, que coincide con la semana 0 posterior. La firma del suelo
+sigue esos pasos reales, porque la anterior se activaba al principio y dejaba
+sin actualizar las semanas de mezcla. Cada paso ahora interpola en tiempo real
+de presentación el suelo, el
+agua, el follaje y la nieve de los tejados; un cambio de acabado del suelo por
+era usa el mismo mecanismo. Motivo: Vera señaló que el cambio entre estaciones
+era brusco y feo, y pidió una base reutilizable para las eras. La animación no
+altera el tick ni el estado del juego. La primera duración es un ajuste visual
+pendiente de revisar en la demo.
+
 ## v4.31 · 22 sep 2026, 02:19 · Modelo propio del bastión
 
 §1b corrige el estado visual de la villa cerrada: Vera aprobó la malla propia

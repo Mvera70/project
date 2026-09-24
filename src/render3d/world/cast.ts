@@ -512,7 +512,7 @@ export class Cast {
     if (action !== undefined) wanted.push({ key, ...action });
     if (actor.weapon !== null && actor.weapon !== undefined) {
       wanted.push({ key: `weapon_${actor.weapon}`, asset: actor.weapon,
-        hand: actor.weapon === 'bow' ? 'hand_l' : 'hand_r' });
+        hand: actor.weapon === 'bow' || actor.weapon === 'sling' ? 'hand_l' : 'hand_r' });
     }
     if (actor.shield === true) wanted.push({ key: 'shield', asset: 'shield', hand: 'hand_l' });
     for (const item of wanted) {

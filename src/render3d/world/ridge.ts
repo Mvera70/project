@@ -22,35 +22,73 @@
 // misma partida da siempre la misma sierra y nadie consume azar del motor.
 
 import {
-  BufferAttribute, BufferGeometry, Color, Mesh, MeshStandardMaterial,
+  BufferAttribute, BufferGeometry, Color, DataTexture, LinearFilter,
+  LinearMipmapLinearFilter, Mesh, MeshStandardMaterial, RepeatWrapping,
+  RGBAFormat, SRGBColorSpace,
 } from 'three';
 import { hash32 } from '@engine/rng';
 import type { ValleyMap } from '@engine/state';
-import { elevationAt } from './ground';
+import { PALETTES, type Palette } from '@derive/palette';
+import { GROUND_BIAS } from '../visual-config';
+import { elevationAt, groundBorderNormalAt, groundColourAt } from './ground';
+import { valleyShoulder } from './valley-profile';
+import { riverExtensionAt } from './river-extension';
 
 /**
  * Lo ancho que es la falda, en celdas, desde el borde del mapa hacia fuera.
  *
- * TUNE: dieciséis, y empezó en veintiséis. Con la falda larga la sierra sube
- * tan despacio que desde la aldea no se ve montaña ninguna: se ve el prado
- * inclinándose, que es justo lo que el dueño del diseño dijo —«el cuenco no
- * parece un cuenco, no aprecio el desnivel»—. Una ladera corta y alta se lee
- * como ladera; una larga y baja se lee como nada.
+ * TUNE visual: 96 celdas. El relieve exterior alcanza el borde del encuadre
+ * panorámico para que no aparezca un plano vacío detrás de la montaña.
  */
-const SKIRT = 16;
+export const SKIRT = 96;
 
 /**
  * Lo alto que llega la cumbre, en celdas.
  *
- * TUNE: quince. Una celda es tres metros (D.6.2), así que son cuarenta y cinco:
- * una loma alta, no un pico alpino. Más arriba, la ladera del sur —que queda
- * entre la cámara y el pueblo— empieza a comérselo; más abajo no cierra nada y
- * el valle sigue pareciendo una alfombra sobre una mesa.
+ * TUNE visual: 11.5. Las lomas exteriores se leen como montaña; el perfil las
+ * eleva gradualmente para no levantar una pared junto al borde jugable.
  */
-const PEAK = 15;
+const PEAK = 19;
 
 /** Cada cuántas celdas se toma un vértice de la sierra. */
 const STRIDE = 2;
+
+/**
+ * Una textura mineral muy pequeña, creada una sola vez al montar la sierra.
+ * El dibujo mezcla grano, vetas horizontales y manchas amplias. Es deliberadamente
+ * casi gris para que la estación siga mandando a través del color por vértice.
+ */
+function rockTexture(seed: number): DataTexture {
+  const size = 128;
+  const pixels = new Uint8Array(size * size * 4);
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const broad = periodicNoise(seed + 1_907, x, y, 32, size) - 0.5;
+      const grain = periodicNoise(seed + 3_271, x, y, 8, size) - 0.5;
+      const fleck = grain > 0.36 ? 0.025 : 0;
+      // Grano mineral discreto: las antiguas bandas largas se repetían como
+      // zigzags negros a escala panorámica y ocultaban la forma de la roca.
+      const stone = Math.max(0.88, Math.min(1, 0.975 + broad * 0.1 + grain * 0.06 + fleck));
+      const blend = Math.max(0, Math.min(1, (Math.min(x, size - x) - 2) / 8));
+      const value = 1 + (stone - 1) * blend;
+      const at = (y * size + x) * 4;
+      pixels[at] = Math.round(value * 255);
+      pixels[at + 1] = Math.round(value * 255);
+      pixels[at + 2] = Math.round(value * 255);
+      pixels[at + 3] = 255;
+    }
+  }
+  const texture = new DataTexture(pixels, size, size, RGBAFormat);
+  texture.name = 'Valley_Rock_Texture';
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.minFilter = LinearMipmapLinearFilter;
+  texture.magFilter = LinearFilter;
+  texture.generateMipmaps = true;
+  texture.colorSpace = SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
 
 /** Un número estable en [0,1) para un nudo de la rejilla del ruido. */
 function knot(seed: number, a: number, b: number): number {
@@ -105,30 +143,96 @@ export function ridgeAt(map: ValleyMap, seed: number, x: number, z: number): num
   // escalón de dieciocho metros justo en el borde: la roca de dentro quedaba
   // **más alta** que la sierra de fuera, y el valle se leía como una tarta. Se
   // vio en una captura al alejarse del todo.
-  const edge = elevationAt(map, clamp(x, 0, map.width - 0.001), clamp(z, 0, map.height - 0.001));
+  const edge = elevationAt(map, clamp(x, 0, map.width), clamp(z, 0, map.height));
   // Dentro del rectángulo jugable, la sierra **es** el suelo: así el vértice del
   // borde vale lo mismo en las dos mallas y la junta no existe. Devolver cero
   // aquí era un escalón de seis celdas —los dieciocho metros que el cinturón de
   // montaña se ha levantado— en el borde exacto del mapa.
   if (out <= 0) return edge;
 
-  // **Arranca plana y se empina.** El coseno sube ya en la primera celda —1,35
-  // de golpe con la falda corta— y eso es el doblez en el borde del mapa que la
-  // sierra venía a quitar. Con el cubo suavizado, el pie sale del prado sin que
-  // se vea dónde y la pendiente se guarda para arriba, que es donde una ladera
-  // escarpada se lee como montaña en vez de como error.
-  const climb = Math.min(1, out / SKIRT);
-  const eased = climb * climb * climb;
+  // El macizo del propio mapa puede medir seis celdas. Fuera del mapa se
+  // convierte gradualmente en montañas redondeadas: prolongarlo desde el borde dibujaba
+  // una pared oscura que dominaba incluso la vista panorámica.
+  const descent = Math.min(1, out / 22);
+  const eased = descent * descent * (3 - 2 * descent);
+  const climb = Math.min(1, out / 20);
+  const profile = climb * climb * (3 - 2 * climb);
 
   // Y la cresta no es lisa: dos escalas de ruido, una para los macizos y otra
   // para que la silueta no sea un arco de circunferencia.
   const big = noise(seed, x, z, 11);
   const fine = noise(seed + 811, x, z, 4);
-  const rough = 0.62 + big * 0.55 + fine * 0.22;
+  const rough = 0.5 + big * 0.9 + fine * 0.15;
 
-  // Lo que la sierra pone se **suma** a la cota del borde: así el pie de la
-  // ladera es exactamente la roca que ya había dentro del mapa y no hay junta.
-  return edge + eased * PEAK * rough;
+  // En la salida del río la ribera se mantiene bajo su lámina de agua.
+  const wet = exteriorWaterAt(map, seed, x, z, 2.8);
+  if (wet) return edge * (1 - eased) - 0.16 * eased;
+  return edge * (1 - eased) + profile * PEAK * rough * valleyShoulder(map, x, z);
+}
+
+/** Ruido periodico: el primer y ultimo texel empalman al repetirse la piedra. */
+function periodicNoise(seed: number, x: number, z: number, scale: number, period: number): number {
+  const knots = period / scale;
+  const gx = x / scale;
+  const gz = z / scale;
+  const rawX = Math.floor(gx);
+  const rawZ = Math.floor(gz);
+  const wrap = (value: number): number => ((value % knots) + knots) % knots;
+  const x0 = wrap(rawX);
+  const z0 = wrap(rawZ);
+  const x1 = wrap(rawX + 1);
+  const z1 = wrap(rawZ + 1);
+  const fx = (1 - Math.cos((gx - rawX) * Math.PI)) / 2;
+  const fz = (1 - Math.cos((gz - rawZ) * Math.PI)) / 2;
+  const a = knot(seed, x0, z0);
+  const b = knot(seed, x1, z0);
+  const c = knot(seed, x0, z1);
+  const d = knot(seed, x1, z1);
+  return (a * (1 - fx) + b * fx) * (1 - fz) + (c * (1 - fx) + d * fx) * fz;
+}
+
+/** El cauce continúa fuera del mapa, siguiendo las celdas de agua del borde. */
+export function exteriorWaterAt(map: ValleyMap, seed: number, x: number, z: number, halfWidth = 1.35): boolean {
+  if (z > 0 && z < map.height) return false;
+  const distance = z <= 0 ? -z : z - map.height;
+  return distance >= 0 && distance <= SKIRT - 4
+    && riverExtensionAt(map, seed, x, z, halfWidth);
+}
+
+/** Los colores de la malla siguen la misma paleta que el prado y el bosque. */
+export function seasonRidge(mesh: Mesh, map: ValleyMap, palette: Palette): void {
+  const position = mesh.geometry.getAttribute('position');
+  const colour = mesh.geometry.getAttribute('color') as BufferAttribute;
+  const values = colour.array as Float32Array;
+  const foot = new Color(palette.meadow);
+  const hillColour = new Color(palette.meadowAlt);
+  const stoneColour = new Color(palette.stone);
+  const tint = new Color();
+  const smooth = (value: number): number => {
+    const t = Math.max(0, Math.min(1, value));
+    return t * t * (3 - 2 * t);
+  };
+  for (let i = 0; i < position.count; i += 1) {
+    const x = position.getX(i);
+    const z = position.getZ(i);
+    const outside = Math.hypot(Math.max(0, -x, x - map.width), Math.max(0, -z, z - map.height));
+    const edgeX = Math.max(0, Math.min(map.width, x));
+    const edgeZ = Math.max(0, Math.min(map.height, z));
+    tint.copy(groundColourAt(map, edgeX, edgeZ, palette));
+    const crossing = smooth(outside / 4);
+    tint.lerp(foot, crossing);
+    tint.lerp(hillColour, 0.34 * crossing);
+    // El ruido desplaza la frontera de roca sin seguir los cuadros de la rejilla.
+    const drift = (noise(91, x, z, 7) - 0.5) * 2;
+    const rise = Math.max(0, position.getY(i) - GROUND_BIAS);
+    const rock = smooth((outside + drift - 1.5) / 4.5) * smooth((rise + 0.5) / 3);
+    tint.lerp(stoneColour, rock * 0.9);
+    const at = i * 4;
+    values[at] = tint.r;
+    values[at + 1] = tint.g;
+    values[at + 2] = tint.b;
+  }
+  colour.needsUpdate = true;
 }
 
 /**
@@ -138,40 +242,50 @@ export function ridgeAt(map: ValleyMap, seed: number, x: number, z: number): num
  * cambian nunca, así que se construyen al cargar el valle y no se vuelven a
  * tocar. El coste por fotograma es el de dibujar un objeto más.
  */
-export function buildRidge(map: ValleyMap, seed: number): Mesh {
-  const from = -SKIRT;
-  const toX = map.width + SKIRT;
-  const toZ = map.height + SKIRT;
-  const cols = Math.ceil((toX - from) / STRIDE) + 1;
-  const rows = Math.ceil((toZ - from) / STRIDE) + 1;
+export function buildRidge(map: ValleyMap, seed: number, palette: Palette = PALETTES.spring): Mesh {
+  // Tres celdas a cada lado del empalme tienen paso uno; lejos, dos y seis.
+  const axis = (size: number): number[] => {
+    const values = new Set<number>([0, size, -SKIRT, size + SKIRT]);
+    for (let at = -SKIRT; at <= -12; at += 6) values.add(at);
+    for (let at = -12; at <= -3; at += STRIDE) values.add(at);
+    for (let at = -3; at <= 3; at += 1) values.add(at);
+    for (let at = 3; at <= size - 3; at += STRIDE) values.add(at);
+    for (let at = size - 3; at <= size + 3; at += 1) values.add(at);
+    for (let at = size + 3; at <= size + 12; at += STRIDE) values.add(at);
+    for (let at = size + 12; at <= size + SKIRT; at += 6) values.add(at);
+    return [...values].sort((a, b) => a - b);
+  };
+  const xs = axis(map.width), zs = axis(map.height);
+  const cols = xs.length, rows = zs.length;
 
   const points = new Float32Array(cols * rows * 3);
-  const tint = new Float32Array(cols * rows * 3);
-
-  // Del prado del pie a la roca de la cumbre, pasando por el monte bajo. El
-  // color sale de la altura y no de un tipo de terreno nuevo: así no hay que
-  // tocar paletas, ni `TERRAIN_CODE`, ni las pruebas que cuentan terrenos.
-  const foot = new Color('#6E8C4F');
-  const scrub = new Color('#4B6138');
-  const stone = new Color('#7C7768');
-  const mix = new Color();
+  const tint = new Float32Array(cols * rows * 4);
+  const uvs = new Float32Array(cols * rows * 2);
 
   for (let row = 0; row < rows; row += 1) {
     for (let col = 0; col < cols; col += 1) {
-      const x = from + col * STRIDE;
-      const z = from + row * STRIDE;
+      const x = xs[col]!;
+      const z = zs[row]!;
       const y = ridgeAt(map, seed, x, z);
-      const at = (row * cols + col) * 3;
-      points[at] = x;
-      points[at + 1] = y;
-      points[at + 2] = z;
+      const pointAt = (row * cols + col) * 3;
+      points[pointAt] = x;
+      points[pointAt + 1] = GROUND_BIAS + y;
+      points[pointAt + 2] = z;
 
-      const high = Math.min(1, y / PEAK);
-      if (high < 0.45) mix.copy(foot).lerp(scrub, high / 0.45);
-      else mix.copy(scrub).lerp(stone, (high - 0.45) / 0.55);
-      tint[at] = mix.r;
-      tint[at + 1] = mix.g;
-      tint[at + 2] = mix.b;
+      // UV continuas en coordenadas del mundo. Elegir el eje según la ladera
+      // producía un pliegue enorme en las esquinas y bandas en vista móvil.
+      const uvAt = (row * cols + col) * 2;
+      uvs[uvAt] = x / 17;
+      uvs[uvAt + 1] = z / 17;
+
+      const colourAt = (row * cols + col) * 4;
+      tint[colourAt] = 1;
+      tint[colourAt + 1] = 1;
+      tint[colourAt + 2] = 1;
+      // El último tramo se funde con el suelo lejano de la misma paleta.
+      const outside = Math.hypot(Math.max(0, -x, x - map.width), Math.max(0, -z, z - map.height));
+      const fade = Math.max(0, Math.min(1, (SKIRT - outside) / 9));
+      tint[colourAt + 3] = fade * fade * (3 - 2 * fade);
     }
   }
 
@@ -190,37 +304,103 @@ export function buildRidge(map: ValleyMap, seed: number): Mesh {
   // sacada sólo de los cuadros que sí están, así que el pie de la sierra cogía
   // luz como si fuera una pared.
   const faces: number[] = [];
+  const extraPoints: number[] = [];
+  const extraTint: number[] = [];
+  const extraUvs: number[] = [];
+  const borderVertex = (x: number, z: number): number => {
+    const index = cols * rows + extraPoints.length / 3;
+    extraPoints.push(x, GROUND_BIAS + ridgeAt(map, seed, x, z), z);
+    extraTint.push(1, 1, 1, 1);
+    extraUvs.push(0, (x === 0 || x === map.width ? z : x) / 17);
+    return index;
+  };
   for (let row = 0; row < rows - 1; row += 1) {
     for (let col = 0; col < cols - 1; col += 1) {
       const a = row * cols + col;
       const b = a + 1;
       const c = a + cols;
       const d = c + 1;
-      const x = from + col * STRIDE;
-      const z = from + row * STRIDE;
-      const inside = x >= 0 && z >= 0 && x + STRIDE <= map.width && z + STRIDE <= map.height;
+      const x = xs[col]!;
+      const z = zs[row]!;
+      const inside = x >= 0 && z >= 0 && xs[col + 1]! <= map.width && zs[row + 1]! <= map.height;
       if (inside) continue;
+      // En el borde hay una esquina de suelo por celda. Se añade solo la
+      // esquina intermedia del anillo inmediato; lejos se conserva el LOD.
+      const vertical = zs[row + 1]! - z === 2 && z >= 0 && zs[row + 1]! <= map.height;
+      if (vertical && x === -1 && xs[col + 1] === 0) {
+        const middle = borderVertex(0, z + 1);
+        faces.push(a, c, b, b, c, middle, middle, c, d);
+        continue;
+      }
+      if (vertical && x === map.width && xs[col + 1] === map.width + 1) {
+        const middle = borderVertex(map.width, z + 1);
+        faces.push(a, middle, b, middle, c, b, b, c, d);
+        continue;
+      }
+      const horizontal = xs[col + 1]! - x === 2 && x >= 0 && xs[col + 1]! <= map.width;
+      if (horizontal && z === -1 && zs[row + 1] === 0) {
+        const middle = borderVertex(x + 1, 0);
+        faces.push(a, c, b, b, c, middle, b, middle, d);
+        continue;
+      }
+      if (horizontal && z === map.height && zs[row + 1] === map.height + 1) {
+        const middle = borderVertex(x + 1, map.height);
+        faces.push(a, c, middle, middle, c, b, b, c, d);
+        continue;
+      }
       faces.push(a, c, b, b, c, d);
     }
   }
 
   const shape = new BufferGeometry();
-  shape.setAttribute('position', new BufferAttribute(points, 3));
-  shape.setAttribute('color', new BufferAttribute(tint, 3));
+  shape.setAttribute('position', new BufferAttribute(Float32Array.from([...points, ...extraPoints]), 3));
+  shape.setAttribute('color', new BufferAttribute(Float32Array.from([...tint, ...extraTint]), 4));
+  shape.setAttribute('uv', new BufferAttribute(Float32Array.from([...uvs, ...extraUvs]), 2));
   shape.setIndex(faces);
   shape.computeVertexNormals();
+  const normals = shape.getAttribute('normal') as BufferAttribute;
+  for (let row = 0; row < rows; row += 1) {
+    for (let col = 0; col < cols; col += 1) {
+      const x = xs[col]!;
+      const z = zs[row]!;
+      const border = (x === 0 || x === map.width) && z >= 0 && z <= map.height
+        || (z === 0 || z === map.height) && x >= 0 && x <= map.width;
+      if (!border) continue;
+      const normal = groundBorderNormalAt(map, x, z);
+      normals.setXYZ(row * cols + col, normal.x, normal.y, normal.z);
+    }
+  }
+  for (let index = 0; index < extraPoints.length / 3; index += 1) {
+    const x = extraPoints[index * 3]!;
+    const z = extraPoints[index * 3 + 2]!;
+    const normal = groundBorderNormalAt(map, x, z);
+    normals.setXYZ(cols * rows + index, normal.x, normal.y, normal.z);
+  }
 
+  const texture = rockTexture(seed);
   const rock = new Mesh(shape, new MeshStandardMaterial({
     vertexColors: true,
+    map: texture,
+    bumpMap: texture,
+    bumpScale: 0.018,
+    // Suelo opaco: escribe profundidad para ocultar árboles tras las lomas y
+    // permitir que el agua transparente se dibuje después sobre su cauce.
+    transparent: false,
+    depthWrite: true,
     // Mate: una sierra que brilla parece plástico, y además compite con los
     // tejados, que son lo que hay que mirar.
     roughness: 1,
     metalness: 0,
+    // El hemisférico solo deja la falda lejana casi negra de noche. El render
+    // regula esta tenue luz reflejada con la hora, sin añadir otra lámpara.
+    emissive: '#000000',
+    emissiveIntensity: 0,
   }));
   rock.name = 'Valley_Ridge';
-  rock.receiveShadow = true;
+  rock.receiveShadow = false;
   // No proyecta: con el sol bajo, la sierra del este echaría una sombra sobre
   // medio pueblo y lo que hay que ver es el pueblo.
   rock.castShadow = false;
+  seasonRidge(rock, map, palette);
   return rock;
 }

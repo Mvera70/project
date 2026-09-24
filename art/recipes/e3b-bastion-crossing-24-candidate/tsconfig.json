@@ -1,0 +1,1 @@
+{"extends":"../../../tsconfig.json","include":["generate.ts","probe.ts","check-scene.ts"]}

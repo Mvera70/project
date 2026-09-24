@@ -157,8 +157,8 @@ export class Fauna {
 
   private ground: (x: number, z: number) => number = () => 0;
 
-  /** Una sola fuente para el ganado y el lobo: los cuerpos de la capa de vida.
-   * Cuervo y pez siguen siendo fauna ambiental derivada. */
+  /** Ganado y lobo del corral vienen de la vida; los lobos de montaña se
+   * suministran como decoración. Cuervo y pez siguen derivados aquí. */
   update(state: GameState, dayPhase: number, live: readonly Animal[] = [], seconds = dayPhase * 120): void {
     const ambient = wildlifePositions(state, dayPhase).filter(animal => animal.kind !== 'wolf');
     const animals: Animal[] = [];
@@ -196,7 +196,7 @@ export class Fauna {
     const byKind = new Map<AnimalKind, Animal[]>();
     for (const animal of animals) {
       const asset = this.asset?.(animal.kind);
-      if (asset !== undefined && asset.clips.some(clip => clip.name === 'walk')) {
+      if (asset !== undefined && asset.clips.some(clip => clip.name === 'walk' || clip.name === 'hop')) {
         let body = this.animated.get(animal.id);
         if (body !== undefined && body.kind !== animal.kind) {
           body.dispose(); this.animated.delete(animal.id); body = undefined;

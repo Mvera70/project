@@ -13,7 +13,7 @@ import { isPost } from './garrison';
 export interface DayJob { readonly place: string; readonly offer: string; readonly seat?: number }
 export interface DayPlan { readonly role: Role | null; readonly job: DayJob | null }
 
-type LabourKind = 'field:' | 'felling' | 'works:' | 'quarry:';
+type LabourKind = 'field:' | 'felling' | 'hunt:' | 'works:' | 'quarry:';
 
 const WEEK_DAYS = 7;
 
@@ -161,6 +161,7 @@ export function dayPlans(
   const farmerDays = hands.farmers * WEEK_DAYS;
   const buildingDays = hands.builders * WEEK_DAYS;
   const roster = weeklyRoster([
+    { kind: 'hunt:', days: hands.hunters * WEEK_DAYS },
     { kind: 'field:', days: winter ? 0 : farmerDays },
     { kind: 'felling', days: Math.max(0, hands.cutters - fixedCutters) * WEEK_DAYS
       + (winter && hasFelling ? farmerDays : 0) },
@@ -170,6 +171,7 @@ export function dayPlans(
   ], idle.size, day);
   const fieldOffer = weekOf(state.tick) === TIME.HARVEST_WEEK ? 'harvest' : 'work';
   const quotas = ([
+    { prefix: 'hunt:' as const, offer: 'hunt' },
     { prefix: 'felling' as const, offer: 'work' },
     { prefix: 'quarry:' as const, offer: 'work' },
     { prefix: 'works:' as const, offer: 'work' },

@@ -1,4 +1,4 @@
-// M-22 · The crossroad, full screen. design.md §11.2, §17 M-22.
+// M-22 · The crossroad, a scrollable decision sheet over the valley.
 //
 // §11.2: the valley dimmed behind, title, three or four sentences of context,
 // and the options as big blocks with the verb and the price — the price
@@ -14,6 +14,7 @@ import type { TickReport } from '@engine/sim';
 import { yearOf } from '@engine/time';
 import type { App } from '../app';
 import { recogniseGesture, type Point } from '../gestures';
+import { retireOverlay } from '../motion';
 
 const STYLE_ID = 'valley-crossroad-style';
 const STYLE = `
@@ -43,46 +44,52 @@ const STYLE = `
    pisan —el color rellena la caja entera y el degradado deja de tener nada que
    fundir—, y lo que salió en la primera captura fue una banda de pergamino
    vacía de 300 px encima del título. Y la altura la pone el contenido: la
-   página ocupa lo que necesita y esta franja le añade la fusión, en vez de un
-   número fijo que a veces sobra. */
+   página mantiene una altura uniforme y desplaza su contenido cuando hace
+   falta; la franja añade la fusión sin ocupar espacio dentro de ella. */
 /* VZ-2 · el hueco por el que se ve el valle. Era una franja de fusión con
    degradado; ahora la transición la hace el canto rasgado de la hoja
    (\`.skin-torn-top\`, \`skin.css\`), el mismo de las tres secciones, y esto
    sólo reserva el sitio. */
-.crossroad-fade { flex: 0 0 64px; }
+.crossroad-fade { flex: 0 0 64px; width: min(100%, 760px); margin-inline: auto; }
 /* La página. */
-.crossroad { box-sizing: border-box; width: 100%; overflow: auto;
-  padding: 0 20px max(20px, env(safe-area-inset-bottom));
+.crossroad { box-sizing: border-box; width: min(100%, 760px); height: 56dvh;
+  flex: 0 0 56dvh; margin-inline: auto; overflow-y: auto;
+  scrollbar-width: none; overscroll-behavior: contain;
+  padding: 22px 24px max(24px, env(safe-area-inset-bottom));
+  border-radius: 16px 16px 0 0;
   background-color: var(--skin-page);
-  background-image: var(--skin-parchment-texture);
-  background-repeat: repeat; background-size: 256px 256px;
-  background-blend-mode: multiply; }
+  background-image: var(--skin-map-pattern); background-repeat: no-repeat;
+  animation: crossroad-sheet-arrive 280ms cubic-bezier(.2, .75, .25, 1) both; }
+.crossroad::-webkit-scrollbar { display: none; }
 /* La cabecera: el sello a la izquierda del título, como el documento sellado
    de la crónica (§3.2), y el título en la tinta roja de una decisión. */
-.crossroad-head { display: flex; align-items: flex-start; gap: 14px; padding-top: 4px; }
-.crossroad-head .skin-seal { margin-top: 2px; }
+.crossroad-head { display: flex; align-items: center; gap: 14px; touch-action: none; }
+.crossroad-head .skin-seal { width: 44px; height: 44px; flex-basis: 44px;
+  background: transparent; clip-path: none; margin: 0; }
+.crossroad-head .skin-seal img { display: block; width: 44px; height: 44px; object-fit: contain; }
 .crossroad h1 { margin: 0; padding-top: 0; border-top: 0; flex: 1 1 auto;
   color: var(--skin-red-ink); text-wrap: balance;
-  font: 600 20px/1.2 var(--skin-font-voice);
-  letter-spacing: var(--skin-track-inscription); text-transform: uppercase; }
-.crossroad p.crossroad-body { margin: 14px 0 20px; color: var(--skin-ink);
-  font: 17px/1.5 var(--skin-font-read); text-wrap: pretty; }
+  font: 600 22px/1.2 var(--skin-font-heading);
+  letter-spacing: .015em; text-transform: none; }
+.crossroad p.crossroad-body { margin: 14px auto 20px; color: var(--skin-ink);
+  font: 400 16px/1.5 var(--skin-font-voice); text-wrap: pretty; }
 .crossroad-options { display: flex; flex-direction: column; gap: 10px; }
-/* Cada opción, una tarjeta de pergamino con el canto rasgado, y los cuatro
-   recortes alternados para que tres seguidas no se lean como tres copias. */
-.crossroad-options button { display: flex; flex-wrap: wrap; align-items: baseline;
-  gap: 4px 10px; width: 100%; box-sizing: border-box; min-height: 52px; text-align: left;
-  padding: 12px 15px; border: 0; border-radius: 0; cursor: pointer;
+/* Las opciones son tarjetas de decisión: superficie marfil, borde definido y
+   sombra corta para que el verbo y el precio parezcan controles tocables. */
+.crossroad-options button { display: flex; flex-wrap: wrap; align-items: center;
+  gap: 4px 10px; width: 100%; box-sizing: border-box; min-height: 68px; text-align: left;
+  padding: 16px; border: 1px solid var(--skin-rule-on-paper);
+  border-radius: 12px; cursor: pointer;
   color: var(--skin-ink); font: inherit;
-  background-color: var(--skin-parchment-deep);
-  background-image: var(--skin-parchment-texture);
-  background-repeat: repeat; background-size: 256px 256px;
-  background-blend-mode: multiply;
-  clip-path: var(--skin-deckle-chip);
-  -webkit-tap-highlight-color: transparent; }
-.crossroad-options button:nth-child(2) { clip-path: var(--skin-deckle-chip-b); }
-.crossroad-options button:nth-child(3) { clip-path: var(--skin-deckle-chip-c); }
-.crossroad-options button:nth-child(4) { clip-path: var(--skin-deckle-chip-d); }
+  background-color: var(--skin-parchment);
+  background-image: none;
+  box-shadow: 0 3px 0 rgba(32, 55, 64, .2), 0 5px 10px rgba(32, 55, 64, .08);
+  -webkit-tap-highlight-color: transparent;
+  animation: crossroad-option-arrive 220ms ease-out backwards; }
+.crossroad-options button:nth-child(2) { animation-delay: 45ms; }
+.crossroad-options button:nth-child(3) { animation-delay: 90ms; }
+.crossroad-options button:nth-child(4) { animation-delay: 135ms; }
+.crossroad-options button:hover { border-color: var(--skin-gold); }
 .crossroad-options button:active { background-color: var(--skin-parchment-aged);
   transform: translateY(1px); }
 .crossroad-options button:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
@@ -100,7 +107,21 @@ const STYLE = `
    decisión no grita, se dice. El banco lo escribe en minúscula con su
    mayúscula inicial (§9.3). */
 .crossroad-cost { color: var(--skin-ink-faded);
-  font: italic 14px/1.35 var(--skin-font-read); letter-spacing: .005em; }
+  font: 400 13px/1.35 var(--skin-font-voice); letter-spacing: 0; }
+@media (max-width: 600px) {
+  .crossroad-options button { min-height: 76px; }
+}
+@keyframes crossroad-sheet-arrive {
+  from { opacity: .7; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes crossroad-option-arrive {
+  from { opacity: .45; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crossroad, .crossroad-options button { animation: none; }
+}
 /* U-07 · la marca discreta de §11.2 pasaba por un punto rojo de 14 px que
    nadie lee como «lo más importante que el juego tiene que pedirte». Desde
    esta ronda es un chip de pergamino con su canto rasgado, como el resto de lo
@@ -146,8 +167,11 @@ function ensureStyle(): void {
 
 /** A `crossroad.<template>.<key>` line, filled with this crossroad's cast and year. */
 function textOf(state: GameState, p: PendingCrossroad, key: string): string {
+  // El aviso del clan lee el tamaño de la partida que ya guarda el motor.
+  // Sin este dato, la plantilla mostraba literalmente `{count}` al jugador.
+  const count = p.templateId === 'raiders_coming' ? { count: state.threat.comingBand } : {};
   return renderEntry(
-    { tick: p.posedTick, kind: 'crossroad_posed', templateKey: key, params: { year: yearOf(p.posedTick), ...namesOf(state, p.cast) }, weight: 3 },
+    { tick: p.posedTick, kind: 'crossroad_posed', templateKey: key, params: { year: yearOf(p.posedTick), ...namesOf(state, p.cast), ...count }, weight: 3 },
     state.rng,
   );
 }
@@ -229,7 +253,7 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
   const fade = document.createElement('div');
   fade.className = 'crossroad-fade';
   const card = document.createElement('section');
-  card.className = 'crossroad skin-torn-top';
+  card.className = 'crossroad';
   // UI-V5c · el sello de lacre a la izquierda del título, como el documento
   // sellado del prototipo 02 (§3.5). El árbol sale del sprite incrustado en
   // `index.html`: un `<use>` a un fichero externo no carga bajo `file://`.
@@ -238,7 +262,7 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
   const seal = document.createElement('div');
   seal.className = 'skin-seal';
   seal.setAttribute('aria-hidden', 'true');
-  seal.innerHTML = '<svg class="skin-icon" aria-hidden="true" focusable="false"><use href="#seal-tree"/></svg>';
+  seal.innerHTML = '<img src="./ui/art/ornament-tree-seal.png" alt="" />';
   const h1 = document.createElement('h1');
   h1.textContent = textOf(state, p, template.title);
   head.append(seal, h1);
@@ -280,8 +304,11 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
       // The screen simply stays open, and this listener never fires — remove
       // it rather than leave it to catch some later, unrelated decision.
       if (!accepted) { document.removeEventListener('valley:decided', onDecided); return; }
-      removeShown();
-      shown = null;
+      if (shown?.overlay === scrim) {
+        shown = null;
+        document.documentElement.classList.remove('crossroad-open');
+        retireOverlay(scrim, card);
+      }
     });
     options.append(button);
   }
@@ -292,14 +319,18 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
   // §11.2: no close button. A swipe down returns to the valley; the crossroad
   // stays pending and a discreet mark takes its place.
   const trace: Point[] = [];
-  scrim.addEventListener('pointerdown', (event) => {
+  head.addEventListener('pointerdown', (event) => {
     trace.length = 0;
     trace.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
+    scrim.setPointerCapture(event.pointerId);
   });
   scrim.addEventListener('pointerup', (event) => {
+    if (trace.length === 0) return;
     trace.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
-    if (recogniseGesture({ points: trace }) === 'swipe_down') {
-      scrim.remove();
+    const gesture = recogniseGesture({ points: trace });
+    trace.length = 0;
+    if (gesture === 'swipe_down') {
+      retireOverlay(scrim, card);
       document.documentElement.classList.remove('crossroad-open');
       // VZ-03 · la decisión queda pendiente y **la marca es el sello de lacre
       // en el ornamento de la bandeja**, no una píldora flotante a 92 px del
@@ -309,6 +340,7 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
       shown = { key: key(p), overlay: null, marker: null };
     }
   });
+  scrim.addEventListener('pointercancel', () => { trace.length = 0; });
 
   document.body.append(scrim);
   shown = { key: key(p), overlay: scrim, marker: null };

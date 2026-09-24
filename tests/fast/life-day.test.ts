@@ -56,6 +56,25 @@ describe('IA-12 · jornada y acciones', () => {
     expect(JSON.stringify(state)).toBe(before);
   });
 
+  it('representa las manos de caza como jornadas asignadas a un sitio del bosque', () => {
+    const state = foundTwenty(7);
+    state.village.grain = 0;
+    const before = JSON.stringify(state), land = terrainOf(state);
+    const hands = allocateLabour(state);
+    expect(hands.hunters).toBeGreaterThan(0);
+    expect(OFFERS.hunt?.routineOnly).toBe(true);
+    const places = placesOf(state, land);
+    const hunting = places.find(place => place.id.startsWith('hunt:'))!;
+    expect(hunting).toBeDefined();
+    expect(hunting.offers[0]?.id).toBe('hunt');
+
+    const huntDays = Array.from({ length: 7 }, (_, day) => dayPlans(state, places, land, undefined, day))
+      .flatMap(plans => [...plans.values()].filter(plan => plan.job?.offer === 'hunt'));
+    expect(huntDays.length).toBeGreaterThan(0);
+    expect(Math.abs(huntDays.length - hands.hunters * 7)).toBeLessThanOrEqual(1);
+    expect(JSON.stringify(state)).toBe(before);
+  });
+
   it('conserva los puestos de especialista y usa otra plaza si la primera no tiene ruta', () => {
     const state = foundTwenty(7);
     for (const villager of state.people.villagers) villager.homeId = null;

@@ -1,0 +1,817 @@
+{
+  "schemaVersion": 1,
+  "id": "e3b-contour-pair-24-66-candidate",
+  "scale": 1,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "e3b-contour-joint-candidate",
+    "version": 5,
+    "note": "Unexported compound geometry for the actual gate24 to wall66 adjacency. Boundary rails rebuilt from the union; do not stack standalone parapets.",
+    "floorY": 1.02,
+    "routeXZ": [
+      [
+        -0.5,
+        0.8
+      ],
+      [
+        0.5,
+        0.8
+      ],
+      [
+        0.5,
+        0.5
+      ],
+      [
+        1.5,
+        -0.5
+      ],
+      [
+        1.5,
+        -0.8
+      ],
+      [
+        2.5,
+        -0.8
+      ]
+    ],
+    "portals": [
+      {
+        "center": [
+          -0.5,
+          0.8
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "width": 0.94
+      },
+      {
+        "center": [
+          2.5,
+          -0.8
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "width": 0.94
+      }
+    ],
+    "status": "candidate_unexported",
+    "sourceRecipe": "art/recipes/e3b-gate-crossing-candidate/e3b-gate-crossing-65-corbel-candidate.json",
+    "sourceSha256": "1c4e5267a052fc2dfd16c08576ba69485c6ae8f98b71686c1d1bf75d5dd85990",
+    "orientation": {
+      "quarterTurns": 3,
+      "mirrorSourceGeometry": true,
+      "negativeScale": false
+    },
+    "assemblyCells": [
+      {
+        "kind": "gate",
+        "mask": 24,
+        "x": 0,
+        "z": 0
+      },
+      {
+        "kind": "wall",
+        "mask": 66,
+        "x": 1,
+        "z": -1
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "GateDeck",
+      "location": [
+        0.635,
+        -0.635,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        1.27,
+        1.27,
+        0.08999999999999997
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -90.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "JambPierNorth",
+      "location": [
+        0.03999999999999998,
+        -0.5,
+        0.825
+      ],
+      "dimensions": [
+        0.34,
+        0.08,
+        0.21000000000000008
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -90.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "JambPierSouth",
+      "location": [
+        0.96,
+        -0.5,
+        0.825
+      ],
+      "dimensions": [
+        0.34,
+        0.07999999999999996,
+        0.21000000000000008
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -90.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "SouthWestDeck",
+      "location": [
+        1.0,
+        -0.0,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.94,
+        0.08999999999999997
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        45.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "SouthWestWallWeb",
+      "location": [
+        1.25,
+        0.25,
+        0.8425
+      ],
+      "dimensions": [
+        0.7071067811865476,
+        0.2,
+        0.17500000000000004
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        45.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "GateSouthCornerCorbel",
+      "location": [
+        1.0,
+        -0.20999999999999996,
+        0.825
+      ],
+      "dimensions": [
+        0.58,
+        0.16,
+        0.21
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -90.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "GateSouthWing",
+      "location": [
+        1.0,
+        -0.185,
+        0.36
+      ],
+      "dimensions": [
+        0.53,
+        0.16,
+        0.72
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -90.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NorthDeckConnector",
+      "location": [
+        -0.25,
+        -0.8,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        0.5,
+        0.94,
+        0.08999999999999997
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -3.508354649267438e-15
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NextWallGateDeck",
+      "location": [
+        1.365,
+        0.635,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        1.27,
+        1.27,
+        0.08999999999999997
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        90.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "NextWallSouthWestDeck",
+      "location": [
+        1.0,
+        0.0,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.94,
+        0.08999999999999997
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -135.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "NextWallNorthDeckConnector",
+      "location": [
+        2.25,
+        0.8,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        0.5,
+        0.94,
+        0.08999999999999997
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        180.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NextWallCoreBearing",
+      "location": [
+        1.5,
+        0.5,
+        0.815
+      ],
+      "dimensions": [
+        0.19999999999999996,
+        0.2,
+        0.2300000000000001
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        90.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NextWallNorthBearing",
+      "location": [
+        2.0,
+        0.5,
+        0.815
+      ],
+      "dimensions": [
+        1.0,
+        0.2,
+        0.2300000000000001
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        180.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NextWallDiagonalBearing",
+      "location": [
+        1.0,
+        0.0,
+        0.815
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.2,
+        0.2300000000000001
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -135.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NextWallNorthCorbelMiddle",
+      "location": [
+        2.0,
+        0.6,
+        0.8375
+      ],
+      "dimensions": [
+        1.0,
+        0.4,
+        0.07499999999999996
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        180.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NextWallNorthCorbelUpper",
+      "location": [
+        1.85,
+        0.68,
+        0.9025000000000001
+      ],
+      "dimensions": [
+        1.3,
+        0.72,
+        0.05500000000000005
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        180.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NextWallDiagonalCorbelMiddle",
+      "location": [
+        1.0,
+        0.0,
+        0.8375
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.46,
+        0.07499999999999996
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -135.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NextWallDiagonalCorbelUpper",
+      "location": [
+        1.0,
+        0.0,
+        0.9025000000000001
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.74,
+        0.05500000000000005
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -135.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NextWallTurnCrossCorbel",
+      "location": [
+        1.4,
+        0.8,
+        0.9025000000000001
+      ],
+      "dimensions": [
+        0.7999999999999999,
+        0.72,
+        0.05500000000000005
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        90.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet00",
+      "location": [
+        1.22,
+        -0.8323401871578,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.9853196256844,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -90.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet01",
+      "location": [
+        0.635,
+        -1.22,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        1.38,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -180.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet02",
+      "location": [
+        0.05,
+        -0.16499999999997506,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.4399999999999501,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        90.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet03",
+      "location": [
+        0.16765981284201,
+        -0.05000000000000003,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.44531962568402,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        2.6783189798042137e-15
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet04",
+      "location": [
+        0.5680151519016501,
+        0.16198484809834993,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.6681623381601772,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        45.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet05",
+      "location": [
+        1.43198484809835,
+        -0.16198484809834993,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.6681623381601772,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -135.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet06",
+      "location": [
+        -0.24999999999999994,
+        -0.38000000000000006,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.61,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -0.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet07",
+      "location": [
+        -0.25000000000000006,
+        -1.22,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.61,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -180.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet08",
+      "location": [
+        0.78,
+        0.8323401871578,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.9853196256843999,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        90.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet09",
+      "location": [
+        1.365,
+        1.22,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        1.3800000000000003,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -0.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet10",
+      "location": [
+        1.95,
+        0.16499999999997506,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.4399999999999501,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -90.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet11",
+      "location": [
+        1.83234018715799,
+        0.049999999999999975,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.44531962568402017,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        180.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet12",
+      "location": [
+        2.25,
+        0.38000000000000006,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.6100000000000001,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -180.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ContourParapet13",
+      "location": [
+        2.25,
+        1.22,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.6100000000000001,
+        0.1,
+        0.17999999999999994
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        -0.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 1000,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0.5,
+      -0.5,
+      0.85
+    ],
+    "orthoScale": 2.5,
+    "worldRole": "sky"
+  }
+}

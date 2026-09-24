@@ -11,14 +11,20 @@ mundo.
 
 ## Propuesta pendiente · portada del menú y apertura del libro
 
-**Estado:** propuesta visual aprobada como dirección; pendiente de diseño e
-implementación de la transición.
+**Estado:** cubierta estática con pergamino, lomo, cuero y canto de páginas
+integrada en el menú; pendiente la apertura animada y precarga coordinada.
 
 La portada definitiva de Higgsfield (`public/ui/art/title-valley-higgsfield.png`)
 se conserva como una **pantalla plana de inicio de videojuego** con apariencia de
 portada de libro medieval. No se debe convertir en un libro 3D permanente ni en
 una escena de producto: la tapa frontal contiene el menú y conserva la lectura
 inmediata de una pantalla jugable.
+
+La pantalla actual reutiliza la ilustración central de ese PNG; los rótulos y
+botones impresos no entran en el recorte. El fondo de pergamino usa el tono
+`#E0C39A` y la textura local existente. El marco de cuero, lomo y cantos se
+dibujan con CSS, conservando los controles HTML. Falta validar la apertura
+descrita abajo; la cubierta estática no la acredita.
 
 ### Flujo propuesto
 
@@ -336,3 +342,13 @@ versalitas sueltas bajo el ornamento.
 Así que quien vuelva a intentarlo: **el tamaño de destino va antes del trazo**, y
 lo que hay hoy en el sprite son siluetas rellenas calcadas para leerse a 26 px,
 no dibujos de línea.
+
+### Caza física: ilustraciones de crónica pendientes
+
+Los nuevos registros `hunt.kill.partridge`, `hunt.kill.rabbit`,
+`hunt.kill.deer`, `hunt.kill.boar` y `hunt.kill.bear` necesitan una estampa
+sepia distinta por especie. El encuadre debe mostrar la presa, el arma elegida
+cuando sea visible y el entorno propio: prado, linde, bosque y entrada rocosa.
+La del oso ocurre **fuera** de la guarida; no hay interior ni pantalla jugable
+dentro de ella. Las huidas usan el mismo motivo sin cadáver. Los modelos 3D
+aprobados ya cubren la escena en vivo; esta tarea es solo para la crónica.

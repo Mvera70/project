@@ -114,4 +114,22 @@ describe('G-24 · recursos aprobados integrados', () => {
       expect(plank.getWorldPosition(new Vector3()).distanceTo(closed)).toBeGreaterThan(0.1);
     } finally { village.dispose(); }
   });
+
+  it('conserva la hoja animada del portón de madera publicado', async () => {
+    const loader = new GLTFLoader();
+    const timber = await loader.parseAsync(arrayBuffer(bytes('gate-timber')), '');
+    const village = new Village(() => timber.scene.clone(true));
+    village.add({ id: 1, kind: 'gate', x: 4, z: 5, w: 1, h: 1, ruin: false,
+      walls: 1, roof: 0, roofed: false, wallColour: '#765432', roofColour: '#765432',
+      asset: 'gate-timber', gate: 'z' });
+    try {
+      const leaf = village.group.getObjectByName('gate_door')!;
+      expect(leaf).toBeDefined();
+      village.group.updateMatrixWorld(true);
+      const before = leaf.children[0]!.getWorldPosition(new Vector3());
+      village.doors(new Set([1]), 1);
+      village.group.updateMatrixWorld(true);
+      expect(leaf.children[0]!.getWorldPosition(new Vector3()).distanceTo(before)).toBeGreaterThan(0.1);
+    } finally { village.dispose(); }
+  });
 });

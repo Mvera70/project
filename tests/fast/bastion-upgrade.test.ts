@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { foundTwenty } from '../helpers/founding';
 import { TERRAIN_CODE, type Building } from '@engine/state';
 import { bastionAccessOf } from '@engine/world/bastion-access';
+import { bastionWalkwayOf } from '@engine/world/bastion-walkway';
 import { nextUpgrade, upgradeSpot } from '@engine/world/upgrade';
 
 function defence(id: number, kind: 'wall' | 'bastion', x: number, y: number): Building {
@@ -21,6 +22,17 @@ function closedState() {
 }
 
 describe('E3 · elección de bastión accesible', () => {
+  it('prefiere una pasarela recta real cuando otro muro sólo admite escalera', () => {
+    const state = closedState();
+    const stairOnly = defence(1, 'wall', 6, 10);
+    const connected = defence(4, 'wall', 10, 14);
+    state.buildings = [stairOnly, connected, defence(5, 'wall', 9, 14), defence(6, 'wall', 8, 14)];
+    expect(bastionAccessOf(state, stairOnly)).not.toBeNull();
+    expect(bastionWalkwayOf(state, stairOnly)).toBeNull();
+    expect(bastionWalkwayOf(state, connected)?.nextWallId).toBe(6);
+    expect(nextUpgrade(state)).toEqual({ kind: 'bastion', buildingId: 4 });
+  });
+
   it('prefiere un muro accesible al primero por id y conserva el respaldo si ninguno cabe', () => {
     const preferred = closedState();
     const blocked = defence(1, 'wall', 10, 14);

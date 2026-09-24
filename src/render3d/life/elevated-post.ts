@@ -5,6 +5,7 @@
 // acceso de guardia convierta por accidente la huella en un camino público.
 
 import type { BastionAccess } from '@derive/bastion-access';
+import type { ElevatedRing } from '@derive/elevated-ring';
 import { fitsCircle, type Point, type Terrain } from './body';
 import { canReach } from './terrain';
 
@@ -62,25 +63,68 @@ function worldPoint(origin: Point, access: BastionAccess, x: number, z: number, 
  * No consulta el terreno: así las cuatro orientaciones se pueden falsar sin
  * Three, física ni una partida del motor.
  */
-export function elevatedPostRoute(origin: Point, access: BastionAccess, approachY = 0): ElevatedPost {
+export function elevatedPostRoute(origin: Point, access: BastionAccess, approachY = 0,
+  stairShift = 0): ElevatedPost {
   const point = (x: number, z: number, y: number) => worldPoint(origin, access, x, z, y);
-  const approach = point(0.5, 2.4, approachY);
-  const foot = point(0.5, 2, 0);
+  // La fuente ancla66 separa la escalera del retorno diagonal. Su acceso
+  // comparte el pie; E3a conserva sus puntos anteriores con desplazamiento 0.
+  const approach = point(0.5, stairShift === 0 ? 2.4 : 2 + stairShift, approachY);
+  const foot = point(0.5, 2 + stairShift, 0);
   const supports = Array.from({ length: ELEVATED_POST_STEPS }, (_, index) => {
     const step = index + 1;
-    return point(0.5, 2 - (step - 0.5) / ELEVATED_POST_STEPS, step * ELEVATED_POST_HEIGHT / ELEVATED_POST_STEPS);
+    return point(0.5, 2 + stairShift - (step - 0.5) / ELEVATED_POST_STEPS,
+      step * ELEVATED_POST_HEIGHT / ELEVATED_POST_STEPS);
   });
   const climb: ElevatedPoint[] = [approach, foot];
   for (let step = 1; step <= ELEVATED_POST_STEPS; step += 1) {
-    const z = 2 - (step - 1) / ELEVATED_POST_STEPS;
+    const z = 2 + stairShift - (step - 1) / ELEVATED_POST_STEPS;
     const after = step * ELEVATED_POST_HEIGHT / ELEVATED_POST_STEPS;
     climb.push(point(0.5, z, after));
-    climb.push(point(0.5, 2 - step / ELEVATED_POST_STEPS, after));
+    climb.push(point(0.5, 2 + stairShift - step / ELEVATED_POST_STEPS, after));
   }
-  const exit = point(0.5, 1, ELEVATED_POST_HEIGHT);
+  const exit = point(0.5, 1 + stairShift, ELEVATED_POST_HEIGHT);
   const post = point(0.5, 0.58, ELEVATED_POST_HEIGHT);
   climb.push(exit, post);
   return { access, approach, foot, supports, exit, post, climb, descent: [...climb].reverse() };
+}
+
+/** La misma transformación cardinal de E3a, aplicada al giro certificado de E3b. */
+function walkwayPoint(origin: Point, access: BastionAccess, x: number, z: number): ElevatedPoint {
+  return worldPoint(origin, access, x, z, ELEVATED_POST_HEIGHT);
+}
+
+/**
+ * Ruta privada desde la escalera del bastión hasta el centro del segundo tramo
+ * recto. Sólo describe el giro aprobado: el selector decide si existen ambos.
+ */
+export function elevatedWallRoute(origin: Point, access: BastionAccess, approachY = 0): ElevatedPost {
+  const stair = elevatedPostRoute(origin, access, approachY);
+  const walkway = [
+    walkwayPoint(origin, access, 0.5, 0.72),
+    walkwayPoint(origin, access, 0.95, 0.72),
+    walkwayPoint(origin, access, 1.2, 0.79),
+    walkwayPoint(origin, access, 1.5, 0.79),
+    walkwayPoint(origin, access, 2.5, 0.79),
+  ];
+  const climb = [...stair.climb.slice(0, -1), ...walkway];
+  const post = walkway.at(-1)!;
+  return { ...stair, post, climb, descent: [...climb].reverse() };
+}
+
+/** Un circuito privado completo; sólo se ofrece cuando toda su geometría está aprobada. */
+export function elevatedRingCircuit(stair: ElevatedPost, ring: ElevatedRing): ElevatedPost | null {
+  if (!ring.geometryReady || !ring.topologyClosed || ring.route.length < 4) return null;
+  const first = ring.route[0]!, last = ring.route.at(-1)!;
+  const joins = (point: ElevatedPoint): boolean =>
+    Math.hypot(point.x - stair.post.x, point.z - stair.post.z, point.y - stair.post.y) < 0.02;
+  if (!joins(first) || !joins(last)) return null;
+  for (let index = 1; index < ring.route.length; index += 1) {
+    const before = ring.route[index - 1]!, after = ring.route[index]!;
+    const length = Math.hypot(after.x - before.x, after.z - before.z, after.y - before.y);
+    if (!Number.isFinite(length) || length > Math.SQRT2 + 0.1 || length < 0.01) return null;
+  }
+  const climb = [...stair.climb, ...ring.route.slice(1)];
+  return { ...stair, post: last, climb, descent: [...climb].reverse() };
 }
 
 /**
@@ -92,8 +136,9 @@ export function elevatedPostRoute(origin: Point, access: BastionAccess, approach
 export function elevatedPostOf(
   land: Terrain, reach: Uint8Array | undefined, origin: Point, access: BastionAccess,
   ground?: (x: number, z: number) => number,
+  stairShift = 0,
 ): ElevatedPost | null {
-  const flat = elevatedPostRoute(origin, access);
+  const flat = elevatedPostRoute(origin, access, 0, stairShift);
   const approachY = ground?.(flat.approach.x, flat.approach.z) ?? 0;
   const footY = ground?.(flat.foot.x, flat.foot.z) ?? 0;
   // El GLB está anclado a cero: una ladera no se compensa sumándola a la
@@ -102,7 +147,7 @@ export function elevatedPostOf(
   if (!Number.isFinite(approachY) || !Number.isFinite(footY)
     || Math.abs(approachY) > ELEVATED_POST_HEIGHT / (ELEVATED_POST_STEPS * 2)
     || Math.abs(footY) > ELEVATED_POST_HEIGHT / (ELEVATED_POST_STEPS * 2)) return null;
-  const route = elevatedPostRoute(origin, access, approachY);
+  const route = elevatedPostRoute(origin, access, approachY, stairShift);
   if (!fitsCircle(land, route.approach.x, route.approach.z, ELEVATED_POST_RADIUS)) return null;
   if (reach !== undefined && !canReach(land, reach, route.approach)) return null;
   return route;

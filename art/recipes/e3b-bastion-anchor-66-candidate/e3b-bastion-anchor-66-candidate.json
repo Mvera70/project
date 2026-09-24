@@ -1,0 +1,2397 @@
+{
+  "schemaVersion": 1,
+  "id": "e3b-bastion-anchor-66-candidate",
+  "scale": 1,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "status": "candidate_source_only",
+    "cellUnit": 1,
+    "kind": "bastion",
+    "version": 1,
+    "footprint": [
+      1.8181980515,
+      2.65
+    ],
+    "mask": 66,
+    "access": {
+      "x": 0,
+      "z": 1
+    },
+    "floorY": 1.02,
+    "clearWidth": 0.7,
+    "sourceRecipe": "art/recipes/e3b-bastion296-mixed-candidate/e3b-bastion296-mixed-candidate.json",
+    "sourceSha256": "7813dc25d0c4e9f1bf0af87d11b440c4a336e1da7fd8c7d9347ce51635142735",
+    "transform": "Reflection world X about X=0.5; authoring [x,-z,y]. Local identity placement.",
+    "fixtures": [
+      {
+        "seed": 23,
+        "tick": 3846,
+        "id": 283,
+        "cell": [
+          36,
+          41
+        ]
+      },
+      {
+        "seed": 91,
+        "tick": 3846,
+        "id": 295,
+        "cell": [
+          34,
+          39
+        ]
+      }
+    ],
+    "ports": [
+      {
+        "kind": "cardinal",
+        "face": "east",
+        "center": [
+          1,
+          0.5
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "width": 0.7
+      },
+      {
+        "kind": "diagonal",
+        "face": "southwest",
+        "center": [
+          -0.5,
+          1.5
+        ],
+        "normal": [
+          -0.7071067811865476,
+          0.7071067811865476
+        ],
+        "width": 0.7
+      }
+    ],
+    "routeXZ": [
+      [
+        1,
+        0.5
+      ],
+      [
+        0.5,
+        0.5
+      ],
+      [
+        -0.5,
+        1.5
+      ]
+    ],
+    "stairsRouteXZ": [
+      [
+        0.5,
+        2.65
+      ],
+      [
+        0.5,
+        1.65
+      ],
+      [
+        0.5,
+        0.5
+      ]
+    ],
+    "stair": {
+      "direction": "+Z",
+      "shift": 0.65,
+      "count": 14,
+      "width": 0.72,
+      "run": 1,
+      "rise": 1.02
+    },
+    "lifeRouteXYZ": {
+      "approach": [
+        0.5,
+        0,
+        2.65
+      ],
+      "foot": [
+        0.5,
+        0,
+        2.65
+      ],
+      "exit": [
+        0.5,
+        1.02,
+        1.65
+      ],
+      "post": [
+        0.5,
+        1.02,
+        0.58
+      ],
+      "climb": [
+        [
+          0.5,
+          0,
+          2.65
+        ],
+        [
+          0.5,
+          0.07285714285714286,
+          2.65
+        ],
+        [
+          0.5,
+          0.07285714285714286,
+          2.5785714285714283
+        ],
+        [
+          0.5,
+          0.1457142857142857,
+          2.5785714285714283
+        ],
+        [
+          0.5,
+          0.1457142857142857,
+          2.507142857142857
+        ],
+        [
+          0.5,
+          0.21857142857142858,
+          2.507142857142857
+        ],
+        [
+          0.5,
+          0.21857142857142858,
+          2.4357142857142855
+        ],
+        [
+          0.5,
+          0.2914285714285714,
+          2.4357142857142855
+        ],
+        [
+          0.5,
+          0.2914285714285714,
+          2.3642857142857143
+        ],
+        [
+          0.5,
+          0.36428571428571427,
+          2.3642857142857143
+        ],
+        [
+          0.5,
+          0.36428571428571427,
+          2.2928571428571427
+        ],
+        [
+          0.5,
+          0.43714285714285717,
+          2.2928571428571427
+        ],
+        [
+          0.5,
+          0.43714285714285717,
+          2.2214285714285715
+        ],
+        [
+          0.5,
+          0.51,
+          2.2214285714285715
+        ],
+        [
+          0.5,
+          0.51,
+          2.15
+        ],
+        [
+          0.5,
+          0.5828571428571429,
+          2.15
+        ],
+        [
+          0.5,
+          0.5828571428571429,
+          2.0785714285714283
+        ],
+        [
+          0.5,
+          0.6557142857142857,
+          2.0785714285714283
+        ],
+        [
+          0.5,
+          0.6557142857142857,
+          2.007142857142857
+        ],
+        [
+          0.5,
+          0.7285714285714285,
+          2.007142857142857
+        ],
+        [
+          0.5,
+          0.7285714285714285,
+          1.9357142857142855
+        ],
+        [
+          0.5,
+          0.8014285714285715,
+          1.9357142857142855
+        ],
+        [
+          0.5,
+          0.8014285714285715,
+          1.8642857142857143
+        ],
+        [
+          0.5,
+          0.8742857142857143,
+          1.8642857142857143
+        ],
+        [
+          0.5,
+          0.8742857142857143,
+          1.7928571428571427
+        ],
+        [
+          0.5,
+          0.9471428571428572,
+          1.7928571428571427
+        ],
+        [
+          0.5,
+          0.9471428571428572,
+          1.7214285714285713
+        ],
+        [
+          0.5,
+          1.02,
+          1.7214285714285713
+        ],
+        [
+          0.5,
+          1.02,
+          1.65
+        ],
+        [
+          0.5,
+          1.02,
+          0.58
+        ]
+      ],
+      "integration": "Requires a variant-specific elevatedPostRoute; unchanged Z=2..1 route is invalid. Approach coincides with foot to keep radius .35 within reserved Z<3."
+    },
+    "ownership": "Bastion, extended south landing and stairs, southwest diagonal through center of first adjacent cell. Neighbor half must be replaced, never overlaid.",
+    "limitation": "Requires extending old stair footprint 0.65 toward +Z. Scene occupancy and next neighbor turn not validated.",
+    "budget": {
+      "maxTriangles": 1800,
+      "maxMaterials": 2,
+      "textures": 0
+    }
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "mortar",
+      "role": "soil",
+      "roughness": 1
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Anchor66_CornerPier_NE",
+      "location": [
+        0.94,
+        -0.06,
+        0.545
+      ],
+      "dimensions": [
+        0.12,
+        0.12,
+        0.83
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_CornerPier_NW",
+      "location": [
+        0.06000000000000005,
+        -0.06,
+        0.545
+      ],
+      "dimensions": [
+        0.12,
+        0.12,
+        0.83
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_CornerPier_SE",
+      "location": [
+        0.94,
+        -0.94,
+        0.545
+      ],
+      "dimensions": [
+        0.12,
+        0.12,
+        0.83
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_CornerPier_SW",
+      "location": [
+        0.06000000000000005,
+        -0.94,
+        0.545
+      ],
+      "dimensions": [
+        0.12,
+        0.12,
+        0.83
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Footing",
+      "location": [
+        0.5,
+        -0.5,
+        0.065
+      ],
+      "dimensions": [
+        1,
+        1,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Core",
+      "location": [
+        0.5,
+        -0.5,
+        0.545
+      ],
+      "dimensions": [
+        0.87,
+        0.87,
+        0.83
+      ],
+      "material": "mortar",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_0_0",
+      "location": [
+        0.7935,
+        -0.05,
+        0.211
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_0_1",
+      "location": [
+        0.5,
+        -0.05,
+        0.211
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_0_2",
+      "location": [
+        0.20650000000000002,
+        -0.05,
+        0.211
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_1_0",
+      "location": [
+        0.95,
+        -0.2065,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_1_1",
+      "location": [
+        0.95,
+        -0.5,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_1_2",
+      "location": [
+        0.95,
+        -0.7935,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_2_0",
+      "location": [
+        0.7935,
+        -0.95,
+        0.211
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_2_1",
+      "location": [
+        0.5,
+        -0.95,
+        0.211
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_2_2",
+      "location": [
+        0.20650000000000002,
+        -0.95,
+        0.211
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_3_0",
+      "location": [
+        0.050000000000000044,
+        -0.2065,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_3_1",
+      "location": [
+        0.050000000000000044,
+        -0.5,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_0_3_2",
+      "location": [
+        0.050000000000000044,
+        -0.7935,
+        0.211
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_0_0",
+      "location": [
+        0.8674999999999999,
+        -0.05,
+        0.377
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_0_1",
+      "location": [
+        0.6475,
+        -0.05,
+        0.377
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_0_2",
+      "location": [
+        0.35250000000000004,
+        -0.05,
+        0.377
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_0_3",
+      "location": [
+        0.13249999999999995,
+        -0.05,
+        0.377
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_1_0",
+      "location": [
+        0.95,
+        -0.1325,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_1_1",
+      "location": [
+        0.95,
+        -0.3525,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_1_2",
+      "location": [
+        0.95,
+        -0.6475,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_1_3",
+      "location": [
+        0.95,
+        -0.8675,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_2_0",
+      "location": [
+        0.8674999999999999,
+        -0.95,
+        0.377
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_2_1",
+      "location": [
+        0.6475,
+        -0.95,
+        0.377
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_2_2",
+      "location": [
+        0.35250000000000004,
+        -0.95,
+        0.377
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_2_3",
+      "location": [
+        0.13249999999999995,
+        -0.95,
+        0.377
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_3_0",
+      "location": [
+        0.050000000000000044,
+        -0.1325,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_3_1",
+      "location": [
+        0.050000000000000044,
+        -0.3525,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_3_2",
+      "location": [
+        0.050000000000000044,
+        -0.6475,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_1_3_3",
+      "location": [
+        0.050000000000000044,
+        -0.8675,
+        0.377
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_0_0",
+      "location": [
+        0.7935,
+        -0.05,
+        0.543
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_0_1",
+      "location": [
+        0.5,
+        -0.05,
+        0.543
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_0_2",
+      "location": [
+        0.20650000000000002,
+        -0.05,
+        0.543
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_1_0",
+      "location": [
+        0.95,
+        -0.2065,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_1_1",
+      "location": [
+        0.95,
+        -0.5,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_1_2",
+      "location": [
+        0.95,
+        -0.7935,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_2_0",
+      "location": [
+        0.7935,
+        -0.95,
+        0.543
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_2_1",
+      "location": [
+        0.5,
+        -0.95,
+        0.543
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_2_2",
+      "location": [
+        0.20650000000000002,
+        -0.95,
+        0.543
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_3_0",
+      "location": [
+        0.050000000000000044,
+        -0.2065,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_3_1",
+      "location": [
+        0.050000000000000044,
+        -0.5,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_2_3_2",
+      "location": [
+        0.050000000000000044,
+        -0.7935,
+        0.543
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_0_0",
+      "location": [
+        0.8674999999999999,
+        -0.05,
+        0.709
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_0_1",
+      "location": [
+        0.6475,
+        -0.05,
+        0.709
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_0_2",
+      "location": [
+        0.35250000000000004,
+        -0.05,
+        0.709
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_0_3",
+      "location": [
+        0.13249999999999995,
+        -0.05,
+        0.709
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_1_0",
+      "location": [
+        0.95,
+        -0.1325,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_1_1",
+      "location": [
+        0.95,
+        -0.3525,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_1_2",
+      "location": [
+        0.95,
+        -0.6475,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_1_3",
+      "location": [
+        0.95,
+        -0.8675,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_2_0",
+      "location": [
+        0.8674999999999999,
+        -0.95,
+        0.709
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_2_1",
+      "location": [
+        0.6475,
+        -0.95,
+        0.709
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_2_2",
+      "location": [
+        0.35250000000000004,
+        -0.95,
+        0.709
+      ],
+      "dimensions": [
+        0.288,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_2_3",
+      "location": [
+        0.13249999999999995,
+        -0.95,
+        0.709
+      ],
+      "dimensions": [
+        0.138,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_3_0",
+      "location": [
+        0.050000000000000044,
+        -0.1325,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_3_1",
+      "location": [
+        0.050000000000000044,
+        -0.3525,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_3_2",
+      "location": [
+        0.050000000000000044,
+        -0.6475,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.288,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_3_3_3",
+      "location": [
+        0.050000000000000044,
+        -0.8675,
+        0.709
+      ],
+      "dimensions": [
+        0.1,
+        0.138,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_0_0",
+      "location": [
+        0.7935,
+        -0.05,
+        0.875
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_0_1",
+      "location": [
+        0.5,
+        -0.05,
+        0.875
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_0_2",
+      "location": [
+        0.20650000000000002,
+        -0.05,
+        0.875
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_1_0",
+      "location": [
+        0.95,
+        -0.2065,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_1_1",
+      "location": [
+        0.95,
+        -0.5,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_1_2",
+      "location": [
+        0.95,
+        -0.7935,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_2_0",
+      "location": [
+        0.7935,
+        -0.95,
+        0.875
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_2_1",
+      "location": [
+        0.5,
+        -0.95,
+        0.875
+      ],
+      "dimensions": [
+        0.287,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_2_2",
+      "location": [
+        0.20650000000000002,
+        -0.95,
+        0.875
+      ],
+      "dimensions": [
+        0.286,
+        0.1,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_3_0",
+      "location": [
+        0.050000000000000044,
+        -0.2065,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_3_1",
+      "location": [
+        0.050000000000000044,
+        -0.5,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.287,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Ashlar_4_3_2",
+      "location": [
+        0.050000000000000044,
+        -0.7935,
+        0.875
+      ],
+      "dimensions": [
+        0.1,
+        0.286,
+        0.159
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_WallSeat_0",
+      "location": [
+        0.5,
+        -0.025,
+        0.46
+      ],
+      "dimensions": [
+        0.36,
+        0.05,
+        0.66
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_WallSeat_1",
+      "location": [
+        0.975,
+        -0.5,
+        0.46
+      ],
+      "dimensions": [
+        0.05,
+        0.36,
+        0.66
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_WallSeat_2",
+      "location": [
+        0.5,
+        -0.975,
+        0.46
+      ],
+      "dimensions": [
+        0.36,
+        0.05,
+        0.66
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_WallSeat_3",
+      "location": [
+        0.025000000000000022,
+        -0.5,
+        0.46
+      ],
+      "dimensions": [
+        0.05,
+        0.36,
+        0.66
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_Parapet_0",
+      "location": [
+        0.5,
+        -0.08,
+        1.09
+      ],
+      "dimensions": [
+        0.96,
+        0.14,
+        0.14
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_CornerMerlon_NE",
+      "location": [
+        0.92,
+        -0.075,
+        1.26
+      ],
+      "dimensions": [
+        0.14,
+        0.15,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_CornerMerlon_SE",
+      "location": [
+        0.92,
+        -0.925,
+        1.26
+      ],
+      "dimensions": [
+        0.14,
+        0.15,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_CornerMerlon_NW",
+      "location": [
+        0.07999999999999996,
+        -0.075,
+        1.26
+      ],
+      "dimensions": [
+        0.14,
+        0.15,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_CenterMerlon_0",
+      "location": [
+        0.5,
+        -0.08,
+        1.26
+      ],
+      "dimensions": [
+        0.2,
+        0.14,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_01",
+      "location": [
+        0.5,
+        -2.6142857142857143,
+        0.03642857142857143
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.07285714285714286
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_02",
+      "location": [
+        0.5,
+        -2.5428571428571427,
+        0.07285714285714286
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.1457142857142857
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_03",
+      "location": [
+        0.5,
+        -2.4714285714285715,
+        0.10928571428571429
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.21857142857142858
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_04",
+      "location": [
+        0.5,
+        -2.4,
+        0.1457142857142857
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.2914285714285714
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_05",
+      "location": [
+        0.5,
+        -2.3285714285714287,
+        0.18214285714285713
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.36428571428571427
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_06",
+      "location": [
+        0.5,
+        -2.257142857142857,
+        0.21857142857142858
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.43714285714285717
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_07",
+      "location": [
+        0.5,
+        -2.1857142857142855,
+        0.255
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.51
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_08",
+      "location": [
+        0.5,
+        -2.1142857142857143,
+        0.2914285714285714
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.5828571428571429
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_09",
+      "location": [
+        0.5,
+        -2.0428571428571427,
+        0.32785714285714285
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.6557142857142857
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_10",
+      "location": [
+        0.5,
+        -1.9714285714285715,
+        0.36428571428571427
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.7285714285714285
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_11",
+      "location": [
+        0.5,
+        -1.9,
+        0.40071428571428575
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.8014285714285715
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_12",
+      "location": [
+        0.5,
+        -1.8285714285714287,
+        0.43714285714285717
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.8742857142857143
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_13",
+      "location": [
+        0.5,
+        -1.7571428571428571,
+        0.4735714285714286
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        0.9471428571428572
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_InteriorStep_14",
+      "location": [
+        0.5,
+        -1.6857142857142855,
+        0.51
+      ],
+      "dimensions": [
+        0.72,
+        0.07142857142857142,
+        1.02
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_UpperLandingSupport",
+      "location": [
+        0.5,
+        -1.325,
+        0.47
+      ],
+      "dimensions": [
+        0.72,
+        0.65,
+        0.94
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_DiagonalWallSupport",
+      "location": [
+        0,
+        -1,
+        0.47
+      ],
+      "dimensions": [
+        1.4142135623730951,
+        0.9,
+        0.94
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_WestNorthCap",
+      "location": [
+        0.925,
+        -0.075,
+        1.11
+      ],
+      "dimensions": [
+        0.15,
+        0.15,
+        0.18
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_WestSouthCap",
+      "location": [
+        0.925,
+        -0.925,
+        1.11
+      ],
+      "dimensions": [
+        0.15,
+        0.15,
+        0.18
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_LandingWestParapet",
+      "location": [
+        0.9,
+        -1.325,
+        1.11
+      ],
+      "dimensions": [
+        0.1,
+        0.65,
+        0.18
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_EastNorthParapet",
+      "location": [
+        0.050000000000000044,
+        -0.19215728752538092,
+        1.11
+      ],
+      "dimensions": [
+        0.1,
+        0.38431457505076183,
+        0.18
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_DiagonalOuterParapet",
+      "location": [
+        -0.36642135623730954,
+        -0.8007359312880713,
+        1.11
+      ],
+      "dimensions": [
+        1.1778174593052024,
+        0.1,
+        0.18
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_DiagonalInnerParapet",
+      "location": [
+        -0.05857864376269051,
+        -1.6242640687119287,
+        1.11
+      ],
+      "dimensions": [
+        0.44852813742385694,
+        0.1,
+        0.18
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        45.00000000000001
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_LandingEastParapet",
+      "location": [
+        0.09999999999999998,
+        -1.557842712474619,
+        1.11
+      ],
+      "dimensions": [
+        0.1,
+        0.18431457505076176,
+        0.18
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_MixedDeckRectangle_0",
+      "location": [
+        0.5,
+        -0.09090097425,
+        0.98
+      ],
+      "dimensions": [
+        1,
+        0.1818019485,
+        0.08
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_MixedDeckRectangle_1",
+      "location": [
+        0.5,
+        -0.2727029227,
+        0.98
+      ],
+      "dimensions": [
+        1,
+        0.1818019484,
+        0.08
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_MixedDeckRectangle_2",
+      "location": [
+        0.5000000000160536,
+        -0.5909009742,
+        0.98
+      ],
+      "dimensions": [
+        0.9999999999678928,
+        0.4545941546,
+        0.08
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "gable",
+      "name": "Anchor66_MixedDeckTriangle_3",
+      "location": [
+        -0.22729707726789283,
+        -0.5909009742,
+        0.98
+      ],
+      "width": 0.6428932188108516,
+      "depth": 0.08,
+      "height": 0.32144660940542585,
+      "rotationDegrees": [
+        90,
+        0,
+        45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_MixedDeckRectangle_4",
+      "location": [
+        0.27270292271605356,
+        -0.90909902575,
+        0.98
+      ],
+      "dimensions": [
+        1.4545941545678929,
+        0.18180194849999998,
+        0.08
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "gable",
+      "name": "Anchor66_MixedDeckTriangle_5",
+      "location": [
+        -0.5454951288178929,
+        -0.90909902575,
+        0.98
+      ],
+      "width": 0.25710678123455494,
+      "depth": 0.08,
+      "height": 0.12855339061727747,
+      "rotationDegrees": [
+        90,
+        0,
+        45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_MixedDeckRectangle_6",
+      "location": [
+        0.15680194846605355,
+        -1.09090097425,
+        0.98
+      ],
+      "dimensions": [
+        1.5863961030678928,
+        0.18180194849999998,
+        0.08
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "gable",
+      "name": "Anchor66_MixedDeckTriangle_7",
+      "location": [
+        -0.7272970773178928,
+        -1.09090097425,
+        0.98
+      ],
+      "width": 0.25710678123455494,
+      "depth": 0.08,
+      "height": 0.12855339061727747,
+      "rotationDegrees": [
+        90,
+        0,
+        45
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_MixedDeckRectangle_8",
+      "location": [
+        0.26819805155,
+        -1.3840990257999999,
+        0.98
+      ],
+      "dimensions": [
+        1.3636038969,
+        0.40459415460000003,
+        0.08
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "gable",
+      "name": "Anchor66_MixedDeckTriangle_9",
+      "location": [
+        -0.6159009742000001,
+        -1.3840990257999999,
+        0.98
+      ],
+      "width": 0.5721825406921969,
+      "depth": 0.08,
+      "height": 0.2860912703460984,
+      "rotationDegrees": [
+        90,
+        0,
+        135
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_MixedDeckRectangle_10",
+      "location": [
+        0.5,
+        -1.6181980515499998,
+        0.98
+      ],
+      "dimensions": [
+        0.8999999999999999,
+        0.0636038968999999,
+        0.08
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "cube",
+      "name": "Anchor66_MixedDeckRectangle_11",
+      "location": [
+        -0.18180194846605358,
+        -1.6181980515499998,
+        0.98
+      ],
+      "dimensions": [
+        0.336396103067893,
+        0.0636038968999999,
+        0.08
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "material": "stone"
+    },
+    {
+      "type": "gable",
+      "name": "Anchor66_MixedDeckTriangle_12",
+      "location": [
+        0.018198051517892888,
+        -1.6181980515499998,
+        0.98
+      ],
+      "width": 0.08994949361575992,
+      "depth": 0.08,
+      "height": 0.044974746807879884,
+      "rotationDegrees": [
+        90,
+        0,
+        -135
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Anchor66_MixedDeckTriangle_13",
+      "location": [
+        -0.38180194845000015,
+        -1.6181980515499998,
+        0.98
+      ],
+      "width": 0.08994949361575992,
+      "depth": 0.08,
+      "height": 0.04497474680787995,
+      "rotationDegrees": [
+        90,
+        0,
+        135
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Anchor66_MixedDeckTriangle_14",
+      "location": [
+        -0.09770292268210712,
+        -1.73409902575,
+        0.98
+      ],
+      "width": 0.2378679655960285,
+      "depth": 0.08,
+      "height": 0.11893398279801425,
+      "rotationDegrees": [
+        90,
+        0,
+        -135
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Anchor66_MixedDeckTriangle_15",
+      "location": [
+        -0.26590097425000003,
+        -1.73409902575,
+        0.98
+      ],
+      "width": 0.2378679655960285,
+      "depth": 0.08,
+      "height": 0.11893398279801425,
+      "rotationDegrees": [
+        90,
+        0,
+        135
+      ],
+      "material": "stone",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 1000,
+    "height": 1000,
+    "cameraLocation": [
+      3,
+      -4,
+      3
+    ],
+    "cameraTarget": [
+      0,
+      -1.3,
+      0.6
+    ],
+    "orthoScale": 3.5,
+    "worldRole": "sky"
+  }
+}

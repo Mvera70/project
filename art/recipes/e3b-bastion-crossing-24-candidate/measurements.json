@@ -1,0 +1,140 @@
+{
+  "sha256": "f03a1a176a24bbc7dee1fd48102e5abf86732d8d3a5dfb87a66fc992402070a1",
+  "deterministic": true,
+  "fixture": {
+    "seed": 91,
+    "tick": 3846,
+    "id": 296,
+    "cell": [
+      40,
+      65
+    ],
+    "mask": 24
+  },
+  "triangles": 244,
+  "budget": {
+    "maxTriangles": 600,
+    "maxMaterials": 2,
+    "textures": 0
+  },
+  "parts": 15,
+  "materials": 2,
+  "textures": 0,
+  "ports": [
+    {
+      "face": "west",
+      "center": [
+        0,
+        0.5
+      ],
+      "normal": [
+        -1,
+        0
+      ],
+      "clearWidth": 0.7,
+      "threshold": 1.02
+    },
+    {
+      "face": "northeast",
+      "center": [
+        1.5,
+        -0.5
+      ],
+      "normal": [
+        0.7071067811865476,
+        -0.7071067811865476
+      ],
+      "clearWidth": 0.7,
+      "threshold": 1.02
+    }
+  ],
+  "interfaces": [
+    {
+      "kind": "straight",
+      "source": "../e3b-walltop-finish-candidate/e3b-walltop-finish-straight-candidate.json",
+      "sha256": "d6ebd1db1886a22f2678a35a289e4beca6b758e320ebd8472afa0a24c1b6a266",
+      "measuredClearWidth": 0.7000000000000001,
+      "deckWidth": 0.9,
+      "deckBottom": 0.94,
+      "deckTop": 1.02,
+      "parapetBands": [
+        {
+          "min": -0.45,
+          "max": -0.35000000000000003,
+          "bottom": 1.02,
+          "top": 1.2000000000000002
+        },
+        {
+          "min": 0.35000000000000003,
+          "max": 0.45,
+          "bottom": 1.02,
+          "top": 1.2000000000000002
+        }
+      ],
+      "contactSamples": 202,
+      "capSamples": 500,
+      "sectionGaps": 0
+    },
+    {
+      "kind": "diagonal",
+      "source": "../e3b-walltop-finish-candidate/e3b-walltop-finish-diagonal-candidate.json",
+      "sha256": "20c63b655797cfb6e619602fb472d7ae84d1b913784d998c4e98208713631f87",
+      "measuredClearWidth": 0.7000000000000003,
+      "deckWidth": 0.9,
+      "deckBottom": 0.94,
+      "deckTop": 1.02,
+      "parapetBands": [
+        {
+          "min": -0.4500000000000001,
+          "max": -0.35000000000000014,
+          "bottom": 1.02,
+          "top": 1.2000000000000002
+        },
+        {
+          "min": 0.35000000000000014,
+          "max": 0.4500000000000001,
+          "bottom": 1.02,
+          "top": 1.2000000000000002
+        }
+      ],
+      "contactSamples": 202,
+      "capSamples": 300,
+      "sectionGaps": 0
+    }
+  ],
+  "route": {
+    "samples": 67795,
+    "failures": 0,
+    "clippedAtNeighborPlanes": 6510,
+    "analyticContinuousClearance": 0.35,
+    "radius": 0.35,
+    "margin": 0
+  },
+  "parapets": {
+    "boundarySamples": 2997,
+    "failures": 0,
+    "height": 0.24
+  },
+  "support": {
+    "layers": 13,
+    "exactFullFootprintContact": true,
+    "groundY": 0,
+    "floorY": 1.02
+  },
+  "topology": {
+    "perPartClosed": true,
+    "outwardWinding": true,
+    "minSignedVolume": 0.018574011537017696,
+    "zeroAreaFaces": 0
+  },
+  "negativeControls": {
+    "missingDeckRejected": true,
+    "mirroredNorthRejected": true,
+    "portalPlugDetected": true
+  },
+  "limits": [
+    "Internal contact faces remain in source; no overlapping positive volumes.",
+    "Port portions of disk outside owned geometry require neighbor floor.",
+    "No GLB, GPU, runtime dynamics, scene occupancy, structural simulation or human visual approval."
+  ]
+}

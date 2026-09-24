@@ -13,23 +13,28 @@
       1,
       1
     ],
-    "note": "ART-pendientes-1 · Portón de una celda (3 m), altura 2,80 m. Hoja gate_door separada del marco; origen de edificio en esquina. No incluye estado roto."
+    "note": "Portón de piedra de una celda, unido visualmente a la muralla; hoja gate_door de madera reforzada, con pivote conservado para apertura y rotura."
   },
   "materials": [
     {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
       "name": "wood",
+      "role": "timberDark",
+      "roughness": 0.9
+    },
+    {
+      "name": "plank",
       "role": "timber",
       "roughness": 0.9
     },
     {
       "name": "iron",
       "role": "timberDark",
-      "roughness": 0.9
-    },
-    {
-      "name": "plank",
-      "role": "soil",
-      "roughness": 0.9
+      "roughness": 0.75
     }
   ],
   "groups": [
@@ -55,52 +60,239 @@
   "primitives": [
     {
       "type": "cube",
-      "name": "Gate_Post_L",
+      "name": "Gate_Stone_Jamb_L",
       "location": [
-        0.195,
+        0.25,
         1.5,
-        1.35
+        1.08
       ],
       "dimensions": [
-        0.39,
-        0.46,
-        2.7
+        0.5,
+        0.94,
+        2.16
       ],
-      "material": "wood",
+      "material": "stone",
       "parent": "Root",
       "bevel": 0
     },
     {
       "type": "cube",
-      "name": "Gate_Post_R",
+      "name": "Gate_Stone_Jamb_R",
       "location": [
-        2.805,
+        2.75,
         1.5,
-        1.35
+        1.08
       ],
       "dimensions": [
-        0.39,
-        0.46,
-        2.7
+        0.5,
+        0.94,
+        2.16
       ],
-      "material": "wood",
+      "material": "stone",
       "parent": "Root",
       "bevel": 0
     },
     {
       "type": "cube",
-      "name": "Gate_Lintel",
+      "name": "Gate_Stone_Lintel",
       "location": [
         1.5,
         1.5,
-        2.665
+        1.98
       ],
       "dimensions": [
         3,
-        0.5,
-        0.27
+        0.94,
+        0.36
       ],
-      "material": "wood",
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Stone_Coping",
+      "location": [
+        1.5,
+        1.5,
+        2.22
+      ],
+      "dimensions": [
+        3.02,
+        1.03,
+        0.14
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Merlon_0",
+      "location": [
+        0.3,
+        1.5,
+        2.42
+      ],
+      "dimensions": [
+        0.48,
+        0.94,
+        0.35
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Merlon_1",
+      "location": [
+        1.1,
+        1.5,
+        2.42
+      ],
+      "dimensions": [
+        0.48,
+        0.94,
+        0.35
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Merlon_2",
+      "location": [
+        1.9,
+        1.5,
+        2.42
+      ],
+      "dimensions": [
+        0.48,
+        0.94,
+        0.35
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Merlon_3",
+      "location": [
+        2.7,
+        1.5,
+        2.42
+      ],
+      "dimensions": [
+        0.48,
+        0.94,
+        0.35
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Jamb_Stone_0_0",
+      "location": [
+        0.25,
+        0.99,
+        0.48
+      ],
+      "dimensions": [
+        0.52,
+        0.06,
+        0.48
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Jamb_Stone_0_1",
+      "location": [
+        0.25,
+        0.99,
+        1.02
+      ],
+      "dimensions": [
+        0.52,
+        0.06,
+        0.48
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Jamb_Stone_0_2",
+      "location": [
+        0.25,
+        0.99,
+        1.56
+      ],
+      "dimensions": [
+        0.52,
+        0.06,
+        0.48
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Jamb_Stone_1_0",
+      "location": [
+        2.75,
+        0.99,
+        0.48
+      ],
+      "dimensions": [
+        0.52,
+        0.06,
+        0.48
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Jamb_Stone_1_1",
+      "location": [
+        2.75,
+        0.99,
+        1.02
+      ],
+      "dimensions": [
+        0.52,
+        0.06,
+        0.48
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Jamb_Stone_1_2",
+      "location": [
+        2.75,
+        0.99,
+        1.56
+      ],
+      "dimensions": [
+        0.52,
+        0.06,
+        0.48
+      ],
+      "material": "stone",
       "parent": "Root",
       "bevel": 0
     },
@@ -110,12 +302,12 @@
       "location": [
         0.13875,
         0,
-        1.19
+        0.91
       ],
       "dimensions": [
         0.268,
-        0.14,
-        2.3
+        0.16,
+        1.74
       ],
       "material": "wood",
       "parent": "gate_door",
@@ -127,12 +319,12 @@
       "location": [
         0.41625,
         0,
-        1.19
+        0.91
       ],
       "dimensions": [
         0.268,
-        0.14,
-        2.3
+        0.16,
+        1.74
       ],
       "material": "plank",
       "parent": "gate_door",
@@ -144,12 +336,12 @@
       "location": [
         0.6937500000000001,
         0,
-        1.19
+        0.91
       ],
       "dimensions": [
         0.268,
-        0.14,
-        2.3
+        0.16,
+        1.74
       ],
       "material": "wood",
       "parent": "gate_door",
@@ -161,12 +353,12 @@
       "location": [
         0.9712500000000001,
         0,
-        1.19
+        0.91
       ],
       "dimensions": [
         0.268,
-        0.14,
-        2.3
+        0.16,
+        1.74
       ],
       "material": "wood",
       "parent": "gate_door",
@@ -178,12 +370,12 @@
       "location": [
         1.24875,
         0,
-        1.19
+        0.91
       ],
       "dimensions": [
         0.268,
-        0.14,
-        2.3
+        0.16,
+        1.74
       ],
       "material": "plank",
       "parent": "gate_door",
@@ -195,12 +387,12 @@
       "location": [
         1.52625,
         0,
-        1.19
+        0.91
       ],
       "dimensions": [
         0.268,
-        0.14,
-        2.3
+        0.16,
+        1.74
       ],
       "material": "wood",
       "parent": "gate_door",
@@ -212,12 +404,12 @@
       "location": [
         1.80375,
         0,
-        1.19
+        0.91
       ],
       "dimensions": [
         0.268,
-        0.14,
-        2.3
+        0.16,
+        1.74
       ],
       "material": "wood",
       "parent": "gate_door",
@@ -229,12 +421,12 @@
       "location": [
         2.0812500000000003,
         0,
-        1.19
+        0.91
       ],
       "dimensions": [
         0.268,
-        0.14,
-        2.3
+        0.16,
+        1.74
       ],
       "material": "plank",
       "parent": "gate_door",
@@ -246,7 +438,7 @@
       "location": [
         1.11,
         0.1,
-        0.35
+        0.31
       ],
       "dimensions": [
         2.22,
@@ -263,7 +455,7 @@
       "location": [
         1.11,
         0.1,
-        1.93
+        1.47
       ],
       "dimensions": [
         2.22,
@@ -280,15 +472,15 @@
       "location": [
         1.105,
         0.15,
-        1.135
+        0.89
       ],
       "radius": 0.065,
-      "depth": 2.490180716333656,
+      "depth": 2.05,
       "vertices": 6,
       "material": "wood",
       "parent": "gate_door",
       "rotationDegrees": [
-        53.82037955202105,
+        55,
         0,
         90
       ],
@@ -300,7 +492,7 @@
       "location": [
         0.16,
         -0.105,
-        0.38
+        0.33
       ],
       "dimensions": [
         0.54,
@@ -317,7 +509,7 @@
       "location": [
         0.16,
         -0.105,
-        1.92
+        1.46
       ],
       "dimensions": [
         0.54,
@@ -334,12 +526,63 @@
       "location": [
         1.92,
         -0.12,
-        1.16
+        0.94
       ],
       "dimensions": [
         0.3,
         0.07,
         0.085
+      ],
+      "material": "iron",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Iron_Band_Lower",
+      "location": [
+        1.11,
+        -0.105,
+        0.36
+      ],
+      "dimensions": [
+        2.22,
+        0.045,
+        0.08
+      ],
+      "material": "iron",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Iron_Band_Upper",
+      "location": [
+        1.11,
+        -0.105,
+        1.45
+      ],
+      "dimensions": [
+        2.22,
+        0.045,
+        0.08
+      ],
+      "material": "iron",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Iron_Lock_Plate",
+      "location": [
+        1.96,
+        -0.14,
+        0.94
+      ],
+      "dimensions": [
+        0.18,
+        0.04,
+        0.22
       ],
       "material": "iron",
       "parent": "gate_door",

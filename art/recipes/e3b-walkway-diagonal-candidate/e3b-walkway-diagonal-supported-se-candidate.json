@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "id": "e3b-walkway-diagonal-supported-se-candidate",
+  "scale": 1,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "wall-walkway-diagonal-supported-candidate",
+    "footprint": [
+      2,
+      2
+    ],
+    "version": 1,
+    "note": "SE half: 0.20 web on real clipped wall; keystone bridges the shared vertex. Candidate only."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Deck",
+      "location": [
+        0.75,
+        -0.75,
+        0.9750000000000001
+      ],
+      "dimensions": [
+        0.7071067811865476,
+        0.94,
+        0.08999999999999997
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -45.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "OuterParapet",
+      "location": [
+        1.04698484809835,
+        -0.4530151519016501,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.7071067811865476,
+        0.1,
+        0.17999999999999994
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -45.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "WallWeb",
+      "location": [
+        0.75,
+        -0.75,
+        0.8425
+      ],
+      "dimensions": [
+        0.7071067811865476,
+        0.2,
+        0.17500000000000004
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -45.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "VertexKeystone",
+      "location": [
+        1.0,
+        -1.0,
+        0.8425
+      ],
+      "dimensions": [
+        0.14142135623730964,
+        0.2,
+        0.17500000000000004
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -45.0
+      ]
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 1000,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0.5,
+      -0.5,
+      0.85
+    ],
+    "orthoScale": 2.5,
+    "worldRole": "sky"
+  }
+}

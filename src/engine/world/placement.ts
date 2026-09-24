@@ -20,10 +20,12 @@ const overlaps = (a: Rect, b: Rect): boolean => a.x < b.x + b.w && a.x + a.w > b
  * dos condiciones. Aquí, una vez.
  */
 function buildable(tile: number | undefined, kind: BuildingKind): boolean {
-  // La marisma de ribera deja pasar cuerpos: defensas de una celda pueden
-  // hincarse ahí. Casas y campos conservan su exigencia de suelo seco.
+  // El cerco puede cruzar el cauce con estacas o piedra; el vado sigue libre
+  // para que la ruta de entrada al valle conserve su paso.
   const bankDefence = kind === 'palisade' || kind === 'wall' || kind === 'gate' || kind === 'bastion';
-  return tile !== undefined && tile !== TERRAIN_CODE.water && (tile !== TERRAIN_CODE.marsh || bankDefence)
+  const riverWall = kind === 'palisade' || kind === 'wall';
+  return tile !== undefined && (tile !== TERRAIN_CODE.water || riverWall)
+    && (tile !== TERRAIN_CODE.marsh || bankDefence)
     && tile !== TERRAIN_CODE.mountain && tile !== TERRAIN_CODE.lake
     // El vado se anda, no se edifica: una casa sobre el paso cierra el paso.
     && tile !== TERRAIN_CODE.ford;
@@ -47,6 +49,8 @@ export function canPlace(state: GameState, kind: BuildingKind, x: number, y: num
   if (upgradeOf === null && inPlaza(state, x, y, w, h)) return false;
   if (kind !== 'gate' && kind !== 'wall' && kind !== 'palisade' && kind !== 'bastion'
     && inGateway(state, x, y, w, h)) return false;
+  if (upgradeOf === null && state.ring !== null && WALLED.has(kind)
+    && inRingCorridor(rect, plazaCentre(state.plaza), state.ring)) return false;
   if (upgradeOf !== null && WALLED.has(kind)) {
     const source = state.buildings.find(b => b.id === upgradeOf);
     const grows = source !== undefined && (w > source.w || h > source.h);
@@ -166,6 +170,96 @@ function onRingRect(rect: Rect, centre: Point, radius: number): boolean {
   return false;
 }
 
+/** Una celda libre de grosor junto a la cara interior de la muralla. */
+function ringInteriorCells(centre: Point, radius: number): Set<number> {
+  const key = `${centre.x}|${centre.y}|${radius}`;
+  const had = RING_INTERIOR_CACHE.get(key);
+  if (had !== undefined) return had;
+  const wall = ringCells(centre, radius);
+  const inside = new Set<number>();
+  for (const cell of wall) {
+    const x = cell % RING_STRIDE, y = Math.floor(cell / RING_STRIDE);
+    for (let dy = -1; dy <= 1; dy += 1) for (let dx = -1; dx <= 1; dx += 1) {
+      if (dx === 0 && dy === 0) continue;
+      const col = x + dx, row = y + dy;
+      if (col < 0 || row < 0 || col >= RING_STRIDE || wall.has(row * RING_STRIDE + col)) continue;
+      if (Math.hypot(col + 0.5 - centre.x, row + 0.5 - centre.y) >= radius) continue;
+      inside.add(row * RING_STRIDE + col);
+    }
+  }
+  if (RING_INTERIOR_CACHE.size >= RING_CACHE_MAX) RING_INTERIOR_CACHE.clear();
+  RING_INTERIOR_CACHE.set(key, inside);
+  return inside;
+}
+
+const RING_INTERIOR_CACHE = new Map<string, Set<number>>();
+
+function inRingCorridor(rect: Rect, centre: Point, radius: number): boolean {
+  const inside = ringInteriorCells(centre, radius);
+  for (let y = rect.y; y < rect.y + rect.h; y += 1) {
+    for (let x = rect.x; x < rect.x + rect.w; x += 1) {
+      if (inside.has(y * RING_STRIDE + x)) return true;
+    }
+  }
+  return false;
+}
+
+export interface RingCorridorMove {
+  readonly buildingId: number;
+  readonly from: Point;
+  readonly to: Point;
+}
+
+export function ringCorridorConflicts(state: GameState): Building[] {
+  const radius = state.ring;
+  if (radius === null) return [];
+  const centre = plazaCentre(state.plaza);
+  return state.buildings.filter(b => b.lostTick === null && WALLED.has(b.kind)
+    && inRingCorridor(b, centre, radius)).sort((a, b) => a.id - b.id);
+}
+
+/**
+ * Prepara, sin tocar la partida, el traslado mínimo de edificios anteriores
+ * al anillo. La decisión que pague la reforma aplicará el plan completo o
+ * ninguno; cargar una partida no mueve casas por sorpresa.
+ */
+export function planRingCorridorMoves(state: GameState): RingCorridorMove[] | null {
+  if (state.ring === null) return [];
+  const centre = plazaCentre(state.plaza);
+  const radius = state.ring;
+  const conflicts = ringCorridorConflicts(state);
+  if (conflicts.length === 0) return [];
+  // Una mejora activa tiene ancla propia: no se cambia de parcela a medias.
+  if (conflicts.some(b => state.works.some(work => work.upgradeOf === b.id))) return null;
+  const moving = new Set(conflicts.map(b => b.id));
+  const staged: GameState = { ...state, buildings: state.buildings.filter(b => !moving.has(b.id)) };
+  const moves: RingCorridorMove[] = [];
+  for (const building of conflicts) {
+    const ground = occupiedCells(staged);
+    const origin = center(building);
+    const wasInside = Math.hypot(origin.x - centre.x, origin.y - centre.y) < radius;
+    let best: Point | null = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (let y = 0; y <= state.map.height - building.h; y += 1) {
+      for (let x = 0; x <= state.map.width - building.w; x += 1) {
+        const distanceSquared = (x - building.x) ** 2 + (y - building.y) ** 2;
+        const candidateInside = Math.hypot(x + building.w / 2 - centre.x,
+          y + building.h / 2 - centre.y) < radius;
+        const score = distanceSquared + (wasInside && !candidateInside ? 10000 : 0);
+        if (score >= bestDistance) continue;
+        if (onRingRect({ x, y, w: building.w, h: building.h }, centre, radius)) continue;
+        if (!fitsEmptyGround(staged, building.kind, x, y, ground)) continue;
+        best = { x, y };
+        bestDistance = score;
+      }
+    }
+    if (best === null) return null;
+    staged.buildings.push({ ...building, x: best.x, y: best.y });
+    moves.push({ buildingId: building.id, from: { x: building.x, y: building.y }, to: best });
+  }
+  return moves;
+}
+
 /**
  * El radio del anillo que toca levantar, o nada si ya no hay muralla que hacer.
  *
@@ -202,7 +296,8 @@ function ringToBuild(state: GameState, centre: Point, coreRadius: number,
     const viable = [...ringCells(centre, radius)].every(cell => {
       const x = cell % RING_STRIDE, y = Math.floor(cell / RING_STRIDE);
       if (x >= state.map.width || y >= state.map.height) return false;
-      if (!walkableTerrain(state.map.terrain[y * state.map.width + x])) return true;
+      const tile = state.map.terrain[y * state.map.width + x];
+      if (!walkableTerrain(tile) && tile !== TERRAIN_CODE.water) return true;
       return fitsEmptyGround(state, 'palisade', x, y, ground);
     });
     if (viable && ringHasRoom(state, centre, radius, ground)) return radius;
@@ -515,6 +610,8 @@ function fitsEmptyGround(
   // que la aldea reserva no se le da a nadie. La muralla es la excepción —su
   // línea pasa por la puerta— y por eso se pregunta por la clase.
   if (kind !== 'gate' && kind !== 'palisade' && kind !== 'wall' && inGateway(state, x, y, w, h)) return false;
+  if (state.ring !== null && WALLED.has(kind)
+    && inRingCorridor({ x, y, w, h }, plazaCentre(state.plaza), state.ring)) return false;
   for (let row = y; row < y + h; row += 1) {
     for (let col = x; col < x + w; col += 1) {
       const cell = row * state.map.width + col;

@@ -112,13 +112,24 @@ silencio y la prueba pasa sin probar nada.
 | `animals-preview.ts` · `animals-preview.mjs` | El banco de fauna (G-23): GLB publicado y controlador del juego con recorrido conocido |
 | `skin-compare.py` | Pone el recorte del prototipo al lado de la captura real. **Es el criterio de hecho de cada ronda de piel** |
 | `animation-audit.ts` | Audita los clips **en el navegador**, sobre el GLB exportado, no en Blender (D.4, D.6) |
-| `bench.ts` · `bench.html` · `bench-scenes.ts` · `benchmark.ts` | El banco de rendimiento de G-09 (D.9): la página, la lista de escenas y el corredor |
+| `bench.ts` · `bench.html` · `bench-scenes.ts` · `benchmark.ts` | El banco de rendimiento de G-09 (D.9) y P-1a. `npx tsx tools/graphics/benchmark.ts --suite p1 --repeats 3 --seconds 10 --width 390 --height 844` mide tres muestras de día/noche del preset real 11/año visible 21, con fase inyectada sólo en `GraphicsFrame` y vida activa a ×1; informa el cielo real derivado, sin falsearlo. Conserva cada JSON bajo `artifacts/graphics/P-1a/`. Sus dos cargas son de instancia dentro de la misma sesión, no caché fría/caliente de navegador. No mide INP/UI; la comparación lluvia controlada requiere una fase posterior sobre la app real. |
+| `bench-app.ts` | P-1a sobre **la aplicación real**: abre el menú, Desarrollo y el preset village (semilla 11/año visible 21), y conserva carga, cadencia RAF, Long Tasks, Event Timing disponible y una latencia sintética wheel→RAF —nunca llamada INP— bajo `artifacts/graphics/P-1a-app/<marca>/run.json`, sin pisar corridas. Edge si está instalado; Chromium queda marcado como respaldo. `--condition all` compara día despejado, noche despejada y noche lluviosa mediante controles de presentación sólo locales; `--condition natural` conserva la ruta anterior. Corrida fría P-1a.1: `npx tsx tools/graphics/bench-app.ts --condition all --repeats 3 --cache cold --seconds 10 --settle-seconds 5`. P-1a.2: `--profile-load true` conserva un perfil CPU desde antes del clic del preset hasta 3D utilizable; después registra seis clics de vista despejada por `interactionId`. `--headed true` abre Edge visible. `--cpu-profile true` perfila la cadencia con sobrecoste y no debe combinarse con su comparación sin perfil. Caché caliente y fría se ejecutan por separado. El INP del navegador sigue sin medirse. |
 | `doctor.ts` | Diagnóstico del entorno gráfico antes de culpar al código |
 | `viewer.ts` · `viewer.html` | El visor suelto de un GLB |
 | `publish-assets.ts` | Admite un lote explícito aprobado con `--ids bow,spear`; verifica hash, bytes y procedencia antes de copiar, conserva todos los recursos ya publicados y rechaza sobrescribir bytes distintos |
 | `g20-check.mjs` | Comprueba la hoja de evidencia de G-20: cero imágenes rotas, cero errores de página |
 | `sound-check.mjs` | Comprueba que el juego montado suena, sin poder oírlo, por `window.__valleySound` |
 | `thunder-check.mjs` | Lo mismo para el trueno de U-13, entrando por su ruta de depuración |
+
+P-1b.2: `bench-app.ts --stages true` activa sólo en Vite local las marcas
+`valley3d:` de importación, creación y primer fotograma. Las guarda como
+`stageMarks` en cada réplica del `run.json`. Son tiempos del hilo del navegador,
+no tiempo GPU. Ejecutar caché fría y caliente por separado, con autorización
+explícita para abrir la app y medir el equipo. `--capture true` guarda una
+captura de la primera réplica de cada condición después del asentamiento.
+La comparación de partición del primer fotograma está cerrada en el
+[informe P-1b.2](../docs/historico/graphics-rounds/P-1b2-primer-fotograma.md);
+la partición se retiró.
 
 `npm run shot`, `npm run bundle`, `npm run serve:shots`, `npx tsx tools/graphics/publish-assets.ts --ids bow,spear`.
 
@@ -159,6 +170,12 @@ El estándar visual está en la skill `piel-del-valle`; el calco de dibujos, en
 | `rig.py` | El esqueleto, **separado** de la geometría porque D.4 lo exige |
 | `animate.py` | Los clips, separados del rig por el mismo motivo |
 | `lots/` | Cada fichero **escribe** las recetas de un lote en `art/recipes/`. Tiene su propio [README](art/lots/README.md) |
+| `art/recipes/e3b-bastion-anchor-66-candidate/{generate,probe,state,gate-clearance,combined-source,combined-probe}.ts` | Fuentes y sondas CPU del bastión de acceso con retorno diagonal SO (máscara 66). `combined-source.ts --write-combined` genera la unión exclusiva bastión-portón; `combined-probe.ts` comprueba suelo, pretiles, vano, hoja y apoyo geométrico, y escribe medidas en la misma carpeta. La fuente combinada aún no está publicada. |
+| `art/recipes/e3b-bastion-anchor-66-candidate/export-combined-static.py` | Exportador Blender de la fábrica estática combinada a `artifacts/graphics/E3b2-candidates/anchor66-gate24-static-review-01/`. Exige autorización de invocación exacta y `--authorize-export`; no incluye la hoja articulada, no toca `public/` ni el catálogo. |
+| `art/recipes/e3b-bastion-anchor-66-candidate/{check-door-only,check-combined-scene}.ts` | Sondas CPU del GLB ancho real: separan hoja y bisagra sin moverlas y montan la fuente combinada en las coordenadas de seed91 para barrer la ruta sobre el suelo. No exportan ni publican assets y no abren GPU. |
+| `art/recipes/e3b-bastion-anchor-66-candidate/check-source-coverage.ts` | Inventaría las fuentes de los 104 y 88 segmentos de las villas 23/91. Comprueba archivo, máscara mixta, dirección de bocas, cota declarada 1,02 y paso declarado ≥0,70, con cuartos de vuelta en recta/codo/diagonal. Sólo lee; no prueba GLB ni costura en escena. |
+| `art/recipes/e3b-bastion-crossing-24-candidate/check-scene.ts` | Comprueba la huella XY de la candidata bastión296 en la escena reproducible de semilla91 frente a edificios, obras y troncos, excluyendo los dos muros de interfaz. No prueba altura, colisiones ni render. |
+| `art/recipes/e3b-bastion-crossing-24-candidate/export-static.py` | Exportador Blender preparado para revisar sólo la fuente W+NE en `artifacts/graphics/E3b2-candidates/bastion-crossing-24-review-01/`. Exige autorización de la invocación exacta y `--authorize-export`; no toca catálogo ni demo. |
 
 **Una receta no es documentación: es una entrada de compilación con su hash
 anotado.** `index.ts` guarda el sha256 de `art/recipes/<id>/<id>.json` en

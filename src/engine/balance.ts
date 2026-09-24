@@ -97,6 +97,13 @@ export const TIME = {
   SAVE_EVERY_TICKS: 1,
 } as const;
 
+// TUNE: calendario visual de los escombros de vivienda (§12.1). La parcela y
+// su historia siguen en el motor; sólo cambia lo que se ve en la escena.
+export const HOUSE_RUBBLE = {
+  FRESH_WEEKS: 48,
+  CLEAR_WEEKS: 144,
+} as const;
+
 // ---------------------------------------------------------------------------
 // §12.2 · The founding
 // ---------------------------------------------------------------------------
@@ -1407,6 +1414,14 @@ export const FORAGE = {
   // temporada nueva cada quince días. Con una, el aviso volvía a salir en
   // cuanto el reparto de manos caía a cero una semana.
   SPELL_GRACE: 2,
+} as const;
+
+/** Cacerías observables: encuentros escasos sobre la subsistencia semanal. */
+export const HUNT = {
+  // TUNE: probabilidad semanal sobre cien cuando la especie ya está abierta.
+  chance: { partridge: 70, rabbit: 48, deer: 18, boar: 12, bear: 0 },
+  // TUNE: comida adicional sólo si el proyectil o la lanza alcanza a la presa.
+  meat: { partridge: 1, rabbit: 2, deer: 8, boar: 12, bear: 18 },
 } as const;
 
 /**

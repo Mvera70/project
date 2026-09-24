@@ -13,12 +13,13 @@
 // caso en que no haya biblioteca de recursos.
 
 import {
-  CylinderGeometry, Group, Mesh, MeshStandardMaterial, Quaternion, Vector3,
+  CylinderGeometry, Group, Mesh, MeshStandardMaterial, Quaternion, SphereGeometry, Vector3,
   type Material, type Object3D,
 } from 'three';
 
 /** Dónde está una flecha y hacia dónde va, en celdas. */
 export interface ArrowSighting {
+  readonly weapon?: 'bow' | 'sling';
   readonly id: number;
   readonly x: number;
   readonly y: number;
@@ -64,6 +65,7 @@ export class Arrows {
   readonly group = new Group();
   private readonly shown = new Map<number, Object3D>();
   private readonly geometry = new CylinderGeometry(THICK, THICK, SHAFT, 5);
+  private readonly stoneGeometry = new SphereGeometry(0.08, 6, 4);
   private material: Material | null = null;
   private readonly turn = new Quaternion();
   private readonly heading = new Vector3();
@@ -87,10 +89,10 @@ export class Arrows {
       present.add(sighting.id);
       let shaft = this.shown.get(sighting.id);
       if (shaft === undefined) {
-        shaft = this.instance?.('arrow');
+        shaft = sighting.weapon === 'sling' ? undefined : this.instance?.('arrow');
         if (shaft === undefined) {
           this.material ??= new MeshStandardMaterial({ color: WOOD, roughness: 0.8 });
-          shaft = new Mesh(this.geometry, this.material);
+          shaft = new Mesh(sighting.weapon === 'sling' ? this.stoneGeometry : this.geometry, this.material);
         }
         shaft.name = `Arrow_${sighting.id}`;
         shaft.castShadow = true;
@@ -99,7 +101,7 @@ export class Arrows {
       }
       shaft.position.set(sighting.x, sighting.y, sighting.z);
       const speed = Math.hypot(sighting.vx, sighting.vy, sighting.vz);
-      if (speed > STILL) {
+      if (speed > STILL && sighting.weapon !== 'sling') {
         this.heading.set(sighting.vx / speed, sighting.vy / speed, sighting.vz / speed);
         // El fallback histórico es un cilindro vertical; el GLB nuevo apunta
         // hacia +Z. Cada uno conserva su eje local para no tumbar sólo la
@@ -123,6 +125,7 @@ export class Arrows {
   dispose(): void {
     this.clear();
     this.geometry.dispose();
+    this.stoneGeometry.dispose();
     this.material?.dispose();
     this.material = null;
   }

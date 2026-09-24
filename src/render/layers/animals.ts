@@ -23,5 +23,9 @@ export function paintAnimals(
 ): void {
   // Painted under the villagers (§10.2): a person walking past a hen hides it,
   // never the other way round.
-  for (const animal of animals) SPRITES[animal.kind](ctx, animal.x, animal.y, cell, palette, 0);
+  for (const animal of animals) {
+    if (animal.kind === 'partridge' || animal.kind === 'rabbit'
+      || animal.kind === 'deer' || animal.kind === 'boar' || animal.kind === 'bear') continue; // Fauna salvaje sólo en 3D.
+    SPRITES[animal.kind](ctx, animal.x, animal.y, cell, palette, 0);
+  }
 }

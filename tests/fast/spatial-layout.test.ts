@@ -42,6 +42,25 @@ describe('el trazado respeta lo que se puede recorrer', () => {
     expect(canPlace(state, 'palisade', 20, 40)).toBe(false);
     expect(canPlace(state, 'gate', 20, 40)).toBe(false);
   });
+  it('completa el anillo sobre el río sin ocupar el vado', () => {
+    const state = enclosed();
+    const gate = placeBuilding(state, 'gate');
+    expect(gate).not.toBeNull();
+    state.buildings.find(b => b.x === gate!.x && b.y === gate!.y)!.kind = 'gate';
+    const crossing = state.buildings.find(b => b.kind === 'palisade' && b.x === 43 && b.y === 55)!;
+    crossing.lostTick = 1;
+    state.map.terrain[55 * state.map.width + 43] = TERRAIN_CODE.water;
+
+    expect(canPlace(state, 'palisade', 43, 55)).toBe(true);
+    expect(canPlace(state, 'wall', 43, 55)).toBe(true);
+    expect(canPlace(state, 'house', 43, 55)).toBe(false);
+    expect(canPlace(state, 'gate', 43, 55)).toBe(false);
+    expect(ringClosed(state)).toBe(false);
+    expect(placeBuilding(state, 'palisade')).toEqual({ x: 43, y: 55 });
+
+    add(state, 'palisade', 43, 55);
+    expect(ringClosed(state)).toBe(true);
+  });
   it('el desgaste sale por una fachada y nunca cruza paredes ni la fuente', () => {
     for (const seed of [7, 11, 23, 41]) {
       const state = foundTwenty(seed);
@@ -126,5 +145,18 @@ describe('el trazado respeta lo que se puede recorrer', () => {
     state.plaza = { x: 35, y: 55 };
     add(state, 'chapel', 38, 54);
     expect(canPlace(state, 'church', 37, 54, 0)).toBe(false);
+  });
+
+  it('reserva una celda interior del anillo para el paso elevado, sin prohibir campos', () => {
+    const state = foundGame(7);
+    state.map.terrain.fill(TERRAIN_CODE.meadow);
+    state.buildings = [];
+    state.works = [];
+    state.plaza = { x: 35, y: 55 };
+    state.ring = 8;
+    expect(canPlace(state, 'house', 41, 54)).toBe(false);
+    expect(canPlace(state, 'field', 41, 54)).toBe(true);
+    expect(canPlace(state, 'house', 34, 50)).toBe(true);
+    expect(placeBuilding(state, 'house')).not.toBeNull();
   });
 });

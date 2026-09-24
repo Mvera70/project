@@ -12,6 +12,7 @@
 
 import { WORLD } from '@engine/balance';
 import type { GameState } from '@engine/state';
+import type { HuntSpecies, HuntWeapon } from '@engine/world/hunting';
 import type { ActorDoing, BattleReport, GraphicsStats } from '../render3d/contracts';
 import type { InspectTarget } from './inspect';
 import { inspectAt } from './inspect';
@@ -55,6 +56,11 @@ interface ValleyBackend {
    * defiende peor, y eso es verdad.
    */
   battle(): BattleReport | null;
+  /** Start one physical hunt using the player's chosen weapon. */
+  startHunt(state: Readonly<GameState>, species: HuntSpecies, weapon: HuntWeapon): boolean;
+  attackHunt(): boolean;
+  /** Completed hunt report, consumed once by the UI and forwarded to the engine. */
+  hunt(): { sourceTick: number; species: HuntSpecies; weapon: HuntWeapon; hits: number; killed: boolean } | null;
   /**
    * F2 · Cómo va el asalto **mientras pasa**, o `null` si no hay ninguno.
    *
@@ -162,6 +168,9 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     doing() { return null; },
     // El 2D no tiene batalla: el motor resuelve el asalto con su cuenta (B3).
     battle() { return null; },
+    startHunt() { return false; },
+    attackHunt() { return false; },
+    hunt() { return null; },
     siege() { return null; },
     ending() { return null; },
     zoom() { /* Canvas has no camera; app.ts scales the element instead. */ },
@@ -243,12 +252,17 @@ export function attachBackend(
 
   void (async (): Promise<void> => {
     try {
+      // P-1b.2 · sólo el banco local pide estas marcas de montaje.
+      const traceStages = import.meta.env.DEV && new URLSearchParams(window.location.search).get('bench-stages') === '1';
+      const markStage = (name: string): void => { if (traceStages) performance.mark(`valley3d:${name}`); };
+      markStage('backend:imports-start');
       // Imported here and not at the top: nobody who plays in 2D should pay for
       // downloading Three.js, and most people play in 2D.
       const [{ createGraphicsRenderer }, { createPresentationClock }] = await Promise.all([
         import('../render3d/renderer'),
         import('../render3d/presentation-clock'),
       ]);
+      markStage('backend:imports-end');
       if (closed) return;
       const clock = createPresentationClock();
 
@@ -307,21 +321,33 @@ export function attachBackend(
         });
       }
 
+      markStage('backend:renderer-start');
       const renderer = await createGraphicsRenderer({
         ...(library === undefined ? {} : { library }),
         canvas: webgl,
         assetBaseUrl: options.assetBaseUrl ?? './assets/valley3d/',
         quality: 'standard',
-        // E0e · ruta de diagnóstico para `shot.mjs`, no una opción de UI. El
-        // renderer la usa sólo para elegir acabados; el estado sigue intacto.
+        // E0e/P-1a · rutas de diagnóstico locales, nunca controles de UI. Sólo
+        // afectan a la presentación; el estado y el guardado siguen intactos.
         ...(() => {
           const local = window.location.protocol === 'file:'
             || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
           if (!local) return {};
-          const era = new URLSearchParams(window.location.search).get('preview-era');
-          return era === 'hamlet' || era === 'village' || era === 'town' ? { previewEra: era } : {};
+          const params = new URLSearchParams(window.location.search);
+          const era = params.get('preview-era');
+          const previewEra = era === 'hamlet' || era === 'village' || era === 'town' ? { previewEra: era } as const : {};
+          if (!import.meta.env.DEV) return previewEra;
+          const sky = params.get('preview-sky');
+          const phaseText = params.get('preview-phase');
+          const phase = phaseText === null ? NaN : Number(phaseText);
+          return {
+            ...previewEra,
+            ...(sky === 'clear' || sky === 'rain' ? { previewSky: sky } as const : {}),
+            ...(Number.isFinite(phase) && phase >= 0 && phase < 1 ? { previewPhase: phase } : {}),
+          };
         })(),
       });
+      markStage('backend:renderer-end');
       if (closed) {
         // The view was closed while this was loading. D.5 asks that such a load
         // be destroyed rather than attached to nothing.
@@ -358,6 +384,9 @@ export function attachBackend(
         look(x, z) { renderer.look(x, z); },
         doing(id) { return renderer.doing(id); },
         battle() { return renderer.battle(); },
+        startHunt(state, species, weapon) { return renderer.startHunt(state, species, weapon); },
+        attackHunt() { return renderer.attackHunt(); },
+        hunt() { return renderer.hunt(); },
         siege() { return renderer.siege(); },
         ending() { return renderer.ending(); },
         paint(state, tickFraction, speed) {
@@ -387,6 +416,7 @@ export function attachBackend(
         },
       };
       options.onSwap?.(handle);
+      markStage('backend:swap-end');
     } catch (error: unknown) {
       failure = error instanceof Error ? error.message : String(error);
       // El 3D no llegó: el 2D vuelve a la vista, que es para lo que está.

@@ -1,4 +1,4 @@
-// V-14 · El cuenco. Anexo E.
+// V-14 · El valle abierto. Anexo E.
 //
 // Lo que estas pruebas guardan es la decisión, no el dibujo: **la sierra vive
 // fuera del mapa jugable**. Si algún día alguien la mete dentro «para que se
@@ -10,8 +10,14 @@ import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
+import { PALETTES } from '@derive/palette';
+import { BoxGeometry, Mesh, MeshStandardMaterial } from 'three';
 import { elevationAt } from '../../src/render3d/world/ground';
-import { buildRidge, ridgeAt } from '../../src/render3d/world/ridge';
+import { GROUND_BIAS } from '../../src/render3d/visual-config';
+import { buildRidge, exteriorWaterAt, ridgeAt } from '../../src/render3d/world/ridge';
+import { valleyAxis } from '../../src/render3d/world/valley-profile';
+import { buildBackdrop } from '../../src/render3d/world/backdrop';
+import { riverSection } from '../../src/render3d/world/river-extension';
 
 const grown = new Map<number, GameState>();
 function village(seed: number): GameState {
@@ -24,7 +30,7 @@ function village(seed: number): GameState {
   return base;
 }
 
-describe('V-14 · el cuenco', () => {
+describe('V-14 · el valle', () => {
   it('no pisa ni una celda del valle', () => {
     // La propiedad que lo hace gratis. Medido antes de escribirlo: en las dos
     // celdas del borde del mapa viven el 32 % del bosque, trece edificios de
@@ -41,32 +47,24 @@ describe('V-14 · el cuenco', () => {
       const state = village(seed);
       for (let z = 0; z <= state.map.height; z += 1) {
         for (let x = 0; x <= state.map.width; x += 1) {
-          const inside = Math.min(x, state.map.width - 0.001);
-          const alongZ = Math.min(z, state.map.height - 0.001);
           expect(ridgeAt(state.map, state.terrainSeed, x, z),
             `semilla ${seed}: la sierra sube dentro del valle en ${x},${z}`)
-            .toBe(elevationAt(state.map, inside, alongZ));
+            .toBe(elevationAt(state.map, x, z));
         }
       }
     }
   });
 
-  it('cierra el valle por los cuatro lados', () => {
+  it('mantiene bajos los extremos del eje y levanta los flancos', () => {
     const state = village(7);
     const { width, height } = state.map;
     const high = (x: number, z: number): number => ridgeAt(state.map, state.terrainSeed, x, z);
-    // A media falda ya hay monte, y en la cresta hay sierra de verdad.
-    for (const [x, z] of [
-      [-14, height / 2], [width + 14, height / 2],
-      [width / 2, -14], [width / 2, height + 14],
-    ] as const) {
-      expect(high(x, z), `no cierra por ${x},${z}`).toBeGreaterThan(2);
+    for (const z of [-26, height + 26]) {
+      const x = valleyAxis(state.map, z);
+      expect(high(x, z), `el extremo del eje queda alto en ${x},${z}`).toBeLessThan(4);
     }
-    for (const [x, z] of [
-      [-26, height / 2], [width + 26, height / 2],
-      [width / 2, -26], [width / 2, height + 26],
-    ] as const) {
-      expect(high(x, z), `la cresta se queda baja en ${x},${z}`).toBeGreaterThan(6);
+    for (const x of [-26, width + 26]) {
+      expect(high(x, height / 2), `falta un flanco elevado en ${x}`).toBeGreaterThan(4);
     }
   });
 
@@ -81,11 +79,9 @@ describe('V-14 · el cuenco', () => {
     const state = village(7);
     let worst = 0;
     for (let z = 0; z < state.map.height; z += 4) {
-      for (let out = 0; out < 5; out += 1) {
-        const a = ridgeAt(state.map, state.terrainSeed, -out, z);
-        const b = ridgeAt(state.map, state.terrainSeed, -(out + 1), z);
-        worst = Math.max(worst, Math.abs(b - a));
-      }
+      const a = ridgeAt(state.map, state.terrainSeed, 0, z);
+      const b = ridgeAt(state.map, state.terrainSeed, -1, z);
+      worst = Math.max(worst, Math.abs(b - a));
     }
     // Menos de media celda de subida por celda andada en las cinco primeras: el
     // pie se confunde con el prado.
@@ -119,6 +115,8 @@ describe('V-14 · el cuenco', () => {
     const index = ridge.geometry.getIndex();
     expect(position.count, 'tiene vértices').toBeGreaterThan(100);
     expect(index, 'y caras').not.toBeNull();
+    const triangles = index!.count / 3;
+    expect(triangles, `la malla exterior tiene ${triangles} triángulos`).toBeLessThan(16_000);
     expect(ridge.geometry.getAttribute('color'), 'el color va por vértice').toBeDefined();
     // Y ningún vértice de dentro del valle se despega del suelo: el suelo de
     // siempre es quien pinta el interior, y dos superficies a distinta altura en
@@ -131,7 +129,7 @@ describe('V-14 · el cuenco', () => {
       const z = position.getZ(i);
       if (x > 0 && z > 0 && x < state.map.width && z < state.map.height) {
         expect(position.getY(i), 'un vértice despegado del suelo dentro del valle')
-          .toBeCloseTo(elevationAt(state.map, x, z), 5);
+          .toBeCloseTo(GROUND_BIAS + elevationAt(state.map, x, z), 5);
         inside += 1;
       }
     }
@@ -153,6 +151,49 @@ describe('V-14 · el cuenco', () => {
         if (edge && terrain[c] === TERRAIN_CODE.water) edgeWater += 1;
       }
       expect(edgeWater, `semilla ${seed}: el río no toca el borde`).toBeGreaterThan(0);
+      let extended = 0;
+      for (let cell = 0; cell < terrain.length; cell += 1) {
+        if (terrain[cell] !== TERRAIN_CODE.water) continue;
+        const x = cell % width, z = Math.floor(cell / width);
+        if (x === 0 && exteriorWaterAt(state.map, state.terrainSeed, -0.5, z + 0.5)) extended += 1;
+        if (x === width - 1 && exteriorWaterAt(state.map, state.terrainSeed, width + 0.5, z + 0.5)) extended += 1;
+        if (z === 0 && exteriorWaterAt(state.map, state.terrainSeed, x + 0.5, -0.5)) extended += 1;
+        if (z === height - 1 && exteriorWaterAt(state.map, state.terrainSeed, x + 0.5, height + 0.5)) extended += 1;
+      }
+      expect(extended, `semilla ${seed}: el agua exterior no empalma`).toBeGreaterThan(0);
     }
+  });
+
+  it('la prolongación del río nace en ambas salidas sin saltos y es estable', () => {
+    for (const seed of [7, 11, 23]) {
+      const state = village(seed);
+      for (const [edgeZ, nextZ] of [[0, -0.01], [state.map.height, state.map.height + 0.01]] as const) {
+        const edge = riverSection(state.map, state.terrainSeed, edgeZ);
+        const next = riverSection(state.map, state.terrainSeed, nextZ);
+        expect(edge).not.toBeNull();
+        expect(next).not.toBeNull();
+        expect(Math.abs(next!.left - edge!.left)).toBeLessThan(0.01);
+        expect(Math.abs(next!.right - edge!.right)).toBeLessThan(0.01);
+        expect(riverSection(state.map, state.terrainSeed, nextZ)).toEqual(next);
+      }
+    }
+  });
+
+  it('bosque y terreno exterior siguen la paleta sin tocar el mapa', () => {
+    const state = village(7);
+    const before = Array.from(state.map.terrain);
+    const leaf = new Mesh(new BoxGeometry(1, 2, 1), new MeshStandardMaterial());
+    leaf.material.name = 'leaf-light';
+    const backdrop = buildBackdrop(state.map, state.terrainSeed, PALETTES.spring, leaf);
+    expect(backdrop.treeCount).toBeGreaterThan(0);
+    expect(backdrop.treeCount).toBeLessThanOrEqual(256);
+    const spring = Array.from(backdrop.ridge.geometry.getAttribute('color').array);
+    backdrop.season(PALETTES.autumn);
+    const autumn = Array.from(backdrop.ridge.geometry.getAttribute('color').array);
+    expect(autumn).not.toEqual(spring);
+    expect(Array.from(state.map.terrain)).toEqual(before);
+    backdrop.dispose();
+    leaf.geometry.dispose();
+    leaf.material.dispose();
   });
 });

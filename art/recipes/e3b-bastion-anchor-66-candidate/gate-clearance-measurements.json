@@ -1,0 +1,50 @@
+{
+  "gateGlbSha256": "356aae92a16c4a364ace663367c3306ba981b8997cb3e8d46cee0d1f9de04d2b",
+  "localGateCell": [
+    -1,
+    1
+  ],
+  "axis": "z",
+  "opening": 0.8400000658631337,
+  "doorSweepPositions": 91,
+  "doorCollisions": 0,
+  "maxDoorY": 0.5933333613475167,
+  "groundVoid": {
+    "width": 0.84,
+    "ceiling": 0.599,
+    "samples": 2193,
+    "invasions": 0
+  },
+  "oldCopingBounds": {
+    "min": [
+      -1.00333333025376,
+      0.7166666974624001,
+      1.3283333180844785
+    ],
+    "max": [
+      0.003333360056082313,
+      0.763333365718524,
+      1.671666652113199
+    ]
+  },
+  "oldLintelBounds": {
+    "min": [
+      -1,
+      0.6000000218550365,
+      1.343333314160506
+    ],
+    "max": [
+      2.9802322387695312e-8,
+      0.720000030199687,
+      1.6566666560371717
+    ]
+  },
+  "deckUnderside": 0.94,
+  "status": "BLOCKED_JOIN_AND_SUPPORT",
+  "limitations": [
+    "Old wide GLB only proves doorway and transform. Light-finish gate is source-only; its lintel is not validated here.",
+    "Upper deck overlaps connector24 light; coplanar overlap must be removed by explicit union.",
+    "Parapet compatibility and loaded support at gate joint remain unproved.",
+    "No closed canonical package, GLB export, GPU or runtime approval."
+  ]
+}

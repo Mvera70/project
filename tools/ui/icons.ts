@@ -17,18 +17,18 @@ import { chromium, type Browser } from '@playwright/test';
 const SYSTEM_CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const SOURCE = resolve('tools/ui/icon-source.png');
 
-function markup(size: number, source: string): string {
+function markup(size: number, source: string, maskable: boolean): string {
   return `<!doctype html>
     <style>
-      html, body { margin: 0; width: ${size}px; height: ${size}px; overflow: hidden; }
-      img { display: block; width: ${size}px; height: ${size}px; object-fit: cover; }
+      html, body { margin: 0; width: ${size}px; height: ${size}px; overflow: hidden; background: #103b2b; }
+      img { display: block; width: ${maskable ? '80%' : '100%'}; height: ${maskable ? '80%' : '100%'}; object-fit: cover; ${maskable ? 'margin: 10%;' : ''} }
     </style>
     <img src="${source}" alt="">`;
 }
 
-async function shoot(browser: Browser, size: number, path: string, source: string): Promise<void> {
+async function shoot(browser: Browser, size: number, path: string, source: string, maskable = false): Promise<void> {
   const page = await browser.newPage({ viewport: { width: size, height: size }, deviceScaleFactor: 1 });
-  await page.setContent(markup(size, source), { waitUntil: 'load' });
+  await page.setContent(markup(size, source, maskable), { waitUntil: 'load' });
   await page.screenshot({ path, omitBackground: false });
   await page.close();
 }
@@ -45,9 +45,8 @@ async function main(): Promise<void> {
   try {
     await shoot(browser, 192, resolve(output, 'icon-192.png'), source);
     await shoot(browser, 512, resolve(output, 'icon-512.png'), source);
-    // El emblema y el título ya viven en el 72 % central de la fuente; el
-    // fondo naranja sangra hasta el borde y tolera las máscaras del launcher.
-    await shoot(browser, 512, resolve(output, 'icon-maskable-512.png'), source);
+    // La máscara puede recortar las esquinas: el motivo ocupa el 80 % central.
+    await shoot(browser, 512, resolve(output, 'icon-maskable-512.png'), source, true);
     process.stdout.write(`Wrote three icons to ${output}\n`);
   } finally {
     await browser.close();

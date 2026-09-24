@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
-  advanceElevated, elevatedPostOf, elevatedPostRoute,
+  advanceElevated, elevatedPostOf, elevatedPostRoute, elevatedRingCircuit,
   ELEVATED_POST_HEIGHT, ELEVATED_POST_RADIUS, ELEVATED_POST_STEPS,
 } from '../../src/render3d/life/elevated-post';
 import type { BastionAccess } from '../../src/derive/bastion-access';
 import type { Terrain } from '../../src/render3d/life/body';
+import { elevatedRingOf, type ElevatedRingVariant } from '../../src/derive/elevated-ring';
+import { TERRAIN_CODE, type Building } from '@engine/state';
+import { foundTwenty } from '../helpers/founding';
 
 const origin = { x: 10, z: 10 };
 const land = (): Terrain => ({ width: 32, height: 32, blocked: new Uint8Array(32 * 32) });
@@ -41,6 +44,20 @@ describe('E3a · ruta privada del puesto elevado', () => {
     );
   });
 
+  it('reproduce la escalera desplazada del ancla66 sin mover el puesto del anillo', () => {
+    const access = { x: 0, z: 1 } as const;
+    const old = elevatedPostRoute(origin, access);
+    const shifted = elevatedPostRoute(origin, access, 0, 0.65);
+    expect(shifted.approach).toEqual({ x: 10.5, z: 12.65, y: 0 });
+    expect(shifted.foot).toEqual(shifted.approach);
+    expect(shifted.exit).toEqual({ x: 10.5, z: 11.65, y: 1.02 });
+    expect(shifted.post).toEqual(old.post);
+    expect(shifted.supports.map(point => point.y)).toEqual(old.supports.map(point => point.y));
+    expect(shifted.descent).toEqual([...shifted.climb].reverse());
+    const allowed = elevatedPostOf(land(), allReachable(land()), origin, access, undefined, 0.65);
+    expect(allowed?.approach).toEqual(shifted.approach);
+  });
+
   it('avanza acotado por velocidad y llega sin salto al puesto y de vuelta', () => {
     const route = elevatedPostRoute(origin, { x: 1, z: 0 });
     let at = route.climb[0]!, next = 1;
@@ -75,5 +92,36 @@ describe('E3a · ruta privada del puesto elevado', () => {
     expect(route?.approach.y).toBe(0.03);
     expect(route?.foot.y).toBe(0);
     expect(elevatedPostOf(open, reach, origin, { x: 0, z: 1 }, (_x, z) => z >= 12 && z < 12.2 ? 0.05 : 0)).toBeNull();
+  });
+
+  it('prepara la vuelta completa y el regreso por la escalera solo con anillo cerrado y aprobado', () => {
+    const state = foundTwenty(7);
+    state.map.terrain.fill(TERRAIN_CODE.meadow);
+    state.plaza = { x: 10, y: 10 };
+    state.ring = 4;
+    state.works = [];
+    const cells = [[10, 14], [9, 14], [8, 14], [7, 14], [7, 13], [7, 12],
+      [7, 11], [8, 11], [9, 11], [10, 11], [11, 11], [12, 11], [13, 11],
+      [13, 12], [13, 13], [13, 14], [12, 14], [11, 14]];
+    state.buildings = cells.map(([x, y], index): Building => ({
+      id: index + 1, kind: index === 0 ? 'bastion' : 'wall', x: x!, y: y!,
+      w: 1, h: 1, builtTick: 0, lostTick: null, blockedUntil: null, tier: 1, lit: false,
+    }));
+    const stair = elevatedPostRoute({ x: 10, z: 14 }, { x: 0, z: -1 });
+    const pending = elevatedRingOf(state, state.buildings[0]!);
+    expect(elevatedRingCircuit(stair, pending)).toBeNull();
+    const approved: ElevatedRingVariant[] = ['straight', 'turn', 'diagonal', 'mixed',
+      'gate-cardinal', 'gate-diagonal', 'gate-mixed', 'bastion-crossing', 'bastion-return'];
+    const ring = elevatedRingOf(state, state.buildings[0]!, { approvedVariants: approved });
+    const circuit = elevatedRingCircuit(stair, ring);
+    expect(circuit).not.toBeNull();
+    expect(circuit!.climb.length).toBe(stair.climb.length + ring.route.length - 1);
+    expect(circuit!.climb.at(-1)).toEqual(stair.post);
+    expect(advanceElevated(circuit!.climb[0]!, circuit!.climb, 1, 1000, 1).at).toEqual(stair.post);
+    expect(advanceElevated(circuit!.post, circuit!.descent, 1, 1000, 1).at).toEqual(stair.approach);
+    const shiftedStair = elevatedPostRoute({ x: 10, z: 14 }, { x: 0, z: -1 }, 0, 0.65);
+    const shiftedCircuit = elevatedRingCircuit(shiftedStair, ring);
+    expect(shiftedCircuit?.climb.at(-1)).toEqual(shiftedStair.post);
+    expect(shiftedCircuit?.descent.at(-1)).toEqual(shiftedStair.approach);
   });
 });

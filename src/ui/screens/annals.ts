@@ -26,6 +26,7 @@ import { ledgerFromChronicle } from '@engine/chronicle/ledger';
 import type { ArchivedGame, SaveFile } from '@engine/state';
 import { yearOf } from '@engine/time';
 import { recogniseGesture } from '../gestures';
+import { retireOverlay } from '../motion';
 import type { Point } from '../gestures';
 
 const STYLE_ID = 'valley-annals-style';
@@ -39,37 +40,42 @@ const STYLE = `
    que la capitular baja de 112 a 56 px y la inscripción se lee en una línea.
    Mismo vocabulario, otro tamaño. */
 .annals-scrim { position: fixed; inset: 0; z-index: 14; display: flex;
-  flex-direction: column; justify-content: flex-end;
-  background: rgba(27, 22, 19, .32);
+  flex-direction: column; align-items: center; justify-content: flex-end;
+  background: rgba(27, 22, 19, .18);
   color: var(--skin-ink); font-family: var(--skin-font-read); }
-.annals-fade { flex: 0 0 48px; }
+.annals-fade { flex: 0 0 48px; width: min(100%, 760px); margin-inline: auto; }
 /* **Un mínimo, no un tope** (§4 de la piel). Sin él, el cronicón vacío subía
    como una tira de cuatro dedos con el menú entero asomando encima, y eso se
    lee como un fallo y no como una página: lo enseñó la captura a 390 y a 750,
    y las dos veces igual. Con el mínimo, una página con un valle y una página
    con veinte son la misma hoja. */
-.annals { position: relative; box-sizing: border-box; width: 100%;
+.annals { position: relative; box-sizing: border-box; width: min(100%, 760px); margin-inline: auto;
   min-height: min(58vh, 560px); max-height: 100%;
-  overflow: auto; padding: 0 20px max(28px, env(safe-area-inset-bottom)); }
+  overflow: auto; padding: 0 20px max(28px, env(safe-area-inset-bottom));
+  background-color: var(--skin-page); background-image: var(--skin-map-pattern);
+  background-repeat: no-repeat;
+  animation: annals-sheet-arrive 280ms cubic-bezier(.2, .75, .25, 1) both; }
 .annals > * { box-sizing: border-box; width: 100%; max-width: 390px; margin-inline: auto; }
 .annals h1 { margin: 18px auto 4px; text-align: center; text-wrap: balance;
-  color: var(--skin-red-ink); font: 600 20px/1.2 var(--skin-font-voice);
-  letter-spacing: var(--skin-track-inscription); text-transform: uppercase; }
+  color: var(--skin-red-ink); font: 600 22px/1.2 var(--skin-font-heading);
+  letter-spacing: .02em; text-transform: uppercase; }
 .annals-count { margin: 0 auto 18px; text-align: center; color: var(--skin-ink-faded);
   font: 13px/1.4 var(--skin-font-read); }
 /* La página vacía: una línea y nada más. No es un hueco que tapar — es lo que
    el dueño del diseño eligió que se viera la primera vez. */
 .annals-empty { margin: 32px auto 40px; text-align: center; text-wrap: pretty;
-  color: var(--skin-ink-faded); font: italic 16px/1.6 var(--skin-font-read); }
+  color: var(--skin-ink-faded); font: 400 16px/1.5 var(--skin-font-voice); }
 
 .annals-stone { display: grid; grid-template-columns: 56px 1fr; gap: 14px;
-  align-items: center; padding: 14px 0; }
-.annals-stone + .annals-stone { border-top: 1px solid var(--skin-rule); }
+  align-items: center; margin-bottom: 8px; padding: 12px;
+  border: 1px solid var(--skin-rule-on-paper); border-radius: 11px;
+  background: var(--skin-parchment);
+  box-shadow: 0 2px 0 rgba(32, 55, 64, .12); }
 .annals-capital { width: 56px; height: 56px; font-size: 34px; }
 .annals-lines { min-width: 0; }
 .annals-inscription { margin: 0; color: var(--skin-ink);
-  font: 600 14px/1.25 var(--skin-font-voice);
-  letter-spacing: var(--skin-track-inscription); text-transform: uppercase;
+  font: 600 14px/1.25 var(--skin-font-heading);
+  letter-spacing: .02em; text-transform: uppercase;
   text-wrap: balance; }
 .annals-anno { margin: 4px 0 0; color: var(--skin-ink-faded);
   font: 12px/1.3 var(--skin-font-voice); letter-spacing: var(--skin-track-inscription);
@@ -79,12 +85,24 @@ const STYLE = `
 .annals-figures { margin: 6px 0 0; color: var(--skin-ink);
   font: 15px/1.4 var(--skin-font-read); font-variant-numeric: tabular-nums; }
 
-.annals-close { position: absolute; top: 4px; right: 6px; z-index: 2;
-  width: var(--ui-tap-min); height: var(--ui-tap-min); display: grid; place-items: center;
-  padding: 0; border: 0; background: transparent; color: var(--skin-ink-faded);
-  font: 400 19px/1 var(--skin-font-voice); cursor: pointer;
+.annals-close { position: absolute; top: 8px; right: 12px; z-index: 2;
+  width: auto; max-width: none; margin: 0;
+  min-width: var(--ui-tap-min); min-height: var(--ui-tap-min); display: grid; place-items: center;
+  padding: 0 14px; border: 1px solid var(--skin-parchment-aged); border-radius: 9px;
+  background: var(--skin-parchment); color: var(--skin-ink-soft);
+  box-shadow: 0 2px 0 rgba(32, 55, 64, .14);
+  font: 700 12px/1 var(--skin-font-voice); letter-spacing: .04em; text-transform: uppercase; cursor: pointer;
   -webkit-tap-highlight-color: transparent; }
-.annals-close:active { color: var(--skin-ink); }
+.annals-close:hover { border-color: var(--skin-gold); color: var(--skin-ink); }
+.annals-close:active { color: var(--skin-ink); transform: translateY(1px); box-shadow: none; }
+.annals-close:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
+@keyframes annals-sheet-arrive {
+  from { opacity: .7; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .annals, .annals-close:active { animation: none; transform: none; }
+}
 `;
 
 function ensureStyle(): void {
@@ -169,22 +187,22 @@ export function openAnnals(save: SaveFile | null, onClose: () => void): void {
 
   const close = (): void => {
     if (open === null) return;
-    scrim.remove();
+    retireOverlay(scrim, page);
     open = null;
     document.documentElement.classList.remove('annals-open');
     onClose();
   };
 
-  const cross = document.createElement('button');
-  cross.type = 'button';
-  cross.className = 'annals-close';
-  cross.setAttribute('aria-label', renderUiText('app.close'));
-  cross.textContent = '×';
-  cross.addEventListener('click', close);
+  const closeButton = document.createElement('button');
+  closeButton.type = 'button';
+  closeButton.className = 'annals-close';
+  closeButton.setAttribute('aria-label', renderUiText('app.close'));
+  closeButton.textContent = renderUiText('app.close');
+  closeButton.addEventListener('click', close);
 
   const heading = document.createElement('h1');
   heading.textContent = renderUiText('annals.title');
-  page.append(cross, heading);
+  page.append(closeButton, heading);
 
   // **Del último al primero**: el archivo se llena por el final, así que lo
   // último que se jugó es lo último de la lista y es lo primero que se quiere

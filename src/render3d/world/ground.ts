@@ -10,13 +10,14 @@
 // rebuild.
 
 import {
-  BufferAttribute, BufferGeometry, Color, DoubleSide, Mesh, MeshStandardMaterial,
+  BufferAttribute, BufferGeometry, Color, DoubleSide, Mesh, MeshStandardMaterial, Vector3,
 } from 'three';
 import { TERRAIN_CODE } from '@engine/state';
 import type { ValleyMap } from '@engine/state';
 import type { Palette } from '@derive/palette';
 import type { Era } from '@derive/era';
 import { GROUND_BIAS } from '../visual-config';
+import { valleyShoulder } from './valley-profile';
 
 /**
  * How much a cell's colour varies from its neighbours of the same kind.
@@ -123,30 +124,16 @@ function wobbleAt(map: ValleyMap, x: number, z: number): { x: number; z: number 
 }
 
 /**
- * Cuanto pesa la propia celda en el color de sus esquinas.
+ * El color de una esquina de celda: media de las cuatro que la comparten.
  *
- * TUNE: cuarenta y seis centesimas contra dieciocho de cada vecina. Con el
- * color plano por celda, dos terrenos vecinos se encuentran en un escalon recto
- * y el valle entero es un tablero de ajedrez. Promediando del todo se pierde el
- * campo de cultivo, que mide tres por dos y se disolveria en el prado. Con la
- * celda pesando algo mas de lo que suman sus vecinas, la linde es un degradado
- * de una celda de ancho y lo que hay a cada lado sigue siendo reconocible.
- */
-const OWN_CELL = 0.46;
-
-/**
- * El color de una esquina de celda: el suyo, mezclado con el de las vecinas.
- *
- * `own` es la celda a la que pertenece este vertice; las otras tres que tocan
- * la esquina entran con el peso que sobra.
+ * Los vertices estan duplicados por celda, por eso el resultado debe depender
+ * solo de la posicion de la esquina. Si la celda propia pesaba mas, dos copias
+ * del mismo punto recibian colores distintos y aparecian juntas cuadradas.
  */
 function cornerColour(
-  map: ValleyMap, own: number, x: number, z: number, palette: Palette, into: Color,
+  map: ValleyMap, x: number, z: number, palette: Palette, into: Color,
   plaza?: Plaza, era?: Era,
 ): void {
-  const rest = (1 - OWN_CELL) / 3;
-  const ownX = own % map.width;
-  const ownZ = Math.floor(own / map.width);
   let r = 0;
   let g = 0;
   let b = 0;
@@ -154,17 +141,25 @@ function cornerColour(
   for (const [dx, dz] of [[-1, -1], [0, -1], [-1, 0], [0, 0]] as const) {
     const cx = x + dx;
     const cz = z + dz;
-    const mine = cx === ownX && cz === ownZ;
-    // Fuera del mapa no hay terreno que mezclar: esa parte de la mezcla la pone
-    // la propia celda, y asi los pesos siguen sumando uno.
-    const inside = cx >= 0 && cz >= 0 && cx < map.width && cz < map.height;
-    sample.set(cellColour(map, inside ? cz * map.width + cx : own, palette, plaza, era));
-    const weight = mine ? OWN_CELL : rest;
-    r += sample.r * weight;
-    g += sample.g * weight;
-    b += sample.b * weight;
+    // La celda del borde se prolonga fuera: una esquina tiene un unico color
+    // aunque la consulten el suelo y la sierra desde lados distintos.
+    const edgeX = Math.max(0, Math.min(map.width - 1, cx));
+    const edgeZ = Math.max(0, Math.min(map.height - 1, cz));
+    sample.set(cellColour(map, edgeZ * map.width + edgeX, palette, plaza, era));
+    r += sample.r * 0.25;
+    g += sample.g * 0.25;
+    b += sample.b * 0.25;
   }
   into.setRGB(r, g, b);
+}
+
+/** El mismo color en cada copia del borde de las dos mallas. */
+export function groundColourAt(
+  map: ValleyMap, x: number, z: number, palette: Palette, plaza?: Plaza, era?: Era,
+): Color {
+  const tint = new Color();
+  cornerColour(map, x, z, palette, tint, plaza, era);
+  return tint.multiplyScalar(1 + mottleAt(x, z) + patchAt(x, z));
 }
 
 /**
@@ -347,7 +342,8 @@ function risesOf(map: ValleyMap): Float32Array {
     // conocido: cuenta como lo más alto, que es lo que hay pegado a la sierra.
     const deep = depth[cell] as number;
     const from = deep < 0 ? MOUNTAIN_RISE / MOUNTAIN_SLOPE : deep;
-    rises[cell] = Math.min(MOUNTAIN_RISE, from * MOUNTAIN_SLOPE);
+    const shoulder = valleyShoulder(map, cell % map.width + 0.5, Math.floor(cell / map.width) + 0.5);
+    rises[cell] = Math.min(MOUNTAIN_RISE, from * MOUNTAIN_SLOPE) * shoulder;
   }
   RISES.set(map, rises);
   return rises;
@@ -411,14 +407,18 @@ const WATER_LEVEL = -0.10;
 function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
   const cells: number[] = [];
   for (let cell = 0; cell < map.terrain.length; cell += 1) {
-    if (map.terrain[cell] === 2) cells.push(cell);
+    if (map.terrain[cell] === TERRAIN_CODE.water || map.terrain[cell] === TERRAIN_CODE.lake) cells.push(cell);
   }
   if (cells.length === 0) return null;
 
   const positions = new Float32Array(cells.length * 4 * 3);
+  const colours = new Float32Array(cells.length * 4 * 3);
   const indices = new Uint32Array(cells.length * 6);
+  const river = new Color(palette.water);
+  const lake = new Color(palette.lake);
   for (let index = 0; index < cells.length; index += 1) {
     const cell = cells[index] ?? 0;
+    const isLake = map.terrain[cell] === TERRAIN_CODE.lake;
     const x = cell % map.width;
     const z = Math.floor(cell / map.width);
     const corner = index * 4;
@@ -429,8 +429,13 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
       // cuadricula, el agua asomaria por fuera del cauce.
       const moved = wobbleAt(map, points[vertex]?.[0] ?? 0, points[vertex]?.[1] ?? 0);
       positions[at] = moved.x;
-      positions[at + 1] = GROUND_BIAS + WATER_LEVEL;
+      positions[at + 1] = GROUND_BIAS + (isLake ? -0.23 : WATER_LEVEL);
       positions[at + 2] = moved.z;
+      // El renderer anima el color base del agua al cambiar de estación.
+      // El lago conserva su tono hondo en la misma malla y el mismo draw call.
+      colours[at] = isLake ? lake.r / river.r : 1;
+      colours[at + 1] = isLake ? lake.g / river.g : 1;
+      colours[at + 2] = isLake ? lake.b / river.b : 1;
     }
     const face = index * 6;
     indices[face] = corner;
@@ -443,12 +448,14 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
 
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new BufferAttribute(colours, 3));
   geometry.setIndex(new BufferAttribute(indices, 1));
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
 
   const material = new MeshStandardMaterial({
     color: palette.water,
+    vertexColors: true,
     roughness: 0.18,
     metalness: 0.1,
     // Translucida lo justo para que el fondo del cauce se intuya. Del todo
@@ -500,6 +507,17 @@ export function elevationAt(map: ValleyMap, x: number, z: number): number {
   return (a * (1 - fx) + b * fx) * (1 - fz) + (c * (1 - fx) + d * fx) * fz;
 }
 
+/** Normal comun del limite: deriva solo del relieve jugable. */
+export function groundBorderNormalAt(map: ValleyMap, x: number, z: number): Vector3 {
+  const west = Math.max(0, x - 1);
+  const east = Math.min(map.width, x + 1);
+  const north = Math.max(0, z - 1);
+  const south = Math.min(map.height, z + 1);
+  const slopeX = (heightAt(map, east, z) - heightAt(map, west, z)) / (east - west || 1);
+  const slopeZ = (heightAt(map, x, south) - heightAt(map, x, north)) / (south - north || 1);
+  return new Vector3(-slopeX, 1, -slopeZ).normalize();
+}
+
 export interface Ground {
   readonly mesh: Mesh;
   /** La lamina de agua, o `null` si el mapa no tiene rio. */
@@ -533,53 +551,45 @@ export function groundAppearanceKey(ground: number, era: Era): string {
 
 export function buildGround(map: ValleyMap, palette: Palette, plaza?: Plaza, era: Era = 'hamlet'): Ground {
   const cells = map.width * map.height;
-  const positions = new Float32Array(cells * 4 * 3);
-  const colours = new Float32Array(cells * 4 * 3);
-  const normals = new Float32Array(cells * 4 * 3);
+  const columns = map.width + 1;
+  const vertices = columns * (map.height + 1);
+  const positions = new Float32Array(vertices * 3);
+  const colours = new Float32Array(vertices * 3);
   const indices = new Uint32Array(cells * 6);
   const tint = new Color();
 
-  for (let cell = 0; cell < cells; cell += 1) {
-    const x = cell % map.width;
-    const z = Math.floor(cell / map.width);
-    const corner = cell * 4;
-
-    // Map (x, y) becomes scene (x, 0, y), per D.4's spatial convention.
-    const points = [
-      [x, z], [x + 1, z], [x + 1, z + 1], [x, z + 1],
-    ] as const;
-    for (let vertex = 0; vertex < 4; vertex += 1) {
-      const at = (corner + vertex) * 3;
-      const px = points[vertex]?.[0] ?? 0;
-      const pz = points[vertex]?.[1] ?? 0;
-      // La cota se toma en la esquina de la cuadricula y el vertice se dibuja
-      // movido: el relieve es el mismo, el borde no es recto.
-      const moved = wobbleAt(map, px, pz);
+  // Una sola copia de cada esquina permite promediar su normal entre todas las
+  // caras vecinas. Las cuatro copias anteriores dibujaban las líneas de celda.
+  for (let z = 0; z <= map.height; z += 1) {
+    for (let x = 0; x <= map.width; x += 1) {
+      const at = (z * columns + x) * 3;
+      const moved = wobbleAt(map, x, z);
       positions[at] = moved.x;
-      positions[at + 1] = GROUND_BIAS + heightAt(map, px, pz);
+      positions[at + 1] = GROUND_BIAS + heightAt(map, x, z);
       positions[at + 2] = moved.z;
-      normals[at] = 0;
-      normals[at + 1] = 1;
-      normals[at + 2] = 0;
-      cornerColour(map, cell, px, pz, palette, tint, plaza, era);
-      const shade = 1 + mottleAt(px, pz) + patchAt(px, pz);
+      cornerColour(map, x, z, palette, tint, plaza, era);
+      const shade = 1 + mottleAt(x, z) + patchAt(x, z);
       colours[at] = tint.r * shade;
       colours[at + 1] = tint.g * shade;
       colours[at + 2] = tint.b * shade;
     }
+  }
 
+  for (let cell = 0; cell < cells; cell += 1) {
+    const x = cell % map.width;
+    const z = Math.floor(cell / map.width);
+    const corner = z * columns + x;
     const face = cell * 6;
     indices[face] = corner;
-    indices[face + 1] = corner + 2;
+    indices[face + 1] = corner + columns + 1;
     indices[face + 2] = corner + 1;
     indices[face + 3] = corner;
-    indices[face + 4] = corner + 3;
-    indices[face + 5] = corner + 2;
+    indices[face + 4] = corner + columns;
+    indices[face + 5] = corner + columns + 1;
   }
 
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new BufferAttribute(positions, 3));
-  geometry.setAttribute('normal', new BufferAttribute(normals, 3));
   geometry.setAttribute('color', new BufferAttribute(colours, 3));
   geometry.setIndex(new BufferAttribute(indices, 1));
   geometry.computeBoundingSphere();
@@ -588,6 +598,14 @@ export function buildGround(map: ValleyMap, palette: Palette, plaza?: Plaza, era
   // rio se hundio: con todas apuntando arriba, la orilla no coge luz y el cauce
   // no se ve.
   geometry.computeVertexNormals();
+  const normal = geometry.getAttribute('normal') as BufferAttribute;
+  for (let z = 0; z <= map.height; z += 1) {
+    for (let x = 0; x <= map.width; x += 1) {
+      if (x !== 0 && x !== map.width && z !== 0 && z !== map.height) continue;
+      const edge = groundBorderNormalAt(map, x, z);
+      normal.setXYZ(z * columns + x, edge.x, edge.y, edge.z);
+    }
+  }
   const material = new MeshStandardMaterial({ vertexColors: true, roughness: 1 });
   const mesh = new Mesh(geometry, material);
   mesh.name = 'Valley_Ground';

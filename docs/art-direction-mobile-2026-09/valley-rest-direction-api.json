@@ -1,0 +1,32 @@
+{
+  "prompt": {
+    "1": {
+      "class_type": "UnetLoaderGGUF",
+      "inputs": {"unet_name": "qwen-image-2.1-Q4_K_M.gguf"}
+    },
+    "2": {
+      "class_type": "CLIPLoader",
+      "inputs": {"clip_name": "qwen3vl_8b_int8_convrot.safetensors", "type": "qwen_image", "device": "default"}
+    },
+    "3": {
+      "class_type": "VAELoader",
+      "inputs": {"vae_name": "qwen_image_2.1_vae_bf16.safetensors"}
+    },
+    "4": {
+      "class_type": "TextEncodeQwenImage21",
+      "inputs": {
+        "clip": ["2", 0],
+        "prompt": "Vertical mobile game art-direction concept sheet, no UI text. A peaceful medieval valley seen as an elegant miniature diorama from a high three-quarter isometric view. The landscape is the hero and fills most of the composition: a winding river, cultivated fields, a compact organic village, varied timber-and-plaster cottages, a small stone fountain plaza, footpaths with worn earth texture, orchard trees in three distinct silhouettes, fences, haystacks, carts and tiny signs of human life. Warm sunrise after rain, cream sky, soft amber light, muted moss green, ochre, clay red and deep umber palette. At the bottom, a single restrained tactile parchment decision card, blank wax seal and simple geometric icon shapes only, no readable symbols. At the top, a thin carved-wood status strip with blank round medallions only. Premium mobile strategy game key art, handcrafted painted 3D miniature, soft shadows, atmospheric depth, coherent materials, inviting, implementable visual design. No people close up, no monsters, no battle, no giant castle, no exaggerated fantasy spectacle.",
+        "negative_prompt": "text, letters, words, numbers, logo, watermark, signature, readable interface, barcode, photorealism, flat web dashboard, dense HUD, neon, sci-fi, oversized castle, giant characters, battle, blood, weapons, blurry, malformed buildings, duplicate houses",
+        "resolution": 1024
+      }
+    },
+    "5": {"class_type": "EmptyLatentImage", "inputs": {"width": 768, "height": 1024, "batch_size": 1}},
+    "6": {
+      "class_type": "KSampler",
+      "inputs": {"model": ["1", 0], "seed": 9222026, "steps": 25, "cfg": 1.0, "sampler_name": "euler", "scheduler": "simple", "positive": ["4", 0], "negative": ["4", 1], "latent_image": ["5", 0], "denoise": 1.0}
+    },
+    "7": {"class_type": "VAEDecode", "inputs": {"samples": ["6", 0], "vae": ["3", 0]}},
+    "8": {"class_type": "SaveImage", "inputs": {"images": ["7", 0], "filename_prefix": "qwen-image-2.1-gguf/valley-rest-direction"}}
+  }
+}

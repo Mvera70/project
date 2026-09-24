@@ -15,6 +15,7 @@ import { yearOf } from '@engine/time';
 import type { App } from '../app';
 import { roman } from '../app';
 import { recogniseGesture, type Point } from '../gestures';
+import { requestSheetClose } from '../motion';
 import { illustrationFor } from '../redesign/chronicle-art';
 import {
   ENTRY_DIAMOND, ORNAMENT_VIEWBOX, PAGE_VINE, YEAR_FLOURISH, type OrnamentName,
@@ -33,7 +34,9 @@ const STYLE = `
    desplazamiento — no sólo arriba del todo. */
 .chronicle-scrim { position: fixed; inset: 0; z-index: 13; overflow: auto; overflow-x: hidden;
   box-sizing: border-box; padding: 0 0 calc(74px + env(safe-area-inset-bottom));
-  color: var(--skin-ink); font-family: var(--skin-font-read); pointer-events: auto; }
+  color: var(--skin-ink); font-family: var(--skin-font-read); pointer-events: auto;
+  background: transparent; scrollbar-width: none; }
+.chronicle-scrim::-webkit-scrollbar { display: none; }
 /* La página empieza en y 379 y se funde con el valle en 60px (§3.2): del
    borde superior transparente a \`--skin-page\` opaco en y 439. El degradado
    **va dentro del contenido que se desplaza** (el primer hijo de
@@ -59,7 +62,10 @@ const STYLE = `
    la vista, y lo lee de \`--ui-hud-height\` —que publica \`hud.ts\` con un
    \`ResizeObserver\`— en vez de escribirlo a mano. Sigue siendo parte del
    contenido que se desplaza, asi que la pagina sigue subiendo al leer. */
-.chronicle-fade { height: calc(var(--ui-hud-height, 96px) + 8px); }
+.chronicle-fade { width: min(100%, 440px); height: calc(var(--ui-hud-height, 96px) + 8px); margin-inline: auto; }
+.chronicle-sheet-wrap { width: min(100%, 440px); margin-inline: auto;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent); }
 /* La página en sí: \`--skin-page\` **con su textura** (§3.2), no un color
    plano — \`.skin-paper\`/\`.skin-paper--page\` son del kit (\`skin.css\`, UI-V0)
    y se componen tal cual él las deja, sin redefinir nada aquí. */
@@ -89,18 +95,16 @@ const STYLE = `
    siempre a la vista desde UI-V2 y su pestaña del valle es la misma puerta —
    que es justo lo que U-14 pedía y entonces no existía. Y el deslizamiento
    hacia abajo se queda, como siempre. */
-/* VZ-2 · **una cruz pequeña sobre el papel, y no una placa flotando arriba a
-   la derecha.** Lo dijo el dueño del diseño: «el botón de close no lo puedes
-   poner arriba a la derecha; tiene que ir como una cruz pequeñita o si no la
-   opción de poder deslizar hacia abajo». Las dos cosas: esta cruz es la misma
-   que la hoja de gente ya tenía —cuarenta y cuatro píxeles de toque con la
-   aspa dibujada pequeña— y el deslizamiento hacia abajo sigue donde estaba.
-   Va dentro de la página y sube con ella: la salida de U-14 no depende de
-   esto, la da la pestaña del valle, que está siempre a la vista. */
-.chronicle-close { position: absolute; top: 4px; right: 6px; z-index: 2;
-  width: var(--ui-tap-min); height: var(--ui-tap-min); display: grid; place-items: center;
-  padding: 0; border: 0; background: transparent; color: var(--skin-ink-faded);
-  font: 400 19px/1 var(--skin-font-voice); cursor: pointer;
+/* Cierre de texto, visible sobre la página. La navegación inferior y el
+   deslizamiento siguen ofreciendo una segunda salida. */
+.chronicle-close { position: relative; z-index: 2;
+  width: fit-content; max-width: none; min-width: var(--ui-tap-min); min-height: var(--ui-tap-min);
+  margin: 20px max(12px, calc((100% - 390px) / 2)) 14px auto;
+  display: grid; place-items: center;
+  padding: 0 14px; border: 1px solid var(--skin-parchment-aged); border-radius: 9px;
+  background: var(--skin-parchment); color: var(--skin-ink-soft);
+  box-shadow: 0 2px 0 rgba(27, 22, 19, .12);
+  font: 700 12px/1 var(--skin-font-voice); letter-spacing: .04em; text-transform: uppercase; cursor: pointer;
   -webkit-tap-highlight-color: transparent; }
 .chronicle-close:active { color: var(--skin-ink); }
 /* UI-R3 · desde esta ronda la crónica puede vivir anidada dentro de la
@@ -110,8 +114,8 @@ const STYLE = `
    cambiar — el mismo criterio que \`shell.css\` ya sigue consigo mismo.
 
    -------------------------------------------------------------- año y capitular */
-.chronicle-year { padding: 28px 0 4px; }
-.chronicle-year-head { display: flex; align-items: center; gap: 14px; padding: 0 34px 0 30px; }
+.chronicle-year { padding: 20px 0 4px; }
+.chronicle-year-head { display: flex; align-items: center; gap: 10px; padding: 0 20px; }
 /* A5 · la fase del valle aquel anyo, al final de la linea del anyo y en tinta
    apagada: el anyo es el titulo y esto es su apunte al margen, no un segundo
    titulo. Un margen izquierdo automatico la lleva al canto derecho sin una
@@ -129,16 +133,19 @@ const STYLE = `
    inicial es una \`A\` en cualquier año— y por eso una sola imagen sirve. El
    texto del año lo sigue leyendo el \`<h2>\` de al lado, de modo que la imagen
    es pura decoración y va con \`alt=""\`. */
-.chronicle-capital { flex: 0 0 62px; width: 62px; height: 64px; }
+.chronicle-capital { display: none; }
 .chronicle-capital img { display: block; width: 100%; height: 100%; }
-.chronicle-anno { margin: 0; font-size: var(--skin-text-anno); color: var(--skin-ink); }
+.chronicle-anno { margin: 0; color: var(--skin-ink);
+  font: 600 22px/1.2 var(--skin-font-heading); letter-spacing: .015em; }
 /* El filete del año muere en una palmeta de oro, como en el prototipo: el
    filete crece y el adorno se queda a su derecha, a la altura de la línea. */
 .chronicle-year-rule { display: flex; align-items: center; gap: 2px;
-  margin: 14px 34px 0 30px; }
+  margin: 10px 20px 0; border-bottom: 1px solid var(--skin-rule-on-paper); }
 .chronicle-year-rule hr { flex: 1 1 auto; margin: 0; }
 .chronicle-year-rule svg { flex: 0 0 auto; display: block; height: 15px; width: auto;
   color: var(--skin-gold); margin-top: -1px; }
+.chronicle-year-rule svg,
+.chronicle-year-rule hr { display: none; }
 
 /* ------------------------------------------------------------- línea de tiempo */
 .chronicle-timeline { position: relative; margin-top: 4px; }
@@ -150,11 +157,11 @@ const STYLE = `
   width: 1px; background: var(--skin-gold); }
 /* El filete entre dos entradas lleva un rombo de oro en el centro (§3.2, y
    está en el prototipo): dos hairlines que crecen y el adorno en medio. */
-.chronicle-entry-sep { display: flex; align-items: center; gap: 6px;
-  margin: 0 34px 0 38px; }
+.chronicle-entry-sep { display: none; }
 .chronicle-entry-sep hr { flex: 1 1 auto; margin: 0; }
 .chronicle-entry-sep svg { flex: 0 0 auto; display: block; height: 7px; width: auto;
   color: var(--skin-gold); }
+.chronicle-entry-sep svg { display: none; }
 .chronicle-entry { position: relative; display: flex; align-items: flex-start; gap: 16px;
   padding: 16px 34px 16px 38px; }
 /* **La cuenta es un anillo, no un punto.** En el prototipo cada entrada se
@@ -192,7 +199,8 @@ const STYLE = `
    personalizada: un adorno calcado es un \`<path>\`, y un fondo de CSS
    necesita una URL, así que \`chronicle.ts\` la compone en \`data:\` una sola
    vez al montar. */
-.chronicle-body { position: relative; }
+.chronicle-body { position: relative; box-sizing: border-box; width: 100%; margin-inline: auto;
+  box-shadow: 0 8px 26px rgba(27, 22, 19, .16); }
 /* UI-V8 · la orla va pegada al **canto de la columna**, no al de la pantalla.
    Con la página cruzando la tablet y el texto centrado, \`left: 0\` la dejaba
    huérfana a medio metro de lo que adorna. 195 es la mitad de la columna de
@@ -201,7 +209,7 @@ const STYLE = `
   top: 0; bottom: 0; width: 20px;
   background-image: var(--chronicle-vine); background-repeat: repeat-y;
   background-size: 20px auto; background-position: left top;
-  opacity: .42; pointer-events: none; }
+  opacity: 0; pointer-events: none; }
 
 /* --------------------------------------------------- decisión: tarjeta y sello */
 /* Una decisión ya resuelta (\`crossroad_posed\` de otro año, \`crossroad_taken\`,
@@ -733,16 +741,16 @@ export function openChronicle(app: App, sinceTick?: number, onClose?: () => void
   const body = document.createElement('div');
   body.className = 'chronicle-body skin-paper skin-paper--page skin-torn-top';
   paintVine(body);
-  // VZ-2 · **la cruz vive dentro de la página, y sobrevive a cada pintado.**
+  // El cierre vive dentro de la página y sobrevive a cada pintado.
   // Se crea antes de `renderSource` y se repone con `replaceChildren(close)`:
   // ese método vacía la página en cada cambio de fuente, y montada después se
   // la llevaba por delante en el primer repintado.
   const close = document.createElement('button');
   close.type = 'button';
   close.className = 'chronicle-close';
-  // La etiqueta se queda para quien no ve el aspa (lector de pantalla).
+  // El botón muestra su acción también a quien lee la página visualmente.
   close.setAttribute('aria-label', renderUiText('app.close'));
-  close.textContent = '×';
+  close.textContent = renderUiText('app.close');
   close.addEventListener('click', closeChronicle);
   const current: ChronicleSource = { chronicle: state.chronicle, rng: state.rng, lastTick: state.tick };
   const renderSource = (source: ChronicleSource, scrollSince?: number): HTMLElement | null => {
@@ -889,28 +897,21 @@ export const chroniclePanel: PanelFactory = (actions) => {
   const close = document.createElement('button');
   close.type = 'button';
   close.className = 'chronicle-close';
-  // La etiqueta se queda para quien no ve el aspa (lector de pantalla).
+  // El botón muestra su acción también a quien lee la página visualmente.
   close.setAttribute('aria-label', renderUiText('app.close'));
-  close.textContent = '×';
-  close.addEventListener('click', () => { actions.navigate({ kind: 'valley' }); });
+  close.textContent = renderUiText('app.close');
+  close.addEventListener('click', () => {
+    requestSheetClose(element, () => actions.navigate({ kind: 'valley' }));
+  });
 
   body.append(close);
-  element.append(fade, body);
+  const sheet = document.createElement('div');
+  sheet.className = 'chronicle-sheet-wrap';
+  sheet.append(body);
+  element.append(fade, sheet);
 
-  // El mismo gesto que el resto del valle (S-05, U-14): deslizar hacia abajo
-  // cierra, y siempre por `actions.navigate` — nunca un callback propio, que
-  // es lo que hacía la pantalla vieja (`closed`, arriba) porque no tenía un
-  // propietario único de la navegación a quien avisar.
-  const trace: Point[] = [];
-  element.addEventListener('pointerdown', (event) => {
-    trace.length = 0;
-    trace.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
-  });
-  element.addEventListener('pointerup', (event) => {
-    trace.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
-    if (recogniseGesture({ points: trace }) === 'swipe_down') actions.navigate({ kind: 'valley' });
-  });
-
+  // La carcasa gestiona el arrastre desde el tirador. Aquí sólo se desplaza
+  // la crónica para que un gesto en la zona de lectura nunca cierre la hoja.
   let archiveCount = -1;
   /**
    * Qué partida se está leyendo: `null` la de ahora, o el índice de una

@@ -1,6 +1,7 @@
 // M-19 · Deterministic debug route for automated screenshots.
 
 import { skyAt } from '../derive/weather';
+import { bastionWalkwayOf } from '../derive/bastion-walkway';
 import { CROWN, OFFER, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
@@ -288,6 +289,37 @@ export function wallWorkNow(state: GameState, kind: 'gate' | 'wall', progress = 
 }
 
 /**
+ * E3b · Junta controlada para revisar los dos módulos en la app.
+ *
+ * La selección de mejoras ya levanta el bastión de forma espontánea junto a
+ * dos muros rectos. Esta ruta sólo comprueba la precondición; no modifica la
+ * partida ni el guardado antes de abrir la cámara.
+ */
+export function walkwayNow(state: GameState): void {
+  if (state.seed !== 7 || yearOf(state.tick) !== 60 || seasonOf(state.tick) !== 'summer') {
+    throw new Error('E3b controlled scene requires seed 7, year 60, and summer.');
+  }
+  const liveAt = (x: number, y: number, kind: 'bastion' | 'wall') => state.buildings.find((building) => (
+    building.kind === kind && building.lostTick === null && building.x === x && building.y === y
+  ));
+  const bastion = liveAt(30, 67, 'bastion');
+  const first = liveAt(29, 67, 'wall');
+  const next = liveAt(28, 67, 'wall');
+  if (bastion === undefined || first === undefined || next === undefined) {
+    throw new Error('E3b review needs a bastion (30,67) and stone walls (29,67), (28,67).');
+  }
+  if (bastion.id !== 281 || first.id !== 255 || next.id !== 256
+    || bastion.tier !== 1 || first.tier !== 1 || next.tier !== 1) {
+    throw new Error('E3b controlled scene found unexpected defence identities or non-stone walls.');
+  }
+  const walkway = bastionWalkwayOf(state, bastion);
+  if (walkway === null || walkway.firstWallId !== 255 || walkway.nextWallId !== 256
+    || walkway.access.x !== 0 || walkway.access.z !== -1 || walkway.side.x !== -1 || walkway.side.z !== 0) {
+    throw new Error('E3b controlled scene did not select the expected north bastion walkway (255 → 256).');
+  }
+}
+
+/**
  * F3d · **Un archivo con partidas dentro, para poder fotografiar el cronicón.**
  *
  * Hace falta por lo mismo que `?crossroad=1` y `?raid=`: el índice de valles
@@ -327,6 +359,24 @@ export function runToCrossroad(state: GameState, limitWeeks = 400): number {
 export function openAtYear(state: GameState, year: number): void {
   const weeks = Math.max(0, Math.floor(year) - 1) * TIME.WEEKS_PER_YEAR;
   if (weeks > 0) run(state, weeks, 'prudent', CATALOG);
+}
+
+/**
+ * P-1b.1 · El mismo avance para el menú, con pausas sólo entre tramos.
+ * El estado y la política son idénticos a `openAtYear`; el navegador puede
+ * pintar el aviso y atender eventos antes de ejecutar el tramo siguiente.
+ */
+export async function openAtYearCooperative(
+  state: GameState,
+  year: number,
+  yieldToBrowser: () => Promise<void> = () => new Promise((done) => setTimeout(done, 0)),
+): Promise<void> {
+  const weeks = Math.max(0, Math.floor(year) - 1) * TIME.WEEKS_PER_YEAR;
+  const batchWeeks = 8;
+  for (let advanced = 0; advanced < weeks && state.ended === null; advanced += batchWeeks) {
+    run(state, Math.min(batchWeeks, weeks - advanced), 'prudent', CATALOG);
+    if (advanced + batchWeeks < weeks && state.ended === null) await yieldToBrowser();
+  }
 }
 
 function diagnosticCanvas(root: HTMLElement, state: GameState, request: DebugRequest): void {

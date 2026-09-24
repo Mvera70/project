@@ -4,6 +4,7 @@ import { BUILDINGS } from '../balance';
 import type { Building, BuildingId, BuildingKind, GameState } from '../state';
 import { count } from '../subsistence/building-counts';
 import { bastionAccessOf } from './bastion-access';
+import { bastionWalkwayOf } from './bastion-walkway';
 import { canPlace } from './placement';
 
 export interface Upgrade {
@@ -120,9 +121,12 @@ export function nextUpgrade(state: GameState): Upgrade | null {
       if (eligible[0] !== undefined) return { kind, buildingId: eligible[0].id };
       continue;
     }
+    // El primer bastión abre el adarve si existe una junta recta. El segundo
+    // conserva la regla estratégica de repartir las torres por el anillo.
+    const connected = accessible.filter(source => bastionWalkwayOf(state, source) !== null);
     const raised = state.buildings.filter(building => building.kind === 'bastion' && building.lostTick === null)
       .sort((a, b) => a.id - b.id);
-    if (raised.length === 0) return { kind, buildingId: accessible[0]!.id };
+    if (raised.length === 0) return { kind, buildingId: (connected[0] ?? accessible[0])!.id };
     // El segundo bastión reparte la lectura de la escalera por el anillo.
     // No hay azar: la distancia al primero manda y el id desempata.
     const first = raised[0]!;

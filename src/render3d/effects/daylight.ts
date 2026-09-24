@@ -61,7 +61,8 @@ const NIGHT_FLOOR = 0.38;
  * ver son las cosas, y aclarar el fondo haría la noche más gris en vez de más
  * legible. Sigue siendo de noche; lo que cambia es que se distinga el valle.
  */
-const NIGHT_SKY_GAIN = 2.35;
+// Revisión del valle longitudinal: claridad lunar difusa, sin pasada de sombras.
+const NIGHT_SKY_GAIN = 4.3;
 
 /** Lo alto que llega el sol al mediodía, en grados sobre el horizonte. */
 const NOON_ELEVATION = 62;
@@ -101,7 +102,7 @@ const BOUNCE_DAY = new Color('#776F62');
 /** El rebote del suelo de noche. **De #2E3644 a #3D4859 el 18 sep 2026**: es la
     mitad de «que se vea de noche» —el cielo alumbra desde arriba y esto desde
     abajo—, y sin subirlo los tejados quedaban legibles y las paredes no. */
-const BOUNCE_NIGHT = new Color('#3D4859');
+const BOUNCE_NIGHT = new Color('#65758C');
 
 function ease(value: number): number {
   const clamped = Math.max(0, Math.min(1, value));
@@ -178,7 +179,8 @@ function lightAt(phase: number): Daylight {
     // Sin suelo: el sol se pone del todo, y una direccional de intensidad cero
     // no ilumina y por tanto no proyecta sombra de nada.
     sunIntensity: 2.6 * light,
-    skyColour: background,
+    // Luz lunar difusa independiente del cielo visible: mantiene legible el relieve.
+    skyColour: blend(new Color(background), new Color('#B7C6DA'), dark * 0.85),
     groundBounce: blend(BOUNCE_DAY, BOUNCE_NIGHT, dark),
     // Y el cielo recoge lo que el sol suelta, que es lo que deja ver el valle
     // de noche sin que nada proyecte sombra.

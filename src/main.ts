@@ -2,9 +2,9 @@
 import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { HAPPENINGS, MEANS_IDS, SCHEMA_VERSION, type HappeningId, type MeansId, type SaveFile } from '@engine/state';
-import { archivedGames, crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYear,
+import { archivedGames, crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYearCooperative,
   parseDebugRequest, raidNow, bracedNow, comingNow, warningNow, warningPendingNow, aftermathNow, wallWorkNow,
-  runToCrossroad, runToSky, stateAt } from './ui/debug';
+  runToCrossroad, runToSky, stateAt, walkwayNow } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
@@ -17,20 +17,20 @@ import { openTitle, type TitleChoice } from './ui/screens/title';
  * cual se guardó, con su letargo (§13.2) a cargo de `boot`.
  *
  * **U-10b · y si el menú pidió un año, el valle se juega hasta ahí antes de
- * abrirlo** (`openAtYear`, con la política de referencia). Lo que entra
+ * abrirlo** (`openAtYearCooperative`, con la política de referencia). Lo que entra
  * en `boot` es una partida normal de ese año: sus decisiones contestadas en
  * `decisions`, su crónica entera, y su encrucijada pendiente si el año cae en
  * una —`boot` ya sabe abrirla, que es lo que hacía falta para el camino de
  * `?live=1`—. No hay estado inventado y no hay nada que limpiar después.
  */
-function saveFor(choice: TitleChoice, save: SaveFile | null): SaveFile | undefined {
+async function saveFor(choice: TitleChoice, save: SaveFile | null): Promise<SaveFile | undefined> {
   if (choice.kind === 'continue') return save ?? undefined;
   const archive = save?.archive ?? [];
   const ended = save !== null && save.state.ended !== null
     ? archive.find((game) => game.seed === save.state.seed)
     : undefined;
   const state = ended !== undefined ? foundSuccessor(ended, choice.seed) : foundGame(choice.seed);
-  openAtYear(state, choice.year);
+  await openAtYearCooperative(state, choice.year);
   return {
     schema: SCHEMA_VERSION,
     savedAtMs: Date.now(),
@@ -61,13 +61,13 @@ if (root) {
     openTitle({
       schema: SCHEMA_VERSION, savedAtMs: Date.now(), state,
       decisions: [...state.history], archive,
-    }, (choice) => boot(root, saveFor(choice, null)));
+    }, async (choice) => { boot(root, await saveFor(choice, null)); });
   } else if (request === null) {
     // §13.1: resume the save if there is one and it still parses —
     // `loadSave` already turns a missing or corrupt one into `null` rather
     // than throwing, so a bad blob founds a fresh game instead of a blank page.
     void loadSave().then((save) => {
-      openTitle(save, (choice) => boot(root, saveFor(choice, save)));
+      openTitle(save, async (choice) => { boot(root, await saveFor(choice, save)); });
     });
   } else if (query.get('live') === '1') {
     const state = stateAt(request);
@@ -125,6 +125,9 @@ if (root) {
     const crown = query.get('crown');
     if (crown === 'ready') crownReady(state);
     else if (crown !== null) crownNow(state, crown);
+    // E3b.1d · escena de revisión controlada, nunca una forma de jugar ni de
+    // alterar otra ruta de depuración: sólo vive bajo los tres interruptores.
+    if (query.get('e3b') === '1') walkwayNow(state);
     if (query.get('hunger') === '1') state.village.grain = 0;
     // F3 · `&ended=1` acaba la partida, y `&ended=<causa>` acaba de esa manera
     // concreta: `extinction`, `abandoned`, `dispersed` o `stormed`. Hacía falta

@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "id": "e3b-walkway-turn-candidate",
+  "scale": 1,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "wall-walkway-turn-candidate",
+    "footprint": [
+      1.27,
+      1.27
+    ],
+    "version": 1,
+    "note": "West to north elbow; opening on both adjoining faces. Candidate only."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Deck",
+      "location": [
+        0.635,
+        -0.635,
+        0.97
+      ],
+      "dimensions": [
+        1.27,
+        1.27,
+        0.09999999999999998
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "EastParapet",
+      "location": [
+        1.21,
+        -0.635,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.1200000000000001,
+        1.27,
+        0.17999999999999994
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SouthParapet",
+      "location": [
+        0.575,
+        -1.21,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        1.15,
+        0.1200000000000001,
+        0.17999999999999994
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "NorthWallBearing",
+      "location": [
+        0.5,
+        -0.335,
+        0.9025000000000001
+      ],
+      "dimensions": [
+        0.34,
+        0.67,
+        0.03500000000000003
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WestWallBearing",
+      "location": [
+        0.335,
+        -0.5,
+        0.9025000000000001
+      ],
+      "dimensions": [
+        0.67,
+        0.34,
+        0.03500000000000003
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerCorbelUpper",
+      "location": [
+        0.825,
+        -0.825,
+        0.8200000000000001
+      ],
+      "dimensions": [
+        0.35,
+        0.35,
+        0.20000000000000007
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerCorbelMiddle",
+      "location": [
+        0.76,
+        -0.76,
+        0.625
+      ],
+      "dimensions": [
+        0.21999999999999997,
+        0.21999999999999997,
+        0.18999999999999995
+      ],
+      "material": "stone",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 1000,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0.5,
+      -0.5,
+      0.85
+    ],
+    "orthoScale": 2.5,
+    "worldRole": "sky"
+  }
+}

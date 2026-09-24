@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v4.31 · 22 de septiembre de 2026, 02:19 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v4.34 · 22 de septiembre de 2026 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -1257,6 +1257,15 @@ Las ruinas
 de madera **sí** se pueden edificar encima; la ruina desaparece del mapa pero
 queda en la crónica.
 
+**Escombros de vivienda (24 sep 2026).** La huella y `lostTick` permanecen en
+la partida; su aspecto cambia sin crear un sistema de limpieza. Durante el
+primer año se ve el derrumbe completo; entre el primero y el tercero se
+asienta y reduce; al tercero desaparece el montón. Las ruinas de piedra dejan
+una cimentación baja porque todavía bloquean esa parcela. La madera deja una
+marca baja únicamente mientras `blockedUntil` siga vigente; después ya no se
+dibuja. La historia y la máscara de ruina no se borran. La recogida animada
+por aldeanos queda fuera de esta ronda.
+
 **Cómo se ordenan estas preferencias (v2.12).** No hay elevación ni fertilidad
 en el estado, así que no se inventa una suma de coeficientes: las preferencias
 de cada fila se ordenan lexicográficamente, en el orden en que están escritas,
@@ -1319,6 +1328,32 @@ aldea sin que nadie la diseñe.
 ---
 
 ### 7.7 Los animales del valle
+
+**Oso de la linde (23 sep 2026).** El suceso existente `bear_in_the_wood`
+activa una visita visible durante sus dos semanas de bandera `bear`. Hay como
+máximo un oso: sale de un bosque transitable, cruza un claro, hoza y se retira
+al caer la tarde. Ante una persona cercana se detiene y da un zarpazo de
+advertencia antes de volver al bosque; los habitantes libres próximos buscan
+refugio y los ciervos se alejan. Modelo original con clips `idle`, `walk` y
+`attack`. El motor ya aplica la moral y la crónica de ese suceso; la escena no
+inventa heridas, bajas, carne, presas cobradas ni tiradas de azar. Al expirar
+la bandera, el oso deja de aparecer. El identificador ocupa el rango 50 000,
+separado de lobos y ciervos. El coste máximo es un esqueleto animado adicional
+de 2 712 triángulos durante la visita.
+
+**Ciervo de la linde (23 sep 2026 · primer animal salvaje integrado).** Dos
+ciervos como máximo pastan en prados transitables junto al bosque de caza. Su
+modelo low poly tiene reposo y marcha articulados; la vida escénica los mueve
+con paso fijo. Sus pastos quedan fuera de la aldea, a distancia de las casas;
+huyen ante personas, cazadores a mayor distancia, lobos y osos. El encuentro
+físico de caza se desbloquea por primera captura en este orden: perdiz, conejo,
+ciervo, jabalí y oso. Las presas anteriores pueden volver; el oso es el cierre.
+El jugador elige el arma al iniciar cada encuentro. Solo un impacto real cobra
+la carne, y la primera pieza de cada especie queda como hito destacado en la
+crónica. La vida escénica no escribe en el guardado ni consume el RNG del motor;
+el resultado del encuentro sí pasa al motor como acción. Si ya no queda bosque
+cazable, no aparece ningún ciervo. Sus identificadores no comparten el rango
+de los lobos de montaña.
 
 Una aldea medieval sin un animal a la vista está vacía, y el valle lo estaba.
 Esta sección es el plan completo; **se construye por partes y cada parte dice
@@ -2840,9 +2875,19 @@ outline(c)  = mezcla de c con negro al 45 %
 shadow      = rgba(0, 0, 0, 0.22)
 ```
 
-La transición entre estaciones interpola las doce ranuras a lo largo de las dos
-primeras semanas de la estación nueva. Un corte seco de color se lee como un
-fallo.
+La mezcla empieza al final de cada estación: la paleta es propia en
+`seasonWeek` 0–9, queda a medio camino en 10 y ya coincide con la siguiente en
+11; al entrar en la nueva estación conserva ese mismo color. La clave del suelo
+refleja esos pasos reales de paleta; no se reconstruye al comienzo de la
+estación mientras el color aún no ha cambiado.
+
+Cada paso visible de paleta se interpola en tiempo de presentación entre los
+colores que ya están en pantalla y el objetivo nuevo. La transición sigue aunque
+el valle esté pausado y no depende de la velocidad de juego. Se aplica al suelo,
+al agua, al follaje y a la nieve de los tejados; los cambios de acabado del suelo
+por era recorren la misma transición. La geometría que se sustituya en otros
+sistemas necesita conectar esta base de presentación por separado. Un corte
+seco de color se lee como un fallo.
 
 **Test obligatorio:** cada paleta pasa la comprobación de silueta — convertida a
 escala de grises, `forest`, `meadow`, `field`, `water` y `path` mantienen entre
@@ -2994,6 +3039,30 @@ trueno se comprueba con `tools/graphics/thunder-check.mjs`, que engancha el
 ---
 
 ## 11. Interfaz
+
+### 11.0 Dirección visual de juego (v4.33)
+
+La interfaz funcional se diseña como **interfaz de juego** para el valle 3D
+voxel/low poly: lectura inmediata, controles táctiles con relieve corto y
+selección inequívoca. Mantiene un acento medieval propio, pero no aplica la
+metáfora del manuscrito a cada contador, botón o ficha. La crónica y la portada
+pueden conservar detalles narrativos; fecha, recursos, navegación, decisiones y
+acciones usan una sans clara y superficies regulares. La referencia visual de
+Clash Royale indica jerarquía y sensación de juego, no una paleta, iconos,
+cantidad de controles o grado de caricatura que haya que copiar.
+
+**El reloj del sol no se rediseña.** Su arco, disco y lectura actual permanecen.
+El alcance, los pasos y la revisión visual se detallan en
+`docs/ui-redesign/game-ui-direction.md`. Esta dirección actualiza las reglas de
+presentación anteriores de este capítulo y los antiguos prototipos de piel;
+los contratos sobre qué datos y acciones existen siguen vigentes.
+
+**Altura común de las hojas abiertas (23 sep 2026).** Crónica, Personas y las
+hojas de Valle —carro y fichas— se anclan a la barra inferior y empiezan a
+media altura de la pantalla. Su marco conserva esa altura con cualquier
+cantidad de contenido; el texto y las listas se desplazan dentro. Arrastrar
+desde la franja superior baja y cierra la hoja; arrastrar en el centro desplaza
+el contenido. Las decisiones narrativas son superposiciones aparte.
 
 ### 11.1 Principio
 
@@ -3284,28 +3353,22 @@ causa es civil (`yearOf(endedTick) + 1`); la duración son años completos
 La lógica de gestos vive en `src/ui/gestures.ts`, sin DOM y con tests, como
 exige `valle.md` §11.
 
-### 11.4 La interfaz no anima sobre el reloj del navegador
+### 11.4 Reloj de juego y movimiento de interfaz
 
-**Ninguna animación de interfaz puede depender del reloj del compositor.** El
-juego tiene su propio reloj y el jugador lo controla: pausa, ×1, ×4, ×16, y el
-letargo de §13.2 que ejecuta **960 ticks en menos de dos segundos**. Una
-transición CSS corre sobre un reloj que no tiene ningún motivo para coincidir con
-ninguno de esos, y en cuanto los dos discrepan la interfaz se queda a medias.
+**El movimiento que representa el estado del juego sigue el tick y su fracción**,
+nunca el reloj del compositor. La multitud de §10.6 y el reloj solar son parte
+del mundo y no pueden quedarse a mitad de camino si el jugador pausa, cambia la
+velocidad o vuelve de un letargo de §13.2.
 
-Se descubrió en M-22 y no lo cazó una revisión visual: lo cazó una prueba de
-reloj falso que encontró el zoom **atascado a mitad de recorrido**. El arreglo
-fue sustituir la transición por un corte seco.
+Las transiciones que sólo presentan una ruta o un panel pueden usar tiempo real:
+son decoración de la interfaz, no estado de partida. Deben ser breves, llegar a
+un estado final definido aunque la pestaña se suspenda, no retrasar controles ni
+acciones, y respetar `prefers-reduced-motion`. El lienzo, la cámara, el tick y
+el reloj del sol no se animan como parte de esos cambios de ruta.
 
-La regla, generalizada:
-
-- Lo que representa el estado del juego se anima con **la fracción del tick**,
-  nunca con tiempo de pared. La multitud de §10.6 ya lo hace bien.
-- Lo que es afordancia para el humano —el enfoque de dos segundos de §11.2— sí
-  puede usar tiempo real, pero **debe tener un estado bien definido en todo
-  instante y sobrevivir a un salto de reloj**. Si no se puede garantizar, corte
-  seco.
-- **El caso de prueba es el letargo.** Cualquier animación que no aguante 960
-  ticks en dos segundos está mal, y ahí es donde se comprueba.
+La lección de M-22 sigue vigente para el zoom: una transición CSS dejó el zoom
+**atascado a mitad de recorrido** al saltar el reloj falso, y se sustituyó por
+un corte seco. El zoom representa el estado de cámara; una entrada de panel no.
 
 ### 11.5 Cuando el efecto visible no tiene sitio
 
@@ -3918,6 +3981,11 @@ siendo provisionales en el sentido de que la primera partida larga real
 (hito 5) manda, pero son un punto de partida jugable, no un relleno.
 
 ### 12.1 Tiempo
+
+La retirada visual de escombros domésticos usa `HOUSE_RUBBLE`:
+`FRESH_WEEKS = 48` y `CLEAR_WEEKS = 144` (un año y tres años).
+**TUNE:** plazos artísticos iniciales para que el solar deje de mostrar
+escombros eternamente; no cambian recursos, capacidad ni colocación.
 
 ```ts
 export const TIME = {
@@ -6358,6 +6426,18 @@ producciones de G-03 en vez de tirar una.
 | **Variedad, más adelante** | Cuatro o cinco formas de casa distintas |
 | **Ropa** | Integrada en los tonos tierra del pueblo |
 
+**Ampliación de viviendas (24 sep 2026, pendiente de revisión en juego).** Las
+cuatro fases narrativas no son cuatro materiales de vivienda: la construcción
+usa casa de madera (`house`) y su mejora de piedra (`stone_house`). Para cada
+una se prepararon dos siluetas adicionales, con huella 2×2, puerta y tres
+ventanas originales, sin alterar motor ni guardados. Madera: dos crujías y
+cubierta a cuatro aguas; piedra: cubierta cruzada y altillo lateral. Las recetas
+y la comparativa de geometría están en `art/recipes/house-variant-candidate/`
+y `artifacts/graphics/house-variant-review-01/`. La tabla anterior refleja la
+decisión histórica de P1; estas formas sólo pasan a ser variedad del juego tras
+exportación, revisión nocturna y activación P5. La forma se asigna por semilla
+y parcela, estable al mejorar una casa.
+
 **Lo que la vista de cerca destapó, y por eso hacía falta.** De lejos parecía que
 A y B sólo se diferenciaban en el tejado. De cerca se vio que difieren también
 en cosas que **no son de la casa**: las copas de los árboles son de 7 caras sin
@@ -7017,7 +7097,7 @@ ve cambiar. Hacer el tick mas fino tampoco lo arreglaria —con tick diario seri
 cincuenta y seis pasos por jornada en vez de ocho—, porque el desfase es
 estructural a D.6.1 y no al tamano del paso.
 
-#### D.6.8 · El cuenco: las montanas van fuera del mapa (v3.63)
+#### D.6.8 · El valle longitudinal: paisaje exterior fuera del mapa
 
 El valle se llamaba valle y no lo parecia: el mapa acababa en un corte recto
 contra el cielo, y la niebla de D.5 estaba puesta ahi para disimularlo. Lo que
@@ -7052,17 +7132,38 @@ Tres decisiones dentro de eso:
 2. **El ruido va interpolado.** La primera version tomaba el nudo mas cercano y
    la ladera daba escalones de 3,47 celdas de una a la siguiente: un muro, no
    una montana.
-3. **El color sale de la altura**, no de un `TERRAIN_CODE` nuevo: del prado del
-   pie al monte bajo y de ahi a la roca. Anadir un terreno habria tocado
-   paletas, colores y todas las pruebas que cuentan terrenos, para nada.
+3. **El color sale de la paleta de la estación y del terreno del borde**, sin
+   añadir un `TERRAIN_CODE`. El suelo exterior, los árboles y el agua cambian
+   junto al valle durante la transición estacional.
+
+**Revisión visual del 23 sep 2026.** La antigua cresta exterior formaba una
+pared oscura y dejaba ver el cielo claro en las esquinas al alejar la cámara.
+Tras revisar la primera versión, Vera pide un **valle longitudinal, nunca un
+cuenco**, con montaña predominante y pocos árboles. El eje visual sigue el río:
+dos flancos elevados y extremos abiertos. `valley-profile.ts` obtiene ese eje
+del agua del mapa; el relieve de las celdas de montaña se atenúa en los pasos,
+sin modificar su tipo, transitabilidad, recursos ni guardados. La malla exterior
+continúa los flancos, con rejilla menos densa a distancia y un máximo de 256
+árboles decorativos instanciados. El agua continúa por los extremos. La luz lunar
+difusa es compartida por el paisaje, sin hacer brillar las montañas por separado.
 
 La sierra **no proyecta sombra**: con el sol bajo, la del este echaria una
 sombra sobre medio pueblo, y lo que hay que ver es el pueblo.
 
-**Lo que esto no es:** relieve jugable. El valle sigue siendo plano por dentro
-—0,23 celdas de desnivel en todo el mapa, derivadas del tipo de terreno— y una
-roca rodando por una ladera sigue sin tener donde ocurrir. Eso pide una capa de
-altura en `ValleyMap` y es trabajo del generador de mapas.
+**Segunda pasada, 23 sep 2026.** El prado usa una rejilla con vértices
+compartidos: posición, color y normal no se duplican por celda. En el borde,
+suelo y sierra toman la misma cota, tinte y normal para evitar la junta visible.
+La roca entra gradualmente con grano mineral procedimental pequeño y una
+superficie mate; la trama y la densidad de la malla disminuyen lejos de la
+aldea. Sólo hay pinos dispersos en las laderas y el límite decorativo sigue
+siendo 256 instancias. El río sale por los extremos norte y sur mediante dos
+cintas continuas que siguen las celdas de agua del límite; el lecho y la
+exclusión de árboles usan esa misma trayectoria. El lago recibe una lámina
+propia dentro de la malla de agua existente. Estos elementos no añaden celdas
+ni afectan a la simulación.
+
+Las cotas visuales de montaña cambian; sus reglas y celdas del motor se conservan.
+El paisaje añadido empieza fuera de los límites del mapa.
 
 ### D.8b Los pinos de la ladera, y la sombra que parpadeaba (18 sep 2026)
 

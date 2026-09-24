@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Box3, BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
-import { houseVariant, varyHouse } from '../../src/render3d/world/house-variation';
+import { houseForm, houseFormAsset, houseVariant, varyHouse } from '../../src/render3d/world/house-variation';
 import { buildFromAsset } from '../../src/render3d/world/buildings';
 import type { PlannedBuilding } from '../../src/render3d/world/plan';
 
@@ -19,6 +19,19 @@ describe('viviendas distintas sin alterar la parcela', () => {
     const values = Array.from({ length: 20 }, (_, x) => houseVariant(7, x, 18));
     expect(values).toEqual(Array.from({ length: 20 }, (_, x) => houseVariant(7, x, 18)));
     expect(new Set(values).size).toBe(4);
+  });
+  it('asigna tres siluetas por parcela y conserva el índice al pasar de madera a piedra', () => {
+    const forms = Array.from({ length: 40 }, (_, x) => houseForm(7, x, 18));
+    expect(new Set(forms)).toEqual(new Set([0, 1, 2]));
+    for (let x = 0; x < forms.length; x++) {
+      expect(houseForm(7, x, 18)).toBe(forms[x]);
+      expect(houseFormAsset('house', 7, x, 18)).toBe(
+        ['house', 'house-twin-gable', 'house-hip-roof'][forms[x]!],
+      );
+      expect(houseFormAsset('stone_house', 7, x, 18)).toBe(
+        ['stone-house', 'stone-house-cross-gable', 'stone-house-tower-loft'][forms[x]!],
+      );
+    }
   });
   it('conserva huella, alero y puerta sin contaminar otra instancia', () => {
     const original = house(); const copy = original.clone(true);
