@@ -1,5 +1,24 @@
 # Cuaderno de tareas — el rework
 
+## 24 sep 2026 · IA-anim, segunda tanda: contacto y cantera
+
+Hacha al derecho (el filo miraba arriba en el golpe), contacto medido de −0,06
+a 0,19 contra la corteza y pico en el borde de la roca, sacudida del árbol con
+hojas, leñadores en árboles del borde y cantera en la ladera cuando la roca
+queda fuera de alcance. Picado filmado en partida (semilla 23). Pantalla final
+en móvil corregida (`0140dfa`). Pedido después por Vera: el ciclo del campo
+(abonar, arar, sembrar, crecer según cultivo, cosechar, vuelta), sin empezar.
+
+**Pedidos de Vera en cola (24 sep 2026), sin empezar, en este orden propuesto:**
+1. **El ciclo del campo, con eventos.** Abonar, arar, sembrar, crecer (continuo
+   según el cultivo), cosechar y vuelta al bucle, **cada fase contada como
+   suceso** («la primera siembra de X»). Cada línea de crónica nueva trae su
+   imagen pedida en `plan-arte-pendiente.md`.
+2. **Desorden en el reparto:** en las villas grandes se ve a demasiada gente en
+   el campo, más de la que el espacio aguanta.
+3. **El ganado no se puede pisar** (pendiente de aclarar con Vera qué se ve).
+4. **Diseñar los oficios:** la herrería, por ejemplo, está vacía.
+
 ## 24 sep 2026 · IA-anim: reuniones que se acaban, talar y picar
 
 Vera: la aldea se reunía fuera, pegada al bosque sin hacer nada, varios días

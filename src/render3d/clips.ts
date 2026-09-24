@@ -51,6 +51,22 @@ export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'ta
  */
 export const STRIKE_AT: Readonly<Record<'chop' | 'mine', number>> = { chop: 0.52, mine: 0.5 };
 
+/**
+ * IA-anim · Dónde cae la cabeza de la herramienta en `STRIKE_AT`, en celdas y
+ * en el marco del cuerpo (+Z delante, +X a su izquierda... la de la escena:
+ * `x` positivo es el costado derecho del mundo con `facing = 0`).
+ *
+ * Medido sobre el GLB publicado con el montaje de `world/cast.ts`, y vigilado
+ * por `tests/fast/work-gestures.test.ts`: si el gesto cambia, la prueba falla
+ * y estos números se vuelven a medir. La vida coloca al trabajador con ellos
+ * para que el golpe **toque** el tronco o la roca, y el cuerpo a cuerpo podrá
+ * usarlos como alcance del arma cuando estos gestos se reaprovechen en combate.
+ */
+export const STRIKE_HEAD: Readonly<Record<'chop' | 'mine', { readonly x: number; readonly y: number; readonly z: number }>> = {
+  chop: { x: -0.21, y: 0.32, z: 0.45 },
+  mine: { x: 0.03, y: 0.07, z: 0.39 },
+};
+
 /** Gestos de combate: su reloj procede del hecho, nunca del primer pintado. */
 export function combatClip(clip: string): boolean {
   return clip === 'bow_draw' || clip === 'bow_loose' || clip === 'gate_strike'

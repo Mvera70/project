@@ -81,7 +81,7 @@ ausentes quedan superadas por [esta entrega](historico/life-rounds/E1b-cuerpo-a-
 |---|---|
 | **Clips de combate** (E1) | **Entregados por código, 20 sep:** tensar, soltar, golpear portón, lanza, recibir impacto, caer y huir. Reacción de puerta integrada. No son clips embebidos nuevos. [Cierre y límites](historico/life-rounds/E3-visibilidad-y-huida.md) |
 | **La hoja del portón** | Integrada con pivote `gate_door`; rotura procedural que conserva el marco y genera tablas, sin otro GLB |
-| **Talar y picar** (IA-anim, 24 sep) | **Entregados por código:** `chop` y `mine` con carga, golpe acelerado, rebote y astillas de madera o piedra en el instante del impacto. **Falta:** que el árbol acuse el golpe (se sacude o pierde copa) y que la roca cambie al picarla; el leñador golpea a algo más de un paso del tronco porque su plaza está en suelo pisable junto a la celda del árbol |
+| **Talar y picar** (IA-anim, 24 sep) | **Entregados por código:** `chop` y `mine` con carga, golpe acelerado, rebote y astillas en el impacto; el filo del hacha va por delante. **Contacto medido:** la cabeza de la herramienta queda de −0,06 a 0,19 de la corteza y el pico en el borde de la roca (`tests/journeys/work-contact.test.ts`); el árbol golpeado oscila y suelta hojas. **Falta:** que la roca cambie al picarla (se dibuja como cantos sueltos y no se lee como cara de cantera) |
 | **Fuego, humo y gore** (E4) | Nada. Cómo se ve arder una casa en un asalto y cómo se ve morir. **El gore es decisión del dueño** |
 | **Escombros y ragdoll** | Entregados por código el 20 sep: once segmentos por cuerpo, suelo real, obstáculos y tablas físicas. Topes 24/24; reposo conservado y liberación al cambiar escena. [Evidencia](historico/life-rounds/D6-saqueo-y-fisica.md) |
 

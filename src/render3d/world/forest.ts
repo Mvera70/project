@@ -87,6 +87,12 @@ export interface Forest {
   readonly revealedCount: number;
   /** Actualiza la oclusión selectiva; una lista vacía restaura el bosque. */
   reveal(camera: Camera, targets: readonly ForestRevealTarget[]): number;
+  /**
+   * IA-anim · Inclina el árbol de una celda sobre su base, hacia `(x, z)`, y
+   * `angle = 0` lo devuelve a su sitio. Sólo toca las matrices de ese árbol:
+   * un hachazo no rehace el bosque. Devuelve si la celda tenía árbol.
+   */
+  sway(cell: number, x: number, z: number, angle: number): boolean;
   season(palette: Palette): void;
   dispose(): void;
 }
@@ -264,6 +270,7 @@ export function buildForest(
     stumpCount: stumpCells.length,
     get revealedCount(): number { return scattered.revealedCount; },
     reveal(camera, targets): number { return scattered.reveal(camera, targets); },
+    sway(cell, x, z, angle): boolean { return scattered.sway(cell, x, z, angle); },
     season(palette): void {
       scattered.season(palette);
       conifers?.season(palette);
@@ -540,6 +547,26 @@ export function scatterCells(
 
   let revealedSlots = '';
   let revealedCount = 0;
+  const slotOf = new Map(cells.map((cell, index) => [cell, index * PER_CELL]));
+
+  function sway(cell: number, x: number, z: number, angle: number): boolean {
+    // Con el robledal atenuado los huecos se reparten de otra manera: ese rato
+    // el árbol no se mueve, antes que mover el que no es.
+    const slot = slotOf.get(cell);
+    if (!occludable || slot === undefined || revealedCount > 0) return false;
+    const base = new Vector3(), turn = new Quaternion(), size = new Vector3();
+    const axis = new Vector3(z, 0, -x);
+    if (axis.lengthSq() < 1e-9) axis.set(1, 0, 0);
+    const tilt = new Quaternion().setFromAxisAngle(axis.normalize(), angle);
+    const matrix = new Matrix4();
+    for (let piece = 0; piece < owned.length; piece += 1) {
+      matrices[piece]![slot]!.decompose(base, turn, size);
+      matrix.compose(base, tilt.clone().multiply(turn), size);
+      owned[piece]!.setMatrixAt(slot, matrix);
+      owned[piece]!.instanceMatrix.needsUpdate = true;
+    }
+    return true;
+  }
 
   function reveal(camera: Camera, targets: readonly ForestRevealTarget[]): number {
     if (!occludable || total === 0) return 0;
@@ -582,6 +609,7 @@ export function scatterCells(
     stumpCount: 0,
     get revealedCount(): number { return revealedCount; },
     reveal,
+    sway,
     season(palette): void {
       for (const material of tinted) tintFoliage(material, palette);
       for (const material of fadedMaterials) tintFoliage(material, palette);

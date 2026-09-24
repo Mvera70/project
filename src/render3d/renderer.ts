@@ -37,7 +37,7 @@ import { mountainWolves } from './world/mountain-wolves';
 import { ridgeAt } from './world/ridge';
 import { buildFord, type Ford } from './world/ford';
 import {
-  buildForest, builtCells, scatterCells, scatterOn, scrubCells, shoreCells, type Forest,
+  buildForest, builtCells, scatterCells, scatterOn, scatterTransform, scrubCells, shoreCells, type Forest,
 } from './world/forest';
 import type { ForestRevealTarget } from './world/forest-occlusion';
 import { BUILDING_ASSETS, ELEVATED_RING_ASSETS, Village } from './world/buildings';
@@ -762,7 +762,48 @@ export async function createGraphicsRenderer(
     treeFalls.season(appearancePalette);
   }
 
+  /**
+   * IA-anim · El árbol acusa el hachazo: se inclina hacia fuera del golpe y
+   * vuelve con dos o tres vaivenes amortiguados, y la copa suelta unas hojas.
+   * Es tinta: el motor tala por semanas, no por golpes, y el árbol no cae aquí.
+   */
+  const shakes = new Map<number, { elapsed: number; x: number; z: number }>();
+  /** El mapa con el que se plantó el bosque que se ve: el árbol golpeado es de ése. */
+  let lastPaintedMap: GameState['map'] | null = null;
+  /** TUNE visual: 0,05 rad en la base mueven la copa unas 0,12 celdas; 0,8 s de vaivén. */
+  const SHAKE = { angle: 0.05, seconds: 0.8, damping: 5, rate: 26 } as const;
+  function stepShakes(seconds: number): void {
+    for (const [cell, shake] of shakes) {
+      shake.elapsed += seconds;
+      const done = shake.elapsed >= SHAKE.seconds;
+      const angle = done ? 0 : SHAKE.angle * Math.exp(-shake.elapsed * SHAKE.damping) * Math.cos(shake.elapsed * SHAKE.rate);
+      forest?.sway(cell, shake.x, shake.z, angle);
+      if (done) shakes.delete(cell);
+    }
+  }
+  cast.onStrike = (at, kind, seed) => {
+    if (kind !== 'wood' || forest === null) return;
+    const map = lastPaintedMap;
+    if (map === null) return;
+    let best: { cell: number; x: number; z: number; d: number } | null = null;
+    for (let dz = -1; dz <= 1; dz += 1) for (let dx = -1; dx <= 1; dx += 1) {
+      const cx = Math.floor(at.x) + dx, cz = Math.floor(at.z) + dz;
+      if (cx < 0 || cz < 0 || cx >= map.width || cz >= map.height) continue;
+      const cell = cz * map.width + cx;
+      if (map.terrain[cell] !== TERRAIN_CODE.forest) continue;
+      const trunk = scatterTransform(map.width, cell);
+      const d = Math.hypot(trunk.x - at.x, trunk.z - at.z);
+      if (d < 0.8 && (best === null || d < best.d)) best = { cell, x: trunk.x - at.x, z: trunk.z - at.z, d };
+    }
+    if (best === null) return;
+    shakes.set(best.cell, { elapsed: 0, x: best.x, z: best.z });
+    const trunk = scatterTransform(map.width, best.cell);
+    cast.chips.hit(new Vector3(trunk.x, groundFloor(trunk.x, trunk.z) + 1.6 * trunk.scale, trunk.z), 'leaf', seed);
+  };
+
   function rebuildForest(state: GameState, palette: ReturnType<typeof paletteFor>): void {
+    shakes.clear();
+    lastPaintedMap = state.map;
     if (forest !== null) {
       world.remove(forest.group);
       forest.dispose();
@@ -912,6 +953,9 @@ export async function createGraphicsRenderer(
       renderedAnimals: fauna.snapshot().map(animal => ({ ...animal, screen: screen(animal.x, animal.z) })),
       day: lifeDay,
       steps: life.steps,
+      // IA-anim · los sitios de la jornada: sin ellos no se ve por qué un
+      // tajo o una cantera no se ofrece, sólo que nadie va.
+      places: life.places.map(place => place.id),
       timberDeliveries: life.timberDeliveries,
       stoneDeliveries: life.stoneDeliveries,
       harvestDeliveries: life.harvestDeliveries,
@@ -1459,6 +1503,7 @@ export async function createGraphicsRenderer(
       cast.show(lastActors, life.physics?.ragdolls ?? []);
       // IA-anim · las astillas van con el reloj de la escena: en pausa, quietas.
       cast.chips.step(frame.deltaSeconds, groundFloor);
+      stepShakes(frame.deltaSeconds);
       // D.7 · sólo el robledal realmente interpuesto ante el encuentro pierde
       // opacidad. Se calcula después de mover los cuerpos; no toca mapa,
       // obstáculos ni geometría física.
@@ -1944,6 +1989,7 @@ interface LifeSnapshot {
     readonly z: number; readonly walkWeight: number | null; readonly screen: ScreenPoint }[];
   readonly day: number;
   readonly steps: number;
+  readonly places: readonly string[];
   readonly timberDeliveries: number;
   readonly stoneDeliveries: number;
   readonly harvestDeliveries: number;

@@ -16,7 +16,7 @@
 // en el río» es una entrada en una tabla, no una rama en un árbol de decisión.
 
 import { hash32 } from '@engine/rng';
-import type { GameState } from '@engine/state';
+import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { allocateLabour } from '@engine/subsistence/labour';
 import { TIME } from '@engine/balance';
 import { seasonOf, weekOf } from '@engine/time';
@@ -26,6 +26,9 @@ import { blockedAt, fitsCircle, WALL_CLEAR } from './body';
 import type { NeedName } from './needs';
 import { quarryCells, stoneWork, woodStoreCells } from './resource-sites';
 import { pathTo } from './navigate';
+import { canReach, reachableFrom } from './terrain';
+import { scatterTransform } from '../world/forest';
+import { STRIKE_HEAD } from '../clips';
 
 /** Algo que se puede hacer, y dónde. */
 export interface Offer {
@@ -198,9 +201,62 @@ const WORK = OFFERS['work'] as OfferSpec;
 /** TUNE escénico: una tanda de hachazos produce un haz transportable. La obra
  * dura 20–45 s, pero ese plazo ocupa casi toda la mañana y nunca deja tiempo
  * para volver a la leñera antes del regreso nocturno. */
-const FELL = { ...WORK, seconds: [6, 10] as const };
+// IA-anim · `reach` corto: el trabajo del campo da por llegado a quien está a
+// 1,6 de su plaza, que en el tajo dejaba al leñador parado a un paso del tronco
+// (medido: de 0,8 a 1,3 celdas con las plazas ya a 0,5 del tronco).
+const FELL = { ...WORK, seconds: [6, 10] as const, reach: 0.15 };
+/**
+ * IA-anim · Los corros, sumados a la distancia de contacto (`strikeStand`):
+ * el primero es el que toca el tronco; los siguientes, cuando en ése no cabe
+ * nadie, se quedan a una décima más cada uno. Más allá, el reparto de siempre.
+ */
+const CHOP_REACH = [0, 0.1, 0.2, 0.3] as const;
+/** Radio del tronco adulto de `tree.glb`, el mismo que mide `plan.ts`. */
+const TRUNK_RADIUS = 0.34 / 3;
+/**
+ * IA-anim · Distancia del cuerpo al centro de lo golpeado para que la cabeza de
+ * la herramienta toque su superficie: el alcance medido del golpe más el radio.
+ */
+export function strikeStand(clip: 'chop' | 'mine', surface: number): number {
+  const head = STRIKE_HEAD[clip];
+  return Math.hypot(head.x, head.z) + surface;
+}
+/** Las plazas desde las que un hachazo toca el tronco de esa celda. */
+function contactSpots(width: number, land: Terrain, cell: number): Point[] {
+  const trunk = scatterTransform(width, cell);
+  const touch = strikeStand('chop', TRUNK_RADIUS * trunk.scale);
+  return Array.from({ length: 12 }, (_, k) => {
+    const angle = k * Math.PI / 6 + 0.39;
+    return { x: trunk.x + Math.sin(angle) * touch, z: trunk.z + Math.cos(angle) * touch };
+  }).filter(spot => fitsCircle(land, spot.x, spot.z, 0.32));
+}
+
+/** Los árboles en pie a dos celdas del que tala el motor, del más cercano al más lejano. */
+function nearTrees(state: GameState, target: number): number[] {
+  const width = state.map.width, tx = target % width, tz = Math.floor(target / width);
+  const near: number[] = [];
+  for (let dz = -2; dz <= 2; dz += 1) for (let dx = -2; dx <= 2; dx += 1) {
+    const x = tx + dx, z = tz + dz;
+    if (x < 0 || z < 0 || x >= width || z >= state.map.height) continue;
+    const cell = z * width + x;
+    if (state.map.terrain[cell] === TERRAIN_CODE.forest && (state.map.forestStock[cell] ?? 0) > 0) near.push(cell);
+  }
+  return near.sort((a, b) => Math.hypot(a % width - tx, Math.floor(a / width) - tz)
+    - Math.hypot(b % width - tx, Math.floor(b / width) - tz) || a - b);
+}
+
+/** El árbol con un lado abierto más cercano al que tala el motor. */
+function edgeTree(state: GameState, land: Terrain, target: number): number {
+  return nearTrees(state, target).find(cell => contactSpots(state.map.width, land, cell).length > 0) ?? target;
+}
+
+/** El giro que compensa que la cabeza no cae recta delante del cuerpo. */
+export function strikeTurn(clip: 'chop' | 'mine'): number {
+  const head = STRIKE_HEAD[clip];
+  return Math.atan2(head.x, head.z);
+}
 /** Una tanda breve de pico antes de llevar la carga a la obra. */
-const QUARRY = { ...WORK, seconds: [6, 10] as const };
+const QUARRY = { ...WORK, seconds: [6, 10] as const, reach: 0.15 };
 
 /** Un sitio del valle, con lo que da. */
 export interface Place {
@@ -345,10 +401,44 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
   const tree = fellingTarget(state);
   const felling = Math.ceil(hands.cutters + (winter && tree !== null ? hands.farmers : 0));
   if (felling > 0) {
-    const cell = tree;
+    // IA-anim · **El árbol del gesto es uno del borde.** El que marca el motor
+    // es el más cercano al pueblo, y a menudo queda dentro de la masa, rodeado
+    // de celdas cerradas: medido en las semillas 7 y 23 (año 30), ningún hueco
+    // junto a su tronco y los leñadores golpeando a 1,2–2,3 celdas. Se toma el
+    // más cercano a él —dos celdas como mucho— con un lado abierto donde
+    // plantarse. La madera la sigue contando el motor, como antes.
+    const cell = tree === null ? null : edgeTree(state, land, tree);
     if (cell !== null) {
       const at = { x: cell % state.map.width + 0.5, z: Math.floor(cell / state.map.width) + 0.5 };
-      const offer = placedOffer({ ...FELL, seats: Math.min(felling, MOST_SEATS) }, at, land);
+      // IA-anim · Las plazas, en corro alrededor del **tronco**, a un hachazo
+      // de distancia. El árbol se planta desplazado hasta 0,34 dentro de su
+      // celda (`scatterTransform`) y el corro alrededor del centro dejaba al
+      // leñador golpeando el aire a más de un paso del tronco.
+      const trunk = scatterTransform(state.map.width, cell);
+      // Los corros de dentro afuera: el propio tronco y los vecinos ocupan
+      // suelo, y en un bosque denso el primero no tiene hueco. Si ni así hay
+      // plaza para todos los del día, se completa con el reparto de siempre:
+      // mejor un leñador lejos del tronco que uno sin tajo.
+      const want = Math.min(felling, MOST_SEATS);
+      const touch = strikeStand('chop', TRUNK_RADIUS * trunk.scale);
+      // Primero, un sitio de contacto junto a cada árbol del borde cercano:
+      // cada leñador con su tronco, como un tajo de verdad.
+      const candidates = [
+        ...contactSpots(state.map.width, land, cell),
+        ...nearTrees(state, tree!).filter(other => other !== cell)
+          .flatMap(other => contactSpots(state.map.width, land, other)),
+        ...CHOP_REACH.map(extra => touch + extra).flatMap(reach => Array.from({ length: 12 }, (_, k) => {
+          const angle = k * Math.PI / 6 + 0.39;
+          return { x: trunk.x + Math.sin(angle) * reach, z: trunk.z + Math.cos(angle) * reach };
+        }).filter(spot => fitsCircle(land, spot.x, spot.z, 0.32))),
+        ...seatsOn(land, at, want),
+      ];
+      const around = candidates.reduce<Point[]>((kept, spot) =>
+        // Dos leñadores no comparten hueco: entre plazas, al menos un cuerpo.
+        kept.length < want && kept.every(other => Math.hypot(other.x - spot.x, other.z - spot.z) >= 0.64)
+          ? [...kept, spot] : kept, []);
+      const offer = placedOffer({ ...FELL, seats: Math.min(felling, MOST_SEATS) }, at, land, undefined,
+        around.length > 0 ? around : undefined);
       if (offer !== null) places.push({ id: `felling:${cell}`, at: offer.at, offers: [offer] });
     }
     const store = woodStoreCells(state)[0];
@@ -390,9 +480,21 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
     }
     if (stoneWork(state) !== null) {
       const workAt = doorOf(land, work.x, work.y, work.w, work.h);
+      // Una sola inundación desde la obra: descartar aquí las caras sin suelo
+      // alcanzable al lado evita trazar una ruta por cada celda de montaña.
+      const region = workAt === null ? null : reachableFrom(land, workAt);
       for (const cell of quarryCells(state)) {
-        const at = { x: cell % state.map.width + 0.5, z: Math.floor(cell / state.map.width) + 0.5 };
-        const offer = placedOffer({ ...QUARRY, seats: Math.min(building, MOST_SEATS) }, at, land);
+        const cx = cell % state.map.width, cz = Math.floor(cell / state.map.width);
+        if (region === null || ![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dz]) =>
+          canReach(land, region, { x: cx + dx! + 0.5, z: cz + dz! + 0.5 }))) continue;
+        const at = { x: cx + 0.5, z: cz + 0.5 };
+        // IA-anim · Una plaza por cara pisable, a la distancia en que el pico
+        // clava dentro de la celda: el alcance medido menos un palmo de roca.
+        const faces = [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dz]) => ({
+          x: at.x + dx! * (0.5 + strikeStand('mine', -0.05)), z: at.z + dz! * (0.5 + strikeStand('mine', -0.05)),
+        })).filter(spot => fitsCircle(land, spot.x, spot.z, 0.32) && canReach(land, region, spot));
+        const offer = placedOffer({ ...QUARRY, seats: Math.min(building, MOST_SEATS) }, at, land, undefined,
+          faces.length > 0 ? faces.slice(0, Math.min(building, MOST_SEATS)) : undefined);
         if (offer === null || workAt === null || pathTo(land, workAt, offer.at, 0.32) === null) continue;
         places.push({ id: `quarry:${cell}`, at, offers: [offer] });
         break;

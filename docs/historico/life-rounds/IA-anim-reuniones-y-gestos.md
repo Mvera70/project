@@ -68,3 +68,32 @@ golpe baja rápido y la herramienta mide como una.
 - El leñador golpea a algo más de un paso del tronco, y el árbol no acusa el
   golpe. Apuntado en `docs/encargos-3d.md`.
 - Hacha y pico son respaldo por código; un GLB con `grip` los sustituye.
+
+## Segunda tanda (24 sep 2026): contacto, árbol y cantera
+
+Vera preguntó si el hacha estaba al revés y si el golpe tenía contacto físico.
+Las dos cosas eran ciertas y se midieron antes de tocar nada:
+
+- **El hacha pegaba con el lomo.** En el impacto el filo miraba hacia arriba
+  (0,97 en vertical) mientras la cabeza bajaba. Se dio la vuelta a la cabeza;
+  una prueba exige ahora que el filo vaya por delante del movimiento.
+- **No había contacto.** La cabeza quedaba de 0,1 a 0,3 celdas del tronco, y el
+  pico no llegaba a la roca: un cuerpo no pisa a menos de 0,32 de su borde.
+  `STRIKE_HEAD` guarda dónde cae la cabeza en el golpe (vigilado contra el GLB);
+  la vida planta al trabajador a esa distancia más el radio del tronco y lo
+  gira compensando el desvío lateral. El pico gana alcance en el golpe.
+- **El árbol del motor suele estar dentro del bosque**, sin un lado libre: en
+  las semillas 7 y 23 los leñadores quedaban a 1,2–2,3 celdas. El gesto se
+  hace en los árboles del borde más cercanos, uno por leñador; la madera la
+  sigue contando el motor. Resultado: de −0,06 a 0,19.
+- **El árbol acusa el golpe:** `Forest.sway` inclina sólo ese árbol y lo
+  devuelve, con vaivén amortiguado de 0,8 s, y la copa suelta hojas.
+- **La cantera no aparecía en valles cuya roca queda al otro lado del río o
+  del muro** (semilla 7, semana 1418). Ahora se pica también en la ladera de la
+  montaña alcanzable, con una plaza por cara a la distancia del pico.
+- Picado filmado en partida: semilla 23, año 30, con obra de muralla
+  (`artifacts/graphics/IA-anim/mine-close-seed23/sheet.png`).
+
+Reaprovechar en combate: los gestos tienen instante de impacto (`STRIKE_AT`) y
+punto de impacto (`STRIKE_HEAD`) con nombre; un hachazo de guerra sólo necesita
+arrancar desde el golpe real, como la lanza, y otra herramienta en la mano.

@@ -15,9 +15,20 @@ const LIFE = 0.7;
 /** Gravedad en celdas por segundo al cuadrado: una celda son tres metros. */
 const GRAVITY = 3.3;
 
-const COLOURS = { wood: new Color('#c9a26a'), stone: new Color('#a39d92') } as const;
+const COLOURS = { wood: new Color('#c9a26a'), stone: new Color('#a39d92'), leaf: new Color('#5d7a3a') } as const;
+export type ChipKind = keyof typeof COLOURS;
+/**
+ * Las hojas que suelta la copa al acusar el hachazo caen despacio y duran más:
+ * nacen a dos celdas de altura y con la gravedad de una astilla llegarían al
+ * suelo después de haber desaparecido.
+ */
+const PHYSICS: Readonly<Record<ChipKind, { gravity: number; life: number; lift: number; spread: number }>> = {
+  wood: { gravity: GRAVITY, life: LIFE, lift: 1, spread: 1 },
+  stone: { gravity: GRAVITY, life: LIFE, lift: 1, spread: 1 },
+  leaf: { gravity: 0.7, life: 2.2, lift: 0.1, spread: 0.5 },
+};
 
-interface Chip { x: number; y: number; z: number; vx: number; vy: number; vz: number; age: number; spin: number; kind: 'wood' | 'stone' }
+interface Chip { x: number; y: number; z: number; vx: number; vy: number; vz: number; age: number; spin: number; kind: ChipKind }
 
 function unit(seed: number): number {
   // xorshift de 32 bits sobre la semilla: estable y sin estado compartido.
@@ -45,13 +56,14 @@ export class WorkChips {
   }
 
   /** Un golpe en `at`, del material que toque. `seed` distingue golpes y aldeanos. */
-  hit(at: Vector3, kind: 'wood' | 'stone', seed: number): void {
+  hit(at: Vector3, kind: ChipKind, seed: number): void {
+    const physics = PHYSICS[kind];
     for (let n = 0; n < PER_HIT; n += 1) {
       const a = unit(seed * 97 + n * 7919 + 1), b = unit(seed * 31 + n * 104_729 + 7), c = unit(seed * 13 + n * 15_485_863 + 3);
       const angle = a * Math.PI * 2, speed = 0.35 + b * 0.45;
       this.chips[this.next] = {
         x: at.x, y: at.y, z: at.z,
-        vx: Math.cos(angle) * speed, vy: 0.6 + c * 0.7, vz: Math.sin(angle) * speed,
+        vx: Math.cos(angle) * speed * physics.spread, vy: (0.6 + c * 0.7) * physics.lift, vz: Math.sin(angle) * speed * physics.spread,
         age: 0, spin: a * 20, kind,
       };
       this.next = (this.next + 1) % POOL;
@@ -64,14 +76,15 @@ export class WorkChips {
     for (let i = 0; i < POOL; i += 1) {
       const chip = this.chips[i];
       if (chip === null || chip === undefined) continue;
+      const { gravity, life } = PHYSICS[chip.kind];
       chip.age += seconds;
-      if (chip.age >= LIFE) { this.chips[i] = null; continue; }
-      chip.vy -= GRAVITY * seconds;
+      if (chip.age >= life) { this.chips[i] = null; continue; }
+      chip.vy -= gravity * seconds;
       chip.x += chip.vx * seconds; chip.y += chip.vy * seconds; chip.z += chip.vz * seconds;
       const floor = ground(chip.x, chip.z) + 0.01;
       if (chip.y < floor) { chip.y = floor; chip.vx *= 0.3; chip.vz *= 0.3; chip.vy = 0; }
       this.rotation.setFromAxisAngle(this.axis, chip.spin * chip.age);
-      const shrink = chip.age > LIFE * 0.7 ? 1 - (chip.age - LIFE * 0.7) / (LIFE * 0.3) : 1;
+      const shrink = chip.age > life * 0.7 ? 1 - (chip.age - life * 0.7) / (life * 0.3) : 1;
       this.matrix.compose(new Vector3(chip.x, chip.y, chip.z), this.rotation, new Vector3(shrink, shrink, shrink));
       // Las vivas se compactan al principio del buffer: `count` las dibuja todas.
       this.mesh.setMatrixAt(drawn, this.matrix);

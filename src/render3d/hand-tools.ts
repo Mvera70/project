@@ -26,10 +26,13 @@ export function handTool(clip: string): Group | undefined {
         arm.position.set(side * 0.16, 0.86, 0); arm.rotation.z = side * 0.28; tool.add(arm);
       }
     } else {
+      // El filo va hacia −X: medido en el banco, en el golpe el mango apunta
+      // al tronco y la cabeza baja, y con el filo en +X el hacha pegaba con el
+      // lomo (el filo miraba hacia arriba). Vera lo vio en la primera toma.
       const blade = new Mesh(new BoxGeometry(0.26, 0.24, 0.05), metal);
-      blade.position.set(0.13, 0.82, 0); tool.add(blade);
+      blade.position.set(-0.13, 0.82, 0); tool.add(blade);
       const poll = new Mesh(new BoxGeometry(0.08, 0.1, 0.08), metal);
-      poll.position.set(-0.04, 0.82, 0); tool.add(poll);
+      poll.position.set(0.04, 0.82, 0); tool.add(poll);
     }
     tool.quaternion.set(0.6794, 0.2790, 0.6522, 0.1878);
     group.add(tool); return group;

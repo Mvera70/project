@@ -70,7 +70,11 @@ window.pose = (name, t, view) => {
   const handScale = villager.getObjectByName('hand_r')!.getWorldScale(new Vector3()).toArray();
   const actorScale = villager.getWorldScale(new Vector3()).toArray();
   const handQuat = villager.getObjectByName('hand_r')!.getWorldQuaternion(new Quaternion()).toArray();
-  return { finite, hand, tool: head, handScale, actorScale, handQuat } as never;
+  // Filo (−X de la cabeza, `hand-tools.ts`): hacia dónde corta la herramienta.
+  const inner = tool?.children[0];
+  const edge = inner === undefined ? null : new Vector3(-1, 0, 0).applyQuaternion(inner.getWorldQuaternion(new Quaternion())).toArray();
+  const shaft = inner === undefined ? null : new Vector3(0, 1, 0).applyQuaternion(inner.getWorldQuaternion(new Quaternion())).toArray();
+  return { finite, hand, tool: head, handScale, actorScale, handQuat, edge, shaft } as never;
 };
 window.SECONDS = Object.fromEntries(
   (Object.keys(VILLAGER_CLIPS) as ClipName[]).map(name => [name, VILLAGER_CLIPS[name].seconds]));

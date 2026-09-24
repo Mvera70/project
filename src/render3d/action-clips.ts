@@ -172,13 +172,16 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
       ]);
       if (name === 'mine') {
         for (const side of ['L', 'R']) {
-          turn(`upperarm.${side}`, x, pose(-0.9, -2.75, -0.55));
+          // Golpe con los brazos más adelante que abajo: un cuerpo no puede
+          // pisar a menos de 0,32 del borde de la roca y el pico, clavando a
+          // los pies, se quedaba fuera de ella.
+          turn(`upperarm.${side}`, x, pose(-0.9, -2.75, -0.95));
           turn(`forearm.${side}`, x, pose(-0.7, -1.0, -0.05));
           turn(`upperarm.${side}`, z, pose(0, 0, 0));
           turn(`thigh.${side}`, x, pose(-0.1, 0.05, -0.35));
           turn(`shin.${side}`, x, pose(0.15, 0, 0.55));
         }
-        turn('spine', x, pose(0.15, -0.2, 0.55));
+        turn('spine', x, pose(0.15, -0.2, 0.7));
         turn('head', x, pose(0.1, -0.15, 0.25));
       } else {
         turn('upperarm.R', x, pose(-0.8, -2.3, -1.15));

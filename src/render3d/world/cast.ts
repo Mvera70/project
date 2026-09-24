@@ -153,6 +153,8 @@ export class Cast {
   readonly group = new Group();
   /** IA-anim · Astillas de los golpes de hacha y pico; el renderer las avanza. */
   readonly chips: WorkChips;
+  /** IA-anim · Aviso de cada golpe, para que el árbol lo acuse. */
+  onStrike: ((at: Vector3, kind: 'wood' | 'stone', seed: number) => void) | null = null;
   private readonly players = new Map<VillagerId, Player>();
   private readonly extraClips: AnimationClip[];
 
@@ -578,15 +580,17 @@ export class Cast {
     const before = player.strikePhase;
     player.strikePhase = phase;
     if (before === undefined) return;
-    const at = STRIKE_AT[actor.clip];
-    const crossed = before <= phase ? before < at && at <= phase : before < at || at <= phase;
+    const moment = STRIKE_AT[actor.clip];
+    const crossed = before <= phase ? before < moment && moment <= phase : before < moment || moment <= phase;
     if (!crossed) return;
     const tool = player.held.get(actor.clip);
     const head = tool?.children[0]?.children.at(-1) ?? tool;
     if (head === undefined || !head.visible || tool?.visible === false) return;
     player.strikes = (player.strikes ?? 0) + 1;
-    this.chips.hit(head.getWorldPosition(new Vector3()), actor.clip === 'chop' ? 'wood' : 'stone',
-      actor.id * 1009 + player.strikes);
+    const at = head.getWorldPosition(new Vector3());
+    const kind = actor.clip === 'chop' ? 'wood' : 'stone';
+    this.chips.hit(at, kind, actor.id * 1009 + player.strikes);
+    this.onStrike?.(at, kind, actor.id * 1009 + player.strikes);
   }
 
   private retire(id: VillagerId): void {

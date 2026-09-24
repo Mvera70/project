@@ -10,8 +10,9 @@
 
 import { homeRoutine, indoors, isNight, stepHome, type HomeRoutine } from './home';
 import { statureAt } from '../world/models';
+import { scatterTransform } from '../world/forest';
 import { VILLAGER_CLIPS } from '../clips';
-import type { GameState, Trait, VillagerId } from '@engine/state';
+import { TERRAIN_CODE, type GameState, type Trait, type VillagerId } from '@engine/state';
 import { DAY, FOOD, TIME } from '@engine/balance';
 import { population } from '@engine/people/demography';
 import { opinionOf } from '@engine/people/opinions';
@@ -28,7 +29,7 @@ import { clearBetween, createRouter, pathTo, routeAroundBodies, type Router } fr
 import { dayPlans, leisurePlaces, type DayPlan } from './day';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
-import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
+import { doorOf, OFFERS, placesOf, seatAt, seatKey, strikeTurn, type Offer, type Place } from './offers';
 import { garrisonPlaces, isPost, mannedPlatformCells, type Manned, type RampartSelector, type RingSelector, type WalkwaySelector } from './garrison';
 import { advanceElevated, type ElevatedPoint, type ElevatedPost } from './elevated-post';
 import { archersOf, stepArchery, type Archer, type Arrow } from './archery';
@@ -533,6 +534,21 @@ interface ActiveYield { readonly id: string; readonly yielding: Yielding }
  *  A lo sumo una por jornada (`quarrelStaged`), así que basta con un valor
  *  nulable y no una lista. */
 interface ActiveQuarrel { readonly id: string; readonly scene: QuarrelScene }
+
+/** IA-anim · El tronco en pie más cercano a un cuerpo, en su celda o las vecinas. */
+function nearestTrunk(state: GameState, at: { readonly x: number; readonly z: number }): { x: number; z: number } | null {
+  let best: { x: number; z: number } | null = null, gap = 1.2;
+  for (let dz = -1; dz <= 1; dz += 1) for (let dx = -1; dx <= 1; dx += 1) {
+    const x = Math.floor(at.x) + dx, z = Math.floor(at.z) + dz;
+    if (x < 0 || z < 0 || x >= state.map.width || z >= state.map.height) continue;
+    const cell = z * state.map.width + x;
+    if (state.map.terrain[cell] !== TERRAIN_CODE.forest || (state.map.forestStock[cell] ?? 0) <= 0) continue;
+    const trunk = scatterTransform(state.map.width, cell);
+    const d = Math.hypot(trunk.x - at.x, trunk.z - at.z);
+    if (d < gap) { gap = d; best = trunk; }
+  }
+  return best;
+}
 
 /**
  * E3b.3 · Cuánto se queda el guardia en su puesto entre dos rondas por el
@@ -2068,8 +2084,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           const [kind, cell] = dweller.doing.place.id.split(':');
           if ((kind === 'felling' || kind === 'quarry') && cell !== undefined) {
             const index = Number(cell);
-            const tx = index % land.width + 0.5, tz = Math.floor(index / land.width) + 0.5;
-            if (Math.hypot(tx - body.x, tz - body.z) > 0.05) turnTo(body, Math.atan2(tx - body.x, tz - body.z), LIFE_STEP);
+            // Al tronco de verdad que tiene delante: su plaza puede ser la de
+            // otro árbol del borde (`offers.ts`, `nearTrees`).
+            const trunk = kind === 'felling' ? nearestTrunk(state, body) ?? scatterTransform(land.width, index) : null;
+            const tx = trunk?.x ?? index % land.width + 0.5, tz = trunk?.z ?? Math.floor(index / land.width) + 0.5;
+            // Y se gira lo justo para que la cabeza de la herramienta, que no
+            // cae recta delante del cuerpo (`STRIKE_HEAD`), dé en el blanco.
+            if (Math.hypot(tx - body.x, tz - body.z) > 0.05) {
+              turnTo(body, Math.atan2(tx - body.x, tz - body.z) - strikeTurn(kind === 'felling' ? 'chop' : 'mine'), LIFE_STEP);
+            }
           }
         }
 

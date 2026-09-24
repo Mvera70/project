@@ -21,21 +21,31 @@ export function stoneWork(state: Pick<GameState, 'works'>): ConstructionWork | n
   return spec.stone > 0 && work.stoneDone < spec.stone ? work : null;
 }
 
-/** Pedregales ordenados por cercanía a la obra real; la alcanzabilidad se comprueba al poner la oferta. */
+/**
+ * Pedregales ordenados por cercanía a la obra real, y después la ladera.
+ *
+ * IA-anim · **La montaña también es cantera.** En la semilla 7 (semana 1418)
+ * las veinte rocas quedaban fuera de la zona a la que la aldea llega andando, y
+ * la cantera no aparecía nunca aunque el motor sí producía piedra. La roca
+ * suelta va primero; la cara de la montaña, detrás. La alcanzabilidad se
+ * comprueba al poner la oferta.
+ */
 export function quarryCells(state: Pick<GameState, 'map' | 'works'>): number[] {
   const work = stoneWork(state);
   if (work === null) return [];
   const centreX = work.x + work.w / 2;
   const centreZ = work.y + work.h / 2;
-  const cells: number[] = [];
+  const rocks: number[] = [], faces: number[] = [];
   for (let cell = 0; cell < state.map.terrain.length; cell += 1) {
-    if (state.map.terrain[cell] === TERRAIN_CODE.rock) cells.push(cell);
+    if (state.map.terrain[cell] === TERRAIN_CODE.rock) rocks.push(cell);
+    else if (state.map.terrain[cell] === TERRAIN_CODE.mountain) faces.push(cell);
   }
-  return cells.sort((a, b) => {
+  const near = (a: number, b: number): number => {
     const ax = a % state.map.width + 0.5, az = Math.floor(a / state.map.width) + 0.5;
     const bx = b % state.map.width + 0.5, bz = Math.floor(b / state.map.width) + 0.5;
     return Math.hypot(ax - centreX, az - centreZ) - Math.hypot(bx - centreX, bz - centreZ) || a - b;
-  });
+  };
+  return [...rocks.sort(near), ...faces.sort(near)];
 }
 
 function ringOf(map: ValleyMap, building: Building): number[] {

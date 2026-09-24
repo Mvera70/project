@@ -1,5 +1,14 @@
 # The Valley — Registro de cambios
 
+## v4.40 · 24 sep 2026 · El golpe toca el tronco y la roca
+
+El hacha pegaba con el lomo y ningún golpe llegaba a tocar lo que golpeaba:
+de 0,1 a 0,3 celdas de hueco con el tronco, y el pico fuera de la roca. Con la
+cabeza medida en el golpe (`STRIKE_HEAD`), el trabajador se planta a la
+distancia de contacto en un árbol del borde o en la cara de la roca, y el
+árbol oscila y suelta hojas. La cantera aparece también donde la roca queda
+fuera del alcance de la aldea, en la ladera. Medido: de −0,06 a 0,19.
+
 ## v4.39 · 24 sep 2026 · Reuniones que se acaban; talar y picar con gesto propio
 
 `gather.days` se lee como jornadas y no como semanas: desde v3.72 una reunión
