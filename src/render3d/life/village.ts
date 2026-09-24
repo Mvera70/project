@@ -535,17 +535,37 @@ interface ActiveYield { readonly id: string; readonly yielding: Yielding }
  *  nulable y no una lista. */
 interface ActiveQuarrel { readonly id: string; readonly scene: QuarrelScene }
 
-/** IA-pasture · La celda abierta más cercana a un punto, de dentro afuera. */
-function openNear(land: Terrain, at: Point): Point {
-  if (!blockedAt(land, at.x, at.z)) return at;
-  for (let ring = 1; ring < 12; ring += 1) {
+/**
+ * IA-pasture · Dónde empieza el suelo del ganado: el mayor trozo de pasto
+ * alrededor del corazón, no la primera celda libre.
+ *
+ * Con los campos cerrados, la celda libre más cercana al corazón podía ser un
+ * bolsillo de pocas celdas entre dos parcelas. Todo lo que el ganado alcanza se
+ * medía desde ahí, así que casi ninguna casa quedaba a su alcance y la mitad de
+ * la cabaña caía en el propio corazón: treinta gallinas en una celda en la
+ * semilla 7 (Vera, 24 sep 2026: «mira cómo se concentran las gallinas»). Se
+ * miran los trozos que tocan los primeros anillos y se queda el más grande.
+ */
+function pastureOrigin(pasture: Terrain, at: Point, people: Uint8Array): { heart: Point; shore: Uint8Array } {
+  let best: { heart: Point; shore: Uint8Array; size: number } | null = null;
+  const seen = new Uint8Array(pasture.width * pasture.height);
+  const cx = Math.floor(at.x), cz = Math.floor(at.z);
+  for (let ring = 0; ring < 12; ring += 1) {
     for (let dz = -ring; dz <= ring; dz += 1) for (let dx = -ring; dx <= ring; dx += 1) {
       if (Math.max(Math.abs(dx), Math.abs(dz)) !== ring) continue;
-      const x = Math.floor(at.x) + dx + 0.5, z = Math.floor(at.z) + dz + 0.5;
-      if (x > 0.5 && z > 0.5 && x < land.width - 0.5 && z < land.height - 0.5 && !blockedAt(land, x, z)) return { x, z };
+      const x = cx + dx, z = cz + dz;
+      if (x < 1 || z < 1 || x >= pasture.width - 1 || z >= pasture.height - 1) continue;
+      const cell = z * pasture.width + x;
+      // Sólo trozos de la orilla de la gente: el ganado no nace al otro lado del río.
+      if (seen[cell] === 1 || pasture.blocked[cell] === 1 || people[cell] !== 1) continue;
+      const heart = { x: x + 0.5, z: z + 0.5 };
+      const shore = reachableFrom(pasture, heart);
+      let size = 0;
+      for (let n = 0; n < shore.length; n += 1) if (shore[n] === 1) { size += 1; seen[n] = 1; }
+      if (best === null || size > best.size) best = { heart, shore, size };
     }
   }
-  return at;
+  return best ?? { heart: at, shore: reachableFrom(pasture, at) };
 }
 
 /** IA-pasture · El terreno del ganado: el de la gente con los campos cerrados. */
@@ -673,8 +693,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const pasture = fencedFields(land, state);
   // El corazón de la aldea puede caer dentro de un campo, que para el ganado
   // está cerrado: desde ahí no se alcanzaría nada y no nacería ningún animal.
-  const pastureHeart = openNear(pasture, heart);
-  const pastureShore = reachableFrom(pasture, pastureHeart);
+  const { heart: pastureHeart, shore: pastureShore } = pastureOrigin(pasture, heart, shore);
   const beasts = createBeasts(state, pasture, pastureHeart, seed, pastureShore, preparing);
   const deer = createDeer(state, land, seed, heart);
   const bear = createBear(state, land, heart);

@@ -54,7 +54,7 @@ import { follow, routeAroundBodies, type Router } from './navigate';
 import { doorOf, OFFERS, seatAt, type Offer, type OfferSpec, type Place } from './offers';
 import { commons } from './places';
 import { avoid, drive, seek, separate, type Push } from './steering';
-import { canReach, nearestReachable } from './terrain';
+import { canReach, nearestReachable, reachableFrom } from './terrain';
 import type { Dweller } from './village';
 
 /** Las tres clases que hoy tienen cuerpo, cabaña y nombre en `state.herd`. */
@@ -492,6 +492,26 @@ function fordDrinkOf(state: GameState, land: Terrain): Place | null {
 }
 
 /**
+ * IA-pasture · El claro que busca un animal sin sitio junto a su casa: cuántos
+ * anillos de celdas se miran, cuántos candidatos se juntan antes de elegir y
+ * cuánta holgura (en celdas) pide alrededor. TUNE: con 0,9 de holgura el hueco
+ * de una celda entre dos campos no cuenta como claro; ocho anillos llegan al
+ * borde de la aldea en las semillas medidas.
+ */
+const SPREAD_RINGS = 8;
+const SPREAD_CHOICES = 4;
+const SPREAD_CLEARANCE = 0.9;
+/**
+ * IA-pasture · El trozo de pasto más pequeño en el que un animal puede vivir
+ * separado del corazón. TUNE: treinta celdas es un prado de seis por cinco,
+ * sitio para picotear, hozar y pastar sin pisarse.
+ */
+const OWN_PASTURE_CELLS = 30;
+
+/** Dónde nace un animal y qué suelo cuenta como suyo. */
+interface Home { readonly at: Point; readonly reach: Uint8Array }
+
+/**
  * La cabaña de esta jornada, con cuerpo y sitio para cada cabeza.
  *
  * **Cuenta lo que `state.herd` dice, no lo que el tick vivo tenga** (D.6.7,
@@ -530,10 +550,11 @@ export function createBeasts(
   const beasts: Beast[] = [];
   let n = 0;
 
-  const spawn = (kind: BeastKind, anchor: Point): void => {
+  const spawn = (kind: BeastKind, home: Home): void => {
+    let anchor = home.at;
     // El centro libre no basta: el cuerpo entero debe caber al nacer.
     if (!fitsCircle(land, anchor.x, anchor.z, RADIUS[kind])) {
-      const free = nearestReachable(land, shore, anchor, RADIUS[kind]);
+      const free = nearestReachable(land, home.reach, anchor, RADIUS[kind]);
       if (free === null) return;
       anchor = free;
     }
@@ -570,7 +591,7 @@ export function createBeasts(
       dweller,
       kind,
       anchor,
-      self: selfPlaceOf(kind, id, anchor, land, shore, seed),
+      self: selfPlaceOf(kind, id, anchor, land, home.reach, seed),
       gift: giftPlaceOf(kind, id, body),
       drink: kind === 'cow' ? drink : null,
       progress: freshProgress(),
@@ -582,10 +603,10 @@ export function createBeasts(
   const anchorOf = (
     building: { x: number; y: number; w: number; h: number } | undefined,
     id: number,
-  ): Point => {
-    if (building === undefined) return heart;
+  ): Home => {
+    if (building === undefined) return settle(heart, id);
     const door = doorOf(land, building.x, building.y, building.w, building.h);
-    if (door === null) return heart;
+    if (door === null) return settle({ x: building.x + building.w / 2, z: building.y + building.h / 2 }, id);
     // **No al mismo punto exacto que la gente.** `doorOf` es determinista y
     // sin este empujón un animal se plantaba en el mismo palmo que la oferta
     // `sit` del propio edificio — la puerta es un único punto, y compartirlo
@@ -609,8 +630,69 @@ export function createBeasts(
     // `terrain.ts`); si el valle entero estuviera cerrado —no ocurre en la
     // práctica, el corazón siempre tiene suelo alrededor— el corazón mismo
     // cierra el reparto.
-    if (canReach(land, shore, candidate)) return candidate;
-    return nearestReachable(land, shore, candidate) ?? heart;
+    if (canReach(land, shore, candidate)) return { at: claimNear(candidate, id, shore), reach: shore };
+    // IA-pasture · Una hilera de campos puede partir el pasto en dos: las
+    // casas del otro lado quedan fuera de la orilla del corazón aunque tengan
+    // prado de sobra alrededor. Su ganado vive en su trozo si el trozo da
+    // para vivir, en vez de cruzar media aldea hasta el único hueco común.
+    const own = pastureOf(candidate);
+    if (own !== null) return { at: claimNear(candidate, id, own), reach: own };
+    return settle(candidate, id);
+  };
+
+  // IA-pasture · **Sin sitio junto a su casa, cada animal busca el suyo.**
+  // Desde que los campos son cerca, una casa encajada entre parcelas deja a
+  // sus gallinas sin celda alcanzable al lado, y `nearestReachable` devolvía
+  // a todas la misma: se apiñaban en el hueco entre dos campos (Vera, 24 sep
+  // 2026: «mira cómo se concentran las gallinas»). Ahora se busca en anillos
+  // un claro —suelo alcanzable con holgura alrededor— que ningún otro animal
+  // haya tomado, y entre los primeros que salen se elige uno por hash.
+  const taken = new Map<number, number>();
+  const cellOf = (p: Point): number => Math.floor(p.z) * land.width + Math.floor(p.x);
+  const claim = (p: Point): Point => { taken.set(cellOf(p), (taken.get(cellOf(p)) ?? 0) + 1); return p; };
+  // Las dos gallinas de una casa pueden compartir su palmo junto a la puerta;
+  // un tercer animal en la misma celda ya es un montón y busca la de al lado.
+  const claimNear = (p: Point, id: number, reach: Uint8Array): Point =>
+    (taken.get(cellOf(p)) ?? 0) < 2 ? claim(p) : openSpotNear(p, id, RADIUS.cow, reach) ?? claim(p);
+  const openSpotNear = (from: Point, id: number, clearance: number, reach = shore): Point | null => {
+    const startX = Math.floor(from.x), startZ = Math.floor(from.z);
+    const found: Point[] = [];
+    for (let ring = 0; ring <= SPREAD_RINGS && found.length < SPREAD_CHOICES; ring += 1) {
+      for (let dz = -ring; dz <= ring; dz += 1) {
+        for (let dx = -ring; dx <= ring; dx += 1) {
+          if (Math.max(Math.abs(dx), Math.abs(dz)) !== ring) continue;
+          const x = startX + dx, z = startZ + dz;
+          if (x < 1 || z < 1 || x >= land.width - 1 || z >= land.height - 1) continue;
+          const cell = z * land.width + x;
+          if (reach[cell] !== 1 || taken.has(cell)) continue;
+          if (!fitsCircle(land, x + 0.5, z + 0.5, clearance)) continue;
+          found.push({ x: x + 0.5, z: z + 0.5 });
+        }
+      }
+    }
+    if (found.length === 0) return null;
+    return claim(found[hash32(seed, `beast:spread:${id}`) % found.length] as Point);
+  };
+  // Primero un claro; si no lo hay, cualquier celda propia; y sólo si el valle
+  // entero estuviera cerrado, el punto compartido de siempre.
+  const settle = (from: Point, id: number): Home => ({
+    at: openSpotNear(from, id, SPREAD_CLEARANCE) ?? openSpotNear(from, id, RADIUS.cow)
+      ?? nearestReachable(land, shore, from) ?? heart,
+    reach: shore,
+  });
+  // Los trozos de pasto sueltos ya medidos, para no inundar dos veces el mismo.
+  const pastures: { reach: Uint8Array; size: number }[] = [];
+  const pastureOf = (at: Point): Uint8Array | null => {
+    const cell = Math.floor(at.z) * land.width + Math.floor(at.x);
+    let found = pastures.find((p) => p.reach[cell] === 1);
+    if (found === undefined) {
+      const reach = reachableFrom(land, at);
+      let size = 0;
+      for (let i = 0; i < reach.length; i += 1) size += reach[i] as number;
+      found = { reach, size };
+      if (size > 0) pastures.push(found);
+    }
+    return found.size >= OWN_PASTURE_CELLS ? found.reach : null;
   };
 
   // Gallinas: dos por casa, como en `render/animals.ts` (`HENS_PER_HOUSE`).

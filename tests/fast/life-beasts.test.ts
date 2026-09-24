@@ -371,3 +371,28 @@ describe('IA-4 · createBeasts sigue siendo determinista con el vado', () => {
     }
   });
 });
+
+describe('IA-pasture · la cabaña no se apiña cuando los campos la cercan', () => {
+  it('no hay más de dos animales anclados en la misma celda', () => {
+    // Vera, 24 sep 2026: «mira cómo se concentran las gallinas». Con los campos
+    // cerrados al ganado, las casas encajadas entre parcelas mandaban a todas
+    // sus gallinas al mismo punto libre más cercano. Medido antes del arreglo:
+    // treinta animales en una celda en la semilla 7 (68 anclas en dos semillas).
+    let worst = 0;
+    let beasts = 0;
+    for (const seed of SEEDS) {
+      const state = village(20, seed);
+      state.herd = { hens: 24, pigs: 6, cows: 4 };
+      const life = createVillage(state, 0);
+      const cells = new Map<string, number>();
+      for (const beast of life.beasts) {
+        const key = `${Math.floor(beast.anchor.x)}:${Math.floor(beast.anchor.z)}`;
+        cells.set(key, (cells.get(key) ?? 0) + 1);
+        beasts += 1;
+      }
+      worst = Math.max(worst, ...cells.values());
+    }
+    expect(beasts).toBeGreaterThan(40);
+    expect(worst).toBeLessThanOrEqual(2);
+  });
+});
