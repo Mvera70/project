@@ -19,6 +19,7 @@ import type { LoadedAsset } from '../assets';
 import { actionClips } from '../action-clips';
 import { clipTime, combatClip, STRIKE_AT, STRIKE_HEAD, VILLAGER_CLIPS, type ClipName } from '../clips';
 import { WorkChips } from '../effects/work-chips';
+import { Stains } from '../effects/stains';
 import { handTool } from '../hand-tools';
 import { displayScaleFor, modelFor } from './models';
 
@@ -76,6 +77,9 @@ interface Player {
   /** IA-anim · Fase del gesto de herramienta en el pintado anterior, para ver el golpe. */
   strikePhase?: number;
   strikes?: number;
+  /** E4 · El último golpe recibido que ya salpicó, y si ya dejó su mancha al caer. */
+  bledAt?: number;
+  stained?: boolean;
 }
 
 /**
@@ -165,6 +169,8 @@ export class Cast {
   readonly group = new Group();
   /** IA-anim · Astillas de los golpes de hacha y pico; el renderer las avanza. */
   readonly chips: WorkChips;
+  /** E4 · Las manchas donde cae alguien; el renderer las avanza con las astillas. */
+  readonly stains = new Stains();
   /** IA-anim · Aviso de cada golpe, para que el árbol lo acuse. */
   onStrike: ((at: Vector3, kind: 'wood' | 'stone', seed: number) => void) | null = null;
   private readonly players = new Map<VillagerId, Player>();
@@ -346,6 +352,7 @@ export class Cast {
       this.pose(player, actor.clip, seconds, actor.poseSeconds ?? actor.clipSeconds);
       this.equip(player, actor);
       this.strike(player, actor, seconds);
+      this.wound(player, actor, seconds);
       if (ragdoll !== undefined) this.applyRagdoll(player, ragdoll);
     }
 
@@ -620,6 +627,34 @@ export class Cast {
     this.onStrike?.(at, kind, actor.id * 1009 + player.strikes);
   }
 
+  /**
+   * E4 · **Gore contenido.** Una salpicadura corta en el instante en que se
+   * recibe un golpe (`hit_take`) y otra al caer (`fall`), desde el pecho; y al
+   * acabar la caída, una mancha en el suelo bajo el cuerpo (`Stains`) que se
+   * desvanece en unas horas. Una por golpe y una por cuerpo: `bledAt` y
+   * `stained` recuerdan lo ya hecho aunque el clip siga sonando.
+   */
+  private wound(player: Player, actor: Actor, seconds: number): void {
+    if (actor.clip !== 'hit_take' && actor.clip !== 'fall') {
+      delete player.bledAt;
+      if (actor.clip !== 'flee') player.stained = false;
+      return;
+    }
+    const started = actor.clipSeconds - seconds;
+    if (player.bledAt !== started && seconds >= 0.08) {
+      player.bledAt = started;
+      player.object.updateMatrixWorld(true);
+      const chest = player.object.localToWorld(new Vector3(0, 0.42, 0.05));
+      player.strikes = (player.strikes ?? 0) + 1;
+      this.chips.hit(chest, 'blood', actor.id * 7919 + player.strikes);
+    }
+    if (actor.clip === 'fall' && player.stained !== true && seconds >= VILLAGER_CLIPS.fall.seconds * 0.8) {
+      player.stained = true;
+      const at = player.object.position;
+      this.stains.add(actor.id * 31 + Math.floor(started), at.x, this.ground(at.x, at.z), at.z);
+    }
+  }
+
   private retire(id: VillagerId): void {
     const player = this.players.get(id);
     if (player === undefined) return;
@@ -660,12 +695,14 @@ export class Cast {
 
   clear(): void {
     for (const id of [...this.players.keys()]) this.retire(id);
+    this.stains.clear();
   }
 
   dispose(): void {
     this.ring.geometry.dispose();
     (this.ring.material as Material).dispose();
     this.clear();
+    this.stains.dispose();
   }
 }
 

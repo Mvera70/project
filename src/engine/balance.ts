@@ -419,6 +419,24 @@ export const BURNING = {
   FLAG_WEEKS: 2,
 } as const;
 
+/**
+ * E4 · **Gore contenido**, decisión del dueño del diseño (25 sep 2026): una
+ * salpicadura corta al recibir el golpe y una mancha bajo el cuerpo que se
+ * desvanece. Presentación, como `BURNING`.
+ */
+export const GORE = {
+  // TUNE: gotas por salpicadura. Las astillas de un hachazo son cinco; la
+  // sangre va igual de corta, que se lea como golpe y no como fuente.
+  SPRAY_DROPS: 5,
+  // TUNE: la mancha, en celdas de lado, su opacidad y su tono (oscuro, casi
+  // pardo: a la distancia de juego un rojo vivo se lee como una señal de UI).
+  STAIN_SIZE: 0.55,
+  STAIN_OPACITY: 0.72,
+  STAIN_COLOUR: '#4E0F0B',
+  // TUNE: horas escénicas hasta que se va del todo; «unas horas de juego».
+  STAIN_HOURS: 8,
+} as const;
+
 export const FATE = {
   // TUNE: la probabilidad semanal de que pase algo, y el hueco mínimo entre
   // dos sucesos. Con 0,35 y dos semanas salen unos catorce al año: uno cada

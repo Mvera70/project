@@ -16,7 +16,7 @@ const LIFE = 0.7;
 const GRAVITY = 3.3;
 
 const COLOURS = { wood: new Color('#c9a26a'), stone: new Color('#a39d92'), leaf: new Color('#5d7a3a'),
-  seed: new Color('#d8b25e'), muck: new Color('#4a3524') } as const;
+  seed: new Color('#d8b25e'), muck: new Color('#4a3524'), blood: new Color('#6a130e') } as const;
 export type ChipKind = keyof typeof COLOURS;
 /**
  * Las hojas que suelta la copa al acusar el hachazo caen despacio y duran más:
@@ -31,6 +31,8 @@ const PHYSICS: Readonly<Record<ChipKind, { gravity: number; life: number; lift: 
   // terrones que suben poco y caen pesados.
   seed: { gravity: 2.2, life: 0.9, lift: 0.4, spread: 1.4 },
   muck: { gravity: GRAVITY, life: LIFE, lift: 0.8, spread: 0.7 },
+  // E4 · la salpicadura de un golpe: sale corta y cae deprisa, gore contenido.
+  blood: { gravity: GRAVITY * 1.2, life: 0.55, lift: 0.5, spread: 0.8 },
 };
 
 interface Chip { x: number; y: number; z: number; vx: number; vy: number; vz: number; age: number; spin: number; kind: ChipKind }

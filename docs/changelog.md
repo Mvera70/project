@@ -1,5 +1,13 @@
 # The Valley — Registro de cambios
 
+## v4.46 · 25 sep 2026 · Gore contenido (E4, tanda 2)
+
+Decisión de Vera: gore contenido. Un golpe recibido o una caída sueltan una
+salpicadura corta de sangre desde el pecho, por el mismo camino que las
+astillas de un hachazo, y quien cae deja una mancha oscura en el suelo que se
+va en unas horas de juego (`GORE`). Nada rojo vivo: a la distancia de juego un
+rojo saturado se lee como una señal de la interfaz.
+
 ## v4.45 · 25 sep 2026 · El fuego se ve (E4, tanda 1)
 
 El motor quemaba casas —el incendio anual de §5.9 y el rayo de §7.10— y en

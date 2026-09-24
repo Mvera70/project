@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · E4, tanda 2: gore contenido
+
+Hecho: salpicadura de sangre corta (clase `blood` de `work-chips.ts`) en el
+instante de un golpe recibido y de una caída, y mancha plana bajo el cuerpo
+(`src/render3d/effects/stains.ts`) que crece un poco y se desvanece en
+`GORE.STAIN_HOURS`. Probado en `tests/fast/gore.test.ts` con el modelo real:
+una salpicadura por golpe, una mancha por cuerpo, y se va sola. **Límite
+medido:** en el asalto filmado (semilla 7, año 30) el cuerpo cae en el portón y
+la mancha no se distingue bajo el velo del bosque del observatorio; y con
+ragdoll la mancha va donde cayó el cuerpo según su clip, no donde lo dejó la
+física. Hay que mirarlo en la demo.
+
 ## 25 sep 2026 · E4, tanda 1: el fuego se ve
 
 Hecho: marca `burnt:<id>` en el motor para el incendio anual y el rayo, y el
