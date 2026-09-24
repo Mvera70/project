@@ -972,3 +972,20 @@ html.bare #root .ui-shell-content:not([hidden]) > .ui-shell-content-close { visi
 html.bare:has(#root .ui-shell-content:not([hidden])) .valley-hud-right.hud-speed-corner {
   bottom: calc(env(safe-area-inset-bottom, 0px) + 56px);
 }
+
+/** La portada **se reparte por la altura** en vez de apilarse arriba (Vera:
+    «se ve todo muy pegado, muy feo»). Probado también hacer crecer el grabado
+    y los huecos con la pantalla: en móvil dejaba el pie fuera. Lo que vale es
+    repartir sólo el sitio que sobra. */
+/* El sitio libre se reparte **entre** los botones y no se lo lleva el pie: con
+   `margin-top: auto` en el pie, en la tablet de Vera «Fundar» y «El cronicón»
+   quedaban pegados y encima del pie sobraba media tabla. El pie sigue abajo
+   porque es el último de la columna y la columna llena la hoja. */
+:root .title-actions { justify-content: space-between; }
+:root .title-actions > .title-bottom { margin-top: 0; }
+/* En pantallas bajas (un móvil de 844) el pie quedaba recortado por abajo:
+   un poco menos de aire arriba y entre el logotipo y el grabado. */
+@media (max-height: 880px) {
+  :root .title-sheet { gap: 10px; padding-top: max(28px, env(safe-area-inset-top)); }
+  :root .title-logo { width: min(100%, 270px); }
+}
