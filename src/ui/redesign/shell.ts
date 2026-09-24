@@ -213,10 +213,25 @@ export function createShell(actions: UiActions): ShellHandle {
     content.style.setProperty('--ui-sheet-drag', `${dragDistance}px`);
     event.preventDefault();
   });
+  // UI-W · **tirar del tirador no cambia de pestaña: aparca la hoja.** Vera,
+  // 24 sep: «en lugar de entrar en modo pantalla completa se nos abre la
+  // sección de valley; no debe cambiar pestaña, sólo la oculta; pulsando de
+  // nuevo en la pestaña saldremos del modo pantalla completa». El arrastre
+  // largo pide la pantalla despejada con la ruta intacta, y un toque en el
+  // tirador aparcado la devuelve. Quien escucha es `app.ts`, que es el dueño
+  // de ese modo (`valley:bare`). Cerrar sigue siendo el sello de lacre.
+  const requestBare = (on: boolean): void => {
+    document.dispatchEvent(new CustomEvent('valley:bare', { detail: on }));
+  };
   grip.addEventListener('pointerup', (event) => {
     if (event.pointerId !== dragPointer) return;
     grip.releasePointerCapture(event.pointerId);
-    finishDrag(dragDistance >= Math.min(96, content.clientHeight * .25));
+    const parked = document.documentElement.classList.contains('bare');
+    const pulled = dragDistance >= Math.min(96, content.clientHeight * .25);
+    const tapped = dragDistance < 8;
+    finishDrag(false);
+    if (parked && tapped) requestBare(false);
+    else if (!parked && pulled) requestBare(true);
   });
   grip.addEventListener('pointercancel', (event) => {
     if (event.pointerId === dragPointer) finishDrag(false);
@@ -287,7 +302,11 @@ export function createShell(actions: UiActions): ShellHandle {
     } else {
       ornament.setAttribute('aria-hidden', 'true');
       ornament.removeAttribute('aria-label');
-      ornament.innerHTML = '<img class="skin-ornament-art skin-ornament-art--leaf" src="./ui/art/ornament-oak-leaf.png" alt="" />';
+      // UI-W · el sello del árbol y no la hoja de roble (Vera, 24 sep: «ese
+      // icono de la hoja debe sustituirse por el sello del árbol que ya
+      // usamos»). Sin la cera roja: la cera sigue siendo la marca de una
+      // decisión aplazada, que es lo único que se toca aquí.
+      ornament.innerHTML = '<img class="skin-ornament-art skin-ornament-art--tree" src="./ui/art/ornament-tree-seal.png" alt="" />';
     }
   };
   setOrnament('leaf');

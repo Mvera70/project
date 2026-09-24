@@ -166,6 +166,13 @@
   --plank-texture: url('./wood-planks.png');
   --plank-size: 256px;
   --cobble-texture: url('./cobble.png');
+  /* El pergamino de los botones y fichas sobre la madera: beis con presencia,
+     el grano de `parchment.png` multiplicado y los bordes envejecidos. El
+     marfil liso se leía «muy claro» sobre la tabla (Vera, 24 sep). */
+  --parch-color: #E4CFA3;
+  --parch-image:
+    radial-gradient(ellipse 75% 70% at 50% 40%, transparent 55%, rgba(122, 82, 34, .26) 100%),
+    var(--skin-story-texture);
   --stone: #8A867D;                 /* el dintel de las hojas */
   --stone-deep: #5E5A53;
   --card: #F3EAD6;                  /* la tarjeta, marfil sobre la hoja */

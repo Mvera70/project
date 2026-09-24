@@ -83,6 +83,24 @@ serif de la crónica para las descripciones, la sans para cifras. La regla del
 **La portada entró después, con diseño de Vera** (arriba): las tres propuestas
 mías del lienzo las descartó («muy, muy malas») y generó ella la referencia.
 
+**Lo que se decidió probando la demo (24 sep, tarde):**
+
+- **Los botones y fichas de pergamino llevan textura**: beis con presencia
+  (`--parch-color`, `--parch-image`: el grano de `parchment.png` y bordes
+  envejecidos) y relieve. El marfil liso se leía «muy claro».
+- **Idioma y sonido de la portada son de madera**, no de piedra: la piedra «se
+  ve muy mal».
+- **El cierre está en la misma esquina en las cuatro hojas**: el sello de la
+  carcasa, arriba a la derecha bajo el dintel; los propios de la crónica y del
+  carro se apagan dentro de la hoja.
+- **El dintel mide 7 px** y el sello de la bandeja va encima: con 14 se lo comía.
+- **La bandeja lleva el sello del árbol**, no la hoja de roble. La cera roja
+  sigue siendo sólo la marca de una decisión aplazada.
+- **Tirar del tirador no cambia de pestaña: aparca la hoja** en pantalla
+  completa, con el tirador asomando; tocarlo, o el botón de la esquina, la
+  devuelve (`valley:bare`, dueño `app.ts`). Antes la pantalla completa
+  escondía la barra y dejaba la hoja flotando.
+
 **Y la regla nueva de esta ronda: el estilo no basta, se corrige el uso.** Lo
 dijo Vera a mitad de la ronda («no es solo estilo sino corregir UX»), y lo que
 salió de mirar las capturas con esa pregunta:

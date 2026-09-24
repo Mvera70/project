@@ -138,14 +138,21 @@
 }
 /** El secundario: pergamino con borde de madera y su escalón debajo. */
 :root .skin-button--parchment {
-  border: 2px solid var(--card-edge);
-  background-color: var(--card);
-  color: var(--wood-plank-deep);
+  border: 2px solid #A9875A;
+  background-color: var(--parch-color);
+  background-image: var(--parch-image);
+  background-size: 100% 100%, 256px;
+  background-blend-mode: normal, multiply;
+  color: #3A2412;
   font-family: var(--skin-font-display);
   font-weight: 700;
-  box-shadow: 0 3px 0 var(--card-edge), 0 6px 10px rgba(60, 40, 20, .15);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 248, 230, .6),
+    inset 0 -3px 0 rgba(122, 82, 34, .3),
+    0 4px 0 #8C6A40,
+    0 7px 12px rgba(0, 0, 0, .35);
 }
-:root .skin-button--parchment:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--card-edge); }
+:root .skin-button--parchment:active { transform: translateY(3px); box-shadow: inset 0 2px 0 rgba(255, 248, 230, .5), 0 1px 0 #8C6A40; }
 
 /* --------------------------------------------------------- las hojas */
 
@@ -174,7 +181,9 @@
   left: 0;
   right: 0;
   top: 0;
-  height: 14px;
+  /* Fino: con 14 px se comía el sello de la bandeja (Vera: «el borde debe ser
+     más fino, además se come el icono»). */
+  height: 7px;
   border-radius: inherit;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -741,7 +750,10 @@ html.bare .ui-hud-header::before { visibility: hidden; }
 :root .title-seed-row {
   align-items: flex-end;
   padding: 12px 14px 14px;
-  background: var(--card);
+  background-color: var(--parch-color);
+  background-image: var(--parch-image);
+  background-size: 100% 100%, 256px;
+  background-blend-mode: normal, multiply;
   clip-path: var(--skin-deckle-card);
   filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .4));
 }
@@ -810,16 +822,23 @@ html.bare .ui-hud-header::before { visibility: hidden; }
   align-self: center;
   min-width: 170px;
   padding: 0 26px;
-  border: 2px solid var(--card-edge);
+  border: 2px solid #A9875A;
   border-radius: 10px;
-  background: var(--card);
+  background-color: var(--parch-color);
+  background-image: var(--parch-image);
+  background-size: 100% 100%, 256px;
+  background-blend-mode: normal, multiply;
   color: #3A2412;
   font: 700 16px/1 var(--skin-font-display);
   letter-spacing: .03em;
   text-decoration: none;
-  box-shadow: 0 3px 0 var(--card-edge), 0 6px 10px rgba(0, 0, 0, .3);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 248, 230, .6),
+    inset 0 -3px 0 rgba(122, 82, 34, .3),
+    0 4px 0 #8C6A40,
+    0 7px 12px rgba(0, 0, 0, .35);
 }
-:root .title-annals:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--card-edge); }
+:root .title-annals:active { transform: translateY(3px); box-shadow: inset 0 2px 0 rgba(255, 248, 230, .5), 0 1px 0 #8C6A40; }
 
 /** El pie: una tabla más oscura que cruza la portada, con los dos mandos
     redondos de madera y latón, y el taller discreto a la derecha. */
@@ -840,25 +859,24 @@ html.bare .ui-hud-header::before { visibility: hidden; }
   background-size: 192px;
   box-shadow: inset 0 4px 6px rgba(0, 0, 0, .45);
 }
-/** Idioma y sonido son **de piedra**, más clara que el empedrado donde se
-    asientan (Vera: «los botones no son de madera, son de piedra; quizás la
-    piedra un pelín más clarita»). */
+/** Idioma y sonido, **de madera** con aro de latón, como en el primer diseño
+    de Vera: la versión de piedra «se ve muy mal» sobre el empedrado (24 sep). */
 :root .title-language,
 :root .title-sound {
   min-width: 52px;
   min-height: 52px;
-  border: 2px solid #3E3B36;
+  border: 2px solid var(--brass);
   border-radius: 999px;
-  background-color: #A8A399;
-  background-image: linear-gradient(rgba(255, 255, 255, .22), rgba(255, 255, 255, .22)), var(--cobble-texture);
-  background-size: auto, 96px;
-  color: #FFF6E0;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
+  background-color: #6B4226;
+  background-image: linear-gradient(rgba(255, 214, 160, .14), rgba(0, 0, 0, .18)), var(--plank-texture);
+  background-size: auto, 160px;
+  color: #FFF3D6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .7);
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, .35),
+    inset 0 2px 0 rgba(255, 214, 160, .35),
     inset 0 -3px 0 rgba(0, 0, 0, .35),
-    0 3px 0 #2A2825,
-    0 5px 8px rgba(0, 0, 0, .45);
+    0 3px 0 #2B1A0E,
+    0 6px 10px rgba(0, 0, 0, .45);
 }
 :root .title-sound svg,
 :root .title-language { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .6)); }
@@ -871,12 +889,12 @@ html.bare .ui-hud-header::before { visibility: hidden; }
   letter-spacing: .04em;
   text-transform: none;
   background-image:
-    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFF6E0' stroke-width='1.8'><circle cx='12' cy='12' r='9'/><path d='M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18'/></svg>"),
-    linear-gradient(rgba(255, 255, 255, .22), rgba(255, 255, 255, .22)),
-    var(--cobble-texture);
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFF3D6' stroke-width='1.8'><circle cx='12' cy='12' r='9'/><path d='M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18'/></svg>"),
+    linear-gradient(rgba(255, 214, 160, .14), rgba(0, 0, 0, .18)),
+    var(--plank-texture);
   background-repeat: no-repeat, no-repeat, repeat;
   background-position: 14px 50%, 0 0, 0 0;
-  background-size: 20px 20px, auto, 96px;
+  background-size: 20px 20px, auto, 160px;
 }
 :root .title-language option { color: #2B1A0E; background: #F3EAD6; }
 :root .title-dev { color: rgba(243, 227, 194, .55); }
@@ -884,10 +902,62 @@ html.bare .ui-hud-header::before { visibility: hidden; }
 :root .title-dev-row label { color: #F3E3C2; }
 /* La portada pinta el sonido encendido en ocre (`title.ts`); sobre la madera
    se perdía. Encendido va en crema y apagado, atenuado. */
-:root .title-sound[aria-pressed="true"] { color: #FFF6E0; }
+:root .title-sound[aria-pressed="true"] { color: #FFF3D6; }
 :root .title-sound[aria-pressed="false"] { color: rgba(255, 246, 224, .6); }
 :root .title-actions { flex: 1 1 auto; }
 /* En piedra, los rótulos de la barra sobre el empedrado necesitan sombra: el
    crema sobre gris moteado se perdía (captura de la semilla 7, año 30). */
 :root[data-material="stone"] .skin-nav .skin-nav-tab { text-shadow: 0 1px 2px rgba(0, 0, 0, .9), 0 0 6px rgba(0, 0, 0, .6); }
 :root[data-material="stone"] .skin-nav .skin-nav-tab .skin-icon { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .8)); }
+
+/* ------------------------------------------------ un cierre, en un sitio */
+
+/** **El sello de cerrar va en el mismo sitio en las cuatro hojas**: la esquina
+    de arriba a la derecha, bajo el dintel. Vera, viendo la crónica y la gente
+    seguidas: «los botones de close, ajustarlos al mismo sitio alineados con la
+    esquina». La crónica montaba el suyo dentro de su página, más abajo; el
+    carro, en la fila de su título. Ahora cierra el de la carcasa, que hace lo
+    mismo en las cuatro (`shell.ts`, `finishDrag`), y los propios se apagan
+    **sólo dentro de la hoja**: la crónica que se abre desde el final conserva
+    el suyo. Esto sustituye a las dos excepciones de `skin.css` que lo
+    escondían para la crónica y para el carro. */
+#root .ui-shell-content:has(.chronicle-scrim, .people-scrim, .valley-panel, .valley-cart) > .ui-shell-content-close {
+  display: inline-flex;
+  position: absolute;
+  top: 18px;
+  right: 14px;
+  left: auto;
+  z-index: 6;
+  margin: 0;
+}
+#root .ui-shell-content .chronicle-close,
+#root .ui-shell-content .cart-close { display: none; }
+/* El título del carro deja sitio al sello de la esquina, como el de la gente. */
+#root .ui-shell-content .cart-head { min-height: 48px; padding-right: 56px; }
+
+/** El sello de la bandeja va por encima del dintel y a su tamaño. */
+:root .ui-shell-message > .skin-ornament { position: relative; z-index: 5; }
+:root .skin-ornament-art--tree { width: 34px; height: 34px; display: block; object-fit: contain; }
+
+/* ------------------------------------------- la hoja aparcada, a pantalla completa */
+
+/** **Con la pantalla despejada, una hoja abierta se aparca abajo** con sólo su
+    tirador asomando, y la pestaña no cambia. Antes la pantalla despejada
+    escondía la pila de abajo pero no la hoja, que se quedaba flotando sin
+    barra (Vera: «se queda el menú pillado flotando»). Se entra tirando del
+    tirador o con el botón de la esquina, y se sale tocando el tirador o el
+    mismo botón (`shell.ts`, `valley:bare`). */
+html.bare #root .ui-shell-content:not([hidden]) {
+  transform: translateY(calc(100% - 44px + var(--ui-nav-height) + env(safe-area-inset-bottom)));
+  transition: transform 220ms ease-out;
+}
+html.bare #root .ui-shell-content:not([hidden]) > :not(.ui-sheet-grip) { pointer-events: none; }
+html.bare #root .ui-shell-content:not([hidden]) > .ui-shell-content-close { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  html.bare #root .ui-shell-content:not([hidden]) { transition: none; }
+}
+/* Y con una hoja aparcada, los dos botones de las esquinas suben por encima de
+   su tira: si no, el tirador los tapaba (medido en la primera captura). */
+html.bare:has(#root .ui-shell-content:not([hidden])) .valley-hud-right.hud-speed-corner {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 56px);
+}

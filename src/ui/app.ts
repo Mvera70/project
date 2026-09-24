@@ -450,6 +450,17 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   };
   bareToggle.addEventListener('click', () => { bare = !bare; paintBare(); });
   paintBare();
+  // UI-W · el tirador de una hoja también entra y sale de este modo
+  // (`shell.ts`, `valley:bare`): tirar aparca la hoja sin cambiar de pestaña
+  // y tocarlo la devuelve. Un solo dueño del modo, aquí.
+  document.addEventListener('valley:bare', (event) => {
+    // Una partida nueva monta otra aplicación; la de antes ya no escucha.
+    if (!bareToggle.isConnected) return;
+    const on = (event as CustomEvent<boolean>).detail === true;
+    if (bare === on) return;
+    bare = on;
+    paintBare();
+  });
   /**
    * Y se cae sola en cuanto hay algo que leer: abrir la crónica, la gente, el
    * carro o una ficha con la pantalla despejada dejaría una hoja sobre un valle

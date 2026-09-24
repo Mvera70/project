@@ -1,6 +1,16 @@
 # Cuaderno de tareas — el rework
 
-## 24 sep 2026 · UI-W: la interfaz de madera y piedra (en revisión con Vera)
+## 24 sep 2026 · UI-W, correcciones probando la demo
+
+Pergamino con textura y relieve en botones y fichas; idioma y sonido de madera;
+un solo sitio para el cierre en las cuatro hojas; dintel de 7 px con el sello
+del árbol encima en la bandeja; y tirar del tirador aparca la hoja en pantalla
+completa sin cambiar de pestaña (tocarlo la devuelve), que arregla también la
+hoja que se quedaba flotando en la pantalla despejada. Comprobado con clics
+reales de Playwright (gente y crónica) y capturas en
+`artifacts/graphics/ui-wood/tex5/`.
+
+## 24 sep 2026 · UI-W: la interfaz de madera y piedra
 
 Hecho, **sin commit** mientras Vera la revisa: la capa `wood.css` (cabecera de
 madera, hojas con dintel de piedra, tarjetas con cinta y grabado, cierre de
