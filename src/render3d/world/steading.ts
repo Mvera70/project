@@ -147,8 +147,11 @@ export function steadingOf(
     const z = Math.floor(cell / map.width);
     return out.every((one) => {
       if (one.asset !== asset) return true;
-      return Math.abs((one.cell % map.width) - x) >= APART
-        || Math.abs(Math.floor(one.cell / map.width) - z) >= APART;
+      // La leña se apila junta, en su leñero: separarla es lo que la hacía
+      // parecer olvidada por el pueblo (Vera, 24 sep 2026).
+      const apart = asset === 'log-pile' ? 1 : APART;
+      return Math.abs((one.cell % map.width) - x) >= apart
+        || Math.abs(Math.floor(one.cell / map.width) - z) >= apart;
     });
   };
   const place = (asset: SteadingAsset, candidates: readonly number[], limit = MOST_STEADED[asset]): void => {
@@ -164,7 +167,10 @@ export function steadingOf(
       used.add(cell);
       // El rumbo sale de la celda, en ocho direcciones: un almiar y su vecino
       // mirando al mismo sitio se leen como dos copias.
-      const facing = (hash32(seed, `steading:${asset}:${cell}`) % 8) * (Math.PI / 4);
+      // La leña de un leñero, toda en el mismo sentido: apilada con orden y no
+      // tirada. El sentido sale de la primera pila, así que no cambia.
+      const firstPile = asset === 'log-pile' ? out.find(one => one.asset === 'log-pile') : undefined;
+      const facing = firstPile?.facing ?? (hash32(seed, `steading:${asset}:${cell}`) % 8) * (Math.PI / 4);
       out.push({ asset, cell, facing });
     }
   };
@@ -174,30 +180,36 @@ export function steadingOf(
   // Cada sesenta unidades visibles sostienen una pila. La rutina de transporte
   // comparte su emplazamiento y la colocamos primero para que un almiar próximo
   // no robe justo la celda donde se descarga.
-  const homes = state.buildings.filter(
-    (one) => (one.kind === 'house' || one.kind === 'stone_house') && one.lostTick === null,
-  );
   const logPiles = state.tick === 0
     ? 0
     : Math.min(MOST_STEADED['log-pile'], Math.floor(state.village.wood / 60));
-  place('log-pile', [
-    ...woodStoreCells(state),
-    ...homes.flatMap((one) => ringOf(map, one)),
-  ], logPiles);
-
+  // IA-piles · **Un solo leñero**, junto a la descarga, y no una pila contra
+  // cada casa: seis montones repartidos por el pueblo se leían como material
+  // dejado y olvidado. Si en el leñero no caben todas, caben menos.
+  const woodCells = woodStoreCells(state);
+  const yardAt = woodCells[0];
+  const yard = yardAt === undefined ? [] : woodCells.filter(cell => Math.hypot(
+    cell % map.width - yardAt % map.width, Math.floor(cell / map.width) - Math.floor(yardAt / map.width)) <= 3.5);
   // El cobertizo aparece cuando ya hay madera suficiente para haber dejado de
   // ser la reserva con la que llegaron los fundadores. Comparte la franja de
-  // descarga de la leña, pero se coloca después de las pilas: la madera sigue
+  // descarga de la leña, pero se coloca **antes** que las pilas (IA-piles: es el almacén del leñero y las pilas se arriman a él): la madera sigue
   // leyendo como material al aire libre y el cobertizo como almacén de la
   // aldea asentada. Es un adorno derivado, no un edificio ni una nueva regla
   // del motor.
   const sheds = state.tick === 0
     ? 0
     : Math.min(MOST_STEADED.shed, Math.floor(state.village.wood / 180));
-  place('shed', [
-    ...woodStoreCells(state),
-    ...homes.flatMap((one) => ringOf(map, one)),
-  ], sheds);
+  // La primera celda es la de descarga: ahí va la leña, nunca el cobertizo.
+  // Y el cobertizo puede quedarse algo más allá si la plaza o una puerta le
+  // quitan sitio, siempre del más cercano al leñero al más lejano.
+  const shedCells = yardAt === undefined ? [] : woodCells.slice(1).filter(cell => Math.hypot(
+    cell % map.width - yardAt % map.width, Math.floor(cell / map.width) - Math.floor(yardAt / map.width)) <= 4)
+    .sort((a, b) => Math.hypot(a % map.width - yardAt % map.width, Math.floor(a / map.width) - Math.floor(yardAt / map.width))
+      - Math.hypot(b % map.width - yardAt % map.width, Math.floor(b / map.width) - Math.floor(yardAt / map.width)) || a - b);
+  place('shed', shedCells, sheds);
+  place('log-pile', yard, logPiles);
+
+
 
   // El almiar toca un campo y representa grano que existe. Antes aparecía por
   // el mero hecho de haber una parcela: la pareja fundadora empezaba junto a

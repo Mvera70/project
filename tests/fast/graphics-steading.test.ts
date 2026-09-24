@@ -78,7 +78,10 @@ describe('G-15 · dónde se dejan los trastos del corral', () => {
     for (const seed of [7, 11, 23]) {
       const state = village(25, seed);
       const places = steadingOf(state, state.terrainSeed);
-      for (const asset of STEADING_ASSETS) {
+      // IA-piles · la leña no: se apila junta en su leñero, a propósito (la
+      // repartida por el pueblo se leía como material olvidado). Su prueba es
+      // la de abajo, que la quiere reunida.
+      for (const asset of STEADING_ASSETS.filter((one) => one !== 'log-pile')) {
         const mine = places.filter((one) => one.asset === asset);
         for (let a = 0; a < mine.length; a += 1) {
           for (let b = a + 1; b < mine.length; b += 1) {
@@ -123,8 +126,22 @@ describe('G-15 · dónde se dejan los trastos del corral', () => {
     expect(places.filter(place => place.asset === 'shed')).toEqual([]);
   });
 
+  it('la leña se guarda en un solo leñero, no repartida por el pueblo', () => {
+    for (const seed of [7, 11, 23]) {
+      const state = village(25, seed);
+      const piles = steadingOf(state, state.terrainSeed).filter((one) => one.asset === 'log-pile' || one.asset === 'shed');
+      for (const a of piles) for (const b of piles) {
+        const dx = Math.abs(a.cell % state.map.width - b.cell % state.map.width);
+        const dz = Math.abs(Math.floor(a.cell / state.map.width) - Math.floor(b.cell / state.map.width));
+        expect(Math.hypot(dx, dz), `semilla ${seed}`).toBeLessThanOrEqual(5);
+      }
+    }
+  });
+
   it('la leña, los cobertizos y los almiares responden a las reservas, no a contar casas y campos', () => {
-    const state = foundGame(7);
+    // IA-piles · en la aldea de veinte: la recién fundada tiene una sola casa
+    // pegada a la plaza y su leñero cabe en una celda, con reservas o sin ellas.
+    const state = foundTwenty(7);
     state.tick = 1;
     state.village.wood = 0;
     state.village.grain = 0;

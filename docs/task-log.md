@@ -16,7 +16,8 @@ en móvil corregida (`0140dfa`). Pedido después por Vera: el ciclo del campo
    imagen pedida en `plan-arte-pendiente.md`.
 2. **Desorden en el reparto:** en las villas grandes se ve a demasiada gente en
    el campo, más de la que el espacio aguanta.
-3. **El ganado no se puede pisar** (pendiente de aclarar con Vera qué se ve).
+3. ~~**El ganado no debe pisar el campo de cultivo.**~~ Hecho el 24 sep: terreno propio con los campos cerrados, de 29–40 % a 0 %.
+5. ~~**Montones de material olvidados en el suelo.**~~ Hecho el 24 sep: la carga entra en su almacén y la leña va a un solo leñero.
 4. **Diseñar los oficios:** la herrería, por ejemplo, está vacía, y el granero no lo lleva nadie.
 
 ## 24 sep 2026 · IA-anim: reuniones que se acaban, talar y picar

@@ -1,10 +1,11 @@
 import { visibleBuildings } from '@derive/visible-buildings';
-import { BUILDINGS } from '@engine/balance';
+import { BUILDINGS, PLAZA } from '@engine/balance';
+import { plazaCentre } from '@engine/world/plaza';
 import { TERRAIN_CODE, type Building, type ConstructionWork, type GameState, type ValleyMap } from '@engine/state';
 import { homeRoutine } from './home';
 import { terrainOf } from './terrain';
 
-type ResourceState = { readonly buildings: readonly Building[]; readonly map: ValleyMap };
+type ResourceState = { readonly buildings: readonly Building[]; readonly map: ValleyMap; readonly plaza?: { readonly x: number; readonly y: number } };
 
 /** Una obra cuyo coste incluye cantera, no una concesión gratuita de encrucijada. */
 export function stoneWork(state: Pick<GameState, 'works'>): ConstructionWork | null {
@@ -69,7 +70,7 @@ function ringOf(map: ValleyMap, building: Building): number[] {
  * Compartir la selección evita que el haz se descargue junto a una casa y la
  * pila aparezca al otro lado del pueblo.
  */
-export function woodStoreCells(state: ResourceState): number[] {
+export function woodStoreCells(state: ResourceState, keepPlaza = true): number[] {
   const buildings = visibleBuildings(state);
   const occupied = new Set<number>();
   for (const building of buildings) for (let z = building.y; z < building.y + building.h; z += 1) {
@@ -83,7 +84,7 @@ export function woodStoreCells(state: ResourceState): number[] {
     .map(building => homeRoutine(building, land).approach);
   const homes = buildings.filter(building => building.kind === 'house' || building.kind === 'stone_house');
   const seen = new Set<number>();
-  return homes.flatMap(home => ringOf(state.map, home)).filter(cell => {
+  const cells = homes.flatMap(home => ringOf(state.map, home)).filter(cell => {
     if (seen.has(cell)) return false;
     seen.add(cell);
     if (occupied.has(cell) || (state.map.path[cell] ?? 0) > 0) return false;
@@ -92,8 +93,18 @@ export function woodStoreCells(state: ResourceState): number[] {
     const x = cell % state.map.width + 0.5;
     const z = Math.floor(cell / state.map.width) + 0.5;
     if (entrances.some(entry => Math.abs(entry.x - x) < 1.5 && Math.abs(entry.z - z) < 1.5)) return false;
+    // IA-piles · Fuera de la plaza: un leñero en el empedrado, junto a la
+    // fuente, se leía como troncos tirados en mitad del pueblo.
+    if (keepPlaza && state.plaza !== undefined) {
+      const square = plazaCentre(state.plaza);
+      if (Math.hypot(x - square.x, z - square.y) <= PLAZA.RADIUS + 0.75) return false;
+    }
     return !buildings.some(building => building.kind !== 'field' && building.kind !== 'grave_yard'
       && x > building.x - 1 && x < building.x + building.w + 1
       && z > building.y - 1 && z < building.y + building.h + 1);
   });
+  // Una aldea recién fundada tiene su única casa pegada a la plaza: sin sitio
+  // fuera de ella, el leñero vuelve a su borde antes que no tener dónde
+  // descargar (el talador se quedaba con el haz en la mano).
+  return cells.length > 0 || !keepPlaza ? cells : woodStoreCells(state, false);
 }

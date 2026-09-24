@@ -535,6 +535,31 @@ interface ActiveYield { readonly id: string; readonly yielding: Yielding }
  *  nulable y no una lista. */
 interface ActiveQuarrel { readonly id: string; readonly scene: QuarrelScene }
 
+/** IA-pasture · La celda abierta más cercana a un punto, de dentro afuera. */
+function openNear(land: Terrain, at: Point): Point {
+  if (!blockedAt(land, at.x, at.z)) return at;
+  for (let ring = 1; ring < 12; ring += 1) {
+    for (let dz = -ring; dz <= ring; dz += 1) for (let dx = -ring; dx <= ring; dx += 1) {
+      if (Math.max(Math.abs(dx), Math.abs(dz)) !== ring) continue;
+      const x = Math.floor(at.x) + dx + 0.5, z = Math.floor(at.z) + dz + 0.5;
+      if (x > 0.5 && z > 0.5 && x < land.width - 0.5 && z < land.height - 0.5 && !blockedAt(land, x, z)) return { x, z };
+    }
+  }
+  return at;
+}
+
+/** IA-pasture · El terreno del ganado: el de la gente con los campos cerrados. */
+function fencedFields(land: Terrain, state: GameState): Terrain {
+  const blocked = Uint8Array.from(land.blocked);
+  for (const field of state.buildings) {
+    if (field.kind !== 'field' || field.lostTick !== null) continue;
+    for (let z = field.y; z < field.y + field.h; z += 1) for (let x = field.x; x < field.x + field.w; x += 1) {
+      if (x >= 0 && z >= 0 && x < land.width && z < land.height) blocked[z * land.width + x] = 1;
+    }
+  }
+  return { ...land, blocked };
+}
+
 /** IA-anim · El tronco en pie más cercano a un cuerpo, en su celda o las vecinas. */
 function nearestTrunk(state: GameState, at: { readonly x: number; readonly z: number }): { x: number; z: number } | null {
   let best: { x: number; z: number } | null = null, gap = 1.2;
@@ -641,7 +666,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // `chase`, `feed`— sí entra en la misma lista que el resto de sitios: para
   // `decide()` un animal cerca no es distinto de un pozo cerca.
   const preparing = preparationActive(state);
-  const beasts = createBeasts(state, land, heart, seed, shore, preparing);
+  // IA-pasture · **El ganado no pisa los sembrados.** La gente trabaja dentro
+  // del campo y por eso el campo es suelo para ella; para vacas, cerdos y
+  // gallinas es una cerca. Mismo terreno, con las parcelas cerradas (Vera,
+  // 24 sep 2026: «el ganado no debe pisar el campo de cultivo»).
+  const pasture = fencedFields(land, state);
+  // El corazón de la aldea puede caer dentro de un campo, que para el ganado
+  // está cerrado: desde ahí no se alcanzaría nada y no nacería ningún animal.
+  const pastureHeart = openNear(pasture, heart);
+  const pastureShore = reachableFrom(pasture, pastureHeart);
+  const beasts = createBeasts(state, pasture, pastureHeart, seed, pastureShore, preparing);
   const deer = createDeer(state, land, seed, heart);
   const bear = createBear(state, land, heart);
   // IA-5 · El lobo del corral (§7.10, `wolves_at_the_coop`): si el motor lo
@@ -1881,48 +1915,20 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           }
           if (dweller.doing.offer.id === 'deliver' && dweller.holding !== null && dweller.holding < 0) {
             timberDeliveries += 1;
-            // Hasta tres haces quedan junto a la descarga durante la jornada.
-            // No son inventario y no se pueden volver a coger: hacen visible
-            // el resultado inmediato antes de que el siguiente tick reconstruya
-            // la pila estable a partir de `village.wood`.
-            if (timberDeliveries <= 3) {
-              const bundle: Prop = {
-                id: -10_000_000 - timberDeliveries,
-                kind: 'bundle', x: body.x, z: body.z, y: 0,
-                vx: 0, vz: 0, vy: 0, held: null,
-                restUntil: Number.POSITIVE_INFINITY, for: null,
-              };
-              props.push(bundle);
-              propsById.set(bundle.id, bundle);
-            }
+            // IA-piles · La carga se guarda: entra en el leñero y no se deja al
+            // lado. Hasta el 24 sep quedaban hasta tres haces sueltos junto a la
+            // descarga toda la jornada, y Vera los vio como material olvidado.
+            // Lo que se ve crecer es el leñero, que sale de `village.wood`.
           }
           if (dweller.doing.offer.id === 'deliver-stone'
             && dweller.holding !== null && dweller.holding <= -1_000_000) {
             stoneDeliveries += 1;
-            if (stoneDeliveries <= 3) {
-              const stone: Prop = {
-                id: -20_000_000 - stoneDeliveries,
-                kind: 'stone', x: body.x, z: body.z, y: 0,
-                vx: 0, vz: 0, vy: 0, held: null,
-                restUntil: Number.POSITIVE_INFINITY, for: null,
-              };
-              props.push(stone);
-              propsById.set(stone.id, stone);
-            }
+            // La piedra la consume la obra: no queda un canto suelto al lado.
           }
           if (dweller.doing.offer.id === 'deliver-grain'
             && dweller.holding !== null && dweller.holding <= -2_000_000) {
             harvestDeliveries += 1;
-            if (harvestDeliveries <= 3) {
-              const grain: Prop = {
-                id: -30_000_000 - harvestDeliveries,
-                kind: 'grain', x: body.x, z: body.z, y: 0,
-                vx: 0, vz: 0, vy: 0, held: null,
-                restUntil: Number.POSITIVE_INFINITY, for: null,
-              };
-              props.push(grain);
-              propsById.set(grain.id, grain);
-            }
+            // Y el grano entra en el granero.
           }
           // V-09: si se acaba con un trasto en la mano, se resuelve. Una
           // pelota se tira —encarado a quien tocara, o hacia delante si nadie
@@ -2500,7 +2506,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // tiene al lado viene a él (consolidación de IA-4). Y desde IA-5, si hay
       // lobo vivo, su posición es la amenaza que puede hacer huir a una
       // gallina (`WOLF_ALARM_RADIUS`, `beasts.ts`).
-      stepBeasts(beasts, land, around, router, seed, steps, taken, commitments,
+      stepBeasts(beasts, pasture, around, router, seed, steps, taken, commitments,
         (bodyId) => {
           const person = byId.get(bodyId);
           return person?.doing?.there === true ? person.doing.offer.id : null;

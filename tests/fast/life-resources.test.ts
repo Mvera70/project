@@ -32,11 +32,18 @@ describe('IA-15/17/18 · recursos visibles', () => {
           && dweller.doing?.offer.id === 'deliver'));
     }
     expect(chopping).toBe(true);
-    expect(hauling).toBe(true);
+    // IA-piles · Con la leñera fuera de la plaza, en la aldea recién fundada de
+    // la semilla 7 cae en la celda donde se tala (3705): se entrega sin andar.
+    // El porte tiene que verse cuando la descarga queda a más de un paso.
+    const store = life.places.find(place => place.id.startsWith('wood-store:'))!;
+    const tajo = life.places.find(place => place.id.startsWith('felling:'))!;
+    const apart = Math.hypot(store.at.x - tajo.at.x, store.at.z - tajo.at.z) > 1.5;
+    if (apart) expect(hauling).toBe(true);
     expect(unloading).toBe(true);
     expect(haulingInterrupted, 'el porteador no deja la carga para charlar').toBe(false);
     expect(life.timberDeliveries).toBeGreaterThan(0);
-    expect(life.props.some(prop => prop.kind === 'bundle' && prop.held === null)).toBe(true);
+    // IA-piles · la carga se guarda en el leñero: ningún haz se queda suelto en el suelo.
+    expect(life.props.some(prop => prop.kind === 'bundle' && prop.held === null)).toBe(false);
     expect(JSON.stringify(state)).toBe(before);
   });
 
@@ -81,7 +88,7 @@ describe('IA-15/17/18 · recursos visibles', () => {
     }
     expect(sawQueue, 'cuando la leñera se llena, el tercer haz espera fuera de su puerta').toBe(true);
     expect(life.timberDeliveries).toBeGreaterThan(delivery.seats);
-    expect(life.props.filter(prop => prop.kind === 'bundle' && prop.held === null).length).toBeLessThanOrEqual(3);
+    expect(life.props.filter(prop => prop.kind === 'bundle' && prop.held === null)).toHaveLength(0);
     expect(mirror.timberDeliveries).toBe(life.timberDeliveries);
     expect(mirror.dwellers.map(dweller => ({
       id: dweller.villager, x: dweller.body.x, z: dweller.body.z, holding: dweller.holding,
@@ -124,7 +131,8 @@ describe('IA-15/17/18 · recursos visibles', () => {
     expect(unloading).toBe(true);
     expect(interrupted).toBe(false);
     expect(life.stoneDeliveries).toBeGreaterThan(0);
-    expect(life.props.some(prop => prop.kind === 'stone' && prop.held === null)).toBe(true);
+    // IA-piles · la piedra la consume la obra: no queda un canto suelto al lado.
+    expect(life.props.some(prop => prop.kind === 'stone' && prop.held === null)).toBe(false);
     expect(JSON.stringify(state)).toBe(before);
   });
 
@@ -139,7 +147,10 @@ describe('IA-15/17/18 · recursos visibles', () => {
 
     const farmer = life.dwellers.find(dweller => dweller.dayPlan?.job?.offer === 'harvest')!;
     let gathering = false, hauling = false, unloading = false, emptyDelivery = false, interrupted = false;
-    for (let step = 0; step < 7_200 && life.harvestDeliveries === 0; step += 1) {
+    // Hasta que **este** campesino descargue: con el ganado fuera de los campos
+    // (IA-pasture) cambia el ritmo y a veces entrega antes otro vecino, y parar
+    // en la primera entrega de cualquiera dejaba a éste a medio cosechar.
+    for (let step = 0; step < 7_200 && !(unloading && farmer.holding === null); step += 1) {
       life.step(0.45);
       const actor = castOf(life, step / 30, new Map(), new Set()).find(item => item.id === farmer.villager);
       gathering ||= actor?.clip === 'sort' && farmer.doing?.offer.id === 'harvest';
@@ -155,7 +166,8 @@ describe('IA-15/17/18 · recursos visibles', () => {
     expect(interrupted).toBe(false);
     expect(emptyDelivery, 'nadie elige una descarga profesional con las manos vacías').toBe(false);
     expect(life.harvestDeliveries).toBeGreaterThan(0);
-    expect(life.props.some(prop => prop.kind === 'grain' && prop.held === null)).toBe(true);
+    // IA-piles · el grano entra en el granero: ningún saco se queda fuera.
+    expect(life.props.some(prop => prop.kind === 'grain' && prop.held === null)).toBe(false);
     expect(JSON.stringify(state)).toBe(before);
   });
 

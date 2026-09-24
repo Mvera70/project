@@ -1,5 +1,14 @@
 # The Valley — Registro de cambios
 
+## v4.41 · 24 sep 2026 · Nada suelto por el pueblo, y el ganado fuera de los sembrados
+
+Vera vio montones de material tirados y olvidados. Cada entrega dejaba hasta
+tres haces, piedras o sacos junto a la descarga, y la leña se repartía en
+seis pilas contra casas distintas. Ahora la carga entra en su almacén y la
+leña se guarda en un solo leñero, con su cobertizo, fuera de la plaza y
+alineada. Y el ganado tiene su propio terreno con los campos cerrados: antes
+pasaba del 29 % al 40 % del tiempo dentro de un sembrado; ahora, nunca.
+
 ## v4.40 · 24 sep 2026 · El golpe toca el tronco y la roca
 
 El hacha pegaba con el lomo y ningún golpe llegaba a tocar lo que golpeaba:
