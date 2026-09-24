@@ -94,13 +94,16 @@ mías del lienzo las descartó («muy, muy malas») y generó ella la referencia
   carcasa, arriba a la derecha bajo el dintel; los propios de la crónica y del
   carro se apagan dentro de la hoja.
 - **El dintel mide 7 px** y el sello de la bandeja va encima: con 14 se lo comía.
-- **El título de la portada es un logotipo de hierro viejo pintado**, no texto
-  con efectos: `textures.py` lo pinta con la Cinzel de la casa al peso 900,
-  cara de hierro picado y oxidado con bisel, lateral extruido, contorno oscuro
-  y sombra (`public/ui/art/title-logo-<lengua>.png`, uno por lengua porque
-  «El valle» no es «The Valley»). El nombre del banco es su `alt`. Tallado en
-  la madera no se veía; en plata con CSS era «un título de PowerPoint»; Vera
-  dio de ejemplo la portada de otro juego: cara, lateral y contorno.
+- **El título de la portada es el logotipo que generó Vera**: «THE» en hierro
+  picado, «VALLEY» en bronce martillado, contorno grueso y el roble en un
+  escudo de latón (`docs/visual-reference/ui-wood/title-logo-en-2026-09-24.jpg`).
+  Antes probamos tallado (no se veía), plata con CSS («un título de
+  PowerPoint») y hierro pintado por script (sin el acabado de un logotipo de
+  juego). **Los generadores de imágenes no dan transparencia: pintan el
+  tablero de cuadros dentro del JPG.** `tools/ui/cut-logo.py` lo quita: relleno
+  desde el borde con el contorno oscuro de muro, y los bolsillos encerrados
+  por su firma de dos grises. Hay un logotipo por lengua (`TITLE_LOGO` en
+  `title.ts`); **el español falta** y mientras tanto sale el inglés.
 - **La bandeja lleva el sello del árbol**, no la hoja de roble. La cera roja
   sigue siendo sólo la marca de una decisión aplazada.
 - **Tirar del tirador no cambia de pestaña: aparca la hoja** en pantalla

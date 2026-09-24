@@ -1,5 +1,11 @@
 # Cuaderno de tareas — el rework
 
+## 24 sep 2026 · UI-W, el logotipo del título
+
+Logotipo generado por Vera, recortado con `tools/ui/cut-logo.py` y puesto en la
+portada. **Pendiente: la versión en español** («EL VALLE»); hasta que llegue
+sale la inglesa (`TITLE_LOGO` en `src/ui/screens/title.ts`).
+
 ## 24 sep 2026 · UI-W, correcciones probando la demo
 
 Pergamino con textura y relieve en botones y fichas; idioma y sonido de madera;

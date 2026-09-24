@@ -33,7 +33,7 @@ porque se decide píxel a píxel y no por mezcla.
 import math
 import os
 
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImageOps
+from PIL import Image, ImageFilter, ImageOps
 
 SEED = 0x7A11  # fija: ver la cabecera
 OUT_DIR = os.path.join('src', 'ui', 'redesign')
@@ -250,78 +250,9 @@ def iron_image():
     return image
 
 
-# ------------------------------------------------------------------ el logotipo
-
-FONT = os.path.join('src', 'ui', 'redesign', 'fonts', 'cinzel.woff2')
-# El nombre del juego en cada lengua del banco (`title.name`): un logotipo en
-# imagen no se traduce solo, así que hay uno por lengua.
-LOGOS = {'en': 'THE VALLEY', 'es': 'EL VALLE'}
-LOGO_W, LOGO_H = 1500, 480     # se pinta a triple tamaño y se lee a ~340 px
-EXTRUDE = 28                   # el lateral de la letra, en píxeles del lienzo
-SIDE_NEAR = (92, 74, 58)       # el lateral junto a la cara, hierro en sombra
-SIDE_FAR = (30, 22, 16)        # y el fondo del lateral
-OUTLINE = (22, 15, 10)
-
-
-def logo(lang, text):
-    u"""El título como logotipo: hierro viejo con bisel, extrusión y contorno.
-
-    Vera, 24 sep, con la portada de un juego como ejemplo de «profundidad y
-    3D»: las letras tienen cara, lateral y contorno, no efectos sobre texto.
-    Con CSS sobre texto no se llega; pintado aquí, sí, y sale igual siempre.
-    """
-    font = ImageFont.truetype(FONT, 200)
-    font.set_variation_by_axes([900])
-    box = font.getbbox(text)
-    scale = min(1.0, 1320 / (box[2] - box[0]))
-    if scale < 1.0:
-        font = ImageFont.truetype(FONT, int(200 * scale))
-        font.set_variation_by_axes([900])
-        box = font.getbbox(text)
-    mask = Image.new('L', (LOGO_W, LOGO_H), 0)
-    x = (LOGO_W - (box[2] - box[0])) // 2 - box[0]
-    y = 90 - box[1]
-    ImageDraw.Draw(mask).text((x, y), text, font=font, fill=255)
-    outline = mask.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.MaxFilter(5))
-
-    canvas = Image.new('RGBA', (LOGO_W, LOGO_H), (0, 0, 0, 0))
-    # La sombra en la tabla, larga y blanda.
-    shadow = ImageChops.offset(outline.filter(ImageFilter.MaxFilter(7)), 0, EXTRUDE + 10)
-    shadow = shadow.filter(ImageFilter.GaussianBlur(14)).point(lambda v: int(v * 0.7))
-    canvas.paste((0, 0, 0, 255), (0, 0), shadow)
-    # El lateral: la silueta con contorno repetida hacia abajo, de lejos a cerca.
-    for d in range(EXTRUDE, 0, -1):
-        t = d / EXTRUDE
-        col = tuple(int(SIDE_NEAR[c] * (1 - t) + SIDE_FAR[c] * t) for c in range(3)) + (255,)
-        canvas.paste(col, (0, 0), ImageChops.offset(outline, 0, d))
-    # El contorno oscuro que separa la cara del lateral y de la madera.
-    canvas.paste(OUTLINE + (255,), (0, 0), outline)
-    # La cara: hierro con la luz de arriba y el bisel de los cantos.
-    # El azulejo de 256 se repetía a la vista en columnas de óxido iguales:
-    # aquí va a triple tamaño, que a lo ancho del título no llega a repetirse.
-    iron = iron_image().resize((768, 768), Image.BICUBIC)
-    face = Image.new('RGB', (LOGO_W, LOGO_H))
-    for ty in range(0, LOGO_H, iron.height):
-        for tx in range(0, LOGO_W, iron.width):
-            face.paste(iron, (tx, ty))
-    top, bottom = y + box[1], y + box[3]
-    light = Image.new('L', (LOGO_W, LOGO_H))
-    lp = light.load()
-    for yy in range(LOGO_H):
-        t = min(1.0, max(0.0, (yy - top) / max(1, bottom - top)))
-        v = int(255 * (1.35 - 0.6 * t) / 1.35)
-        for xx in range(LOGO_W):
-            lp[xx, yy] = v
-    face = ImageChops.multiply(face, Image.merge('RGB', (light, light, light)))
-    face = face.point(lambda v: min(255, int(v * 1.8)))
-    soft = mask.filter(ImageFilter.GaussianBlur(5))
-    lit = ImageChops.subtract(soft, ImageChops.offset(soft, 0, 6)).point(lambda v: min(255, v * 3))
-    shade = ImageChops.subtract(ImageChops.offset(soft, 0, 6), soft).point(lambda v: min(255, v * 2))
-    face = Image.composite(Image.new('RGB', face.size, (238, 226, 206)), face, lit.point(lambda v: int(v * 0.75)))
-    face = Image.composite(Image.new('RGB', face.size, (20, 16, 12)), face, shade.point(lambda v: int(v * 0.6)))
-    canvas.paste(face, (0, 0), mask)
-    canvas = canvas.crop(canvas.getbbox())
-    canvas.save(os.path.join('public', 'ui', 'art', f'title-logo-{lang}.png'), optimize=True)
+# El logotipo del título ya no sale de aquí: lo pintaba este script (hierro con
+# bisel y extrusión) y no llegó al acabado de un logotipo de juego. El de ahora
+# lo generó Vera y lo recorta `tools/ui/cut-logo.py`.
 
 
 # ------------------------------------------------------ el grabado de la portada
@@ -351,6 +282,4 @@ if __name__ == '__main__':
     cobble()
     metal()
     engraving()
-    for lang, text in LOGOS.items():
-        logo(lang, text)
     print('wood-planks.png, cobble.png, metal.png y title-valley-engraving.png')

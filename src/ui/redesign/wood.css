@@ -715,7 +715,7 @@ html.bare .ui-hud-header::before { visibility: hidden; }
 :root .title-sheet {
   gap: 16px;
   min-height: 100%;
-  padding: max(56px, env(safe-area-inset-top)) 26px 0;
+  padding: max(40px, env(safe-area-inset-top)) 26px 0;
   border: 0;
   border-radius: inherit;
   background: transparent;
@@ -723,10 +723,10 @@ html.bare .ui-hud-header::before { visibility: hidden; }
 }
 :root .title-head { gap: 0; padding-top: 6px; }
 :root .title-head h1 {
-  /* UI-W · el título es el logotipo de hierro de `tools/ui/textures.py`, una
-     imagen por lengua (`title.ts`). Tallado se perdía, en plata parecía «un
-     título de PowerPoint»; lo que Vera pidió, con la portada de otro juego
-     como ejemplo, es un logotipo con cara, lateral y contorno. */
+  /* UI-W · el título es el logotipo que generó Vera (`title.ts`, recortado
+     por `tools/ui/cut-logo.py`). Tallado se perdía, en plata parecía «un
+     título de PowerPoint» y el hierro pintado por script no llegó al acabado
+     de un logotipo de juego. */
   margin: 0;
   line-height: 0;
   background: none;
@@ -734,8 +734,9 @@ html.bare .ui-hud-header::before { visibility: hidden; }
 }
 :root .title-logo {
   display: block;
-  width: min(100%, 350px);
+  width: min(100%, 300px);
   height: auto;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .5));
   margin: 0 auto;
 }
 :root .title-head p,
@@ -744,7 +745,7 @@ html.bare .ui-hud-header::before { visibility: hidden; }
 
 /** El grabado en su ventana en arco, con marco de madera y filete de latón. */
 :root .title-vignette {
-  width: min(64vw, 250px);
+  width: min(54vw, 210px);
   aspect-ratio: 258 / 312;
   margin: 0 auto;
   clip-path: none;

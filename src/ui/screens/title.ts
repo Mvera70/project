@@ -32,6 +32,8 @@ import { openAnnals } from './annals';
 import type { Locale } from '@engine/chronicle/render';
 
 const STYLE_ID = 'valley-title-style';
+/** El logotipo del título por lengua (`public/ui/art/`). */
+const TITLE_LOGO: Readonly<Record<string, string>> = { en: 'title-logo-en.png' };
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const STYLE = `
 /* UI-V5 · **La cubierta de la crónica.**
@@ -329,13 +331,14 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   const head = document.createElement('header');
   head.className = 'title-head';
   const name = document.createElement('h1');
-  // UI-W · el título es un logotipo de hierro pintado (`tools/ui/textures.py`,
-  // uno por lengua): cara, lateral y contorno, como pidió Vera con la portada de
-  // otro juego de ejemplo. El nombre del banco es su texto alternativo, así que
-  // el lector de pantalla sigue diciendo el título.
+  // UI-W · el título es el logotipo que generó Vera (hierro, bronce y el roble
+  // en su escudo), recortado de su fondo por `tools/ui/cut-logo.py`. El nombre
+  // del banco es su texto alternativo, así que el lector de pantalla sigue
+  // diciendo el título. **Una imagen por lengua**, y la española todavía no
+  // existe: mientras tanto se usa la inglesa.
   const logo = document.createElement('img');
   logo.className = 'title-logo';
-  logo.src = `./ui/art/title-logo-${currentLocale()}.png`;
+  logo.src = `./ui/art/${TITLE_LOGO[currentLocale()] ?? TITLE_LOGO.en}`;
   logo.alt = renderUiText('title.name');
   logo.decoding = 'async';
   name.append(logo);
