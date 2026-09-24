@@ -843,6 +843,20 @@ export const LIFE = {
  */
 export const THREAT = {
   /**
+   * E4 · **Lo que queman al entrar.** Decisión del dueño del diseño, 25 sep
+   * 2026: «si toman la villa, los asaltantes queman casas». Se queman las de
+   * madera más cercanas a por donde entraron —el portón, o el corazón de una
+   * aldea sin él—, sin tirar dados.
+   *
+   * TUNE: tres en una villa tomada, que es el final de la partida y lo que la
+   * lápida tiene que enseñar: la calle del portón ardiendo. Una en el saqueo de
+   * una aldea abierta, que sigue viva y no puede perder media aldea por una
+   * partida que se lleva el grano; y nunca la última casa, como el rayo
+   * (`FATE`, decisión 4 del dueño). Tras la muralla no queman: no entraron.
+   */
+  STORM_BURN: 3,
+  SACK_BURN: 1,
+  /**
    * Cuántos hombres junta el clan cada año. Dos: al cabo de veinte años son
    * cuarenta, del orden de lo que una aldea hecha tiene de gente (mediana 48 a
    * los sesenta años, medido en B-1), así que el vecino es un igual y no una

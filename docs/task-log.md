@@ -1,5 +1,24 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · E4, tanda 3: casas quemadas en el asalto
+
+Motor: `torch` en `world/threat.ts` quema por `burnBuilding` las casas de
+madera más cercanas a por donde entraron, sin dados. Villa tomada: tres
+(`THREAT.STORM_BURN`); saqueo a campo abierto: una (`SACK_BURN`), nunca la
+última casa; tras la muralla: ninguna. Crónica `raid.burnt` (peso 2), con
+`fire.png` mientras llega `raid-burnt.png` (pedido en
+`plan-arte-pendiente.md`). Prueba en `tests/fast/raid-burn.test.ts`, tres
+semillas. **Listón movido, con su causa:** `raiders.test.ts` («la visita
+siempre acaba») esperaba a todos los asaltantes vivos; con la quema la aldea
+de la semilla 41 es otra y los defensores tumban a uno. Ahora pide que todos
+se vayan o caigan. Otros dos listones que la aldea nueva destapó:
+`gatherings.test.ts` vaciaba las decisiones pero no los sucesos (una boda
+también reúne) y ahora vacía los dos; y `graphics-steading.test.ts` medía los
+montones de leña entre sí contra 5 celdas, que era una medida del día, y ahora
+mide lo que el leñero promete: cada montón a 3,5 de la descarga y el cobertizo
+a 4. Y de paso, las marcas `burnt:` caducadas se barren en cada
+quema nueva: se acumulaban (31 en veinte años).
+
 ## 25 sep 2026 · E4, tanda 2: gore contenido
 
 Hecho: salpicadura de sangre corta (clase `blood` de `work-chips.ts`) en el

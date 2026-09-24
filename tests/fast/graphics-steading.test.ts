@@ -5,6 +5,7 @@
 // alguien los habría dejado**: junto a algo, en suelo pisable, y nunca dos
 // encima del mismo sitio. Un objeto en medio del prado se lee como decorado.
 
+import { woodStoreCells } from '../../src/render3d/life/resource-sites';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
@@ -127,13 +128,22 @@ describe('G-15 · dónde se dejan los trastos del corral', () => {
   });
 
   it('la leña se guarda en un solo leñero, no repartida por el pueblo', () => {
+    // **Contra la descarga, que es lo que el leñero promete** (`steading.ts`):
+    // cada montón a 3,5 celdas o menos de ella y el cobertizo a 4. La primera
+    // versión medía los montones entre sí contra 5, que era una medida del día
+    // y no la regla, y se rompió cuando el saqueo empezó a quemar una casa
+    // (E4, 25 sep 2026) y la aldea de la semilla 11 cambió: 5,1 entre dos
+    // montones, los dos dentro de su leñero.
     for (const seed of [7, 11, 23]) {
       const state = village(25, seed);
-      const piles = steadingOf(state, state.terrainSeed).filter((one) => one.asset === 'log-pile' || one.asset === 'shed');
-      for (const a of piles) for (const b of piles) {
-        const dx = Math.abs(a.cell % state.map.width - b.cell % state.map.width);
-        const dz = Math.abs(Math.floor(a.cell / state.map.width) - Math.floor(b.cell / state.map.width));
-        expect(Math.hypot(dx, dz), `semilla ${seed}`).toBeLessThanOrEqual(5);
+      const yard = woodStoreCells(state)[0];
+      if (yard === undefined) continue;
+      const gap = (cell: number): number => Math.hypot(
+        cell % state.map.width - yard % state.map.width,
+        Math.floor(cell / state.map.width) - Math.floor(yard / state.map.width));
+      for (const one of steadingOf(state, state.terrainSeed)) {
+        if (one.asset === 'log-pile') expect(gap(one.cell), `semilla ${seed}, montón`).toBeLessThanOrEqual(3.5);
+        if (one.asset === 'shed') expect(gap(one.cell), `semilla ${seed}, cobertizo`).toBeLessThanOrEqual(4);
       }
     }
   });

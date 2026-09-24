@@ -88,6 +88,9 @@ const RAID_ART: Readonly<Record<string, string>> = {
   'raid.stormed': 'raid-stormed.png',
   // La cabeza de ganado que se llevan de paso comparte el dibujo del saqueo.
   'raid.beast': 'raid-sack.png',
+  // E4 · las casas que queman: el grabado del incendio mientras llega el suyo
+  // (`docs/plan-arte-pendiente.md`, «raid-burnt.png»).
+  'raid.burnt': 'fire.png',
 };
 
 /** A1, A2, A4 y C3 · obras que antes compartían el grabado genérico. */

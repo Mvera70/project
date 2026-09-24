@@ -28,6 +28,7 @@ import { defenders, resistance } from './garrison';
 import { flagSet } from '../crossroads/conditions';
 import { next } from '../rng';
 import { hasTrait, type GameState, type HerdKind } from '../state';
+import { burnBuilding } from './buildings';
 import { yearOf } from '../time';
 
 /**
@@ -78,6 +79,8 @@ export interface Sack {
   beast: HerdKind | null;
   /** Si la aldea lo recibió tras su muralla cerrada. */
   walled: boolean;
+  /** E4 · Cuántas casas quemaron al irse (o al entrar, si la tomaron). */
+  burnt: number;
 }
 
 /**
@@ -302,6 +305,31 @@ function fall(state: GameState, howMany: number): number {
 }
 
 /**
+ * E4 · **Queman las casas de madera más cercanas a por donde entraron.**
+ *
+ * El portón si lo hay y, si no, el centro del mapa, que es donde está la aldea.
+ * Por distancia y, a igualdad, por id: sin dados, así que el mismo asalto quema
+ * siempre las mismas casas. `spareLast` guarda la última casa en pie, como el
+ * rayo: el saqueo no puede dejar a la aldea sin techo. Devuelve cuántas quemó.
+ */
+function torch(state: GameState, howMany: number, spareLast: boolean): number {
+  if (howMany <= 0) return 0;
+  const gate = state.buildings.find((b) => b.kind === 'gate');
+  const from = gate === undefined
+    ? { x: state.map.width / 2, y: state.map.height / 2 }
+    : { x: gate.x + gate.w / 2, y: gate.y + gate.h / 2 };
+  const roofs = state.buildings.filter((b) => b.lostTick === null && (b.kind === 'house' || b.kind === 'stone_house')).length;
+  const wooden = state.buildings
+    .filter((b) => b.lostTick === null && b.kind === 'house' && b.tier === 0)
+    .sort((a, b) => Math.hypot(a.x + a.w / 2 - from.x, a.y + a.h / 2 - from.y)
+      - Math.hypot(b.x + b.w / 2 - from.x, b.y + b.h / 2 - from.y) || a.id - b.id);
+  const allowed = spareLast ? Math.min(howMany, Math.max(0, roofs - 1)) : howMany;
+  const doomed = wooden.slice(0, allowed);
+  for (const house of doomed) burnBuilding(state, house.id);
+  return doomed.length;
+}
+
+/**
  * B3 · **Entran, y se acaba.**
  *
  * Lo que §1b describe con las palabras del dueño: «que el ejército rival consiga
@@ -348,6 +376,8 @@ function storm(state: GameState): { sack: Sack; fallen: number } {
 
   // Los que defendían: los sube `defenders` y los entierra `fall`.
   const buried = fall(state, defenders(state));
+  // E4 · y la calle del portón arde: es lo que la lápida enseña.
+  const burnt = torch(state, THREAT.STORM_BURN, false);
 
   state.threat.comingTick = null;
   state.threat.comingBand = 0;
@@ -364,7 +394,7 @@ function storm(state: GameState): { sack: Sack; fallen: number } {
   // **Sin campo nuevo en el esquema**: cuántos cayeron sólo hace falta esta
   // semana, para la línea de crónica, así que vuelve por aquí en vez de
   // guardarse. Un número más que migrar por un titular no vale la pena.
-  return { sack: { band, silver, grain, beast, walled: walled(state) }, fallen: buried };
+  return { sack: { band, silver, grain, beast, walled: walled(state), burnt }, fallen: buried };
 }
 
 /**
@@ -412,5 +442,8 @@ function arrive(state: GameState): Sack {
   // queda mientras esta marca dure. Un año, que es lo que una aldea tarda en
   // dejar de hablar de ello.
   state.flags['just_sacked'] = state.tick + TIME.WEEKS_PER_YEAR;
-  return { band, silver, grain, beast, walled: behindWall };
+  // E4 · a una aldea abierta le queman una casa al irse; tras la muralla no
+  // entraron, y nunca la última casa.
+  const burnt = behindWall ? 0 : torch(state, THREAT.SACK_BURN, true);
+  return { band, silver, grain, beast, walled: behindWall, burnt };
 }

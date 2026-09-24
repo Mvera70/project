@@ -869,6 +869,17 @@ export function tick(
         });
       }
     }
+    // E4 · y lo que quemaron, en el saqueo o en la villa tomada. Peso 2, como
+    // un incendio (§9.2): se cuenta, pero el titular es el asalto.
+    const burnt = raid.sack?.burnt ?? 0;
+    if (burnt > 0) {
+      say({
+        kind: 'raid',
+        templateKey: 'raid.burnt',
+        params: { year: year(), season: season(), count: burnt },
+        weight: 2,
+      });
+    }
   }
 
   // ---- 2b · LOS SUCESOS DEL VALLE (R-1, §7.10) ------------------------------

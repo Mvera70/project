@@ -1,5 +1,14 @@
 # The Valley — Registro de cambios
 
+## v4.47 · 25 sep 2026 · Queman casas al entrar (E4, tanda 3)
+
+Vera: «si toman la villa, los asaltantes queman casas». La villa tomada ve
+arder las tres casas de madera más cercanas al portón, que es lo que la
+lápida tiene que enseñar; una aldea abierta saqueada pierde una, nunca la
+última, como con el rayo; tras la muralla no arde nada porque no entraron.
+Se cuenta en la crónica (`raid.burnt`). Esto sí cambia el motor: un saqueo a
+campo abierto cuesta ahora un techo.
+
 ## v4.46 · 25 sep 2026 · Gore contenido (E4, tanda 2)
 
 Decisión de Vera: gore contenido. Un golpe recibido o una caída sueltan una

@@ -47,6 +47,10 @@ describe('una decisión convoca a la aldea · §11.8', () => {
   it('sin decisiones no hay ninguna reunión', () => {
     const state = village(20);
     state.history = [];
+    // Y sin sucesos: una boda o una fiesta también reúnen (R-1), y esta prueba
+    // es de decisiones. Pasaba por suerte hasta que el saqueo empezó a quemar
+    // una casa (E4) y la semilla tuvo un suceso vivo a los veinte años.
+    state.happenings = [];
     expect(gatheringsAt(state, CATALOG)).toEqual([]);
   });
 
@@ -73,6 +77,7 @@ describe('una decisión convoca a la aldea · §11.8', () => {
   it('una decisión del futuro no convoca nada', () => {
     const state = village(20);
     state.history = [];
+    state.happenings = [];
     decide(state, state.tick + 10);
     expect(gatheringsAt(state, CATALOG)).toEqual([]);
   });

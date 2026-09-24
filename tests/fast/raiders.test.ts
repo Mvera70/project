@@ -61,12 +61,20 @@ describe('D3 · la partida se ve llegar', () => {
     const state = raided(41);
     const life = createVillage(state, 0);
     const seen = new Set<string>();
-    for (let n = 0; n < 3600 && life.raiders.some((r) => r.phase !== 'gone'); n += 1) {
+    // **Se van o caen.** Hasta E4 esta semilla los devolvía a todos vivos; desde
+    // que el saqueo quema una casa (25 sep 2026) la aldea de la semilla 41 a los
+    // veinte años es otra y sus defensores tumban a uno (medido: once se van,
+    // uno queda `down` en la puerta). Un muerto no se marcha, y eso es D4, no
+    // una visita que no acaba: lo que esta prueba guarda es que nadie se queda
+    // con una intención repetida para siempre.
+    const over = (phase: string): boolean => phase === 'gone' || phase === 'down';
+    for (let n = 0; n < 3600 && life.raiders.some((r) => !over(r.phase)); n += 1) {
       life.step();
       for (const raider of life.raiders) seen.add(raider.phase);
     }
     expect(seen.has('standing'), 'se plantaron ante el portón').toBe(true);
-    expect(life.raiders.every((r) => r.phase === 'gone'), 'y se fueron todos').toBe(true);
+    expect(life.raiders.every((r) => over(r.phase)), 'y se fueron o cayeron todos').toBe(true);
+    expect(life.raiders.some((r) => r.phase === 'gone'), 'y alguno volvió a su valle').toBe(true);
   });
 
   it('y no tocan ni una cifra del motor', () => {

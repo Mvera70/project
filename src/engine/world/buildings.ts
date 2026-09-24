@@ -42,6 +42,12 @@ export function burnBuilding(state: GameState, id: BuildingId, blockYears = 0): 
   const building = state.buildings.find((b) => b.id === id && b.lostTick === null);
   if (building === undefined) return;
   destroyBuilding(state, id, blockYears);
+  // Las marcas de quemas viejas ya no dicen nada: se barren aquí, que es el
+  // único sitio que las escribe, para que no se acumulen en la partida
+  // guardada (medido antes del barrido: 31 en veinte años de la semilla 41).
+  for (const key of Object.keys(state.flags)) {
+    if (key.startsWith('burnt:') && (state.flags[key] ?? 0) <= state.tick) delete state.flags[key];
+  }
   state.flags[`burnt:${id}`] = state.tick + BURNING.FLAG_WEEKS;
 }
 

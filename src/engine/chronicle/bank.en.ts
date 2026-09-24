@@ -1082,6 +1082,13 @@ export const BANK: Record<string, string[]> = {
     'The wall did not hold that {season}: {count} of them came over it, and the valley was theirs by dark.',
     'In year {year} the next valley came for good — {count} men, the gate in pieces, {fallen} dead on it.',
   ],
+  // E4 · lo que queman: la calle del portón de una villa tomada, o una casa de
+  // una aldea abierta al irse. {count} es cuántas.
+  'raid.burnt': [
+    'They put a torch to {count} houses on the way through, and the smoke stood over the valley for days.',
+    '{count} roofs went up behind them. Nobody put the fires out; there was nobody left to.',
+    'Year {year}: {count} houses burned where they had passed, and the wind carried the ash to the river.',
+  ],
   'raid.beast': [
     'They drove off a {animal} as they went.',
     'A {animal} went up the valley with them.',
