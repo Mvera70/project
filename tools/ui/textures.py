@@ -20,6 +20,7 @@ Vite resuelven igual desde la raíz y desde el subdirectorio de Pages.
 
   python tools/ui/textures.py   -> src/ui/redesign/wood-planks.png
                                    src/ui/redesign/cobble.png
+                                   src/ui/redesign/metal.png
                                    public/ui/art/title-valley-engraving.png
 
 **Y el grabado de la portada**, que no es textura pero sale de la misma idea:
@@ -200,6 +201,36 @@ def cobble():
     image.save(os.path.join(OUT_DIR, 'cobble.png'), optimize=True)
 
 
+# ------------------------------------------------------------------ el metal
+
+METAL_SIZE = 256
+METAL_BASE = (196, 198, 202)   # plata vieja, un punto fría
+
+
+def metal():
+    u"""Metal cepillado: vetas horizontales largas y finas, y algún rayón.
+
+    Para las letras del título (Vera, 24 sep: «algo como un plateado, chapado,
+    que simule la época de metal que habrá en un futuro»). El brillo y el
+    bisel los pone el CSS encima; esto es sólo la superficie.
+    """
+    size = METAL_SIZE
+    image = Image.new('RGB', (size, size))
+    px = image.load()
+    for y in range(size):
+        for x in range(size):
+            u = x / size
+            w = y / size
+            brush = 0.9 + 0.12 * pnoise(u, w, 2, 96, 80) + 0.05 * pnoise(u, w, 6, 192, 81)
+            brush *= 0.97 + 0.05 * pnoise(u, w, 128, 256, 82)
+            scratch = 1.0
+            if rnd(y, 0, 83) < 0.03 and pnoise(u, w, 4, 1, 84) > 0.55:
+                scratch = 1.12
+            k = brush * scratch
+            px[x, y] = (clamp(METAL_BASE[0] * k), clamp(METAL_BASE[1] * k), clamp(METAL_BASE[2] * k))
+    image.save(os.path.join(OUT_DIR, 'metal.png'), optimize=True)
+
+
 # ------------------------------------------------------ el grabado de la portada
 
 ENGRAVING_SRC = os.path.join('public', 'ui', 'art', 'title-valley-higgsfield.png')
@@ -225,5 +256,6 @@ def engraving():
 if __name__ == '__main__':
     wood()
     cobble()
+    metal()
     engraving()
-    print('wood-planks.png, cobble.png y title-valley-engraving.png')
+    print('wood-planks.png, cobble.png, metal.png y title-valley-engraving.png')

@@ -166,6 +166,7 @@
   --plank-texture: url('./wood-planks.png');
   --plank-size: 256px;
   --cobble-texture: url('./cobble.png');
+  --metal-texture: url('./metal.png');
   /* El pergamino de los botones y fichas sobre la madera: beis con presencia,
      el grano de `parchment.png` multiplicado y los bordes envejecidos. El
      marfil liso se leía «muy claro» sobre la tabla (Vera, 24 sep). */

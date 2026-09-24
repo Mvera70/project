@@ -723,10 +723,29 @@ html.bare .ui-hud-header::before { visibility: hidden; }
 }
 :root .title-head { gap: 0; padding-top: 6px; }
 :root .title-head h1 {
-  color: #3A2412;
-  font: 700 44px/1 var(--skin-font-display);
+  /* UI-W · **letras de metal plateado, en relieve y no talladas.** Hundidas y
+     oscuras en la madera «no se ven mucho» (Vera, 24 sep), y el metal anuncia
+     la edad que viene. La superficie es el metal cepillado de
+     `tools/ui/textures.py` recortado a las letras; encima, el brillo de una
+     chapa curvada (luz arriba, sombra en el ecuador, reflejo abajo), y las
+     sombras apiladas hacen el canto y la separación de la tabla. */
+  color: transparent;
+  font: 700 46px/1.05 var(--skin-font-display);
   letter-spacing: .03em;
-  text-shadow: 0 1px 0 rgba(255, 214, 160, .35), 0 -1px 0 rgba(0, 0, 0, .45);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, .75) 0%, rgba(255, 255, 255, .15) 38%, rgba(40, 42, 48, .35) 52%, rgba(255, 255, 255, .1) 70%, rgba(255, 255, 255, .45) 100%),
+    var(--metal-texture);
+  background-size: 100% 100%, 256px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  /* Sin `text-stroke`: con Cinzel variable dibuja por dentro las juntas
+     entre las piezas de cada letra (la barra de la H y de la A). El canto lo
+     hacen las sombras. */
+  text-shadow: none;
+  filter:
+    drop-shadow(0 -1px 0 rgba(255, 255, 255, .35))
+    drop-shadow(0 2px 0 #2B1A0E)
+    drop-shadow(0 4px 5px rgba(0, 0, 0, .55));
 }
 :root .title-head p,
 :root .title-flourish,
