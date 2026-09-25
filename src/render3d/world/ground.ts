@@ -9,6 +9,7 @@
 // rebuild everything every frame and this is the biggest thing there is to
 // rebuild.
 
+import { cloudShadows } from '../effects/clouds';
 import {
   BufferAttribute, BufferGeometry, Color, DoubleSide, Mesh, MeshStandardMaterial, Vector3,
 } from 'three';
@@ -607,6 +608,8 @@ export function buildGround(map: ValleyMap, palette: Palette, plaza?: Plaza, era
     }
   }
   const material = new MeshStandardMaterial({ vertexColors: true, roughness: 1 });
+  // El valle más vivo · las sombras de las nubes pasan por el prado.
+  cloudShadows(material);
   const mesh = new Mesh(geometry, material);
   mesh.name = 'Valley_Ground';
   mesh.receiveShadow = true;

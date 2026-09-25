@@ -38,3 +38,23 @@ describe('el viento', () => {
     expect(windStrength()).toBe(at);
   });
 });
+
+// Y las sombras de las nubes sobre el prado (25 sep 2026).
+import { cloudCover, cloudShadows, cloudsFor, stepClouds } from '../../src/render3d/effects/clouds';
+
+describe('las nubes', () => {
+  it('se ponen una vez en el suelo, y la tormenta tapa más que el cielo claro', () => {
+    const ground = new MeshStandardMaterial({ vertexColors: true });
+    cloudShadows(ground);
+    const once = ground.onBeforeCompile;
+    cloudShadows(ground);
+    expect(ground.onBeforeCompile).toBe(once);
+    expect(ground.customProgramCacheKey()).toContain('clouds');
+    cloudsFor('clear');
+    for (let n = 0; n < 300; n += 1) stepClouds(0.1);
+    const clear = cloudCover();
+    cloudsFor('storm');
+    for (let n = 0; n < 300; n += 1) stepClouds(0.1);
+    expect(cloudCover()).toBeGreaterThan(clear * 2);
+  });
+});
