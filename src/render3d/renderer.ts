@@ -38,6 +38,8 @@ import { cloudsFor, stepClouds } from './effects/clouds';
 import { createAmbience, type Ambience } from './effects/ambience';
 import { createFires } from './effects/fires';
 import { createHearth } from './effects/hearth';
+import { createFestoon } from './effects/festoon';
+import { festivityOf } from '@derive/festivity';
 import { buildGreatOak, type GreatOak } from './world/great-oak';
 import { greatOakCell } from '@derive/landmark';
 import { mountainWolves } from './world/mountain-wolves';
@@ -391,10 +393,12 @@ export async function createGraphicsRenderer(
   const plaza = new PlazaFountain((id) => library.instance(id));
   // El valle más vivo · la hoguera de la plaza, al final de la tarde.
   const hearth = createHearth();
+  // Y los banderines y farolillos cuando hay fiesta (`derive/festivity.ts`).
+  const festoon = createFestoon();
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, tells.group, fires.group, hearth.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, tells.group, fires.group, hearth.group, festoon.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1176,6 +1180,7 @@ export async function createGraphicsRenderer(
   };
   let observingLive = false;
   let heldPhase: number | null = null;
+  let forceFestoon = false;
   window.__valleyObserveLive = () => { observingLive = true; };
   // Gancho de observación del rayo: cae uno en el centro de la vista. Los de
   // una tormenta caen donde quieren y duran medio segundo, así que esperarlos
@@ -1184,6 +1189,9 @@ export async function createGraphicsRenderer(
   // lo que sólo pasa a una hora —la niebla del alba, las luciérnagas—; `null`
   // la suelta. No toca el motor ni el reloj del juego.
   window.__valleyHoldPhase = (value: number | null) => { heldPhase = value; };
+  // Gancho de observación: cuelga la decoración de fiesta sin esperar a una
+  // boda. No toca el motor.
+  window.__valleyFestoon = (on: boolean) => { forceFestoon = on; };
   window.__valleyStrike = (index = 0) => {
     const centre = view.view.centre;
     weather.strike(centre.x, centre.z, index, camera);
@@ -1556,6 +1564,8 @@ export async function createGraphicsRenderer(
       plaza.show(plazaOf(shown), groundFloor);
       hearth.place(plazaOf(shown), groundFloor);
       hearth.step(phase, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
+      festoon.place(plazaOf(shown), groundFloor);
+      festoon.step(forceFestoon || festivityOf(shown) !== null, phase, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       cast.show(lastActors, life.physics?.ragdolls ?? []);
       // IA-anim · las astillas van con el reloj de la escena: en pausa, quietas.
       cast.chips.step(frame.deltaSeconds, groundFloor);
@@ -1981,6 +1991,7 @@ export async function createGraphicsRenderer(
       tells.dispose();
       fires.dispose();
       hearth.dispose();
+      festoon.dispose();
       fauna.dispose();
       bubbles.dispose();
       props.dispose();
@@ -2054,6 +2065,7 @@ declare global {
     __valleyObserveLive?: () => void;
     __valleyStrike?: (index?: number) => { x: number; z: number };
     __valleyHoldPhase?: (value: number | null) => void;
+    __valleyFestoon?: (on: boolean) => void;
   }
 }
 
