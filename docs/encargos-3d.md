@@ -124,25 +124,23 @@ brigada en una captura todavía: está probada en `fire-brigade.test.ts`.
 
 ## El valle más vivo (25 sep 2026)
 
-Lo que la tanda dejó a medias por falta de malla o de tiempo:
+Lo que la tanda dejó a medias, y lo que se hizo después el mismo día:
 
-- **Un perro** que siga a los niños y ladre al forastero. Pedido por Vera
-  («niños jugando y un perro»). No hay `dog.glb`: el juego de los niños
-  (`play`, `chase`) ya existe, el perro no.
-- **Zorro de noche y patos en el río.** Pedidos con los animales de paso; no hay
-  `fox.glb` ni `duck.glb`. Hoy los animales de paso son los conejos de la linde
-  (`life/rabbits.ts`, con el `rabbit.glb` de la caza) y los ciervos que ya
-  había.
-- **El buhonero y los tratantes** (`life/visitors.ts`) llevan el fardo genérico
-  (`load: 'bundle'`) y usan el modelo del forastero. Falta su carretilla o su
-  mula, y un puesto en la plaza mientras se quedan: hoy se plantan y charlan.
-  Las visitas de M-0 dejan una oferta al jugador; que se vea **quién** la trae
-  está hecho, que se vea **qué** trae no.
-- **Los postes del tendedero no son sólidos** para la capa de vida
-  (`effects/yards.ts`): son finos y quedan fuera de la fachada, pero alguien
-  puede cruzarlos. Pasa lo mismo con el bancal del huerto.
-- **A cubierto bajo un alero.** Con lluvia, un 11 % de la aldea se queda en
-  pausa donde está; esperar bajo el alero de la casa más cercana se leería
-  mejor.
+- ~~**Un perro, un zorro y patos.**~~ Hechos: `dog.glb`, `fox.glb` y `duck.glb`
+  salen del generador de G-23 (`tools/art/lots/animals-g23.mjs`) y viven en
+  `life/companions.ts`. **Pendiente si se quiere más:** el perro no ladra (no
+  hay audio ni gesto de ladrido: se planta delante del forastero), no juega
+  con la pelota de los niños (va detrás de ellos), y el zorro nunca se lleva
+  una gallina —eso sólo lo decide el motor, y hoy sólo con el lobo—.
+- ~~**La mula del buhonero.**~~ Hecha (Vera eligió la mula frente a la
+  carretilla): `mule.glb`, con albarda, serones y fardo, va detrás del que
+  viene a vender por donde él pisa (`life/visitors.ts`). **Falta:** un puesto
+  en la plaza mientras se quedan —hoy se plantan y charlan— y que se vea
+  **qué** trae cada visita de M-0 (la sal, el ganado del tratante).
+- ~~**Los postes del tendedero y el bancal, sólidos.**~~ Hecho
+  (`yardSolids`, `world/obstacles.ts`).
+- ~~**A cubierto bajo un alero.**~~ Hecho (`shelterUnder`): quien no tiene nada
+  que hacer con lluvia espera pegado a la pared de una casa. No hay gesto de
+  encogerse ni de sacudirse el agua: está de pie.
 - **Los charcos no salpican ni reflejan de verdad**: son discos grises lisos
   (`effects/puddles.ts`). Un mapa de entorno los haría espejos.

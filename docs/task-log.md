@@ -1,5 +1,29 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · El valle más vivo, lo apuntado: perro, zorro, patos, mula, sólidos y aleros
+
+- **Modelos** (`tools/art/lots/animals-g23.mjs`): el generador de G-23 acepta
+  `dog`, `fox` y `mule` como cuadrúpedos (con su tamaño, orejas y cola; la
+  mula con albarda y serones) y `duck` como ave (cabeza verde, pico y patas
+  naranjas, cola plana). Una especie nueva nace de la cabecera del lobo y se
+  da de alta sola en `art/catalog.json`. Construidos con `tools/art/index.ts
+  all <id>` y publicados con `publish-assets.ts --ids dog,fox,mule,duck`.
+- **Conducta** (`life/companions.ts`): un perro por aldea de cuatro casas o
+  más; el zorro sólo de noche y con la madriguera a 12 celdas de la plaza y 5
+  de cualquier edificio —más cerca, siempre había alguien y no salía nunca
+  (semilla 7 en el navegador)—, alarma a 3,5 celdas; tres patos que no pisan
+  tierra. La mula (`visitors.ts`) sigue la huella del buhonero a un ramal.
+  Medido: el zorro sale en dos de tres semillas (en la 23 hay gente junto a
+  su linde toda la noche).
+- **Sólidos**: los tendederos y huertos se colocan antes de abrir la jornada,
+  con las fachadas de `homeRoutine`, y entran en su terreno (`yardSolids`).
+- **Aleros** (`shelterUnder`, `village.ts`): semillas 7, 23 y 41, un día de
+  lluvia o tormenta, de 12–18 % parados en la calle a 0,4–2 %; 11–14 % bajo
+  un alero, nunca delante de una puerta.
+
+En la traza: `wild` (con los nuevos), `fox`. Capturas: `artifacts/graphics/alive/pet-*`,
+`new-animals.png`. Lo que queda está en `docs/encargos-3d.md`.
+
 ## 25 sep 2026 · El valle más vivo: visitantes, conejos, tendederos, huertos, charcos y fiesta
 
 Cierra la tanda de `/goal` «que el valle se sienta más vivo».

@@ -1,5 +1,17 @@
 # The Valley — Registro de cambios
 
+## v4.54 · 25 sep 2026 · Perro, zorro, patos, la mula del buhonero y los aleros
+
+Lo que la tanda anterior dejó apuntado por falta de malla. **Cuatro animales
+nuevos** con el mismo generador articulado de G-23, construidos en Blender por
+la cadena de recetas: un **perro** que va detrás de los niños, sale a ver al
+forastero y duerme en su puerta; un **zorro** que de noche sale de la linde
+hacia el gallinero y huye de la gente; **patos** en el agua más cercana; y la
+**mula** del buhonero —la eligió Vera frente a la carretilla—, que va detrás de
+él con la carga. **Los postes del tendedero y el bancal del huerto ya no se
+atraviesan.** Y **con lluvia, quien no tiene nada que hacer espera bajo un
+alero**: parados en mitad de la calle, del 12–18 % al 0,4–2 %.
+
 ## v4.53 · 25 sep 2026 · Visitantes, conejos, tendederos, huertos, charcos y fiesta
 
 El valle más vivo, última tanda. **La plaza se engalana** con banderines y
