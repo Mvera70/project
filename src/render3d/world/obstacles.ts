@@ -1,6 +1,7 @@
 import { visibleBuildings } from '@derive/visible-buildings';
 // IA-10 · La navegación recibe los mismos objetos y transformaciones que se pintan.
 import { greatOakCell } from '@derive/landmark';
+import type { Yard } from '@derive/yards';
 import { Box3, Matrix4, Mesh, Quaternion, Vector3, type Object3D } from 'three';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { terrainOf } from '../life/terrain';
@@ -45,7 +46,11 @@ export function groundFootprints(source: Object3D): Box3[] {
 
 /** Rejilla conservadora: se reserva toda celda que toca un sólido grande.
  * No incluye tejados ni copas de árboles. Se calcula una vez por cambio de mapa. */
-export function solidTerrain(state: GameState, source: (id: string) => Object3D | undefined): Terrain {
+export function solidTerrain(
+  state: GameState, source: (id: string) => Object3D | undefined,
+  /** Lo que el render pone y el estado no sabe: tendederos y huertos. */
+  extra: readonly Solid[] = [],
+): Terrain {
   const land = terrainOf(state);
   const solids: Solid[] = [];
   const add = (box: Box3): void => { solids.push({ minX: box.min.x, minZ: box.min.z, maxX: box.max.x, maxZ: box.max.z }); };
@@ -97,5 +102,35 @@ export function solidTerrain(state: GameState, source: (id: string) => Object3D 
       else solids.push({ minX: b.x + 0.3, maxX: b.x + 0.9, minZ: b.y + side, maxZ: b.y + side + 0.08 });
     }
   }
+  solids.push(...extra);
   return { ...land, solids: indexSolids(land.width, land.height, solids) };
+}
+
+/** Medio vano del tendedero y medias medidas del bancal, en celdas (`effects/yards.ts`). */
+const LINE_HALF = 0.8;
+const POST = 0.06;
+const BED_HALF = { along: 0.75, across: 0.4 };
+
+/**
+ * El valle más vivo · los postes del tendedero y el bancal del huerto, como
+ * sólidos para la capa de vida. Se veían atravesar: la ropa tendida se pasaba
+ * por en medio del poste y el huerto se pisaba en diagonal.
+ */
+export function yardSolids(yards: readonly Yard[]): Solid[] {
+  const solids: Solid[] = [];
+  for (const yard of yards) {
+    const alongX = yard.along === 'x';
+    if (yard.kind === 'line') {
+      for (const end of [-1, 1]) {
+        const x = yard.x + (alongX ? end * LINE_HALF : 0);
+        const z = yard.z + (alongX ? 0 : end * LINE_HALF);
+        solids.push({ minX: x - POST, maxX: x + POST, minZ: z - POST, maxZ: z + POST });
+      }
+    } else {
+      const hx = alongX ? BED_HALF.along : BED_HALF.across;
+      const hz = alongX ? BED_HALF.across : BED_HALF.along;
+      solids.push({ minX: yard.x - hx, maxX: yard.x + hx, minZ: yard.z - hz, maxZ: yard.z + hz });
+    }
+  }
+  return solids;
 }

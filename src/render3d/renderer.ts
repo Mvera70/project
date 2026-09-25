@@ -56,7 +56,8 @@ import { BUILDING_ASSETS, ELEVATED_RING_ASSETS, Village } from './world/building
 import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
 import { isNight, type HomeRoutine } from './life/home';
 import { fitsCircle, penetration } from './life/body';
-import { solidTerrain } from './world/obstacles';
+import { solidTerrain, yardSolids } from './world/obstacles';
+import { homeRoutine } from './life/home';
 import { Cast } from './world/cast';
 import { VILLAGER_MODELS, modelChainFor } from './world/models';
 import { dayNumber, dayPhase } from './presentation-clock';
@@ -402,8 +403,6 @@ export async function createGraphicsRenderer(
   const festoon = createFestoon();
   // El valle más vivo · la ropa tendida y el huerto de cada casa.
   const yards = createYards();
-  let yardsFor: GameState | null = null;
-  let yardsDoors = '';
   let yardsShown: Yard[] = [];
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
@@ -1395,8 +1394,17 @@ export async function createGraphicsRenderer(
         huntScene = null;
         clearBattleDebris();
         pendingBrokenGate = null;
+        // Los tendederos y huertos se colocan antes de abrir la jornada, con las
+        // fachadas que el terreno da (`homeRoutine`), y entran en ese mismo
+        // terreno como sólidos: si se colocaran después, el primer día se
+        // atravesarían y el tendedero podría acabar delante de una puerta.
+        const bare = solidTerrain(shown, id => library.instance(id));
+        const doors = new Map(shown.buildings.filter(b => b.kind === 'house' && b.lostTick === null)
+          .map(b => [b.id, homeRoutine(b, bare).facing]));
+        yardsShown = yardsOf(shown, doors, new Set(steadingOf(shown, shown.terrainSeed).map(prop => prop.cell)));
+        yards.show(yardsShown, groundFloor);
         life = createVillage(shown, today, {
-          land: solidTerrain(shown, id => library.instance(id)),
+          land: solidTerrain(shown, id => library.instance(id), yardSolids(yardsShown)),
           ground: groundFloor,
           walkwayOf: sceneWalkwayOf,
           ringOf: sceneRingOf,
@@ -1573,16 +1581,6 @@ export async function createGraphicsRenderer(
       const entrances = new Map(life.dwellers.filter(person => person.residence !== undefined)
         .map(person => [person.residence!.building, person.residence!.facing]));
       village.entrances(entrances);
-      // Los tendederos y huertos se rehacen sólo si cambió el valle o alguna
-      // fachada: son un par de decenas de piezas y no cambian cada fotograma.
-      const doorsKey = [...entrances].map(([id, facing]) => `${id}:${facing}`).join(',');
-      if (yardsFor !== shown || yardsDoors !== doorsKey) {
-        yardsFor = shown;
-        yardsDoors = doorsKey;
-        yardsShown = yardsOf(shown, entrances,
-          new Set(steadingOf(shown, shown.terrainSeed).map(prop => prop.cell)));
-        yards.show(yardsShown, groundFloor);
-      }
       // La hoja es una animación legible para el jugador: usa tiempo real y se
       // congela en pausa. La jornada y los cuerpos siguen usando tiempo
       // escénico, como antes.

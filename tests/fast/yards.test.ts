@@ -7,6 +7,9 @@ import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
 import { foundTwenty } from '../helpers/founding';
 import { yardsOf } from '../../src/derive/yards';
+import { yardSolids } from '../../src/render3d/world/obstacles';
+import { fitsCircle, indexSolids } from '../../src/render3d/life/body';
+import { terrainOf } from '../../src/render3d/life/terrain';
 
 function grown(seed: number): GameState {
   const state = foundTwenty(seed);
@@ -44,6 +47,24 @@ describe('El valle más vivo · tendederos y huertos', () => {
     for (const yard of yardsOf(state, doors)) {
       const house = houses.find((b) => b.id === yard.house)!;
       expect(yard.z < house.y + house.h, `casa ${house.id}`).toBe(true);
+    }
+  });
+
+  it('los postes y el bancal no se atraviesan: son sólidos para la gente', () => {
+    for (const seed of [7, 23, 41]) {
+      const state = grown(seed);
+      const yards = yardsOf(state);
+      const base = terrainOf(state);
+      const land = { ...base, solids: indexSolids(base.width, base.height, yardSolids(yards)) };
+      for (const yard of yards) {
+        const alongX = yard.along === 'x';
+        const probe = yard.kind === 'line'
+          ? { x: yard.x + (alongX ? 0.8 : 0), z: yard.z + (alongX ? 0 : 0.8) }
+          : { x: yard.x, z: yard.z };
+        expect(fitsCircle(land, probe.x, probe.z, 0.32), `semilla ${seed}, casa ${yard.house}`).toBe(false);
+        // Y bajo la cuerda, entre los postes, sí se pasa: sólo estorban los postes.
+        if (yard.kind === 'line') expect(fitsCircle(land, yard.x, yard.z, 0.2)).toBe(fitsCircle(base, yard.x, yard.z, 0.2));
+      }
     }
   });
 });
