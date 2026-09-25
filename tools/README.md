@@ -107,6 +107,7 @@ silencio y la prueba pasa sin probar nada.
 | `serve.mjs` | Sirve ese paquete cuando va partido (`--split`), que pide su JSON por la red |
 | `capture.ts` | El motor de captura compartido |
 | `capture-chronicle-sheet.mjs` | Fotografía la hoja de contactos de los grabados de la crónica. **Espera un `chronicle-contact-sheet.html` servido en la raíz**, que se monta a mano para la ronda y no vive en el árbol |
+| `animal-gestures-bench.mjs` · `animal-gestures-bench.ts` | **Los gestos fabricados del perro** (`effects/animal-gestures.ts`: correr, ladrar, jugar) sobre el GLB publicado y el `Fauna` del juego, una fila por gesto: `node tools/graphics/animal-gestures-bench.mjs`. Para comprobar que un perro nuevo sigue sirviendo |
 | `model-sheet.mjs` · `model-sheet.ts` | **La hoja de todos los modelos publicados**: cada GLB de `public/assets/valley3d` con la misma luz y la misma cámara, agrupados por familia y con su tamaño en celdas. `node tools/graphics/model-sheet.mjs [--out artifacts/graphics/models]`. Lo que se dibuja por código (roble, hoguera, tendederos, fuego) no sale: no es un GLB |
 | `contact-sheet.py` | Monta la hoja de contactos de una ronda gráfica, para juzgarla de un vistazo |
 | `villager-sheet.py` | La hoja de los dieciséis aldeanos (G-19), a la escala real de la cámara: veinte píxeles |

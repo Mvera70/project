@@ -2,6 +2,10 @@
 import { AnimationMixer, Group, LoopOnce, Mesh, SkinnedMesh, type AnimationAction, type Object3D } from 'three';
 import type { LoadedAsset } from '../assets';
 import type { Animal } from '@derive/animals';
+import { dogGestures } from './animal-gestures';
+
+/** Correr abre la zancada lo mismo que abre las patas (`animal-gestures.ts`). */
+const RUN_STRIDE = 1.6;
 
 export class AnimalMotion {
   readonly group = new Group();
@@ -12,6 +16,11 @@ export class AnimalMotion {
   private readonly flee: AnimationAction | undefined;
   private readonly charge: AnimationAction | undefined;
   private readonly attack: AnimationAction | undefined;
+  // El valle más vivo · correr, ladrar y jugar: los del GLB si los trae, si no
+  // fabricados sobre su esqueleto (`animal-gestures.ts`). Hoy, sólo el perro.
+  private readonly run: AnimationAction | undefined;
+  private readonly bark: AnimationAction | undefined;
+  private readonly play: AnimationAction | undefined;
   private attackStartedAt: number | undefined;
   private readonly stride: number;
   private previous: { x: number; y: number } | undefined;
@@ -36,6 +45,14 @@ export class AnimalMotion {
       : this.mixer.clipAction(asset.clips.find(clip => clip.name === 'flee')!).play();
     this.charge = asset.clips.find(clip => clip.name === 'charge') === undefined ? undefined
       : this.mixer.clipAction(asset.clips.find(clip => clip.name === 'charge')!).play();
+    const extra = kind === 'dog' ? dogGestures(asset.clips) : [];
+    const named = (name: string) => asset.clips.find(clip => clip.name === name) ?? extra.find(clip => clip.name === name);
+    const run = named('run');
+    const bark = named('bark');
+    const play = named('play');
+    this.run = run === undefined ? undefined : this.mixer.clipAction(run).play();
+    this.bark = bark === undefined ? undefined : this.mixer.clipAction(bark).play();
+    this.play = play === undefined ? undefined : this.mixer.clipAction(play).play();
     const attack = asset.clips.find(clip => clip.name === 'attack');
     this.attack = attack === undefined ? undefined : this.mixer.clipAction(attack);
     this.attack?.setLoop(LoopOnce, 1);
@@ -66,7 +83,11 @@ export class AnimalMotion {
     const attacking = animal.action === 'attack' && this.attack !== undefined;
     const special = animal.action === 'flight' ? this.flight
       : animal.action === 'flee' ? this.flee
-        : animal.action === 'charge' ? this.charge : undefined;
+        : animal.action === 'charge' ? this.charge
+          : animal.action === 'bark' ? this.bark
+            : animal.action === 'play' ? this.play : undefined;
+    // Correr es andar más largo: se lleva por la distancia, como la marcha.
+    const running = animal.action === 'run' && this.run !== undefined;
     const down = animal.action === 'down';
     if (attacking && this.attackStartedAt === undefined) {
       this.attackStartedAt = seconds;
@@ -81,9 +102,13 @@ export class AnimalMotion {
     }
     if (this.walk !== undefined) {
       this.walk.time = ((this.distance / this.stride + this.phase) % 1) * this.walk.getClip().duration;
-      this.walk.setEffectiveWeight(attacking || special !== undefined || down ? 0 : this.blend);
+      this.walk.setEffectiveWeight(attacking || special !== undefined || down || running ? 0 : this.blend);
     }
-    for (const clip of [this.flight, this.flee, this.charge]) {
+    if (this.run !== undefined) {
+      this.run.time = ((this.distance / (this.stride * RUN_STRIDE) + this.phase) % 1) * this.run.getClip().duration;
+      this.run.setEffectiveWeight(running && special === undefined && !attacking && !down ? this.blend : 0);
+    }
+    for (const clip of [this.flight, this.flee, this.charge, this.bark, this.play]) {
       if (clip === undefined) continue;
       clip.time = (seconds + this.phase * clip.getClip().duration) % clip.getClip().duration;
       clip.setEffectiveWeight(clip === special ? 1 : 0);

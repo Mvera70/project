@@ -213,9 +213,22 @@ function nearest(from: Point, points: readonly Point[], reach: number): Point | 
   return best;
 }
 
+/**
+ * El gesto del perro (`effects/animal-gestures.ts`): ladra plantado; corre
+ * cuando va detrás de un niño, de la pelota o del forastero; y cuando alcanza
+ * al niño o la pelota, se agacha a jugar. Rondando su puerta, anda.
+ */
+export function dogAction(dog: Dog): Animal['action'] {
+  if (dog.barking) return 'bark';
+  const moving = Math.hypot(dog.body.vx, dog.body.vz) > 0.02;
+  const chasing = dog.mode === 'ball' || dog.mode === 'child' || dog.mode === 'stranger';
+  if (moving) return chasing ? 'run' : 'walk';
+  return dog.mode === 'ball' || dog.mode === 'child' ? 'play' : undefined;
+}
+
 export function dogPosition(dog: Dog | null): Animal[] {
   if (dog === null) return [];
-  return [{ id: dog.body.id, kind: 'dog', x: dog.body.x, y: dog.body.z, action: actionOf(dog.body) }];
+  return [{ id: dog.body.id, kind: 'dog', x: dog.body.x, y: dog.body.z, action: dogAction(dog) }];
 }
 
 // --- el zorro ----------------------------------------------------------------
