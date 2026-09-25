@@ -974,3 +974,31 @@ export function pauseHere(
     there: false,
   };
 }
+
+/**
+ * El valle más vivo · **Esperar bajo un alero** cuando llueve y no hay nada que
+ * hacer. Es `pauseHere` con el sitio elegido: pegado a la pared de una casa, por
+ * fuera, donde el tejado vuela. Medido antes, en las semillas 7, 23 y 41 un día
+ * de lluvia o tormenta: del 12 al 18 % de quien estaba fuera se quedaba parado
+ * en mitad de la calle, mojándose, porque `pauseHere` para donde uno está.
+ */
+export function shelterUnder(
+  eave: Point, from: Point, land: Terrain, router: Router, seed: number, id: number, step: number,
+  traits: readonly Trait[] = [],
+): Intent {
+  const offer: Offer = {
+    id: 'shelter', at: eave, reach: 0.5, seats: 1,
+    // Lo mismo que da una pausa: estar parado un rato, sin más.
+    gives: { rest: 0.2, boredom: 0.2, irritation: 0.15 },
+    seconds: pauseSpan(traits),
+    spots: [eave],
+  };
+  const place: Place = { id: `shelter:${id}`, at: eave, offers: [offer] };
+  const route = router.to(land, from, eave) ?? [{ x: eave.x, z: eave.z }];
+  const dice = hash32(seed, `sheltersp:${id}:${step}`) / 4_294_967_296;
+  return {
+    place, offer, route: [...route], seat: 0, since: step,
+    until: step + Math.round((offer.seconds[0] + dice * (offer.seconds[1] - offer.seconds[0])) * 30),
+    there: false,
+  };
+}

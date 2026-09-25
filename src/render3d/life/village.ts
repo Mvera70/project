@@ -10,6 +10,7 @@
 
 import { skyAt } from '../../derive/weather';
 import { homeRoutine, indoors, isNight, stepHome, type HomeRoutine } from './home';
+import { shelterUnder } from './decide';
 import { statureAt } from '../world/models';
 import { scatterTransform } from '../world/forest';
 import { VILLAGER_CLIPS } from '../clips';
@@ -601,6 +602,31 @@ function fencedFields(land: Terrain, state: GameState): Terrain {
   return { ...land, blocked };
 }
 
+/**
+ * El valle más vivo · los aleros de las casas: puntos pegados a cada pared, por
+ * fuera, cada celda de fachada, donde un cuerpo cabe. TUNE: a 0,45 celdas de la
+ * pared —el tejado vuela media celda (recetas G-21)— y a no más de
+ * `EAVE_REACH` de quien los busca, que es lo que se anda bajo la lluvia antes
+ * de preferir quedarse donde uno está.
+ */
+const EAVE_OFF = 0.45;
+const EAVE_REACH = 12;
+/** Lo que tiene tejado con alero: casas y obradores, no murallas ni campos. */
+const EAVED: ReadonlySet<string> = new Set(['house', 'stone_house', 'granary', 'smithy', 'mill', 'hall', 'chapel', 'church']);
+function eavesOf(state: GameState, land: Terrain): Point[] {
+  const out: Point[] = [];
+  for (const b of state.buildings) {
+    if (b.lostTick !== null || !EAVED.has(b.kind)) continue;
+    for (let x = b.x; x < b.x + b.w; x += 1) {
+      out.push({ x: x + 0.5, z: b.y - EAVE_OFF }, { x: x + 0.5, z: b.y + b.h + EAVE_OFF });
+    }
+    for (let z = b.y; z < b.y + b.h; z += 1) {
+      out.push({ x: b.x - EAVE_OFF, z: z + 0.5 }, { x: b.x + b.w + EAVE_OFF, z: z + 0.5 });
+    }
+  }
+  return out.filter((at) => fitsCircle(land, at.x, at.z, 0.32));
+}
+
 /** IA-anim · El tronco en pie más cercano a un cuerpo, en su celda o las vecinas. */
 function nearestTrunk(state: GameState, at: { readonly x: number; readonly z: number }): { x: number; z: number } | null {
   let best: { x: number; z: number } | null = null, gap = 1.2;
@@ -648,6 +674,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     .map((place) => place.id.startsWith('gather:') ? place
       : { ...place, offers: place.offers.filter((offer) => !OPEN_AIR.has(offer.id)) })
     .filter((place) => place.offers.length > 0 && !place.id.startsWith('leisure:'));
+  // Y los aleros: el pie de cada pared de casa, por fuera, donde vuela el
+  // tejado. Quien no tiene nada que hacer con lluvia espera ahí y no en mitad
+  // de la calle (`shelterUnder`). Se calcula una vez, y sólo si llueve.
+  const eaves: Point[] = wet ? eavesOf(state, land) : [];
   // IA-6 · La riña de la plaza (§7.10, `docs/historico/rework.md` §4 R-2 punto 1): si el
   // motor tiró `quarrel_in_the_square` esta semana, éstos son los dos `id` de
   // verdad — nunca una pareja que esta capa se invente. `null` si esta semana
@@ -1287,6 +1317,26 @@ export function createVillage(state: GameState, day: number, options: DayOptions
    * está usando ni persiguiendo todavía. Quien no la encuentre espera donde
    * terminó el tajo; nunca frente a la puerta de la leñera.
    */
+  /** El alero libre más cercano, a menos de `EAVE_REACH`; `null` si no hay. */
+  function shelterFor(body: Body): Intent | null {
+    const takenEaves = dwellers.filter((other) => other.doing?.offer.id === 'shelter')
+      .map((other) => other.doing!.offer.at);
+    // Nadie espera delante de una puerta: taparía la entrada a quien vuelve.
+    const doors = dwellers.flatMap((other) => other.residence === undefined ? [] : [other.residence.approach]);
+    let best: Point | null = null;
+    let gapBest = EAVE_REACH;
+    for (const eave of eaves) {
+      const d = Math.hypot(eave.x - body.x, eave.z - body.z);
+      if (d >= gapBest || takenEaves.some((at) => Math.hypot(at.x - eave.x, at.z - eave.z) < 0.5)
+        || doors.some((at) => Math.hypot(at.x - eave.x, at.z - eave.z) < 0.9)) continue;
+      gapBest = d;
+      best = eave;
+    }
+    if (best === null) return null;
+    const dweller = byId.get(body.id);
+    return shelterUnder(best, body, land, router, seed, body.id, steps, dweller?.traits ?? []);
+  }
+
   function woodDelivery(body: Body): Intent | null {
     const store = mine.find((place) => place.id.startsWith('wood-store:'));
     const offer = store?.offers.find((item) => item.id === 'deliver');
@@ -1835,7 +1885,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
               restart: tooLong || overdue,
             },
             summoned || wet ? eventOptions : [...eventOptions, ...(dweller.leisure ?? [])], taken, land, router, seed, steps,
-          ) ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits, body.pace);
+          ) ?? (wet && dweller.holding === null ? shelterFor(body) : null)
+            ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits, body.pace);
           // **La plaza se reserva al decidir, no al llegar**, y ése era el imán
           // que se veía en pantalla: el aforo se contaba una vez al empezar el
           // paso, así que los veinte que decidían en ese instante veían el mismo
