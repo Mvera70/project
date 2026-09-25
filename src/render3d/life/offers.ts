@@ -101,6 +101,15 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   douse: { id: 'douse', reach: 1.2, seats: 8, gives: { duty: 1 }, seconds: [8, 16] },
   /** Cazar en el bosque: solo el reparto laboral puede iniciar esta rutina. */
   hunt: { id: 'hunt', reach: 1.2, seats: 4, gives: { duty: 0.6 }, seconds: [12, 24], routineOnly: true },
+  /**
+   * El valle más vivo (25 sep 2026) · **la comida en corro**, al mediodía, en
+   * la plaza: se sientan juntos, descansan y hablan. Con su franja propia
+   * (`hours` en `places.ts`), así que a mediodía gana a lo demás y fuera de
+   * ella casi nadie la elige.
+   */
+  meal: { id: 'meal', reach: 1.1, seats: 8, gives: { company: 0.7, rest: 0.5, boredom: 0.3 }, seconds: [20, 40] },
+  /** Y **la hoguera de la noche**: corro alrededor del fuego de la plaza. */
+  hearth: { id: 'hearth', reach: 1.2, seats: 10, gives: { company: 0.8, boredom: 0.5, rest: 0.3 }, seconds: [25, 50] },
   gossip: { id: 'gossip', reach: 1.3, seats: 4, gives: { company: 0.9, boredom: 0.4 }, seconds: [6, 18] },
   /** Mirar correr el agua. No calma nada del cuerpo y despeja la cabeza. */
   loiter: { id: 'loiter', reach: 1.5, seats: 3, gives: { boredom: 0.5, irritation: 0.3 }, seconds: [8, 18] },

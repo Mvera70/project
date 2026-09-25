@@ -72,9 +72,12 @@ describe('IA-15/17/18 · recursos visibles', () => {
       .toBeGreaterThan(delivery.seats);
 
     let sawQueue = false;
+    // A las diez (fase 0,38) y no a las once: desde el 25 sep 2026 las once son
+    // la hora de comer en corro en la plaza, y con los leñadores comiendo no
+    // llegan tres haces a la vez. La cola se mide en hora de faena.
     for (let step = 0; step < 4_800; step += 1) {
-      life.step(0.45);
-      mirror.step(0.45);
+      life.step(0.38);
+      mirror.step(0.38);
       const carriers = life.dwellers.filter(dweller => dweller.holding === -1 - dweller.body.id);
       const unloading = carriers.filter(dweller => dweller.doing?.place.id === store.id
         && dweller.doing.offer.id === 'deliver');

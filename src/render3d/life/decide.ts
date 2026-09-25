@@ -530,6 +530,20 @@ export function decide(
       // reunión por valer cero.
       if (summoned && score <= 0) score = Number.EPSILON;
       if (score <= 0) continue;
+      // El valle más vivo · **la comida y la hoguera tienen su hora y sólo su
+      // hora.** `hourFactor` deja fuera de franja un 0,6 —una charla en la plaza
+      // vale a cualquier hora—, y con eso medio pueblo «comía» desde las siete
+      // de la mañana hasta la cena (medido, semilla 23). Fuera de su franja no
+      // se ofrecen.
+      if ((offer.id === 'meal' || offer.id === 'hearth') && hourFactor(offer, dayPhase) < 1.4) continue;
+      // Y en su franja **ganan al tajo**: el turno de trabajo pone un suelo de
+      // 1,2 a su puesto (arriba) y con él nadie dejaba la azada para comer.
+      // **Salvo a mitad de un porte**: quien lleva un haz o una carga de grano
+      // a su almacén (una rutina de oficio que no es el tajo) la termina antes.
+      // Sin esta salvedad se soltaban leña y grano en medio del camino
+      // (`life-resources.test.ts`, que juega su jornada al mediodía).
+      const carrying = who.doing !== null && who.doing.offer.routineOnly === true && who.doing.offer.id !== 'work';
+      if ((offer.id === 'meal' || offer.id === 'hearth') && !carrying) score = Math.max(score, 1.3);
       score *= hourFactor(offer, dayPhase);
       score *= ageLeanOf(who.ageGroup, offer.id);
       score *= homePull(who.ageGroup, who.home, place.at);

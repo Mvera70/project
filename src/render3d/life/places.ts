@@ -90,7 +90,21 @@ function detectSquare(state: GameState, land: Terrain, shore: Uint8Array): Place
   if (spots.length === 0) return null;
   const offer = placedOffer(gossipSpec, middle, land, [0.6, 1.0], spots.slice(0, gossipSpec.seats));
   if (offer === null) return null;
-  return { id: 'square:common', at: offer.at, offers: [offer] };
+  // El valle más vivo · la comida del mediodía y la hoguera del atardecer, en
+  // corro alrededor del centro de la plaza. Las franjas son fases de jornada:
+  // 0,42–0,52 es de las once a la una (`day-phases.ts`), y 0,58–0,66 de las
+  // tres a las cinco, **al acabar la faena y antes de que la gente se recoja**
+  // (`home.ts` empieza a mandar a casa desde media jornada según lo lejos que
+  // vive cada uno). La primera versión la ponía de ocho a once y a esa hora la
+  // aldea entera ya dormía; la segunda, de cuatro y media a siete, y a esa
+  // hora el 87 % ya estaba en casa o volviendo (semilla 7): nadie fue.
+  const offers = [offer];
+  const ring = spots.slice(0, 12);
+  const meal = OFFERS.meal === undefined ? null : placedOffer(OFFERS.meal, middle, land, [0.42, 0.52], ring.slice(0, OFFERS.meal.seats));
+  const hearth = OFFERS.hearth === undefined ? null : placedOffer(OFFERS.hearth, middle, land, [0.58, 0.66], ring.slice(0, OFFERS.hearth.seats));
+  if (meal !== null) offers.push(meal);
+  if (hearth !== null) offers.push(hearth);
+  return { id: 'square:common', at: offer.at, offers };
 }
 
 /**

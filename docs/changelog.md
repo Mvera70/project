@@ -1,5 +1,12 @@
 # The Valley — Registro de cambios
 
+## v4.52 · 25 sep 2026 · Nubes, niebla, pájaros, luciérnagas, la comida y la hoguera
+
+El valle más vivo, en pedazos que se ven: sombras de nubes que cruzan el
+prado, niebla sobre el río al alba, bandadas de día, luciérnagas en las noches
+de verano, gente que come junta en la plaza a mediodía y un corro alrededor de
+una hoguera a media tarde.
+
 ## v4.51 · 25 sep 2026 · Las estaciones llegan poco a poco
 
 La nieve ya no aparece entera el primer día de invierno: se espolvorea al

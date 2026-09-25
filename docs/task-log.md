@@ -1,5 +1,19 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · El valle más vivo: comer juntos y la hoguera de la plaza
+
+Medido antes: la vida social ya existía (109–124 escenas de dos por jornada,
+7 % del tiempo) y no hacía falta rehacerla. Lo nuevo: **la comida en corro** en
+la plaza de once a una (`OFFERS.meal`) y **la hoguera** de tres a cinco
+(`OFFERS.hearth`, con su cerco de piedras, leños, llama y luz en
+`effects/hearth.ts`), antes de que la aldea se recoja. Medido: hasta un 16 %
+de la aldea come junta hacia la una y un 3–7 % se sienta al fuego (semillas 7
+y 23). Lo que costó: la hoguera de noche no la veía nadie porque a esa hora
+todos duermen, ni la del atardecer (87 % ya en casa); comer perdía contra el
+tajo (suelo de 1,2) y ahora gana en su franja, salvo a mitad de un porte.
+`life-resources.test.ts` medía la cola de la leñera a las once, que ahora es
+la hora de comer; se mide a las diez. Capturas: `artifacts/graphics/alive/plaza-sheet.png`.
+
 ## 25 sep 2026 · El valle más vivo: nubes, niebla, pájaros y luciérnagas
 
 Sombras de nubes que cruzan el prado (`effects/clouds.ts`, en el sombreador

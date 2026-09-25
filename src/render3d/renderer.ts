@@ -37,6 +37,7 @@ import { stepWind, windFor } from './effects/wind';
 import { cloudsFor, stepClouds } from './effects/clouds';
 import { createAmbience, type Ambience } from './effects/ambience';
 import { createFires } from './effects/fires';
+import { createHearth } from './effects/hearth';
 import { buildGreatOak, type GreatOak } from './world/great-oak';
 import { greatOakCell } from '@derive/landmark';
 import { mountainWolves } from './world/mountain-wolves';
@@ -388,10 +389,12 @@ export async function createGraphicsRenderer(
   const arrows = new Arrows((id) => library.instance(id));
   // P-2 · la fuente del centro de la plaza. El empedrado lo pinta el suelo.
   const plaza = new PlazaFountain((id) => library.instance(id));
+  // El valle más vivo · la hoguera de la plaza, al final de la tarde.
+  const hearth = createHearth();
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, tells.group, fires.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, tells.group, fires.group, hearth.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1551,6 +1554,8 @@ export async function createGraphicsRenderer(
       // D2b · y las flechas, con su altura absoluta: la `y` es del mundo físico.
       arrows.update([...arrowsOf(life), ...(huntScene?.projectiles ?? [])]);
       plaza.show(plazaOf(shown), groundFloor);
+      hearth.place(plazaOf(shown), groundFloor);
+      hearth.step(phase, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       cast.show(lastActors, life.physics?.ragdolls ?? []);
       // IA-anim · las astillas van con el reloj de la escena: en pausa, quietas.
       cast.chips.step(frame.deltaSeconds, groundFloor);
@@ -1975,6 +1980,7 @@ export async function createGraphicsRenderer(
       weather.dispose();
       tells.dispose();
       fires.dispose();
+      hearth.dispose();
       fauna.dispose();
       bubbles.dispose();
       props.dispose();

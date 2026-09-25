@@ -44,6 +44,8 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
     if (action === 'harvest') return 'sort';
     // E4 · la brigada de cubos contra el fuego.
     if (action === 'douse') return 'douse';
+    // El valle más vivo · sentados a comer y al fuego de la noche.
+    if (action === 'meal' || action === 'hearth') return 'sit';
     // IA-fields · en el campo, el gesto de la fase: horca, voleo o azada.
     const task = dweller.doing.place.task;
     if (action === 'work' && place.startsWith('field:')) return task === 'spread' ? 'spread' : task === 'sow' ? 'sow' : 'work_hoe';
