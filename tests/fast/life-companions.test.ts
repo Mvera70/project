@@ -9,7 +9,7 @@ import { run } from '@engine/sim';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { foundTwenty } from '../helpers/founding';
 import { createVillage } from '../../src/render3d/life/village';
-import { createDog, createFox, stepDog, stepFox } from '../../src/render3d/life/companions';
+import { createDog, createFox, dogAction, stepDog, stepFox } from '../../src/render3d/life/companions';
 import { terrainOf } from '../../src/render3d/life/terrain';
 import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
 import { isNight } from '../../src/render3d/life/home';
@@ -151,5 +151,25 @@ describe('El valle más vivo · el perro, el zorro, los patos y la mula', () => 
       expect(Math.hypot(fresh.body.x - ball.x, fresh.body.z - ball.z))
         .toBeLessThan(Math.hypot(fresh.body.x - child.x, fresh.body.z - child.z));
     }
+  });
+
+  it('el perro no sólo anda: corre tras la pelota, juega al alcanzarla y ladra plantado', () => {
+    const state = grown(7);
+    const land = terrainOf(state);
+    const heart = { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 };
+    const dog = createDog(state, land, 7, heart)!;
+    const ball = { x: dog.door.x + 4, z: dog.door.z };
+    const seen = new Set<string>();
+    for (let step = 0; step < 600; step += 1) {
+      stepDog(dog, land, 7, step, false, [], [], [ball]);
+      seen.add(String(dogAction(dog)));
+    }
+    expect(seen.has('run'), [...seen].join(',')).toBe(true);
+    expect(seen.has('play'), [...seen].join(',')).toBe(true);
+    stepDog(dog, land, 7, 600, false, [], [{ x: dog.body.x + 2, z: dog.body.z }]);
+    for (let step = 601; step < 700 && !dog.barking; step += 1) {
+      stepDog(dog, land, 7, step, false, [], [{ x: dog.body.x + 2, z: dog.body.z }]);
+    }
+    expect(dogAction(dog)).toBe('bark');
   });
 });
