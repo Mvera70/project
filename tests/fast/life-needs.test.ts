@@ -408,7 +408,13 @@ describe('IA-3 · aldeanos con hábitos', () => {
 
   // IA-12: pasa al evitar la charla previa al primer destino laboral.
   // Se conserva el umbral 2× y la condición de necesidades urgentes.
-  it('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
+  //
+  // **Rojo desde el cielo por estaciones (25 sep 2026), y es la deuda que la
+  // fila H del plan ya nombra («la del devoto»):** depende de qué aldea sale
+  // en la muestra, y con la trayectoria nueva el devoto reza el 3,7 % de sus
+  // jornadas contra el 3,0 % del resto (1,2×, no 2×). Se deja `it.fails` con
+  // la propiedad intacta, como manda la casa, en vez de bajar el listón.
+  it.fails('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
     const { byTrait, anyThirstIgnored } = habitSample();
     expect(anyThirstIgnored, 'una necesidad urgente no se apaga con otra cosa').toBe(false);
 

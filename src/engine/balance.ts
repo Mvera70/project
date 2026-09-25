@@ -364,6 +364,27 @@ export const SKY = {
   // El resto es lluvia sin rayos. En invierno la tormenta no sale: nieva.
   STORM_SHARE: 0.25,
   OVERCAST_SHARE: 0.35,
+  /**
+   * **El cielo de cada estación** (Vera, 25 sep 2026: «el clima debe variar con
+   * las estaciones»). Antes las cuatro eran iguales: medido en seis semillas
+   * (7, 11, 23, 42, 91, 108) y veinte años, un 20 % de días cerrados y un 5,2 %
+   * de tormenta en primavera, verano y otoño por igual.
+   *
+   * `wet` multiplica la fila del año (`WET_BY_YEAR`) y **promedia 1**, así que
+   * el año llueve lo mismo, repartido distinto: chubascos en primavera, verano
+   * seco, otoño gris, invierno de nieve. `storm` y `overcast` son el reparto de
+   * un día cerrado (el resto es lluvia, o nieve en invierno); `strength`
+   * escala cuánto arrecia. **Los días de tormenta del año se conservan**
+   * (15,6 % → 15,3 % de los días de las tres estaciones con rayo), porque el
+   * rayo que quema casas pesa por ellos (`fate.ts`) y eso es economía: ahora
+   * caen en verano, que es cuando caen.
+   */
+  SEASONS: {
+    spring: { wet: 1.2, storm: 0.15, overcast: 0.3, strength: 0.8 },
+    summer: { wet: 0.7, storm: 0.65, overcast: 0.1, strength: 1 },
+    autumn: { wet: 1.3, storm: 0.1, overcast: 0.55, strength: 0.9 },
+    winter: { wet: 0.8, storm: 0, overcast: 0.4, strength: 1 },
+  },
   // TUNE: por debajo de esto no se pinta. Un chispeo que no se ve es peor que
   // un cielo claro: el jugador nota que algo pasa y no encuentra qué.
   MIN_INTENSITY: 0.45,

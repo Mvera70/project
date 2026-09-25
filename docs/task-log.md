@@ -1,5 +1,20 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · El valle más vivo: viento y cielo por estaciones
+
+Viento en copas, juncos y cultivos (`effects/wind.ts`, sombreador), con la
+fuerza del cielo. Y **el cielo cambia con la estación** (Vera: «el clima debe
+variar con las estaciones»): antes las cuatro eran iguales (20 % de días
+cerrados, 5,2 % de tormenta). Ahora (`SKY.SEASONS`): primavera de chubascos,
+verano seco con el doble de tormentas, otoño gris, invierno de nieve; el año
+llueve lo mismo y los días de tormenta se conservan. **Efecto medido en el
+motor** (seis semillas, sesenta años): rayos que queman casas 377 → 349; **riadas
+81 → 134**, porque la primavera lluviosa es la que las trae. Es economía y
+no se ha compensado: lo decide Vera en el nivelado. Dos pruebas que la
+trayectoria nueva destapó: `crown.test.ts` cogía a un herrero muerto (ahora
+pide uno vivo) y el devoto de `life-needs.test.ts` baja a 1,2× (deuda H ya
+nombrada; `it.fails` con la propiedad intacta).
+
 ## 25 sep 2026 · El valle más vivo, tanda 1: el rayo
 
 Pedido por Vera con `/goal` («que el valle se sienta más vivo: interacciones,

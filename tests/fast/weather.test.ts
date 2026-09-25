@@ -186,3 +186,37 @@ describe('el rayo parpadea como un rayo', () => {
     expect(boltEnvelope(start + last * 0.25)).toBeGreaterThan(boltEnvelope(start + last * 0.75));
   });
 });
+
+// El cielo de cada estación (Vera, 25 sep 2026: «el clima debe variar con las
+// estaciones»). Varias semillas y veinte años de jornadas.
+import { skyOfDay } from '@engine/world/sky';
+
+describe('cada estación tiene su cielo', () => {
+  const share = (season: string, kind: string): number => {
+    let hits = 0;
+    let days = 0;
+    for (const seed of [7, 11, 23, 42]) {
+      for (let day = 0; day < 48 * 7 * 20; day += 1) {
+        if (seasonOf(Math.floor(day / TIME.DAYS_PER_WEEK)) !== season) continue;
+        days += 1;
+        if (skyOfDay(seed, 2, day).kind === kind) hits += 1;
+      }
+    }
+    return hits / days;
+  };
+
+  it('el verano trae las tormentas, el otoño el cielo gris, el invierno la nieve', () => {
+    expect(share('summer', 'storm')).toBeGreaterThan(share('spring', 'storm') * 1.5);
+    expect(share('summer', 'storm')).toBeGreaterThan(share('autumn', 'storm') * 1.5);
+    expect(share('autumn', 'overcast')).toBeGreaterThan(share('summer', 'overcast') * 3);
+    expect(share('spring', 'rain')).toBeGreaterThan(share('summer', 'rain') * 2);
+    expect(share('winter', 'storm')).toBe(0);
+    expect(share('winter', 'rain')).toBe(0);
+    expect(share('winter', 'snow')).toBeGreaterThan(0.05);
+  });
+
+  it('el año llueve lo mismo: el reparto cambia, la cantidad no', () => {
+    const wet = (Object.values(SKY.SEASONS) as { wet: number }[]).reduce((sum, one) => sum + one.wet, 0) / 4;
+    expect(wet).toBeCloseTo(1, 5);
+  });
+});

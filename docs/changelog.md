@@ -1,5 +1,12 @@
 # The Valley — Registro de cambios
 
+## v4.50 · 25 sep 2026 · Viento, y un cielo para cada estación
+
+Las copas, los juncos y el cereal se mecen, más con tormenta. Y el cielo deja
+de ser el mismo todo el año: chubascos en primavera, tormentas en verano,
+otoño gris, nieve en invierno, con la misma lluvia al año. Cambia el motor:
+las riadas de primavera suben de 81 a 134 en seis semillas y sesenta años.
+
 ## v4.49 · 25 sep 2026 · El rayo, rehecho (el valle más vivo, tanda 1)
 
 «Visualmente no me gusta», del rayo. Eran tres líneas de un píxel: a la

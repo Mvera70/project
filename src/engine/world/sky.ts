@@ -42,26 +42,23 @@ export function skyDice(seed: number, day: number, what: string): number {
  */
 export function skyOfDay(seed: number, weatherIndex: number, day: number): Sky {
   const row = Math.max(0, Math.min(SKY.WET_BY_YEAR.length - 1, weatherIndex));
-  const wet = SKY.WET_BY_YEAR[row] as number;
+  // La estación **de esa jornada**, no la de ningún tick que ande por ahí: una
+  // función pura que dependiera de cuándo se la llama sería una trampa.
+  const season = seasonOf(Math.floor(day / TIME.DAYS_PER_WEEK));
+  const table = SKY.SEASONS[season];
+  const wet = (SKY.WET_BY_YEAR[row] as number) * table.wet;
   if (skyDice(seed, day, 'wet') >= wet) return CLEAR;
 
   // Cuánto arrecia lo decide su propio dado, y nunca es un chispeo invisible:
-  // si el cielo se cierra, se tiene que ver.
-  const strength = SKY.MIN_INTENSITY + skyDice(seed, day, 'how') * (1 - SKY.MIN_INTENSITY);
-  // La estación **de esa jornada**, no la de ningún tick que ande por ahí: una
-  // función pura que dependiera de cuándo se la llama sería una trampa.
-  const winter = seasonOf(Math.floor(day / TIME.DAYS_PER_WEEK)) === 'winter';
+  // si el cielo se cierra, se tiene que ver. La estación lo escala.
+  const raw = SKY.MIN_INTENSITY + skyDice(seed, day, 'how') * (1 - SKY.MIN_INTENSITY);
+  const strength = Math.max(SKY.MIN_INTENSITY, raw * table.strength);
   const draw = skyDice(seed, day, 'kind');
-  if (winter) {
-    // En invierno cae nieve y no hay tormenta con rayos: una tronada de nieve
-    // existe pero es rara, y un valle que truena en enero se lee como un fallo.
-    return { kind: draw < SKY.OVERCAST_SHARE ? 'overcast' : 'snow', intensity: strength };
-  }
-  if (draw < SKY.STORM_SHARE) return { kind: 'storm', intensity: strength };
-  if (draw < SKY.STORM_SHARE + SKY.OVERCAST_SHARE) {
-    return { kind: 'overcast', intensity: strength };
-  }
-  return { kind: 'rain', intensity: strength };
+  if (draw < table.storm) return { kind: 'storm', intensity: strength };
+  if (draw < table.storm + table.overcast) return { kind: 'overcast', intensity: strength };
+  // En invierno el resto es nieve y no lluvia: un valle que truena o llueve en
+  // enero se lee como un fallo.
+  return { kind: season === 'winter' ? 'snow' : 'rain', intensity: strength };
 }
 
 /** Las siete jornadas de la semana `tick`, en orden. */

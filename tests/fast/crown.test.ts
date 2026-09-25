@@ -67,7 +67,11 @@ describe('K-1 · la corona se da, y se paga', () => {
     // que cambia es quién lo ocupa y que **el oficio de antes se recuerda**,
     // porque es lo que decide el estilo.
     const state = rich();
-    const smith = state.people.villagers.find((v) => v.role === 'smith' && v.named);
+    // Un herrero **vivo**: la prueba cogía al primero con nombre, y cuando el
+    // cielo pasó a cambiar con la estación (25 sep 2026) el de la semilla 41
+    // murió antes del año quince y la corona, con razón, no se le daba.
+    const smith = state.people.villagers.find((v) => v.role === 'smith' && v.named
+      && v.diedTick === null && v.leftTick === null);
     const who = smith ?? crownCandidates(state)[0];
     expect(who).toBeDefined();
     if (who === undefined) return;
