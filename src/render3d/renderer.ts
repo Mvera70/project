@@ -24,7 +24,7 @@ import { paletteFor, snowCover } from '@derive/palette';
 import type { Palette } from '@derive/palette';
 import { moodsFor } from '@derive/moods';
 import { createValleyCamera } from './camera';
-import { TERRAIN_CODE, type GameState, type VillagerId } from '@engine/state';
+import { TERRAIN_CODE, type GameState, type HappeningId, type VillagerId } from '@engine/state';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
   Actor, ActorDoing, BattleReport, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats,
@@ -1034,6 +1034,12 @@ export async function createGraphicsRenderer(
         x: round(raider.body.x), z: round(raider.body.z),
         screen: screen(raider.body.x, raider.body.z),
       })),
+      // El valle más vivo · los que vienen por el camino, y en qué andan.
+      visitors: life.visitors.map(visitor => ({
+        id: visitor.body.id, kind: visitor.kind, phase: visitor.phase,
+        x: round(visitor.body.x), z: round(visitor.body.z),
+        screen: screen(visitor.body.x, visitor.body.z),
+      })),
       arrows: arrowsOf(life).map(arrow => ({
         id: arrow.id,
         x: round(arrow.x), y: round(arrow.y), z: round(arrow.z),
@@ -1181,6 +1187,7 @@ export async function createGraphicsRenderer(
   let observingLive = false;
   let heldPhase: number | null = null;
   let forceFestoon = false;
+  let forcedVisits: HappeningId[] | null = null;
   window.__valleyObserveLive = () => { observingLive = true; };
   // Gancho de observación del rayo: cae uno en el centro de la vista. Los de
   // una tormenta caen donde quieren y duran medio segundo, así que esperarlos
@@ -1192,6 +1199,9 @@ export async function createGraphicsRenderer(
   // Gancho de observación: cuelga la decoración de fiesta sin esperar a una
   // boda. No toca el motor.
   window.__valleyFestoon = (on: boolean) => { forceFestoon = on; };
+  // Gancho de observación: rehace la jornada con un visitante del camino
+  // (`life/visitors.ts`) sin esperar a que el motor lo sortee. No toca el motor.
+  window.__valleyVisit = (kind: HappeningId = 'pedlar') => { forcedVisits = [kind]; life = null; };
   window.__valleyStrike = (index = 0) => {
     const centre = view.view.centre;
     weather.strike(centre.x, centre.z, index, camera);
@@ -1359,6 +1369,7 @@ export async function createGraphicsRenderer(
           ringOf: sceneRingOf,
           rampartOf: sceneRampartPatrolView,
           ragdollSeed: (id, bornAt, placement) => cast.captureRagdoll(id, bornAt, placement),
+          ...(forcedVisits === null ? {} : { visits: forcedVisits }),
         });
         if (denVisual !== null) world.remove(denVisual);
         denVisual = null;
@@ -2066,6 +2077,7 @@ declare global {
     __valleyStrike?: (index?: number) => { x: number; z: number };
     __valleyHoldPhase?: (value: number | null) => void;
     __valleyFestoon?: (on: boolean) => void;
+    __valleyVisit?: (kind?: HappeningId) => void;
   }
 }
 

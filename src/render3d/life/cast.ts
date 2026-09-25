@@ -10,6 +10,7 @@
 // función que evaluaba una curva del reloj— ya no existe, y con ella se fue la
 // bandera que permitía volver a ella.
 
+import { visiting } from './visitors';
 import { indoors } from './home';
 import { occupationOf } from '../world/models';
 import type { ArrowSighting } from '../world/arrows';
@@ -227,6 +228,38 @@ export function castOf(
       occupation: null,
       role: 'stranger',
       visualIdentity: 'neighbor',
+    });
+  }
+
+  // El valle más vivo · Y los que vienen por el camino (`visitors.ts`): el
+  // buhonero y los tratantes con su fardo, el forastero con las manos vacías.
+  // Éstos sí son el `stranger` civil, así que sin identidad de vecino.
+  for (const visitor of life.visitors) {
+    if (!visiting(visitor)) continue;
+    const { body } = visitor;
+    const moving = Math.hypot(body.vx, body.vz) > 0.05;
+    const clip = moving ? visitor.pack ? 'carry_walk' : 'walk' : 'idle';
+    const cellX = Math.max(0, Math.min(width - 1, Math.floor(body.x)));
+    const cellZ = Math.max(0, Math.min(life.land.height - 1, Math.floor(body.z)));
+    actors.push({
+      id: body.id,
+      x: body.x,
+      z: body.z,
+      facing: body.facing,
+      activity: moving ? 'walking' : 'resting',
+      clip,
+      load: visitor.pack && moving ? 'bundle' : null,
+      poseSeconds: seconds,
+      clipSeconds: clipTime(clip, visitor.travelled, seconds, 0),
+      travelled: visitor.travelled,
+      cell: cellZ * width + cellX,
+      named: false,
+      age: 40,
+      // Plantado en la plaza, charla: es a lo que ha venido.
+      talking: visitor.phase === 'staying',
+      arguing: false,
+      occupation: null,
+      role: 'stranger',
     });
   }
   return actors;

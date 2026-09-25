@@ -54,6 +54,8 @@ import {
   anyEntered, assaultToday, createRaiders, gateNow, raidToday, raidersHere, stepRaider,
   approachOf, type Gate, type Raider,
 } from './raiders';
+import type { HappeningId } from '@engine/state';
+import { createVisitors, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
@@ -315,6 +317,12 @@ export interface Village {
    */
   readonly raiders: readonly Raider[];
   /**
+   * El valle más vivo · Los que vienen por el camino (`visitors.ts`): el
+   * buhonero, el forastero y las visitas de M-0, la semana que el motor los
+   * sortea. Tampoco son vecinos, así que van por su lista.
+   */
+  readonly visitors: readonly Visitor[];
+  /**
    * C2 · Los puestos del cerco ocupados hoy, con su arma y su puesto (§1b).
    *
    * Vacía casi siempre, por lo mismo que `raiders`: sólo la víspera de un
@@ -406,6 +414,12 @@ export interface Village {
  */
 export interface DayOptions {
   readonly props?: boolean;
+  /**
+   * Gancho de observación: quién viene hoy por el camino, en vez de lo que
+   * diga el motor. Sólo lo usa `window.__valleyVisit` para poder mirar al
+   * buhonero sin esperar a que salga.
+   */
+  readonly visits?: readonly HappeningId[];
   readonly land?: Terrain;
   /**
    * D2 · **El mundo físico, si quien llama ya lo tiene.**
@@ -1021,6 +1035,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const raiders: Raider[] = bandSize === 0
     ? []
     : createRaiders(state, land, heart, seed, 0, bandSize, assault);
+  // El valle más vivo · y los que vienen por el camino, si el motor trajo a
+  // alguien esta semana. Se montan al abrir la jornada y llegan a su hora.
+  const visitors: Visitor[] = createVisitors(state, land, heart,
+    { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 }, seed, options.visits ?? visitsToday(state, day, TIME.DAYS_PER_WEEK));
   // D5 · el portón, como cosa que se rompe. Sólo existe en un asalto: en un
   // saqueo nadie lo toca.
   const gate: Gate | null = assault ? gateNow(state, heart) : null;
@@ -1323,6 +1341,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     },
 
     get raiders(): readonly Raider[] { return raiders; },
+    get visitors(): readonly Visitor[] { return visitors; },
 
     get manned(): readonly Manned[] { return manned; },
 
@@ -1432,7 +1451,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           && wounded.get(person.villager)?.down !== true);
       }), ...raiders
         .filter((raider) => raider.phase !== 'gone' && raider.phase !== 'down')
-        .map((raider) => raider.body)];
+        .map((raider) => raider.body), ...visitors.filter(visiting).map((visitor) => visitor.body)];
       const taken = seats();
       // Se va actualizando conforme la gente decide: ver el comentario de abajo.
       around.rebuild(outside());
@@ -2267,6 +2286,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         stepRaider(raider, land, seed, steps, gate ?? undefined);
       }
       if (sackScene !== null) props.push(...sackScene.step(raiders, land, seed, steps));
+      // Y los del camino, a su hora.
+      for (const visitor of visitors) stepVisitor(visitor, land, phase, steps);
 
       // E1 · La entrada que dispara la huida es un cuerpo hostil vivo con
       // `entered`, no la puerta rota ni el recuerdo de uno que ya se fue. Hoy
