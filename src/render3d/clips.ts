@@ -42,7 +42,7 @@ export interface ClipMotion {
   readonly strideLength: number | null;
 }
 
-export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'mine' | 'sow' | 'spread' | 'douse' | 'play' | 'drink' | 'sort'
+export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'mine' | 'sow' | 'spread' | 'douse' | 'play' | 'drink' | 'sort' | 'shelter'
   | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'spear_thrust' | 'hit_take' | 'fall' | 'flee';
 
 /**
@@ -103,6 +103,10 @@ export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
   douse: { seconds: 1.5, loop: true, strideLength: null },
   play: { seconds: 2.4, loop: true, strideLength: null },
   drink: { seconds: 3, loop: true, strideLength: null },
+  // El valle más vivo · bajo el alero con lluvia: encogido, brazos cruzados y
+  // un tiritón. TUNE: 2,2 s, un temblor lento que se lea como frío y no como
+  // risa.
+  shelter: { seconds: 2.2, loop: true, strideLength: null },
   idle: { seconds: 4, loop: true, strideLength: null },
   walk: { seconds: 4 / 3, loop: true, strideLength: 0.317 },
   work_hoe: { seconds: 2, loop: true, strideLength: null },

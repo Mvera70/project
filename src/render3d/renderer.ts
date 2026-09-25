@@ -41,6 +41,8 @@ import { createFires } from './effects/fires';
 import { createHearth } from './effects/hearth';
 import { createFestoon } from './effects/festoon';
 import { createYards } from './effects/yards';
+import { createBarks } from './effects/barks';
+import { createStalls, stallKind, type Stall } from './effects/stalls';
 import { yardsOf, type Yard } from '../derive/yards';
 import { festivityOf } from '@derive/festivity';
 import { buildGreatOak, type GreatOak } from './world/great-oak';
@@ -403,11 +405,16 @@ export async function createGraphicsRenderer(
   const festoon = createFestoon();
   // El valle más vivo · la ropa tendida y el huerto de cada casa.
   const yards = createYards();
+  // Y el ladrido del perro, que se dibuja porque no hay sonido.
+  const barks = createBarks();
+  // Y el puesto de cada visita del camino mientras se queda en la plaza.
+  const stalls = createStalls();
+  const cameraRight = new Vector3();
   let yardsShown: Yard[] = [];
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1054,6 +1061,8 @@ export async function createGraphicsRenderer(
       // El valle más vivo · los tendederos y huertos, y cuánta ropa hay tendida.
       puddles: puddles?.shown ?? 0,
       fox: life.fox,
+      dog: life.dog,
+      stalls: stalls.shown,
       yards: { hung: yards.hung, at: yardsShown.map(yard => ({ house: yard.house, kind: yard.kind,
         x: round(yard.x), z: round(yard.z) })) },
       // El valle más vivo · los animales salvajes que se ven ahora (ciervos,
@@ -1227,7 +1236,7 @@ export async function createGraphicsRenderer(
   window.__valleyHoldPhase = (value: number | null) => { heldPhase = value; };
   // Gancho de observación: fija el cielo (lluvia, nieve…) para mirar lo que
   // sólo pasa con él —los charcos, la ropa recogida—; `null` lo suelta.
-  window.__valleyHoldSky = (kind: SkyKind | null) => { heldSky = kind; };
+  window.__valleyHoldSky = (kind: SkyKind | null) => { heldSky = kind; life = null; };
   // Gancho de observación: cuelga la decoración de fiesta sin esperar a una
   // boda. No toca el motor.
   window.__valleyFestoon = (on: boolean) => { forceFestoon = on; };
@@ -1411,6 +1420,7 @@ export async function createGraphicsRenderer(
           rampartOf: sceneRampartPatrolView,
           ragdollSeed: (id, bornAt, placement) => cast.captureRagdoll(id, bornAt, placement),
           ...(forcedVisits === null ? {} : { visits: forcedVisits }),
+          ...(heldSky === null ? {} : { sky: heldSky }),
         });
         if (denVisual !== null) world.remove(denVisual);
         denVisual = null;
@@ -1616,6 +1626,19 @@ export async function createGraphicsRenderer(
       plaza.show(plazaOf(shown), groundFloor);
       hearth.place(plazaOf(shown), groundFloor);
       hearth.step(phase, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
+      cameraRight.setFromMatrixColumn(camera.matrixWorld, 0);
+      barks.step(life.dog, groundFloor, frame.speed === 0 ? 0 : frame.realDeltaSeconds, cameraRight);
+      // El que trae la mula monta su puesto entre él y el centro de la plaza,
+      // con el mostrador hacia la gente; se recoge al irse.
+      stalls.show(life.visitors.flatMap((visitor): Stall[] => {
+        const kind = stallKind(visitor.kind);
+        if (kind === null || visitor.phase !== 'staying' || visitor.beast?.kind !== 'mule') return [];
+        const dx = visitor.centre.x - visitor.spot.x;
+        const dz = visitor.centre.z - visitor.spot.z;
+        const span = Math.hypot(dx, dz) || 1;
+        return [{ id: visitor.body.id, kind, x: visitor.spot.x + (dx / span) * 0.55,
+          z: visitor.spot.z + (dz / span) * 0.55, facing: Math.atan2(dx, dz) }];
+      }), groundFloor);
       festoon.place(plazaOf(shown), groundFloor);
       festoon.step(forceFestoon || festivityOf(shown) !== null, phase, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       cast.show(lastActors, life.physics?.ragdolls ?? []);
@@ -2047,6 +2070,8 @@ export async function createGraphicsRenderer(
       hearth.dispose();
       festoon.dispose();
       yards.dispose();
+      barks.dispose();
+      stalls.dispose();
       fauna.dispose();
       bubbles.dispose();
       props.dispose();

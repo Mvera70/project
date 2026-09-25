@@ -50,11 +50,12 @@ export interface Visitor {
   /** Si trae género: el que viene a vender, sí; el de paso, no. */
   readonly pack: boolean;
   /**
-   * La mula del que viene a vender, con la carga a lomos: va detrás de él, por
-   * donde él ha pisado. Pedida por Vera («mula de buhonero mejor») frente a la
-   * carretilla. `null` para el forastero y para el segundo de una pareja.
+   * El animal que trae, y que va detrás de él por donde ha pisado: la **mula**
+   * del que viene a vender, con la carga a lomos (Vera, «mula de buhonero
+   * mejor», frente a la carretilla), o la **vaca** que el tratante viene a
+   * vender. `null` para el forastero y para el segundo de una pareja.
    */
-  readonly mule: { x: number; z: number; moving: boolean } | null;
+  readonly beast: { readonly kind: 'mule' | 'cow'; x: number; z: number; moving: boolean } | null;
   /** Por dónde ha pisado, para que la mula lo siga sin atajar por una casa. */
   readonly trail: Point[];
 }
@@ -90,6 +91,28 @@ const VISITOR_PACE = 1.1;
 const VISITOR_RADIUS = 0.32;
 /** Identificadores negativos y lejos de la partida (−9 000) y de la cabaña (−10 000). */
 const VISITOR_ID_BASE = 8_500;
+/**
+ * Dónde se pone el que monta puesto: a tres celdas del centro, y el puesto a
+ * medio camino hacia él (2,45), fuera de la fuente (radio 0,4).
+ */
+const STALL_RADIUS = 3;
+/**
+ * Los ángulos ocupados de la plaza, en radianes desde +X hacia +Z: la hoguera
+ * (`effects/hearth.ts`, a +1,8/+1,1 del centro) y los cuatro postes de la
+ * fiesta (`effects/festoon.ts`, a 45° + k·90°). Se copian aquí porque la capa
+ * de vida no importa del render; si se mueven allí, se mueven aquí.
+ */
+const PLAZA_TAKEN = [Math.atan2(1.1, 1.8), ...[1, 3, 5, 7].map((k) => (k * Math.PI) / 4)];
+const TAKEN_GAP = 0.4;
+function stallAngle(wanted: number): number {
+  for (let k = 0; k < 16; k += 1) {
+    const angle = wanted + k * 0.39;
+    const clear = PLAZA_TAKEN.every((taken) => Math.abs(Math.atan2(Math.sin(angle - taken), Math.cos(angle - taken))) > TAKEN_GAP);
+    if (clear) return angle;
+  }
+  return wanted;
+}
+
 /** Cuántas entradas se prueban antes de renunciar a que venga. */
 const ENTRY_TRIES = 12;
 /** Holgura de un tramo, en pasos, sobre el doble de lo que se tarda en línea recta. */
@@ -140,12 +163,18 @@ export function createVisitors(
     const visit = VISITS[kind]!;
     for (let n = 0; n < visit.people; n += 1) {
       const index = visitors.length;
-      const angle = unit(seed, `${index}:angle`) * Math.PI * 2;
+      // El que monta puesto (`effects/stalls.ts`) se pone más lejos del centro,
+      // para que el tenderete no caiga encima de la fuente, y en un ángulo que
+      // no pise la hoguera ni los postes de la fiesta.
+      const stall = n === 0 && visit.pack;
+      const radius = stall ? STALL_RADIUS : 1.4;
+      const angle = stall ? stallAngle(unit(seed, `${index}:angle`) * Math.PI * 2)
+        : unit(seed, `${index}:angle`) * Math.PI * 2;
       const spot = nearestReachable(land, shore, {
-        x: plaza.x + Math.cos(angle) * 1.4,
-        z: plaza.z + Math.sin(angle) * 1.4,
+        x: plaza.x + Math.cos(angle) * radius,
+        z: plaza.z + Math.sin(angle) * radius,
       }, VISITOR_RADIUS);
-      if (spot === null || Math.hypot(spot.x - plaza.x, spot.z - plaza.z) > 3) continue;
+      if (spot === null || Math.hypot(spot.x - plaza.x, spot.z - plaza.z) > radius + 1.6) continue;
       // **La entrada se elige probando a llegar, no mirando el mapa**, como el
       // puesto de la partida (`createRaiders`). Lo enseñó la primera toma del
       // navegador, semilla 11 al año 30: la entrada caía en el bosque, A* no
@@ -182,7 +211,9 @@ export function createVisitors(
         travelled: 0,
         stalled: 0,
         pack: visit.pack,
-        mule: visit.pack && n === 0 ? { x: from.x, z: from.z, moving: false } : null,
+        beast: n !== 0 ? null
+          : visit.pack ? { kind: 'mule', x: from.x, z: from.z, moving: false }
+            : kind === 'drover_visit' ? { kind: 'cow', x: from.x, z: from.z, moving: false } : null,
         trail: [{ x: from.x, z: from.z }],
       });
     }
@@ -230,7 +261,7 @@ export function visiting(visitor: Visitor): boolean {
  */
 export function stepVisitor(visitor: Visitor, land: Terrain, phase: number, step: number): void {
   moveVisitor(visitor, land, phase, step);
-  followWithMule(visitor);
+  followWithBeast(visitor);
 }
 
 function moveVisitor(visitor: Visitor, land: Terrain, phase: number, step: number): void {
@@ -317,8 +348,8 @@ const MULE_PACE = VISITOR_PACE * 1.3;
 const TRAIL_STEP = 0.25;
 const TRAIL_KEEP = 16;
 
-function followWithMule(visitor: Visitor): void {
-  const { mule, trail, body } = visitor;
+function followWithBeast(visitor: Visitor): void {
+  const { beast: mule, trail, body } = visitor;
   if (mule === null) return;
   const last = trail[trail.length - 1]!;
   if (Math.hypot(body.x - last.x, body.z - last.z) > TRAIL_STEP) {
@@ -340,11 +371,12 @@ function followWithMule(visitor: Visitor): void {
   mule.z += ((target.z - mule.z) / gap) * move;
 }
 
-/** La mula, como animal para el render, si está a la vista. */
-export function muleOf(visitor: Visitor): Animal[] {
-  if (visitor.mule === null || !visiting(visitor)) return [];
-  return [{ id: MULE_ID_BASE - visitor.body.id - VISITOR_ID_BASE, kind: 'mule', x: visitor.mule.x, y: visitor.mule.z,
-    action: visitor.mule.moving ? 'walk' : undefined }];
+/** La mula o la vaca, como animal para el render, si está a la vista. */
+export function beastOf(visitor: Visitor): Animal[] {
+  const beast = visitor.beast;
+  if (beast === null || !visiting(visitor)) return [];
+  return [{ id: MULE_ID_BASE - visitor.body.id - VISITOR_ID_BASE, kind: beast.kind, x: beast.x, y: beast.z,
+    action: beast.moving ? 'walk' : undefined }];
 }
 
 /** Fuera de los animales del valle (40 000–44 299). */

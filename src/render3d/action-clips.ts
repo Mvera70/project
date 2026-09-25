@@ -13,7 +13,7 @@ import { STRIKE_AT, VILLAGER_CLIPS, type ClipName } from './clips';
  * Lo vigila `tests/fast/graphics-clock.test.ts`.
  */
 export const ACTION_CLIPS: readonly ClipName[] = [
-  'sit', 'talk', 'pray', 'hammer', 'chop', 'mine', 'sow', 'spread', 'douse', 'play', 'drink', 'sort',
+  'sit', 'talk', 'pray', 'hammer', 'chop', 'mine', 'sow', 'spread', 'douse', 'play', 'drink', 'sort', 'shelter',
   'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall', 'flee',
 ];
 
@@ -237,6 +237,18 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
         turn(`forearm.${side}`, x, t => -0.8 + 0.2 * wave(t));
       }
       turn('spine', x, t => 0.1 + 0.08 * wave(t));
+    } else if (name === 'shelter') {
+      // Bajo el alero: los brazos cruzados contra el pecho, los hombros
+      // encogidos, la cabeza gacha y un tiritón corto de vez en cuando.
+      const shiver = (t: number): number => 0.035 * Math.sin(t * Math.PI * 2 * 7) * Math.max(0, Math.sin(t * Math.PI * 2));
+      for (const [side, sign] of [['L', -1], ['R', 1]] as const) {
+        turn(`upperarm.${side}`, x, () => -0.45);
+        turn(`upperarm.${side}`, z, t => sign * (-0.28 + shiver(t)));
+        turn(`forearm.${side}`, x, () => -1.5);
+        turn(`forearm.${side}`, y, () => sign * 0.6);
+      }
+      turn('spine', x, t => 0.14 + shiver(t) * 0.5);
+      turn('head', x, () => 0.28);
     } else if (name === 'drink') {
       turn('upperarm.R', x, () => -0.8); turn('forearm.R', x, t => -1.4 + 0.12 * wave(t));
       turn('head', x, t => -0.1 - 0.05 * wave(t));

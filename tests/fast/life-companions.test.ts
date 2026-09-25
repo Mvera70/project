@@ -89,7 +89,7 @@ describe('El valle más vivo · el perro, el zorro, los patos y la mula', () => 
       state.happenings.push({ tick: state.tick, id: 'pedlar', visible: [], who: [] });
       const life = createVillage(state, state.tick * TIME.DAYS_PER_WEEK);
       const pedlar = life.visitors[0]!;
-      expect(pedlar.mule, `semilla ${seed}`).not.toBeNull();
+      expect(pedlar.beast?.kind, `semilla ${seed}`).toBe('mule');
       let farthest = 0;
       let seen = 0;
       for (let n = 0; n < STEPS_PER_DAY * 0.6; n += 1) {
@@ -106,6 +106,49 @@ describe('El valle más vivo · el perro, el zorro, los patos y la mula', () => 
     const state = grown(7, 6);
     state.happenings.push({ tick: state.tick, id: 'stranger_passes', visible: [], who: [] });
     const life = createVillage(state, state.tick * TIME.DAYS_PER_WEEK);
-    expect(life.visitors.every((visitor) => visitor.mule === null)).toBe(true);
+    expect(life.visitors.every((visitor) => visitor.beast === null)).toBe(true);
+  });
+
+  it('el tratante trae la vaca que vende, detrás de él', () => {
+    for (const seed of SEEDS) {
+      const state = grown(seed, 6);
+      state.happenings = state.happenings.filter((h) => h.tick !== state.tick);
+      state.happenings.push({ tick: state.tick, id: 'drover_visit', visible: [], who: [] });
+      const life = createVillage(state, state.tick * TIME.DAYS_PER_WEEK);
+      const drover = life.visitors[0]!;
+      expect(drover.beast?.kind, `semilla ${seed}`).toBe('cow');
+      let seen = 0;
+      for (let n = 0; n < STEPS_PER_DAY * 0.5; n += 1) {
+        life.step(n / STEPS_PER_DAY);
+        const cow = life.wildlife.find((animal) => animal.kind === 'cow' && animal.id >= 44_300);
+        if (cow !== undefined) seen += 1;
+      }
+      expect(seen, `semilla ${seed}`).toBeGreaterThan(0);
+    }
+  });
+
+  it('el perro ladra plantado ante el forastero y corre a por la pelota en juego', () => {
+    for (const seed of SEEDS) {
+      const state = grown(seed);
+      const land = terrainOf(state);
+      const heart = { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 };
+      const dog = createDog(state, land, seed, heart)!;
+      const stranger = { x: dog.door.x + 5, z: dog.door.z };
+      let barked = false;
+      for (let step = 0; step < 400; step += 1) {
+        stepDog(dog, land, seed, step, false, [], [stranger]);
+        barked ||= dog.barking;
+      }
+      const free = land.blocked[Math.floor(stranger.z) * land.width + Math.floor(stranger.x)] !== 1;
+      if (free) expect(barked, `semilla ${seed}: no ladra`).toBe(true);
+      // Un niño a un lado y la pelota rodando al otro: va a por la pelota.
+      const fresh = createDog(state, land, seed, heart)!;
+      const child = { x: fresh.door.x - 3, z: fresh.door.z };
+      const ball = { x: fresh.door.x + 3, z: fresh.door.z };
+      for (let step = 0; step < 300; step += 1) stepDog(fresh, land, seed, step, false, [child], [], [ball]);
+      expect(fresh.mode, `semilla ${seed}`).toBe('ball');
+      expect(Math.hypot(fresh.body.x - ball.x, fresh.body.z - ball.z))
+        .toBeLessThan(Math.hypot(fresh.body.x - child.x, fresh.body.z - child.z));
+    }
   });
 });

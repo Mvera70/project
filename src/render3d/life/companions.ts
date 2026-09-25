@@ -91,15 +91,26 @@ const DOG_FROM_HOUSES = 4;
 const DOG_PACE = 1.25;
 const DOG_RADIUS = 0.22;
 /** A cuánto sale a ver a un forastero, y cuánto rato se le queda mirando. */
-const STRANGER_REACH = 10;
+// TUNE: 16. Con 10, medido en el navegador (semillas 7 y 11, año 20), el
+// perro no llegaba a ver al buhonero: su casa quedaba a 13 celdas de la plaza y
+// se quedaba con los niños. Un forastero en el pueblo es cosa de todo el perro.
+const STRANGER_REACH = 16;
 const STARE_STEPS = 360;
 /** A cuánto va detrás de un niño, y desde cuán lejos lo ve. */
 const CHILD_REACH = 14;
 const HEEL = 1.1;
+/** A cuánto oye al zorro, de día o de noche. */
+const FOX_BARK = 9;
 
 export interface Dog extends Walker {
   readonly door: Point;
-  mode: 'home' | 'child' | 'stranger' | 'sleep';
+  mode: 'home' | 'child' | 'ball' | 'stranger' | 'sleep';
+  /**
+   * Si está ladrando ahora: plantado ante el forastero o ante el zorro. No
+   * hay sonido en el juego (se borró el sintetizado, 24 sep 2026), así que el
+   * ladrido se dibuja (`effects/barks.ts`).
+   */
+  barking: boolean;
   /** Hasta cuándo mira al forastero, y a partir de cuándo puede volver a ir. */
   stareUntil: number;
   stareAgain: number;
@@ -126,7 +137,7 @@ export function createDog(state: GameState, land: Terrain, seed: number, heart: 
   return {
     body: { id: DOG_ID, x: door.x, z: door.z, vx: 0, vz: 0, facing: 0, radius: DOG_RADIUS, pace: DOG_PACE },
     route: [], goal: null, replanAt: 0,
-    door, mode: 'home', stareUntil: 0, stareAgain: 0, idleUntil: 0, wander: null,
+    door, mode: 'home', barking: false, stareUntil: 0, stareAgain: 0, idleUntil: 0, wander: null,
     wanders: hash32(seed, 'dog:wander') % 7,
   };
 }
@@ -134,9 +145,22 @@ export function createDog(state: GameState, land: Terrain, seed: number, heart: 
 export function stepDog(
   dog: Dog | null, land: Terrain, seed: number, step: number, night: boolean,
   children: readonly Point[], strangers: readonly Point[],
+  /** La pelota, si está en juego: en la mano de alguien o rodando. */
+  balls: readonly Point[] = [],
+  /** El zorro, si ronda: le ladra aunque sea de noche. */
+  fox: Point | null = null,
 ): void {
   if (dog === null) return;
   const { body } = dog;
+  dog.barking = false;
+  // El zorro despierta al perro: se planta y le ladra desde donde esté, sin
+  // perseguirlo (un perro de casa no se mete en el bosque de noche).
+  if (fox !== null && Math.hypot(fox.x - body.x, fox.z - body.z) < FOX_BARK) {
+    still(body);
+    body.facing = Math.atan2(fox.x - body.x, fox.z - body.z);
+    dog.barking = true;
+    return;
+  }
   if (night) {
     dog.mode = 'sleep';
     if (walk(dog, land, dog.door, DOG_PACE, step)) still(body);
@@ -146,12 +170,20 @@ export function stepDog(
   const stranger = nearest(body, strangers, STRANGER_REACH);
   if (stranger !== null && (dog.mode === 'stranger' ? step < dog.stareUntil : step >= dog.stareAgain)) {
     if (dog.mode !== 'stranger') { dog.mode = 'stranger'; dog.stareUntil = step + STARE_STEPS; }
-    if (walk(dog, land, stranger, DOG_PACE, step, 1.6)) {
+    if (walk(dog, land, stranger, DOG_PACE, step, 2.2)) {
       body.facing = Math.atan2(stranger.x - body.x, stranger.z - body.z);
+      dog.barking = true;
     }
     return;
   }
   if (dog.mode === 'stranger') { dog.mode = 'home'; dog.stareAgain = step + STARE_STEPS * 2; }
+  // La pelota en juego antes que el niño: es a por lo que va un perro.
+  const ball = nearest(body, balls, CHILD_REACH);
+  if (ball !== null) {
+    dog.mode = 'ball';
+    walk(dog, land, ball, DOG_PACE * 1.3, step, 0.45);
+    return;
+  }
   const child = nearest(body, children, CHILD_REACH);
   if (child !== null) {
     dog.mode = 'child';

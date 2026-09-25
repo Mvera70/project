@@ -43,7 +43,9 @@ describe('El valle más vivo · los visitantes del camino', () => {
           closest = Math.min(closest, Math.hypot(body.x - plaza.x, body.z - plaza.z));
         }
       }
-      if (closest < 3.5) reached += 1;
+      // El que monta puesto se pone a tres celdas del centro (`STALL_RADIUS`),
+      // fuera de la fuente: llegar es quedar a menos de cuatro y media.
+      if (closest < 4.5) reached += 1;
       // Al acabar el día se ha ido.
       expect(life.visitors.every((v) => v.phase === 'gone'), `semilla ${seed}`).toBe(true);
       expect(JSON.stringify(state), 'la visita no escribe en el motor').toBe(before);

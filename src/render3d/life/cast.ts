@@ -57,6 +57,8 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
     if (action === 'sit') return 'sit';
     if (action === 'pray') return 'pray';
     if (action === 'drink') return 'drink';
+    // El valle más vivo · con lluvia, encogido bajo el alero.
+    if (action === 'shelter') return 'shelter';
     if (action === 'play') return 'play';
   }
   return 'idle';
@@ -240,7 +242,7 @@ export function castOf(
     const moving = Math.hypot(body.vx, body.vz) > 0.05;
     // Con mula, la carga va a lomos y él lleva el ramal: anda con las manos
     // libres. Sólo carga él mismo el que viene a vender sin mula.
-    const carries = visitor.pack && visitor.mule === null;
+    const carries = visitor.pack && visitor.beast === null;
     const clip = moving ? carries ? 'carry_walk' : 'walk' : 'idle';
     const cellX = Math.max(0, Math.min(width - 1, Math.floor(body.x)));
     const cellZ = Math.max(0, Math.min(life.land.height - 1, Math.floor(body.z)));

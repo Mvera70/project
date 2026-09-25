@@ -8,7 +8,7 @@
 // pantalla sale de aquí, y nada de aquí sale del reloj de la pared ni escribe
 // una coma en `GameState`.
 
-import { skyAt } from '../../derive/weather';
+import { skyAt, type SkyKind } from '../../derive/weather';
 import { homeRoutine, indoors, isNight, stepHome, type HomeRoutine } from './home';
 import { shelterUnder } from './decide';
 import { statureAt } from '../world/models';
@@ -56,7 +56,7 @@ import {
   approachOf, type Gate, type Raider,
 } from './raiders';
 import type { HappeningId } from '@engine/state';
-import { createVisitors, muleOf, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
+import { beastOf, createVisitors, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
@@ -327,6 +327,9 @@ export interface Village {
    * sortea. Tampoco son vecinos, así que van por su lista.
    */
   readonly visitors: readonly Visitor[];
+  /** El perro, si la aldea tiene: dónde está y si ladra (el ladrido se dibuja). */
+  readonly dog: { readonly x: number; readonly z: number; readonly facing: number;
+    readonly barking: boolean; readonly mode: string } | null;
   /** El zorro de la noche, si el valle tiene linde para él: en qué anda y dónde vive. */
   readonly fox: { readonly phase: string; readonly den: Point } | null;
   /**
@@ -427,6 +430,8 @@ export interface DayOptions {
    * buhonero sin esperar a que salga.
    */
   readonly visits?: readonly HappeningId[];
+  /** Gancho de observación: el cielo de hoy, en vez del de `skyAt` (`window.__valleyHoldSky`). */
+  readonly sky?: SkyKind;
   readonly land?: Terrain;
   /**
    * D2 · **El mundo físico, si quien llama ya lo tiene.**
@@ -618,7 +623,12 @@ function eavesOf(state: GameState, land: Terrain): Point[] {
   for (const b of state.buildings) {
     if (b.lostTick !== null || !EAVED.has(b.kind)) continue;
     for (let x = b.x; x < b.x + b.w; x += 1) {
-      out.push({ x: x + 0.5, z: b.y - EAVE_OFF }, { x: x + 0.5, z: b.y + b.h + EAVE_OFF });
+      out.push({ x: x + 0.5, z: b.y - EAVE_OFF });
+      // La fachada +Z es la de la puerta en todos los modelos (recetas G-21):
+      // ahí no se espera, que se tapa la entrada. Medido en la primera toma
+      // (semilla 11): alguien plantado en la escalera del granero. Las casas
+      // pueden abrir a otro lado, y eso lo mira `shelterFor` con su portal.
+      if (b.kind === 'house' || b.kind === 'stone_house') out.push({ x: x + 0.5, z: b.y + b.h + EAVE_OFF });
     }
     for (let z = b.y; z < b.y + b.h; z += 1) {
       out.push({ x: b.x - EAVE_OFF, z: z + 0.5 }, { x: b.x + b.w + EAVE_OFF, z: z + 0.5 });
@@ -668,7 +678,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // lo que es al aire libre —la charla y la comida de la plaza, el vado, el
   // claro, los juegos, el ocio— y queda lo que tiene techo o puerta: el porche
   // de casa, la capilla, mirar al herrero, y el trabajo, que no espera.
-  const wet = ((kind) => kind === 'rain' || kind === 'storm')(skyAt(state, day).kind);
+  const wet = ((kind) => kind === 'rain' || kind === 'storm')(options.sky ?? skyAt(state, day).kind);
   const OPEN_AIR = new Set(['gossip', 'meal', 'hearth', 'loiter', 'play', 'chase', 'pet', 'feed']);
   const sheltered = (list: readonly Place[]): Place[] => list
     .map((place) => place.id.startsWith('gather:') ? place
@@ -1405,6 +1415,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
 
     get raiders(): readonly Raider[] { return raiders; },
     get visitors(): readonly Visitor[] { return visitors; },
+    get dog() {
+      return dog === null ? null
+        : { x: dog.body.x, z: dog.body.z, facing: dog.body.facing, barking: dog.barking, mode: dog.mode };
+    },
     get fox() { return fox === null ? null : { phase: fox.phase, den: fox.den }; },
 
     get manned(): readonly Manned[] { return manned; },
@@ -1433,7 +1447,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
 
     get wildlife(): readonly Animal[] {
       return [...deerPositions(deer), ...rabbitPositions(rabbits, steps), ...dogPosition(dog),
-        ...foxPosition(fox), ...duckPositions(ducks), ...visitors.flatMap(muleOf), ...bearPosition(bear), ...(wolf !== null && wolf.phase !== 'gone'
+        ...foxPosition(fox), ...duckPositions(ducks), ...visitors.flatMap(beastOf), ...bearPosition(bear), ...(wolf !== null && wolf.phase !== 'gone'
         ? [{ id: wolf.body.id, kind: 'wolf' as const, x: wolf.body.x, y: wolf.body.z }]
         : [])];
     },
@@ -2610,10 +2624,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         bear !== null && bear.phase !== 'gone' ? bear.body : null);
       const abroad = dwellers.filter((dweller) => !indoors(dweller));
       stepRabbits(rabbits, land, seed, steps, phase, abroad);
+      const foxOut = fox !== null && fox.phase !== 'den' ? fox.body : null;
       stepDog(dog, land, seed, steps, isNight(phase),
         abroad.filter((dweller) => dweller.ageGroup === 'child').map((dweller) => dweller.body),
-        visitors.filter(visiting).map((visitor) => visitor.body));
-      stepFox(fox, land, seed, steps, isNight(phase), abroad.map((dweller) => dweller.body));
+        visitors.filter(visiting).map((visitor) => visitor.body),
+        props.filter((prop) => prop.kind === 'ball'
+          && (prop.held !== null || prop.y > 0.02 || Math.hypot(prop.vx, prop.vz) > 0.05)),
+        foxOut);
+      // El zorro también huye del perro: un ladrido lo manda a la madriguera.
+      stepFox(fox, land, seed, steps, isNight(phase),
+        [...abroad.map((dweller) => dweller.body), ...(dog === null ? [] : [dog.body])]);
       stepDucks(ducks, state, seed, steps);
 
       // 8 · La cabaña vive su propio paso. V-08.
