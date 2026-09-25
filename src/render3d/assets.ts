@@ -14,7 +14,8 @@
 import type { AnimationClip, Object3D } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
-import { Mesh, type Material, type Texture } from 'three';
+import { Mesh, SkinnedMesh, type Material, type Texture } from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 interface AssetMotion {
   readonly name: string;
@@ -141,6 +142,63 @@ function urlOf(base: string, asset: AssetEntry): string {
   return `${base}${asset.file}?v=${asset.sha256.slice(0, 8).toLowerCase()}`;
 }
 
+/**
+ * Los modelos hechos pieza a pieza (Vera, `deliverables/marked-models-trial/`,
+ * adoptados con `tools/art/adopt-models.mjs`): nodos rígidos con de 6 a 68
+ * mallas sueltas, y cada malla es una llamada de dibujo. Los del generador de
+ * recetas vienen ya fundidos por material (4 mallas por animal).
+ */
+export const PIECED: ReadonlySet<string> = new Set([
+  'wolf', 'bear', 'partridge', 'boar', 'dog', 'mule', 'hoe', 'bucket', 'arrow', 'shield', 'pickaxe',
+]);
+
+/**
+ * **Funde las piezas que se mueven juntas.** Dentro de cada articulación, las
+ * mallas hoja que comparten material pasan a ser una sola, con su posición
+ * horneada en la geometría: la articulación sigue girando igual y el animal
+ * pasa de 40–68 llamadas de dibujo a unas 15–25. No se toca una malla con
+ * hijos ni una que algún clip mueva por su nombre.
+ */
+export function fuseRigidPieces(root: Object3D, clips: readonly AnimationClip[]): void {
+  const animated = new Set(clips.flatMap((clip) => clip.tracks.map((track) => track.name.split('.')[0]!)));
+  const parents: Object3D[] = [];
+  root.traverse((node) => { parents.push(node); });
+  for (const parent of parents) {
+    const groups = new Map<Material, Mesh[]>();
+    for (const child of parent.children) {
+      if (!(child instanceof Mesh) || child instanceof SkinnedMesh || child.children.length > 0
+        || animated.has(child.name) || Array.isArray(child.material)) continue;
+      const list = groups.get(child.material) ?? [];
+      list.push(child);
+      groups.set(child.material, list);
+    }
+    for (const [material, meshes] of groups) {
+      if (meshes.length < 2) continue;
+      const pieces = meshes.map((mesh) => {
+        mesh.updateMatrix();
+        const geometry = (mesh.geometry.index === null ? mesh.geometry : mesh.geometry.toNonIndexed()).clone();
+        geometry.applyMatrix4(mesh.matrix);
+        // Sólo lo que el material usa: estos son de color liso, y unas piezas
+        // traen coordenadas de textura y otras no, lo que impide fundirlas
+        // (medido: la cabeza del lobo, 14 piezas, no se fundía).
+        const textured = (material as { map?: unknown }).map !== null && (material as { map?: unknown }).map !== undefined;
+        for (const name of Object.keys(geometry.attributes)) {
+          if (name !== 'position' && name !== 'normal' && !(textured && name === 'uv')) geometry.deleteAttribute(name);
+        }
+        return geometry;
+      });
+      const merged = mergeGeometries(pieces, false);
+      if (merged === null) continue;
+      const fused = new Mesh(merged, material);
+      fused.name = `${meshes[0]!.name}_fused`;
+      fused.castShadow = meshes.some((mesh) => mesh.castShadow);
+      fused.receiveShadow = meshes.some((mesh) => mesh.receiveShadow);
+      for (const mesh of meshes) parent.remove(mesh);
+      parent.add(fused);
+    }
+  }
+}
+
 export async function loadAssets(options: AssetOptions): Promise<AssetLibrary> {
   const base = options.baseUrl.endsWith('/') ? options.baseUrl : `${options.baseUrl}/`;
   const get = options.fetcher ?? fetch;
@@ -173,6 +231,7 @@ export async function loadAssets(options: AssetOptions): Promise<AssetLibrary> {
           fail(new Error(`Could not parse '${asset.id}': ${error.message}`));
         });
       });
+    if (PIECED.has(asset.id)) fuseRigidPieces(gltf.scene, gltf.animations);
     loaded.set(asset.id, {
       id: asset.id,
       original: gltf.scene,

@@ -65,91 +65,88 @@
     },
     {
       "id": "boar",
-      "artifactRound": "G-37",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/boar/boar.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-23T12-39-27-760Z-46360",
-        "directory": "artifacts/graphics/G-37/approved/4e215fd0a56b6963"
+        "runId": "marked-models-63db59c",
+        "directory": "artifacts/graphics/marked-models/approved/boar"
       },
       "bounds": {
         "min": [
-          -0.430833,
+          -0.4255,
           0,
-          -0.113333
+          -0.12
         ],
         "max": [
-          0.301667,
-          0.34455,
-          0.113333
+          0.287442,
+          0.42,
+          0.12
         ],
         "size": [
-          0.7325,
-          0.34455,
-          0.226667
+          0.712942,
+          0.42,
+          0.24
         ]
       },
-      "recipeSha256": "2480686872F39C1829BC19AC2C7AF4158376A0D829FF27679FB68073CD285952",
+      "recipeSha256": null,
       "materials": [
-        "coat",
-        "mane",
-        "ivory",
-        "dark"
+        "coat_002",
+        "coatTop_002",
+        "nose_002",
+        "light_002",
+        "ivory_002",
+        "earInner_002",
+        "eye_002"
       ],
       "clips": [
-        "idle",
         "walk",
+        "idle",
         "charge",
         "attack"
       ],
       "motion": [
         {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.342
+        },
+        {
           "name": "idle",
-          "seconds": 4.041666666666667,
+          "seconds": 4,
           "loop": true,
           "strideLength": null
         },
         {
-          "name": "walk",
-          "seconds": 2.0416666666666665,
-          "loop": true,
-          "strideLength": 0.15
-        },
-        {
           "name": "charge",
-          "seconds": 1.0416666666666667,
+          "seconds": 0.8,
           "loop": true,
-          "strideLength": 0.28
+          "strideLength": 0.513
         },
         {
           "name": "attack",
-          "seconds": 1.375,
+          "seconds": 1.2,
           "loop": false,
           "strideLength": null
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 23,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 1730
+        "objects": 63,
+        "meshes": 44,
+        "materials": 7,
+        "triangles": 1574
       },
       "hashes": {
-        "boar.blend": "3095B8E07F0E4F7F453E6BF4BCCC9F812C1BBFD9FE32A56F6ADCDC8200FCFC9A",
-        "boar.glb": "4E215FD0A56B69633826BA7235A9C8888116468A7FEF82331EECD2F860BC09D9",
-        "boar-blender.png": "04DC56CBBBB32866E7F5C7C5E651792041051A15A470A3B58D8DA19CE5830221",
-        "capture-1.png": "C03868F5B6B3506FBE7455772B0AF6A82EEF2C7519BF96D65AF05B23ABFF0605",
-        "capture-1-gray.png": "5FFF662ECD88D5AC1F08DAABC5729A3916B4E0EB32DD5F8996335D2A5CCEBCC4",
-        "capture.json": "C1A544887732B08730F06D0AE9A0FD00C384C7DD06AAF6867F73EDA0B173D301",
-        "build.json": "24228CAEC58D3C579BA150DE538A2EAFE53550FD1EF557DDB8DD18C9F4F2B361",
-        "validation.json": "EC7CB62CE000DAF65201312F7C436BE7A5E4B34D0E6BEEE40552B9464709096C"
+        "boar.glb": "040873AABA5348C1EF1CB529B88264144D5C241256EB688C06FB9757C196C48C",
+        "boar-preview.png": "1668CCC6B25960B6BB05A3DCBE1846CD77DCD822B7061A734D545473720A86F5"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original low-poly wild boar for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, boar.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
         "license": "Project original"
       }
     },
@@ -238,167 +235,170 @@
     },
     {
       "id": "partridge",
-      "artifactRound": "G-35",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/partridge/partridge.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-23T12-31-21-894Z-47560",
-        "directory": "artifacts/graphics/G-35/approved/3627e6187d35249e"
+        "runId": "marked-models-63db59c",
+        "directory": "artifacts/graphics/marked-models/approved/partridge"
       },
       "bounds": {
         "min": [
-          -0.131167,
-          0,
-          -0.068333
+          -0.16,
+          0.003537,
+          -0.078
         ],
         "max": [
-          0.131667,
-          0.190167,
-          0.068333
+          0.153,
+          0.2075,
+          0.078
         ],
         "size": [
-          0.262833,
-          0.190167,
-          0.136667
+          0.313,
+          0.203963,
+          0.156
         ]
       },
-      "recipeSha256": "F7A0829D29C2892152F4ED2DA70B00AE65208C34B58FC581F979CC1F04D403DE",
+      "recipeSha256": null,
       "materials": [
-        "coat",
-        "cream",
-        "dark",
-        "red"
+        "light_005",
+        "mark",
+        "red",
+        "eye_005",
+        "ivory_005",
+        "coat_005",
+        "coatTop_005",
+        "feather"
       ],
       "clips": [
-        "idle",
+        "takeoff",
         "walk",
+        "idle",
         "flight"
       ],
       "motion": [
         {
-          "name": "idle",
-          "seconds": 4.041666666666667,
-          "loop": true,
+          "name": "takeoff",
+          "seconds": 1.1666666666666667,
+          "loop": false,
           "strideLength": null
         },
         {
           "name": "walk",
-          "seconds": 1.0416666666666667,
+          "seconds": 0.6,
           "loop": true,
-          "strideLength": 0.055
+          "strideLength": 0.064
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
         },
         {
           "name": "flight",
-          "seconds": 0.5416666666666666,
+          "seconds": 0.3,
           "loop": true,
           "strideLength": null
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 17,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 994
+        "objects": 79,
+        "meshes": 68,
+        "materials": 8,
+        "triangles": 3044
       },
       "hashes": {
-        "partridge.blend": "7C9DD2D4B63A64864FE30DD5362FA46165A1D5FB763A6E98CAA9E36F7BDD5E43",
-        "partridge.glb": "3627E6187D35249E7B09F506CFA95301D13F93B6F4289B8DA1EF5EF2A8DF1478",
-        "partridge-blender.png": "D4A6EC85170C47A7EE9580863A289E7D32CC3A85DE115D9D6F0815513890590F",
-        "capture-1.png": "60A54014CD6EA772C21DF0E24031B2F0768697FBA1D0D2A6A852F2F446FB9F84",
-        "capture-1-gray.png": "5E53ECB0A720F2B519E6165092EEFA62CDC053E758382EB00921B8393B51D071",
-        "capture.json": "55FDFE4576CF16D12A8B40221272C403464C940B89F302F2DBC4FCBFDD1B79F3",
-        "build.json": "4A83F69C1D0533A9F4BD139BA2301CB1F05C18D688E5B8A7D120FB8A9702350F",
-        "validation.json": "31FE9698E36C8B8AFF753EB43EE75E568C7AED781872B72D8E5C9D88DB879117"
+        "partridge.glb": "5DA9BEDE8836660B0D5CF2D4BF512DAF88FD824969E3ABAD4FB9DAB674A15998",
+        "partridge-preview.png": "84385C8E3E6B6204607430E781D76E99357D237EC449D1E2E349F102EA1600B1"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original low-poly partridge for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, partridge.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
         "license": "Project original"
       }
     },
     {
       "id": "bear",
-      "artifactRound": "G-34",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/bear/bear.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-23T11-09-11-004Z-43780",
-        "directory": "artifacts/graphics/G-34/approved/eca8aa70e7a3d31b"
+        "runId": "marked-models-63db59c",
+        "directory": "artifacts/graphics/marked-models/approved/bear"
       },
       "bounds": {
         "min": [
-          -0.7728,
+          -0.701,
           0,
-          -0.218316
+          -0.2405
         ],
         "max": [
-          0.4767,
-          0.7245,
-          0.218316
+          0.459,
+          0.730356,
+          0.2405
         ],
         "size": [
-          1.2495,
-          0.7245,
-          0.436632
+          1.16,
+          0.730356,
+          0.481
         ]
       },
-      "recipeSha256": "0EE60D66A1CCF98CE9AF3305AF9AE291E8E5B7F2D077BC8F728F190B34A87BDD",
+      "recipeSha256": null,
       "materials": [
+        "coatTop",
         "coat",
-        "shoulder",
-        "muzzle",
-        "dark"
+        "claw",
+        "earInner",
+        "eye",
+        "ivory",
+        "nose",
+        "light"
       ],
       "clips": [
-        "idle",
+        "attack",
         "walk",
-        "attack"
+        "idle"
       ],
       "motion": [
         {
-          "name": "idle",
-          "seconds": 4.041666666666667,
-          "loop": true,
+          "name": "attack",
+          "seconds": 3,
+          "loop": false,
           "strideLength": null
         },
         {
           "name": "walk",
-          "seconds": 2.0416666666666665,
+          "seconds": 1.2,
           "loop": true,
-          "strideLength": 0.22
+          "strideLength": 0.444
         },
         {
-          "name": "attack",
-          "seconds": 1.5416666666666667,
-          "loop": false,
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
           "strideLength": null
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 23,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 2712
+        "objects": 82,
+        "meshes": 63,
+        "materials": 8,
+        "triangles": 3168
       },
       "hashes": {
-        "bear.blend": "3878DC51061AB4008E65F6D3473750D882622E83D1C3A6A8A4C4ABD2C12D35A0",
-        "bear.glb": "ECA8AA70E7A3D31BFC25DC0B826AA959C5D6E832B3F30075B8DA8B7652416445",
-        "bear-blender.png": "5DC122E3365685122A9DFE9F1FCBFF5F3773FE6B88D4BFF4A2002C9081353244",
-        "capture-1.png": "B46878F252ABFA3894E4AAFE21EA8AAE1A15A3A0BC17C088AFF381884205AD50",
-        "capture-1-gray.png": "F9803755F7B396DEEDF9F06B0EEBEC79EFC89F6FD88056F2DF30F4AC12AB3E56",
-        "capture.json": "BD3CC3037A2725D0D7A009ACCE48B7127A66F8E4B7D5B3E68D9B556877DCCD0E",
-        "build.json": "6E8033078820C82CD0EFADCDD66E1946061AB943EAF8AFEF4F684CB51BD492EE",
-        "validation.json": "D14BAB0F53F4F328F58B0D61FBD94F4F59C7AF0BE8265BB8BB81458EFEE7B098"
+        "bear.glb": "25EFA025A83F3DC3308E0269C967563AD7D5C501F63454E730BC27401A9EA2F3",
+        "bear-preview.png": "70F2878BDF603FD3AA57B0C49EF658C24005ADFF48B8805E086B1F03A18A63AB"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original procedural brown bear modeled for The Valley, 23 Sep 2026. No external provider.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, bear.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
         "license": "Project original"
       }
     },
@@ -955,37 +955,38 @@
     },
     {
       "id": "arrow",
-      "artifactRound": "G-24",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/arrow/arrow.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-19T23-13-54-879Z-47100",
-        "directory": "artifacts/graphics/G-24/approved/474435e79c604956"
+        "runId": "marked-models-63db59c",
+        "directory": "artifacts/graphics/marked-models/approved/arrow"
       },
       "bounds": {
         "min": [
-          -0.009822,
-          -0.014069,
+          -0.01,
+          -0.011258,
           0
         ],
         "max": [
-          0.01562,
-          0.014069,
-          0.266667
+          0.013,
+          0.011258,
+          0.26667
         ],
         "size": [
-          0.025442,
-          0.028138,
-          0.266667
+          0.023,
+          0.022517,
+          0.26667
         ]
       },
-      "recipeSha256": "E58F85E9940C20534E93ABCDC6786EA7C8FB48B9EA1C0AC60ADE6F393FB9C6E0",
+      "recipeSha256": null,
       "materials": [
-        "wood",
-        "iron",
-        "feather"
+        "wood_007",
+        "rope_007",
+        "iron_007",
+        "feather_001"
       ],
       "clips": [],
       "motion": [],
@@ -993,60 +994,57 @@
         "grip"
       ],
       "statistics": {
-        "objects": 5,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 62
+        "objects": 9,
+        "meshes": 7,
+        "materials": 4,
+        "triangles": 104
       },
       "hashes": {
-        "arrow.blend": "47EAFEE3E77D4AE0D260AA71B93B1F56011D54E4444894E58B104328272D98D0",
-        "arrow.glb": "474435E79C60495683575EF1D1BE3F0F7717DC01242E8487414C145051F5596F",
-        "arrow-blender.png": "BCEA0CF362F043620BFB83E9832E1E26E9C9B34CDD98A2136DC4B331F273A36C",
-        "capture-1.png": "5082A88F0D27F22C607B33299A2B810484365C9CC541B56E1F343429FEF6CE17",
-        "capture-1-gray.png": "037CD94A87065D23326D55BA1180B437618E3E0974BAC51D074CF9B69BBC905A",
-        "capture.json": "BC87F96C4D2CB621D5E6FC766D868ECD2F487FB96662E152F3396724CE7FD7B4",
-        "build.json": "2D0EFE989CC67AD6637CEAF2ED6D46741CE70640BD084E3DC0AF09D21307A832",
-        "validation.json": "C21F5153AEA5119131D7F495470B828FA58B65A1CD0448B9806B72E95A37CBBD"
+        "arrow.glb": "D84A0E02F56603B641149900841D35EACC28C01DA4D16D56B978BEB5D533B619",
+        "arrow-preview.png": "C4278CFE1E40536A45D1E43A7B9D018B4D8DB205F1BE16A115D77644B0B8EBD5"
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, arrow.glb; commit 63db59c).",
         "license": "Project original"
       }
     },
     {
       "id": "shield",
-      "artifactRound": "G-24",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/shield/shield.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-19T23-14-12-022Z-47272",
-        "directory": "artifacts/graphics/G-24/approved/a6a11ccf641b564c"
+        "runId": "marked-models-63db59c",
+        "directory": "artifacts/graphics/marked-models/approved/shield"
       },
       "bounds": {
         "min": [
           -0.15,
           0,
-          -0.035839
+          -0.04
         ],
         "max": [
           0.15,
           0.3,
-          0.048167
+          0.0275
         ],
         "size": [
           0.3,
           0.3,
-          0.084006
+          0.0675
         ]
       },
-      "recipeSha256": "B82272B91F642D76720577509B058181AA45FC8A89CF06B3046BA66564CC9E85",
+      "recipeSha256": null,
       "materials": [
-        "wood",
-        "iron",
-        "plank"
+        "woodLight_008",
+        "wood_008",
+        "iron_008",
+        "leather_008",
+        "woodDark_008",
+        "ironEdge_008"
       ],
       "clips": [],
       "motion": [],
@@ -1054,24 +1052,18 @@
         "grip"
       ],
       "statistics": {
-        "objects": 5,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 122
+        "objects": 27,
+        "meshes": 25,
+        "materials": 6,
+        "triangles": 1408
       },
       "hashes": {
-        "shield.blend": "6665F27AE7CAC4E61C51BDE549A3D3735A1BB8B0BBF09378896C455B9A4D5D28",
-        "shield.glb": "A6A11CCF641B564CAE5867A72D37A328610E71FEBD84851837CA188E70A2C025",
-        "shield-blender.png": "BAFAA4E2FE1E50AE83FAD0D685B7966FA964017A90C516CE3EFEC20B6923AB7C",
-        "capture-1.png": "ED1B08AB664280B7EE424DC8EF20331D433D94DD471D9B4B956E81D1E2691F0C",
-        "capture-1-gray.png": "D54969C62D292B65F124429A3FC6AE25E6E123ACB009D830D6D45410A6F181E4",
-        "capture.json": "DFF42A2021B8BC0BBFEB26BBB7B885E2833C47BDCCA36C7A276C299D22468FE9",
-        "build.json": "693BB931F358250B6E84E9195C8BC59686AC9324DA94FFAE08136443644458C2",
-        "validation.json": "BA497AE34EFCDCB3C72DAAACA8243F6CE8488211FFC49D55E83ED3ECFAA70EBC"
+        "shield.glb": "7CBF210C0DB92C6E11587AD7662DE7BD3EEBC01AE4D8BC52FE420CB15DFEDB20",
+        "shield-preview.png": "F873455FBA4DA29DA074A14114DD8490BC5161354AA6459ABEF32A00CF4C4E7C"
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, shield.glb; commit 63db59c).",
         "license": "Project original"
       }
     },
@@ -3068,77 +3060,81 @@
     },
     {
       "id": "wolf",
-      "artifactRound": "G-23",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/wolf/wolf.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T21-18-22-160Z-50676",
-        "directory": "artifacts/graphics/G-23/approved/a88c9eebeecf4944"
+        "runId": "marked-models-63db59c",
+        "directory": "artifacts/graphics/marked-models/approved/wolf"
       },
       "bounds": {
         "min": [
-          -0.408833,
+          -0.389,
           0,
-          -0.075
+          -0.084
         ],
         "max": [
-          0.246267,
-          0.429067,
-          0.075
+          0.379055,
+          0.431,
+          0.084
         ],
         "size": [
-          0.6551,
-          0.429067,
-          0.15
+          0.768055,
+          0.431,
+          0.168
         ]
       },
-      "recipeSha256": "462B45D3287375CA67562F234BBA633256614A1E26861BD624322E931A1F77DB",
+      "recipeSha256": null,
       "materials": [
-        "coat",
+        "coatTop",
         "light",
-        "dark",
-        "accent"
+        "coat",
+        "earInner",
+        "eye",
+        "ivory",
+        "nose"
       ],
       "clips": [
-        "idle",
-        "walk"
+        "attack",
+        "walk",
+        "idle"
       ],
       "motion": [
         {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
+          "name": "attack",
+          "seconds": 1.4166666666666667,
+          "loop": false,
           "strideLength": null
         },
         {
           "name": "walk",
-          "seconds": 2.7083333333333335,
+          "seconds": 1.2,
           "loop": true,
-          "strideLength": 0.2
+          "strideLength": 0.358
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 24,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 2828
+        "objects": 59,
+        "meshes": 40,
+        "materials": 7,
+        "triangles": 2128
       },
       "hashes": {
-        "wolf.blend": "993222FD14EA12642FDB4E60C5065354B42FCB340725EBC345008D0E9E3F7FA9",
-        "wolf.glb": "A88C9EEBEECF49441B0E5AC427EABB0A67C6D0D6567A8E59FECC48720682BEF8",
-        "wolf-blender.png": "450CCAE09EB1B7D188B2109703E74F5F15D5B10D53FBE30F96F7AD416E21CFFC",
-        "capture-1.png": "FCFEAEA8F09E74E01A0512C7053157B115D101ED58982D5BB2B45DA585057DE6",
-        "capture-1-gray.png": "EFBEEBB776D799F0299A8F58E99EA1795BDD56DC444EB4E58A28FB1AE8EC5964",
-        "capture.json": "B0269CDF0E3AFEFA7A88FD57671496E8ABC5707E34EAE3A66235BBA87AD06689",
-        "build.json": "F5305B5EE248D3ACAE3697C49B60B40336A6F6275D7715743EE534AA07FAB106",
-        "validation.json": "8ED7DD814500ABFC50021170316D4C6612E91FD366B84C35B432B598887559C0"
+        "wolf.glb": "61D658FC1C51A557D5ACFA9ACA3DA28DFBDA395147715E6FCDD21013D5B0A19A",
+        "wolf-preview.png": "B30663CF0C39D4EE7A90C2A01F1F2478507AD45976C18C97150C08E3B86480E9"
       },
       "provenance": {
         "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, wolf.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
         "license": "project-original"
       }
     },
@@ -3296,59 +3292,56 @@
     },
     {
       "id": "hoe",
-      "artifactRound": "G-10",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/hoe/hoe.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T01-01-00-041Z-53652",
-        "directory": "artifacts/graphics/G-10/approved/85051dc5a63c834f"
+        "runId": "marked-models-63db59c",
+        "directory": "artifacts/graphics/marked-models/approved/hoe"
       },
       "bounds": {
         "min": [
-          -0.11,
-          -1.37,
-          -0.029314
+          -0.123,
+          -1.371,
+          -0.017691
         ],
         "max": [
-          0.11,
-          0.02004,
-          1.005
+          0.123,
+          0.012866,
+          1.011
         ],
         "size": [
-          0.22,
-          1.39004,
-          1.034314
+          0.246,
+          1.383866,
+          1.028691
         ]
       },
-      "recipeSha256": "07A8CED6449910C61C4943E8644E61D1532922C51917D82F04FFBDB7E28D6E96",
+      "recipeSha256": null,
       "materials": [
-        "wood",
-        "iron"
+        "iron_010",
+        "wood_010",
+        "rope_010",
+        "ironEdge_010",
+        "woodDark_010"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 44
+        "objects": 11,
+        "meshes": 10,
+        "materials": 5,
+        "triangles": 408
       },
       "hashes": {
-        "hoe.blend": "56565C1F845B259C86194B7E70551CF03D9626621FC4BB58DE44118AB333C234",
-        "hoe.glb": "85051DC5A63C834F7428927E71F0B31D71E8C4A8FC8C9288858913C4DE88439C",
-        "hoe-blender.png": "355F393574EFEECEB4A10C101C52C8FB103D1C05B56B030A84390923F6A52D8E",
-        "capture-1.png": "750677493DBF5F9A11D375D806EF00B8E6C999D6CEB357EDF68D82B334DD5A8C",
-        "capture-1-gray.png": "F6EC648B39EC2E8DB3D1133B2C61D1736313825FA546682A951197789EDE70CE",
-        "capture.json": "81707846C840AD623876FCE2ECF1D8CDE9FF6E91E773A2E44FF81B63228F12A8",
-        "build.json": "23924BB49C5CA156C2E1CFE186A0EDC050C209090AEF40DC55C76822BC40E938",
-        "validation.json": "457C9C24058C8272EA7A4378543FE3E8EDD293C87224AA3986DE7D1699E805F9"
+        "hoe.glb": "11933454050B93980F2C37E0A52CFAB5B488B8AFBB2315FBF4E34769EE5D6D8D",
+        "hoe-preview.png": "116D7B1BCF9350CD769570B42E882101B1B839154CDF02FCE116A18E4D395BE3"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original hoe authored for The Valley G-10",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, hoe.glb; commit 63db59c).",
         "license": "Project original"
       }
     },
@@ -3583,59 +3576,57 @@
     },
     {
       "id": "bucket",
-      "artifactRound": "G-10",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/bucket/bucket.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-14T18-44-24-696Z-49268",
-        "directory": "artifacts/graphics/G-10/approved/6ca65d90e57d4551"
+        "runId": "marked-models-63db59c",
+        "directory": "artifacts/graphics/marked-models/approved/bucket"
       },
       "bounds": {
         "min": [
-          -0.042164,
+          -0.043782,
           0,
-          -0.044333
+          -0.0415
         ],
         "max": [
-          0.042164,
-          0.1,
-          0.044333
+          0.043782,
+          0.094,
+          0.0415
         ],
         "size": [
-          0.084327,
-          0.1,
-          0.088667
+          0.087564,
+          0.094,
+          0.083
         ]
       },
-      "recipeSha256": "49D420BBEA9A4AE02E97C595159782BD57F1A78A1C2417B9B2722965CD55BF67",
+      "recipeSha256": null,
       "materials": [
-        "wood",
-        "hoop"
+        "inside",
+        "iron_006",
+        "ironEdge_006",
+        "staveA",
+        "staveB",
+        "staveC"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 108
+        "objects": 21,
+        "meshes": 20,
+        "materials": 6,
+        "triangles": 892
       },
       "hashes": {
-        "bucket.blend": "84C255797CAD5688F1B4C27A998351C7331B90B2424FB8784257DCB038905211",
-        "bucket.glb": "6CA65D90E57D45518FA178C4C9ED3C05660D4E6C6BC92BAF10057550E7260B6B",
-        "bucket-blender.png": "CC29232004C27221B542182C8132D3D9274FE1719AF8F88059B1853772ED2FE3",
-        "capture-1.png": "2B6FA1D5D77591453B43E674F4195D2A351646E3A6BDCD1845B106D5AEB67398",
-        "capture-1-gray.png": "0B4A10B42DD443D365CFA2693D297ADD1807047919C09B22A7DBC60CC2C3CB24",
-        "capture.json": "E64A8A9D169F4627DB3739D422EC8070871BA4E5ED7B30538ECE8D71FCDBFC2B",
-        "build.json": "1E8A6B8861ECE234AFDE1B32B8DFD2B62E5EC1AA56A55D8751C3685D40DAC020",
-        "validation.json": "8A94718EBCE4A3B42493B645BDC677F432609A62325DC4C0E5C63F11CC17DF57"
+        "bucket.glb": "16771258060FAF6BD849CD56F376602BEE1E4D8C5944AA6B1D26CC7B350E3749",
+        "bucket-preview.png": "B6941FC9C2EB1B2A2598B6DF6871F8BB31A3ACBEF74E7C946E884AF9CD6D5E9D"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original bucket authored for The Valley G-10 (V-09 props)",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, bucket.glb; commit 63db59c).",
         "license": "Project original"
       }
     },
@@ -5510,34 +5501,36 @@
       "id": "pickaxe",
       "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/pickaxe/pickaxe.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-24T14-52-07-095Z-42948",
-        "directory": "artifacts/graphics/G-40/approved/1d93208e3a58f8bb"
+        "runId": "marked-models-63db59c",
+        "directory": "artifacts/graphics/marked-models/approved/pickaxe"
       },
       "bounds": {
         "min": [
-          -0.125892,
-          -0.033333,
-          -0.011667
+          -0.128063,
+          -0.033512,
+          -0.012
         ],
         "max": [
-          0.125892,
-          0.303333,
-          0.011667
+          0.128178,
+          0.302,
+          0.012
         ],
         "size": [
-          0.251784,
-          0.336667,
-          0.023333
+          0.256241,
+          0.335512,
+          0.024
         ]
       },
-      "recipeSha256": "AEEB0445A6969B917FA08DA932A12E775CD1814BD26975C5BB00BE7ED4EA2417",
+      "recipeSha256": null,
       "materials": [
-        "wood",
-        "iron"
+        "leather_009",
+        "woodDark_009",
+        "iron_009",
+        "wood_009"
       ],
       "clips": [],
       "motion": [],
@@ -5545,100 +5538,90 @@
         "grip"
       ],
       "statistics": {
-        "objects": 4,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 68
+        "objects": 8,
+        "meshes": 6,
+        "materials": 4,
+        "triangles": 328
       },
       "hashes": {
-        "pickaxe.blend": "9604E55E00B1B7BAF38C77501D0D47F6B20EFC25C1A0E3D8F4906F052F6F171F",
-        "pickaxe.glb": "1D93208E3A58F8BBA8FDAE1159F52AD9E146CAA653F4AD4496D129280995E544",
-        "pickaxe-blender.png": "D5E01B0F2347B527B6BD662EE37F28BAD58C550D9B88E79CAD284283E70C8CE6",
-        "capture-1.png": "93E3F429F75F55232605F6CD21A26A9C763A64E929BCC8FCDD93DA2A7707C33B",
-        "capture-1-gray.png": "623BF7C2FDB82E1D2CFF84758268A862F90F275E452ECB0342DD2036DAAF1168",
-        "capture.json": "8B1BD395645C97CA69B5DA3510E3AC153FEE0A56F34EBF0B0E027F4327021893",
-        "build.json": "521092CBCD2427D7EE9C6D053E6C03EFDCF46924CB80E289516887FAB82C42AF",
-        "validation.json": "11D9C85D332C2F60524B37A4A7CC7C6CF1AF4C5AA14584B420B18100D0AA5FC3"
+        "pickaxe.glb": "AEF27CF76A8384DE08112241DEAD19D267112F72F4EEFAFF766E6B38E9E47868",
+        "pickaxe-preview.png": "417BD05A480355A922249E2A4E5DF84BE668F74E7210FBBC57B9D86484A281F0"
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, 24 sep 2026, pedido por Vera; sin proveedor generativo.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, pickaxe.glb; commit 63db59c).",
         "license": "Project original"
       }
     },
     {
       "id": "dog",
-      "artifactRound": "G-23",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/dog/dog.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-25T10-46-57-280Z-26372",
-        "directory": "artifacts/graphics/G-23/approved/5a40929bd3ec5d76"
+        "runId": "marked-models-63db59c",
+        "directory": "artifacts/graphics/marked-models/approved/dog"
       },
       "bounds": {
         "min": [
-          -0.334167,
+          -0.32,
           0,
-          -0.060433
+          -0.076
         ],
         "max": [
-          0.196667,
-          0.297667,
-          0.060433
+          0.2766,
+          0.387,
+          0.076
         ],
         "size": [
-          0.530833,
-          0.297667,
-          0.120867
+          0.5966,
+          0.387,
+          0.152
         ]
       },
-      "recipeSha256": "F810AD0E4F16221B74CD829E6CADF0D49CE97FC98D339BF841650C00F5A654C0",
+      "recipeSha256": null,
       "materials": [
-        "coat",
-        "light",
-        "dark",
-        "accent"
+        "coat_001",
+        "light_001",
+        "earInner_001",
+        "eye_001",
+        "ivory_001",
+        "nose_001"
       ],
       "clips": [
-        "idle",
-        "walk"
+        "walk",
+        "idle"
       ],
       "motion": [
         {
-          "name": "idle",
-          "seconds": 8.041666666666666,
+          "name": "walk",
+          "seconds": 1.2,
           "loop": true,
-          "strideLength": null
+          "strideLength": 0.345
         },
         {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
+          "name": "idle",
+          "seconds": 4,
           "loop": true,
-          "strideLength": 0.15
+          "strideLength": null
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 24,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 2916
+        "objects": 60,
+        "meshes": 41,
+        "materials": 6,
+        "triangles": 1812
       },
       "hashes": {
-        "dog.blend": "883ECD977A64B4B4703FE02F47B59855ED190DD96514DE422F2460E30FED53E0",
-        "dog.glb": "5A40929BD3EC5D765E1A167307DF53B6945FC84FC222F78A3DE1750FBF2C3F0F",
-        "dog-blender.png": "20083BBE62896D00632860C0F473E248A8564A5E0210F9B754AABEB2AED360C2",
-        "capture-1.png": "85C8204679B4F8D7422C205495618E38F3947534FCE374F07DA0370DA4A49BB4",
-        "capture-1-gray.png": "DE972EB5085F3E530EBB31FFCA1283EA9786537B7F76236D590DA2C0261E47B4",
-        "capture.json": "BD728A26B3A14639A3AF44BA5A526BF3A18C7B7D9BA6BAAE97D4BA7A15B71B70",
-        "build.json": "E7E1D82A624B61FA734EBBAE6FAA946E1562AADE6399C62455DCAE22945DA8A5",
-        "validation.json": "151ED4A21E596AD308BB9D338FFDD1E49987474C932FE0733C9FF0E0A84FA127"
+        "dog.glb": "66E606B431C7E1E6AA21D00AAB21A1EB51F1645355185DDB885884789BC4C85D",
+        "dog-preview.png": "F9ED9CF710F8453748FF73D1BE86C50AE27077F0191307FD5F83C611F4ED8823"
       },
       "provenance": {
         "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, dog.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
         "license": "project-original"
       }
     },
@@ -5720,78 +5703,78 @@
     },
     {
       "id": "mule",
-      "artifactRound": "G-23",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/mule/mule.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-25T10-47-28-180Z-11740",
-        "directory": "artifacts/graphics/G-23/approved/c22a2ed787ea1b19"
+        "runId": "marked-models-63db59c",
+        "directory": "artifacts/graphics/marked-models/approved/mule"
       },
       "bounds": {
         "min": [
-          -0.465333,
+          -0.409,
           0,
-          -0.136667
+          -0.155912
         ],
         "max": [
-          0.291667,
-          0.587283,
-          0.136667
+          0.294801,
+          0.695,
+          0.155912
         ],
         "size": [
-          0.757,
-          0.587283,
-          0.273333
+          0.703801,
+          0.695,
+          0.311823
         ]
       },
-      "recipeSha256": "460F52DA9D0A4696B7414608BA96235F7E75CF5DAC22F7D5F93EAA8C4D269D61",
+      "recipeSha256": null,
       "materials": [
-        "coat",
-        "light",
-        "dark",
-        "accent",
-        "pack"
+        "light_004",
+        "rope_004",
+        "coat_004",
+        "coatTop_004",
+        "nose_004",
+        "earInner_004",
+        "eye_004",
+        "ivory_004",
+        "leather_004",
+        "pack",
+        "cloth"
       ],
       "clips": [
-        "idle",
-        "walk"
+        "walk",
+        "idle"
       ],
       "motion": [
         {
-          "name": "idle",
-          "seconds": 8.041666666666666,
+          "name": "walk",
+          "seconds": 1.2,
           "loop": true,
-          "strideLength": null
+          "strideLength": 0.449
         },
         {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
+          "name": "idle",
+          "seconds": 4,
           "loop": true,
-          "strideLength": 0.24
+          "strideLength": null
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 25,
-        "meshes": 5,
-        "materials": 5,
-        "triangles": 3152
+        "objects": 85,
+        "meshes": 66,
+        "materials": 11,
+        "triangles": 2474
       },
       "hashes": {
-        "mule.blend": "05227496F2E56B179F6421D61B09189D64B943A2CEFD5FFB9729B85EE8AE363D",
-        "mule.glb": "C22A2ED787EA1B199D3FBD1994EE49BE10464B4CBEA3EDFF6913FB980089EE24",
-        "mule-blender.png": "57F9446B926EF49B00D30ED912FD041CD616B995FF78758439E5553C11176A36",
-        "capture-1.png": "C2ACEF44CD07B93AC421DD184C84344CFD90483DEB08DF3D5D7E80A1089395AF",
-        "capture-1-gray.png": "78E6CE9A3062FB4D8FC3449E1F576F799834D2E8787033088395872253B4CB36",
-        "capture.json": "DFF4EBD32DD94C21A6BDCA45613F1F2BA237CFE301D553BAC7CC0437470B78BF",
-        "build.json": "51F80F01607FBA0B297BD3A4AA7381C22DD583CBCAC5E3C1E9F14B58CB2B53F3",
-        "validation.json": "DA6F3E09425ECE88408FCD2922E6335E046AFD4355F5FEB8A117DDF3C1D58DF3"
+        "mule.glb": "88B79BD57D0274ADAF2842B17F77E6B2CBE08AD7A92D2F9E9E7DB43F8F0B03AC",
+        "mule-preview.png": "64A46E7880357450145E55706A90D9478E6451DA0FC40C0BF462CDAAD6D8DBA6"
       },
       "provenance": {
         "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, mule.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
         "license": "project-original"
       }
     },

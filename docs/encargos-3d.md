@@ -129,20 +129,22 @@ Lo que la tanda dejó a medias, y lo que se hizo después el mismo día:
 - ~~**Un perro, un zorro y patos.**~~ Hechos (`life/companions.ts`), y desde
   la segunda ronda el perro **ladra** —dibujado, `effects/barks.ts`: no hay
   sonido— al forastero y al zorro, y corre a por la pelota en juego.
-  **Pendiente:** el ladrido de verdad cuando haya audio (hay hueco en
-  `src/ui/sound.ts`), y un gesto de ladrar: el perro no tiene más clips que
-  `idle` y `walk`, y **Vera está rehaciendo los modelos de los animales**; el
-  gesto irá con su perro. El zorro sigue sin llevarse ninguna gallina (lo decide
-  el motor, y hoy sólo con el lobo).
+  **Hecho después (25 sep):** el perro corre, ladra y hace la reverencia de
+  juego (`effects/animal-gestures.ts`), fabricados sobre su esqueleto, y el
+  perro nuevo de Vera ya está en el juego. **Pendiente:** el ladrido con sonido
+  cuando haya audio (hay hueco en `src/ui/sound.ts`). El zorro sigue sin
+  llevarse ninguna gallina (lo decide el motor, y hoy sólo con el lobo).
 - ~~**La mula del buhonero, el puesto y lo que trae cada visita.**~~ Hechos:
   la mula va detrás del que vende; mientras se queda, monta delante su puesto
   (`effects/stalls.ts`): **el buhonero**, un tenderete a rayas con baratijas;
   **el factor**, la mesa con el libro de cuentas y la balanza y sacos vacíos;
   **el salinero**, sus sacos con uno abierto. **El tratante** trae detrás la
-  vaca que vende. **Pendiente:** los puestos no son sólidos para la gente
-  (aparecen a mediodía y el terreno de la jornada ya está hecho); nadie se
-  acerca a comprar —la aldea charla en la plaza, no va al mostrador—; y si el
-  trato se cierra, no se ve la madera, el grano o la vaca cambiar de manos.
+  vaca que vende. **Hecho después (25 sep):** los puestos son sólidos
+  mientras están montados, la gente se acerca a mirar el género, y el trato
+  cerrado se ve: le llevan la leña o el grano, la mula sale cargada, la vaca va
+  al pasto, la sal se queda. **Pendiente:** nadie paga a la vista (no hay
+  moneda que se vea pasar de mano), y el despegue (`takeoff`) de la perdiz nueva
+  no se usa todavía: la caza la hace volar con el bucle `flight`.
 - ~~**Los postes del tendedero y el bancal, sólidos.**~~ Hecho
   (`yardSolids`, `world/obstacles.ts`).
 - ~~**A cubierto bajo un alero, y con gesto.**~~ Hechos: `shelterUnder` y el

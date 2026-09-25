@@ -1,5 +1,21 @@
 # The Valley — Registro de cambios
 
+## v4.56 · 25 sep 2026 · Los modelos de Vera, en el juego
+
+Once modelos rehechos por Vera (`deliverables/marked-models-trial/`, commit
+63db59c): lobo, oso, perdiz, jabalí, perro, mula, azada, cubo, flecha, escudo
+y pico. Los animales venían articulados con nodos rígidos y sin las
+animaciones de andar y de reposo: se las pone `tools/art/rigid-clips.mjs`
+sobre sus nodos, con el pie apoyado en línea recta para que no patine, y se
+fabrican las que faltaban (la carga y el golpe del jabalí, el vuelo en bucle de
+la perdiz; el `rear` del oso es su `attack`). Entran al catálogo con
+`tools/art/adopt-models.mjs` y se publican por el camino de siempre. Al cargarse
+se funden las piezas que se mueven juntas (de 40–68 mallas por animal a
+22–40). El tope de la flecha y del escudo sube, por decisión de Vera, a lo que
+miden. Y el perro tiene más gestos que andar: corre tras los niños y la
+pelota, ladra y hace la reverencia de juego; los puestos de la plaza son
+sólidos y la gente se acerca a mirar; el trato cerrado se ve cambiar de manos.
+
 ## v4.55 · 25 sep 2026 · Puestos en la plaza, la vaca del tratante, el perro que ladra y el frío bajo el alero
 
 Lo que quedó apuntado de la ronda anterior, sin tocar ningún modelo 3D (Vera

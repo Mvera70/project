@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-25T10:48:38.409Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids dog,fox,mule,duck",
+  "generatedAt": "2026-09-25T14:12:12.822Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids partridge",
   "assets": [
     {
       "id": "axis-marker",
@@ -236,25 +236,6 @@
       ]
     },
     {
-      "id": "wolf",
-      "file": "wolf.glb",
-      "sha256": "A88C9EEBEECF49441B0E5AC427EABB0A67C6D0D6567A8E59FECC48720682BEF8",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.2
-        }
-      ]
-    },
-    {
       "id": "crow",
       "file": "crow.glb",
       "sha256": "F9A171936F7695AFCAF975524C52E0569FB025D46F5B966FAEBE9C20ED51E16E",
@@ -293,12 +274,6 @@
       ]
     },
     {
-      "id": "hoe",
-      "file": "hoe.glb",
-      "sha256": "85051DC5A63C834F7428927E71F0B31D71E8C4A8FC8C9288858913C4DE88439C",
-      "motion": []
-    },
-    {
       "id": "bundle",
       "file": "bundle.glb",
       "sha256": "B12A90A6C76BDFD0C8788EB7EE1F1B8797A02A5966D074E50349C694C03C17D8",
@@ -320,12 +295,6 @@
       "id": "stick",
       "file": "stick.glb",
       "sha256": "08D8DBB24D8AEB4894772DCF10B5072F6E108D66A58A8F74A9E2BAF97EBDCF21",
-      "motion": []
-    },
-    {
-      "id": "bucket",
-      "file": "bucket.glb",
-      "sha256": "6CA65D90E57D45518FA178C4C9ED3C05660D4E6C6BC92BAF10057550E7260B6B",
       "motion": []
     },
     {
@@ -852,28 +821,6 @@
       }
     },
     {
-      "id": "arrow",
-      "file": "arrow.glb",
-      "sha256": "474435E79C60495683575EF1D1BE3F0F7717DC01242E8487414C145051F5596F",
-      "motion": [],
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "shield",
-      "file": "shield.glb",
-      "sha256": "A6A11CCF641B564CAE5867A72D37A328610E71FEBD84851837CA188E70A2C025",
-      "motion": [],
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
-        "license": "Project original"
-      }
-    },
-    {
       "id": "gate",
       "file": "gate.glb",
       "sha256": "C5E11188892DE6D2B1735CA36911999F3D8D6E3226CC2B43A5EF7B7F12A9FB81",
@@ -1033,66 +980,6 @@
       }
     },
     {
-      "id": "bear",
-      "file": "bear.glb",
-      "sha256": "ECA8AA70E7A3D31BFC25DC0B826AA959C5D6E832B3F30075B8DA8B7652416445",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4.041666666666667,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.0416666666666665,
-          "loop": true,
-          "strideLength": 0.22
-        },
-        {
-          "name": "attack",
-          "seconds": 1.5416666666666667,
-          "loop": false,
-          "strideLength": null
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Original procedural brown bear modeled for The Valley, 23 Sep 2026. No external provider.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "partridge",
-      "file": "partridge.glb",
-      "sha256": "3627E6187D35249E7B09F506CFA95301D13F93B6F4289B8DA1EF5EF2A8DF1478",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4.041666666666667,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 1.0416666666666667,
-          "loop": true,
-          "strideLength": 0.055
-        },
-        {
-          "name": "flight",
-          "seconds": 0.5416666666666666,
-          "loop": true,
-          "strideLength": null
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Original low-poly partridge for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
-        "license": "Project original"
-      }
-    },
-    {
       "id": "rabbit",
       "file": "rabbit.glb",
       "sha256": "FBEA726A5B1F5251B8ADDBD4379A4C9D42F1762FD66B1012721D1428AF302EF6",
@@ -1119,42 +1006,6 @@
       "provenance": {
         "kind": "original",
         "source": "Original low-poly rabbit for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "boar",
-      "file": "boar.glb",
-      "sha256": "4E215FD0A56B69633826BA7235A9C8888116468A7FEF82331EECD2F860BC09D9",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4.041666666666667,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.0416666666666665,
-          "loop": true,
-          "strideLength": 0.15
-        },
-        {
-          "name": "charge",
-          "seconds": 1.0416666666666667,
-          "loop": true,
-          "strideLength": 0.28
-        },
-        {
-          "name": "attack",
-          "seconds": 1.375,
-          "loop": false,
-          "strideLength": null
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Original low-poly wild boar for The Valley, 23 Sep 2026. Local procedural authorship; no external provider.",
         "license": "Project original"
       }
     },
@@ -1192,41 +1043,6 @@
       }
     },
     {
-      "id": "pickaxe",
-      "file": "pickaxe.glb",
-      "sha256": "1D93208E3A58F8BBA8FDAE1159F52AD9E146CAA653F4AD4496D129280995E544",
-      "motion": [],
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado original para The Valley, 24 sep 2026, pedido por Vera; sin proveedor generativo.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "dog",
-      "file": "dog.glb",
-      "sha256": "5A40929BD3EC5D765E1A167307DF53B6945FC84FC222F78A3DE1750FBF2C3F0F",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.15
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
-        "license": "project-original"
-      }
-    },
-    {
       "id": "fox",
       "file": "fox.glb",
       "sha256": "6BD39948587E59A5A94B601C5AA7923CDE8023F6F5DAEF6995C98C7C476B9DA3",
@@ -1242,30 +1058,6 @@
           "seconds": 2.7083333333333335,
           "loop": true,
           "strideLength": 0.13
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
-        "license": "project-original"
-      }
-    },
-    {
-      "id": "mule",
-      "file": "mule.glb",
-      "sha256": "C22A2ED787EA1B199D3FBD1994EE49BE10464B4CBEA3EDFF6913FB980089EE24",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.24
         }
       ],
       "provenance": {
@@ -1296,6 +1088,241 @@
         "kind": "original",
         "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
         "license": "project-original"
+      }
+    },
+    {
+      "id": "hoe",
+      "file": "hoe.glb",
+      "sha256": "11933454050B93980F2C37E0A52CFAB5B488B8AFBB2315FBF4E34769EE5D6D8D",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, hoe.glb; commit 63db59c).",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "bucket",
+      "file": "bucket.glb",
+      "sha256": "16771258060FAF6BD849CD56F376602BEE1E4D8C5944AA6B1D26CC7B350E3749",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, bucket.glb; commit 63db59c).",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "arrow",
+      "file": "arrow.glb",
+      "sha256": "D84A0E02F56603B641149900841D35EACC28C01DA4D16D56B978BEB5D533B619",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, arrow.glb; commit 63db59c).",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "shield",
+      "file": "shield.glb",
+      "sha256": "7CBF210C0DB92C6E11587AD7662DE7BD3EEBC01AE4D8BC52FE420CB15DFEDB20",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, shield.glb; commit 63db59c).",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "pickaxe",
+      "file": "pickaxe.glb",
+      "sha256": "AEF27CF76A8384DE08112241DEAD19D267112F72F4EEFAFF766E6B38E9E47868",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, pickaxe.glb; commit 63db59c).",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "wolf",
+      "file": "wolf.glb",
+      "sha256": "61D658FC1C51A557D5ACFA9ACA3DA28DFBDA395147715E6FCDD21013D5B0A19A",
+      "motion": [
+        {
+          "name": "attack",
+          "seconds": 1.4166666666666667,
+          "loop": false,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.358
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, wolf.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "dog",
+      "file": "dog.glb",
+      "sha256": "66E606B431C7E1E6AA21D00AAB21A1EB51F1645355185DDB885884789BC4C85D",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.345
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, dog.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "mule",
+      "file": "mule.glb",
+      "sha256": "88B79BD57D0274ADAF2842B17F77E6B2CBE08AD7A92D2F9E9E7DB43F8F0B03AC",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.449
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, mule.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "bear",
+      "file": "bear.glb",
+      "sha256": "25EFA025A83F3DC3308E0269C967563AD7D5C501F63454E730BC27401A9EA2F3",
+      "motion": [
+        {
+          "name": "attack",
+          "seconds": 3,
+          "loop": false,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.444
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, bear.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "boar",
+      "file": "boar.glb",
+      "sha256": "040873AABA5348C1EF1CB529B88264144D5C241256EB688C06FB9757C196C48C",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.342
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "charge",
+          "seconds": 0.8,
+          "loop": true,
+          "strideLength": 0.513
+        },
+        {
+          "name": "attack",
+          "seconds": 1.2,
+          "loop": false,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, boar.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "partridge",
+      "file": "partridge.glb",
+      "sha256": "5DA9BEDE8836660B0D5CF2D4BF512DAF88FD824969E3ABAD4FB9DAB674A15998",
+      "motion": [
+        {
+          "name": "takeoff",
+          "seconds": 1.1666666666666667,
+          "loop": false,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.064
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "flight",
+          "seconds": 0.3,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, partridge.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
+        "license": "Project original"
       }
     }
   ]

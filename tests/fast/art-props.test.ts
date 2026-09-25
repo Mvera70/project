@@ -10,8 +10,29 @@ const root = resolve(import.meta.dirname, '../..');
 const catalog = parseCatalog(JSON.parse(readFileSync(resolve(root, 'art/catalog.json'), 'utf8')));
 
 describe('Modelos originales: presupuestos y contratos de exportación', () => {
+  // La flecha y el escudo los rehízo Vera pieza a pieza (25 sep 2026,
+  // `deliverables/marked-models-trial/`) y ya no salen de una receta: su recibo
+  // es el GLB mismo (`tools/art/adopt-models.mjs`). Y su tope sube, por decisión
+  // suya, a lo que miden: flecha 104 triángulos en 4 materiales (antes 62 en 3),
+  // escudo 1 408 en 6 (antes 122 en 3). Al cargarlos se funden por material
+  // (`fuseRigidPieces`), así que cada uno cuesta sus materiales en llamadas.
   it.each([
-    ['bow', 400], ['spear', 200], ['arrow', 100], ['shield', 250],
+    ['arrow', 110, 4], ['shield', 1500, 6],
+  ] as const)('%s, adoptado, conserva recibo verificable y su tope', (id, budget, materials) => {
+    const asset = catalog.assets.find((entry) => entry.id === id)!;
+    expect(asset.statistics?.triangles).toBeGreaterThan(0);
+    expect(asset.statistics?.triangles).toBeLessThanOrEqual(budget);
+    expect(asset.statistics?.materials).toBeLessThanOrEqual(materials);
+    expect(asset.connectors).toContain('grip');
+    expect(asset.bounds?.size.every((size) => Number.isFinite(size) && size > 0)).toBe(true);
+    const path = resolve(root, asset.approved!.directory, `${id}.glb`);
+    if (existsSync(path)) {
+      expect(createHash('sha256').update(readFileSync(path)).digest('hex').toUpperCase()).toBe(asset.hashes?.[`${id}.glb`]);
+    }
+  });
+
+  it.each([
+    ['bow', 400], ['spear', 200],
     ['gate', 500], ['plough', 400], ['fountain', 500],
   ] as const)('%s conserva receta, escala y recibo verificable', async (id, budget) => {
     const asset = catalog.assets.find((entry) => entry.id === id)!;
@@ -32,7 +53,7 @@ describe('Modelos originales: presupuestos y contratos de exportación', () => {
       expect(createHash('sha256').update(bytes).digest('hex').toUpperCase())
         .toBe(asset.hashes?.[`${id}.glb`]);
     }
-    if (['bow', 'spear', 'arrow', 'shield'].includes(id)) {
+    if (['bow', 'spear'].includes(id)) {
       expect(recipe.connectors).toContain('grip');
     }
     if (id === 'gate') {

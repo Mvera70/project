@@ -20,7 +20,7 @@
 // `idle`, la cola se mueve en `walk`), así un esqueleto con otros ejes sigue
 // funcionando.
 
-import { AnimationClip, Quaternion, QuaternionKeyframeTrack, Vector3 } from 'three';
+import { AnimationClip, Quaternion, QuaternionKeyframeTrack, Vector3, type Object3D } from 'three';
 
 type Track = QuaternionKeyframeTrack;
 
@@ -52,13 +52,17 @@ function axisOf(track: Track): Vector3 | null {
 const SAMPLES = 32;
 
 /** Un clip de giros sobre la pose base de `idle`: `turns[bone] = (t) => ángulo`. */
-function sculpt(name: string, seconds: number, idle: AnimationClip,
+function sculpt(name: string, seconds: number, idle: AnimationClip, root: Object3D,
   turns: Readonly<Record<string, readonly { axis: Vector3; angle: (t: number) => number }[]>>): AnimationClip {
   const tracks: Track[] = [];
   for (const [bone, list] of Object.entries(turns)) {
-    const base = trackOf(idle, bone);
-    if (base === undefined) continue;
-    const rest = keyAt(base, 0);
+    // El reposo del hueso es el del modelo. La primera versión lo sacaba de la
+    // primera clave de `idle`, y el perro de nodos rígidos de Vera —cuyo
+    // `idle` no mueve las patas ni el cuerpo— se quedaba sin reverencia.
+    const node = root.getObjectByName(bone);
+    if (node === undefined) continue;
+    const name = trackOf(idle, bone)?.name ?? `${node.name}.quaternion`;
+    const rest = node.quaternion.clone();
     const times: number[] = [];
     const values: number[] = [];
     for (let n = 0; n <= SAMPLES; n += 1) {
@@ -68,7 +72,7 @@ function sculpt(name: string, seconds: number, idle: AnimationClip,
       for (const { axis, angle } of list) q.multiply(new Quaternion().setFromAxisAngle(axis, angle(t)));
       values.push(...q.toArray());
     }
-    tracks.push(new QuaternionKeyframeTrack(base.name, times, values));
+    tracks.push(new QuaternionKeyframeTrack(name, times, values));
   }
   // Los huesos que no se tocan se quedan en su pose de `idle`, fija.
   for (const track of idle.tracks) {
@@ -80,13 +84,13 @@ function sculpt(name: string, seconds: number, idle: AnimationClip,
 }
 
 /** `walk` con los giros de cada hueso agrandados respecto a su reposo. */
-function amplified(name: string, walk: AnimationClip, idle: AnimationClip, gain: number,
+function amplified(name: string, walk: AnimationClip, root: Object3D, gain: number,
   extra: Readonly<Record<string, (q: Quaternion, t: number) => void>>): AnimationClip {
   const tracks = walk.tracks.map((source) => {
     if (!source.name.endsWith('.quaternion')) return source.clone();
     const track = source as Track;
     const bone = track.name.slice(0, -'.quaternion'.length);
-    const rest = trackOf(idle, bone) === undefined ? keyAt(track, 0) : keyAt(trackOf(idle, bone)!, 0);
+    const rest = root.getObjectByName(bone)?.quaternion.clone() ?? keyAt(track, 0);
     const inverse = rest.clone().invert();
     const values: number[] = [];
     for (let n = 0; n < track.times.length; n += 1) {
@@ -103,25 +107,58 @@ function amplified(name: string, walk: AnimationClip, idle: AnimationClip, gain:
   return new AnimationClip(name, walk.duration, tracks);
 }
 
+/**
+ * El sentido de un giro, **medido sobre el modelo**: gira `bone` un poco sobre
+ * `axis` y mira cuánto se mueve `probe` en el marco del animal (frente a −X,
+ * arriba +Y). Devuelve el eje con el signo que hace crecer ese movimiento.
+ *
+ * Porque el signo no se puede suponer: en el perro del generador de G-23 el
+ * cuello cabeceaba al revés de lo que parecía (medido en el banco), y el de
+ * Vera, de nodos rígidos, gira sobre otros ejes locales.
+ */
+function signed(root: Object3D, bone: string, probe: string, axis: Vector3, along: Vector3): Vector3 {
+  const node = root.getObjectByName(bone);
+  const tip = root.getObjectByName(probe);
+  if (node === undefined || tip === undefined) return axis.clone();
+  const saved = node.quaternion.clone();
+  root.updateMatrixWorld(true);
+  const before = root.worldToLocal(tip.getWorldPosition(new Vector3()));
+  node.quaternion.multiply(new Quaternion().setFromAxisAngle(axis, 0.1));
+  root.updateMatrixWorld(true);
+  const after = root.worldToLocal(tip.getWorldPosition(new Vector3()));
+  node.quaternion.copy(saved);
+  root.updateMatrixWorld(true);
+  return after.sub(before).dot(along) >= 0 ? axis.clone() : axis.clone().negate();
+}
+
+/** El primer hijo de un hueso con otro nombre: la punta con que se mide su giro. */
+function tipOf(root: Object3D, bone: string): string {
+  const node = root.getObjectByName(bone);
+  const child = node?.children.find((one) => one.name !== '' && one.name !== bone);
+  return child?.name ?? bone;
+}
+
 /** Los gestos que le faltan a un perro, fabricados; vacío si el esqueleto no es el esperado. */
-export function dogGestures(clips: readonly AnimationClip[]): AnimationClip[] {
+export function dogGestures(clips: readonly AnimationClip[], root: Object3D): AnimationClip[] {
   const idle = clips.find((clip) => clip.name === 'idle');
   const walk = clips.find((clip) => clip.name === 'walk');
   if (idle === undefined || walk === undefined) return [];
   const neckIdle = trackOf(idle, 'neck');
   const tailWalk = trackOf(walk, 'tail');
-  // El eje en que cabecea el cuello en `idle`. **Su signo se midió en el banco**
-  // (`artifacts/_session/dogbench`), no se supuso: la primera versión creía que
-  // era «bajar la cabeza» y el perro ladraba al suelo. Girado a favor, el cuello
-  // y la cabeza suben, el cuerpo pica hacia delante y las manos se adelantan;
-  // en contra, la cola se levanta.
-  const axis = neckIdle === undefined ? null : axisOf(neckIdle);
+  const foreWalk = trackOf(walk, 'foreL');
+  // El eje de cabeceo es el del cuello en `idle` (o, si no se mueve, el de la
+  // pata al andar: los dos giran en el plano del cuerpo). Y la cola, el de su
+  // meneo al andar. Lo que no se supone es el signo: se mide (`signed`).
+  const pitch = neckIdle !== undefined ? axisOf(neckIdle) : foreWalk !== undefined ? axisOf(foreWalk) : null;
   const wag = tailWalk === undefined ? null : axisOf(tailWalk);
-  if (axis === null || wag === null) return [];
-  const raise = axis;
-  const bowDown = axis;
-  const reach = axis;
-  const tailUp = axis.clone().negate();
+  if (pitch === null || wag === null) return [];
+  const up = new Vector3(0, 1, 0);
+  const ahead = new Vector3(-1, 0, 0);
+  const raise = signed(root, 'neck', 'head', pitch, up);
+  const bowDown = signed(root, 'body', 'neck', pitch, up.clone().negate());
+  const reach = signed(root, 'foreL', tipOf(root, 'foreL'), pitch, ahead);
+  const hindBack = signed(root, 'hindL', tipOf(root, 'hindL'), pitch, ahead.clone().negate());
+  const tailUp = signed(root, 'tail', tipOf(root, 'tail'), pitch, up);
   const have = new Set(clips.map((clip) => clip.name));
   const out: AnimationClip[] = [];
   const pulse = (t: number, at: number, width = 0.08): number => Math.exp(-(((t - at) / width) ** 2));
@@ -131,7 +168,9 @@ export function dogGestures(clips: readonly AnimationClip[]): AnimationClip[] {
     const tilt = (q: Quaternion, t: number, amount: number): void => {
       q.multiply(new Quaternion().setFromAxisAngle(bowDown, amount * wave(t, 2)));
     };
-    out.push(amplified('run', walk, idle, 1.6, {
+    // TUNE: 1,35. Con 1,6 la marcha amplia del perro de Vera acababa con las
+    // patas casi horizontales (banco del 25 sep).
+    out.push(amplified('run', walk, root, 1.35, {
       body: (q, t) => tilt(q, t, 0.07),
       neck: (q) => q.multiply(new Quaternion().setFromAxisAngle(raise, 0.2)),
       tail: (q) => q.multiply(new Quaternion().setFromAxisAngle(tailUp, 0.5)),
@@ -140,25 +179,27 @@ export function dogGestures(clips: readonly AnimationClip[]): AnimationClip[] {
   if (!have.has('bark')) {
     // Medio segundo por golpe: dos tirones de cabeza hacia arriba y adelante.
     const jerk = (t: number): number => pulse(t, 0.2) + 0.7 * pulse(t, 0.55);
-    out.push(sculpt('bark', 0.55, idle, {
+    out.push(sculpt('bark', 0.55, idle, root, {
       neck: [{ axis: raise, angle: (t) => 0.35 + 0.3 * jerk(t) }],
       head: [{ axis: raise, angle: (t) => 0.15 + 0.3 * jerk(t) }],
       tail: [{ axis: tailUp, angle: () => 0.7 }, { axis: wag, angle: (t) => 0.25 * wave(t, 2) }],
-      'ear-1': [{ axis: tailUp, angle: (t) => 0.25 * jerk(t) }],
-      ear1: [{ axis: tailUp, angle: (t) => 0.25 * jerk(t) }],
+      'ear-1': [{ axis: raise.clone().negate(), angle: (t) => 0.25 * jerk(t) }],
+      ear1: [{ axis: raise.clone().negate(), angle: (t) => 0.25 * jerk(t) }],
     }));
   }
   if (!have.has('play')) {
     // La reverencia: el cuerpo pica hacia delante, las manos se estiran por
     // delante para no clavarse, las patas de atrás se enderezan, la cabeza
     // mira arriba y la cola va de lado a lado deprisa.
-    const bow = 0.32;
-    out.push(sculpt('play', 1.2, idle, {
+    // TUNE: 0,24 de reverencia y las manos 0,85 adelante. Con 0,32 y 0,5 las
+    // manos del perro de Vera se hundían en el suelo (banco del 25 sep).
+    const bow = 0.24;
+    out.push(sculpt('play', 1.2, idle, root, {
       body: [{ axis: bowDown, angle: (t) => bow + 0.04 * wave(t, 2) }],
-      foreL: [{ axis: reach, angle: () => 0.5 }],
-      foreR: [{ axis: reach, angle: () => 0.5 }],
-      hindL: [{ axis: tailUp, angle: () => bow }],
-      hindR: [{ axis: tailUp, angle: () => bow }],
+      foreL: [{ axis: reach, angle: () => 0.85 }],
+      foreR: [{ axis: reach, angle: () => 0.85 }],
+      hindL: [{ axis: hindBack, angle: () => bow * 0.6 }],
+      hindR: [{ axis: hindBack, angle: () => bow * 0.6 }],
       neck: [{ axis: raise, angle: () => bow + 0.35 }],
       head: [{ axis: raise, angle: () => 0.15 }],
       tail: [{ axis: tailUp, angle: () => 0.6 }, { axis: wag, angle: (t) => 0.5 * wave(t, 4) }],

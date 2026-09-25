@@ -1,5 +1,43 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · Los once modelos de Vera, integrados; el perro, los puestos y el trato
+
+**Modelos** (`deliverables/marked-models-trial/`, 63db59c; `bear-v2.glb` es el
+oso vigente; el zorro y la piedra del vado quedaron fuera del encargo):
+
+- Los animales son **nodos rígidos** con los mismos nombres de articulación que
+  el generador de G-23. `tools/art/rigid-clips.mjs` les añade `idle`/`walk`
+  (apoyo en línea recta el 62 % del ciclo, como `animals-g23.mjs`: la
+  sinusoide de la primera versión patinaba) y lo que faltaba: `charge` y
+  `attack` del jabalí; `flight` de la perdiz en bucle (su `takeoff` se
+  conserva: es de una vez); `rear` del oso pasa a `attack`.
+- `tools/art/adopt-models.mjs` los admite en el catálogo (carpeta de aprobados
+  `artifacts/graphics/marked-models/approved/`, hash, estadísticas, caja) y se
+  publican con `publish-assets.ts` tras retirar el GLB anterior.
+- Al cargarse, `fuseRigidPieces` (`assets.ts`, sólo los once) funde por
+  material las piezas de cada articulación: animales de 40–68 mallas a 22–40,
+  herramientas de 6–25 a 4–6.
+- Presupuesto (Vera: «subir el tope»): flecha 110 triángulos y 4 materiales,
+  escudo 1 500 y 6 (`art-props.test.ts`). Las herramientas tienen las mismas
+  medidas y el mismo `grip` que las anteriores.
+- Pruebas: `pieced-assets.test.ts`; `graphics-animal-motion.test.ts` mide
+  ahora también los animales de nodos rígidos (el pie es su vértice más bajo)
+  y cubre perro, mula, jabalí, oso y perdiz.
+
+**El perro**: `effects/animal-gestures.ts` fabrica `run`, `bark` y `play` sobre
+el esqueleto del perro, midiendo en el propio modelo el sentido de cada giro
+(`signed`), así que sirven para el de Vera. Banco: `tools/graphics/animal-gestures-bench.mjs`.
+
+**Los puestos y el trato**: los puestos son sólidos mientras están montados
+(`placeSolid`/`liftSolid`) y abren «mirar el género» (`OFFERS.browse`, 3
+plazas, suelo 1,25 a menos de 12 celdas): de 3 a 6 vecinos por visita. El
+trato se apunta la semana siguiente a la visita, así que el vendedor vuelve un
+día esa semana: le llevan la leña o el grano (`tradeSites`, maquinaria de la
+preparación), la mula sale cargada, la vaca va al pasto, la sal se queda.
+
+**Y un aviso**: otra sesión cambió esta misma copia a la rama de los modelos a
+media ronda; dos commits míos cayeron allí y se trajeron a `main` en orden.
+
 ## 25 sep 2026 · Modelos candidatos para revisión
 
 Vera marcó once modelos para rehacer: lobo, oso, perdiz, jabalí, perro, mula,

@@ -45,7 +45,7 @@ export class AnimalMotion {
       : this.mixer.clipAction(asset.clips.find(clip => clip.name === 'flee')!).play();
     this.charge = asset.clips.find(clip => clip.name === 'charge') === undefined ? undefined
       : this.mixer.clipAction(asset.clips.find(clip => clip.name === 'charge')!).play();
-    const extra = kind === 'dog' ? dogGestures(asset.clips) : [];
+    const extra = kind === 'dog' ? dogGestures(asset.clips, object) : [];
     const named = (name: string) => asset.clips.find(clip => clip.name === name) ?? extra.find(clip => clip.name === name);
     const run = named('run');
     const bark = named('bark');
