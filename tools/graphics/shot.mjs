@@ -233,6 +233,11 @@ if (advanceWeeks > 0) {
     await tab.waitForTimeout(500);
   }
   await tab.waitForTimeout(1500);
+  // **Y se deja correr el reloj falso unos segundos.** Instalado, no avanza
+  // solo: sin esto los fundidos de estación (4 s reales) se quedaban a medias
+  // y la captura enseñaba la paleta de antes del salto —así pareció, el 25 sep
+  // 2026, que el invierno llegaba de golpe cuando llegaba poco a poco—.
+  await tab.clock.runFor(6000);
 }
 
 // **Contestar la encrucijada que tapa el valle.** Es la trampa que `CLAUDE.md`

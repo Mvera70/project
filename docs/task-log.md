@@ -1,5 +1,20 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · El cambio de estación, poco a poco
+
+Vera: «entre cambio y cambio de estación el mapa pega un cambio brusco, no hay
+un cambio progresivo, por ejemplo a la nieve». Dos causas: la nieve de los
+tejados era todo o nada (0,72 el primer día de invierno, 0 el de primavera) y
+la paleta giraba sólo en las dos últimas semanas, a saltos fundidos en 0,8 s.
+Ahora `snowCover` (`derive/palette.ts`) espolvorea al final del otoño, cuaja
+en las tres primeras semanas del invierno y se funde en las últimas; la paleta
+gira en cuatro semanas (`TURN_WEEKS`) y cada paso se funde en 4 s. Comprobado
+semana a semana del otoño 7 al invierno 2 (`artifacts/graphics/alive/sr-sheet.png`).
+**Trampa de la herramienta, corregida:** `shot.mjs --advance` deja el reloj
+falso parado y los fundidos no terminaban; la captura enseñaba la paleta de
+antes del salto y parecía que el invierno llegaba de golpe. Ahora corre seis
+segundos antes de disparar.
+
 ## 25 sep 2026 · El valle más vivo: viento y cielo por estaciones
 
 Viento en copas, juncos y cultivos (`effects/wind.ts`, sombreador), con la

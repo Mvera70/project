@@ -20,7 +20,7 @@ import {
 } from 'three';
 import { ford } from '@engine/sim';
 import { clockOf } from '@engine/time';
-import { paletteFor } from '@derive/palette';
+import { paletteFor, snowCover } from '@derive/palette';
 import type { Palette } from '@derive/palette';
 import { moodsFor } from '@derive/moods';
 import { createValleyCamera } from './camera';
@@ -686,7 +686,10 @@ export async function createGraphicsRenderer(
   let paintedGround = '';
   let paintedSteading = '';
   // La apariencia pertenece al tiempo de presentación; ni el tick ni la velocidad la adelantan.
-  const APPEARANCE_SECONDS = 0.8;
+  // Cuánto tarda en fundirse cada paso de estación, en segundos reales. Con 0,8
+  // se veía el salto (Vera, 25 sep 2026); con cuatro, cada semana de las
+  // cuatro de cambio llega fundida sobre la anterior.
+  const APPEARANCE_SECONDS = 4;
   const paletteKeys = Object.keys(paletteFor('spring', 0)) as (keyof Palette)[];
   const tintFrom = new Color();
   const tintTo = new Color();
@@ -839,7 +842,7 @@ export async function createGraphicsRenderer(
     // §10.3 pone el prado blanco es que ha nevado, y la nieve no elige donde
     // cuajar. TUNE: 0,72 y no 1, que un tejado del color exacto del prado
     // nevado deja de leerse como tejado.
-    const snowing = clock.season === 'winter' ? 0.72 : 0;
+    const snowing = snowCover(clock.season, clock.seasonWeek);
     village.season(snowing, palette.accent);
     world.add(ground.mesh);
 
@@ -1266,7 +1269,9 @@ export async function createGraphicsRenderer(
       // estación del reloj vivo**, que es lo que le da el color. §10.3 mezcla
       // hacia la siguiente estación en las dos últimas semanas (10 y 11).
       const live = clockOf(state.tick);
-      const colour = `${live.season}:${seasonColourStep(live.seasonWeek)}`;
+      // Y la nieve, que cuaja en las primeras semanas del invierno (`snowCover`):
+      // también rehace la apariencia, para que crezca a pasos y no de golpe.
+      const colour = `${live.season}:${seasonColourStep(live.seasonWeek)}:${snowCover(live.season, live.seasonWeek).toFixed(2)}`;
       // E0e · El override sólo llega desde la herramienta de captura. No toca
       // `shown`, ni las decisiones de vida, ni la cabecera: sirve para aislar
       // el acabado de una misma escena real.
@@ -1279,7 +1284,7 @@ export async function createGraphicsRenderer(
         const previous = ground === null ? null : Float32Array.from((ground.mesh.geometry.getAttribute('color') as BufferAttribute).array);
         const previousWater = ground?.water === null || ground === null ? null : (ground.water.material as MeshStandardMaterial).color.clone();
         rebuildGround(shown, live, era);
-        startAppearance(previous, previousWater, paletteFor(live.season, live.seasonWeek), live.season === 'winter' ? 0.72 : 0,
+        startAppearance(previous, previousWater, paletteFor(live.season, live.seasonWeek), snowCover(live.season, live.seasonWeek),
           change.cleared || frame.discontinuity);
         painted = colour;
         paintedGround = groundKey;

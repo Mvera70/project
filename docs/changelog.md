@@ -1,5 +1,12 @@
 # The Valley — Registro de cambios
 
+## v4.51 · 25 sep 2026 · Las estaciones llegan poco a poco
+
+La nieve ya no aparece entera el primer día de invierno: se espolvorea al
+final del otoño, cuaja en tres semanas y se funde antes de la primavera. El
+color del valle gira en cuatro semanas en vez de dos, y cada paso se funde en
+cuatro segundos.
+
 ## v4.50 · 25 sep 2026 · Viento, y un cielo para cada estación
 
 Las copas, los juncos y el cereal se mecen, más con tormenta. Y el cielo deja

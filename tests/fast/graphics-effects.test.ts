@@ -18,7 +18,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { run } from '@engine/sim';
 import { clockOf, SEASONS } from '@engine/time';
 import type { GameState } from '@engine/state';
-import { PALETTES, paletteFor } from '@derive/palette';
+import { PALETTES, paletteFor, TURN_WEEKS } from '@derive/palette';
 import { tellsFor } from '@derive/tells';
 import {
   BoxGeometry, Group, Matrix4, Mesh, MeshStandardMaterial, Vector3,
@@ -84,9 +84,9 @@ describe('G-08 · las estaciones', () => {
     for (let week = 0; week < 48; week += 1) {
       seen.add(groundSignature(state.map, week));
     }
-    // Cuatro estaciones y dos semanas de transición en cada una: seis firmas
-    // distintas a lo largo del año, ni una más.
-    expect(seen.size).toBe(SEASONS.length * 3);
+    // Cuatro estaciones y `TURN_WEEKS` semanas de transición en cada una: una
+    // firma por paso, ni una más.
+    expect(seen.size).toBe(SEASONS.length * (TURN_WEEKS + 1));
   });
 
   it('el invierno no se parece al verano en ninguna celda de prado', () => {
@@ -104,7 +104,7 @@ describe('G-08 · las estaciones', () => {
     expect(different).toBe(checked);
   });
 
-  it('la estación se deshiela hacia la siguiente durante sus dos últimas semanas', () => {
+  it('la estación se deshiela hacia la siguiente durante sus últimas semanas', () => {
     // §10.3. Un cambio de golpe se lee como un fallo de dibujo; el degradado se
     // lee como que ha pasado el tiempo.
     //
@@ -117,7 +117,7 @@ describe('G-08 · las estaciones', () => {
     const thawing = paletteFor('winter', TIME.WEEKS_PER_SEASON - 1);
     expect(settled.meadow, 'el invierno empieza siendo invierno').toBe(PALETTES.winter.meadow);
     expect(thawing.meadow, 'y acaba habiéndose vuelto primavera').not.toBe(settled.meadow);
-    expect(paletteFor('winter', TIME.WEEKS_PER_SEASON - 4).meadow,
+    expect(paletteFor('winter', TIME.WEEKS_PER_SEASON - 1 - TURN_WEEKS).meadow,
       'sin degradar la estación entera').toBe(settled.meadow);
   });
 

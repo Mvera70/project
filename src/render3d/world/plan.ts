@@ -1,4 +1,6 @@
 import { visibleBuildings } from '@derive/visible-buildings';
+import { TIME } from '@engine/balance';
+import { TURN_WEEKS } from '@derive/palette';
 import { defenceGates } from '@derive/defence-gates';
 // G-06 · What the scene should contain, as data. design.md D.5, D.6.
 //
@@ -484,7 +486,8 @@ export interface WorkChange {
  */
 /** Las tres paletas que puede mostrar una estación: base, media mezcla y siguiente. */
 export function seasonColourStep(seasonWeek: number): number {
-  return Math.max(0, seasonWeek - 9);
+  // La paleta gira en las `TURN_WEEKS` últimas semanas (`derive/palette.ts`).
+  return Math.max(0, seasonWeek - (TIME.WEEKS_PER_SEASON - 1 - TURN_WEEKS));
 }
 
 export function groundSignature(map: ValleyMap, tick: number): number {

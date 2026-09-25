@@ -71,11 +71,13 @@ function mix(from: string, to: string, amount: number): string {
 /**
  * How many weeks a season spends turning into the next one, at its end.
  *
- * TUNE: two of the twelve. Long enough that the change is a thaw and not a
- * cut — which is what the blend was written for — and short enough that ten of
- * every twelve weeks are the season's own colour.
+ * TUNE: four of the twelve. Two was a cut in three weekly jumps (Vera, 25 sep
+ * 2026: «entre cambio y cambio de estación el mapa pega un cambio brusco, no
+ * hay un cambio progresivo, por ejemplo a la nieve»). Four smaller steps, each
+ * faded over `APPEARANCE_SECONDS`, and eight weeks of every twelve are still
+ * the season's own colour.
  */
-const TURN_WEEKS = 2;
+export const TURN_WEEKS = 4;
 
 /**
  * A season wears its own colours from its first day, and turns into the next
@@ -104,6 +106,25 @@ export function paletteFor(season: Season, seasonWeek: number): Palette {
   const from = WEEKS_PER_SEASON - 1 - TURN_WEEKS;
   const amount = Math.max(0, Math.min(1, (seasonWeek - from) / TURN_WEEKS));
   return Object.fromEntries(KEYS.map((key) => [key, mix(current[key], next[key], amount)])) as unknown as Palette;
+}
+
+/**
+ * How much snow lies on the roofs, from 0 to the `SNOW_DEEP` of midwinter.
+ *
+ * It used to be all or nothing —0.72 on the first day of winter, 0 on the first
+ * day of spring— and that jump was what Vera saw. Now it follows the same
+ * turning as the palette: a dusting over autumn's last weeks, settling over
+ * winter's first three, and melting over winter's last weeks so spring week
+ * zero is bare, which is where the palette already is.
+ */
+export const SNOW_DEEP = 0.72;
+const SNOW_DUST = 0.22;
+export function snowCover(season: Season, seasonWeek: number): number {
+  const turning = Math.max(0, Math.min(1, (seasonWeek - (WEEKS_PER_SEASON - 1 - TURN_WEEKS)) / TURN_WEEKS));
+  if (season === 'autumn') return SNOW_DUST * turning;
+  if (season !== 'winter') return 0;
+  const settled = SNOW_DUST + (SNOW_DEEP - SNOW_DUST) * Math.min(1, seasonWeek / 3);
+  return settled * (1 - turning);
 }
 
 export function outline(colour: string): string {
