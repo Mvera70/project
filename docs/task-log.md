@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · El valle más vivo: nubes, niebla, pájaros y luciérnagas
+
+Sombras de nubes que cruzan el prado (`effects/clouds.ts`, en el sombreador
+del suelo, más con cielo cubierto); niebla sobre el río al alba, bandadas de
+día y luciérnagas en las noches de primavera y verano junto al agua
+(`effects/ambience.ts`). Todo decorado, sin azar y quieto en pausa. Gancho
+`window.__valleyHoldPhase(fase)` para fijar la hora y mirarlo. Capturas en
+`artifacts/graphics/alive/` (`cl2-sheet.png`, `amb2-sheet.png`). Nota:
+`hourAt` da horas enteras, así que niebla y luciérnagas cambian a saltos de
+una hora escénica (unos cinco segundos a ×1); se ve fluido, pero es mejorable.
+
 ## 25 sep 2026 · El cambio de estación, poco a poco
 
 Vera: «entre cambio y cambio de estación el mapa pega un cambio brusco, no hay

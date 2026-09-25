@@ -35,6 +35,7 @@ import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './wo
 import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
 import { cloudsFor, stepClouds } from './effects/clouds';
+import { createAmbience, type Ambience } from './effects/ambience';
 import { createFires } from './effects/fires';
 import { buildGreatOak, type GreatOak } from './world/great-oak';
 import { greatOakCell } from '@derive/landmark';
@@ -414,6 +415,9 @@ export async function createGraphicsRenderer(
   let backdrop: Backdrop | null = null;
   // UI-W · el roble del emblema a la orilla del lago (`world/great-oak.ts`).
   let greatOak: GreatOak | null = null;
+  // El valle más vivo · niebla, pájaros y luciérnagas (`effects/ambience.ts`).
+  let ambience: Ambience | null = null;
+  let ambienceSky: SkyKind = 'clear';
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   /** Cuanto se sube en pantalla a quien se sigue. Ver `track`. TUNE: 0,14. */
   const TRACK_LIFT = 0.14;
@@ -865,6 +869,12 @@ export async function createGraphicsRenderer(
     }
     greatOak = buildGreatOak(state.map, palette);
     world.add(greatOak.group);
+    if (ambience !== null) {
+      world.remove(ambience.group);
+      ambience.dispose();
+    }
+    ambience = createAmbience(state.map);
+    world.add(ambience.group);
 
     // El bosque y los pedregales se replantan con el suelo, que es cuando
     // alguien tala o el terreno cambia.
@@ -1162,10 +1172,15 @@ export async function createGraphicsRenderer(
     return { image: options.canvas.toDataURL('image/png'), life: window.__valleyLife?.() ?? null };
   };
   let observingLive = false;
+  let heldPhase: number | null = null;
   window.__valleyObserveLive = () => { observingLive = true; };
   // Gancho de observación del rayo: cae uno en el centro de la vista. Los de
   // una tormenta caen donde quieren y duran medio segundo, así que esperarlos
   // para juzgar cómo se ven es imposible. En pausa se queda puesto (§11.4).
+  // Gancho de observación: fija la hora del paisaje (0 a 1) para poder mirar
+  // lo que sólo pasa a una hora —la niebla del alba, las luciérnagas—; `null`
+  // la suelta. No toca el motor ni el reloj del juego.
+  window.__valleyHoldPhase = (value: number | null) => { heldPhase = value; };
   window.__valleyStrike = (index = 0) => {
     const centre = view.view.centre;
     weather.strike(centre.x, centre.z, index, camera);
@@ -1213,7 +1228,7 @@ export async function createGraphicsRenderer(
       // que dice que jornada se esta pintando y, con ella, que estado.
       // P-1a · la fase fija sólo cambia la escena de este banco local; el
       // reloj del motor y la jornada que identifica el clima siguen su curso.
-      const phase = options.previewPhase ?? dayPhase(frame.presentationSeconds);
+      const phase = heldPhase ?? options.previewPhase ?? dayPhase(frame.presentationSeconds);
       paintedPhase = phase;
       const today = dayNumber(frame.presentationSeconds);
       // Un fotograma discontinuo —partida nueva, carga, letargo— trae un estado
@@ -1625,6 +1640,7 @@ export async function createGraphicsRenderer(
       if (sky.kind !== paintedSky) {
         weather.set(sky.kind, sky.intensity);
         windFor(sky.kind);
+        ambienceSky = sky.kind;
         cloudsFor(sky.kind);
         paintedSky = sky.kind;
       }
@@ -1658,6 +1674,7 @@ export async function createGraphicsRenderer(
       // El viento sopla en tiempo de presentación: en pausa, quieto (§11.4).
       stepWind(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       stepClouds(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
+      ambience?.step(phase, clockOf(shown.tick).season, ambienceSky, frame.speed === 0 ? 0 : frame.realDeltaSeconds, camera);
       // Y la luz que hace a esa hora, con el cielo que haga encima.
       light(phase, frame.speed, overcastOf(sky));
       // El destello sigue al parpadeo del rayo (`weather.flash`, 0 a 1): el
@@ -1978,6 +1995,11 @@ export async function createGraphicsRenderer(
         greatOak.dispose();
         greatOak = null;
       }
+      if (ambience !== null) {
+        world.remove(ambience.group);
+        ambience.dispose();
+        ambience = null;
+      }
       if (backdrop !== null) {
         world.remove(backdrop.group);
         backdrop.dispose();
@@ -2025,6 +2047,7 @@ declare global {
     __valleyCapture?: (follow?: number, zoom?: number, gateStudy?: boolean, point?: { x: number; z: number }) => { image: string; life: LifeSnapshot | null };
     __valleyObserveLive?: () => void;
     __valleyStrike?: (index?: number) => { x: number; z: number };
+    __valleyHoldPhase?: (value: number | null) => void;
   }
 }
 

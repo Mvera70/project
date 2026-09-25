@@ -58,3 +58,25 @@ describe('las nubes', () => {
     expect(cloudCover()).toBeGreaterThan(clear * 2);
   });
 });
+
+// Niebla del alba, pájaros de día, luciérnagas de las noches de verano.
+import { birdsAt, fliesAt, mistAt } from '../../src/render3d/effects/ambience';
+
+describe('el ambiente sigue a la hora y a la estación', () => {
+  it('la niebla es de la madrugada y se va con la mañana', () => {
+    expect(mistAt(6.5)).toBeGreaterThan(0.5);
+    expect(mistAt(12)).toBe(0);
+    expect(mistAt(22)).toBe(0);
+  });
+  it('los pájaros vuelan de día y no con tormenta', () => {
+    expect(birdsAt(11, 'clear')).toBe(1);
+    expect(birdsAt(11, 'storm')).toBe(0);
+    expect(birdsAt(2, 'clear')).toBe(0);
+  });
+  it('las luciérnagas, noches de primavera y verano sin lluvia', () => {
+    expect(fliesAt(23, 'summer', 'clear')).toBe(1);
+    expect(fliesAt(23, 'winter', 'clear')).toBe(0);
+    expect(fliesAt(23, 'summer', 'rain')).toBe(0);
+    expect(fliesAt(12, 'summer', 'clear')).toBe(0);
+  });
+});
