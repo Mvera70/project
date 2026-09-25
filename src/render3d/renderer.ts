@@ -39,6 +39,8 @@ import { createAmbience, type Ambience } from './effects/ambience';
 import { createFires } from './effects/fires';
 import { createHearth } from './effects/hearth';
 import { createFestoon } from './effects/festoon';
+import { createYards } from './effects/yards';
+import { yardsOf, type Yard } from '../derive/yards';
 import { festivityOf } from '@derive/festivity';
 import { buildGreatOak, type GreatOak } from './world/great-oak';
 import { greatOakCell } from '@derive/landmark';
@@ -395,10 +397,15 @@ export async function createGraphicsRenderer(
   const hearth = createHearth();
   // Y los banderines y farolillos cuando hay fiesta (`derive/festivity.ts`).
   const festoon = createFestoon();
+  // El valle más vivo · la ropa tendida y el huerto de cada casa.
+  const yards = createYards();
+  let yardsFor: GameState | null = null;
+  let yardsDoors = '';
+  let yardsShown: Yard[] = [];
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, tells.group, fires.group, hearth.group, festoon.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1034,6 +1041,9 @@ export async function createGraphicsRenderer(
         x: round(raider.body.x), z: round(raider.body.z),
         screen: screen(raider.body.x, raider.body.z),
       })),
+      // El valle más vivo · los tendederos y huertos, y cuánta ropa hay tendida.
+      yards: { hung: yards.hung, at: yardsShown.map(yard => ({ house: yard.house, kind: yard.kind,
+        x: round(yard.x), z: round(yard.z) })) },
       // El valle más vivo · los animales salvajes que se ven ahora (ciervos,
       // conejos de la linde, oso, lobo), para medir la linde desde una toma.
       wild: life.wildlife.map(animal => ({
@@ -1546,6 +1556,16 @@ export async function createGraphicsRenderer(
       const entrances = new Map(life.dwellers.filter(person => person.residence !== undefined)
         .map(person => [person.residence!.building, person.residence!.facing]));
       village.entrances(entrances);
+      // Los tendederos y huertos se rehacen sólo si cambió el valle o alguna
+      // fachada: son un par de decenas de piezas y no cambian cada fotograma.
+      const doorsKey = [...entrances].map(([id, facing]) => `${id}:${facing}`).join(',');
+      if (yardsFor !== shown || yardsDoors !== doorsKey) {
+        yardsFor = shown;
+        yardsDoors = doorsKey;
+        yardsShown = yardsOf(shown, entrances,
+          new Set(steadingOf(shown, shown.terrainSeed).map(prop => prop.cell)));
+        yards.show(yardsShown, groundFloor);
+      }
       // La hoja es una animación legible para el jugador: usa tiempo real y se
       // congela en pausa. La jornada y los cuerpos siguen usando tiempo
       // escénico, como antes.
@@ -1707,6 +1727,7 @@ export async function createGraphicsRenderer(
       stepWind(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       stepClouds(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       ambience?.step(phase, clockOf(shown.tick).season, ambienceSky, frame.speed === 0 ? 0 : frame.realDeltaSeconds, camera);
+      yards.step(phase, clockOf(shown.tick).season, ambienceSky, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       // Y la luz que hace a esa hora, con el cielo que haga encima.
       light(phase, frame.speed, overcastOf(sky));
       // El destello sigue al parpadeo del rayo (`weather.flash`, 0 a 1): el
@@ -2009,6 +2030,7 @@ export async function createGraphicsRenderer(
       fires.dispose();
       hearth.dispose();
       festoon.dispose();
+      yards.dispose();
       fauna.dispose();
       bubbles.dispose();
       props.dispose();
