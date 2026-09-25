@@ -48,3 +48,35 @@ describe('la plaza se llena a sus horas', () => {
     expect(hearthAt(0.555)).toBeLessThan(1);
   });
 });
+
+// Con lluvia la gente se resguarda: no hay ocio al aire libre.
+import { skyAt } from '../../src/derive/weather';
+
+describe('con lluvia, a cubierto', () => {
+  it('un día de tormenta nadie está de charla, de juego o de comida en la calle', () => {
+    const OPEN = new Set(['gossip', 'meal', 'hearth', 'loiter', 'play', 'chase', 'pet', 'feed']);
+    let wetDays = 0;
+    for (const seed of [7, 11, 23, 42]) {
+      const state = foundTwenty(seed);
+      run(state, 48 * 20 + 20, 'prudent', CATALOG);
+      let day = -1;
+      for (let d = state.tick * 7 - 70; d < state.tick * 7 + 7 && day < 0; d += 1) {
+        const kind = skyAt(state, d).kind;
+        if (kind === 'rain' || kind === 'storm') day = d;
+      }
+      if (day < 0) continue;
+      wetDays += 1;
+      const life = createVillage(state, day);
+      for (let n = 0; n < STEPS_PER_DAY; n += 1) {
+        const phase = n / STEPS_PER_DAY;
+        life.step(phase);
+        if (phase < 0.2 || phase > 0.7) continue;
+        for (const d of life.dwellers) {
+          const outside = OPEN.has(d.doing?.offer.id ?? '') || d.doing?.place.id.startsWith('leisure:') === true;
+          expect(outside, `semilla ${seed}, día ${day}`).toBe(false);
+        }
+      }
+    }
+    expect(wetDays, 'hay días de lluvia que medir').toBeGreaterThan(1);
+  });
+});

@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · El valle más vivo: a cubierto cuando llueve
+
+Con lluvia o tormenta (el cielo de la jornada, `skyAt`, el mismo que pinta la
+lluvia) la gente deja el ocio al aire libre: ni charla ni comida en la plaza,
+ni vado, ni juegos. Queda el porche de casa, la capilla, mirar al herrero y el
+trabajo (`village.ts`). Medido: al aire libre sin trabajar, 39–47 % un día seco
+y 0 % uno de tormenta (semillas 7 y 23). **Mejorable:** un 11 % se queda en
+pausa donde está; mejor sería esperar bajo un alero. Y la prueba del pasto
+contaba como «dentro del campo» a una gallina rozando la linde (centro a 0,12
+con radio 0,14): ahora cuenta lo que es pisar el sembrado.
+
 ## 25 sep 2026 · El valle más vivo: comer juntos y la hoguera de la plaza
 
 Medido antes: la vida social ya existía (109–124 escenas de dos por jornada,

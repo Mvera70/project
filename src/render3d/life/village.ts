@@ -8,6 +8,7 @@
 // pantalla sale de aquí, y nada de aquí sale del reloj de la pared ni escribe
 // una coma en `GameState`.
 
+import { skyAt } from '../../derive/weather';
 import { homeRoutine, indoors, isNight, stepHome, type HomeRoutine } from './home';
 import { statureAt } from '../world/models';
 import { scatterTransform } from '../world/forest';
@@ -615,6 +616,18 @@ const POST_REACH = 1.2;
 export function createVillage(state: GameState, day: number, options: DayOptions = {}): Village {
   const land = options.land ?? terrainOf(state);
   const seed = seedOfDay(state.seed, day);
+  // El valle más vivo (25 sep 2026) · **con lluvia la gente se resguarda.** El
+  // cielo de la jornada es puro por día (`skyAt`), el mismo que pinta la
+  // lluvia, así que aquí se sabe sin que nadie lo pase. Lloviendo no se ofrece
+  // lo que es al aire libre —la charla y la comida de la plaza, el vado, el
+  // claro, los juegos, el ocio— y queda lo que tiene techo o puerta: el porche
+  // de casa, la capilla, mirar al herrero, y el trabajo, que no espera.
+  const wet = ((kind) => kind === 'rain' || kind === 'storm')(skyAt(state, day).kind);
+  const OPEN_AIR = new Set(['gossip', 'meal', 'hearth', 'loiter', 'play', 'chase', 'pet', 'feed']);
+  const sheltered = (list: readonly Place[]): Place[] => list
+    .map((place) => place.id.startsWith('gather:') ? place
+      : { ...place, offers: place.offers.filter((offer) => !OPEN_AIR.has(offer.id)) })
+    .filter((place) => place.offers.length > 0 && !place.id.startsWith('leisure:'));
   // IA-6 · La riña de la plaza (§7.10, `docs/historico/rework.md` §4 R-2 punto 1): si el
   // motor tiró `quarrel_in_the_square` esta semana, éstos son los dos `id` de
   // verdad — nunca una pareja que esta capa se invente. `null` si esta semana
@@ -1753,11 +1766,12 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           const playedOut = now < dweller.playedUntil;
           // V-11: con la aldea convocada no se ofrecen trastos, por lo mismo
           // que no se ofrece la cabaña — ver `mine` arriba.
-          const options = summoned
+          const dry = summoned
             ? mine
             : !playedOut || propOptions.length === 0
               ? [...mine, ...propOptions]
               : [...mine, ...propOptions.filter((place) => place.offers[0]?.id !== 'play')];
+          const options = wet && !summoned ? sheltered(dry) : dry;
           // Los protagonistas de un hecho del motor se reúnen en plazas
           // contiguas; el azar del corro no debe impedir escenificarlo.
           const enactment = !quarrelStaged && quarrelPair?.includes(dweller.villager)
@@ -1786,7 +1800,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
               // pie para siempre.
               restart: tooLong || overdue,
             },
-            summoned ? eventOptions : [...eventOptions, ...(dweller.leisure ?? [])], taken, land, router, seed, steps,
+            summoned || wet ? eventOptions : [...eventOptions, ...(dweller.leisure ?? [])], taken, land, router, seed, steps,
           ) ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits, body.pace);
           // **La plaza se reserva al decidir, no al llegar**, y ése era el imán
           // que se veía en pantalla: el aforo se contaba una vez al empezar el

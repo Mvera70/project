@@ -19,9 +19,16 @@ describe('IA-pasture · el ganado no entra en los campos', () => {
       life.step();
       if (life.steps % 30 !== 0) continue;
       for (const beast of life.beasts) {
-        const { x, z } = beast.dweller.body;
+        // **Dentro de verdad**: el centro metido más de su propio radio en la
+        // parcela. Un cuerpo que roza la linde tiene el centro unas décimas
+        // dentro sin pisar el sembrado —`integrate` deja moverse mientras la
+        // penetración no crezca—, y eso no es lo que Vera pidió que no pasara.
+        // Medido el 25 sep 2026: una gallina a 0,12 de la linde con radio
+        // 0,14, en un día de lluvia de la semilla 23 que movió a la gente.
+        const { x, z, radius } = beast.dweller.body;
         samples += 1;
-        if (fields.some(f => x >= f.x && x < f.x + f.w && z >= f.y && z < f.y + f.h)) inside += 1;
+        if (fields.some(f => x >= f.x + radius && x < f.x + f.w - radius
+          && z >= f.y + radius && z < f.y + f.h - radius)) inside += 1;
       }
     }
     expect(samples).toBeGreaterThan(0);
