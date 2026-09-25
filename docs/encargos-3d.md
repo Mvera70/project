@@ -121,3 +121,28 @@ tanda 4 (flechas incendiarias y defensa).
 contra ella, pero **no va y viene del agua**: el cubo está siempre lleno. Una
 cadena de cubos desde el pozo o el río sería más fiel. Tampoco se ve la
 brigada en una captura todavía: está probada en `fire-brigade.test.ts`.
+
+## El valle más vivo (25 sep 2026)
+
+Lo que la tanda dejó a medias por falta de malla o de tiempo:
+
+- **Un perro** que siga a los niños y ladre al forastero. Pedido por Vera
+  («niños jugando y un perro»). No hay `dog.glb`: el juego de los niños
+  (`play`, `chase`) ya existe, el perro no.
+- **Zorro de noche y patos en el río.** Pedidos con los animales de paso; no hay
+  `fox.glb` ni `duck.glb`. Hoy los animales de paso son los conejos de la linde
+  (`life/rabbits.ts`, con el `rabbit.glb` de la caza) y los ciervos que ya
+  había.
+- **El buhonero y los tratantes** (`life/visitors.ts`) llevan el fardo genérico
+  (`load: 'bundle'`) y usan el modelo del forastero. Falta su carretilla o su
+  mula, y un puesto en la plaza mientras se quedan: hoy se plantan y charlan.
+  Las visitas de M-0 dejan una oferta al jugador; que se vea **quién** la trae
+  está hecho, que se vea **qué** trae no.
+- **Los postes del tendedero no son sólidos** para la capa de vida
+  (`effects/yards.ts`): son finos y quedan fuera de la fachada, pero alguien
+  puede cruzarlos. Pasa lo mismo con el bancal del huerto.
+- **A cubierto bajo un alero.** Con lluvia, un 11 % de la aldea se queda en
+  pausa donde está; esperar bajo el alero de la casa más cercana se leería
+  mejor.
+- **Los charcos no salpican ni reflejan de verdad**: son discos grises lisos
+  (`effects/puddles.ts`). Un mapa de entorno los haría espejos.

@@ -1,5 +1,40 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · El valle más vivo: visitantes, conejos, tendederos, huertos, charcos y fiesta
+
+Cierra la tanda de `/goal` «que el valle se sienta más vivo».
+
+- **La plaza engalanada** (`derive/festivity.ts`, `effects/festoon.ts`): la
+  semana de una boda, la fiesta de la cosecha o la del barril, cuatro postes
+  con banderines que se mecen y farolillos que se encienden al caer la tarde.
+  Gancho `window.__valleyFestoon(true)`.
+- **Los del camino** (`life/visitors.ts`): la semana que el motor saca al
+  buhonero, al forastero o una visita de M-0, uno o dos llegan andando desde
+  lejos de la plaza (de 12 a 26 celdas), se quedan hasta las tres y se van por
+  donde vinieron; los que venden, tres días; el forastero, uno. Lo que costó,
+  medido en el navegador y no en la prueba (que no tiene troncos): la entrada
+  exterior de `approachOf` caía al otro lado del río en la semilla 11 (ahora
+  la entrada es del suelo de la aldea); el buhonero se atascaba contra un
+  tronco por dar un punto de ruta por pasado a media celda (ahora sigue la
+  ruta como un vecino). Gancho `window.__valleyVisit('pedlar')`; en la traza,
+  `visitors`.
+- **Conejos en la linde** (`life/rabbits.ts`): tres, en el prado que toca el
+  bosque, lejos de las casas, del alba a media mañana y de media tarde al
+  anochecer; huyen a cuatro celdas de alguien. En la traza, `wild`.
+- **Tendederos y huertos** (`derive/yards.ts`, `effects/yards.ts`): en un lado
+  libre de la casa que no sea la fachada, con dos celdas de fondo sin otra
+  casa. Medido: de 3 a 6 piezas por aldea de 9 a 12 casas al año 20 (semillas
+  7, 11, 23 y 41); lo que limita es el sitio, no el reparto. En la traza,
+  `yards`.
+- **Charcos** (`effects/puddles.ts`): en el camino gastado, lo pisado y la
+  plaza, mientras llueve y hasta media mañana del día siguiente. La primera
+  versión, metálica, salía negra como tinta. Gancho
+  `window.__valleyHoldSky('rain')`.
+
+Capturas en `artifacts/graphics/alive/` (`visit-*`, `rabbit-*`, `yard-*`,
+`puddle-*`). Lo que queda —perro, zorro, patos, la carretilla del buhonero,
+el alero con lluvia— está en `docs/encargos-3d.md`, «El valle más vivo».
+
 ## 25 sep 2026 · El valle más vivo: a cubierto cuando llueve
 
 Con lluvia o tormenta (el cielo de la jornada, `skyAt`, el mismo que pinta la

@@ -1,5 +1,18 @@
 # The Valley — Registro de cambios
 
+## v4.53 · 25 sep 2026 · Visitantes, conejos, tendederos, huertos, charcos y fiesta
+
+El valle más vivo, última tanda. **La plaza se engalana** con banderines y
+farolillos la semana de una boda o una fiesta (`derive/festivity.ts`). **El
+buhonero, el forastero y las visitas de M-0 llegan andando** por el camino a
+la plaza, se quedan hasta media tarde y se van (`life/visitors.ts`): hasta hoy
+sólo existían en la crónica. **Conejos** salen a la linde del bosque al alba y
+al atardecer y huyen de quien se acerca (`life/rabbits.ts`). **Ropa tendida y
+huertos** junto a las casas que tienen un lado libre —la ropa se recoge con
+lluvia y de noche; el huerto sigue la estación— (`derive/yards.ts`). Y
+**charcos** en los caminos y la plaza cuando llueve, que se secan a la mañana
+siguiente (`effects/puddles.ts`). Nada de esto toca el motor.
+
 ## v4.52 · 25 sep 2026 · Nubes, niebla, pájaros, luciérnagas, la comida y la hoguera
 
 El valle más vivo, en pedazos que se ven: sombras de nubes que cruzan el

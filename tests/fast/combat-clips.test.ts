@@ -45,7 +45,7 @@ function raider(): Raider {
 describe('E1 · el hecho decide la pose', () => {
   it('el reparto marca al raider como clan vecino, no como forastero civil', () => {
     const enemy = raider();
-    const life = { land: { width: 32, height: 32 }, dwellers: [], raiders: [enemy], steps: 1 } as unknown as Village;
+    const life = { land: { width: 32, height: 32 }, dwellers: [], raiders: [enemy], visitors: [], steps: 1 } as unknown as Village;
 
     expect(castOf(life, 0, new Map(), new Set())[0]).toMatchObject({
       role: 'stranger', visualIdentity: 'neighbor',
@@ -56,7 +56,7 @@ describe('E1 · el hecho decide la pose', () => {
     const enemy = raider();
     enemy.thrustAt = 30; enemy.hitAt = 30; enemy.blowAt = 30;
     enemy.meleeFacing = Math.PI / 2;
-    const life = { land: { width: 32, height: 32 }, dwellers: [], raiders: [enemy], steps: 31 } as unknown as Village;
+    const life = { land: { width: 32, height: 32 }, dwellers: [], raiders: [enemy], visitors: [], steps: 31 } as unknown as Village;
     expect(castOf(life, 999, new Map(), new Set())[0]).toMatchObject({ clip: 'spear_thrust', clipSeconds: 0 });
     expect(castOf({ ...life, steps: 34 }, 999, new Map(), new Set())[0]).toMatchObject({ clip: 'hit_take', facing: Math.PI / 2 });
     enemy.phase = 'down'; enemy.downAt = 33;
@@ -82,7 +82,7 @@ describe('E1 · el hecho decide la pose', () => {
     stepRaider(enemy, land, 7, 30, gate);
     expect(gate.hits).toBe(1); expect(enemy.blowAt).toBe(gate.hitAt);
     expect(enemy.blowAt).toBe(30);
-    const life = { land, dwellers: [], raiders: [enemy], steps: 31 } as unknown as Village;
+    const life = { land, dwellers: [], raiders: [enemy], visitors: [], steps: 31 } as unknown as Village;
     expect(castOf(life, 999, new Map(), new Set())[0]).toMatchObject({ clip: 'gate_strike', clipSeconds: 0 });
     stepRaider(enemy, land, 7, 31, gate);
     expect(enemy.blowAt).toBe(30); expect(gate.hits).toBe(1);
@@ -223,7 +223,7 @@ describe('E1 · el hecho decide la pose', () => {
     const defender = { at: { x: 12, z: 10.5 }, post: { post: { arm: 'spear' } } as Manned, hits: 2, down: false, downAt: -1 };
     stepMelee([enemy], [defender], 30);
     expect(defender.downAt).toBe(30); expect(enemy.downAt).toBe(30);
-    const life = { land: { width: 32, height: 32 }, dwellers: [], raiders: [enemy], steps: 31 } as unknown as Village;
+    const life = { land: { width: 32, height: 32 }, dwellers: [], raiders: [enemy], visitors: [], steps: 31 } as unknown as Village;
     expect(castOf(life, 999, new Map(), new Set())[0]).toMatchObject({ clip: 'fall', clipSeconds: 0 });
     const later = { ...life, steps: 400 };
     expect(castOf(later, 999, new Map(), new Set())[0]).toMatchObject({ clip: 'fall', clipSeconds: 1.2 });

@@ -3,7 +3,7 @@ import { TIME, WORLD } from '@engine/balance';
 import type { Season, ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
 import { cellFor } from '@render/canvas';
-import { luminance, outline, PALETTES, paletteFor } from '@derive/palette';
+import { luminance, outline, PALETTES, paletteFor, TURN_WEEKS } from '@derive/palette';
 import { regionContours } from '@render/layers/terrain';
 import { BUILDING_SPRITES, NAMED_TONES } from '@render/sprites';
 import { crowdPositions } from '@render/crowd';
@@ -56,9 +56,10 @@ describe('M-16 · paletas', () => {
       // Y hay deshielo de verdad: la penúltima no es ni una cosa ni la otra.
       expect(paletteFor(season, last - 1)).not.toEqual(PALETTES[season]);
       expect(paletteFor(season, last - 1)).not.toEqual(PALETTES[following]);
-      // Que no se convierta en un degradado de toda la estación: diez de las
-      // doce semanas son la estación misma.
-      expect(paletteFor(season, last - 3)).toEqual(PALETTES[season]);
+      // Que no se convierta en un degradado de toda la estación: hasta que
+      // faltan `TURN_WEEKS` semanas (cuatro desde v4.51, antes dos), la paleta
+      // es la estación misma.
+      expect(paletteFor(season, last - TURN_WEEKS)).toEqual(PALETTES[season]);
     });
   });
 
