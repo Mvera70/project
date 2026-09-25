@@ -1034,6 +1034,12 @@ export async function createGraphicsRenderer(
         x: round(raider.body.x), z: round(raider.body.z),
         screen: screen(raider.body.x, raider.body.z),
       })),
+      // El valle más vivo · los animales salvajes que se ven ahora (ciervos,
+      // conejos de la linde, oso, lobo), para medir la linde desde una toma.
+      wild: life.wildlife.map(animal => ({
+        id: animal.id, kind: animal.kind, action: animal.action ?? null,
+        x: round(animal.x), z: round(animal.y), screen: screen(animal.x, animal.y),
+      })),
       // El valle más vivo · los que vienen por el camino, y en qué andan.
       visitors: life.visitors.map(visitor => ({
         id: visitor.body.id, kind: visitor.kind, phase: visitor.phase,

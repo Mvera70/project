@@ -60,6 +60,7 @@ import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './s
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
 import { createDeer, deerPositions, stepDeer } from './deer';
+import { createRabbits, rabbitPositions, stepRabbits } from './rabbits';
 import { bearPosition, createBear, stepBear } from './bear';
 import { beginFlight, stepFlight, type Flight } from './flee';
 import { createSackScene, sackSnapshot, type SackScene, type SackSnapshot } from './sack';
@@ -723,6 +724,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const { heart: pastureHeart, shore: pastureShore } = pastureOrigin(pasture, heart, shore);
   const beasts = createBeasts(state, pasture, pastureHeart, seed, pastureShore, preparing);
   const deer = createDeer(state, land, seed, heart);
+  // El valle más vivo · conejos en la linde, al alba y al atardecer.
+  const rabbits = createRabbits(state, land, seed, heart);
   const bear = createBear(state, land, heart);
   // IA-5 · El lobo del corral (§7.10, `wolves_at_the_coop`): si el motor lo
   // soltó esta semana (`wolfRaidToday`, `staging.ts`), hay visita esta
@@ -1368,7 +1371,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     },
 
     get wildlife(): readonly Animal[] {
-      return [...deerPositions(deer), ...bearPosition(bear), ...(wolf !== null && wolf.phase !== 'gone'
+      return [...deerPositions(deer), ...rabbitPositions(rabbits, steps), ...bearPosition(bear), ...(wolf !== null && wolf.phase !== 'gone'
         ? [{ id: wolf.body.id, kind: 'wolf' as const, x: wolf.body.x, y: wolf.body.z }]
         : [])];
     },
@@ -2542,6 +2545,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       stepDeer(deer, land, seed, steps, dwellers,
         wolf !== null && wolf.phase !== 'gone' ? wolf.body : null,
         bear !== null && bear.phase !== 'gone' ? bear.body : null);
+      stepRabbits(rabbits, land, seed, steps, phase, dwellers.filter((dweller) => !indoors(dweller)));
 
       // 8 · La cabaña vive su propio paso. V-08.
       //
