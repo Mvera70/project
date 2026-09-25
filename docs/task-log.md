@@ -1,5 +1,14 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · Modelos candidatos para revisión
+
+Vera marcó once modelos para rehacer: lobo, oso, perdiz, jabalí, perro, mula,
+azada, cubo, flecha, escudo y pico. Las propuestas y capturas están en
+[`deliverables/marked-models-trial/`](../deliverables/marked-models-trial/README.md).
+El oso vigente es `bear-v2.glb`, tras corregir la chepa. Zorro y piedra del
+vado quedaron fuera. No están integrados: los animales no conservan los clips
+anteriores `idle`/`walk` ni el esqueleto original.
+
 ## 25 sep 2026 · Puestos, la vaca del tratante, el perro que ladra y el frío bajo el alero
 
 Hecho mientras Vera rehace los modelos: **no se tocó ningún GLB ni receta**.
