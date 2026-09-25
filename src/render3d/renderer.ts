@@ -36,6 +36,7 @@ import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
 import { cloudsFor, stepClouds } from './effects/clouds';
 import { createAmbience, type Ambience } from './effects/ambience';
+import { createPuddles, wetnessAt, type Puddles } from './effects/puddles';
 import { createFires } from './effects/fires';
 import { createHearth } from './effects/hearth';
 import { createFestoon } from './effects/festoon';
@@ -432,6 +433,8 @@ export async function createGraphicsRenderer(
   // El valle más vivo · niebla, pájaros y luciérnagas (`effects/ambience.ts`).
   let ambience: Ambience | null = null;
   let ambienceSky: SkyKind = 'clear';
+  // Y los charcos de los caminos después de llover (`effects/puddles.ts`).
+  let puddles: Puddles | null = null;
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   /** Cuanto se sube en pantalla a quien se sigue. Ver `track`. TUNE: 0,14. */
   const TRACK_LIFT = 0.14;
@@ -889,6 +892,12 @@ export async function createGraphicsRenderer(
     }
     ambience = createAmbience(state.map);
     world.add(ambience.group);
+    if (puddles !== null) {
+      world.remove(puddles.group);
+      puddles.dispose();
+    }
+    puddles = createPuddles(state.map, state.plaza);
+    world.add(puddles.group);
 
     // El bosque y los pedregales se replantan con el suelo, que es cuando
     // alguien tala o el terreno cambia.
@@ -1042,6 +1051,7 @@ export async function createGraphicsRenderer(
         screen: screen(raider.body.x, raider.body.z),
       })),
       // El valle más vivo · los tendederos y huertos, y cuánta ropa hay tendida.
+      puddles: puddles?.shown ?? 0,
       yards: { hung: yards.hung, at: yardsShown.map(yard => ({ house: yard.house, kind: yard.kind,
         x: round(yard.x), z: round(yard.z) })) },
       // El valle más vivo · los animales salvajes que se ven ahora (ciervos,
@@ -1204,6 +1214,7 @@ export async function createGraphicsRenderer(
   let heldPhase: number | null = null;
   let forceFestoon = false;
   let forcedVisits: HappeningId[] | null = null;
+  let heldSky: SkyKind | null = null;
   window.__valleyObserveLive = () => { observingLive = true; };
   // Gancho de observación del rayo: cae uno en el centro de la vista. Los de
   // una tormenta caen donde quieren y duran medio segundo, así que esperarlos
@@ -1212,6 +1223,9 @@ export async function createGraphicsRenderer(
   // lo que sólo pasa a una hora —la niebla del alba, las luciérnagas—; `null`
   // la suelta. No toca el motor ni el reloj del juego.
   window.__valleyHoldPhase = (value: number | null) => { heldPhase = value; };
+  // Gancho de observación: fija el cielo (lluvia, nieve…) para mirar lo que
+  // sólo pasa con él —los charcos, la ropa recogida—; `null` lo suelta.
+  window.__valleyHoldSky = (kind: SkyKind | null) => { heldSky = kind; };
   // Gancho de observación: cuelga la decoración de fiesta sin esperar a una
   // boda. No toca el motor.
   window.__valleyFestoon = (on: boolean) => { forceFestoon = on; };
@@ -1684,7 +1698,7 @@ export async function createGraphicsRenderer(
       // del año dice cuánto llueve en este valle y un `hash32` de la jornada
       // dice qué toca hoy, sin tocar el motor ni consumir una tirada.
       const naturalSky = skyAt(shown, today);
-      const sky = options.previewSky === 'clear'
+      const sky = heldSky !== null ? { kind: heldSky, intensity: 1 } : options.previewSky === 'clear'
         ? { kind: 'clear' as const, intensity: 0 }
         : options.previewSky === 'rain'
           ? { kind: 'rain' as const, intensity: naturalSky.kind === 'rain' ? naturalSky.intensity : 1 }
@@ -1728,6 +1742,7 @@ export async function createGraphicsRenderer(
       stepClouds(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       ambience?.step(phase, clockOf(shown.tick).season, ambienceSky, frame.speed === 0 ? 0 : frame.realDeltaSeconds, camera);
       yards.step(phase, clockOf(shown.tick).season, ambienceSky, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
+      puddles?.step(wetnessAt(ambienceSky, skyAt(shown, today - 1).kind, phase), groundFloor);
       // Y la luz que hace a esa hora, con el cielo que haga encima.
       light(phase, frame.speed, overcastOf(sky));
       // El destello sigue al parpadeo del rayo (`weather.flash`, 0 a 1): el
@@ -2056,6 +2071,11 @@ export async function createGraphicsRenderer(
         ambience.dispose();
         ambience = null;
       }
+      if (puddles !== null) {
+        world.remove(puddles.group);
+        puddles.dispose();
+        puddles = null;
+      }
       if (backdrop !== null) {
         world.remove(backdrop.group);
         backdrop.dispose();
@@ -2105,6 +2125,7 @@ declare global {
     __valleyStrike?: (index?: number) => { x: number; z: number };
     __valleyHoldPhase?: (value: number | null) => void;
     __valleyFestoon?: (on: boolean) => void;
+    __valleyHoldSky?: (kind: SkyKind | null) => void;
     __valleyVisit?: (kind?: HappeningId) => void;
   }
 }
