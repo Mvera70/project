@@ -140,6 +140,14 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   // pasar la prueba sin tocarla.
   /** Jugar con la pelota: se coge, se apunta, se tira. */
   play: { id: 'play', reach: 0.75, seats: 1, gives: { boredom: 0.4, company: 0.2 }, seconds: [1, 2.2] },
+  /**
+   * El valle más vivo · **Mirar el género** del que ha venido por el camino:
+   * delante del tenderete, de la mesa del factor o de los sacos del salinero
+   * (`visitors.ts`, `stallOf`). TUNE: tres plazas —un corro, no una cola— y lo
+   * que da es novedad y compañía, lo mismo que una charla en la plaza pero un
+   * poco más, porque un buhonero no viene todos los días.
+   */
+  browse: { id: 'browse', reach: 0.7, seats: 3, gives: { boredom: 0.55, company: 0.25 }, seconds: [5, 12] },
   /** Cargar con el palo, el cubo o el haz de leña un rato, y soltarlo. */
   carry: { id: 'carry', reach: 0.75, seats: 1, gives: { duty: 0.2, boredom: 0.15 }, seconds: [5, 12] },
   /** Descargar la madera en la leñera. Sólo la rutina del talador la asigna. */

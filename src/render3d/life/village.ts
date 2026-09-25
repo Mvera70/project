@@ -21,8 +21,8 @@ import { opinionOf } from '@engine/people/opinions';
 import { ageOf } from '@engine/people/villagers';
 import { hash32 } from '@engine/rng';
 import {
-  blockedAt, fitsCircle, gap, integrate, turnTo, TURN_MIN_SPEED,
-  type Body, type Point, type Terrain,
+  blockedAt, fitsCircle, gap, integrate, liftSolid, placeSolid, turnTo, TURN_MIN_SPEED,
+  type Body, type Point, type Solid, type Terrain,
 } from './body';
 import { meetingPlace, ordersOf, quarrelToday, wolfRaidToday } from './staging';
 import { createNeighbourhood, type Neighbourhood } from './grid';
@@ -31,7 +31,7 @@ import { clearBetween, createRouter, pathTo, routeAroundBodies, type Router } fr
 import { dayPlans, leisurePlaces, type DayPlan } from './day';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
-import { doorOf, OFFERS, placesOf, seatAt, seatKey, strikeTurn, type Offer, type Place } from './offers';
+import { doorOf, OFFERS, placedOffer, placesOf, seatAt, seatKey, strikeTurn, type Offer, type Place } from './offers';
 import { garrisonPlaces, isPost, mannedPlatformCells, type Manned, type RampartSelector, type RingSelector, type WalkwaySelector } from './garrison';
 import { advanceElevated, type ElevatedPoint, type ElevatedPost } from './elevated-post';
 import { archersOf, stepArchery, type Archer, type Arrow } from './archery';
@@ -56,7 +56,7 @@ import {
   approachOf, type Gate, type Raider,
 } from './raiders';
 import type { HappeningId } from '@engine/state';
-import { beastOf, createVisitors, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
+import { beastOf, createVisitors, stallOf, stallSiteOf, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
@@ -75,7 +75,7 @@ import {
   REST_AFTER_THROW, scatter, settle, take, THROW, THROW_AHEAD, type Prop,
 } from './props';
 import {
-  planPreparation, preparationActive, preparationSites,
+  planCarry, planPreparation, preparationActive, preparationSites, tradeSites,
   type PreparationTrip,
 } from './preparation';
 
@@ -430,6 +430,8 @@ export interface DayOptions {
    * buhonero sin esperar a que salga.
    */
   readonly visits?: readonly HappeningId[];
+  /** Con `visits`: si vienen a cerrar el trato (`window.__valleyVisit(kind, true)`). */
+  readonly dealt?: boolean;
   /** Gancho de observación: el cielo de hoy, en vez del de `skyAt` (`window.__valleyHoldSky`). */
   readonly sky?: SkyKind;
   readonly land?: Terrain;
@@ -616,6 +618,12 @@ function fencedFields(land: Terrain, state: GameState): Terrain {
  */
 const EAVE_OFF = 0.45;
 const EAVE_REACH = 12;
+/**
+ * Cuántos llevan la mercancía de un trato: dos o tres, como los portes de la
+ * preparación (`MIN_PORTERS`/`MAX_PORTERS`), que es lo que se lee como «la aldea
+ * le lleva lo vendido» sin vaciar el tajo.
+ */
+const TRADE_PORTERS = 3;
 /** Lo que tiene tejado con alero: casas y obradores, no murallas ni campos. */
 const EAVED: ReadonlySet<string> = new Set(['house', 'stone_house', 'granary', 'smithy', 'mill', 'hall', 'chapel', 'church']);
 function eavesOf(state: GameState, land: Terrain): Point[] {
@@ -679,7 +687,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // claro, los juegos, el ocio— y queda lo que tiene techo o puerta: el porche
   // de casa, la capilla, mirar al herrero, y el trabajo, que no espera.
   const wet = ((kind) => kind === 'rain' || kind === 'storm')(options.sky ?? skyAt(state, day).kind);
-  const OPEN_AIR = new Set(['gossip', 'meal', 'hearth', 'loiter', 'play', 'chase', 'pet', 'feed']);
+  const OPEN_AIR = new Set(['gossip', 'meal', 'hearth', 'loiter', 'play', 'chase', 'pet', 'feed', 'browse']);
   const sheltered = (list: readonly Place[]): Place[] => list
     .map((place) => place.id.startsWith('gather:') ? place
       : { ...place, offers: place.offers.filter((offer) => !OPEN_AIR.has(offer.id)) })
@@ -1090,8 +1098,36 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     : createRaiders(state, land, heart, seed, 0, bandSize, assault);
   // El valle más vivo · y los que vienen por el camino, si el motor trajo a
   // alguien esta semana. Se montan al abrir la jornada y llegan a su hora.
+  // Las huellas de los puestos que están montados ahora, para quitarlas al recoger.
+  const stallSolids = new Map<number, Solid>();
   const visitors: Visitor[] = createVisitors(state, land, heart,
-    { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 }, seed, options.visits ?? visitsToday(state, day, TIME.DAYS_PER_WEEK));
+    { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 }, seed,
+    options.visits?.map((kind) => ({ kind, dealt: options.dealt === true }))
+      ?? visitsToday(state, day, TIME.DAYS_PER_WEEK), pastureHeart);
+  // El valle más vivo · **lo que se vende, a la vista.** Con el trato cerrado,
+  // dos o tres vecinos llevan la leña (buhonero) o el grano (factor) desde la
+  // leñera o el granero hasta el sitio del puesto, por la misma maquinaria de
+  // portes que la preparación del asedio; al irse el vendedor, esos bultos se
+  // van con él a lomos de la mula (`tradeLoads`, más abajo).
+  const tradeLoads = new Map<string, number[]>();
+  const tradeStarts: { visitor: Visitor; trips: PreparationTrip[]; started?: boolean }[] = [];
+  const closedTrades = new Set<string>();
+  for (const visitor of visitors) {
+    if (!visitor.dealt || (visitor.kind !== 'pedlar' && visitor.kind !== 'factor_visit')) continue;
+    const site = stallSiteOf(visitor);
+    if (site === null) continue;
+    const sites = tradeSites(state, land, mine, visitor.kind === 'pedlar' ? 'bundle' : 'grain', site.front, String(visitor.body.id));
+    const busy = new Set(preparationByVillager.keys());
+    const trips = planCarry(state, land, dwellers.filter((dweller) => !busy.has(dweller.villager)
+      && dweller.ageGroup === undefined && !isPost(dweller.dayPlan?.job?.place ?? ''))
+      .map((dweller) => ({ villager: dweller.villager, at: dweller.body, radius: dweller.body.radius, guarding: false })),
+    sites, seed, TRADE_PORTERS);
+    tradeLoads.set(`trade:${visitor.body.id}`, []);
+    // **Se reparten ahora y se arrancan cuando él echa a andar** (`tradeStarts`,
+    // en el paso): la jornada se abre de noche, y un encargo puesto a esa hora
+    // lo borraba la vuelta a casa —medido en tres semillas: cero bultos—.
+    tradeStarts.push({ visitor, trips });
+  }
   // D5 · el portón, como cosa que se rompe. Sólo existe en un asalto: en un
   // saqueo nadie lo toca.
   const gate: Gate | null = assault ? gateNow(state, heart) : null;
@@ -1546,6 +1582,24 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // conserva su bebida; el arado no tiene oferta propia.
       const propOptions = props.length === 0 ? []
         : propPlaces(props.filter((prop) => prop.fixed !== true || prop.kind === 'barrel'), now, land);
+      // El valle más vivo · los puestos de los que vienen por el camino: su
+      // huella entra en el terreno mientras están montados, y delante se abre
+      // el sitio de mirar el género (`OFFERS.browse`).
+      const stallsNow = visitors.flatMap((visitor) => { const site = stallOf(visitor); return site === null ? [] : [site]; });
+      for (const [id, solid] of stallSolids) {
+        if (stallsNow.some((site) => site.id === id)) continue;
+        liftSolid(land, solid);
+        stallSolids.delete(id);
+      }
+      for (const site of stallsNow) {
+        if (stallSolids.has(site.id)) continue;
+        placeSolid(land, site.solid);
+        stallSolids.set(site.id, site.solid);
+      }
+      const stallOptions: Place[] = stallsNow.flatMap((site) => {
+        const offer = placedOffer(OFFERS['browse']!, site.front, land);
+        return offer === null ? [] : [{ id: `stall:${site.id}`, at: site.front, offers: [offer] }];
+      });
 
       // 0 · Vivir las escenas que ya estaban en marcha. V-07.
       //
@@ -1792,7 +1846,13 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         //     Con un tope, eso sí: si el camino se ha hecho eterno —porque el
         //     sitio se llenó, o porque hay medio pueblo por medio— se replantea
         //     igual. Quedarse andando para siempre es el otro modo de fallar.
-        if (stepHome(dweller, phase, steps, land, around, dwellers)) {
+        // El valle más vivo · quien lleva la mercancía de un trato la entrega
+        // antes de volver a casa: la rutina del hogar empieza a llamar a quien
+        // vive lejos desde mediodía (`home.ts`), y medido en la semilla 7 los
+        // dos porteadores dejaban la leña a mitad de camino justo a las doce.
+        const carryingTrade = !isNight(phase) && (dweller.doing?.place.id.startsWith('trade:') === true
+          || dweller.doing?.place.id.startsWith('prepare-source:trade:') === true);
+        if (!carryingTrade && stepHome(dweller, phase, steps, land, around, dwellers)) {
           // Un haz es parte de la jornada, no de la persona: al volver a casa
           // se considera descargado y no entra con él por la puerta.
           if (dweller.holding !== null && dweller.holding < 0) dweller.holding = null;
@@ -1818,8 +1878,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // recalcula el camino estático y conserva la entrega; en la semilla 7
         // la ruta larga de cosecha progresaba durante treinta segundos y el
         // replanteo la mandaba de vuelta aún con el saco en la mano.
-        const delivering = dweller.holding !== null && dweller.holding < 0
-          && dweller.doing?.offer.id.startsWith('deliver') === true;
+        // El valle más vivo · y lo mismo el porte de un trato cerrado, a la ida y
+        // a la vuelta: la leñera queda lejos de la plaza y, sin esto, medido en
+        // la semilla 7, los dos porteadores lo dejaban a mediodía con la leña
+        // en la mano.
+        const trading = dweller.doing?.place.id.startsWith('trade:') === true
+          || dweller.doing?.place.id.startsWith('prepare-source:trade:') === true;
+        const delivering = trading || (dweller.holding !== null && dweller.holding < 0
+          && dweller.doing?.offer.id.startsWith('deliver') === true);
         if (tooLong && delivering && dweller.doing !== null) {
           const target = seatAt(dweller.doing.offer, dweller.doing.seat);
           const retry = pathTo(land, body, target, body.radius);
@@ -1867,8 +1933,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           const dry = summoned
             ? mine
             : !playedOut || propOptions.length === 0
-              ? [...mine, ...propOptions]
-              : [...mine, ...propOptions.filter((place) => place.offers[0]?.id !== 'play')];
+              ? [...mine, ...propOptions, ...stallOptions]
+              : [...mine, ...propOptions.filter((place) => place.offers[0]?.id !== 'play'), ...stallOptions];
           const options = wet && !summoned ? sheltered(dry) : dry;
           // Los protagonistas de un hecho del motor se reúnen en plazas
           // contiguas; el azar del corro no debe impedir escenificarlo.
@@ -1966,8 +2032,12 @@ export function createVillage(state: GameState, day: number, options: DayOptions
               vx: 0, vz: 0, vy: 0, held: null,
               restUntil: Number.POSITIVE_INFINITY, for: null,
             };
-            props.push(load);
-            propsById.set(load.id, load);
+            // Llegar tarde a un trato ya cargado no deja el bulto en la plaza.
+            if (!closedTrades.has(preparation.target.id)) {
+              props.push(load);
+              propsById.set(load.id, load);
+              tradeLoads.get(preparation.target.id)?.push(load.id);
+            }
             dweller.holding = null;
           }
           // La cosecha entra en el motor de golpe en la semana 35. Esta ruta
@@ -2368,6 +2438,37 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       if (sackScene !== null) props.push(...sackScene.step(raiders, land, seed, steps));
       // Y los del camino, a su hora.
       for (const visitor of visitors) stepVisitor(visitor, land, phase, steps);
+      // Los que llevan lo vendido salen cuando el vendedor ya está en la plaza,
+      // desde donde estén: quien está durmiendo o de guardia no va. Con la
+      // salida del vendedor (al alba) media aldea dormía todavía y no iba nadie.
+      for (const trade of tradeStarts) {
+        if (trade.started === true || trade.visitor.phase !== 'staying') continue;
+        trade.started = true;
+        for (const trip of trade.trips) {
+          const dweller = dwellers.find((one) => one.villager === trip.villager);
+          if (dweller === undefined || indoors(dweller) || dweller.flight !== null || dweller.scene !== null) continue;
+          const offer = trip.source.offers[0]!;
+          const route = pathTo(land, dweller.body, seatAt(offer, trip.sourceSeat), dweller.body.radius);
+          if (route === null) continue;
+          preparationByVillager.set(trip.villager, trip);
+          dweller.doing = { place: trip.source, offer, route, seat: trip.sourceSeat, since: steps, until: steps, there: false };
+          dweller.rethinkAt = steps + GIVE_UP;
+        }
+      }
+      // El vendedor que se va con el trato cerrado carga lo que le trajeron: los
+      // bultos de la plaza desaparecen y la mula sale cargada.
+      for (const visitor of visitors) {
+        if (!visitor.dealt || visitor.loaded || (visitor.phase !== 'leaving' && visitor.phase !== 'gone')) continue;
+        const ids = tradeLoads.get(`trade:${visitor.body.id}`);
+        if (ids === undefined) continue;
+        visitor.loaded = true;
+        closedTrades.add(`trade:${visitor.body.id}`);
+        for (const id of ids) {
+          const at = props.findIndex((prop) => prop.id === id);
+          if (at >= 0) props.splice(at, 1);
+          propsById.delete(id);
+        }
+      }
 
       // E1 · La entrada que dispara la huida es un cuerpo hostil vivo con
       // `entered`, no la puerta rota ni el recuerdo de uno que ya se fue. Hoy

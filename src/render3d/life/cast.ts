@@ -59,6 +59,8 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
     if (action === 'drink') return 'drink';
     // El valle más vivo · con lluvia, encogido bajo el alero.
     if (action === 'shelter') return 'shelter';
+    // Mirando el género del puesto: se revuelve entre las cosas.
+    if (action === 'browse') return 'sort';
     if (action === 'play') return 'play';
   }
   return 'idle';

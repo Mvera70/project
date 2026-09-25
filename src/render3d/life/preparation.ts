@@ -116,7 +116,51 @@ export function planPreparation(
   sites: PreparationSites,
   seed: number,
 ): PreparationTrip[] {
-  if (!preparationActive(state) || sites.sources.length === 0 || sites.targets.length === 0) return [];
+  if (!preparationActive(state)) return [];
+  return planCarry(state, land, candidates, sites, seed);
+}
+
+/**
+ * El valle más vivo · **La mercancía de un trato cerrado.** Lo mismo que la
+ * preparación: vecinos que cogen una carga y la llevan a un sitio, con sus
+ * rutas de verdad. La leña para el buhonero sale de la leñera y el grano para el
+ * factor, del granero; el destino es el sitio de su puesto en la plaza.
+ */
+export function tradeSites(
+  state: GameState, land: Terrain, places: readonly Place[], load: PreparationLoad, target: Point, targetId: string,
+): PreparationSites {
+  const sources: PreparationSource[] = [];
+  if (load === 'bundle') {
+    for (const original of places.filter((place) => place.id.startsWith('wood-store:'))) {
+      const spots = original.offers.flatMap((offer) => offer.spots ?? [offer.at]).slice(0, MAX_PORTERS);
+      if (spots.length === 0) continue;
+      const offer: Offer = { ...PICK_UP, at: original.at, seats: spots.length, spots };
+      sources.push({ place: { id: `prepare-source:trade:${original.id}`, at: original.at, offers: [offer] }, load });
+    }
+  } else {
+    // El grano sale por la puerta del granero o del molino. El sitio de la
+    // cosecha (`grain-store:`) sólo existe la semana en que se cosecha.
+    for (const building of state.buildings.filter((b) => b.lostTick === null && (b.kind === 'granary' || b.kind === 'mill'))) {
+      const at = doorOf(land, building.x, building.y, building.w, building.h);
+      const offer = at === null ? null : placedOffer(PICK_UP, at, land);
+      if (at === null || offer === null) continue;
+      sources.push({ place: { id: `prepare-source:trade:granary:${building.id}`, at, offers: [offer] }, load });
+    }
+  }
+  const offer = placedOffer(PUT_AWAY, target, land);
+  return { sources, targets: offer === null ? [] : [{ id: `trade:${targetId}`, at: target, offers: [offer] }] };
+}
+
+/** El reparto de portes, sin mirar por qué: lo usan la preparación y los tratos. */
+export function planCarry(
+  state: GameState,
+  land: Terrain,
+  candidates: readonly PreparationCandidate[],
+  sites: PreparationSites,
+  seed: number,
+  most = MAX_PORTERS,
+): PreparationTrip[] {
+  if (sites.sources.length === 0 || sites.targets.length === 0) return [];
   const aliveAdults = candidates.filter(candidate => {
     if (candidate.guarding) return false;
     const villager = state.people.villagers.find(person => person.id === candidate.villager);
@@ -166,10 +210,10 @@ export function planPreparation(
     usedSource.add(`${chosen.source.id}:${chosen.sourceSeat}`);
     usedTarget.add(`${chosen.target.id}:${chosen.targetSeat}`);
     trips.push(chosen);
-    if (trips.length >= MAX_PORTERS) break;
+    if (trips.length >= most) break;
   }
 
   // No se rellena con rutas falsas para llegar al mínimo. El llamador puede
   // enseñar una sola persona si es literalmente la única que cabe.
-  return trips.length < MIN_PORTERS ? trips : trips.slice(0, MAX_PORTERS);
+  return trips.length < MIN_PORTERS ? trips : trips.slice(0, most);
 }

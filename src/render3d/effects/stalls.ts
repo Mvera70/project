@@ -16,9 +16,8 @@ import {
   BoxGeometry, ConeGeometry, CylinderGeometry, DoubleSide, Group, Mesh, MeshStandardMaterial, PlaneGeometry,
   type BufferGeometry, type Material,
 } from 'three';
-import type { HappeningId } from '@engine/state';
 
-export type StallKind = 'pedlar' | 'factor_visit' | 'salt_visit';
+import type { StallKind } from '../life/visitors';
 
 export interface Stall {
   readonly id: number;
@@ -29,14 +28,20 @@ export interface Stall {
   readonly facing: number;
 }
 
-export function stallKind(kind: HappeningId): StallKind | null {
-  return kind === 'pedlar' || kind === 'factor_visit' || kind === 'salt_visit' ? kind : null;
+/** Lo que se lleva la mula del que cerró el trato: la leña o el grano comprados. */
+export interface MuleLoad {
+  readonly id: number;
+  readonly kind: 'bundle' | 'grain';
+  readonly x: number;
+  readonly z: number;
 }
 
 export interface Stalls {
   readonly group: Group;
   readonly shown: number;
   show(stalls: readonly Stall[], ground: (x: number, z: number) => number): void;
+  /** La carga sobre la albarda, siguiendo a la mula cada fotograma. */
+  carry(loads: readonly MuleLoad[], ground: (x: number, z: number) => number): void;
   dispose(): void;
 }
 
@@ -123,6 +128,25 @@ export function createStalls(): Stalls {
 
   let key = '';
   let shown = 0;
+  // La carga: tres troncos atados, o dos sacos llenos, a la altura del lomo.
+  const loadGroup = new Group();
+  group.add(loadGroup);
+  const loads = new Map<number, Group>();
+  const buildLoad = (kind: MuleLoad['kind']): Group => {
+    const piece = new Group();
+    if (kind === 'bundle') {
+      for (let n = 0; n < 3; n += 1) {
+        const log = add(piece, cyl(0.035, 0.34, 6), materials.wood, (n - 1) * 0.06, n === 1 ? 0.05 : 0, 0);
+        log.rotation.z = Math.PI / 2;
+        log.rotation.y = Math.PI / 2;
+      }
+    } else {
+      for (const side of [-1, 1]) add(piece, cyl(0.07, 0.16, 7), materials.sack, side * 0.09, 0.02, 0);
+    }
+    return piece;
+  };
+  /** Altura del lomo de la mula, en celdas (receta: cadera 0,86 m y tronco 0,6 m, a un tercio). */
+  const BACK = 0.5;
   return {
     group,
     get shown() { return shown; },
@@ -130,7 +154,7 @@ export function createStalls(): Stalls {
       const next = stalls.map((s) => `${s.id}:${s.kind}:${s.x.toFixed(2)}:${s.z.toFixed(2)}`).join('|');
       if (next === key) return;
       key = next;
-      for (const child of [...group.children]) group.remove(child);
+      for (const child of [...group.children]) if (child !== loadGroup) group.remove(child);
       for (const stall of stalls) {
         const piece = new Group();
         builders[stall.kind](piece);
@@ -140,6 +164,22 @@ export function createStalls(): Stalls {
         group.add(piece);
       }
       shown = stalls.length;
+    },
+    carry(list, ground): void {
+      for (const [id, piece] of loads) {
+        if (list.some((load) => load.id === id)) continue;
+        loadGroup.remove(piece);
+        loads.delete(id);
+      }
+      for (const load of list) {
+        let piece = loads.get(load.id);
+        if (piece === undefined) {
+          piece = buildLoad(load.kind);
+          loads.set(load.id, piece);
+          loadGroup.add(piece);
+        }
+        piece.position.set(load.x, ground(load.x, load.z) + BACK, load.z);
+      }
     },
     dispose(): void {
       for (const child of [...group.children]) group.remove(child);

@@ -17,7 +17,7 @@
 import { hash32 } from '@engine/rng';
 import type { GameState, HappeningId } from '@engine/state';
 import type { Animal } from '@derive/animals';
-import type { Body, Point, Terrain } from './body';
+import type { Body, Point, Solid, Terrain } from './body';
 import { fitsCircle, integrate, turnTo } from './body';
 import { LIFE_STEP } from './clock';
 import { clearBetween, pathTo } from './navigate';
@@ -55,9 +55,16 @@ export interface Visitor {
    * mejor», frente a la carretilla), o la **vaca** que el tratante viene a
    * vender. `null` para el forastero y para el segundo de una pareja.
    */
-  readonly beast: { readonly kind: 'mule' | 'cow'; x: number; z: number; moving: boolean } | null;
+  readonly beast: { readonly kind: 'mule' | 'cow'; x: number; z: number; moving: boolean; home?: boolean } | null;
   /** Por dónde ha pisado, para que la mula lo siga sin atajar por una casa. */
   readonly trail: Point[];
+  /** Si viene a cerrar el trato que el jugador aceptó (`visitsToday`). */
+  readonly dealt: boolean;
+  /** Si ya lleva lo que compró a lomos de la mula: se carga al irse. */
+  loaded: boolean;
+  /** El pasto adonde se lleva la vaca vendida, y la ruta que sigue hasta él. */
+  readonly pasture: Point;
+  beastRoute: Waypoint[] | null;
 }
 
 /**
@@ -118,15 +125,39 @@ const ENTRY_TRIES = 12;
 /** Holgura de un tramo, en pasos, sobre el doble de lo que se tarda en línea recta. */
 const DEADLINE_SLACK = 240;
 
-/** Quién viene hoy por el camino: el suceso de esta semana, si trae a alguien y hoy es uno de sus días. */
-export function visitsToday(state: GameState, day: number, daysPerWeek: number): HappeningId[] {
-  const out: HappeningId[] = [];
+/** Una visita de hoy, y si viene a cerrar el trato que el jugador aceptó. */
+export interface VisitToday {
+  readonly kind: HappeningId;
+  readonly dealt: boolean;
+}
+
+/**
+ * Quién viene hoy por el camino: el suceso de esta semana, si trae a alguien y
+ * hoy es uno de sus días; y **el que vuelve a cerrar el trato**.
+ *
+ * El motor apunta el trato aceptado la semana siguiente a la visita (el acto
+ * del jugador se resuelve al pasar la semana, `sim.ts` paso 1b), así que el
+ * visitante de la semana del suceso nunca lo vería cerrado. La semana en que la
+ * crónica dice `offer.<visita>.taken`, el primer día, vuelve un día a hacer el
+ * cambio: se lleva la madera o el grano, deja la sal o la vaca. Es lo que
+ * haría quien esperaba respuesta.
+ */
+export function visitsToday(state: GameState, day: number, daysPerWeek: number): VisitToday[] {
+  const out: VisitToday[] = [];
   const dayOfWeek = day - state.tick * daysPerWeek;
+  if (dayOfWeek < 0) return out;
   for (const happening of state.happenings) {
     if (happening.tick !== state.tick) continue;
     const visit = VISITS[happening.id];
-    if (visit === undefined || dayOfWeek < 0 || dayOfWeek >= visit.days) continue;
-    out.push(happening.id);
+    if (visit === undefined || dayOfWeek >= visit.days) continue;
+    out.push({ kind: happening.id, dealt: false });
+  }
+  if (dayOfWeek === 0) {
+    for (const entry of state.chronicle) {
+      if (entry.tick !== state.tick || !entry.templateKey.startsWith('offer.') || !entry.templateKey.endsWith('.taken')) continue;
+      const kind = entry.templateKey.slice('offer.'.length, -'.taken'.length) as HappeningId;
+      if (VISITS[kind] !== undefined && !out.some((visit) => visit.kind === kind)) out.push({ kind, dealt: true });
+    }
   }
   return out;
 }
@@ -145,9 +176,11 @@ function deadlineFor(from: Point, to: Point, step: number): number {
  * valle sin entrada exterior no ve llegar a nadie, y no es un error.
  */
 export function createVisitors(
-  state: GameState, land: Terrain, heart: Point, plaza: Point, seed: number, kinds: readonly HappeningId[],
+  state: GameState, land: Terrain, heart: Point, plaza: Point, seed: number, visits: readonly VisitToday[],
+  /** Adónde va la vaca vendida: el pasto de la aldea. */
+  pasture: Point = heart,
 ): Visitor[] {
-  if (kinds.length === 0) return [];
+  if (visits.length === 0) return [];
   // **El suelo es el de la aldea, no el de fuera.** La primera versión usaba el
   // de la entrada exterior (`approachOf`), y en la semilla 11 al año 30 esa
   // entrada queda al otro lado del río: el buhonero acabó plantado en la
@@ -159,7 +192,7 @@ export function createVisitors(
   const entry = entryOf(land, shore, plaza, road);
   if (entry === null) return [];
   const visitors: Visitor[] = [];
-  for (const kind of kinds) {
+  for (const { kind, dealt } of visits) {
     const visit = VISITS[kind]!;
     for (let n = 0; n < visit.people; n += 1) {
       const index = visitors.length;
@@ -215,6 +248,10 @@ export function createVisitors(
           : visit.pack ? { kind: 'mule', x: from.x, z: from.z, moving: false }
             : kind === 'drover_visit' ? { kind: 'cow', x: from.x, z: from.z, moving: false } : null,
         trail: [{ x: from.x, z: from.z }],
+        dealt,
+        loaded: false,
+        pasture,
+        beastRoute: null,
       });
     }
   }
@@ -261,7 +298,7 @@ export function visiting(visitor: Visitor): boolean {
  */
 export function stepVisitor(visitor: Visitor, land: Terrain, phase: number, step: number): void {
   moveVisitor(visitor, land, phase, step);
-  followWithBeast(visitor);
+  followWithBeast(visitor, land);
 }
 
 function moveVisitor(visitor: Visitor, land: Terrain, phase: number, step: number): void {
@@ -348,9 +385,25 @@ const MULE_PACE = VISITOR_PACE * 1.3;
 const TRAIL_STEP = 0.25;
 const TRAIL_KEEP = 16;
 
-function followWithBeast(visitor: Visitor): void {
+function followWithBeast(visitor: Visitor, land: Terrain): void {
   const { beast: mule, trail, body } = visitor;
   if (mule === null) return;
+  // **La vaca vendida no se va con él**: cuando el tratante echa a andar de
+  // vuelta, ella toma el camino del pasto de la aldea y, al llegar, se une al
+  // ganado (que el motor ya cuenta desde que se cerró el trato).
+  if (visitor.dealt && mule.kind === 'cow' && (visitor.phase === 'leaving' || visitor.phase === 'gone')) {
+    if (mule.home === true) return;
+    visitor.beastRoute ??= pathTo(land, mule, visitor.pasture) ?? [{ x: visitor.pasture.x, z: visitor.pasture.z }];
+    const next = visitor.beastRoute[0];
+    if (next === undefined) { mule.home = true; mule.moving = false; return; }
+    const gap = Math.hypot(next.x - mule.x, next.z - mule.z);
+    if (gap < 0.3) { visitor.beastRoute.shift(); return; }
+    const move = Math.min(gap, MULE_PACE * 0.7 * LIFE_STEP);
+    mule.x += ((next.x - mule.x) / gap) * move;
+    mule.z += ((next.z - mule.z) / gap) * move;
+    mule.moving = true;
+    return;
+  }
   const last = trail[trail.length - 1]!;
   if (Math.hypot(body.x - last.x, body.z - last.z) > TRAIL_STEP) {
     trail.push({ x: body.x, z: body.z });
@@ -374,10 +427,84 @@ function followWithBeast(visitor: Visitor): void {
 /** La mula o la vaca, como animal para el render, si está a la vista. */
 export function beastOf(visitor: Visitor): Animal[] {
   const beast = visitor.beast;
-  if (beast === null || !visiting(visitor)) return [];
+  // La vaca vendida sigue a la vista hasta llegar al pasto, aunque él ya se haya ido.
+  const sold = visitor.dealt && beast?.kind === 'cow' && beast.home !== true && visitor.phase !== 'waiting';
+  if (beast === null || (!visiting(visitor) && !sold) || beast.home === true) return [];
   return [{ id: MULE_ID_BASE - visitor.body.id - VISITOR_ID_BASE, kind: beast.kind, x: beast.x, y: beast.z,
     action: beast.moving ? 'walk' : undefined }];
 }
 
 /** Fuera de los animales del valle (40 000–44 299). */
 const MULE_ID_BASE = 44_300;
+
+/** Lo que monta en la plaza: el tenderete, la mesa del factor o los sacos. */
+export type StallKind = 'pedlar' | 'factor_visit' | 'salt_visit';
+
+export interface StallSite {
+  readonly id: number;
+  readonly kind: StallKind;
+  readonly x: number;
+  readonly z: number;
+  /** Hacia dónde da el mostrador: hacia el centro de la plaza. */
+  readonly facing: number;
+  /** Su huella en el suelo, alineada con los ejes: lo que no se atraviesa. */
+  readonly solid: Solid;
+  /** Dónde se ponen los que se acercan a mirar: delante del mostrador. */
+  readonly front: Point;
+}
+
+/**
+ * La huella de cada puesto en su marco (x a lo ancho, z hacia la plaza), en
+ * celdas: la de las piezas que dibuja `effects/stalls.ts`, con un palmo.
+ */
+const STALL_FOOTPRINT: Readonly<Record<StallKind, { x: [number, number]; z: [number, number] }>> = {
+  pedlar: { x: [-0.4, 0.4], z: [-0.2, 0.18] },
+  factor_visit: { x: [-0.28, 0.54], z: [-0.18, 0.17] },
+  salt_visit: { x: [-0.27, 0.35], z: [-0.17, 0.12] },
+};
+/** Lo que se aparta del vendedor hacia la plaza, y lo que se ponen delante los que miran. */
+const STALL_AHEAD = 0.55;
+const FRONT_AHEAD = 0.65;
+
+function stallKindOf(kind: HappeningId): StallKind | null {
+  return kind === 'pedlar' || kind === 'factor_visit' || kind === 'salt_visit' ? kind : null;
+}
+
+/**
+ * El puesto de un visitante, si lo tiene montado ahora: sólo mientras se queda
+ * en la plaza y sólo el que trae la mula. Lo usan el render (lo dibuja) y la
+ * jornada (lo hace sólido y abre el sitio para mirar).
+ */
+export function stallOf(visitor: Visitor): StallSite | null {
+  // Montado mientras se queda; y **la sal comprada se queda en la plaza** cuando
+  // el salinero se va, que es lo que se ve cambiar de manos.
+  const saltLeft = visitor.dealt && visitor.kind === 'salt_visit'
+    && (visitor.phase === 'leaving' || visitor.phase === 'gone');
+  if (visitor.phase !== 'staying' && !saltLeft) return null;
+  return stallSiteOf(visitor);
+}
+
+/** Dónde va el puesto de este visitante, esté montado o no; `null` si no monta. */
+export function stallSiteOf(visitor: Visitor): StallSite | null {
+  const kind = stallKindOf(visitor.kind);
+  if (kind === null || visitor.beast?.kind !== 'mule') return null;
+  const dx = visitor.centre.x - visitor.spot.x;
+  const dz = visitor.centre.z - visitor.spot.z;
+  const span = Math.hypot(dx, dz) || 1;
+  const ux = dx / span;
+  const uz = dz / span;
+  const x = visitor.spot.x + ux * STALL_AHEAD;
+  const z = visitor.spot.z + uz * STALL_AHEAD;
+  const facing = Math.atan2(dx, dz);
+  // Las cuatro esquinas de la huella, giradas como gira el dibujo (en Three,
+  // girar `facing` en Y lleva el +Z local a (sin, cos)).
+  const foot = STALL_FOOTPRINT[kind];
+  const cos = Math.cos(facing);
+  const sin = Math.sin(facing);
+  const corners = foot.x.flatMap((lx) => foot.z.map((lz) => ({ x: x + lx * cos + lz * sin, z: z - lx * sin + lz * cos })));
+  const solid: Solid = {
+    minX: Math.min(...corners.map((c) => c.x)), maxX: Math.max(...corners.map((c) => c.x)),
+    minZ: Math.min(...corners.map((c) => c.z)), maxZ: Math.max(...corners.map((c) => c.z)),
+  };
+  return { id: visitor.body.id, kind, x, z, facing, solid, front: { x: x + ux * FRONT_AHEAD, z: z + uz * FRONT_AHEAD } };
+}

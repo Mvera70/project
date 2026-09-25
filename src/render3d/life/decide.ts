@@ -544,6 +544,13 @@ export function decide(
       // (`life-resources.test.ts`, que juega su jornada al mediodía).
       const carrying = who.doing !== null && who.doing.offer.routineOnly === true && who.doing.offer.id !== 'work';
       if ((offer.id === 'meal' || offer.id === 'hearth') && !carrying) score = Math.max(score, 1.3);
+      // El valle más vivo · **el puesto del buhonero saca a la gente del tajo**,
+      // pero sólo a la de alrededor: a menos de `BROWSE_PULL` celdas. Sin suelo,
+      // medido en las semillas 7, 23 y 41, nadie se acercaba nunca —el turno
+      // vale 1,2 y el puesto sólo está a mediodía—; con él, el aforo (tres)
+      // hace el resto. Por debajo de la comida (1,3): a la una se come.
+      if (offer.id === 'browse' && !carrying
+        && Math.hypot(place.at.x - who.at.x, place.at.z - who.at.z) < BROWSE_PULL) score = Math.max(score, 1.25);
       score *= hourFactor(offer, dayPhase);
       score *= ageLeanOf(who.ageGroup, offer.id);
       score *= homePull(who.ageGroup, who.home, place.at);
@@ -922,6 +929,8 @@ export function moveSeat(
  * avance: lo que se le pide a un cuerpo se mide con ese cuerpo.
  */
 const PAUSE_SECONDS = 0.6;
+/** Hasta dónde llama un puesto de la plaza, en celdas (`OFFERS.browse`). */
+const BROWSE_PULL = 12;
 
 export function pauseHere(
   at: Point, land: Terrain, router: Router, seed: number, id: number, step: number,

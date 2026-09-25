@@ -42,7 +42,8 @@ import { createHearth } from './effects/hearth';
 import { createFestoon } from './effects/festoon';
 import { createYards } from './effects/yards';
 import { createBarks } from './effects/barks';
-import { createStalls, stallKind, type Stall } from './effects/stalls';
+import { createStalls, type MuleLoad, type Stall } from './effects/stalls';
+import { stallOf } from './life/visitors';
 import { yardsOf, type Yard } from '../derive/yards';
 import { festivityOf } from '@derive/festivity';
 import { buildGreatOak, type GreatOak } from './world/great-oak';
@@ -1225,6 +1226,7 @@ export async function createGraphicsRenderer(
   let heldPhase: number | null = null;
   let forceFestoon = false;
   let forcedVisits: HappeningId[] | null = null;
+  let forcedDeal = false;
   let heldSky: SkyKind | null = null;
   window.__valleyObserveLive = () => { observingLive = true; };
   // Gancho de observación del rayo: cae uno en el centro de la vista. Los de
@@ -1242,7 +1244,7 @@ export async function createGraphicsRenderer(
   window.__valleyFestoon = (on: boolean) => { forceFestoon = on; };
   // Gancho de observación: rehace la jornada con un visitante del camino
   // (`life/visitors.ts`) sin esperar a que el motor lo sortee. No toca el motor.
-  window.__valleyVisit = (kind: HappeningId = 'pedlar') => { forcedVisits = [kind]; life = null; };
+  window.__valleyVisit = (kind: HappeningId = 'pedlar', dealt = false) => { forcedVisits = [kind]; forcedDeal = dealt; life = null; };
   window.__valleyStrike = (index = 0) => {
     const centre = view.view.centre;
     weather.strike(centre.x, centre.z, index, camera);
@@ -1419,7 +1421,7 @@ export async function createGraphicsRenderer(
           ringOf: sceneRingOf,
           rampartOf: sceneRampartPatrolView,
           ragdollSeed: (id, bornAt, placement) => cast.captureRagdoll(id, bornAt, placement),
-          ...(forcedVisits === null ? {} : { visits: forcedVisits }),
+          ...(forcedVisits === null ? {} : { visits: forcedVisits, dealt: forcedDeal }),
           ...(heldSky === null ? {} : { sky: heldSky }),
         });
         if (denVisual !== null) world.remove(denVisual);
@@ -1631,14 +1633,14 @@ export async function createGraphicsRenderer(
       // El que trae la mula monta su puesto entre él y el centro de la plaza,
       // con el mostrador hacia la gente; se recoge al irse.
       stalls.show(life.visitors.flatMap((visitor): Stall[] => {
-        const kind = stallKind(visitor.kind);
-        if (kind === null || visitor.phase !== 'staying' || visitor.beast?.kind !== 'mule') return [];
-        const dx = visitor.centre.x - visitor.spot.x;
-        const dz = visitor.centre.z - visitor.spot.z;
-        const span = Math.hypot(dx, dz) || 1;
-        return [{ id: visitor.body.id, kind, x: visitor.spot.x + (dx / span) * 0.55,
-          z: visitor.spot.z + (dz / span) * 0.55, facing: Math.atan2(dx, dz) }];
+        const site = stallOf(visitor);
+        return site === null ? [] : [{ id: site.id, kind: site.kind, x: site.x, z: site.z, facing: site.facing }];
       }), groundFloor);
+      // Y lo que se lleva la mula del que cerró el trato.
+      stalls.carry(life.visitors.flatMap((visitor): MuleLoad[] => visitor.loaded && visitor.beast?.kind === 'mule'
+        && visitor.phase !== 'gone'
+        ? [{ id: visitor.body.id, kind: visitor.kind === 'pedlar' ? 'bundle' : 'grain', x: visitor.beast.x, z: visitor.beast.z }]
+        : []), groundFloor);
       festoon.place(plazaOf(shown), groundFloor);
       festoon.step(forceFestoon || festivityOf(shown) !== null, phase, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       cast.show(lastActors, life.physics?.ragdolls ?? []);
@@ -2152,7 +2154,7 @@ declare global {
     __valleyHoldPhase?: (value: number | null) => void;
     __valleyFestoon?: (on: boolean) => void;
     __valleyHoldSky?: (kind: SkyKind | null) => void;
-    __valleyVisit?: (kind?: HappeningId) => void;
+    __valleyVisit?: (kind?: HappeningId, dealt?: boolean) => void;
   }
 }
 

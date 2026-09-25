@@ -178,3 +178,33 @@ export function turnTo(body: Body, heading: number, seconds: number): void {
 export function gap(a: Point, b: Point): number {
   return Math.hypot(a.x - b.x, a.z - b.z);
 }
+
+/**
+ * El valle más vivo · **Poner y quitar un sólido a media jornada.** El terreno
+ * se hace al abrir la jornada; un puesto de la plaza aparece a mediodía y se
+ * recoge a media tarde, y mientras está no se atraviesa. Se añade al índice de
+ * `solids` de este terreno —que es de esta jornada y de nadie más— y se quita
+ * al irse. Quien ya tenía la ruta trazada por ahí choca y replantea, que es lo
+ * que haría cualquiera que se encuentra un tenderete en medio.
+ */
+export function placeSolid(land: Terrain, solid: Solid): void {
+  const index = (land.solids ?? ((land as { solids?: ReadonlyMap<number, readonly Solid[]> }).solids = new Map())) as Map<number, Solid[]>;
+  forCells(land, solid, (cell) => index.set(cell, [...index.get(cell) ?? [], solid]));
+}
+
+export function liftSolid(land: Terrain, solid: Solid): void {
+  const index = land.solids as Map<number, readonly Solid[]> | undefined;
+  if (index === undefined) return;
+  forCells(land, solid, (cell) => {
+    const rest = (index.get(cell) ?? []).filter((other) => other !== solid);
+    if (rest.length === 0) index.delete(cell); else index.set(cell, rest);
+  });
+}
+
+function forCells(land: Terrain, solid: Solid, visit: (cell: number) => void): void {
+  for (let z = Math.max(0, Math.floor(solid.minZ)); z <= Math.min(land.height - 1, Math.floor(solid.maxZ)); z += 1) {
+    for (let x = Math.max(0, Math.floor(solid.minX)); x <= Math.min(land.width - 1, Math.floor(solid.maxX)); x += 1) {
+      visit(z * land.width + x);
+    }
+  }
+}
