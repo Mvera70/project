@@ -33,6 +33,7 @@ import type {
 import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
 import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './world/ground';
 import { buildBackdrop, type Backdrop } from './world/backdrop';
+import { stepWind, windFor } from './effects/wind';
 import { createFires } from './effects/fires';
 import { buildGreatOak, type GreatOak } from './world/great-oak';
 import { greatOakCell } from '@derive/landmark';
@@ -1617,6 +1618,7 @@ export async function createGraphicsRenderer(
           : naturalSky;
       if (sky.kind !== paintedSky) {
         weather.set(sky.kind, sky.intensity);
+        windFor(sky.kind);
         paintedSky = sky.kind;
       }
       // Los rayos de la jornada están decididos de antemano —fases fijas—, así
@@ -1646,6 +1648,8 @@ export async function createGraphicsRenderer(
       // rayo, que dura 0,12 s y no hay captura que lo alcance corriendo.
       const flashDelta = frame.speed === 0 ? 0 : frame.realDeltaSeconds;
       weather.step(frame.deltaSeconds, view.view.centre, flashDelta);
+      // El viento sopla en tiempo de presentación: en pausa, quieto (§11.4).
+      stepWind(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       // Y la luz que hace a esa hora, con el cielo que haga encima.
       light(phase, frame.speed, overcastOf(sky));
       // El destello sigue al parpadeo del rayo (`weather.flash`, 0 a 1): el

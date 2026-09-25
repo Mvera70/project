@@ -10,6 +10,7 @@ import { visibleBuildings } from '@derive/visible-buildings';
 // consuma azar, y además un bosque que se resembrara en cada fotograma sería
 // peor que uno alineado: aquí el mismo valle da siempre el mismo bosque.
 
+import { swayFoliage } from '../effects/wind';
 import {
   Box3, CylinderGeometry, InstancedMesh, Group, Matrix4, MeshStandardMaterial, Quaternion, Vector3,
   type BufferGeometry, type Camera, type Color, type Material, type Object3D,
@@ -470,6 +471,8 @@ export function scatterCells(
       // de la biblioteca y pintarlo aquí se lo pintaría a todo el que lo use.
       const material = palette === undefined ? piece.material : piece.material.clone();
       if (palette !== undefined) tintFoliage(material, palette);
+      // El valle más vivo · las copas y los juncos se mecen con el viento.
+      swayFoliage(material);
       const instanced = new InstancedMesh(piece.geometry, material, total);
       instanced.castShadow = true;
       // La copa tiene muchas caras pequeñas: recibir su propia sombra hace

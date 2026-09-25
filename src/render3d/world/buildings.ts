@@ -6,6 +6,7 @@
 // D.8 conserva el respaldo para que una biblioteca incompleta no deje huecos
 // invisibles ni bloquee una partida mientras llega un recurso.
 
+import { CROP_BEND, sway } from '../effects/wind';
 import {
   Box3, BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Group, Mesh, MeshStandardMaterial, Vector3,
   type Material, type Object3D,
@@ -181,6 +182,8 @@ function dressField(model: Object3D, planned: PlannedBuilding): Material[] {
       }
       return;
     }
+    // El valle más vivo · el cultivo se mece con el viento.
+    sway(material, CROP_BEND);
     // Brote a ras de suelo al sembrar, y de ahí hasta su altura.
     mesh.visible = phase !== 'plough' && growth > 0;
     mesh.scale.y *= Math.max(0.08, growth);
