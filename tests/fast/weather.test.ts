@@ -162,3 +162,27 @@ describe('la lluvia y el rayo, como mallas · U-13', () => {
     expect(scene.children.length).toBe(0);
   });
 });
+
+// Rayo de E4b (25 sep 2026): «visualmente no me gusta». Ahora son cintas
+// gruesas con núcleo y halo, varias ramas, y un parpadeo de varios destellos.
+import { boltEnvelope } from '../../src/render3d/effects/weather';
+
+describe('el rayo parpadea como un rayo', () => {
+  it('destella, baja, vuelve a destellar y se apaga del todo', () => {
+    const steps = SKY.BOLT_FLICKER;
+    const total = steps.reduce((sum, one) => sum + one, 0);
+    expect(boltEnvelope(0), 'enciende de golpe').toBe(1);
+    expect(boltEnvelope(steps[0] + steps[1] / 2), 'entre retornos baja').toBeLessThan(0.2);
+    expect(boltEnvelope(steps[0] + steps[1] + steps[2] / 2), 'y vuelve').toBe(1);
+    expect(boltEnvelope(total + 0.01), 'y se apaga').toBe(0);
+    // Más de un destello: al menos dos tramos encendidos.
+    expect(steps.filter((_, n) => n % 2 === 0).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('el último destello se va apagando, no corta en seco', () => {
+    const steps = SKY.BOLT_FLICKER;
+    const start = steps.slice(0, -1).reduce((sum, one) => sum + one, 0);
+    const last = steps[steps.length - 1]!;
+    expect(boltEnvelope(start + last * 0.25)).toBeGreaterThan(boltEnvelope(start + last * 0.75));
+  });
+});

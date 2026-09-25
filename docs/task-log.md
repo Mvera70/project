@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · El valle más vivo, tanda 1: el rayo
+
+Pedido por Vera con `/goal` («que el valle se sienta más vivo: interacciones,
+elementos 3D, eventos, efectos climáticos; mejorar el trueno, visualmente no
+me gusta»). Hecho el rayo (`src/render3d/effects/weather.ts`): cintas con
+núcleo y halo, ramas, parpadeo de varios retornos, luz de impacto y nube.
+Capturas en `artifacts/graphics/bolt/` (`sheet-v11.png`, tres rayos). Para
+mirarlo: `window.__valleyStrike(n)` y `window.__valleyCapture` en el mismo
+`evaluate`, porque en el navegador de pruebas van ocho fotogramas por segundo
+y el rayo dura medio. **Sigue:** el resto del pedido.
+
 ## 25 sep 2026 · E4, tanda 4: flechas incendiarias y brigada de cubos · E4 cerrada
 
 Decisiones de Vera: flechas sólo cuando el cerco aguanta un asalto; uno o dos

@@ -381,6 +381,17 @@ export const SKY = {
   // retardo es lo que hace que una tormenta se sienta lejos o encima.
   FLASH_SECONDS: 0.12,
   THUNDER_DELAY: [0.4, 2.2],
+  // TUNE: **el parpadeo de un rayo**, en segundos reales: encendido, apagado,
+  // encendido... Un rayo de verdad destella dos o tres veces en un tercio de
+  // segundo por los retornos del canal; con un solo destello de 0,12 s se leía
+  // como un parpadeo de la pantalla (Vera, 25 sep: «visualmente no me gusta»).
+  // El último tramo se apaga poco a poco: el canal queda brillando un instante.
+  BOLT_FLICKER: [0.07, 0.05, 0.06, 0.06, 0.22],
+  // TUNE: el ancho del canal en celdas, el núcleo y su halo. Con 0,14 y 1,1
+  // el canal se perdía a la distancia de reposo (captura del 25 sep): 0,3 de
+  // núcleo y 2,4 de halo se leen como luz y no como una raya pintada.
+  BOLT_CORE: 0.3,
+  BOLT_GLOW: 2.4,
   // TUNE: partículas a intensidad plena. Una sola malla para todas (D.9), así
   // que esto es el techo de la escena entera y no por celda.
   DROPS: 1200,

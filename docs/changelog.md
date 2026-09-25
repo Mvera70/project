@@ -1,5 +1,17 @@
 # The Valley — Registro de cambios
 
+## v4.49 · 25 sep 2026 · El rayo, rehecho (el valle más vivo, tanda 1)
+
+«Visualmente no me gusta», del rayo. Eran tres líneas de un píxel: a la
+distancia de juego, un pelo. Ahora es un canal quebrado con ramas, en cintas
+que miran a la cámara, con núcleo blanco y halo azulado aditivo, que se ven
+por delante del bosque; parpadea como un rayo de verdad —dos o tres retornos
+en medio segundo (`SKY.BOLT_FLICKER`)— y el cielo se aclara con cada uno;
+alumbra el suelo donde cae y la nube de arriba. Lo que costó verlo: las cintas
+miraban hacia atrás y Three las descartaba (ahora se pintan por las dos
+caras), y el bosque las tapaba (ahora ignoran la profundidad, como la luz que
+son). Gancho `window.__valleyStrike()` para mirarlo a demanda.
+
 ## v4.48 · 25 sep 2026 · Flechas incendiarias y cubos (E4, tanda 4 · E4 cerrada)
 
 Vera: flechas incendiarias sólo contra el cerco que aguanta, uno o dos

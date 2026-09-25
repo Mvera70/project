@@ -14,14 +14,25 @@
 // juzgar.
 
 import {
+  AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
+  CanvasTexture,
   Color,
+  DoubleSide,
   DynamicDrawUsage,
+  Group,
   LineBasicMaterial,
   LineSegments,
+  Mesh,
+  MeshBasicMaterial,
+  PointLight,
   Points,
   PointsMaterial,
+  Sprite,
+  SpriteMaterial,
+  Vector3,
+  type Camera,
   type Scene,
 } from 'three';
 import { SKY } from '@engine/balance';
@@ -51,7 +62,8 @@ const RAIN_COLOUR = new Color('#AEC2D6');
 // frío es lo que separa el copo del crema del suelo sin dejar de leerse como
 // nieve (comparado en captura contra `snow-01.png`..`snow-08.png`).
 const SNOW_COLOUR = new Color('#CFE0EC');
-const BOLT_COLOUR = new Color('#FFF8D8');
+const BOLT_CORE_COLOUR = new Color('#FFFFFF');
+const BOLT_GLOW_COLOUR = new Color('#9DB8FF');
 
 /** Un número de 0 a 1 para esta partícula y este eje. */
 function dice(index: number, what: string): number {
@@ -71,8 +83,13 @@ export interface WeatherLayer {
     centre: { readonly x: number; readonly z: number },
     realDeltaSeconds: number,
   ): void;
-  /** Enciende un rayo que cae en este punto del mapa. Se apaga con `step`. */
-  strike(x: number, z: number, index: number): void;
+  /**
+   * Enciende un rayo que cae en este punto del mapa. Se apaga con `step`. La
+   * cámara orienta las cintas del canal para que se vean de frente.
+   */
+  strike(x: number, z: number, index: number, camera?: Camera): void;
+  /** Cuánto alumbra el rayo ahora, de 0 a 1: el renderer aclara el cielo con esto. */
+  readonly flash: number;
   clear(): void;
   dispose(): void;
 }
@@ -135,41 +152,113 @@ function seed(field: Field): void {
   }
 }
 
-/** Cuántos vértices tiene el zigzag de un rayo, y cuántas hebras se dibujan. */
-const BOLT_STEPS = 9;
-const BOLT_STRANDS = 3;
+/** Cuántos quiebros tiene el canal principal, y cuántas ramas salen de él. */
+const BOLT_STEPS = 14;
+const BOLT_BRANCHES = 3;
+/** Altura de la nube, en celdas. Veinte cae dentro del encuadre de reposo. */
+const BOLT_TOP = 20;
 
 /**
- * El zigzag del rayo, de la nube al suelo, en segmentos sueltos.
- *
- * **Tres hebras juntas y no una raya**, y es por lo que se vio en captura: una
- * `Line` de un píxel de ancho a la distancia de reposo es un pelo que no se
- * distingue del borde de un árbol. Tres hebras separadas medio metro leen como
- * un rayo y siguen costando **una** llamada de dibujo, porque van en la misma
- * malla. Determinista por índice, como todo lo de este módulo.
+ * El camino del rayo: un canal principal de la nube al suelo, con quiebros
+ * cada vez más cortos al bajar, y unas ramas que salen de su tramo alto y se
+ * apagan a medio camino. Devuelve polilíneas y el grosor relativo de cada una.
+ * Determinista por índice, como todo lo de este módulo.
  */
-function boltPoints(x: number, z: number, index: number): Float32Array {
-  const out = new Float32Array(BOLT_STRANDS * BOLT_STEPS * 2 * 3);
-  // **Veinte celdas de alto, no cuarenta.** La cámara es isométrica: un rayo de
-  // cuarenta celdas se proyecta como una raya que cruza la pantalla entera de
-  // esquina a esquina y deja de leerse como un rayo —medido en captura—. Veinte
-  // cae dentro del encuadre de reposo y se ve tocar el suelo.
-  const top = 20;
-  let at = 0;
-  for (let strand = 0; strand < BOLT_STRANDS; strand += 1) {
-    const lean = (strand - 1) * 0.45;
-    for (let n = 0; n < BOLT_STEPS; n += 1) {
-      for (const step of [n, n + 1]) {
-        const t = step / BOLT_STEPS;
-        const spread = (1 - t) * 3;
-        out[at] = x + lean + (dice(index * 31 + step, 'bx') - 0.5) * spread;
-        out[at + 1] = top * (1 - t);
-        out[at + 2] = z + lean * 0.5 + (dice(index * 31 + step, 'bz') - 0.5) * spread;
-        at += 3;
-      }
+function boltPaths(x: number, z: number, index: number): { points: Vector3[]; weight: number }[] {
+  const main: Vector3[] = [];
+  let px = x + (dice(index, 'b0x') - 0.5) * 6;
+  let pz = z + (dice(index, 'b0z') - 0.5) * 6;
+  for (let n = 0; n <= BOLT_STEPS; n += 1) {
+    const t = n / BOLT_STEPS;
+    // Hacia el punto de impacto, con un tirón lateral que se acorta al bajar.
+    const jitter = (1 - t * 0.7) * 1.6;
+    px += (x - px) / (BOLT_STEPS - n + 1) + (dice(index * 97 + n, 'bx') - 0.5) * jitter;
+    pz += (z - pz) / (BOLT_STEPS - n + 1) + (dice(index * 97 + n, 'bz') - 0.5) * jitter;
+    if (n === BOLT_STEPS) { px = x; pz = z; }
+    main.push(new Vector3(px, BOLT_TOP * (1 - t), pz));
+  }
+  const paths = [{ points: main, weight: 1 }];
+  for (let b = 0; b < BOLT_BRANCHES; b += 1) {
+    const from = 2 + Math.floor(dice(index * 13 + b, 'branch-at') * (BOLT_STEPS * 0.5));
+    const start = main[from]!;
+    const side = dice(index * 13 + b, 'branch-side') < 0.5 ? -1 : 1;
+    const branch = [start.clone()];
+    let bx = start.x;
+    let by = start.y;
+    let bz = start.z;
+    const steps = 3 + Math.floor(dice(index * 13 + b, 'branch-len') * 4);
+    for (let n = 1; n <= steps; n += 1) {
+      bx += side * (0.6 + dice(index * 131 + b * 7 + n, 'brx') * 1.2);
+      bz += (dice(index * 131 + b * 7 + n, 'brz') - 0.5) * 1.4;
+      by -= 0.9 + dice(index * 131 + b * 7 + n, 'bry') * 1.1;
+      branch.push(new Vector3(bx, Math.max(0.5, by), bz));
+    }
+    paths.push({ points: branch, weight: 0.45 });
+  }
+  return paths;
+}
+
+/**
+ * Las cintas de un camino: un quad por tramo, de ancho `width × weight`,
+ * girado hacia la cámara (`across` va a lo ancho de la pantalla). Las ramas se
+ * estrechan hacia su punta, que es como se apaga un rayo.
+ */
+function ribbons(paths: { points: Vector3[]; weight: number }[], width: number, across: Vector3): Float32Array {
+  const quads: number[] = [];
+  for (const path of paths) {
+    const half = (k: number): number => width * path.weight * (path.weight < 1 ? 1 - k / path.points.length : 1) / 2;
+    for (let n = 0; n < path.points.length - 1; n += 1) {
+      const a = path.points[n]!;
+      const b = path.points[n + 1]!;
+      const wa = across.clone().multiplyScalar(half(n));
+      const wb = across.clone().multiplyScalar(half(n + 1));
+      const v = [a.clone().sub(wa), a.clone().add(wa), b.clone().add(wb), b.clone().sub(wb)];
+      for (const k of [0, 1, 2, 0, 2, 3]) quads.push(v[k]!.x, v[k]!.y, v[k]!.z);
     }
   }
-  return out;
+  return new Float32Array(quads);
+}
+
+/** Un degradado de lado a lado: brillante en el centro, nada en los bordes. */
+function glowTexture(): CanvasTexture | null {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 64;
+  canvas.height = 4;
+  const ctx = canvas.getContext('2d');
+  if (ctx !== null) {
+    const g = ctx.createLinearGradient(0, 0, 64, 0);
+    g.addColorStop(0, 'rgba(255,255,255,0)');
+    g.addColorStop(0.5, 'rgba(255,255,255,1)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 64, 4);
+  }
+  return new CanvasTexture(canvas);
+}
+
+/** UVs a lo ancho de cada quad, para el degradado del halo. */
+function ribbonUvs(count: number): Float32Array {
+  const uv: number[] = [];
+  const corner = [[0, 0], [1, 0], [1, 1], [0, 1]];
+  for (let q = 0; q < count; q += 1) for (const k of [0, 1, 2, 0, 2, 3]) uv.push(corner[k]![0]!, corner[k]![1]!);
+  return new Float32Array(uv);
+}
+
+/** Cuánto brilla el rayo `t` segundos después de caer, según `SKY.BOLT_FLICKER`. */
+export function boltEnvelope(t: number): number {
+  let at = 0;
+  const steps = SKY.BOLT_FLICKER;
+  for (let n = 0; n < steps.length; n += 1) {
+    const span = steps[n]!;
+    if (t < at + span) {
+      if (n % 2 === 1) return 0.08;
+      // El último destello se apaga poco a poco; los demás, de golpe.
+      return n === steps.length - 1 ? 1 - (t - at) / span : 1;
+    }
+    at += span;
+  }
+  return 0;
 }
 
 export function createWeather(scene: Scene): WeatherLayer {
@@ -179,21 +268,48 @@ export function createWeather(scene: Scene): WeatherLayer {
   seed(snow);
   scene.add(rain.mesh, snow.mesh);
 
-  const boltGeometry = new BufferGeometry();
-  boltGeometry.setAttribute(
-    'position',
-    new BufferAttribute(new Float32Array(BOLT_STRANDS * BOLT_STEPS * 2 * 3), 3),
-  );
-  const boltMaterial = new LineBasicMaterial({ color: BOLT_COLOUR, transparent: true, opacity: 0.95 });
-  const bolt = new LineSegments(boltGeometry, boltMaterial);
-  bolt.frustumCulled = false;
+  // El rayo: un núcleo blanco y un halo azulado aditivo, dos mallas de cintas;
+  // una luz fría en el suelo donde cae y un resplandor en la nube.
+  const glowMap = glowTexture();
+  const coreGeometry = new BufferGeometry();
+  const glowGeometry = new BufferGeometry();
+  // Sin prueba de profundidad: un rayo es luz y se ve por delante de las copas.
+  // Con ella, el bosque tapaba el canal y sólo asomaba un trazo junto al suelo
+  // (primera captura del rayo nuevo).
+  // Por las dos caras: las cintas miran a la cámara según el orden de sus
+  // vértices, y con la cara de atrás descartada no se pintaba ninguna (la luz
+  // del impacto se veía y el canal no; medido en el navegador).
+  const coreMaterial = new MeshBasicMaterial({ color: BOLT_CORE_COLOUR, transparent: true, depthWrite: false, depthTest: false, blending: AdditiveBlending, side: DoubleSide, fog: false });
+  const glowMaterial = new MeshBasicMaterial({
+    color: BOLT_GLOW_COLOUR, transparent: true, depthWrite: false, depthTest: false, blending: AdditiveBlending, side: DoubleSide, fog: false,
+    ...(glowMap === null ? {} : { map: glowMap }),
+  });
+  const core = new Mesh(coreGeometry, coreMaterial);
+  const glow = new Mesh(glowGeometry, glowMaterial);
+  core.name = 'Valley_BoltCore';
+  glow.name = 'Valley_BoltGlow';
+  for (const mesh of [core, glow]) { mesh.frustumCulled = false; mesh.renderOrder = 10; }
+  const impact = new PointLight('#cfdcff', 0, 14, 1.4);
+  const cloud = new Sprite(new SpriteMaterial({
+    color: '#dfe6ff', transparent: true, depthWrite: false, blending: AdditiveBlending,
+    ...(glowMap === null ? {} : { map: glowMap }),
+  }));
+  // Las cuatro piezas en un grupo que se enciende y se apaga entero: el
+  // presupuesto de D.9 sigue siendo tres piezas de clima, y sin rayo la luz del
+  // impacto no está en la escena (una luz cuesta en todos los materiales
+  // aunque tenga intensidad cero).
+  const bolt = new Group();
+  bolt.name = 'Valley_Bolt';
   bolt.visible = false;
+  bolt.add(glow, core, impact, cloud);
+  for (const part of [glow, core, cloud]) part.visible = true;
   scene.add(bolt);
+  let boltAge = -1;
+  let flash = 0;
 
   let falling: 'rain' | 'snow' | null = null;
   let strength = 0;
   let sway = 0;
-  let boltLeft = 0;
 
   const paint = (field: Field, centre: { x: number; z: number }, drops: number): void => {
     const array = field.position.array as Float32Array;
@@ -232,9 +348,20 @@ export function createWeather(scene: Scene): WeatherLayer {
       // El rayo dura lo que dura **de reloj real**: un destello es un destello
       // a cualquier velocidad, y con el escénico a ×64 se habría apagado antes
       // de pintarse una sola vez.
-      if (boltLeft > 0) {
-        boltLeft -= realDeltaSeconds;
-        if (boltLeft <= 0) bolt.visible = false;
+      if (boltAge >= 0) {
+        boltAge += realDeltaSeconds;
+        const total = SKY.BOLT_FLICKER.reduce((sum, one) => sum + one, 0);
+        flash = boltEnvelope(boltAge);
+        coreMaterial.opacity = flash;
+        glowMaterial.opacity = 0.75 * flash;
+        impact.intensity = 9 * flash;
+        (cloud.material as SpriteMaterial).opacity = 0.6 * flash;
+        if (boltAge > total) {
+          boltAge = -1;
+          flash = 0;
+          bolt.visible = false;
+          impact.intensity = 0;
+        }
       }
       if (falling === null) return;
       const field = falling === 'rain' ? rain : snow;
@@ -249,22 +376,48 @@ export function createWeather(scene: Scene): WeatherLayer {
       paint(field, centre, drops);
     },
 
-    strike(x: number, z: number, index: number): void {
-      const array = bolt.geometry.getAttribute('position') as BufferAttribute;
-      (array.array as Float32Array).set(boltPoints(x, z, index));
-      array.needsUpdate = true;
-      bolt.geometry.computeBoundingSphere();
+    strike(x: number, z: number, index: number, camera?: Camera): void {
+      // A lo ancho de la pantalla: la primera columna de la matriz de la cámara.
+      const across = new Vector3(1, 0, 0);
+      if (camera !== undefined) {
+        camera.updateMatrixWorld();
+        across.setFromMatrixColumn(camera.matrixWorld, 0).normalize();
+      }
+      const paths = boltPaths(x, z, index);
+      const corePositions = ribbons(paths, SKY.BOLT_CORE, across);
+      const glowPositions = ribbons(paths, SKY.BOLT_GLOW, across);
+      coreGeometry.setAttribute('position', new BufferAttribute(corePositions, 3));
+      glowGeometry.setAttribute('position', new BufferAttribute(glowPositions, 3));
+      glowGeometry.setAttribute('uv', new BufferAttribute(ribbonUvs(glowPositions.length / 18), 2));
+      coreGeometry.computeBoundingSphere();
+      glowGeometry.computeBoundingSphere();
       bolt.visible = true;
-      boltLeft = SKY.FLASH_SECONDS;
+      // A pleno desde el primer fotograma: el rayo anterior dejó los
+      // materiales apagados al terminar, y hasta el siguiente paso no se
+      // reponían.
+      coreMaterial.opacity = 1;
+      glowMaterial.opacity = 0.75;
+      (cloud.material as SpriteMaterial).opacity = 0.6;
+      impact.intensity = 9;
+      impact.position.set(x, 1.2, z);
+      const top = paths[0]!.points[0]!;
+      cloud.position.set(top.x, top.y + 0.5, top.z);
+      cloud.scale.set(14, 5, 1);
+      boltAge = 0;
+      flash = 1;
     },
+
+    get flash(): number { return flash; },
 
     clear(): void {
       falling = null;
       strength = 0;
-      boltLeft = 0;
+      boltAge = -1;
+      flash = 0;
       rain.mesh.visible = false;
       snow.mesh.visible = false;
       bolt.visible = false;
+      impact.intensity = 0;
     },
 
     dispose(): void {
@@ -274,8 +427,12 @@ export function createWeather(scene: Scene): WeatherLayer {
         (field.mesh.material as LineBasicMaterial | PointsMaterial).dispose();
       }
       scene.remove(bolt);
-      boltGeometry.dispose();
-      boltMaterial.dispose();
+      coreGeometry.dispose();
+      glowGeometry.dispose();
+      coreMaterial.dispose();
+      glowMaterial.dispose();
+      (cloud.material as SpriteMaterial).dispose();
+      glowMap?.dispose();
     },
   };
 }

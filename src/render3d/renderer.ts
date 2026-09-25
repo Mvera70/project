@@ -51,7 +51,6 @@ import { solidTerrain } from './world/obstacles';
 import { Cast } from './world/cast';
 import { VILLAGER_MODELS, modelChainFor } from './world/models';
 import { dayNumber, dayPhase } from './presentation-clock';
-import { SKY } from '@engine/balance';
 import { boltPlace, boltsInDay, overcastOf, skyAt, type SkyKind } from '../derive/weather';
 import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
@@ -540,7 +539,6 @@ export async function createGraphicsRenderer(
   let bolts = 0;
   let boltPhase = 0;
   let boltDay = -1;
-  let flashLeft = 0;
   const FLASH_WHITE = new Color('#FFFDF2');
   let disposed = false;
 
@@ -1160,6 +1158,14 @@ export async function createGraphicsRenderer(
   };
   let observingLive = false;
   window.__valleyObserveLive = () => { observingLive = true; };
+  // Gancho de observación del rayo: cae uno en el centro de la vista. Los de
+  // una tormenta caen donde quieren y duran medio segundo, así que esperarlos
+  // para juzgar cómo se ven es imposible. En pausa se queda puesto (§11.4).
+  window.__valleyStrike = (index = 0) => {
+    const centre = view.view.centre;
+    weather.strike(centre.x, centre.z, index, camera);
+    return { x: centre.x, z: centre.z };
+  };
 
   window.__valleyAdvance = (steps: number, reset = false) => {
     if (!Number.isInteger(steps) || steps < 0 || steps > 3600) throw new Error('Invalid observation steps');
@@ -1628,8 +1634,10 @@ export async function createGraphicsRenderer(
       for (const [index, at] of (options.previewSky === undefined ? boltsInDay(shown, today) : []).entries()) {
         if (at <= boltPhase || at > phase) continue;
         const where = boltPlace(shown, today, index);
-        weather.strike(where.x, where.z, index);
-        flashLeft = SKY.FLASH_SECONDS;
+        weather.strike(where.x, where.z, index, camera);
+        // Gancho de observación, como `data-bolts`: dónde cayó el último, para
+        // poder mirarlo (`__valleyCapture` con ese punto).
+        document.documentElement.dataset.boltAt = `${where.x.toFixed(1)},${where.z.toFixed(1)}`;
         bolts += 1;
       }
       boltPhase = phase;
@@ -1640,15 +1648,16 @@ export async function createGraphicsRenderer(
       weather.step(frame.deltaSeconds, view.view.centre, flashDelta);
       // Y la luz que hace a esa hora, con el cielo que haga encima.
       light(phase, frame.speed, overcastOf(sky));
-      if (flashLeft > 0) {
-        // El destello: el hemisférico a tope y el fondo casi blanco mientras
-        // dura. Se hace **después** de `light` a propósito, porque es un
-        // instante y no una hora: la hora vuelve sola en el fotograma
-        // siguiente sin que nadie tenga que restaurar nada.
-        flashLeft -= flashDelta;
-        ambient.intensity *= 2.4;
-        sun.intensity *= 1.6;
-        (scene.background as Color).lerp(FLASH_WHITE, 0.55);
+      // El destello sigue al parpadeo del rayo (`weather.flash`, 0 a 1): el
+      // cielo se aclara con cada retorno del canal, no una sola vez.
+      const flash = weather.flash;
+      if (flash > 0) {
+        // El hemisférico a tope y el fondo casi blanco mientras dura. Se hace
+        // **después** de `light` a propósito, porque es un instante y no una
+        // hora: la hora vuelve sola en el fotograma siguiente.
+        ambient.intensity *= 1 + 1.4 * flash;
+        sun.intensity *= 1 + 0.6 * flash;
+        (scene.background as Color).lerp(FLASH_WHITE, 0.55 * flash);
         if (scene.fog !== null) (scene.fog as Fog).color.copy(scene.background as Color);
         renderer.setClearColor(scene.background as Color);
       }
@@ -2003,6 +2012,7 @@ declare global {
     __valleyAdvance?: (steps: number, reset?: boolean) => void;
     __valleyCapture?: (follow?: number, zoom?: number, gateStudy?: boolean, point?: { x: number; z: number }) => { image: string; life: LifeSnapshot | null };
     __valleyObserveLive?: () => void;
+    __valleyStrike?: (index?: number) => { x: number; z: number };
   }
 }
 
