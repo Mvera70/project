@@ -136,6 +136,8 @@ interface Blaze {
   readonly sparks: Spark[];
   /** Segundos de presentación en que empezó a arder. */
   readonly startSeconds: number;
+  /** Si la aldea la está apagando: llama corta y vapor blanco. */
+  readonly doused: boolean;
   light: PointLight | null;
 }
 
@@ -157,6 +159,18 @@ export function burningBuildings(state: Readonly<GameState>): Building[] {
   });
 }
 
+/**
+ * E4 · Los que la aldea está apagando: en pie, con la marca `doused:<id>` viva
+ * (flechas incendiarias contra un cerco que aguantó). Arden poco y humean vapor.
+ */
+export function dousedBuildings(state: Readonly<GameState>): Building[] {
+  return state.buildings.filter((b) => {
+    if (b.lostTick !== null) return false;
+    const until = state.flags[`doused:${b.id}`];
+    return until !== undefined && until > state.tick;
+  });
+}
+
 export function createFires(): Fires {
   const group = new Group();
   group.name = 'Valley_Fires';
@@ -166,7 +180,7 @@ export function createFires(): Fires {
   const blazes = new Map<number, Blaze>();
   const totalDays = BURNING.FLAME_DAYS + BURNING.EMBER_DAYS;
 
-  const build = (state: Readonly<GameState>, building: Building, presentationSeconds: number): Blaze => {
+  const build = (state: Readonly<GameState>, building: Building, presentationSeconds: number, doused: boolean): Blaze => {
     const blazeGroup = new Group();
     blazeGroup.name = `Valley_Fire_${building.id}`;
     const cx = building.x + building.w / 2;
@@ -208,11 +222,11 @@ export function createFires(): Fires {
     group.add(blazeGroup);
     // Si el fuego ya llevaba días —una partida cargada, un salto de velocidad—
     // se estrena donde iba, no desde el primer chispazo.
-    const alreadyWeeks = Math.max(0, state.tick - (building.lostTick ?? state.tick));
+    const alreadyWeeks = doused ? 0 : Math.max(0, state.tick - (building.lostTick ?? state.tick));
     const startSeconds = presentationSeconds - alreadyWeeks * 7 * SCENIC_DAY_SECONDS;
     return {
       id: building.id, group: blazeGroup, centre: { x: cx, y: cy, z: cz },
-      spread: { w: building.w, h: building.h }, flames, puffs, sparks, startSeconds, light: null,
+      spread: { w: building.w, h: building.h }, flames, puffs, sparks, startSeconds, doused, light: null,
     };
   };
 
@@ -232,22 +246,30 @@ export function createFires(): Fires {
       const live = new Set<number>();
       for (const building of burningBuildings(state)) {
         live.add(building.id);
-        if (!blazes.has(building.id)) blazes.set(building.id, build(state, building, presentationSeconds));
+        if (!blazes.has(building.id)) blazes.set(building.id, build(state, building, presentationSeconds, false));
+      }
+      for (const building of dousedBuildings(state)) {
+        live.add(building.id);
+        if (!blazes.has(building.id)) blazes.set(building.id, build(state, building, presentationSeconds, true));
       }
       let lights = 0;
       let firstDays = -1;
       for (const blaze of [...blazes.values()]) {
         const days = (presentationSeconds - blaze.startSeconds) / SCENIC_DAY_SECONDS;
-        if (!live.has(blaze.id) || days > totalDays) { drop(blaze); continue; }
+        const flameDays = blaze.doused ? BURNING.DOUSED_FLAME_DAYS : BURNING.FLAME_DAYS;
+        const lastDays = blaze.doused ? BURNING.DOUSED_FLAME_DAYS + BURNING.DOUSED_STEAM_DAYS : totalDays;
+        const afterDays = lastDays - flameDays;
+        if (!live.has(blaze.id) || days > lastDays) { drop(blaze); continue; }
         if (firstDays < 0) firstDays = days;
         // Cuánta llama: sube en medio día, arde entera y se apaga al final de
         // los días de llama; después queda un rescoldo que se consume.
-        const rise = Math.min(1, days / 0.5);
-        const flaming = days < BURNING.FLAME_DAYS;
+        const rise = Math.min(1, days / (blaze.doused ? 0.15 : 0.5));
+        const flaming = days < flameDays;
         const fade = flaming
-          ? Math.min(1, (BURNING.FLAME_DAYS - days) / 0.6)
-          : Math.max(0, 1 - (days - BURNING.FLAME_DAYS) / BURNING.EMBER_DAYS);
-        const flame = flaming ? rise * Math.max(0.25, fade) : 0.22 * fade;
+          ? Math.min(1, (flameDays - days) / (blaze.doused ? 0.3 : 0.6))
+          : Math.max(0, 1 - (days - flameDays) / afterDays);
+        // Apagada, no quedan brasas: sólo vapor.
+        const flame = flaming ? rise * Math.max(0.25, fade) * (blaze.doused ? 0.6 : 1) : (blaze.doused ? 0 : 0.22 * fade);
         const t = presentationSeconds;
 
         for (const one of blaze.flames) {
@@ -265,7 +287,8 @@ export function createFires(): Fires {
         // Opaco y oscuro de verdad: con mezcla normal y poca opacidad el humo
         // se leía como una neblina azul sobre el prado.
         const thick = flaming ? 0.75 + 0.2 * rise : 0.55 * fade;
-        const tone = flaming ? 0.09 : 0.32;
+        // El vapor de una casa apagada es blanco; el humo de una que arde, negro.
+        const tone = blaze.doused && !flaming ? 0.85 : flaming ? 0.09 : 0.32;
         for (const one of blaze.puffs) {
           const period = 5 + unit(one.seed, 1) * 3;
           const life = ((t + unit(one.seed, 2) * period) % period) / period;

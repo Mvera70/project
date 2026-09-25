@@ -825,6 +825,17 @@ export function tick(
         },
         weight: 3,
       });
+      // E4 · y las flechas incendiarias que dejaron al irse.
+      const fired = raid.fired ?? null;
+      if (fired !== null && fired.burnt + fired.saved > 0) {
+        say({
+          kind: 'raid',
+          templateKey: fired.burnt > 0 ? 'raid.arrows.burnt' : 'raid.arrows.saved',
+          // {count} es lo que ardió o, si no ardió nada, lo que se salvó.
+          params: { year: year(), season: season(), count: fired.burnt > 0 ? fired.burnt : fired.saved },
+          weight: 2,
+        });
+      }
     } else if (raid.kind === 'stormed') {
       // B3 · **el final que no es la aldea acabándose sola.** `advanceThreat` ya
       // ha puesto `state.ended`: aquí sólo se cuenta, y con peso 3, que es lo

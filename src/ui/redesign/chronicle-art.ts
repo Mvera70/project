@@ -91,6 +91,10 @@ const RAID_ART: Readonly<Record<string, string>> = {
   // E4 · las casas que queman: el grabado del incendio mientras llega el suyo
   // (`docs/plan-arte-pendiente.md`, «raid-burnt.png»).
   'raid.burnt': 'fire.png',
+  // E4 · las flechas incendiarias: el incendio si ardió algo, el cerco que
+  // aguantó si lo apagaron (`plan-arte-pendiente.md`, «raid-arrows-*.png»).
+  'raid.arrows.burnt': 'fire.png',
+  'raid.arrows.saved': 'raid-held.png',
 };
 
 /** A1, A2, A4 y C3 · obras que antes compartían el grabado genérico. */

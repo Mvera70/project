@@ -93,6 +93,12 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   work: { id: 'work', reach: 1.6, seats: 6, gives: { duty: 0.9, boredom: -0.2 }, seconds: [20, 45] },
   /** Recoger la cosecha ya resuelta por el motor en su única semana de siega. */
   harvest: { id: 'harvest', reach: 1.6, seats: 6, gives: { duty: 0.9 }, seconds: [6, 10], routineOnly: true },
+  /**
+   * E4 · Apagar un fuego con cubos. No es de rutina a propósito: una casa que
+   * arde llama a quien esté cerca, no a quien tenga el turno. El deber más
+   * alto del menú (1, como la guardia) para que se deje lo que se esté haciendo.
+   */
+  douse: { id: 'douse', reach: 1.2, seats: 8, gives: { duty: 1 }, seconds: [8, 16] },
   /** Cazar en el bosque: solo el reparto laboral puede iniciar esta rutina. */
   hunt: { id: 'hunt', reach: 1.2, seats: 4, gives: { duty: 0.6 }, seconds: [12, 24], routineOnly: true },
   gossip: { id: 'gossip', reach: 1.3, seats: 4, gives: { company: 0.9, boredom: 0.4 }, seconds: [6, 18] },
@@ -385,6 +391,20 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
       places.push({ id: `${building.kind}:${building.id}`, at, offers,
         ...(parcel && !harvesting ? { task: fieldTask(building, state.tick) } : {}) });
     }
+  }
+
+  // E4 · **La brigada de cubos.** Toda casa que arde —quemada o que la aldea
+  // está salvando de las flechas— es un sitio con puestos alrededor. Las marcas
+  // son las del motor (`burnt:<id>`, `doused:<id>`); esto sólo las lee.
+  for (const building of state.buildings) {
+    const burnt = state.flags[`burnt:${building.id}`];
+    const doused = state.flags[`doused:${building.id}`];
+    const alight = (burnt !== undefined && burnt > state.tick && building.lostTick !== null)
+      || (doused !== undefined && doused > state.tick && building.lostTick === null);
+    if (!alight) continue;
+    const at = { x: building.x + building.w / 2, z: building.y + building.h / 2 };
+    const offer = placedOffer(OFFERS['douse']!, at, land);
+    if (offer !== null) places.push({ id: `fire:${building.id}`, at, offers: [offer] });
   }
 
   // El juego guarda una capacidad base aunque no haya granero. La descarga

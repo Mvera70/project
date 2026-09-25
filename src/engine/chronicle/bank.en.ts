@@ -1084,9 +1084,21 @@ export const BANK: Record<string, string[]> = {
   ],
   // E4 · lo que queman: la calle del portón de una villa tomada, o una casa de
   // una aldea abierta al irse. {count} es cuántas.
+  // E4 · las flechas incendiarias contra un cerco que aguantó. {count} son las
+  // casas que ardieron y {saved} las que apagaron con cubos.
+  'raid.arrows.burnt': [
+    'They could not get over the wall, so they sent fire over it instead, and {count} roofs burned before the buckets came.',
+    'Burning arrows fell on the houses by the wall that {season}, and the buckets were too late for {count} of them.',
+    'Year {year}: the gate held, but {count} houses behind it did not. The arrows had been dipped in pitch.',
+  ],
+  'raid.arrows.saved': [
+    'Fire came over the wall on arrows, and the whole village ran with buckets from the water. Not a house was lost.',
+    'They set the roofs by the wall alight and left; the buckets got to all {count} before the thatch went.',
+    'Year {year}: burning arrows on the thatch, and a line of buckets from the well. The houses stood.',
+  ],
   'raid.burnt': [
     'They put a torch to {count} houses on the way through, and the smoke stood over the valley for days.',
-    '{count} roofs went up behind them. Nobody put the fires out; there was nobody left to.',
+    'Behind them {count} roofs went up. Nobody put the fires out; there was nobody left to.',
     'Year {year}: {count} houses burned where they had passed, and the wind carried the ash to the river.',
   ],
   'raid.beast': [

@@ -1,5 +1,23 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · E4, tanda 4: flechas incendiarias y brigada de cubos · E4 cerrada
+
+Decisiones de Vera: flechas sólo cuando el cerco aguanta un asalto; uno o dos
+tejados; la aldea apaga con cubos si llega a tiempo. Motor (`fireArrows` en
+`world/threat.ts`): los tejados de madera más cercanos a la muralla, dos si el
+clan era al menos tan fuerte como la defensa; se salva la casa con agua (pozo,
+río o lago) a `THREAT.SAVE_REACH` = 6 celdas —la mediana medida: 84 casas de
+seis semillas a los 35 años quedan a 3,5 / 5,7 / 8,5 del agua— y arde la que
+no. Sin dados. Marca `doused:<id>` para las salvadas; crónica
+`raid.arrows.burnt` / `raid.arrows.saved` con su imagen pedida. Pantalla: la
+salvada arde menos de un día y humea vapor blanco. Vida: sitio `fire:<id>` con
+ocho puestos y gesto `douse` (el lanzamiento de la horca con el cubo) y agua
+que salta. Pruebas: `fire-arrows.test.ts` (las tres semillas recorren los dos
+caminos: 7 y 23 salvan una y pierden otra, 11 salva las dos) y
+`fire-brigade.test.ts` (tres o más personas acuden, sin escribir en el motor).
+**No comprobado a ojo:** la brigada. La toma se perdió por el control de
+velocidad a clics, que no es fiable para acertar un día concreto del fuego.
+
 ## 25 sep 2026 · E4, tanda 3: casas quemadas en el asalto
 
 Motor: `torch` en `world/threat.ts` quema por `burnBuilding` las casas de

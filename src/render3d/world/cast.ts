@@ -138,6 +138,8 @@ const HELD: Readonly<Record<string, Omit<HeldSpec, 'key'>>> = {
   // IA-fields · la bolsa de simiente a la cadera y la horca del estiércol.
   sow: { asset: 'bundle', hand: 'hand_l', scale: 0.45 },
   spread: { asset: 'fork', hand: 'hand_r', fallback: true, turn: HAFT_GRIP },
+  // E4 · el cubo de la brigada contra el fuego.
+  douse: { asset: 'bucket', hand: 'hand_r', scale: 0.8 },
   drink: { asset: 'cup', hand: 'hand_r', fallback: true },
 };
 
@@ -596,7 +598,7 @@ export class Cast {
    * tampoco, y eso se ve.
    */
   private strike(player: Player, actor: Actor, seconds: number): void {
-    if (actor.clip !== 'chop' && actor.clip !== 'mine' && actor.clip !== 'sow' && actor.clip !== 'spread') {
+    if (actor.clip !== 'chop' && actor.clip !== 'mine' && actor.clip !== 'sow' && actor.clip !== 'spread' && actor.clip !== 'douse') {
       delete player.strikePhase; return;
     }
     const phase = seconds / VILLAGER_CLIPS[actor.clip].seconds;
@@ -607,12 +609,14 @@ export class Cast {
     const crossed = before <= phase ? before < moment && moment <= phase : before < moment || moment <= phase;
     if (!crossed) return;
     player.strikes = (player.strikes ?? 0) + 1;
-    if (actor.clip === 'sow' || actor.clip === 'spread') {
-      // Sale de la mano que lanza: la simiente a voleo, el estiércol de la horca.
+    if (actor.clip === 'sow' || actor.clip === 'spread' || actor.clip === 'douse') {
+      // Sale de la mano que lanza: la simiente a voleo, el estiércol de la horca,
+      // el agua del cubo.
       const hand = player.object.getObjectByName('hand_r');
       if (hand === undefined) return;
       const from = hand.getWorldPosition(new Vector3());
-      this.chips.hit(from, actor.clip === 'sow' ? 'seed' : 'muck', actor.id * 1009 + player.strikes);
+      const kind = actor.clip === 'sow' ? 'seed' : actor.clip === 'spread' ? 'muck' : 'water';
+      this.chips.hit(from, kind, actor.id * 1009 + player.strikes);
       return;
     }
     const tool = player.held.get(actor.clip);

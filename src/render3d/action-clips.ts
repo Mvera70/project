@@ -13,7 +13,7 @@ import { STRIKE_AT, VILLAGER_CLIPS, type ClipName } from './clips';
  * Lo vigila `tests/fast/graphics-clock.test.ts`.
  */
 export const ACTION_CLIPS: readonly ClipName[] = [
-  'sit', 'talk', 'pray', 'hammer', 'chop', 'mine', 'sow', 'spread', 'play', 'drink', 'sort',
+  'sit', 'talk', 'pray', 'hammer', 'chop', 'mine', 'sow', 'spread', 'douse', 'play', 'drink', 'sort',
   'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall', 'flee',
 ];
 
@@ -193,7 +193,7 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
         turn('thigh.L', x, pose(0, 0.05, -0.2));
         turn('shin.L', x, pose(0.05, 0, 0.3));
       }
-    } else if (name === 'sow' || name === 'spread') {
+    } else if (name === 'sow' || name === 'spread' || name === 'douse') {
       // IA-fields · Mismas tres poses que el hacha: preparado, carga, suelta.
       const at = STRIKE_AT[name];
       const pose = (ready: number, up: number, hit: number) => keyed([
@@ -216,7 +216,8 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
         turn('spine', y, pose(0, 0.35, -0.35));
       } else {
         // Horca: se hunde a los pies con el torso doblado y se lanza arriba y
-        // adelante; los brazos van juntos por el mango.
+        // adelante; los brazos van juntos por el mango. El cubo de agua (E4) es
+        // el mismo gesto a dos manos: se carga abajo y se vacía hacia el fuego.
         for (const side of ['L', 'R']) {
           turn(`upperarm.${side}`, x, pose(-0.7, -0.45, -1.7));
           turn(`forearm.${side}`, x, pose(-0.6, -0.3, -0.9));

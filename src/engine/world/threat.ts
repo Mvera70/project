@@ -27,7 +27,7 @@ import { THREAT, TIME } from '../balance';
 import { defenders, resistance } from './garrison';
 import { flagSet } from '../crossroads/conditions';
 import { next } from '../rng';
-import { hasTrait, type GameState, type HerdKind } from '../state';
+import { hasTrait, TERRAIN_CODE, type GameState, type HerdKind } from '../state';
 import { burnBuilding } from './buildings';
 import { yearOf } from '../time';
 
@@ -68,6 +68,11 @@ export interface ThreatEvent {
    * que se dejaron aquí no vuelven (`settle`).
    */
   slain: number;
+  /**
+   * E4 · Las flechas incendiarias de un asalto aguantado: cuántas casas ardieron
+   * y cuántas salvó la aldea con cubos. `null` cuando no hubo flechas.
+   */
+  fired?: { burnt: number; saved: number } | null;
 }
 
 /** Lo que un asalto se lleva, para que la crónica pueda contarlo. */
@@ -278,7 +283,9 @@ function settle(state: GameState, battle?: Battle): ThreatEvent {
   const buried = fall(state, ours);
 
   if (!breached) {
-    return { kind: 'held', band, sack: null, fallen: buried, slain };
+    // E4 · el cerco aguantó, pero desde fuera prendieron tejados.
+    const fired = fireArrows(state, band);
+    return { kind: 'held', band, sack: null, fallen: buried, slain, fired };
   }
   const taken = storm(state);
   return { kind: 'stormed', band, sack: taken.sack, fallen: taken.fallen + buried, slain };
@@ -327,6 +334,64 @@ function torch(state: GameState, howMany: number, spareLast: boolean): number {
   const doomed = wooden.slice(0, allowed);
   for (const house of doomed) burnBuilding(state, house.id);
   return doomed.length;
+}
+
+/**
+ * E4 · **Flechas incendiarias contra un cerco que aguanta.**
+ *
+ * Los tejados de madera más cercanos a la muralla —la estacada, la muralla, el
+ * portón o el bastión—, uno o dos según la fuerza del clan. Cada uno se salva si
+ * tiene agua a `THREAT.SAVE_REACH` (la aldea llega con cubos: marca
+ * `doused:<id>`, que la pantalla enseña como un fuego que se apaga) o arde
+ * entero (`burnBuilding`). Sin dados.
+ */
+function fireArrows(state: GameState, band: number): { burnt: number; saved: number } {
+  const ring = state.buildings.filter((b) => b.lostTick === null
+    && (b.kind === 'palisade' || b.kind === 'wall' || b.kind === 'gate' || b.kind === 'bastion'));
+  if (ring.length === 0) return { burnt: 0, saved: 0 };
+  const centre = (b: { x: number; y: number; w: number; h: number }) => ({ x: b.x + b.w / 2, y: b.y + b.h / 2 });
+  const toRing = (b: { x: number; y: number; w: number; h: number }): number => {
+    const c = centre(b);
+    return Math.min(...ring.map((r) => Math.hypot(centre(r).x - c.x, centre(r).y - c.y)));
+  };
+  const roofs = band >= resistance(state) ? THREAT.ARROW_ROOFS_STRONG : THREAT.ARROW_ROOFS;
+  const targets = state.buildings
+    .filter((b) => b.lostTick === null && b.kind === 'house' && b.tier === 0)
+    .sort((a, b) => toRing(a) - toRing(b) || a.id - b.id)
+    .slice(0, roofs);
+  const water = waterPoints(state);
+  for (const key of Object.keys(state.flags)) {
+    if (key.startsWith('doused:') && (state.flags[key] ?? 0) <= state.tick) delete state.flags[key];
+  }
+  let burnt = 0;
+  let saved = 0;
+  for (const house of targets) {
+    const c = centre(house);
+    const near = water.some((w) => Math.hypot(w.x - c.x, w.y - c.y) <= THREAT.SAVE_REACH);
+    if (near) {
+      state.flags[`doused:${house.id}`] = state.tick + 1;
+      saved += 1;
+    } else {
+      burnBuilding(state, house.id);
+      burnt += 1;
+    }
+  }
+  return { burnt, saved };
+}
+
+/** Dónde hay agua para los cubos: los pozos en pie, el río y el lago. */
+function waterPoints(state: GameState): { x: number; y: number }[] {
+  const points = state.buildings
+    .filter((b) => b.kind === 'well' && b.lostTick === null)
+    .map((b) => ({ x: b.x + b.w / 2, y: b.y + b.h / 2 }));
+  const { width, terrain } = state.map;
+  for (let cell = 0; cell < terrain.length; cell += 1) {
+    const t = terrain[cell];
+    if (t === TERRAIN_CODE.water || t === TERRAIN_CODE.lake) {
+      points.push({ x: cell % width + 0.5, y: Math.floor(cell / width) + 0.5 });
+    }
+  }
+  return points;
 }
 
 /**

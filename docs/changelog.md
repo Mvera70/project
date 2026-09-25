@@ -1,5 +1,15 @@
 # The Valley — Registro de cambios
 
+## v4.48 · 25 sep 2026 · Flechas incendiarias y cubos (E4, tanda 4 · E4 cerrada)
+
+Vera: flechas incendiarias sólo contra el cerco que aguanta, uno o dos
+tejados, y la aldea apaga con cubos si llega a tiempo. Llegar a tiempo es
+tener agua a seis celdas —la mediana medida de dónde quedan las casas—, así
+que un pozo junto a las casas salva techos. La casa salvada arde un momento y
+humea vapor; la otra arde entera. La gente acude con cubos y los vacía contra
+el fuego. Con esto E4 queda cerrada: fuego, humo, gore contenido, quema en el
+asalto y flechas.
+
 ## v4.47 · 25 sep 2026 · Queman casas al entrar (E4, tanda 3)
 
 Vera: «si toman la villa, los asaltantes queman casas». La villa tomada ve

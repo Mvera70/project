@@ -376,3 +376,5 @@ integran por `public/ui/art/index.json` y `src/ui/redesign/chronicle-art.ts`.
 | Fichero | Clave | Qué tiene que enseñar |
 |---|---|---|
 | `raid-burnt.png` | `raid.burnt` | La calle del portón ardiendo después de que entraran: dos o tres casas con el tejado en llamas, humo negro subiendo en columna y el portón roto al fondo. Sin figuras en primer plano. Mientras no llegue, la línea usa `fire.png`. |
+| `raid-arrows-burnt.png` | `raid.arrows.burnt` | Flechas encendidas cayendo por encima de la muralla sobre los tejados de paja de detrás; una casa ardiendo junto al muro. Mientras no llegue, `fire.png`. |
+| `raid-arrows-saved.png` | `raid.arrows.saved` | Una fila de aldeanos pasándose cubos desde el pozo hasta un tejado que humea; la muralla entera al fondo. Mientras no llegue, `raid-held.png`. |

@@ -116,3 +116,8 @@ modelo de casa ardiendo ni se ve el derrumbe. Pendiente si se quiere más: la
 casa en pie tiznándose y un derrumbe animado al acabar la llama. Y nadie
 reacciona todavía al fuego —la gente pasa al lado—; que acudan con cubos es la
 tanda 4 (flechas incendiarias y defensa).
+
+**Y la brigada de cubos (tanda 4):** la gente rodea la casa y vacía cubos
+contra ella, pero **no va y viene del agua**: el cubo está siempre lleno. Una
+cadena de cubos desde el pozo o el río sería más fiel. Tampoco se ve la
+brigada en una captura todavía: está probada en `fire-brigade.test.ts`.

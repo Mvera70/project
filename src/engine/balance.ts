@@ -411,6 +411,10 @@ export const BURNING = {
   // borra sola: nadie arrastra un incendio de un año para otro.
   FLAME_DAYS: 3,
   EMBER_DAYS: 4,
+  // TUNE: la casa que la aldea salva con cubos (flechas incendiarias, E4):
+  // arde menos de un día y luego humea vapor blanco otro día.
+  DOUSED_FLAME_DAYS: 0.8,
+  DOUSED_STEAM_DAYS: 1,
   // TUNE: la marca `burnt:<id>` caduca a esta distancia del tick de la quema.
   // Dos y no una: el render pinta el estado de la víspera, así que el fuego
   // empieza a verse hasta un día tarde, y con una semana justa la marca se
@@ -856,6 +860,23 @@ export const THREAT = {
    */
   STORM_BURN: 3,
   SACK_BURN: 1,
+  /**
+   * E4 · **Las flechas incendiarias**, sólo cuando el cerco aguanta un asalto
+   * (decisión del dueño del diseño, 25 sep 2026). Desde fuera prenden los
+   * tejados de madera más cercanos a la muralla: uno, o dos si el clan que vino
+   * era al menos tan fuerte como la defensa («una o dos» casas por asalto).
+   */
+  ARROW_ROOFS: 1,
+  ARROW_ROOFS_STRONG: 2,
+  /**
+   * TUNE: **la aldea apaga con cubos si tiene agua cerca**: pozo, río o lago a
+   * esta distancia de la casa, en celdas. Medido: 84 casas de seis semillas (7,
+   * 11, 23, 42, 91, 108) a los treinta y cinco años quedan a 3,5 / 5,7 / 8,5
+   * celdas del agua en sus cuartiles; seis es la mediana, así que más o menos
+   * la mitad se salva, y un pozo junto a las casas cuenta. Sin dados: decide
+   * dónde está la casa.
+   */
+  SAVE_REACH: 6,
   /**
    * Cuántos hombres junta el clan cada año. Dos: al cabo de veinte años son
    * cuarenta, del orden de lo que una aldea hecha tiene de gente (mediana 48 a
