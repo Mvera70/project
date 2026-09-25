@@ -1,5 +1,32 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · Puestos, la vaca del tratante, el perro que ladra y el frío bajo el alero
+
+Hecho mientras Vera rehace los modelos: **no se tocó ningún GLB ni receta**.
+
+- **Puestos** (`effects/stalls.ts`, montados en `renderer.ts` desde
+  `life.visitors`): sólo mientras la visita está en la plaza y sólo el que trae
+  la mula. El vendedor se pone a tres celdas del centro (`STALL_RADIUS`,
+  `visitors.ts`) y en un ángulo libre de la hoguera y de los postes de la
+  fiesta; con 1,4 el tenderete caía encima de la fuente. La prueba del
+  buhonero pasa de «a menos de 3,5» a «a menos de 4,5» por eso.
+- **La vaca del tratante**: la mula de antes es ahora `Visitor.beast`, `mule`
+  o `cow`, y sigue la huella del mismo modo.
+- **El perro** ladra (`barking`, `effects/barks.ts`: ondas de trazo oscuro con
+  halo; las blancas aditivas no se veían sobre la plaza) plantado ante el
+  forastero —ahora desde 16 celdas y a 2,2 de él; con 10 no llegaba a verlo en
+  las semillas 7 y 11— y ante el zorro, que huye también del perro. La pelota
+  en juego va antes que los niños.
+- **Bajo el alero**: clip `shelter` en `action-clips.ts`. Las fachadas +Z de
+  obradores y granero ya no dan alero (alguien esperaba en la escalera del
+  granero, semilla 11).
+- **Gancho**: `window.__valleyHoldSky` también rehace la jornada con ese cielo
+  (`DayOptions.sky`), para poder mirar el alero sin esperar a que llueva. En la
+  traza, `dog` y `stalls`.
+
+Capturas: `artifacts/graphics/alive/stall-sheet.png`, `bark-crop.png`,
+`eave-crop.png`, y el gesto en `artifacts/graphics/IA-anim/gestures/`.
+
 ## 25 sep 2026 · El valle más vivo, lo apuntado: perro, zorro, patos, mula, sólidos y aleros
 
 - **Modelos** (`tools/art/lots/animals-g23.mjs`): el generador de G-23 acepta

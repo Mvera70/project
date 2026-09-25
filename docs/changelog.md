@@ -1,5 +1,16 @@
 # The Valley — Registro de cambios
 
+## v4.55 · 25 sep 2026 · Puestos en la plaza, la vaca del tratante, el perro que ladra y el frío bajo el alero
+
+Lo que quedó apuntado de la ronda anterior, sin tocar ningún modelo 3D (Vera
+los está rehaciendo). **Cada visita enseña a qué viene** mientras está en la
+plaza: el tenderete del buhonero, la mesa del factor con el libro y la balanza,
+los sacos abiertos del salinero; el tratante trae la vaca que vende. **El perro
+ladra** —dibujado, porque no hay sonido— al forastero y al zorro, y va a por la
+pelota cuando los niños juegan. **Bajo el alero se encogen**, con los brazos
+cruzados y un tiritón. Y la herramienta nueva `tools/graphics/model-sheet.mjs`
+saca la hoja de todos los modelos publicados.
+
 ## v4.54 · 25 sep 2026 · Perro, zorro, patos, la mula del buhonero y los aleros
 
 Lo que la tanda anterior dejó apuntado por falta de malla. **Cuatro animales

@@ -126,21 +126,27 @@ brigada en una captura todavía: está probada en `fire-brigade.test.ts`.
 
 Lo que la tanda dejó a medias, y lo que se hizo después el mismo día:
 
-- ~~**Un perro, un zorro y patos.**~~ Hechos: `dog.glb`, `fox.glb` y `duck.glb`
-  salen del generador de G-23 (`tools/art/lots/animals-g23.mjs`) y viven en
-  `life/companions.ts`. **Pendiente si se quiere más:** el perro no ladra (no
-  hay audio ni gesto de ladrido: se planta delante del forastero), no juega
-  con la pelota de los niños (va detrás de ellos), y el zorro nunca se lleva
-  una gallina —eso sólo lo decide el motor, y hoy sólo con el lobo—.
-- ~~**La mula del buhonero.**~~ Hecha (Vera eligió la mula frente a la
-  carretilla): `mule.glb`, con albarda, serones y fardo, va detrás del que
-  viene a vender por donde él pisa (`life/visitors.ts`). **Falta:** un puesto
-  en la plaza mientras se quedan —hoy se plantan y charlan— y que se vea
-  **qué** trae cada visita de M-0 (la sal, el ganado del tratante).
+- ~~**Un perro, un zorro y patos.**~~ Hechos (`life/companions.ts`), y desde
+  la segunda ronda el perro **ladra** —dibujado, `effects/barks.ts`: no hay
+  sonido— al forastero y al zorro, y corre a por la pelota en juego.
+  **Pendiente:** el ladrido de verdad cuando haya audio (hay hueco en
+  `src/ui/sound.ts`), y un gesto de ladrar: el perro no tiene más clips que
+  `idle` y `walk`, y **Vera está rehaciendo los modelos de los animales**; el
+  gesto irá con su perro. El zorro sigue sin llevarse ninguna gallina (lo decide
+  el motor, y hoy sólo con el lobo).
+- ~~**La mula del buhonero, el puesto y lo que trae cada visita.**~~ Hechos:
+  la mula va detrás del que vende; mientras se queda, monta delante su puesto
+  (`effects/stalls.ts`): **el buhonero**, un tenderete a rayas con baratijas;
+  **el factor**, la mesa con el libro de cuentas y la balanza y sacos vacíos;
+  **el salinero**, sus sacos con uno abierto. **El tratante** trae detrás la
+  vaca que vende. **Pendiente:** los puestos no son sólidos para la gente
+  (aparecen a mediodía y el terreno de la jornada ya está hecho); nadie se
+  acerca a comprar —la aldea charla en la plaza, no va al mostrador—; y si el
+  trato se cierra, no se ve la madera, el grano o la vaca cambiar de manos.
 - ~~**Los postes del tendedero y el bancal, sólidos.**~~ Hecho
   (`yardSolids`, `world/obstacles.ts`).
-- ~~**A cubierto bajo un alero.**~~ Hecho (`shelterUnder`): quien no tiene nada
-  que hacer con lluvia espera pegado a la pared de una casa. No hay gesto de
-  encogerse ni de sacudirse el agua: está de pie.
+- ~~**A cubierto bajo un alero, y con gesto.**~~ Hechos: `shelterUnder` y el
+  clip fabricado `shelter` (`action-clips.ts`): encogido, brazos cruzados,
+  cabeza gacha y un tiritón. Nadie espera ante una puerta, de casa o de obrador.
 - **Los charcos no salpican ni reflejan de verdad**: son discos grises lisos
   (`effects/puddles.ts`). Un mapa de entorno los haría espejos.
