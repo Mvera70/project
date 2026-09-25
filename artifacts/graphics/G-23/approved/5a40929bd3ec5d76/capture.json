@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-25T10:47:10.980Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-46-57-280Z-26372\\candidate\\dog.glb",
+    "assetUrl": "/artifacts/graphics/G-23/runs/2026-09-25T10-46-57-280Z-26372/candidate/dog.glb",
+    "viewport": {
+      "width": 600,
+      "height": 600,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.54",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-46-57-280Z-26372\\three\\capture-1.png",
+      "sha256": "85C8204679B4F8D7422C205495618E38F3947534FCE374F07DA0370DA4A49BB4",
+      "dimensions": {
+        "width": 600,
+        "height": 600
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-46-57-280Z-26372\\three\\capture-1-gray.png",
+        "sha256": "DE972EB5085F3E530EBB31FFCA1283EA9786537B7F76236D590DA2C0261E47B4",
+        "dimensions": {
+          "width": 600,
+          "height": 600
+        }
+      },
+      "durationMs": 1788,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:52428/artifacts/graphics/G-23/runs/2026-09-25T10-46-57-280Z-26372/candidate/dog.glb",
+        "viewport": {
+          "width": 600,
+          "height": 600,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": {
+          "name": "idle",
+          "duration": 8.041666984558105
+        },
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "body",
+          "dog_Rig",
+          "dog_accent",
+          "dog_coat",
+          "dog_dark",
+          "dog_light",
+          "ear-1",
+          "ear1",
+          "foreL",
+          "foreLFoot",
+          "foreLLower",
+          "foreR",
+          "foreRFoot",
+          "foreRLower",
+          "head",
+          "hindL",
+          "hindLFoot",
+          "hindLLower",
+          "hindR",
+          "hindRFoot",
+          "hindRLower",
+          "neck",
+          "tail"
+        ],
+        "bounds": {
+          "min": [
+            -0.334167,
+            0,
+            -0.060433
+          ],
+          "max": [
+            0.196667,
+            0.297667,
+            0.060433
+          ],
+          "size": [
+            0.530833,
+            0.297667,
+            0.120867
+          ]
+        },
+        "loadDurationMs": 168
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-46-57-280Z-26372\\three\\capture-2.png",
+      "sha256": "85C8204679B4F8D7422C205495618E38F3947534FCE374F07DA0370DA4A49BB4",
+      "dimensions": {
+        "width": 600,
+        "height": 600
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-46-57-280Z-26372\\three\\capture-2-gray.png",
+        "sha256": "DE972EB5085F3E530EBB31FFCA1283EA9786537B7F76236D590DA2C0261E47B4",
+        "dimensions": {
+          "width": 600,
+          "height": 600
+        }
+      },
+      "durationMs": 157,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:52428/artifacts/graphics/G-23/runs/2026-09-25T10-46-57-280Z-26372/candidate/dog.glb",
+        "viewport": {
+          "width": 600,
+          "height": 600,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": {
+          "name": "idle",
+          "duration": 8.041666984558105
+        },
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "body",
+          "dog_Rig",
+          "dog_accent",
+          "dog_coat",
+          "dog_dark",
+          "dog_light",
+          "ear-1",
+          "ear1",
+          "foreL",
+          "foreLFoot",
+          "foreLLower",
+          "foreR",
+          "foreRFoot",
+          "foreRLower",
+          "head",
+          "hindL",
+          "hindLFoot",
+          "hindLLower",
+          "hindR",
+          "hindRFoot",
+          "hindRLower",
+          "neck",
+          "tail"
+        ],
+        "bounds": {
+          "min": [
+            -0.334167,
+            0,
+            -0.060433
+          ],
+          "max": [
+            0.196667,
+            0.297667,
+            0.060433
+          ],
+          "size": [
+            0.530833,
+            0.297667,
+            0.120867
+          ]
+        },
+        "loadDurationMs": 32
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:52428/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=600&height=600&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 212,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-46-57-280Z-26372\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

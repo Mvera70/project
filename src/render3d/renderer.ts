@@ -98,7 +98,9 @@ const FORD = 'ford-stone';
  * la clase: no hay correspondencia que escribir porque no hace falta.
  */
 const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish',
-  'partridge', 'rabbit', 'deer', 'boar', 'bear'] as const;
+  'partridge', 'rabbit', 'deer', 'boar', 'bear',
+  // El valle más vivo (25 sep 2026): el perro, el zorro, los patos y la mula.
+  'dog', 'fox', 'duck', 'mule'] as const;
 /** Todo lo que el valle sabe pintar hoy. Lo que no este aqui, no se descarga. */
 /**
  * Los recursos que este renderer pide al catalogo.
@@ -1052,6 +1054,7 @@ export async function createGraphicsRenderer(
       })),
       // El valle más vivo · los tendederos y huertos, y cuánta ropa hay tendida.
       puddles: puddles?.shown ?? 0,
+      fox: life.fox,
       yards: { hung: yards.hung, at: yardsShown.map(yard => ({ house: yard.house, kind: yard.kind,
         x: round(yard.x), z: round(yard.z) })) },
       // El valle más vivo · los animales salvajes que se ven ahora (ciervos,

@@ -5565,6 +5565,312 @@
         "source": "Modelado original para The Valley, 24 sep 2026, pedido por Vera; sin proveedor generativo.",
         "license": "Project original"
       }
+    },
+    {
+      "id": "dog",
+      "artifactRound": "G-23",
+      "status": "study",
+      "recipe": "art/recipes/dog/dog.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-25T10-46-57-280Z-26372",
+        "directory": "artifacts/graphics/G-23/approved/5a40929bd3ec5d76"
+      },
+      "bounds": {
+        "min": [
+          -0.334167,
+          0,
+          -0.060433
+        ],
+        "max": [
+          0.196667,
+          0.297667,
+          0.060433
+        ],
+        "size": [
+          0.530833,
+          0.297667,
+          0.120867
+        ]
+      },
+      "recipeSha256": "F810AD0E4F16221B74CD829E6CADF0D49CE97FC98D339BF841650C00F5A654C0",
+      "materials": [
+        "coat",
+        "light",
+        "dark",
+        "accent"
+      ],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.15
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 2916
+      },
+      "hashes": {
+        "dog.blend": "883ECD977A64B4B4703FE02F47B59855ED190DD96514DE422F2460E30FED53E0",
+        "dog.glb": "5A40929BD3EC5D765E1A167307DF53B6945FC84FC222F78A3DE1750FBF2C3F0F",
+        "dog-blender.png": "20083BBE62896D00632860C0F473E248A8564A5E0210F9B754AABEB2AED360C2",
+        "capture-1.png": "85C8204679B4F8D7422C205495618E38F3947534FCE374F07DA0370DA4A49BB4",
+        "capture-1-gray.png": "DE972EB5085F3E530EBB31FFCA1283EA9786537B7F76236D590DA2C0261E47B4",
+        "capture.json": "BD728A26B3A14639A3AF44BA5A526BF3A18C7B7D9BA6BAAE97D4BA7A15B71B70",
+        "build.json": "E7E1D82A624B61FA734EBBAE6FAA946E1562AADE6399C62455DCAE22945DA8A5",
+        "validation.json": "151ED4A21E596AD308BB9D338FFDD1E49987474C932FE0733C9FF0E0A84FA127"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "fox",
+      "artifactRound": "G-23",
+      "status": "study",
+      "recipe": "art/recipes/fox/fox.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-25T10-47-17-102Z-15440",
+        "directory": "artifacts/graphics/G-23/approved/6bd39948587e59a5"
+      },
+      "bounds": {
+        "min": [
+          -0.306167,
+          0,
+          -0.053633
+        ],
+        "max": [
+          0.246933,
+          0.2594,
+          0.053633
+        ],
+        "size": [
+          0.5531,
+          0.2594,
+          0.107267
+        ]
+      },
+      "recipeSha256": "B0B388561C952A918DA0ABB660E692B8F58DEAC51A4A2B0A6A2F4B48E2FC501A",
+      "materials": [
+        "coat",
+        "light",
+        "dark",
+        "accent"
+      ],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.13
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 2720
+      },
+      "hashes": {
+        "fox.blend": "9CD61C19446B01D93BA8CBFEA9BA0B25DA901AE5618BDA6F9D2E4E868E760A04",
+        "fox.glb": "6BD39948587E59A5A94B601C5AA7923CDE8023F6F5DAEF6995C98C7C476B9DA3",
+        "fox-blender.png": "70B6FEED3E5E0101AFA288729C1676FA945F8329586529A8AEAAE9BD982C87C5",
+        "capture-1.png": "EA006E279053B5F51CB9599753A40686589480A5542CE55DBF6EABBFE0F54217",
+        "capture-1-gray.png": "72541C2DBF355C761184162A161CB7ED83EE81530B5A50505F0C8402940614E1",
+        "capture.json": "6AE432A07A4565839A592A2E3D779656947941E8861FB31A4794E74172E9565E",
+        "build.json": "BAEFA6C1C75F261E4F46948FFA54C9297BB75B62BB29D813360515106759E927",
+        "validation.json": "0B594EABD4A5A01B6647E32A9E3D8BF3C01ACD9BF8ABC3366A8D0F7CA1EE3821"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "mule",
+      "artifactRound": "G-23",
+      "status": "study",
+      "recipe": "art/recipes/mule/mule.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-25T10-47-28-180Z-11740",
+        "directory": "artifacts/graphics/G-23/approved/c22a2ed787ea1b19"
+      },
+      "bounds": {
+        "min": [
+          -0.465333,
+          0,
+          -0.136667
+        ],
+        "max": [
+          0.291667,
+          0.587283,
+          0.136667
+        ],
+        "size": [
+          0.757,
+          0.587283,
+          0.273333
+        ]
+      },
+      "recipeSha256": "460F52DA9D0A4696B7414608BA96235F7E75CF5DAC22F7D5F93EAA8C4D269D61",
+      "materials": [
+        "coat",
+        "light",
+        "dark",
+        "accent",
+        "pack"
+      ],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.24
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 25,
+        "meshes": 5,
+        "materials": 5,
+        "triangles": 3152
+      },
+      "hashes": {
+        "mule.blend": "05227496F2E56B179F6421D61B09189D64B943A2CEFD5FFB9729B85EE8AE363D",
+        "mule.glb": "C22A2ED787EA1B199D3FBD1994EE49BE10464B4CBEA3EDFF6913FB980089EE24",
+        "mule-blender.png": "57F9446B926EF49B00D30ED912FD041CD616B995FF78758439E5553C11176A36",
+        "capture-1.png": "C2ACEF44CD07B93AC421DD184C84344CFD90483DEB08DF3D5D7E80A1089395AF",
+        "capture-1-gray.png": "78E6CE9A3062FB4D8FC3449E1F576F799834D2E8787033088395872253B4CB36",
+        "capture.json": "DFF4EBD32DD94C21A6BDCA45613F1F2BA237CFE301D553BAC7CC0437470B78BF",
+        "build.json": "51F80F01607FBA0B297BD3A4AA7381C22DD583CBCAC5E3C1E9F14B58CB2B53F3",
+        "validation.json": "DA6F3E09425ECE88408FCD2922E6335E046AFD4355F5FEB8A117DDF3C1D58DF3"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "duck",
+      "artifactRound": "G-23",
+      "status": "study",
+      "recipe": "art/recipes/duck/duck.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-25T10-48-15-659Z-19440",
+        "directory": "artifacts/graphics/G-23/approved/3540d24e786cfce8"
+      },
+      "bounds": {
+        "min": [
+          -0.135,
+          0.000333,
+          -0.054167
+        ],
+        "max": [
+          0.113333,
+          0.203333,
+          0.054167
+        ],
+        "size": [
+          0.248333,
+          0.203,
+          0.108333
+        ]
+      },
+      "recipeSha256": "94E1E56B3B0B0350147B0B86A48787AB7C8282F5314FC0FB0D50CEE5C1834BC2",
+      "materials": [
+        "coat",
+        "light",
+        "dark",
+        "accent",
+        "bill"
+      ],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.075
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 19,
+        "meshes": 5,
+        "materials": 5,
+        "triangles": 816
+      },
+      "hashes": {
+        "duck.blend": "0A731D4222293EAE334F3336383450AE6B1D33BC1BA5FD36D8CA37322F6D94CA",
+        "duck.glb": "3540D24E786CFCE87CE49C6581E7297D0D55C28FCABD96C216B7849ACE2F73CE",
+        "duck-blender.png": "735EF30855A674AD0BF073785443AD0B5585FF58308E43E1E18923CB40CD93AB",
+        "capture-1.png": "0B77024AD77026D7AA9786094BFBD6789360974852C16D080BA68F9511293209",
+        "capture-1-gray.png": "4EB9E8C25335BD3F10F48355755002EEC954C2DF829520A29250979E38061B85",
+        "capture.json": "0DC582E0F50BA1FDD01FB6ACEEBB4DFD7946291EFD7D9D178F4C689D4FB50AA5",
+        "build.json": "C0CDBC4A93AD4D2430D82D9746A836C4284B7A6070D8FC8F4C549118C07B81BF",
+        "validation.json": "721745075D11B4128596339FEA1DB7B5359CB0FA10D91AA2CBF6E9FDDC124BF5"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
+      }
     }
   ]
 }

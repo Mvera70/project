@@ -238,7 +238,10 @@ export function castOf(
     if (!visiting(visitor)) continue;
     const { body } = visitor;
     const moving = Math.hypot(body.vx, body.vz) > 0.05;
-    const clip = moving ? visitor.pack ? 'carry_walk' : 'walk' : 'idle';
+    // Con mula, la carga va a lomos y él lleva el ramal: anda con las manos
+    // libres. Sólo carga él mismo el que viene a vender sin mula.
+    const carries = visitor.pack && visitor.mule === null;
+    const clip = moving ? carries ? 'carry_walk' : 'walk' : 'idle';
     const cellX = Math.max(0, Math.min(width - 1, Math.floor(body.x)));
     const cellZ = Math.max(0, Math.min(life.land.height - 1, Math.floor(body.z)));
     actors.push({
@@ -248,7 +251,7 @@ export function castOf(
       facing: body.facing,
       activity: moving ? 'walking' : 'resting',
       clip,
-      load: visitor.pack && moving ? 'bundle' : null,
+      load: carries && moving ? 'bundle' : null,
       poseSeconds: seconds,
       clipSeconds: clipTime(clip, visitor.travelled, seconds, 0),
       travelled: visitor.travelled,

@@ -1,16 +1,37 @@
 // G-23 · Autoría reproducible: ejecutar con un único id, validar y subir antes del siguiente.
 import fs from 'node:fs';
 const id = process.argv[2];
-if (!['cow', 'pig', 'hen', 'wolf', 'crow', 'fish'].includes(id)) throw Error('Especie desconocida');
+// El valle más vivo (25 sep 2026): perro, zorro, mula y pato, con el mismo
+// esqueleto que los de G-23. Una especie nueva nace de la cabecera del lobo.
+const NEW = ['dog', 'fox', 'mule', 'duck'];
+if (!['cow', 'pig', 'hen', 'wolf', 'crow', 'fish', ...NEW].includes(id)) throw Error('Especie desconocida');
+if (!fs.existsSync(`art/recipes/${id}/${id}.json`)) {
+  const base = JSON.parse(fs.readFileSync('art/recipes/wolf/wolf.json', 'utf8'));
+  base.id = id; base.metadata.kind = id;
+  fs.mkdirSync(`art/recipes/${id}`, { recursive: true });
+  fs.writeFileSync(`art/recipes/${id}/${id}.json`, JSON.stringify(base, null, 2) + '\n');
+}
+{
+  const catalog = JSON.parse(fs.readFileSync('art/catalog.json', 'utf8'));
+  if (!catalog.assets.some(a => a.id === id)) {
+    const wolf = catalog.assets.find(a => a.id === 'wolf');
+    catalog.assets.push({ ...wolf, id, recipe: `art/recipes/${id}/${id}.json`, approved: null, bounds: null,
+      recipeSha256: null, materials: [], clips: [], motion: [], connectors: [], statistics: null, hashes: null });
+    fs.writeFileSync('art/catalog.json', JSON.stringify(catalog, null, 2) + '\n');
+  }
+}
 const r = JSON.parse(fs.readFileSync(`art/recipes/${id}/${id}.json`, 'utf8'));
 r.primitives = []; r.clips = []; r.mergeByMaterial = true;
 r.metadata.note = 'G-23: animal articulado, silueta propia, clips idle y walk in-place; marcha vinculada a distancia en el juego.';
 r.materials = [
-  {name:'coat',color:({cow:'#765039',pig:'#b77968',hen:'#b07b47',wolf:'#666962',crow:'#303b40',fish:'#78918b'})[id],roughness:.9},
-  {name:'light',color:({cow:'#dfd2b3',pig:'#d29b85',hen:'#e5d1a5',wolf:'#a5a795',crow:'#56616a',fish:'#c8c9a8'})[id],roughness:.9},
+  {name:'coat',color:({cow:'#765039',pig:'#b77968',hen:'#b07b47',wolf:'#666962',crow:'#303b40',fish:'#78918b',dog:'#8a6440',fox:'#b8612c',mule:'#6e5a48',duck:'#8f8676'})[id],roughness:.9},
+  {name:'light',color:({cow:'#dfd2b3',pig:'#d29b85',hen:'#e5d1a5',wolf:'#a5a795',crow:'#56616a',fish:'#c8c9a8',dog:'#d8c4a0',fox:'#efe3cf',mule:'#b9a78e',duck:'#d9d2bf'})[id],roughness:.9},
   {name:'dark',color:'#302c29',roughness:.95},
-  {name:'accent',color:({cow:'#a78372',pig:'#96564d',hen:'#a13f31',wolf:'#373e3c',crow:'#222b30',fish:'#a38964'})[id],roughness:.85},
+  {name:'accent',color:({cow:'#a78372',pig:'#96564d',hen:'#a13f31',wolf:'#373e3c',crow:'#222b30',fish:'#a38964',dog:'#4a3a2c',fox:'#2e2622',mule:'#3a2e26',duck:'#2f5d3a'})[id],roughness:.85},
 ];
+// El pico del pato y la carga de la mula: un color que no tiene nadie más.
+if (id === 'duck') r.materials.push({name:'bill',color:'#d9913a',roughness:.8});
+if (id === 'mule') r.materials.push({name:'pack',color:'#a8845a',roughness:.95});
 // Sin paleta externa: colores de especie explícitos, sin alterar la compartida.
 delete r.palette;
 r.rig = {bones:[],bind:{}};
@@ -27,11 +48,13 @@ const fin = (name,location,width,depth,height,bind,rotationDegrees=[0,0,0]) => {
 bone('body',[0,0,.5]);
 let stride=.18;
 const legs=[];
-if (['cow','pig','wolf'].includes(id)) {
-  const cow=id==='cow',pig=id==='pig';
-  const length=cow?1.48:pig?1.02:1.22, width=cow?.66:pig?.58:.4;
-  const hip=cow?.72:pig?.34:.62, l=hip/2, h=cow?.63:pig?.48:.42;
-  stride=cow?.21:pig?.115:.2;
+if (['cow','pig','wolf','dog','fox','mule'].includes(id)) {
+  const cow=id==='cow',pig=id==='pig',dog=id==='dog',fox=id==='fox',mule=id==='mule';
+  // Largo, ancho, cadera, alto del tronco y zancada, en metros.
+  const size={cow:[1.48,.66,.72,.63,.21],pig:[1.02,.58,.34,.48,.115],wolf:[1.22,.4,.62,.42,.2],
+    dog:[.9,.32,.42,.34,.15],fox:[.78,.26,.3,.27,.13],mule:[1.5,.5,.86,.6,.24]}[id];
+  const [length,width,hip,h]=size, l=hip/2;
+  stride=size[4];
   piece('Torso',[0,0,hip+h*.48],[length,width,h],'coat','body',.10);
   piece('Chest',[-length*.34,0,hip+h*.48],[length*.36,width*1.05,h*1.05],'coat','body',.065);
   if(cow) {
@@ -46,16 +69,26 @@ if (['cow','pig','wolf'].includes(id)) {
   bone('head',[hx+.11,0,hz+.08],'neck');
   piece('Head',[hx,0,hz],[pig?.37:.36,width*.56,pig?.31:.39],cow?'light':'coat','head',.06);
   piece('Muzzle',[hx-.2,0,hz-.09],[pig?.14:.27,width*.53,.19],pig?'accent':cow?'accent':'light','head',.04);
-  if(id==='wolf'){
+  if(id==='wolf'||dog||fox){
     piece('Nose',[hx-.34,0,hz-.065],[.065,.18,.115],'accent','head',.018);
-    piece('Mane',[-.3,0,hip+h*.97],[.42,width*.8,.12],'accent','body',.04);
+    if(id==='wolf')piece('Mane',[-.3,0,hip+h*.97],[.42,width*.8,.12],'accent','body',.04);
+  }
+  if(mule){
+    // La crin corta a lo largo del cuello, y la albarda con dos serones.
+    piece('Mane',[-length*.5,0,hip+h*1.02],[.4,.08,.14],'accent','neck',.03);
+    piece('Saddle',[0,0,hip+h*1.0],[.62,width*1.08,.1],'pack','body',.03);
+    for(const side of [-1,1])piece('Pannier_'+(side<0?'L':'R'),[0,side*(width*.62),hip+h*.55],[.5,.2,.42],'pack','body',.04);
+    piece('Bundle',[.05,0,hip+h*1.18],[.44,.3,.22],'light','body',.05);
   }
   for(const side of [-1,1]) {
     piece('Eye_'+(side<0?'L':'R'),[hx-.075,side*width*.287,hz+.08],[.065,.018,.052],'dark','head',.009);
     piece('Nostril_'+(side<0?'L':'R'),[hx-(pig?.276:.34),side*width*.135,hz-.07],[.012,.043,.035],'dark','head',.006);
     bone('ear'+side,[hx+.09,side*width*.27,hz+.15],'head');
     if(cow||pig)piece('Ear_'+(side<0?'L':'R'),[hx+.09,side*width*.42,hz+.18],[.21,.22,.085],pig?'accent':'coat','ear'+side,.025);
-    else cone('Ear_'+(side<0?'L':'R'),[hx+.1,side*.13,hz+.27],.095,.24,'coat','ear'+side);
+    // El perro, orejas caídas; la mula, largas y tiesas; lobo y zorro, de punta.
+    else if(dog)piece('Ear_'+(side<0?'L':'R'),[hx+.08,side*width*.36,hz+.06],[.1,.05,.2],'accent','ear'+side,.02);
+    else if(mule)cone('Ear_'+(side<0?'L':'R'),[hx+.12,side*.1,hz+.32],.06,.38,'coat','ear'+side,[side*12,0,0]);
+    else cone('Ear_'+(side<0?'L':'R'),[hx+.1,side*(fox?.09:.13),hz+(fox?.2:.27)],fox?.07:.095,fox?.2:.24,fox?'accent':'coat','ear'+side);
     if(cow)cone('Horn_'+(side<0?'L':'R'),[hx+.13,side*.17,hz+.32],.055,.22,'light','head',[side*20,0,0]);
   }
   for(const [front,x] of [[true,-length*.33],[false,length*.34]])for(const side of [-1,1]) {
@@ -71,27 +104,37 @@ if (['cow','pig','wolf'].includes(id)) {
     piece('TailBase',[length*.55,0,hip+h*.67],[.19,.055,.055],'coat','tail',.012);
     piece('TailCurlUp',[length*.62,0,hip+h*.75],[.05,.055,.16],'coat','tail',.012);
     piece('TailCurlBack',[length*.59,0,hip+h*.84],[.1,.055,.055],'coat','tail',.012);
+  } else if(fox) {
+    // La cola del zorro: gruesa, baja y con la punta blanca.
+    piece('Tail',[length*.62,0,hip+h*.25],[.42,.17,.17],'coat','tail',.06);
+    piece('TailTip',[length*.86,0,hip+h*.2],[.14,.15,.15],'light','tail',.05);
+  } else if(dog) {
+    // La del perro, arriba y un poco curvada.
+    piece('Tail',[length*.55,0,hip+h*.95],[.08,.07,.3],'coat','tail',.02);
+    piece('TailTip',[length*.6,0,hip+h*1.12],[.1,.07,.08],'light','tail',.02);
   } else {
-    piece('Tail',[length*.53,0,hip+h*.35],[cow?.065:.16,.09,cow?.68:.5],'coat','tail',.026);
-    piece('TailTip',[length*.54,0,hip+h*.35-(cow?.34:.24)],[cow?.13:.16,.12,.18],'dark','tail',.035);
+    piece('Tail',[length*.53,0,hip+h*.35],[cow||mule?.065:.16,.09,cow||mule?.68:.5],'coat','tail',.026);
+    piece('TailTip',[length*.54,0,hip+h*.35-(cow||mule?.34:.24)],[cow||mule?.13:.16,.12,.18],'dark','tail',.035);
   }
   r.referenceRender={width:600,height:600,cameraLocation:[-3.2,-4,2.6],cameraTarget:[0,0,.65],orthoScale:3.05,worldColor:'#bec9c0'};
-} else if(id==='hen'||id==='crow') {
-  const hen=id==='hen',hip=hen?.19:.16;
+} else if(id==='hen'||id==='crow'||id==='duck') {
+  const duck=id==='duck',hen=id==='hen'||duck,hip=hen?.19:.16;
   stride=hen?.075:.08;
   piece('Breast',[-.05,0,.31],[.33,.24,.28],hen?'light':'coat','body',.075);
   piece('Back',[.08,0,.33],[.3,.23,.22],'coat','body',.06);
   bone('neck',[-.16,0,.35],'body');
-  piece('Neck',[-.17,0,.43],[.13,.14,.23],hen?'light':'coat','neck',.035);
+  piece('Neck',[-.17,0,.43],[.13,.14,.23],duck?'accent':hen?'light':'coat','neck',.035);
   bone('head',[-.18,0,.5],'neck');
-  piece('Head',[-.21,0,.53],[.17,.145,.16],'coat','head',.035);
-  cone('Beak',[-.33,0,.515],.045,hen?.1:.16,hen?'light':'dark','head',[0,-90,0]);
+  // El pato: cabeza verde y pico ancho y plano, no de punta.
+  piece('Head',[-.21,0,.53],[.17,.145,.16],duck?'accent':'coat','head',.035);
+  if(duck)piece('Bill',[-.34,0,.5],[.13,.075,.035],'bill','head',.012);
+  else cone('Beak',[-.33,0,.515],.045,hen?.1:.16,hen?'light':'dark','head',[0,-90,0]);
   for(const side of [-1,1]) {
     piece('Eye_'+(side<0?'L':'R'),[-.25,side*.075,.55],[.035,.012,.03],hen?'dark':'light','head',.005);
     const n=side<0?'legL':'legR';bone(n,[0,side*.07,hip],'body');bone(n+'Lower',[0,side*.07,.10],n);bone(n+'Foot',[0,side*.07,.025],n+'Lower');
     piece(n+'Thigh',[0,side*.07,.16],[.055,.055,.11],'coat',n,.01);
-    piece(n+'Shin',[0,side*.07,.065],[.025,.028,.1],hen?'light':'dark',n+'Lower',.005);
-    for(const toe of [-1,0,1])piece(n+'Toe'+(toe+1),[-.04,side*.07+toe*.025,.015],[.12,.015,.028],hen?'light':'dark',n+'Foot',.005);
+    piece(n+'Shin',[0,side*.07,.065],[.025,.028,.1],duck?'bill':hen?'light':'dark',n+'Lower',.005);
+    for(const toe of [-1,0,1])piece(n+'Toe'+(toe+1),[-.04,side*.07+toe*.025,.015],[.12,.015,.028],duck?'bill':hen?'light':'dark',n+'Foot',.005);
     legs.push({n,l1:hip-.10,l2:.075,hip,phase:side<0?0:.5});
     bone('wing'+side,[.03,side*.1,.39],'body');
     piece('Wing_'+(side<0?'L':'R'),[.045,side*.125,.335],[.26,.075,.16],hen?'coat':'accent','wing'+side,.04);
@@ -99,8 +142,10 @@ if (['cow','pig','wolf'].includes(id)) {
   }
   bone('tail',[.19,0,.36],'body');
   piece('Rump',[.19,0,.35],[.18,.18,.17],'coat','tail',.035);
-  for(let k=0;k<3;k++)piece('TailFeather'+k,[(hen?.23:.31)+k*.035,(k-1)*.045,hen?.40+k*.025:.31],[hen?.18:.28,.055,hen?.16:.055],'dark','tail',.018);
-  if(hen){for(let k=0;k<3;k++)piece('Comb'+k,[-.25+k*.045,0,.63],[.052,.035,.065-k*.006],'accent','head',.015);piece('Wattle',[-.27,0,.455],[.04,.06,.08],'accent','head',.015);}
+  // La del pato, corta y plana, con el rizo negro del macho.
+  if(duck){piece('TailFeather0',[.27,0,.37],[.14,.14,.045],'dark','tail',.012);piece('TailCurl',[.29,0,.42],[.05,.04,.06],'dark','tail',.01);}
+  else for(let k=0;k<3;k++)piece('TailFeather'+k,[(hen?.23:.31)+k*.035,(k-1)*.045,hen?.40+k*.025:.31],[hen?.18:.28,.055,hen?.16:.055],'dark','tail',.018);
+  if(hen&&!duck){for(let k=0;k<3;k++)piece('Comb'+k,[-.25+k*.045,0,.63],[.052,.035,.065-k*.006],'accent','head',.015);piece('Wattle',[-.27,0,.455],[.04,.06,.08],'accent','head',.015);}
   r.referenceRender={width:600,height:600,cameraLocation:[-1.3,-1.8,1.15],cameraTarget:[0,0,.3],orthoScale:1.1,worldColor:'#bec9c0'};
   for(const primitive of r.primitives)if(primitive.dimensions&&Math.min(...primitive.dimensions)<.09)primitive.bevel=0;
 } else {

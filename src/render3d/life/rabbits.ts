@@ -64,7 +64,7 @@ function clearLine(land: Terrain, from: Point, to: Point): boolean {
 }
 
 /** El prado que linda con el bosque: una celda de hierba con árboles al lado. */
-function edgeOfWood(state: GameState, x: number, z: number): boolean {
+export function edgeOfWood(state: GameState, x: number, z: number): boolean {
   const { width, height, terrain } = state.map;
   if (terrain[z * width + x] !== TERRAIN_CODE.meadow) return false;
   for (let dz = -1; dz <= 1; dz += 1) {

@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "assetId": "duck",
+  "runId": "2026-09-25T10-48-15-659Z-19440",
+  "status": "pass",
+  "durationMs": 7264,
+  "candidateSha256": "3540D24E786CFCE87CE49C6581E7297D0D55C28FCABD96C216B7849ACE2F73CE",
+  "glb": {
+    "version": 2,
+    "declaredLength": 192508,
+    "nodeNames": [
+      "legLFoot",
+      "legLLower",
+      "legL",
+      "legRFoot",
+      "legRLower",
+      "legR",
+      "head",
+      "neck",
+      "tail",
+      "wing1",
+      "wing-1",
+      "body",
+      "duck_accent",
+      "duck_bill",
+      "duck_coat",
+      "duck_dark",
+      "duck_light",
+      "duck_Rig",
+      "Root"
+    ],
+    "meshNames": [
+      "duck_accent_Mesh",
+      "duck_bill_Mesh",
+      "duck_coat_Mesh",
+      "duck_dark_Mesh",
+      "duck_light_Mesh"
+    ],
+    "materialNames": [
+      "accent",
+      "bill",
+      "coat",
+      "dark",
+      "light"
+    ],
+    "animationNames": [
+      "idle",
+      "walk"
+    ],
+    "finitePositionAccessors": 5,
+    "statistics": {
+      "objects": 19,
+      "meshes": 5,
+      "materials": 5,
+      "triangles": 816
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-25T10:48:25.245Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-48-15-659Z-19440\\candidate\\duck.glb",
+      "assetUrl": "/artifacts/graphics/G-23/runs/2026-09-25T10-48-15-659Z-19440/candidate/duck.glb",
+      "viewport": {
+        "width": 600,
+        "height": 600,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.54",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-48-15-659Z-19440\\three\\capture-1.png",
+        "sha256": "0B77024AD77026D7AA9786094BFBD6789360974852C16D080BA68F9511293209",
+        "dimensions": {
+          "width": 600,
+          "height": 600
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-48-15-659Z-19440\\three\\capture-1-gray.png",
+          "sha256": "4EB9E8C25335BD3F10F48355755002EEC954C2DF829520A29250979E38061B85",
+          "dimensions": {
+            "width": 600,
+            "height": 600
+          }
+        },
+        "durationMs": 4766,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:60871/artifacts/graphics/G-23/runs/2026-09-25T10-48-15-659Z-19440/candidate/duck.glb",
+          "viewport": {
+            "width": 600,
+            "height": 600,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "idle",
+            "duration": 8.041666984558105
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "body",
+            "duck_Rig",
+            "duck_accent",
+            "duck_bill",
+            "duck_coat",
+            "duck_dark",
+            "duck_light",
+            "head",
+            "legL",
+            "legLFoot",
+            "legLLower",
+            "legR",
+            "legRFoot",
+            "legRLower",
+            "neck",
+            "tail",
+            "wing-1",
+            "wing1"
+          ],
+          "bounds": {
+            "min": [
+              -0.135,
+              0.000333,
+              -0.054167
+            ],
+            "max": [
+              0.113333,
+              0.203333,
+              0.054167
+            ],
+            "size": [
+              0.248333,
+              0.203,
+              0.108333
+            ]
+          },
+          "loadDurationMs": 248
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-48-15-659Z-19440\\three\\capture-2.png",
+        "sha256": "0B77024AD77026D7AA9786094BFBD6789360974852C16D080BA68F9511293209",
+        "dimensions": {
+          "width": 600,
+          "height": 600
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-48-15-659Z-19440\\three\\capture-2-gray.png",
+          "sha256": "4EB9E8C25335BD3F10F48355755002EEC954C2DF829520A29250979E38061B85",
+          "dimensions": {
+            "width": 600,
+            "height": 600
+          }
+        },
+        "durationMs": 121,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:60871/artifacts/graphics/G-23/runs/2026-09-25T10-48-15-659Z-19440/candidate/duck.glb",
+          "viewport": {
+            "width": 600,
+            "height": 600,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "idle",
+            "duration": 8.041666984558105
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "body",
+            "duck_Rig",
+            "duck_accent",
+            "duck_bill",
+            "duck_coat",
+            "duck_dark",
+            "duck_light",
+            "head",
+            "legL",
+            "legLFoot",
+            "legLLower",
+            "legR",
+            "legRFoot",
+            "legRLower",
+            "neck",
+            "tail",
+            "wing-1",
+            "wing1"
+          ],
+          "bounds": {
+            "min": [
+              -0.135,
+              0.000333,
+              -0.054167
+            ],
+            "max": [
+              0.113333,
+              0.203333,
+              0.054167
+            ],
+            "size": [
+              0.248333,
+              0.203,
+              0.108333
+            ]
+          },
+          "loadDurationMs": 30
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:60871/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=600&height=600&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 199,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-25T10-48-15-659Z-19440\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

@@ -16,6 +16,7 @@
 
 import { hash32 } from '@engine/rng';
 import type { GameState, HappeningId } from '@engine/state';
+import type { Animal } from '@derive/animals';
 import type { Body, Point, Terrain } from './body';
 import { fitsCircle, integrate, turnTo } from './body';
 import { LIFE_STEP } from './clock';
@@ -46,8 +47,16 @@ export interface Visitor {
   travelled: number;
   /** Pasos seguidos sin avanzar: al pasar de `STALL_STEPS`, se rehace la ruta. */
   stalled: number;
-  /** Si lleva fardo: el que viene a vender, sí; el de paso, no. */
+  /** Si trae género: el que viene a vender, sí; el de paso, no. */
   readonly pack: boolean;
+  /**
+   * La mula del que viene a vender, con la carga a lomos: va detrás de él, por
+   * donde él ha pisado. Pedida por Vera («mula de buhonero mejor») frente a la
+   * carretilla. `null` para el forastero y para el segundo de una pareja.
+   */
+  readonly mule: { x: number; z: number; moving: boolean } | null;
+  /** Por dónde ha pisado, para que la mula lo siga sin atajar por una casa. */
+  readonly trail: Point[];
 }
 
 /**
@@ -173,6 +182,8 @@ export function createVisitors(
         travelled: 0,
         stalled: 0,
         pack: visit.pack,
+        mule: visit.pack && n === 0 ? { x: from.x, z: from.z, moving: false } : null,
+        trail: [{ x: from.x, z: from.z }],
       });
     }
   }
@@ -218,6 +229,11 @@ export function visiting(visitor: Visitor): boolean {
  * irse no llega a salir: ese día ya se fue.
  */
 export function stepVisitor(visitor: Visitor, land: Terrain, phase: number, step: number): void {
+  moveVisitor(visitor, land, phase, step);
+  followWithMule(visitor);
+}
+
+function moveVisitor(visitor: Visitor, land: Terrain, phase: number, step: number): void {
   const { body } = visitor;
   if (visitor.phase === 'gone') return;
   if (visitor.phase === 'waiting') {
@@ -294,3 +310,42 @@ export function stepVisitor(visitor: Visitor, land: Terrain, phase: number, step
 
 /** Pasos sin avanzar antes de rehacer la ruta: medio segundo escénico. */
 const STALL_STEPS = Math.round(0.5 / LIFE_STEP);
+
+/** Lo que va la mula detrás del ramal, en celdas, y lo que anda como mucho. */
+const MULE_BEHIND = 1.1;
+const MULE_PACE = VISITOR_PACE * 1.3;
+const TRAIL_STEP = 0.25;
+const TRAIL_KEEP = 16;
+
+function followWithMule(visitor: Visitor): void {
+  const { mule, trail, body } = visitor;
+  if (mule === null) return;
+  const last = trail[trail.length - 1]!;
+  if (Math.hypot(body.x - last.x, body.z - last.z) > TRAIL_STEP) {
+    trail.push({ x: body.x, z: body.z });
+    if (trail.length > TRAIL_KEEP) trail.shift();
+  }
+  // El punto de la huella que queda a un ramal de distancia; si él está quieto
+  // y la mula ya llegó, se queda donde está.
+  let target: Point | null = null;
+  for (let n = trail.length - 1; n >= 0; n -= 1) {
+    const point = trail[n]!;
+    if (Math.hypot(point.x - body.x, point.z - body.z) >= MULE_BEHIND) { target = point; break; }
+  }
+  const gap = target === null ? 0 : Math.hypot(target.x - mule.x, target.z - mule.z);
+  mule.moving = target !== null && gap > 0.05;
+  if (!mule.moving || target === null) return;
+  const move = Math.min(gap, MULE_PACE * LIFE_STEP);
+  mule.x += ((target.x - mule.x) / gap) * move;
+  mule.z += ((target.z - mule.z) / gap) * move;
+}
+
+/** La mula, como animal para el render, si está a la vista. */
+export function muleOf(visitor: Visitor): Animal[] {
+  if (visitor.mule === null || !visiting(visitor)) return [];
+  return [{ id: MULE_ID_BASE - visitor.body.id - VISITOR_ID_BASE, kind: 'mule', x: visitor.mule.x, y: visitor.mule.z,
+    action: visitor.mule.moving ? 'walk' : undefined }];
+}
+
+/** Fuera de los animales del valle (40 000–44 299). */
+const MULE_ID_BASE = 44_300;

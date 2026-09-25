@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-24T14:52:43.798Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids axe,pickaxe",
+  "generatedAt": "2026-09-25T10:48:38.409Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids dog,fox,mule,duck",
   "assets": [
     {
       "id": "axis-marker",
@@ -1200,6 +1200,102 @@
         "kind": "original",
         "source": "Modelado original para The Valley, 24 sep 2026, pedido por Vera; sin proveedor generativo.",
         "license": "Project original"
+      }
+    },
+    {
+      "id": "dog",
+      "file": "dog.glb",
+      "sha256": "5A40929BD3EC5D765E1A167307DF53B6945FC84FC222F78A3DE1750FBF2C3F0F",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.15
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "fox",
+      "file": "fox.glb",
+      "sha256": "6BD39948587E59A5A94B601C5AA7923CDE8023F6F5DAEF6995C98C7C476B9DA3",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.13
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "mule",
+      "file": "mule.glb",
+      "sha256": "C22A2ED787EA1B199D3FBD1994EE49BE10464B4CBEA3EDFF6913FB980089EE24",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.24
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "duck",
+      "file": "duck.glb",
+      "sha256": "3540D24E786CFCE87CE49C6581E7297D0D55C28FCABD96C216B7849ACE2F73CE",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.075
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
       }
     }
   ]

@@ -19,7 +19,7 @@ import { TERRAIN_CODE } from '@engine/state';
 import { seasonOf, weekOf } from '@engine/time';
 
 export type AnimalKind = 'hen' | 'pig' | 'cow' | 'crow' | 'wolf' | 'fish'
-  | 'partridge' | 'rabbit' | 'deer' | 'boar' | 'bear';
+  | 'partridge' | 'rabbit' | 'deer' | 'boar' | 'bear' | 'dog' | 'fox' | 'duck' | 'mule';
 
 export interface Animal {
   id: number;

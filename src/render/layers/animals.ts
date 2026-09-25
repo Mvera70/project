@@ -25,7 +25,8 @@ export function paintAnimals(
   // never the other way round.
   for (const animal of animals) {
     if (animal.kind === 'partridge' || animal.kind === 'rabbit'
-      || animal.kind === 'deer' || animal.kind === 'boar' || animal.kind === 'bear') continue; // Fauna salvaje sólo en 3D.
+      || animal.kind === 'deer' || animal.kind === 'boar' || animal.kind === 'bear'
+      || animal.kind === 'dog' || animal.kind === 'fox' || animal.kind === 'duck' || animal.kind === 'mule') continue; // Sólo en 3D.
     SPRITES[animal.kind](ctx, animal.x, animal.y, cell, palette, 0);
   }
 }

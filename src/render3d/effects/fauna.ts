@@ -36,6 +36,13 @@ const TURN_FLOOR = 0.02;
 const FISH_LEVEL = -0.14;
 
 /**
+ * A qué altura flota un pato, en celdas. La lámina está diez centésimas por
+ * debajo del prado; el pato hunde en ella las patas (0,06 celdas a escala), así
+ * que su origen —los pies— va un poco más abajo y se ve sólo el cuerpo.
+ */
+const DUCK_LEVEL = -0.16;
+
+/**
  * Saca de la corriente a un animal de tierra.
  *
  * Las posiciones vienen de las anclas de §7.7 —la gallina al umbral, la vaca al
@@ -207,7 +214,8 @@ export class Fauna {
           body = new AnimalMotion(animal.kind, object, asset, animal.id);
           this.animated.set(animal.id, body); this.group.add(body.group);
         }
-        body.place(animal, animal.kind === 'fish' ? FISH_LEVEL : this.ground(animal.x, animal.y), seconds, delta);
+        body.place(animal, animal.kind === 'fish' ? FISH_LEVEL : animal.kind === 'duck' ? DUCK_LEVEL
+          : this.ground(animal.x, animal.y), seconds, delta);
         continue;
       }
       const list = byKind.get(animal.kind);

@@ -55,12 +55,15 @@ import {
   approachOf, type Gate, type Raider,
 } from './raiders';
 import type { HappeningId } from '@engine/state';
-import { createVisitors, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
+import { createVisitors, muleOf, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
 import { createDeer, deerPositions, stepDeer } from './deer';
 import { createRabbits, rabbitPositions, stepRabbits } from './rabbits';
+import {
+  createDog, createDucks, createFox, dogPosition, duckPositions, foxPosition, stepDog, stepDucks, stepFox,
+} from './companions';
 import { bearPosition, createBear, stepBear } from './bear';
 import { beginFlight, stepFlight, type Flight } from './flee';
 import { createSackScene, sackSnapshot, type SackScene, type SackSnapshot } from './sack';
@@ -323,6 +326,8 @@ export interface Village {
    * sortea. Tampoco son vecinos, así que van por su lista.
    */
   readonly visitors: readonly Visitor[];
+  /** El zorro de la noche, si el valle tiene linde para él: en qué anda y dónde vive. */
+  readonly fox: { readonly phase: string; readonly den: Point } | null;
   /**
    * C2 · Los puestos del cerco ocupados hoy, con su arma y su puesto (§1b).
    *
@@ -735,6 +740,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // teniendo sentido narrativo aunque no quede ninguna a la que asustar.
   const wolfRaid = wolfRaidToday(state);
   const henAnchor = beasts.find((beast) => beast.kind === 'hen')?.anchor ?? heart;
+  // El valle más vivo · el perro de una casa, el zorro que ronda el gallinero
+  // de noche y los patos del agua más cercana (`companions.ts`).
+  const dog = createDog(state, land, seed, heart);
+  const fox = createFox(state, land, seed, heart, henAnchor);
+  const ducks = createDucks(state, seed, heart);
   // V-11 · **Y cuando hay reunión, la reunión es lo único que se ofrece.**
   //
   // Medido, porque mi primera versión sólo sustituía los sitios del valle y
@@ -1345,6 +1355,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
 
     get raiders(): readonly Raider[] { return raiders; },
     get visitors(): readonly Visitor[] { return visitors; },
+    get fox() { return fox === null ? null : { phase: fox.phase, den: fox.den }; },
 
     get manned(): readonly Manned[] { return manned; },
 
@@ -1371,7 +1382,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     },
 
     get wildlife(): readonly Animal[] {
-      return [...deerPositions(deer), ...rabbitPositions(rabbits, steps), ...bearPosition(bear), ...(wolf !== null && wolf.phase !== 'gone'
+      return [...deerPositions(deer), ...rabbitPositions(rabbits, steps), ...dogPosition(dog),
+        ...foxPosition(fox), ...duckPositions(ducks), ...visitors.flatMap(muleOf), ...bearPosition(bear), ...(wolf !== null && wolf.phase !== 'gone'
         ? [{ id: wolf.body.id, kind: 'wolf' as const, x: wolf.body.x, y: wolf.body.z }]
         : [])];
     },
@@ -2545,7 +2557,13 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       stepDeer(deer, land, seed, steps, dwellers,
         wolf !== null && wolf.phase !== 'gone' ? wolf.body : null,
         bear !== null && bear.phase !== 'gone' ? bear.body : null);
-      stepRabbits(rabbits, land, seed, steps, phase, dwellers.filter((dweller) => !indoors(dweller)));
+      const abroad = dwellers.filter((dweller) => !indoors(dweller));
+      stepRabbits(rabbits, land, seed, steps, phase, abroad);
+      stepDog(dog, land, seed, steps, isNight(phase),
+        abroad.filter((dweller) => dweller.ageGroup === 'child').map((dweller) => dweller.body),
+        visitors.filter(visiting).map((visitor) => visitor.body));
+      stepFox(fox, land, seed, steps, isNight(phase), abroad.map((dweller) => dweller.body));
+      stepDucks(ducks, state, seed, steps);
 
       // 8 · La cabaña vive su propio paso. V-08.
       //
