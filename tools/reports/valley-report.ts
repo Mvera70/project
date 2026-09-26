@@ -137,11 +137,15 @@ const report: ValleyReport = {
   ladder: LADDER.map(([name]) => name),
   valleys,
   seconds: Math.round((Date.now() - started) / 1000),
+  // Lo que cuesta: la memoria máxima del proceso, en MB (un solo hilo).
+  peakMb: Math.round(process.resourceUsage().maxRSS / 1024),
 };
 const dir = join(OUT_ROOT, `${stamp}-${LABEL}`);
 mkdirSync(dir, { recursive: true });
 writeFileSync(join(dir, 'data.json'), JSON.stringify(report));
 writeFileSync(join(dir, 'report.html'), reportPage(report));
+// La misma página, como fragmento para publicarla (el visor pone el resto).
+writeFileSync(join(dir, 'report-publish.html'), reportPage(report, { publish: true }));
 
 // El índice: una fila por ejecución guardada, para compararlas de un vistazo.
 const runs: RunSummary[] = [];
@@ -159,4 +163,4 @@ for (const name of readdirSync(OUT_ROOT).sort().reverse()) {
   });
 }
 writeFileSync(join(OUT_ROOT, 'index.html'), indexPage(runs));
-process.stdout.write(`\n${join(dir, 'report.html')}\n${join(OUT_ROOT, 'index.html')}\n`);
+process.stdout.write(`\n${report.seconds} s · memoria máxima ${report.peakMb} MB\n${join(dir, 'report.html')}\n${join(OUT_ROOT, 'index.html')}\n`);

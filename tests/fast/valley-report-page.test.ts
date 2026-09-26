@@ -22,12 +22,21 @@ describe('El informe del valle, en HTML', () => {
   it('es autocontenido: sin recursos de fuera, y la crónica no cierra el script de datos', () => {
     const html = reportPage(report);
     expect(html).not.toMatch(/<script[^>]+src=/u);
-    expect(html).not.toMatch(/<link[^>]+href=/u);
+    // Lo único de fuera son las letras del juego (Google Fonts), con respaldo:
+    // sin red, la página se lee igual con las del sistema.
+    for (const [, href] of html.matchAll(/<link[^>]+href="([^"]+)"/gu)) expect(href).toMatch(/^https:\/\/fonts\.(googleapis|gstatic)\.com/u);
     // El texto de la crónica va escapado dentro del JSON: un `</script>` en una
     // línea no puede cerrar el bloque de datos antes de tiempo.
     const data = html.slice(html.indexOf('<script id="data"'), html.indexOf('</script>', html.indexOf('<script id="data"')));
     expect(data).toContain('\\u003c/script>');
     expect(JSON.parse(data.slice(data.indexOf('>') + 1).replace(/\\u003c/gu, '<')).valleys[0].seed).toBe(7);
+  });
+
+  it('para publicar sale como fragmento, sin el enlace al índice local', () => {
+    const html = reportPage(report, { publish: true });
+    expect(html.startsWith('<title>')).toBe(true);
+    expect(html).not.toMatch(/<html|<body|<!doctype/iu);
+    expect(html).not.toContain('../index.html');
   });
 
   it('el índice enlaza cada ejecución con su informe', () => {
