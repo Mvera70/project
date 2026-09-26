@@ -48,6 +48,7 @@ import { stallOf } from './life/visitors';
 import { yardsOf, type Yard } from '../derive/yards';
 import { festivityOf } from '@derive/festivity';
 import { buildGreatOak, type GreatOak } from './world/great-oak';
+import { buildWaterfalls, type Waterfalls } from './world/waterfalls';
 import { greatOakCell } from '@derive/landmark';
 import { mountainWolves } from './world/mountain-wolves';
 import { ridgeAt } from './world/ridge';
@@ -451,6 +452,7 @@ export async function createGraphicsRenderer(
   let backdrop: Backdrop | null = null;
   // UI-W · el roble del emblema a la orilla del lago (`world/great-oak.ts`).
   let greatOak: GreatOak | null = null;
+  let waterfalls: Waterfalls | null = null;
   // El valle más vivo · niebla, pájaros y luciérnagas (`effects/ambience.ts`).
   let ambience: Ambience | null = null;
   let ambienceSky: SkyKind = 'clear';
@@ -907,6 +909,13 @@ export async function createGraphicsRenderer(
     }
     greatOak = buildGreatOak(state.map, palette);
     world.add(greatOak.group);
+    // Las cascadas de las gargantas y del lago: decorado del mapa, como el roble.
+    if (waterfalls !== null) {
+      world.remove(waterfalls.group);
+      waterfalls.dispose();
+    }
+    waterfalls = buildWaterfalls(state.map, state.terrainSeed, (x, z) => elevationAt(state.map, x, z));
+    world.add(waterfalls.group);
     if (ambience !== null) {
       world.remove(ambience.group);
       ambience.dispose();
@@ -1665,9 +1674,18 @@ export async function createGraphicsRenderer(
       festoon.place(plazaOf(shown), groundFloor);
       festoon.step(forceFestoon || festivityOf(shown) !== null, phase, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       cast.show(lastActors, life.physics?.ragdolls ?? []);
+      // Quien cruza el vado o anda por la orilla salpica a cada paso.
+      for (const actor of lastActors) {
+        if (actor.clip !== 'walk' && actor.clip !== 'carry_walk') continue;
+        if (!wadingCell(shown.map, actor.x, actor.z)) continue;
+        cast.waters.wade(actor.id, actor.x, groundFloor(actor.x, actor.z), actor.z);
+      }
+      cast.waters.endWading();
       // IA-anim · las astillas van con el reloj de la escena: en pausa, quietas.
       cast.chips.step(frame.deltaSeconds, groundFloor);
-      cast.waters.step(frame.deltaSeconds, groundFloor);
+      waterfalls?.step(frame.deltaSeconds);
+      cast.waters.churn(waterfalls?.feet ?? [], frame.deltaSeconds);
+      cast.waters.step(frame.deltaSeconds, groundFloor, wallsOf(state, groundFloor));
       cast.stains.step(frame.deltaSeconds);
       stepShakes(frame.deltaSeconds);
       // D.7 · sólo el robledal realmente interpuesto ante el encuentro pierde
@@ -1801,7 +1819,7 @@ export async function createGraphicsRenderer(
       stepClouds(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       ambience?.step(phase, clockOf(shown.tick).season, ambienceSky, frame.speed === 0 ? 0 : frame.realDeltaSeconds, camera);
       yards.step(phase, clockOf(shown.tick).season, ambienceSky, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
-      puddles?.step(wetnessAt(ambienceSky, skyAt(shown, today - 1).kind, phase), groundFloor);
+      puddles?.step(wetnessAt(ambienceSky, skyAt(shown, today - 1).kind, phase), groundFloor, frame.deltaSeconds);
       // Y la luz que hace a esa hora, con el cielo que haga encima.
       light(phase, frame.speed, overcastOf(sky));
       // El destello sigue al parpadeo del rayo (`weather.flash`, 0 a 1): el
@@ -2128,6 +2146,11 @@ export async function createGraphicsRenderer(
         greatOak.dispose();
         greatOak = null;
       }
+      if (waterfalls !== null) {
+        world.remove(waterfalls.group);
+        waterfalls.dispose();
+        waterfalls = null;
+      }
       if (ambience !== null) {
         world.remove(ambience.group);
         ambience.dispose();
@@ -2287,4 +2310,29 @@ function wetCell(map: GameState['map'], x: number, z: number): boolean {
   if (x < 0 || z < 0 || x >= map.width || z >= map.height) return false;
   const t = map.terrain[Math.floor(z) * map.width + Math.floor(x)];
   return t === TERRAIN_CODE.water || t === TERRAIN_CODE.lake;
+}
+
+/**
+ * Las paredes contra las que choca el agua de los cubos: los edificios en pie
+ * —no los campos—, con su planta un poco recogida y la altura de un muro. Del
+ * estado vivo, como el fuego: la casa que se apaga es la que arde ahora.
+ */
+const WALL_TOP = 0.9;
+const WALL_INSET = 0.12;
+function wallsOf(state: Readonly<GameState>, ground: (x: number, z: number) => number): (x: number, y: number, z: number) => boolean {
+  return (x, y, z) => {
+    for (const b of state.buildings) {
+      if (b.lostTick !== null || b.kind === 'field') continue;
+      if (x < b.x + WALL_INSET || x > b.x + b.w - WALL_INSET || z < b.y + WALL_INSET || z > b.y + b.h - WALL_INSET) continue;
+      if (y < ground(x, z) + WALL_TOP) return true;
+    }
+    return false;
+  };
+}
+
+/** Si en ese punto se anda por el agua: el vado, o el cauce mismo. */
+function wadingCell(map: GameState['map'], x: number, z: number): boolean {
+  if (x < 0 || z < 0 || x >= map.width || z >= map.height) return false;
+  const t = map.terrain[Math.floor(z) * map.width + Math.floor(x)];
+  return t === TERRAIN_CODE.ford || t === TERRAIN_CODE.water;
 }

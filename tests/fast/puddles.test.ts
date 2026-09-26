@@ -29,4 +29,24 @@ describe('El valle más vivo · los charcos', () => {
       puddles.dispose();
     }
   });
+
+  it('crecen mientras llueve: pocos al empezar, todos al rato, y se van al secarse', () => {
+    // Vera, 26 sep 2026: «que los charcos crezcan mientras llueve, en lugar de
+    // aparecer ya hechos».
+    for (const seed of [7, 23]) {
+      const state = foundTwenty(seed);
+      run(state, TIME.WEEKS_PER_YEAR * 10, 'prudent', CATALOG);
+      const puddles = createPuddles(state.map, state.plaza);
+      puddles.step(0, () => 0, 1);
+      puddles.step(1, () => 0, 3);
+      const early = puddles.shown;
+      for (let s = 0; s < 60; s += 1) puddles.step(1, () => 0, 1);
+      const full = puddles.shown;
+      expect(early, `semilla ${seed}: al empezar, pocos`).toBeLessThan(full / 2);
+      expect(full, `semilla ${seed}: al rato, muchos`).toBeGreaterThan(10);
+      puddles.step(0, () => 0, 1);
+      expect(puddles.shown).toBe(0);
+      puddles.dispose();
+    }
+  });
 });

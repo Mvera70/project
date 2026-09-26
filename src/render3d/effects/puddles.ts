@@ -27,6 +27,14 @@ const SHARE_PATH = 600;
 const SHARE_TRAFFIC = 220;
 const SHARE_PLAZA = 450;
 const PLAZA_RADIUS = 3.5;
+/**
+ * Lo que tardan en llenarse del todo, en segundos de presentación: un tercio
+ * de jornada (`SCENIC_DAY_SECONDS` son 120). TUNE visual: Vera, 26 sep 2026,
+ * «que los charcos crezcan mientras llueve, en lugar de aparecer ya hechos».
+ */
+const FILL_SECONDS = 40;
+/** Hasta qué punto del llenado espera el último charco en asomar: salen de uno en uno. */
+const LATEST = 0.6;
 
 /**
  * Lo mojado que está el suelo, de 0 a 1: lloviendo, del todo; el día después
@@ -42,14 +50,20 @@ export interface Puddles {
   readonly group: Group;
   /** Cuántos se ven ahora (para la traza y las pruebas). */
   readonly shown: number;
-  step(wetness: number, ground: (x: number, z: number) => number): void;
+  /**
+   * `seconds` es el tiempo de presentación desde el paso anterior: mientras
+   * llueve, los charcos se van llenando a lo largo de él. Sin él, se ponen al
+   * nivel de `wetness` de golpe (lo que hacían antes, y lo que quieren las
+   * pruebas que sólo miran dónde salen).
+   */
+  step(wetness: number, ground: (x: number, z: number) => number, seconds?: number): void;
   dispose(): void;
 }
 
 export function createPuddles(map: ValleyMap, plaza: { x: number; y: number }): Puddles {
   const group = new Group();
   group.name = 'Valley_Puddles';
-  const spots: { x: number; z: number; size: number; turn: number }[] = [];
+  const spots: { x: number; z: number; size: number; turn: number; from: number }[] = [];
   for (let cell = 0; cell < map.terrain.length && spots.length < PUDDLES; cell += 1) {
     const x = cell % map.width;
     const z = Math.floor(cell / map.width);
@@ -62,6 +76,7 @@ export function createPuddles(map: ValleyMap, plaza: { x: number; y: number }): 
       z: Math.floor(cell / map.width) + 0.2 + (hash32(cell, 'puddle:z') % 600) / 1000,
       size: 0.14 + (hash32(cell, 'puddle:size') % 240) / 1000,
       turn: (hash32(cell, 'puddle:turn') % 628) / 100,
+      from: ((hash32(cell, 'puddle:from') % 1000) / 1000) * LATEST,
     });
   }
   const geometry = new CircleGeometry(1, 12);
@@ -84,28 +99,41 @@ export function createPuddles(map: ValleyMap, plaza: { x: number; y: number }): 
   const size = new Vector3();
   const turn = new Quaternion();
   const up = new Vector3(0, 1, 0);
-  let placed = false;
+  // Lo lleno que está el suelo, de 0 a 1: sube despacio mientras llueve y baja
+  // con `wetness`, que ya se seca a lo largo de la mañana siguiente.
+  let fill = -1;
+  let drawnAt = -1;
   let shown = 0;
 
   return {
     group,
     get shown() { return shown; },
-    step(wetness, ground): void {
-      if (!placed) {
-        placed = true;
-        spots.forEach((spot, n) => {
-          at.set(spot.x, ground(spot.x, spot.z) + 0.012, spot.z);
-          size.set(spot.size, 1, spot.size * 0.7);
-          turn.setFromAxisAngle(up, spot.turn);
-          matrix.compose(at, turn, size);
-          mesh.setMatrixAt(n, matrix);
-        });
-        mesh.instanceMatrix.needsUpdate = true;
+    step(wetness, ground, seconds = Infinity): void {
+      // La primera vez, el suelo está como diga el cielo: quien abre la partida
+      // con lluvia la encuentra lloviendo desde hace rato.
+      if (fill < 0) fill = wetness;
+      else if (wetness > fill) fill = Math.min(wetness, fill + seconds / FILL_SECONDS);
+      else fill = wetness;
+      if (Math.abs(fill - drawnAt) < 0.004) return;
+      drawnAt = fill;
+      // Cada charco asoma cuando el llenado pasa su umbral y crece hasta su
+      // tamaño; los que aún no han asomado no se dibujan.
+      let n = 0;
+      for (const spot of spots) {
+        const grown = Math.min(1, Math.max(0, (fill - spot.from) / (1 - spot.from)));
+        if (grown <= 0.02) continue;
+        const radius = spot.size * Math.sqrt(grown);
+        at.set(spot.x, ground(spot.x, spot.z) + 0.012, spot.z);
+        size.set(radius, 1, radius * 0.7);
+        turn.setFromAxisAngle(up, spot.turn);
+        matrix.compose(at, turn, size);
+        mesh.setMatrixAt(n, matrix);
+        n += 1;
       }
-      // Al secarse se aclaran hasta desaparecer.
-      mesh.count = wetness <= 0.02 ? 0 : spots.length;
-      shown = mesh.count;
-      material.opacity = 0.55 * Math.min(1, wetness * 1.2);
+      mesh.count = n;
+      mesh.instanceMatrix.needsUpdate = true;
+      shown = n;
+      material.opacity = 0.55 * Math.min(1, fill * 1.5);
     },
     dispose(): void {
       geometry.dispose();

@@ -1,5 +1,19 @@
 # The Valley — Registro de cambios
 
+## v4.64 · 26 sep 2026 · Agua que choca, salpica, se llena y cae
+
+Las cuatro cosas que v4.63 dejó al alcance, pedidas por Vera:
+- **El agua del cubo choca con la pared** de la casa y escurre por ella hasta
+  el suelo, y un poco rebota hacia atrás. Antes la atravesaba.
+- **Quien cruza el vado salpica**: cada pisada en el vado o en el cauce abre un
+  anillo y levanta dos gotas.
+- **Los charcos crecen mientras llueve**: cada uno asoma a su tiempo y se
+  ensancha a lo largo de un tercio de jornada, en vez de aparecer ya hecho.
+- **Cascadas**: una baja por la pared de cada garganta hasta el río, y otra
+  al lago si hay roca detrás. Es una cinta pegada a la roca con vetas que bajan
+  y espuma al pie. Se elige la pared que mira a la cámara: en la otra sólo
+  se veía la espuma.
+
 ## v4.63 · 26 sep 2026 · El agua viva
 
 Vera: «mejorar el agua … que se vea viva, que se sienta con físicas; ahora

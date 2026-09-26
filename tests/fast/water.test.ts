@@ -7,10 +7,13 @@
 // apunta y baja después.
 
 import { describe, expect, it } from 'vitest';
-import { Vector3 } from 'three';
+import { type Mesh, Vector3 } from 'three';
 import { foundGame } from '@engine/found';
 import { WaterThrows } from '../../src/render3d/effects/water-throws';
 import { floodOf } from '../../src/derive/flood';
+import { buildWaterfalls, waterfallSites } from '../../src/render3d/world/waterfalls';
+import { elevationAt } from '../../src/render3d/world/ground';
+import { valleyAxis } from '../../src/render3d/world/valley-profile';
 
 const flat = (): number => 0;
 
@@ -53,6 +56,43 @@ describe('el agua que se tira', () => {
     water.dispose();
   });
 
+  it('contra una pared, el agua choca y escurre al pie: no pasa al otro lado', () => {
+    // Vera, 26 sep 2026: «que las gotas choquen con la pared y escurran».
+    const water = new WaterThrows();
+    // Una pared de una celda de alto que empieza a media celda del cubo.
+    const wall = (_x: number, y: number, z: number): boolean => z > 0.5 && z < 1.5 && y < 1;
+    water.throw(new Vector3(0, 0.6, 0), new Vector3(0, 0, 1), 3);
+    const landings: number[] = [];
+    const seen = new Set<object>();
+    let slid = 0;
+    for (let frame = 0; frame < 240; frame += 1) {
+      water.step(1 / 60, flat, wall);
+      slid = Math.max(slid, water['live'].filter((d) => d !== null && d.sliding).length);
+      for (const ring of water['ringsLive']) {
+        if (ring === null || seen.has(ring)) continue;
+        seen.add(ring);
+        landings.push(ring.z);
+      }
+    }
+    expect(slid, 'hay agua escurriendo por la pared').toBeGreaterThan(5);
+    expect(Math.max(...landings), 'y nada cae detrás de ella').toBeLessThanOrEqual(0.5);
+    water.dispose();
+  });
+
+  it('quien cruza el vado salpica a cada paso, y quien está quieto no', () => {
+    // Vera, 26 sep 2026: «que quien cruza el vado salpique».
+    const water = new WaterThrows();
+    for (let frame = 0; frame <= 60; frame += 1) {
+      water.wade(1, 0, 0, frame * 0.03); // 1,8 celdas andadas
+      water.wade(2, 5, 0, 5); // quieto en el agua
+      water.endWading();
+    }
+    const rings = water['ringsLive'].filter((r) => r !== null);
+    expect(rings.length, 'unas seis pisadas').toBeGreaterThanOrEqual(5);
+    expect(rings.every((r) => r!.x < 1), 'y ninguna del que está quieto').toBe(true);
+    water.dispose();
+  });
+
   it('la lluvia salpica la tierra, nunca donde hay agua, y sin lluvia nada', () => {
     const water = new WaterThrows();
     const dry = (x: number): boolean => x < 0;
@@ -75,5 +115,34 @@ describe('la riada', () => {
     expect(floodOf(state)).toBe(0.5);
     state.tick += 1;
     expect(floodOf(state)).toBe(0);
+  });
+});
+
+describe('las cascadas', () => {
+  it('una baja por la pared de cada garganta hasta el río, cae de verdad y sólo baja', () => {
+    // Vera, 26 sep 2026: «una cascada … como decorado en la garganta o junto al lago».
+    for (const seed of [7, 11, 23]) {
+      const { map, terrainSeed } = foundGame(seed);
+      const height = (x: number, z: number): number => elevationAt(map, x, z);
+      const sites = waterfallSites(map, terrainSeed, height);
+      const gorges = sites.filter((site) => site.kind === 'gorge');
+      expect(gorges.length, `semilla ${seed}: una por garganta`).toBe(2);
+      for (const site of sites) {
+        expect(height(site.top.x, site.top.z) - height(site.bottom.x, site.bottom.z)).toBeGreaterThan(1.5);
+      }
+      for (const site of gorges) {
+        // El pie, en la orilla del río: a menos de dos celdas del eje.
+        expect(Math.abs(site.bottom.x - valleyAxis(map, site.bottom.z))).toBeLessThan(2);
+      }
+      const falls = buildWaterfalls(map, terrainSeed, height);
+      expect(falls.feet.length).toBe(sites.length);
+      for (const mesh of falls.group.children) {
+        const position = (mesh as Mesh).geometry.getAttribute('position');
+        for (let i = 2; i < position.count; i += 2) {
+          expect(position.getY(i), 'el agua nunca sube').toBeLessThanOrEqual(position.getY(i - 2) + 1e-6);
+        }
+      }
+      falls.dispose();
+    }
   });
 });

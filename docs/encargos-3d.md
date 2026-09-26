@@ -127,12 +127,9 @@ brigada en una captura todavía: está probada en `fire-brigade.test.ts`.
 Hecho en v4.63: el agua viva, la lluvia sobre ella, la riada y el cubo que se
 tira. Pendiente, por orden de lo que se vería:
 
-- **Las gotas del cubo atraviesan la pared** de la casa que arde: el efecto no
-  conoce los muros. Deberían chocar y escurrir.
-- **Quien cruza el vado no salpica.**
-- **Los charcos aparecen, no crecen**: cuando empieza a llover ya están.
-- **No hay cascadas.** El mapa no tiene saltos de agua; una en la garganta o
-  en el circo del lago sería decorado.
+- ~~Las gotas atraviesan la pared; el vado no salpica; los charcos no crecen;
+  no hay cascadas.~~ Hecho en v4.64. Queda: la cascada del lago se ve estrecha
+  desde la cámara de reposo, y la niebla al pie de las cascadas no existe.
 - **Los pájaros son una uve dibujada**: encargados a Astra
   (`encargos/encargo-astra-modelos.md`, final).
 

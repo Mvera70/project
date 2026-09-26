@@ -1,5 +1,23 @@
 # Cuaderno de tareas — el rework
 
+## 26 sep 2026 · Agua que choca, salpica, se llena y cae (v4.64)
+
+- `effects/water-throws.ts`: `step(…, solid)` con `sliding`, porque las gotas
+  chocan y escurren (el renderer pasa `wallsOf`, los edificios en pie menos los
+  campos, con un muro de 0,9); `wade`/`endWading` da una pisada cada 0,3
+  celdas en el vado o el cauce; `churn` pinta la espuma al pie de las cascadas.
+- `effects/puddles.ts`: `step(…, seconds)` los llena en `FILL_SECONDS` 40, y
+  cada charco tiene su umbral (`LATEST` 0,6). Al abrir la partida con lluvia
+  ya están llenos.
+- `world/waterfalls.ts` (nuevo): `waterfallSites` pone una por garganta y una
+  en el lago, puntuadas por caída y por lo de cara a la cámara. La cinta se
+  separa 0,28 de la roca para que las facetas no la tapen, y la textura corre
+  hacia abajo.
+- Pruebas: `water.test.ts` (pared, vado, cascadas en tres semillas) y
+  `puddles.test.ts` (crecen). Capturas: `artifacts/graphics/env/fall3-sheet.png`.
+- Suite rápida: las mismas 6 rojas. **Abierto:** la cascada del lago queda
+  estrecha desde la cámara de reposo.
+
 ## 26 sep 2026 · El agua viva (v4.63), y el alcance del agua
 
 **Hecho.** `world/water-surface.ts` parchea el material del agua con

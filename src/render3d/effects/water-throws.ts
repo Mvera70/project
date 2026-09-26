@@ -40,7 +40,30 @@ const RAIN_RINGS = 40;
 /** Lo lejos de lo que se mira que caen, en celdas. */
 const RAIN_RADIUS = 9;
 
-interface Drop { x: number; y: number; z: number; vx: number; vy: number; vz: number; age: number; size: number; bounces: number }
+interface Drop {
+  x: number; y: number; z: number; vx: number; vy: number; vz: number; age: number; size: number; bounces: number;
+  /** Si va escurriendo por una pared: cae despacio, pegada a ella. */
+  sliding: boolean;
+}
+
+/**
+ * Lo que hay sólido en el aire, para que el agua choque: si el punto está
+ * dentro de una pared. Sin ello las gotas atravesaban la casa que ardía.
+ */
+export type Solid = (x: number, y: number, z: number) => boolean;
+
+/**
+ * Cada cuánto camino salpica quien vadea, en celdas: una pisada. TUNE visual:
+ * un aldeano da un paso de unos 0,25 celdas (75 cm).
+ */
+const STRIDE = 0.3;
+/** Salpicaduras por segundo al pie de las cascadas, entre todas. TUNE visual. */
+const CHURN = 14;
+/** Lo que se abre el anillo de una pisada en el agua, en celdas. */
+const RING_WADE = 0.16;
+
+/** Lo deprisa que escurre el agua por una pared, en celdas por segundo. TUNE visual. */
+const SLIDE = 0.55;
 interface Ring { x: number; y: number; z: number; age: number; size: number }
 
 function unit(seed: number): number {
@@ -61,6 +84,11 @@ export class WaterThrows {
   private nextDrop = 0;
   private nextRing = 0;
   private rainClock = 0;
+  /** Quién vadea: dónde pisó la última vez y cuánto lleva andado desde entonces. */
+  private readonly waders = new Map<number, { x: number; z: number; walked: number; steps: number; seen: number }>();
+  private wadeFrame = 0;
+  private churnClock = 0;
+  private churnCount = 0;
   private rainCount = 0;
   private readonly matrix = new Matrix4();
   private readonly rotation = new Quaternion();
@@ -102,7 +130,7 @@ export class WaterThrows {
       this.live[this.nextDrop] = {
         x: from.x, y: from.y, z: from.z,
         vx: forward.x * push + side.x * spread, vy: 0.9 + c * 0.8, vz: forward.z * push + side.z * spread,
-        age: -n * 0.006, size: 0.03 + c * 0.025, bounces: 0,
+        age: -n * 0.006, size: 0.03 + c * 0.025, bounces: 0, sliding: false,
       };
       this.nextDrop = (this.nextDrop + 1) % DROPS;
     }
@@ -133,8 +161,68 @@ export class WaterThrows {
     }
   }
 
-  /** Avanza las gotas y los anillos; las gotas caen al suelo que diga `ground`. */
-  step(seconds: number, ground: (x: number, z: number) => number): void {
+  /**
+   * Alguien anda por el agua —el vado, la orilla—: cada pisada abre un anillo
+   * y levanta dos gotas. Se llama por fotograma con quien está en el agua; a
+   * quien sale se le olvida solo.
+   */
+  wade(id: number, x: number, y: number, z: number): void {
+    const was = this.waders.get(id);
+    if (was === undefined) { this.waders.set(id, { x, z, walked: 0, steps: 0, seen: this.wadeFrame }); return; }
+    was.walked += Math.hypot(x - was.x, z - was.z);
+    was.x = x; was.z = z; was.seen = this.wadeFrame;
+    if (was.walked < STRIDE) return;
+    was.walked -= STRIDE;
+    was.steps += 1;
+    // Un pie y el otro: el anillo cae a un lado y al otro del camino.
+    const side = was.steps % 2 === 0 ? 0.04 : -0.04;
+    this.ring(x + side, y + 0.02, z - side, RING_WADE);
+    for (let k = 0; k < 2; k += 1) {
+      const angle = unit(id * 7919 + was.steps * 31 + k) * Math.PI * 2;
+      this.live[this.nextDrop] = {
+        x: x + side, y: y + 0.03, z: z - side,
+        vx: Math.cos(angle) * 0.35, vy: 0.55 + k * 0.15, vz: Math.sin(angle) * 0.35,
+        age: 0, size: 0.018, bounces: 1, sliding: false,
+      };
+      this.nextDrop = (this.nextDrop + 1) % DROPS;
+    }
+  }
+
+  /**
+   * La espuma al pie de una cascada: anillos que se abren y gotas que saltan,
+   * a ritmo fijo y sin dados (`world/waterfalls.ts`).
+   */
+  churn(feet: readonly { x: number; y: number; z: number }[], seconds: number): void {
+    if (feet.length === 0) return;
+    this.churnClock += seconds * CHURN;
+    while (this.churnClock >= 1) {
+      this.churnClock -= 1;
+      this.churnCount += 1;
+      const foot = feet[this.churnCount % feet.length]!;
+      const n = this.churnCount;
+      const ox = (unit(n * 7_919 + 3) - 0.5) * 0.5, oz = (unit(n * 104_729 + 5) - 0.5) * 0.5;
+      this.ring(foot.x + ox, foot.y + 0.03, foot.z + oz, RING_SPLASH * (0.7 + unit(n * 31 + 1) * 0.6));
+      const angle = unit(n * 15_485_863 + 9) * Math.PI * 2;
+      this.live[this.nextDrop] = {
+        x: foot.x + ox, y: foot.y + 0.05, z: foot.z + oz,
+        vx: Math.cos(angle) * 0.4, vy: 0.9 + unit(n * 13 + 2) * 0.6, vz: Math.sin(angle) * 0.4,
+        age: 0, size: 0.022, bounces: 1, sliding: false,
+      };
+      this.nextDrop = (this.nextDrop + 1) % DROPS;
+    }
+  }
+
+  /** Olvida a quien no ha vadeado en el último fotograma. */
+  endWading(): void {
+    for (const [id, was] of this.waders) if (was.seen !== this.wadeFrame) this.waders.delete(id);
+    this.wadeFrame += 1;
+  }
+
+  /**
+   * Avanza las gotas y los anillos; las gotas caen al suelo que diga `ground`
+   * y, si se da `solid`, chocan con las paredes y escurren por ellas.
+   */
+  step(seconds: number, ground: (x: number, z: number) => number, solid?: Solid): void {
     let drawn = 0;
     for (let i = 0; i < DROPS; i += 1) {
       const drop = this.live[i];
@@ -142,8 +230,28 @@ export class WaterThrows {
       drop.age += seconds;
       if (drop.age < 0) continue;
       if (drop.age > 2.5) { this.live[i] = null; continue; }
-      drop.vy -= GRAVITY * seconds;
-      drop.x += drop.vx * seconds; drop.y += drop.vy * seconds; drop.z += drop.vz * seconds;
+      if (drop.sliding) {
+        drop.y -= SLIDE * seconds;
+      } else {
+        drop.vy -= GRAVITY * seconds;
+        const nx = drop.x + drop.vx * seconds, ny = drop.y + drop.vy * seconds, nz = drop.z + drop.vz * seconds;
+        if (drop.bounces === 0 && solid?.(nx, ny, nz) === true) {
+          // Contra la pared: se queda en la cara donde tocó y escurre hacia
+          // abajo; y un poco de agua rebota hacia atrás.
+          drop.sliding = true;
+          for (let k = 0; k < 2; k += 1) {
+            const angle = unit(i * 173 + k * 29 + Math.round(drop.y * 100)) - 0.5;
+            this.live[this.nextDrop] = {
+              x: drop.x, y: drop.y, z: drop.z,
+              vx: -drop.vx * 0.25 + angle * 0.3, vy: 0.3 + k * 0.2, vz: -drop.vz * 0.25 - angle * 0.3,
+              age: 0, size: drop.size * 0.4, bounces: 1, sliding: false,
+            };
+            this.nextDrop = (this.nextDrop + 1) % DROPS;
+          }
+        } else {
+          drop.x = nx; drop.y = ny; drop.z = nz;
+        }
+      }
       const floor = ground(drop.x, drop.z) + 0.01;
       if (drop.y <= floor) {
         // La salpicadura: la gota grande rebota en tres pequeñas y deja anillo;
@@ -155,7 +263,7 @@ export class WaterThrows {
             this.live[this.nextDrop] = {
               x: drop.x, y: floor + 0.02, z: drop.z,
               vx: Math.cos(angle) * 0.5 + drop.vx * 0.15, vy: 0.7 + k * 0.15, vz: Math.sin(angle) * 0.5 + drop.vz * 0.15,
-              age: 0, size: drop.size * 0.45, bounces: 1,
+              age: 0, size: drop.size * 0.45, bounces: 1, sliding: false,
             };
             this.nextDrop = (this.nextDrop + 1) % DROPS;
           }
@@ -163,8 +271,10 @@ export class WaterThrows {
         this.live[i] = null;
         continue;
       }
-      // Estirada en la dirección en que vuela: así se lee agua y no granizo.
-      this.direction.set(drop.vx, drop.vy, drop.vz);
+      // Estirada en la dirección en que vuela: así se lee agua y no granizo. La
+      // que escurre, estirada hacia abajo y más fina: es un reguero.
+      if (drop.sliding) this.direction.set(0, -SLIDE * 2, 0);
+      else this.direction.set(drop.vx, drop.vy, drop.vz);
       const speed = this.direction.length();
       this.rotation.setFromUnitVectors(UP, this.direction.multiplyScalar(1 / Math.max(speed, 1e-4)));
       this.scale.set(drop.size, drop.size * (1 + speed * 0.9), drop.size);
@@ -198,7 +308,7 @@ export class WaterThrows {
   /** Cuántos anillos hay abiertos. */
   get open(): number { return this.ringsLive.filter(ring => ring !== null).length; }
 
-  clear(): void { this.live.fill(null); this.ringsLive.fill(null); this.drops.count = 0; this.rings.count = 0; }
+  clear(): void { this.live.fill(null); this.ringsLive.fill(null); this.waders.clear(); this.drops.count = 0; this.rings.count = 0; }
 
   dispose(): void {
     this.drops.geometry.dispose(); (this.drops.material as MeshStandardMaterial).dispose();
