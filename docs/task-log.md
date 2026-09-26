@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 26 sep 2026 · Rocas romas y la senda pegada al río (v4.62)
+
+`rockShape` (`world/mountains.ts`): `DodecahedronGeometry`, empuje de 0,88 a
+1,08 y cima aplastada desde `ROCK_CROWN` 0,5 (36 triángulos por roca, antes
+20). `buildGorgeRoads` busca la orilla real con `wet`/`soggy`, sin contar la
+marisma; ensancha con el máximo de las vecinas y luego promedia
+(`ROAD_SMOOTH` 4); la cota se promedia a lo largo (`ROAD_LEVEL` 6) y es plana
+de lado a lado. Hecho en una copia aparte de `main`, porque otra sesión tiene
+la carpeta en `art/bear-anatomy-v3`. Capturas:
+`artifacts/graphics/env/rocks7-sheet.png` (en esa copia).
+
 ## 26 sep 2026 · La sierra, fundida (v4.61)
 
 `paintFacets` (`world/mountains.ts`) pinta por vértice con `sharedUps`, la

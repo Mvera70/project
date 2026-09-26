@@ -1,5 +1,17 @@
 # The Valley — Registro de cambios
 
+## v4.62 · 26 sep 2026 · Rocas romas y la senda, pegada al río
+
+Vera: «algunas piedras son demasiado puntiagudas». Los peñascos y el mojón
+salen ahora de un dodecaedro, que no tiene un vértice solo arriba. Se empujan
+sus puntos de 0,88 a 1,08 en lugar de 0,72 a 1,22, y la cima se aplasta como
+una roca gastada. Al mirarlas de cerca apareció otro defecto: la senda de la
+garganta doblaba en zigzag y subía por la pared. Ahora sigue la orilla real del
+río en lugar del eje del valle. Cruza la marisma en vez de rodearla. Se suaviza
+sin mojarse: primero cada muestra toma la mayor distancia al agua de sus
+vecinas y después se promedia. Y va a una cota suavizada y plana de lado a
+lado, como una plataforma, en lugar de copiar cada bache de la ladera.
+
 ## v4.61 · 26 sep 2026 · La sierra, fundida
 
 Vera: la forma facetada le gusta, pero no que cada triángulo cambie de color

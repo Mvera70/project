@@ -23,7 +23,7 @@
 // sale del mapa y de un hash, así que el mismo valle da siempre la misma sierra.
 
 import {
-  BufferAttribute, BufferGeometry, Color, DoubleSide, DynamicDrawUsage, Euler, Group, IcosahedronGeometry, InstancedMesh,
+  BufferAttribute, BufferGeometry, Color, DodecahedronGeometry, DoubleSide, DynamicDrawUsage, Euler, Group, InstancedMesh,
   Matrix4, Mesh, MeshStandardMaterial, Quaternion, Vector3,
 } from 'three';
 import { hash32 } from '@engine/rng';
@@ -225,8 +225,14 @@ export function buildMountainSkin(map: ValleyMap, palette: Palette, snow = 0): M
 const SHAPES = 5;
 
 /** Una roca facetada: un icosaedro con los vértices movidos, aplastado. */
+/** Desde qué altura (de 1) se aplasta la cima de una roca. */
+const ROCK_CROWN = 0.5;
+
 function rockShape(seed: number): BufferGeometry {
-  const base = new IcosahedronGeometry(1, 0);
+  // Un dodecaedro y no un icosaedro: más redondo y sin un vértice solo en lo
+  // alto, que con el empuje salía en punta (Vera, 26 sep 2026: «algunas son
+  // demasiado puntiagudas»). Treinta y seis triángulos, contra veinte.
+  const base = new DodecahedronGeometry(1, 0);
   const position = base.getAttribute('position') as BufferAttribute;
   // Los vértices del icosaedro vienen repetidos por cara: se mueven igual los
   // que están en el mismo sitio, o la roca se abre.
@@ -236,11 +242,15 @@ function rockShape(seed: number): BufferGeometry {
     let to = moved.get(key);
     if (to === undefined) {
       const k = moved.size;
-      const push = 0.72 + unit(seed * 97 + k, 'rock:push') * 0.5;
+      // TUNE visual: de 0,88 a 1,08. Con 0,72 a 1,22 un vértice podía salir
+      // casi el doble que su vecino, y eso es una aguja.
+      const push = 0.88 + unit(seed * 97 + k, 'rock:push') * 0.2;
       to = new Vector3(position.getX(i), position.getY(i), position.getZ(i)).multiplyScalar(push);
       moved.set(key, to);
     }
-    position.setXYZ(i, to.x, to.y * 0.62, to.z);
+    // Y la cima rebajada: lo que pasa de 0,5 se aplasta, como una roca gastada.
+    const y = to.y > ROCK_CROWN ? ROCK_CROWN + (to.y - ROCK_CROWN) * 0.35 : to.y;
+    position.setXYZ(i, to.x, y * 0.62, to.z);
   }
   base.translate(0, 0.25, 0);
   base.computeVertexNormals();
@@ -409,11 +419,16 @@ export interface GorgeRoads { mesh: Mesh; season(palette: Palette): void; dispos
 const ROAD_IN = 14;
 const ROAD_OUT = 42;
 /** Ancho de la senda, y su distancia al eje del río. TUNE visual: el río ocupa dos celdas. */
-const ROAD_WIDTH = 0.75;
-const ROAD_OFFSETS = [1.9, 2.3, 2.8, 3.4, 4, 4.6];
+const ROAD_WIDTH = 0.6;
+/** Lo más cerca del eje que va la senda aunque no haya agua, en celdas. */
+const ROAD_MIN = 1.9;
 /** El paso de muestreo de la senda y cuántas muestras a cada lado promedia el suavizado. */
 const ROAD_STEP = 0.5;
-const ROAD_SMOOTH = 6;
+const ROAD_SMOOTH = 4;
+/** Cuántas muestras a cada lado promedia la cota de la senda. */
+const ROAD_LEVEL = 6;
+/** Hasta dónde a cada lado del eje se busca el agua, en celdas. */
+const ROAD_SEARCH = 6;
 
 export function buildGorgeRoads(
   map: ValleyMap, seed: number, palette: Palette, heightAt: (x: number, z: number) => number,
@@ -430,27 +445,55 @@ export function buildGorgeRoads(
     // Primero lo lejos del eje que puede ir sin mojarse, muestra a muestra; y
     // luego suavizado, que con los saltos de una orilla a otra la senda salía
     // en zigzag y trepaba por la pared (captura del 26 sep).
+    // Lo lejos del eje que va la senda en cada muestra: justo pasada la orilla
+    // real del río, que no es el eje del valle —el cauce serpentea— y medido
+    // con la propia agua, dentro del mapa y fuera.
     const offsets: number[] = [];
     for (let i = 0; i <= count; i += 1) {
       const z = zOf(i * ROAD_STEP);
-      const off = ROAD_OFFSETS.find((o) => !wet(axis(z) + side * o, z)
-        && !soggy(map, axis(z) + side * (o - ROAD_WIDTH * 0.5 - ROAD_SMOOTH_SLACK), z)
-        && !soggy(map, axis(z) + side * (o + ROAD_WIDTH * 0.5 + ROAD_SMOOTH_SLACK), z)) ?? ROAD_OFFSETS.at(-1)!;
-      offsets.push(off + Math.sin(i * 0.23 + unit(seed, `road:w:${end}`) * 6) * 0.18);
+      const centre = axis(z);
+      let bank = -Infinity;
+      for (let d = -ROAD_SEARCH; d <= ROAD_SEARCH; d += 0.1) {
+        const x = centre + side * d;
+        if (wet(x, z) || soggy(map, x, z)) bank = Math.max(bank, d);
+      }
+      const dry = bank === -Infinity ? ROAD_MIN : Math.max(ROAD_MIN, bank + ROAD_WIDTH * 0.5 + ROAD_SMOOTH_SLACK);
+      offsets.push(dry);
     }
-    const centre = offsets.map((_, i) => {
-      let sum = 0, n = 0;
-      for (let k = Math.max(0, i - ROAD_SMOOTH); k <= Math.min(count, i + ROAD_SMOOTH); k += 1) { sum += offsets[k]!; n += 1; }
+    // Suave y sin mojarse: primero cada muestra toma lo más lejos que pida
+    // cualquiera de sus vecinas y después se promedia. Así el promedio nunca
+    // queda más cerca del agua que ninguna muestra cruda. Con el máximo
+    // aplicado después del promedio, los saltos volvían y la senda doblaba en
+    // zigzag (captura del 26 sep).
+    const window = (i: number): [number, number] => [Math.max(0, i - ROAD_SMOOTH), Math.min(count, i + ROAD_SMOOTH)];
+    const wide = offsets.map((_, i) => {
+      const [from, to] = window(i);
+      return Math.max(...offsets.slice(from, to + 1));
+    });
+    const centre = wide.map((_, i) => {
+      const [from, to] = window(i);
+      let sum = 0;
+      for (let k = from; k <= to; k += 1) sum += wide[k]!;
       const z = zOf(i * ROAD_STEP);
-      // Nunca más cerca del río que la muestra cruda: el promedio suaviza el
-      // trazado, pero no puede meterlo en el agua.
-      return { x: axis(z) + side * Math.max(sum / n, offsets[i]!), z };
+      // Y un vaivén suave, siempre hacia fuera del río.
+      const sway = (Math.sin(i * 0.23 + unit(seed, `road:w:${end}`) * 6) + 1) * 0.1;
+      return { x: axis(z) + side * (sum / (to - from + 1) + sway), z };
     });
     const fadeAt = (i: number): number => Math.max(0, Math.min(1, (length - i * ROAD_STEP) / 12));
+    // La cota va suavizada a lo largo y plana de lado a lado, como una
+    // plataforma: copiando cada bache de la ladera, con la cámara en diagonal
+    // cada subida se leía como un quiebro y la senda salía en dientes de sierra
+    // (captura del 26 sep, semilla 11).
+    const raw = centre.map((p) => heightAt(p.x, p.z));
+    const level = raw.map((_, i) => {
+      let sum = 0, n = 0;
+      for (let k = Math.max(0, i - ROAD_LEVEL); k <= Math.min(count, i + ROAD_LEVEL); k += 1) { sum += raw[k]!; n += 1; }
+      return sum / n;
+    });
     const edge = (i: number, s: number): number[] => {
       const p = centre[i]!;
       const x = p.x + s * ROAD_WIDTH * 0.5 * (0.5 + 0.5 * fadeAt(i));
-      return [x, heightAt(x, p.z) + GROUND_BIAS + ROAD_LIFT, p.z];
+      return [x, level[i]! + GROUND_BIAS + ROAD_LIFT, p.z];
     };
     for (let i = 0; i < count; i += 1) {
       const a = edge(i, -1), b = edge(i, 1), c = edge(i + 1, -1), d = edge(i + 1, 1);
@@ -488,13 +531,17 @@ export function buildGorgeRoads(
 }
 
 /** El margen que se deja al agua porque el suavizado puede acercar la senda a la orilla. */
-const ROAD_SMOOTH_SLACK = 0.35;
+const ROAD_SMOOTH_SLACK = 0.12;
 
-/** Si en ese punto del mapa hay agua o marisma; fuera del mapa, nunca (eso lo mira `wet`). */
+/**
+ * Si en ese punto del mapa hay agua; fuera del mapa, nunca (eso lo mira `wet`).
+ * La marisma no cuenta: una senda la cruza, y en la garganta, donde la ribera
+ * es de dos celdas y a veces toda marisma, contarla la subía por la pared.
+ */
 function soggy(map: ValleyMap, x: number, z: number): boolean {
   if (x < 0 || z < 0 || x >= map.width || z >= map.height) return false;
   const t = map.terrain[Math.floor(z) * map.width + Math.floor(x)];
-  return t === TERRAIN_CODE.water || t === TERRAIN_CODE.lake || t === TERRAIN_CODE.marsh || t === TERRAIN_CODE.ford;
+  return t === TERRAIN_CODE.water || t === TERRAIN_CODE.lake || t === TERRAIN_CODE.ford;
 }
 
 /** Lo que la senda se levanta sobre el suelo, en celdas. TUNE: con 0,02 el suelo, que no es plano entre vértices, la tapaba a trozos. */
