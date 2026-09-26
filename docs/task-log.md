@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 26 sep 2026 · Oso v3: torso anatómico
+
+Vera vio el cuerpo del oso como un cilindro. `bear-v3.glb` sustituye esa masa
+por pecho profundo, vientre curvo, flanco recogido y grupa diferenciada, sin
+volver a la chepa de la primera versión. Conserva las garras y el gesto de
+erguirse. Capturas de perfil, tres cuartos y erguido en
+[`deliverables/marked-models-trial/`](../deliverables/marked-models-trial/README.md).
+Publicado solo el oso mediante `rigid-clips.mjs`, `adopt-models.mjs` y
+`publish-assets.ts`; en el juego tiene `attack`, `walk` e `idle`. Los otros diez
+modelos no cambiaron.
+
 ## 26 sep 2026 · El camino de la garganta, el fondo cerrado y el encargo a Astra (v4.60)
 
 `buildGorgeRoads` en `world/mountains.ts` (montado en `backdrop.ts`);
@@ -67,8 +78,9 @@ cerrada llega en 4 de 6 valles, mediana 423 h a ×1; un valle tomado al año 31.
 
 ## 25 sep 2026 · Los once modelos de Vera, integrados; el perro, los puestos y el trato
 
-**Modelos** (`deliverables/marked-models-trial/`, 63db59c; `bear-v2.glb` es el
-oso vigente; el zorro y la piedra del vado quedaron fuera del encargo):
+**Modelos** (`deliverables/marked-models-trial/`, 63db59c; `bear-v2.glb` era el
+oso de aquella ronda, sustituido por `bear-v3.glb` el 26 sep; el zorro y la
+piedra del vado quedaron fuera del encargo):
 
 - Los animales son **nodos rígidos** con los mismos nombres de articulación que
   el generador de G-23. `tools/art/rigid-clips.mjs` les añade `idle`/`walk`
@@ -108,9 +120,9 @@ media ronda; dos commits míos cayeron allí y se trajeron a `main` en orden.
 Vera marcó once modelos para rehacer: lobo, oso, perdiz, jabalí, perro, mula,
 azada, cubo, flecha, escudo y pico. Las propuestas y capturas están en
 [`deliverables/marked-models-trial/`](../deliverables/marked-models-trial/README.md).
-El oso vigente es `bear-v2.glb`, tras corregir la chepa. Zorro y piedra del
-vado quedaron fuera. No están integrados: los animales no conservan los clips
-anteriores `idle`/`walk` ni el esqueleto original.
+El oso de esa ronda fue `bear-v2.glb`, tras corregir la chepa; el 26 sep se
+sustituyó por `bear-v3.glb`. Zorro y piedra del vado quedaron fuera. Los GLB
+fuente no traían `idle`/`walk`; se añadieron durante la integración posterior.
 
 ## 25 sep 2026 · Puestos, la vaca del tratante, el perro que ladra y el frío bajo el alero
 

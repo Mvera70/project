@@ -202,9 +202,46 @@ def boar():
 def bear():
     reset(); mat('coat','775A3E'); mat('coatTop','5C4834'); mat('light','A28559'); mat('earInner','483B2E'); mat('claw','B2A07E')
     body=empty('body',(.235,0,.385),ROOT)
-    loft('Massive_Torso',[(-.440,.485,.105,.148),(-.370,.469,.174,.214),(-.280,.476,.222,.257),(-.190,.472,.235,.265),(-.100,.459,.239,.267),(.010,.445,.236,.258),(.115,.433,.229,.258),(.230,.424,.204,.245),(.308,.416,.171,.227),(.39,.415,.065,.131)],'coat',body,14)
-
-
+    # Perfil dorsal y ventral independientes: cruz amplia, costillas profundas,
+    # vientre recogido hacia el flanco y grupa redondeada. Una sola superficie.
+    sections=[
+        (-.465,.604,.340,.105,.470),
+        (-.405,.646,.265,.160,.456),
+        (-.340,.710,.211,.205,.439),
+        (-.260,.750,.192,.242,.443),
+        (-.165,.728,.197,.237,.448),
+        (-.060,.684,.215,.218,.436),
+        (.055,.650,.249,.192,.435),
+        (.145,.642,.291,.166,.449),
+        (.235,.663,.271,.188,.450),
+        (.310,.646,.283,.188,.460),
+        (.383,.588,.327,.129,.458),
+        (.416,.506,.396,.035,.450),
+    ]
+    vertices=[]; faces=[]; sides=16
+    for x,top,bottom,width,waist in sections:
+        for j in range(sides):
+            angle=2*pi*j/sides; vertical=sin(angle)
+            z=waist+vertical*((top-waist) if vertical>=0 else (waist-bottom))
+            y=cos(angle)*width*(1-.11*abs(vertical))
+            vertices.append((x,y,z))
+    faces.append(tuple(range(sides-1,-1,-1)))
+    for i in range(len(sections)-1):
+        for j in range(sides):
+            a=i*sides+j; b=i*sides+(j+1)%sides
+            c=(i+1)*sides+(j+1)%sides; d=(i+1)*sides+j
+            # Facetas cortas que siguen las masas, sin bandas longitudinales largas.
+            faces.extend([(a,b,c),(a,c,d)] if (i+j)%2 else [(a,b,d),(b,c,d)])
+    faces.append(tuple((len(sections)-1)*sides+j for j in range(sides)))
+    mesh('Massive_Torso',vertices,faces,'coat',body)
+    def flank_surface(x,z):
+        for left,right in zip(sections,sections[1:]):
+            if left[0]<=x<=right[0]:
+                t=(x-left[0])/(right[0]-left[0])
+                _,top,bottom,width,waist=[a+(b-a)*t for a,b in zip(left,right)]
+                v=(z-waist)/((top-waist) if z>=waist else (waist-bottom))
+                return width*math.sqrt(max(0,1-v*v))*(1-.11*abs(v))
+        return .12
     neck=empty('neck',(-.34,0,.49),body); ell('Neck',(-.391,0,.469),(.302,.341,.323),'coat',neck)
     head=empty('head',(-.459,0,.499),neck); ell('Head',(-.481,0,.507),(.304,.285,.279),'coat',head)
     loft('Muzzle',[(-.504,.475,.105,.085),(-.593,.452,.082,.062),(-.666,.448,.064,.049)],'light',head)
@@ -219,13 +256,16 @@ def bear():
         tube('Mouth_'+str(s),[(-.542,s*.075,.421),(-.611,s*.065,.418),(-.65,s*.045,.430)],[.006,.005,.003],'nose',head,6)
         for j in range(5):
             x=-.31+j*.103; z=.52 if j<2 else .435
-            leaf('Flank_Fur_'+str(s)+'_'+str(j),(x,s*.205,z),(x+.035,s*.215,z-.091),.063,.026,'coatTop' if j%3==0 else 'coat',body)
+            leaf('Flank_Fur_'+str(s)+'_'+str(j),(x,s*(flank_surface(x,z)+.006),z),(x+.035,s*(flank_surface(x+.035,z-.091)+.011),z-.091),.063,.026,'coatTop' if j%3==0 else 'coat',body)
         for j in range(3): leaf('Cheek_Fur_'+str(s)+'_'+str(j),(-.408+j*.034,s*.136,.475),(-.386+j*.033,s*.172,.373),.049,.023,'coat',neck)
     fronts=[]; hinds=[]
     for pre,x in [('fore',-.283),('hind',.264)]:
         for s,l in [(-1,'L'),(1,'R')]:
             y=s*.15; hip=(x,y,.466); knee=(x+(.025 if pre=='fore' else -.035),y,.241); ankle=(x-.028,y,.080); toe=(x-.062,y,.041)
             p,q,f=limb(pre+l,hip,knee,ankle,toe,.086,'coat',body,'coatTop',True)
+            if pre=='hind':
+                # Muslo ligado al pivote existente; sostiene también la pose erguida.
+                ell('Haunch_'+l,(x+.008,y*.90,.357),(.222,.192,.304),'coat',p,12,7)
             (fronts if pre=='fore' else hinds).append(p)
             for j in range(4):
                 yy=y+(j-1.5)*.026
@@ -235,7 +275,7 @@ def bear():
     tracks=[(body,'rotation_euler',[(0,0,0),(0,1.16,0),(0,1.16,0),(0,0,0)]),(body,'location',[(.235,0,.385),(.235,0,.454),(.235,0,.454),(.235,0,.385)]),(head,'rotation_euler',[(0,0,0),(0,-.64,0),(0,-.56,0),(0,0,0)])]
     for p in hinds: tracks.append((p,'rotation_euler',[(0,0,0),(0,-1.16,0),(0,-1.16,0),(0,0,0)]))
     for i,p in enumerate(fronts): tracks.append((p,'rotation_euler',[(0,0,0),((-.18 if i==0 else .18),-.40,0),((-.23 if i==0 else .23),-.65,0),(0,0,0)]))
-    clip('rear',tracks,[1,25,48,72]); save('bear-v2')
+    clip('rear',tracks,[1,25,48,72]); save('bear-v3')
 
 def mule():
     reset(); mat('coat','978772'); mat('coatTop','514B40'); mat('light','C9C1A5'); mat('earInner','706658'); mat('pack','B19A6C'); mat('cloth','A28F63')
