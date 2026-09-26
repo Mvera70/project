@@ -1,5 +1,28 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · Líder y no rey; los modelos de Astra (v4.66)
+
+- **Textos**: `bank.en.ts` reescribe las 40 frases de la corona (crónica,
+  carro, oficio, edificio, epitafio) sin tocar claves. `crown-list.test.ts`
+  compara la palabra del oficio con el banco, no con el literal.
+  **Pendiente para la Edad del Hierro** (decisión de Vera): el castillo y el
+  evento de coronación, que es cuando «rey» vuelve. **Abierto:** el icono de la
+  ficha y de la lista sigue siendo una corona (`#crown`).
+- **Modelos**: adoptados con `adopt-models.mjs` (lote `astra-models`) y
+  publicados. Los puestos, con `createStalls(model)` y `STALL_ASSETS`. La
+  cantera es `world/quarry-face.ts`: la cara en la celda `quarry:` del día,
+  mirando a la obra, y el estado sale de `quarryStage(stoneDone, stone)`. Los
+  peñascos, con `buildCrags(…, models)` y `rockGeometry`, a escala ×2 para
+  ocupar lo mismo que la forma de respaldo. El mojón, con `buildCairns(…, model)`.
+  Prueba: `tests/fast/astra-models.test.ts`.
+- **Sin captura todavía** de los puestos, de la cantera ni del mojón: el
+  visitante forzado con `__valleyVisit` no llega a montar el puesto con la hora
+  congelada, y la cantera sólo existe mientras una obra pide piedra. Los
+  peñascos sí se han visto (`artifacts/graphics/env/astra-sheet.png`).
+- **La sala (`hall`) se retiró antes de publicarse**: Vera la ha vuelto a
+  encargar. La receta compartida de Astra se queda en `art/recipes/hall-candidate/`
+  (sin `hall.json`), porque reconstruye también la cantera y las rocas.
+
 ## 26 sep 2026 · Las golondrinas de Astra (v4.65)
 
 Astra dejó sus candidatos en la rama local `art/astra-modelos` (commits

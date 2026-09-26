@@ -1,5 +1,21 @@
 # The Valley — Registro de cambios
 
+## v4.66 · 27 sep 2026 · Líder y no rey; los modelos de Astra
+
+**Líder, no rey, hasta la Edad del Hierro.** Vera: «podríamos al principio
+llamarlo líder, en lugar de rey; a efectos prácticos es un rey, pero lo
+dejamos para la edad de hierro, cuando hagamos el castillo y el evento de
+coronación». El sistema de la corona (K-1 a K-6) no cambia; cambia lo que lee
+el jugador. En el carro se da **un bastón de mando** («A staff of office»), el
+elegido es **leader**, la sala es **leader’s hall**, y la crónica dice «was
+chosen to lead» y «took the staff». Las claves siguen siendo `crown.*`.
+
+**Los modelos de Astra, en el juego:** los tres puestos de los que visitan, la
+cara de la cantera en sus tres estados —entera, explotada y agotada, según la
+piedra que la obra lleva sacada—, los cinco peñascos de las laderas y el
+mojón de las entradas. **La sala no entra**: Vera ha pedido a Astra otra,
+porque ésta no parece de la Edad Media. Sigue la caja de respaldo.
+
 ## v4.65 · 26 sep 2026 · Las golondrinas de Astra
 
 Vera: «los pájaros estos no me gustan, hay que hacer modelos 3D». Las

@@ -122,6 +122,14 @@ contra ella, pero **no va y viene del agua**: el cubo está siempre lleno. Una
 cadena de cubos desde el pozo o el río sería más fiel. Tampoco se ve la
 brigada en una captura todavía: está probada en `fire-brigade.test.ts`.
 
+## Líder y rey (27 sep 2026)
+
+- **La Edad del Hierro: el castillo y el evento de coronación.** Hasta
+  entonces el que manda es «leader» y se le da un bastón de mando (Vera). El
+  icono de la corona (`#crown`) en la ficha y la lista sigue a la vista.
+- **La sala del líder**: Vera encargó a Astra un modelo nuevo; el primero no
+  parecía de la Edad Media. Hasta que llegue, la caja de respaldo.
+
 ## El agua (26 sep 2026)
 
 Hecho en v4.63: el agua viva, la lluvia sobre ella, la riada y el cubo que se

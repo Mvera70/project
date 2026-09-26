@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-26T21:34:17.818Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bird",
+  "generatedAt": "2026-09-26T22:10:10.327Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids stall-pedlar,stall-factor,stall-salter,quarry-face-intact,quarry-face-mined,quarry-face-exhausted,crag-1,crag-2,crag-3,crag-4,crag-5,cairn",
   "assets": [
     {
       "id": "axis-marker",
@@ -1333,6 +1333,138 @@
       "provenance": {
         "kind": "original",
         "source": "Modelado por Astra para The Valley (art/recipes/bird-candidate, rama art/astra-modelos, commit 350648d): golondrina en vuelo, alas en el hombro.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "stall-pedlar",
+      "file": "stall-pedlar.glb",
+      "sha256": "901642F9CA87C5E0BE15519EE3066F4365BEAFB039978092E950AFD341B9A3D8",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/stall-pedlar-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "stall-factor",
+      "file": "stall-factor.glb",
+      "sha256": "BA4AF4A7B3AB5AB70D724DEB8623B43E5F9FCB75019CC7597EB30A819C70E63B",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/stall-factor-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "stall-salter",
+      "file": "stall-salter.glb",
+      "sha256": "C609F3A5BE13266FCA7651F182175CF7FFF81C1E930692542166CA1C3A4896CB",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/stall-salter-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "quarry-face-intact",
+      "file": "quarry-face-intact.glb",
+      "sha256": "A55959AE9D6FCDED58E03394015F3E0E8F155E0461660EDF20183D63C074D18F",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-intact-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "quarry-face-mined",
+      "file": "quarry-face-mined.glb",
+      "sha256": "EC953113434D0EE65173947031827834CC1B7E65E84D251CAFA9A46895A67A1A",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-mined-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "quarry-face-exhausted",
+      "file": "quarry-face-exhausted.glb",
+      "sha256": "AE47B3DD1C388783B824EAB1BCB5458E8605021B3C6BD7B30F30C2F4CADB47E6",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-exhausted-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "crag-1",
+      "file": "crag-1.glb",
+      "sha256": "219D689B0BFDA2CDEC4BA8D7BAB8C28D3761CCA16263AB88D88B6053F2DBD4C4",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-1-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "crag-2",
+      "file": "crag-2.glb",
+      "sha256": "6629F65F716B2477F5C3AE37229708D35AB501251CFAEAA702E058941EEEE5CF",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-2-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "crag-3",
+      "file": "crag-3.glb",
+      "sha256": "D06A46492F56C1E141B325378D42B02AE98BCF6011667ECF1D14D5B34472BC40",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-3-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "crag-4",
+      "file": "crag-4.glb",
+      "sha256": "8E663EF5A6ACB595C26F0C502F49FE1C0003330355E06E4EF2B5BA08628B3176",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-4-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "crag-5",
+      "file": "crag-5.glb",
+      "sha256": "862A95297E32637555AEA449F704426EC25A55247A3805C624A3CACF661B81C4",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-5-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "cairn",
+      "file": "cairn.glb",
+      "sha256": "19D4CACDF6C319D9F146A00190514FB1FDF6DCE3EC0ABFACCD072BEC27FE94A7",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/cairn-candidate, rama art/astra-modelos, commit 8fc1826).",
         "license": "project-original"
       }
     }

@@ -655,8 +655,8 @@ export const BANK: Record<string, string[]> = {
   ],
   // K-4 · y la casa del que manda, que no es «otro edificio».
   'fire.hall': [
-    'The hall burned in the {season} of year {year}, and the crown slept under someone else’s roof.',
-    'Fire took the king’s hall that {season}. Nobody said what it meant.',
+    'The hall burned in the {season} of year {year}, and the leader slept under someone else’s roof.',
+    'Fire took the leader’s hall that {season}. Nobody said what it meant.',
     'They lost the hall to fire in year {year}, and the burgundy roof with it.',
   ],
   'fire.other': [
@@ -705,52 +705,57 @@ export const BANK: Record<string, string[]> = {
   // hecho de una partida que cambia **quién** decide qué hace la aldea. Cuatro
   // claves, una por estilo, porque lo que se lee después no es lo mismo: la
   // frase tiene que dejar dicho hacia dónde va a tirar el valle.
+  // 27 sep 2026 · **Líder, no rey, hasta la Edad del Hierro.** Vera: «podríamos
+  // al principio llamarlo líder, en lugar de rey; a efectos prácticos es un rey,
+  // pero lo dejamos para la edad de hierro, cuando hagamos el castillo y el
+  // evento de coronación». Las claves siguen siendo `crown.*` —el sistema es el
+  // de K-1 a K-6—; lo que lee el jugador es un bastón de mando y un líder.
   'crown.given.forge': [
-    '{name} was given the crown in the {season} of year {year}, with a hammer still on the bench.',
-    'They crowned {name} the smith in year {year}. The talk that evening was of walls.',
-    'A smith took the crown that {season}. What the valley made after, it made in iron.',
+    '{name} was chosen to lead in the {season} of year {year}, with a hammer still on the bench.',
+    'They gave the staff to {name} the smith in year {year}. The talk that evening was of walls.',
+    'A smith took the lead that {season}. What the valley made after, it made in iron.',
   ],
   'crown.given.plough': [
-    '{name} was given the crown in the {season} of year {year}, and went back to the fields the same week.',
-    'They crowned {name} in year {year}. The furrows came first after that.',
-    'A crown to {name} that {season}, and the sowing went wider than it ever had.',
+    '{name} was chosen to lead in the {season} of year {year}, and went back to the fields the same week.',
+    'They gave the staff to {name} in year {year}. The furrows came first after that.',
+    'The staff to {name} that {season}, and the sowing went wider than it ever had.',
   ],
   'crown.given.chapel': [
-    '{name} was given the crown in the {season} of year {year}, and said the first words over it.',
-    'They crowned {name} the priest in year {year}. The chapel was never short of hands after.',
-    'A priest took the crown that {season}, and the feasts grew quieter.',
+    '{name} was chosen to lead in the {season} of year {year}, and said the first words over the staff.',
+    'They gave the staff to {name} the priest in year {year}. The chapel was never short of hands after.',
+    'A priest took the lead that {season}, and the feasts grew quieter.',
   ],
   'crown.given.court': [
-    '{name} was given the crown in the {season} of year {year}, and the road heard of it before the year was out.',
-    'They crowned {name} in year {year}. A hall was spoken of the same month.',
-    'A crown to {name} that {season}, and from then on the valley had a door to knock at.',
+    '{name} was chosen to lead in the {season} of year {year}, and the road heard of it before the year was out.',
+    'They gave the staff to {name} in year {year}. A hall was spoken of the same month.',
+    'The staff to {name} that {season}, and from then on the valley had a door to knock at.',
   ],
   'crown.set_aside': [
-    '{name} had held the seat until then. {other} wore the crown, and {name} said nothing about it.',
-    'The seat had belonged to {name} until then. After {other} was crowned, {name} kept to their own work.',
+    '{name} had held the seat until then. {other} took the staff, and {name} said nothing about it.',
+    'The seat had belonged to {name} until then. After {other} was chosen, {name} kept to their own work.',
     '{name} stepped aside for {other} in year {year}, and was not asked twice.',
   ],
   // K-3 · la corona que pasa por la sucesión de A.15. Peso 2: la línea de peso
   // 3 la escribe ya la decisión.
   'crown.passed.forge': [
-    'The crown went to {name} that {season}, and the walls were spoken of again.',
-    '{name} took the crown in year {year}. A smith, and the valley knew what that meant.',
-    'A smith wore the crown from that {season} on, and the forge never went cold.',
+    'The staff went to {name} that {season}, and the walls were spoken of again.',
+    '{name} took the lead in year {year}. A smith, and the valley knew what that meant.',
+    'A smith held the staff from that {season} on, and the forge never went cold.',
   ],
   'crown.passed.plough': [
-    'The crown went to {name} that {season}, and the fields came first again.',
-    '{name} took the crown in year {year}, and was in the furrows by the week after.',
-    'From that {season} the crown was {name}’s, and the sowing set the year.',
+    'The staff went to {name} that {season}, and the fields came first again.',
+    '{name} took the lead in year {year}, and was in the furrows by the week after.',
+    'From that {season} the staff was {name}’s, and the sowing set the year.',
   ],
   'crown.passed.chapel': [
-    'The crown went to {name} that {season}, and the chapel had its hands back.',
-    '{name} took the crown in year {year}. The feasts stayed short.',
-    'A priest wore the crown from that {season}, and the bell was rung more often.',
+    'The staff went to {name} that {season}, and the chapel had its hands back.',
+    '{name} took the lead in year {year}. The feasts stayed short.',
+    'A priest held the staff from that {season}, and the bell was rung more often.',
   ],
   'crown.passed.court': [
-    'The crown went to {name} that {season}, and the hall had someone in it again.',
-    '{name} took the crown in year {year}, and the road was told.',
-    'From that {season} the crown was {name}’s, and the hall had a master again.',
+    'The staff went to {name} that {season}, and the hall had someone in it again.',
+    '{name} took the lead in year {year}, and the road was told.',
+    'From that {season} the staff was {name}’s, and the hall had a master again.',
   ],
   // M-2 · y lo que el jugador metió. Peso 2: es un hecho de la partida y se lee
   // sobre el valle, pero no es un hito.
@@ -983,8 +988,8 @@ export const BANK: Record<string, string[]> = {
   // K-4 · la sala del rey, levantada. Peso 2 como los edificios singulares: se
   // hace una vez en la vida de un valle.
   'built.hall': [
-    'The king’s hall was finished in the {season} of year {year}, and the roof was burgundy before the week was out.',
-    'They raised a hall for the crown that {season}: three bays, a porch, and a door that takes two hands.',
+    'The leader’s hall was finished in the {season} of year {year}, and the roof was burgundy before the week was out.',
+    'They raised a hall for the leader that {season}: three bays, a porch, and a door that takes two hands.',
     'The hall went up in year {year}, the largest thing the valley had ever built in timber.',
   ],
   // A1 · El cierre del anillo (§1b, fase 3): la aldea deja de ser un pueblo
@@ -2522,20 +2527,20 @@ export const UI_BANK: Record<string, string> = {
   'cart.ale.what': 'A feast this week. Weddings follow a barrel, and so do quarrels.',
   // K-5 · la corona. **Una fila por candidato**, porque una corona se da a
   // alguien: es lo único del carro que no se le da al valle sino a una persona.
-  'cart.crown': 'A crown',
-  'cart.crown.what': 'One of them wears it, and the valley leans the way they lean. Nobody is told what to do.',
-  'cart.crown.who': 'Who wears it',
-  'cart.crown.give': 'Crown',
-  'cart.crown.reigns': '{name} has worn the crown since ANNO {year}.',
-  'cart.crown.empty': 'The crown waits. The valley will be asked when it buries the last to wear it.',
+  'cart.crown': 'A staff of office',
+  'cart.crown.what': 'One of them holds it, and the valley leans the way they lean. Nobody is told what to do.',
+  'cart.crown.who': 'Who holds it',
+  'cart.crown.give': 'Give it',
+  'cart.crown.reigns': '{name} has held the staff since ANNO {year}.',
+  'cart.crown.empty': 'The staff waits. The valley will be asked when it buries the last to hold it.',
   'cart.crown.winters': '{name} · {age} winters',
   'crown.style.forge': 'Would see to the walls',
   'crown.style.plough': 'Would see to the fields',
   'crown.style.chapel': 'Would see to the chapel',
   'crown.style.court': 'Would see to the hall',
-  'role.king': 'king',
+  'role.king': 'leader',
   'cart.no.cost': 'Not enough for that yet.',
-  'cart.no.small': 'Too few people for a crown.',
+  'cart.no.small': 'Too few people for a leader.',
   'cart.no.nobody': 'Nobody of an age to wear it.',
   'cart.no.who': 'Not that one.',
   'cart.no.already': 'The valley already has one.',
@@ -2721,7 +2726,7 @@ export const UI_BANK: Record<string, string> = {
   'epitaph.ledger.wall': 'Wall still standing',
   'epitaph.ledger.decisions': 'Decisions answered',
   'epitaph.ledger.given': 'Things given',
-  'epitaph.ledger.kings': 'Crowned',
+  'epitaph.ledger.kings': 'Chosen to lead',
   'epitaph.ledger.raids': 'Raids suffered',
   'epitaph.ledger.slain': 'Raiders felled',
   'epitaph.ledger.fallen': 'Died on the wall',
@@ -2837,7 +2842,7 @@ export const UI_BANK: Record<string, string> = {
   'building.smithy': 'smithy',
   'building.well': 'well',
   'building.mill': 'mill',
-  'building.hall': 'king’s hall',
+  'building.hall': 'leader’s hall',
   'building.palisade': 'palisade',
   // A2 · **el portón, que faltaba.** Es el título de su ficha, y sin la clave
   // tocarlo en el valle enseñaba `[building.gate]` entre corchetes. Lo cazó el

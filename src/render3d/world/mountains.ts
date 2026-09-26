@@ -24,7 +24,7 @@
 
 import {
   BufferAttribute, BufferGeometry, Color, DodecahedronGeometry, DoubleSide, DynamicDrawUsage, Euler, Group, InstancedMesh,
-  Matrix4, Mesh, MeshStandardMaterial, Quaternion, Vector3,
+  Matrix4, Mesh, MeshStandardMaterial, Quaternion, Vector3, type Object3D,
 } from 'three';
 import { hash32 } from '@engine/rng';
 import { TERRAIN_CODE, type ValleyMap } from '@engine/state';
@@ -266,12 +266,44 @@ export interface Crags {
   dispose(): void;
 }
 
+/**
+ * Los modelos de roca de Astra (27 sep 2026): cinco peñascos y el mojón. Sin
+ * ellos, las formas de aquí (`rockShape`) hacen de respaldo.
+ */
+export interface RockModels {
+  /** Las geometrías de los peñascos, ya en el sistema de su raíz. Son nuestras: se liberan con los peñascos. */
+  readonly crags: readonly BufferGeometry[];
+  readonly cairn?: Object3D | undefined;
+}
+
+/** La geometría de la primera malla de un modelo, llevada al sistema de su raíz. */
+export function rockGeometry(model: Object3D | undefined): BufferGeometry | null {
+  if (model === undefined) return null;
+  model.updateMatrixWorld(true);
+  const root = new Matrix4().copy(model.matrixWorld).invert();
+  let found: BufferGeometry | null = null;
+  model.traverse((object) => {
+    const mesh = object as Mesh;
+    if (found !== null || mesh.isMesh !== true) return;
+    found = mesh.geometry.clone().applyMatrix4(new Matrix4().multiplyMatrices(root, mesh.matrixWorld));
+  });
+  return found;
+}
+
+/**
+ * Lo que se escala un peñasco de Astra para que ocupe lo mismo que la forma de
+ * respaldo: aquélla mide dos de ancho a escala uno (radio uno), el modelo, una.
+ */
+const MODEL_CRAG = 2;
+
 /** Los peñascos, instanciados por forma: unos pocos objetos para cientos de rocas. */
-export function buildCrags(crags: readonly Crag[], palette: Palette): Crags {
+export function buildCrags(crags: readonly Crag[], palette: Palette, models: readonly BufferGeometry[] = []): Crags {
   const group = new Group();
   group.name = 'Valley_Crags';
   const material = new MeshStandardMaterial({ color: '#ffffff', flatShading: true, roughness: 1, metalness: 0 });
-  const shapes = Array.from({ length: SHAPES }, (_, n) => rockShape(n + 1));
+  const modelled = models.length > 0;
+  const shapes = modelled ? [...models] : Array.from({ length: SHAPES }, (_, n) => rockShape(n + 1));
+  const grow = modelled ? MODEL_CRAG : 1;
   const matrix = new Matrix4();
   const at = new Vector3();
   const turn = new Quaternion();
@@ -279,7 +311,7 @@ export function buildCrags(crags: readonly Crag[], palette: Palette): Crags {
   const meshes: InstancedMesh[] = [];
   const tint = new Color();
   const buckets = shapes.map(() => [] as Crag[]);
-  crags.forEach((crag, n) => buckets[n % SHAPES]!.push(crag));
+  crags.forEach((crag, n) => buckets[n % shapes.length]!.push(crag));
   shapes.forEach((shape, n) => {
     const list = buckets[n]!;
     if (list.length === 0) return;
@@ -288,7 +320,7 @@ export function buildCrags(crags: readonly Crag[], palette: Palette): Crags {
     list.forEach((crag, k) => {
       at.set(crag.x, crag.y, crag.z);
       turn.setFromEuler(new Euler(crag.tilt, crag.turn, crag.tilt * 0.5));
-      size.set(crag.size, crag.size, crag.size * (0.8 + (k % 3) * 0.15));
+      size.set(crag.size * grow, crag.size * grow, crag.size * grow * (0.8 + (k % 3) * 0.15));
       matrix.compose(at, turn, size);
       mesh.setMatrixAt(k, matrix);
     });
@@ -370,7 +402,7 @@ export function placeCrags(
  */
 export function buildCairns(
   map: ValleyMap, palette: Palette, heightAt: (x: number, z: number) => number,
-  wet: (x: number, z: number) => boolean, axis: (z: number) => number,
+  wet: (x: number, z: number) => boolean, axis: (z: number) => number, model?: Object3D,
 ): Group {
   const group = new Group();
   group.name = 'Valley_Cairns';
@@ -387,6 +419,16 @@ export function buildCairns(
     if (spot === null) continue;
     const cairn = new Group();
     let y = heightAt(spot.x, spot.z) + GROUND_BIAS;
+    if (model !== undefined) {
+      // El mojón de Astra: cuatro piedras de 0,7 celdas de alto.
+      const piece = model.clone();
+      piece.position.set(0, y, 0);
+      piece.rotation.y = spot.z < 0 ? 0.4 : 2.2;
+      cairn.add(piece);
+      cairn.position.set(spot.x, 0, spot.z);
+      group.add(cairn);
+      continue;
+    }
     for (const [n, size] of [0.22, 0.18, 0.14, 0.1].entries()) {
       const piece = new Mesh(shape, stone);
       piece.scale.set(size, size * 0.8, size);

@@ -1,0 +1,693 @@
+{
+  "schemaVersion": 1,
+  "id": "stall-pedlar",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de receta; una unidad GLB es una celda de 3 m.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "note": "Astra 26 sep 2026 \u00b7 prioridades 1\u20134, candidato sin integrar.",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "stall-pedlar",
+    "footprint": [
+      1,
+      1
+    ]
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.95
+    },
+    {
+      "name": "awning-a",
+      "role": "clothAccent",
+      "roughness": 0.95
+    },
+    {
+      "name": "awning-b",
+      "role": "neighborLinen",
+      "roughness": 0.95
+    },
+    {
+      "name": "cloth",
+      "role": "riverBlue",
+      "roughness": 0.95
+    },
+    {
+      "name": "pot",
+      "role": "soil",
+      "roughness": 0.95
+    },
+    {
+      "name": "dark",
+      "role": "timberDark",
+      "roughness": 0.95
+    },
+    {
+      "name": "sack",
+      "role": "neighborLinen",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Table_Plank_0",
+      "location": [
+        0,
+        0.3,
+        0.84
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "dimensions": [
+        2.1,
+        0.286,
+        0.09
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Table_Plank_1",
+      "location": [
+        0,
+        -0.0,
+        0.84
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "dimensions": [
+        2.1,
+        0.286,
+        0.09
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Table_Plank_2",
+      "location": [
+        0,
+        -0.3,
+        0.84
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "dimensions": [
+        2.1,
+        0.286,
+        0.09
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle__0_798__1",
+      "location": [
+        -0.798,
+        0.315,
+        0.415
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.06,
+      "depth": 0.7712976079309464,
+      "vertices": 6,
+      "rotationDegrees": [
+        13.495733280795811,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle__0_798_1",
+      "location": [
+        -0.798,
+        -0.315,
+        0.415
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.06,
+      "depth": 0.7712976079309464,
+      "vertices": 6,
+      "rotationDegrees": [
+        13.495733280795811,
+        0,
+        180.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle_Rail__0_798",
+      "location": [
+        -0.798,
+        -0.0,
+        0.32
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.05,
+      "depth": 0.774,
+      "vertices": 6,
+      "rotationDegrees": [
+        90.0,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle_0_798__1",
+      "location": [
+        0.798,
+        0.315,
+        0.415
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.06,
+      "depth": 0.7712976079309464,
+      "vertices": 6,
+      "rotationDegrees": [
+        13.495733280795811,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle_0_798_1",
+      "location": [
+        0.798,
+        -0.315,
+        0.415
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.06,
+      "depth": 0.7712976079309464,
+      "vertices": 6,
+      "rotationDegrees": [
+        13.495733280795811,
+        0,
+        180.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle_Rail_0_798",
+      "location": [
+        0.798,
+        -0.0,
+        0.32
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.05,
+      "depth": 0.774,
+      "vertices": 6,
+      "rotationDegrees": [
+        90.0,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Table_Stretcher",
+      "location": [
+        0.0,
+        -0.0,
+        0.3
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.05,
+      "depth": 1.596,
+      "vertices": 6,
+      "rotationDegrees": [
+        90.0,
+        0,
+        90.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Canopy_Post__1_04",
+      "location": [
+        -1.04,
+        0.6,
+        1.025
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.05,
+      "depth": 2.05,
+      "vertices": 6,
+      "rotationDegrees": [
+        0.0,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Canopy_Arm__1_04",
+      "location": [
+        -1.04,
+        -0.10000000000000003,
+        1.7999999999999998
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.03,
+      "depth": 1.4866068747318504,
+      "vertices": 6,
+      "rotationDegrees": [
+        109.6538240580533,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Canopy_Post_1_04",
+      "location": [
+        1.04,
+        0.6,
+        1.025
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.05,
+      "depth": 2.05,
+      "vertices": 6,
+      "rotationDegrees": [
+        0.0,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Canopy_Arm_1_04",
+      "location": [
+        1.04,
+        -0.10000000000000003,
+        1.7999999999999998
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.03,
+      "depth": 1.4866068747318504,
+      "vertices": 6,
+      "rotationDegrees": [
+        109.6538240580533,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Awning_Stripe_0",
+      "location": [
+        -0.9771428571428571,
+        -0.05,
+        1.82
+      ],
+      "material": "awning-a",
+      "parent": "Root",
+      "dimensions": [
+        0.3257142857142857,
+        1.49,
+        0.035
+      ],
+      "rotationDegrees": [
+        19,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Awning_Stripe_1",
+      "location": [
+        -0.6514285714285714,
+        -0.05,
+        1.82
+      ],
+      "material": "awning-b",
+      "parent": "Root",
+      "dimensions": [
+        0.3257142857142857,
+        1.49,
+        0.035
+      ],
+      "rotationDegrees": [
+        19,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Awning_Stripe_2",
+      "location": [
+        -0.32571428571428573,
+        -0.05,
+        1.82
+      ],
+      "material": "awning-a",
+      "parent": "Root",
+      "dimensions": [
+        0.3257142857142857,
+        1.49,
+        0.035
+      ],
+      "rotationDegrees": [
+        19,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Awning_Stripe_3",
+      "location": [
+        0.0,
+        -0.05,
+        1.82
+      ],
+      "material": "awning-b",
+      "parent": "Root",
+      "dimensions": [
+        0.3257142857142857,
+        1.49,
+        0.035
+      ],
+      "rotationDegrees": [
+        19,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Awning_Stripe_4",
+      "location": [
+        0.32571428571428584,
+        -0.05,
+        1.82
+      ],
+      "material": "awning-a",
+      "parent": "Root",
+      "dimensions": [
+        0.3257142857142857,
+        1.49,
+        0.035
+      ],
+      "rotationDegrees": [
+        19,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Awning_Stripe_5",
+      "location": [
+        0.6514285714285715,
+        -0.05,
+        1.82
+      ],
+      "material": "awning-b",
+      "parent": "Root",
+      "dimensions": [
+        0.3257142857142857,
+        1.49,
+        0.035
+      ],
+      "rotationDegrees": [
+        19,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Awning_Stripe_6",
+      "location": [
+        0.9771428571428571,
+        -0.05,
+        1.82
+      ],
+      "material": "awning-a",
+      "parent": "Root",
+      "dimensions": [
+        0.3257142857142857,
+        1.49,
+        0.035
+      ],
+      "rotationDegrees": [
+        19,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Cloth_Roll__0_67",
+      "location": [
+        -0.67,
+        -0.03,
+        1
+      ],
+      "material": "cloth",
+      "parent": "Root",
+      "radius": 0.105,
+      "depth": 0.52,
+      "vertices": 7,
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Cloth_Roll__0_34",
+      "location": [
+        -0.34,
+        -0.03,
+        1
+      ],
+      "material": "cloth",
+      "parent": "Root",
+      "radius": 0.105,
+      "depth": 0.52,
+      "vertices": 7,
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Bowl_0_24",
+      "location": [
+        0.24,
+        -0.05,
+        0.99
+      ],
+      "material": "pot",
+      "parent": "Root",
+      "radius": 0.16,
+      "depth": 0.13,
+      "vertices": 8,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Bowl_Inside_0_24",
+      "location": [
+        0.24,
+        -0.05,
+        1.057
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "radius": 0.123,
+      "depth": 0.009,
+      "vertices": 8,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Bowl_0_59",
+      "location": [
+        0.59,
+        -0.05,
+        0.99
+      ],
+      "material": "pot",
+      "parent": "Root",
+      "radius": 0.16,
+      "depth": 0.13,
+      "vertices": 8,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Bowl_Inside_0_59",
+      "location": [
+        0.59,
+        -0.05,
+        1.057
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "radius": 0.123,
+      "depth": 0.009,
+      "vertices": 8,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Ribbon_0",
+      "location": [
+        0.85,
+        -0.24,
+        0.93
+      ],
+      "material": "awning-a",
+      "parent": "Root",
+      "dimensions": [
+        0.045,
+        0.33,
+        0.018
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Ribbon_1",
+      "location": [
+        0.915,
+        -0.24,
+        0.93
+      ],
+      "material": "awning-a",
+      "parent": "Root",
+      "dimensions": [
+        0.045,
+        0.33,
+        0.018
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Ribbon_2",
+      "location": [
+        0.98,
+        -0.24,
+        0.93
+      ],
+      "material": "awning-a",
+      "parent": "Root",
+      "dimensions": [
+        0.045,
+        0.33,
+        0.018
+      ]
+    },
+    {
+      "type": "sphere",
+      "name": "Bundle",
+      "location": [
+        -0.77,
+        0.92,
+        0.22
+      ],
+      "material": "sack",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        0.62,
+        0.48,
+        0.44
+      ],
+      "segments": 6,
+      "rings": 4
+    },
+    {
+      "type": "cube",
+      "name": "Bundle_Binding",
+      "location": [
+        -0.77,
+        0.92,
+        0.43
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "dimensions": [
+        0.07,
+        0.42,
+        0.025
+      ]
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "referenceRender": {
+    "width": 640,
+    "height": 640,
+    "cameraLocation": [
+      5,
+      -7,
+      6
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 5,
+    "worldRole": "sky"
+  },
+  "candidateBuild": {
+    "adapter": "../hall-candidate/build.py",
+    "triangleLimit": 600,
+    "notes": "",
+    "doorPivot": null
+  }
+}

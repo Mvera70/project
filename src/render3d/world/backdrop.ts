@@ -12,7 +12,7 @@ import { GROUND_BIAS } from '../visual-config';
 import { piecesOf, tintFoliage } from './forest';
 import { buildRidge, exteriorWaterAt, ridgeAt, seasonRidge, SKIRT } from './ridge';
 import { liveWater, SHARED_WATER } from './water-surface';
-import { buildCairns, buildCrags, buildGorgeRoads, buildMountainSkin, MOUNTAIN_PEAK, placeCrags } from './mountains';
+import { buildCairns, buildCrags, buildGorgeRoads, buildMountainSkin, MOUNTAIN_PEAK, placeCrags, type RockModels } from './mountains';
 import { valleyAxis } from './valley-profile';
 import { elevationAt } from './ground';
 import { TERRAIN_CODE } from '@engine/state';
@@ -188,7 +188,7 @@ function outerWater(map: ValleyMap, seed: number, palette: Palette): Mesh | null
 const CRAGS_INSIDE = 260;
 const CRAGS_OUTSIDE = 700;
 
-export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tree?: Object3D, snow = 0): Backdrop {
+export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tree?: Object3D, snow = 0, rocks?: RockModels): Backdrop {
   const group = new Group();
   group.name = 'Valley_Backdrop';
   const distantColour = (next: Palette): Color => new Color(next.stone).lerp(new Color(next.meadowAlt), 0.18);
@@ -212,10 +212,10 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
   const outside = placeCrags(seed + 1, { x0: -40, x1: map.width + 40, z0: -40, z1: map.height + 40 }, 1.6,
     (x, z) => ridgeAt(map, seed, x, z),
     (x, z) => (x > 0 && x < map.width && z > 0 && z < map.height) || exteriorWaterAt(map, seed, x, z, 2.2), CRAGS_OUTSIDE);
-  const crags = buildCrags([...inside, ...outside], palette);
+  const crags = buildCrags([...inside, ...outside], palette, rocks?.crags);
   group.add(crags.group);
   const cairns = buildCairns(map, palette, (x, z) => ridgeAt(map, seed, x, z),
-    (x, z) => exteriorWaterAt(map, seed, x, z, 1.8), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))));
+    (x, z) => exteriorWaterAt(map, seed, x, z, 1.8), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))), rocks?.cairn);
   group.add(cairns);
   const roads = buildGorgeRoads(map, seed, palette, (x, z) => ridgeAt(map, seed, x, z),
     (x, z) => exteriorWaterAt(map, seed, x, z, 1.4), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))));

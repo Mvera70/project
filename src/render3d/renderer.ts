@@ -25,6 +25,7 @@ import type { Palette } from '@derive/palette';
 import { moodsFor } from '@derive/moods';
 import { createValleyCamera } from './camera';
 import { TERRAIN_CODE, type GameState, type HappeningId, type VillagerId } from '@engine/state';
+import { BUILDINGS } from '@engine/balance';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
   Actor, ActorDoing, BattleReport, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats,
@@ -43,7 +44,7 @@ import { createFestoon } from './effects/festoon';
 import { createYards } from './effects/yards';
 import { createBarks } from './effects/barks';
 import { createCoins } from './effects/coins';
-import { createStalls, type MuleLoad, type Stall } from './effects/stalls';
+import { createStalls, STALL_ASSETS, type MuleLoad, type Stall } from './effects/stalls';
 import { stallOf } from './life/visitors';
 import { yardsOf, type Yard } from '../derive/yards';
 import { festivityOf } from '@derive/festivity';
@@ -69,6 +70,9 @@ import { dayNumber, dayPhase } from './presentation-clock';
 import { boltPlace, boltsInDay, overcastOf, skyAt, type SkyKind } from '../derive/weather';
 import { floodOf } from '../derive/flood';
 import { SHARED_WATER } from './world/water-surface';
+import { createQuarryFace, quarryStage } from './world/quarry-face';
+import { rockGeometry } from './world/mountains';
+import { stoneWork } from './life/resource-sites';
 import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
@@ -139,6 +143,11 @@ export const WANTED = [
   'fountain',
   // La golondrina de Astra (26 sep 2026), para las bandadas del cielo.
   'bird',
+  // Y el resto de sus modelos (27 sep 2026): los puestos de los que visitan,
+  // la cara de la cantera en sus tres estados, los peñascos y el mojón.
+  'stall-pedlar', 'stall-factor', 'stall-salter',
+  'quarry-face-intact', 'quarry-face-mined', 'quarry-face-exhausted',
+  'crag-1', 'crag-2', 'crag-3', 'crag-4', 'crag-5', 'cairn',
   // M-3 · el arado ya tiene GLB; el barril sigue usando el respaldo procedural.
   // `WANTED` puede incluirlo antes de publicarlo para que aparezca al llegar.
   'barrel', 'plough',
@@ -422,7 +431,9 @@ export async function createGraphicsRenderer(
   // Y el ladrido del perro, que se dibuja porque no hay sonido.
   const barks = createBarks();
   // Y el puesto de cada visita del camino mientras se queda en la plaza.
-  const stalls = createStalls();
+  const stalls = createStalls((kind) => library.instance(STALL_ASSETS[kind]));
+  // La cara de la cantera donde se pica hoy (`world/quarry-face.ts`).
+  const quarry = createQuarryFace();
   const cameraRight = new Vector3();
   // Y las monedas que pasan de mano en un trato cerrado.
   const coins = createCoins();
@@ -430,7 +441,7 @@ export async function createGraphicsRenderer(
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, coins.mesh, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, quarry.group, coins.mesh, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -901,8 +912,13 @@ export async function createGraphicsRenderer(
       backdrop.dispose();
     }
     // El decorado de las laderas usa pinos; el arbolado de hoja queda en la aldea.
+    // Y las rocas de Astra (27 sep 2026): cinco peñascos y el mojón.
+    const cragModels = ['crag-1', 'crag-2', 'crag-3', 'crag-4', 'crag-5']
+      .map((id) => rockGeometry(library.get(id)?.original))
+      .filter((geometry): geometry is NonNullable<typeof geometry> => geometry !== null);
     backdrop = buildBackdrop(state.map, state.terrainSeed, palette,
-      library.get(TREE_PINE)?.original as Object3D | undefined, appearanceSnow);
+      library.get(TREE_PINE)?.original as Object3D | undefined, appearanceSnow,
+      { crags: cragModels, cairn: library.get('cairn')?.original });
     world.add(backdrop.group);
     // El roble va con el mapa, como la sierra: su sitio sale del lago.
     if (greatOak !== null) {
@@ -1668,6 +1684,15 @@ export async function createGraphicsRenderer(
         return site === null ? [] : [{ id: site.id, kind: site.kind, x: site.x, z: site.z, facing: site.facing }];
       }), groundFloor);
       coins.step(life.payments, life.steps, groundFloor);
+      // La cantera del día, en el estado de lo que la obra lleva sacado.
+      const quarryPlace = life.places.find((place) => place.id.startsWith('quarry:'));
+      const stoneJob = stoneWork(shown);
+      if (quarryPlace === undefined || stoneJob === null) {
+        quarry.show(null, 'intact', shown.map.width, { x: 0, z: 0 }, groundFloor, (id) => library.instance(id));
+      } else {
+        quarry.show(Number(quarryPlace.id.slice('quarry:'.length)), quarryStage(stoneJob.stoneDone, BUILDINGS[stoneJob.kind].stone),
+          shown.map.width, { x: stoneJob.x + stoneJob.w / 2, z: stoneJob.y + stoneJob.h / 2 }, groundFloor, (id) => library.instance(id));
+      }
       // Y lo que se lleva la mula del que cerró el trato.
       stalls.carry(life.visitors.flatMap((visitor): MuleLoad[] => visitor.loaded && visitor.beast?.kind === 'mule'
         && visitor.phase !== 'gone'

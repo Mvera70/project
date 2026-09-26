@@ -5907,6 +5907,633 @@
         "bird.glb": "FEA81FB4848B8B179AE3B2BE7DA78E88F3710A1D5DA337BE3DF1FCCD4684FD71",
         "bird-preview.png": "4611888302197DC2A2CFB8E721C9B5D20770087BC4BD8AED32AA55C645CE6140"
       }
+    },
+    {
+      "id": "stall-pedlar",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/stall-pedlar-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/stall-pedlar-candidate/stall-pedlar.json",
+      "generator": "art/recipes/stall-pedlar-candidate/stall-pedlar.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/stall-pedlar"
+      },
+      "bounds": {
+        "min": [
+          -0.38,
+          0,
+          -0.386667
+        ],
+        "max": [
+          0.38,
+          0.693032,
+          0.27003
+        ],
+        "size": [
+          0.76,
+          0.693032,
+          0.656697
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "awning-a",
+        "awning-b",
+        "cloth",
+        "dark",
+        "pot",
+        "sack",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 7,
+        "meshes": 7,
+        "materials": 7,
+        "triangles": 584
+      },
+      "hashes": {
+        "stall-pedlar.glb": "901642F9CA87C5E0BE15519EE3066F4365BEAFB039978092E950AFD341B9A3D8",
+        "stall-pedlar-preview.png": "047BF0798CC888CB8F5F0BDB2477CA3195ABFF5F9B860B7D654B4152F88E33BA"
+      }
+    },
+    {
+      "id": "stall-factor",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/stall-factor-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/stall-factor-candidate/stall-factor.json",
+      "generator": "art/recipes/stall-factor-candidate/stall-factor.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/stall-factor"
+      },
+      "bounds": {
+        "min": [
+          -0.25,
+          0.000833,
+          -0.145432
+        ],
+        "max": [
+          0.437076,
+          0.486667,
+          0.145432
+        ],
+        "size": [
+          0.687076,
+          0.485833,
+          0.290865
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "dark",
+        "metal",
+        "paper",
+        "sack",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 5,
+        "meshes": 5,
+        "materials": 5,
+        "triangles": 480
+      },
+      "hashes": {
+        "stall-factor.glb": "BA4AF4A7B3AB5AB70D724DEB8623B43E5F9FCB75019CC7597EB30A819C70E63B",
+        "stall-factor-preview.png": "8AC46014025FBE55334436F955D423ED7C7D546671757B450D37B170A1F9D407"
+      }
+    },
+    {
+      "id": "stall-salter",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/stall-salter-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/stall-salter-candidate/stall-salter.json",
+      "generator": "art/recipes/stall-salter-candidate/stall-salter.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/stall-salter"
+      },
+      "bounds": {
+        "min": [
+          -0.2,
+          0.001667,
+          -0.208333
+        ],
+        "max": [
+          0.258638,
+          0.370773,
+          0.148333
+        ],
+        "size": [
+          0.458638,
+          0.369106,
+          0.356667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "sack",
+        "salt",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 454
+      },
+      "hashes": {
+        "stall-salter.glb": "C609F3A5BE13266FCA7651F182175CF7FFF81C1E930692542166CA1C3A4896CB",
+        "stall-salter-preview.png": "7BD62E48BE9E35246C2C99FACAE17FDED66CCD5C3BC8960E9D481630B4900DB7"
+      }
+    },
+    {
+      "id": "quarry-face-intact",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-intact-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/quarry-face-intact-candidate/quarry-face-intact.json",
+      "generator": "art/recipes/quarry-face-intact-candidate/quarry-face-intact.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/quarry-face-intact"
+      },
+      "bounds": {
+        "min": [
+          -1.011964,
+          0,
+          -0.493333
+        ],
+        "max": [
+          1.010976,
+          0.806667,
+          0.443333
+        ],
+        "size": [
+          2.02294,
+          0.806667,
+          0.936667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "rock",
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 400
+      },
+      "hashes": {
+        "quarry-face-intact.glb": "A55959AE9D6FCDED58E03394015F3E0E8F155E0461660EDF20183D63C074D18F",
+        "quarry-face-intact-preview.png": "036AC7FE475BAC27AAECB34725A9EE0863AB14BA89DB9F92BD144D68DFC5B1A7"
+      }
+    },
+    {
+      "id": "quarry-face-mined",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-mined-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/quarry-face-mined-candidate/quarry-face-mined.json",
+      "generator": "art/recipes/quarry-face-mined-candidate/quarry-face-mined.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/quarry-face-mined"
+      },
+      "bounds": {
+        "min": [
+          -1.011964,
+          0,
+          -0.493333
+        ],
+        "max": [
+          1.010976,
+          0.806667,
+          0.445943
+        ],
+        "size": [
+          2.02294,
+          0.806667,
+          0.939277
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "rock",
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 512
+      },
+      "hashes": {
+        "quarry-face-mined.glb": "EC953113434D0EE65173947031827834CC1B7E65E84D251CAFA9A46895A67A1A",
+        "quarry-face-mined-preview.png": "AD01899FEBE4CB32BD8233A331303936B4942CE8A323EFA1319E14A35123EAC1"
+      }
+    },
+    {
+      "id": "quarry-face-exhausted",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-exhausted-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/quarry-face-exhausted-candidate/quarry-face-exhausted.json",
+      "generator": "art/recipes/quarry-face-exhausted-candidate/quarry-face-exhausted.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/quarry-face-exhausted"
+      },
+      "bounds": {
+        "min": [
+          -1.006145,
+          0,
+          -0.29
+        ],
+        "max": [
+          1,
+          0.29,
+          0.445943
+        ],
+        "size": [
+          2.006145,
+          0.29,
+          0.735943
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "rock",
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 452
+      },
+      "hashes": {
+        "quarry-face-exhausted.glb": "AE47B3DD1C388783B824EAB1BCB5458E8605021B3C6BD7B30F30C2F4CADB47E6",
+        "quarry-face-exhausted-preview.png": "80D979E64A48573DAF2620A3401375BBEED859A88C03DE0B670F42DBF16A1F36"
+      }
+    },
+    {
+      "id": "crag-1",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-1-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/crag-1-candidate/crag-1.json",
+      "generator": "art/recipes/crag-1-candidate/crag-1.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/crag-1"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          0,
+          -0.341667
+        ],
+        "max": [
+          0.5,
+          0.216667,
+          0.341667
+        ],
+        "size": [
+          1,
+          0.216667,
+          0.683333
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 42
+      },
+      "hashes": {
+        "crag-1.glb": "219D689B0BFDA2CDEC4BA8D7BAB8C28D3761CCA16263AB88D88B6053F2DBD4C4",
+        "crag-1-preview.png": "C147A9CD09656508B55397DBEFCB6815D6683A58A5E0FA11B089DABA5CCFDA25"
+      }
+    },
+    {
+      "id": "crag-2",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-2-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/crag-2-candidate/crag-2.json",
+      "generator": "art/recipes/crag-2-candidate/crag-2.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/crag-2"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          0,
+          -0.35
+        ],
+        "max": [
+          0.5,
+          1.266667,
+          0.35
+        ],
+        "size": [
+          1,
+          1.266667,
+          0.7
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 42
+      },
+      "hashes": {
+        "crag-2.glb": "6629F65F716B2477F5C3AE37229708D35AB501251CFAEAA702E058941EEEE5CF",
+        "crag-2-preview.png": "F48B8BD3AA63930EC9D8D1E779BE9E4780B4D91AF9AC8FB84838C2A0555AFCB5"
+      }
+    },
+    {
+      "id": "crag-3",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-3-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/crag-3-candidate/crag-3.json",
+      "generator": "art/recipes/crag-3-candidate/crag-3.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/crag-3"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          0,
+          -0.433333
+        ],
+        "max": [
+          0.5,
+          0.716667,
+          0.433333
+        ],
+        "size": [
+          1,
+          0.716667,
+          0.866667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 42
+      },
+      "hashes": {
+        "crag-3.glb": "D06A46492F56C1E141B325378D42B02AE98BCF6011667ECF1D14D5B34472BC40",
+        "crag-3-preview.png": "20AA80971E7AC28719434C5F9ACC3CD2BA84D9FB1DD1EFCECA6C63E690443584"
+      }
+    },
+    {
+      "id": "crag-4",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-4-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/crag-4-candidate/crag-4.json",
+      "generator": "art/recipes/crag-4-candidate/crag-4.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/crag-4"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          0,
+          -0.408333
+        ],
+        "max": [
+          0.5,
+          0.6,
+          0.408333
+        ],
+        "size": [
+          1,
+          0.6,
+          0.816667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 42
+      },
+      "hashes": {
+        "crag-4.glb": "8E663EF5A6ACB595C26F0C502F49FE1C0003330355E06E4EF2B5BA08628B3176",
+        "crag-4-preview.png": "C554BF475EEEFE143B927BBFC7E753CECD5275BC2B95169CB0625B6176A16FE2"
+      }
+    },
+    {
+      "id": "crag-5",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-5-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/crag-5-candidate/crag-5.json",
+      "generator": "art/recipes/crag-5-candidate/crag-5.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/crag-5"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          0,
+          -0.3
+        ],
+        "max": [
+          0.5,
+          0.883333,
+          0.3
+        ],
+        "size": [
+          1,
+          0.883333,
+          0.6
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 42
+      },
+      "hashes": {
+        "crag-5.glb": "862A95297E32637555AEA449F704426EC25A55247A3805C624A3CACF661B81C4",
+        "crag-5-preview.png": "D3B5ADCB3BAD322BDCBEDCFFAF12B2418CAE3587B627DB878DF227A6DD934C1B"
+      }
+    },
+    {
+      "id": "cairn",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/cairn-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/cairn-candidate/cairn.json",
+      "generator": "art/recipes/cairn-candidate/cairn.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/cairn"
+      },
+      "bounds": {
+        "min": [
+          -0.25,
+          0,
+          -0.2
+        ],
+        "max": [
+          0.25,
+          0.7,
+          0.2
+        ],
+        "size": [
+          0.5,
+          0.7,
+          0.4
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 144
+      },
+      "hashes": {
+        "cairn.glb": "19D4CACDF6C319D9F146A00190514FB1FDF6DCE3EC0ABFACCD072BEC27FE94A7",
+        "cairn-preview.png": "78FB6C53553A91913EE50F6C0EE27A8A86616635D32CEB914B19C9A5BB1C1D42"
+      }
     }
   ]
 }

@@ -11,10 +11,14 @@
 //
 // El tratante no monta nada: lo que vende es la vaca que trae detrás. Se monta
 // al llegar y se recoge al irse. Decorado: no toca el estado ni tira dados.
+//
+// Desde el 27 sep 2026 los tres puestos son los modelos de Astra
+// (`stall-pedlar`, `stall-factor`, `stall-salter`), cuando están cargados; los
+// de aquí, hechos de cajas y cilindros, quedan de respaldo.
 
 import {
   BoxGeometry, ConeGeometry, CylinderGeometry, DoubleSide, Group, Mesh, MeshStandardMaterial, PlaneGeometry,
-  type BufferGeometry, type Material,
+  type BufferGeometry, type Material, type Object3D,
 } from 'three';
 
 import type { StallKind } from '../life/visitors';
@@ -45,7 +49,16 @@ export interface Stalls {
   dispose(): void;
 }
 
-export function createStalls(): Stalls {
+/** El modelo publicado de cada puesto. */
+export const STALL_ASSETS: Readonly<Record<StallKind, string>> = {
+  pedlar: 'stall-pedlar', factor_visit: 'stall-factor', salt_visit: 'stall-salter',
+};
+
+/**
+ * `model`, si se da, devuelve una copia del modelo publicado del puesto de esa
+ * clase (o nada, y entonces se arma el de respaldo).
+ */
+export function createStalls(model?: (kind: StallKind) => Object3D | undefined): Stalls {
   const group = new Group();
   group.name = 'Valley_Stalls';
   const mat = (color: string, extra: Partial<{ side: typeof DoubleSide }> = {}): MeshStandardMaterial =>
@@ -157,7 +170,9 @@ export function createStalls(): Stalls {
       for (const child of [...group.children]) if (child !== loadGroup) group.remove(child);
       for (const stall of stalls) {
         const piece = new Group();
-        builders[stall.kind](piece);
+        const made = model?.(stall.kind);
+        if (made !== undefined) piece.add(made);
+        else builders[stall.kind](piece);
         piece.position.set(stall.x, ground(stall.x, stall.z), stall.z);
         // El modelo mira a +Z; se gira para que el mostrador dé a la plaza.
         piece.rotation.y = stall.facing;

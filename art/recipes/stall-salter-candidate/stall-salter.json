@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 1,
+  "id": "stall-salter",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de receta; una unidad GLB es una celda de 3 m.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "note": "Astra 26 sep 2026 \u00b7 prioridades 1\u20134, candidato sin integrar.",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "stall-salter",
+    "footprint": [
+      1,
+      1
+    ]
+  },
+  "materials": [
+    {
+      "name": "sack",
+      "role": "neighborLinen",
+      "roughness": 0.95
+    },
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.95
+    },
+    {
+      "name": "salt",
+      "role": "saltWhite",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "Sack_0",
+      "location": [
+        -0.30,
+        -0.18,
+        0.225
+      ],
+      "material": "sack",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        0.6,
+        0.53,
+        0.54
+      ],
+      "segments": 10,
+      "rings": 6,
+      "flattenBottom": true
+    },
+    {
+      "type": "cylinder",
+      "name": "Sack_Neck_0",
+      "location": [
+        -0.30,
+        -0.18,
+        0.47
+      ],
+      "material": "sack",
+      "parent": "Root",
+      "radius": 0.085,
+      "depth": 0.13,
+      "vertices": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Sack_Tie_0",
+      "location": [
+        -0.30,
+        -0.18,
+        0.505
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.09,
+      "depth": 0.028,
+      "vertices": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "sphere",
+      "name": "Sack_1",
+      "location": [
+        0.30,
+        -0.18,
+        0.235
+      ],
+      "material": "sack",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        0.59,
+        0.53,
+        0.56
+      ],
+      "segments": 10,
+      "rings": 6,
+      "flattenBottom": true
+    },
+    {
+      "type": "cylinder",
+      "name": "Sack_Neck_1",
+      "location": [
+        0.30,
+        -0.18,
+        0.49
+      ],
+      "material": "sack",
+      "parent": "Root",
+      "radius": 0.085,
+      "depth": 0.13,
+      "vertices": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Sack_Tie_1",
+      "location": [
+        0.30,
+        -0.18,
+        0.525
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.09,
+      "depth": 0.028,
+      "vertices": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "sphere",
+      "name": "Sack_2",
+      "location": [
+        0,
+        0.36,
+        0.205
+      ],
+      "material": "sack",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        0.55,
+        0.53,
+        0.50
+      ],
+      "segments": 10,
+      "rings": 6,
+      "flattenBottom": true
+    },
+    {
+      "type": "cylinder",
+      "name": "Open_Rim",
+      "location": [
+        0,
+        0.36,
+        0.44
+      ],
+      "material": "sack",
+      "parent": "Root",
+      "radius": 0.19,
+      "depth": 0.075,
+      "vertices": 8,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cone",
+      "name": "Salt_Heap",
+      "location": [
+        0,
+        0.36,
+        0.493
+      ],
+      "material": "salt",
+      "parent": "Root",
+      "radius": 0.174,
+      "depth": 0.14,
+      "vertices": 8
+    },
+    {
+      "type": "cylinder",
+      "name": "Paddle_Handle",
+      "location": [
+        0.7,
+        0.024999999999999994,
+        0.64
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.0275,
+      "depth": 1.0290286682109493,
+      "vertices": 6,
+      "rotationDegrees": [
+        26.613718092826712,
+        0,
+        167.47119229084848
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Paddle_Blade",
+      "location": [
+        0.63,
+        -0.26,
+        0.16
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "dimensions": [
+        0.24,
+        0.045,
+        0.31
+      ],
+      "rotationDegrees": [
+        -25,
+        0,
+        0
+      ]
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "referenceRender": {
+    "width": 640,
+    "height": 640,
+    "cameraLocation": [
+      5,
+      -7,
+      6
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 5,
+    "worldRole": "sky"
+  },
+  "candidateBuild": {
+    "adapter": "../hall-candidate/build.py",
+    "triangleLimit": 600,
+    "notes": "Sal en blanco suave (#F4F2EC), con un matiz c\u00e1lido muy leve para conservar la lectura de blanco sin deslumbrar. Color aprobado por Vera; sin preguntas pendientes.",
+    "doorPivot": null
+  }
+}

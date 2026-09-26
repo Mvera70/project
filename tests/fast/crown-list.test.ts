@@ -21,6 +21,7 @@ import { crownKing } from '@engine/world/crown';
 import { crownStyleKey, isKing, roleKeyFor } from '@derive/crown';
 import { kingFirst, namedPresent } from '@ui/redesign/people-panel';
 import { personCard } from '@ui/person-card';
+import { renderUiText } from '@engine/chronicle/render';
 import type { GameState, Role } from '@engine/state';
 import { foundTwenty } from '../helpers/founding';
 
@@ -110,7 +111,9 @@ describe('K-8 · la ficha dice lo mismo que la fila', () => {
     expect(king).not.toBeNull();
     const card = personCard(state, king!.id);
     expect(card?.crowned).toBe(true);
-    expect(card?.role).toBe('king');
+    // La palabra la pone el banco: «leader» hasta la Edad del Hierro (Vera,
+    // 27 sep 2026), y la que toque cuando llegue la coronación.
+    expect(card?.role).toBe(renderUiText('role.king'));
     // La querencia es contenido del banco, no una frase escrita aquí.
     expect(card?.lean).toBe('Would see to the chapel');
 
