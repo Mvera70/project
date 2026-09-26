@@ -21,12 +21,17 @@ export interface WildPrey {
   readonly expiresAt: number;
   target: Point;
   readonly start: number;
+  /** Cuándo echó a volar (la perdiz), y si aún está despegando. */
+  fleeSince?: number;
+  takingOff?: boolean;
 }
 
 const IDS: Record<WildKind, number> = { partridge: 42_000, rabbit: 42_001, boar: 42_002 };
 const RADII: Record<WildKind, number> = { partridge: 0.2, rabbit: 0.25, boar: 0.38 };
 const SPEEDS: Record<WildKind, number> = { partridge: 1.5, rabbit: 1.15, boar: 0.85 };
 const MAX_RANGE = 11;
+/** Lo que dura el despegue de la perdiz, en pasos: el clip `takeoff` (1,17 s). */
+const TAKEOFF_STEPS = Math.round(1.17 / LIFE_STEP);
 
 function preferred(kind: WildKind, code: number): boolean {
   if (kind === 'boar') return code === TERRAIN_CODE.forest;
@@ -105,7 +110,7 @@ export function stepWildPrey(
   else if (prey.kind === 'boar' && nearest !== null && nearestD < 4) {
     prey.phase = 'charge'; prey.target = nearest;
   } else if (nearest !== null && nearestD < (prey.kind === 'boar' ? 7 : 4)) {
-    if (prey.phase !== 'flee') prey.target = escapeTarget(prey, nearest, land);
+    if (prey.phase !== 'flee') { prey.target = escapeTarget(prey, nearest, land); prey.fleeSince = step; }
     prey.phase = 'flee';
   }
   const distance = Math.hypot(prey.target.x - body.x, prey.target.z - body.z);
@@ -115,8 +120,14 @@ export function stepWildPrey(
   integrate(body, land, LIFE_STEP);
   if (Math.hypot(body.vx, body.vz) > 0.01) turnTo(body, Math.atan2(body.vx, body.vz), LIFE_STEP);
   // El aleteo de la perdiz es bajo y de duración corta, suficiente para leerse en pantalla.
+  // El despegue va antes que el aleteo: el modelo de Vera trae `takeoff`, de
+  // una vez, y mientras dura la perdiz sube poco a poco en vez de saltar de
+  // golpe a su altura de vuelo.
+  const since = prey.fleeSince === undefined ? TAKEOFF_STEPS : step - prey.fleeSince;
+  prey.takingOff = prey.kind === 'partridge' && prey.phase === 'flee' && since < TAKEOFF_STEPS;
+  const lift = Math.min(1, since / TAKEOFF_STEPS);
   prey.altitude = prey.kind === 'partridge' && prey.phase === 'flee'
-    ? 0.18 + Math.max(0, Math.sin((step - prey.start) * 0.18)) * 0.24 : 0;
+    ? lift * (0.18 + Math.max(0, Math.sin((step - prey.start) * 0.18)) * 0.24) : 0;
   if (prey.phase === 'charge' && distance < 0.7) { body.vx = 0; body.vz = 0; }
   // seed se conserva en la API para que la trayectoria pueda ampliarse con variación estable.
   void seed;
@@ -127,7 +138,7 @@ export function wildPreyPosition(prey: WildPrey | null): Animal[] {
   return [{ id: prey.body.id, kind: prey.kind, x: prey.body.x, y: prey.body.z,
     altitude: prey.altitude,
     action: prey.phase === 'down' ? 'down'
-      : prey.kind === 'partridge' && prey.phase === 'flee' ? 'flight'
+      : prey.kind === 'partridge' && prey.phase === 'flee' ? prey.takingOff === true ? 'takeoff' : 'flight'
         : prey.kind === 'rabbit' && prey.phase === 'flee' ? 'flee'
           : prey.kind === 'boar' && prey.phase === 'charge' ? 'charge' : undefined }];
 }

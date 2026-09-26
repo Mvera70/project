@@ -61,6 +61,8 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
     if (action === 'shelter') return 'shelter';
     // Mirando el género del puesto: se revuelve entre las cosas.
     if (action === 'browse') return 'sort';
+    // Pagando: habla con el que vende mientras cuenta.
+    if (action === 'pay') return 'talk';
     if (action === 'play') return 'play';
   }
   return 'idle';

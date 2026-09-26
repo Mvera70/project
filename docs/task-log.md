@@ -1,5 +1,24 @@
 # Cuaderno de tareas — el rework
 
+## 26 sep 2026 · Las monedas del trato, el despegue de la perdiz y el esqueleto del zorro
+
+- **Pagar** (`Village.payments`, `effects/coins.ts`): el vendedor que compra
+  (buhonero, factor) paga cada bulto al vecino que se lo deja; al que vende a
+  la aldea (tratante, salinero) le paga el adulto libre más cercano, que va a
+  él (`OFFERS.pay`, 2–3 s, gesto `talk`). El pago se apunta al acabar su
+  encargo, en el bucle de la gente: la rutina general lo borraba antes.
+  Medido en las semillas 7, 23 y 41: de 1 a 2 pagos por trato de compra y
+  exactamente 1 por trato de venta (sólo cobra el que trae la mercancía, no su
+  acompañante). Moneda de radio 0,05 celdas, color liso.
+- **El despegue de la perdiz** (`wild-prey.ts`, `animal-motion.ts`): el clip de
+  una vez `takeoff` del modelo de Vera durante 1,17 s desde que echa a volar,
+  con la altura subiendo en rampa, y luego el bucle `flight`.
+- **El zorro**: `fox-astra-softened-muzzle.glb` es una sola malla. Vera eligió
+  ponerle esqueleto por script: `tools/art/rig-single-mesh.py` (Blender) lo
+  escala a 0,62 celdas, pone los huesos del generador leyendo la malla, pesa
+  por regiones y hace `idle`/`walk`/`flee`. **No está publicado**: se le
+  enseñó a Vera antes (`artifacts/graphics/animal-gestures/fox-gestures.png`).
+
 ## 25 sep 2026 · Los once modelos de Vera, integrados; el perro, los puestos y el trato
 
 **Modelos** (`deliverables/marked-models-trial/`, 63db59c; `bear-v2.glb` es el

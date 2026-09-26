@@ -109,4 +109,29 @@ describe('El valle más vivo · el puesto y el trato', () => {
       expect(stallOf(market.visitors[0]!), `semilla ${seed}: la sal se fue con él`).not.toBeNull();
     }
   });
+
+  it('en cada trato cerrado pasan monedas de mano, del que compra al que vende', () => {
+    for (const seed of SEEDS) {
+      for (const kind of ['pedlar', 'factor_visit', 'drover_visit', 'salt_visit'] as const) {
+        const state = dealing(seed, kind);
+        const life = createVillage(state, state.tick * TIME.DAYS_PER_WEEK);
+        const seller = life.visitors[0]!;
+        let sellerAt = { x: seller.body.x, z: seller.body.z };
+        let seen = 0;
+        for (let n = 0; n < STEPS_PER_DAY; n += 1) {
+          life.step(n / STEPS_PER_DAY);
+          if (seller.phase === 'staying') sellerAt = { x: seller.body.x, z: seller.body.z };
+          for (const payment of life.payments.slice(seen)) {
+            // El buhonero y el factor compran: pagan ellos. Al tratante y al
+            // salinero les compra la aldea: cobran ellos.
+            const end = kind === 'pedlar' || kind === 'factor_visit' ? payment.from : payment.to;
+            expect(Math.hypot(end.x - sellerAt.x, end.z - sellerAt.z), `${kind}, semilla ${seed}`).toBeLessThan(0.5);
+          }
+          seen = life.payments.length;
+        }
+        expect(life.payments.length, `${kind}, semilla ${seed}: nadie pagó`).toBeGreaterThan(0);
+        if (kind === 'drover_visit' || kind === 'salt_visit') expect(life.payments).toHaveLength(1);
+      }
+    }
+  });
 });

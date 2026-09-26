@@ -1,5 +1,15 @@
 # The Valley — Registro de cambios
 
+## v4.57 · 26 sep 2026 · Las monedas pasan de mano, y la perdiz despega
+
+En un trato cerrado ya se ve pagar: el buhonero y el factor pagan en mano cada
+bulto que les traen, y al tratante y al salinero les paga un vecino que va a
+ellos, habla un momento y cuenta; cuatro monedas saltan en arco de una mano a
+la otra (`effects/coins.ts`). La perdiz de caza usa el despegue que trae el
+modelo de Vera antes de pasar al aleteo, y sube poco a poco en vez de saltar a
+su altura de vuelo. El zorro de Vera tiene esqueleto (`tools/art/rig-single-mesh.py`),
+pendiente de que ella lo vea antes de publicarlo.
+
 ## v4.56 · 25 sep 2026 · Los modelos de Vera, en el juego
 
 Once modelos rehechos por Vera (`deliverables/marked-models-trial/`, commit

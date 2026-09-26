@@ -27,7 +27,7 @@ export interface Animal {
   x: number;
   y: number;
   /** Gesto escénico opcional, sin consecuencia para el motor. */
-  action?: 'walk' | 'attack' | 'charge' | 'flight' | 'flee' | 'down' | 'run' | 'bark' | 'play' | undefined;
+  action?: 'walk' | 'attack' | 'charge' | 'flight' | 'flee' | 'down' | 'run' | 'bark' | 'play' | 'takeoff' | undefined;
   /** Elevación escénica sobre el relieve; sólo la perdiz al huir la usa. */
   altitude?: number;
 }

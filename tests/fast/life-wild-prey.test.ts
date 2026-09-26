@@ -56,6 +56,30 @@ describe('presas silvestres', () => {
     expect(boar.health).toBe(1);
   });
 
+  it('la perdiz despega antes de aletear, y sube poco a poco', () => {
+    const land = { width: 30, height: 30, blocked: new Uint8Array(900) };
+    const prey: WildPrey = {
+      kind: 'partridge', body: { id: 42_000, x: 15, z: 15, vx: 0, vz: 0, facing: 0, radius: 0.2, pace: 1 },
+      home: { x: 15, z: 15 }, target: { x: 15, z: 15 }, phase: 'roam', health: 1,
+      altitude: 0, start: 0, expiresAt: 450,
+    };
+    const hunter = { body: { x: 13, z: 15 } };
+    const actions: string[] = [];
+    const heights: number[] = [];
+    for (let step = 0; step < 90; step += 1) {
+      stepWildPrey(prey, land, 9, step, [hunter]);
+      actions.push(String(wildPreyPosition(prey)[0]?.action));
+      heights.push(prey.altitude);
+    }
+    // Primero el despegue (el clip de una vez del modelo de Vera), luego el vuelo.
+    expect(actions[0]).toBe('takeoff');
+    expect(actions.at(-1)).toBe('flight');
+    expect(actions.indexOf('flight')).toBeGreaterThan(actions.lastIndexOf('takeoff'));
+    // Sin salto: el primer paso no está ya a altura de vuelo.
+    expect(heights[0]).toBeLessThan(0.05);
+    expect(Math.max(...heights)).toBeGreaterThan(0.15);
+  });
+
   it('mantiene brevemente visible una presa abatida y oculta las desaparecidas', () => {
     const land = { width: 10, height: 10, blocked: new Uint8Array(100) };
     const prey: WildPrey = {

@@ -142,9 +142,10 @@ Lo que la tanda dejó a medias, y lo que se hizo después el mismo día:
   vaca que vende. **Hecho después (25 sep):** los puestos son sólidos
   mientras están montados, la gente se acerca a mirar el género, y el trato
   cerrado se ve: le llevan la leña o el grano, la mula sale cargada, la vaca va
-  al pasto, la sal se queda. **Pendiente:** nadie paga a la vista (no hay
-  moneda que se vea pasar de mano), y el despegue (`takeoff`) de la perdiz nueva
-  no se usa todavía: la caza la hace volar con el bucle `flight`.
+  al pasto, la sal se queda. **Hecho después (26 sep):** se ve pagar
+  (monedas de mano a mano, `effects/coins.ts`) y la perdiz despega con su
+  `takeoff` antes de aletear. **Pendiente:** el zorro de Vera, con esqueleto
+  hecho por script, espera su visto bueno para publicarse.
 - ~~**Los postes del tendedero y el bancal, sólidos.**~~ Hecho
   (`yardSolids`, `world/obstacles.ts`).
 - ~~**A cubierto bajo un alero, y con gesto.**~~ Hechos: `shelterUnder` y el

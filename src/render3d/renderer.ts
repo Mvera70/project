@@ -42,6 +42,7 @@ import { createHearth } from './effects/hearth';
 import { createFestoon } from './effects/festoon';
 import { createYards } from './effects/yards';
 import { createBarks } from './effects/barks';
+import { createCoins } from './effects/coins';
 import { createStalls, type MuleLoad, type Stall } from './effects/stalls';
 import { stallOf } from './life/visitors';
 import { yardsOf, type Yard } from '../derive/yards';
@@ -411,11 +412,13 @@ export async function createGraphicsRenderer(
   // Y el puesto de cada visita del camino mientras se queda en la plaza.
   const stalls = createStalls();
   const cameraRight = new Vector3();
+  // Y las monedas que pasan de mano en un trato cerrado.
+  const coins = createCoins();
   let yardsShown: Yard[] = [];
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, coins.mesh, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1064,6 +1067,8 @@ export async function createGraphicsRenderer(
       fox: life.fox,
       dog: life.dog,
       stalls: stalls.shown,
+      coins: coins.flying,
+      payments: life.payments.length,
       yards: { hung: yards.hung, at: yardsShown.map(yard => ({ house: yard.house, kind: yard.kind,
         x: round(yard.x), z: round(yard.z) })) },
       // El valle más vivo · los animales salvajes que se ven ahora (ciervos,
@@ -1636,6 +1641,7 @@ export async function createGraphicsRenderer(
         const site = stallOf(visitor);
         return site === null ? [] : [{ id: site.id, kind: site.kind, x: site.x, z: site.z, facing: site.facing }];
       }), groundFloor);
+      coins.step(life.payments, life.steps, groundFloor);
       // Y lo que se lleva la mula del que cerró el trato.
       stalls.carry(life.visitors.flatMap((visitor): MuleLoad[] => visitor.loaded && visitor.beast?.kind === 'mule'
         && visitor.phase !== 'gone'
@@ -2074,6 +2080,7 @@ export async function createGraphicsRenderer(
       yards.dispose();
       barks.dispose();
       stalls.dispose();
+      coins.dispose();
       fauna.dispose();
       bubbles.dispose();
       props.dispose();

@@ -148,6 +148,13 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
    * poco más, porque un buhonero no viene todos los días.
    */
   browse: { id: 'browse', reach: 0.7, seats: 3, gives: { boredom: 0.55, company: 0.25 }, seconds: [5, 12] },
+  /**
+   * El valle más vivo · **Pagar al que vende.** Con el trato cerrado del
+   * tratante o del salinero, un vecino va hasta él, habla un momento y le paga
+   * (`village.ts`, `payments`). TUNE: de 2 a 3 s, lo que dura contar unas
+   * monedas; una plaza, porque paga uno.
+   */
+  pay: { id: 'pay', reach: 0.6, seats: 1, gives: { duty: 0.3 }, seconds: [2, 3], routineOnly: true },
   /** Cargar con el palo, el cubo o el haz de leña un rato, y soltarlo. */
   carry: { id: 'carry', reach: 0.75, seats: 1, gives: { duty: 0.2, boredom: 0.15 }, seconds: [5, 12] },
   /** Descargar la madera en la leñera. Sólo la rutina del talador la asigna. */

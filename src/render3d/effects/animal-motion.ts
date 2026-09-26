@@ -21,6 +21,9 @@ export class AnimalMotion {
   private readonly run: AnimationAction | undefined;
   private readonly bark: AnimationAction | undefined;
   private readonly play: AnimationAction | undefined;
+  // El despegue de la perdiz de Vera: de una vez, desde que echa a volar.
+  private readonly takeoff: AnimationAction | undefined;
+  private takeoffStartedAt: number | undefined;
   private attackStartedAt: number | undefined;
   private readonly stride: number;
   private previous: { x: number; y: number } | undefined;
@@ -53,6 +56,10 @@ export class AnimalMotion {
     this.run = run === undefined ? undefined : this.mixer.clipAction(run).play();
     this.bark = bark === undefined ? undefined : this.mixer.clipAction(bark).play();
     this.play = play === undefined ? undefined : this.mixer.clipAction(play).play();
+    const takeoff = asset.clips.find(clip => clip.name === 'takeoff');
+    this.takeoff = takeoff === undefined ? undefined : this.mixer.clipAction(takeoff);
+    this.takeoff?.setLoop(LoopOnce, 1);
+    if (this.takeoff !== undefined) this.takeoff.clampWhenFinished = true;
     const attack = asset.clips.find(clip => clip.name === 'attack');
     this.attack = attack === undefined ? undefined : this.mixer.clipAction(attack);
     this.attack?.setLoop(LoopOnce, 1);
@@ -80,7 +87,12 @@ export class AnimalMotion {
     this.distance += step;
     if (delta > 0) this.blend += ((animal.action === 'walk' || speed > 0.002 ? 1 : 0) - this.blend)
       * (1 - Math.exp(-10 * delta));
+    const takingOff = animal.action === 'takeoff' && this.takeoff !== undefined;
+    if (takingOff && this.takeoffStartedAt === undefined) { this.takeoffStartedAt = seconds; this.takeoff!.reset().play(); }
+    else if (!takingOff && this.takeoffStartedAt !== undefined) { this.takeoff?.stop(); this.takeoffStartedAt = undefined; }
     const attacking = animal.action === 'attack' && this.attack !== undefined;
+    // Un gesto de una vez (golpe o despegue) apaga los demás mientras dura.
+    const oneShot = attacking || takingOff;
     const special = animal.action === 'flight' ? this.flight
       : animal.action === 'flee' ? this.flee
         : animal.action === 'charge' ? this.charge
@@ -98,22 +110,26 @@ export class AnimalMotion {
     }
     if (this.idle !== undefined) {
       this.idle.time = (seconds + this.phase * this.idle.getClip().duration) % this.idle.getClip().duration;
-      this.idle.setEffectiveWeight(attacking || special !== undefined || down ? 0 : 1 - this.blend);
+      this.idle.setEffectiveWeight(oneShot || special !== undefined || down ? 0 : 1 - this.blend);
     }
     if (this.walk !== undefined) {
       this.walk.time = ((this.distance / this.stride + this.phase) % 1) * this.walk.getClip().duration;
-      this.walk.setEffectiveWeight(attacking || special !== undefined || down || running ? 0 : this.blend);
+      this.walk.setEffectiveWeight(oneShot || special !== undefined || down || running ? 0 : this.blend);
     }
     if (this.run !== undefined) {
       this.run.time = ((this.distance / (this.stride * RUN_STRIDE) + this.phase) % 1) * this.run.getClip().duration;
-      this.run.setEffectiveWeight(running && special === undefined && !attacking && !down ? this.blend : 0);
+      this.run.setEffectiveWeight(running && special === undefined && !oneShot && !down ? this.blend : 0);
     }
     for (const clip of [this.flight, this.flee, this.charge, this.bark, this.play]) {
       if (clip === undefined) continue;
       clip.time = (seconds + this.phase * clip.getClip().duration) % clip.getClip().duration;
-      clip.setEffectiveWeight(clip === special ? 1 : 0);
+      clip.setEffectiveWeight(clip === special && !takingOff ? 1 : 0);
     }
-    if (attacking) {
+    if (takingOff) {
+      this.takeoff!.time = Math.min(this.takeoff!.getClip().duration - 0.001, Math.max(0, seconds - this.takeoffStartedAt!));
+      this.takeoff!.setEffectiveWeight(1);
+      this.attack?.setEffectiveWeight(0);
+    } else if (attacking) {
       this.attack!.time = Math.min(this.attack!.getClip().duration - 0.001,
         Math.max(0, seconds - this.attackStartedAt!));
       this.attack!.setEffectiveWeight(1);

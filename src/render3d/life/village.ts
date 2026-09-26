@@ -327,6 +327,13 @@ export interface Village {
    * sortea. Tampoco son vecinos, así que van por su lista.
    */
   readonly visitors: readonly Visitor[];
+  /**
+   * El valle más vivo · **Los pagos de un trato**: quién paga, a quién y en qué
+   * paso de la jornada. El buhonero y el factor pagan a cada vecino que les
+   * deja un bulto; al tratante y al salinero les paga el vecino que va a ellos.
+   * Lo dibuja `effects/coins.ts`: unas monedas que vuelan de mano a mano.
+   */
+  readonly payments: readonly Payment[];
   /** El perro, si la aldea tiene: dónde está y si ladra (el ladrido se dibuja). */
   readonly dog: { readonly x: number; readonly z: number; readonly facing: number;
     readonly barking: boolean; readonly mode: string } | null;
@@ -624,6 +631,13 @@ const EAVE_REACH = 12;
  * le lleva lo vendido» sin vaciar el tajo.
  */
 const TRADE_PORTERS = 3;
+/** Un pago de un trato: de quién a quién, y en qué paso de la jornada. */
+export interface Payment {
+  readonly from: Point;
+  readonly to: Point;
+  readonly at: number;
+}
+
 /** Lo que tiene tejado con alero: casas y obradores, no murallas ni campos. */
 const EAVED: ReadonlySet<string> = new Set(['house', 'stone_house', 'granary', 'smithy', 'mill', 'hall', 'chapel', 'church']);
 function eavesOf(state: GameState, land: Terrain): Point[] {
@@ -1112,6 +1126,9 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const tradeLoads = new Map<string, number[]>();
   const tradeStarts: { visitor: Visitor; trips: PreparationTrip[]; started?: boolean }[] = [];
   const closedTrades = new Set<string>();
+  const payments: Payment[] = [];
+  // Los tratos en que la aldea compra (vaca, sal) y quién va a pagar.
+  const buyers = new Map<number, { payer: VillagerId | null; paid: boolean }>();
   for (const visitor of visitors) {
     if (!visitor.dealt || (visitor.kind !== 'pedlar' && visitor.kind !== 'factor_visit')) continue;
     const site = stallSiteOf(visitor);
@@ -1451,6 +1468,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
 
     get raiders(): readonly Raider[] { return raiders; },
     get visitors(): readonly Visitor[] { return visitors; },
+    get payments(): readonly Payment[] { return payments; },
     get dog() {
       return dog === null ? null
         : { x: dog.body.x, z: dog.body.z, facing: dog.body.facing, barking: dog.barking, mode: dog.mode };
@@ -2037,8 +2055,24 @@ export function createVillage(state: GameState, day: number, options: DayOptions
               props.push(load);
               propsById.set(load.id, load);
               tradeLoads.get(preparation.target.id)?.push(load.id);
+              // Y el que compra le paga, en mano, cada bulto que recibe.
+              const seller = visitors.find((one) => `trade:${one.body.id}` === preparation.target.id);
+              if (seller !== undefined && seller.phase === 'staying') {
+                payments.push({ from: { x: seller.body.x, z: seller.body.z }, to: { x: body.x, z: body.z }, at: steps });
+              }
             }
             dweller.holding = null;
+          }
+          // El vecino que ha ido a pagar al tratante o al salinero acaba de
+          // contar: pasan las monedas a la mano del que vende.
+          if (dweller.doing.offer.id === 'pay' && dweller.doing.place.id.startsWith('pay:')) {
+            const sellerId = Number(dweller.doing.place.id.slice('pay:'.length));
+            const seller = visitors.find((one) => one.body.id === sellerId);
+            const deal = buyers.get(sellerId);
+            if (seller !== undefined && deal !== undefined && !deal.paid) {
+              payments.push({ from: { x: body.x, z: body.z }, to: { x: seller.body.x, z: seller.body.z }, at: steps });
+              deal.paid = true;
+            }
           }
           // La cosecha entra en el motor de golpe en la semana 35. Esta ruta
           // hace visible esa jornada sin volver a sumar grano ni adjudicar una
@@ -2438,6 +2472,39 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       if (sackScene !== null) props.push(...sackScene.step(raiders, land, seed, steps));
       // Y los del camino, a su hora.
       for (const visitor of visitors) stepVisitor(visitor, land, phase, steps);
+      // Al tratante y al salinero, que venden a la aldea, les paga un vecino:
+      // el adulto libre más cercano va a él cuando ya está en la plaza, habla
+      // un momento y, al terminar, pasan las monedas.
+      for (const visitor of visitors) {
+        if (!visitor.dealt || (visitor.kind !== 'drover_visit' && visitor.kind !== 'salt_visit')) continue;
+        // Cobra el que trae la mercancía (la vaca, la mula de la sal), no su acompañante.
+        if (visitor.beast === null) continue;
+        const deal = buyers.get(visitor.body.id) ?? { payer: null, paid: false };
+        buyers.set(visitor.body.id, deal);
+        if (deal.paid || visitor.phase !== 'staying') continue;
+        const payer = deal.payer === null ? undefined : dwellers.find((one) => one.villager === deal.payer);
+        // Va de camino o ya está contando: el pago lo apunta el final de su
+        // encargo, en el bucle de la gente (`offer.id === 'pay'`).
+        if (payer !== undefined && payer.doing?.place.id === `pay:${visitor.body.id}`) continue;
+        const front = { x: visitor.body.x + Math.sin(visitor.body.facing) * 0.7, z: visitor.body.z + Math.cos(visitor.body.facing) * 0.7 };
+        const offer = placedOffer(OFFERS['pay']!, front, land);
+        if (offer === null) continue;
+        const free = dwellers.filter((one) => one.ageGroup === undefined && !indoors(one) && one.flight === null
+          && one.scene === null && one.holding === null && !isPost(one.dayPlan?.job?.place ?? '')
+          && !preparationByVillager.has(one.villager))
+          .sort((a, b) => gap(a.body, front) - gap(b.body, front) || a.villager - b.villager);
+        for (const candidate of free.slice(0, 3)) {
+          const route = pathTo(land, candidate.body, seatAt(offer, 0), candidate.body.radius);
+          if (route === null) continue;
+          deal.payer = candidate.villager;
+          candidate.doing = {
+            place: { id: `pay:${visitor.body.id}`, at: front, offers: [offer] }, offer, route,
+            seat: 0, since: steps, until: steps, there: false,
+          };
+          candidate.rethinkAt = steps + GIVE_UP;
+          break;
+        }
+      }
       // Los que llevan lo vendido salen cuando el vendedor ya está en la plaza,
       // desde donde estén: quien está durmiendo o de guardia no va. Con la
       // salida del vendedor (al alba) media aldea dormía todavía y no iba nadie.
