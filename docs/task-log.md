@@ -1,5 +1,21 @@
 # Cuaderno de tareas — el rework
 
+## 26 sep 2026 · Las golondrinas de Astra (v4.65)
+
+Astra dejó sus candidatos en la rama local `art/astra-modelos` (commits
+8fc1826…350648d; sin subir): sala del rey, puestos, cantera, kit de roca y el
+pájaro. **Sólo el pájaro está integrado.** Se hizo así: la receta se copió a
+`art/recipes/bird-candidate/` y el GLB a `deliverables/astra/`; lo adoptó
+`adopt-models.mjs`, que ahora admite modelos nuevos (`round`, `recipe`,
+`source`, `license`), con aprobados en `artifacts/graphics/astra-bird/`; y lo
+publicó `publish-assets --ids bird`. En `effects/ambience.ts`,
+`createAmbience(map, bird)` pinta una malla instanciada por cada pieza del
+modelo. Las piezas con dos materiales llegan como grupo, y la primera
+integración no las encontraba y seguía pintando uves. `BIRD_SCALE` 10. Prueba:
+`tests/fast/birds.test.ts`. Captura: `artifacts/graphics/env/birds2-crop.png`.
+**Pendiente:** integrar los otros candidatos de Astra (el orden y cuáles, lo
+decide Vera).
+
 ## 26 sep 2026 · Agua que choca, salpica, se llena y cae (v4.64)
 
 - `effects/water-throws.ts`: `step(…, solid)` con `sliding`, porque las gotas

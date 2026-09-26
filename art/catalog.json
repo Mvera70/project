@@ -5854,6 +5854,59 @@
         "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
         "license": "project-original"
       }
+    },
+    {
+      "id": "bird",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/bird-candidate, rama art/astra-modelos, commit 350648d): golondrina en vuelo, alas en el hombro.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/bird-candidate/bird.json",
+      "generator": "art/recipes/bird-candidate/bird.json",
+      "approved": {
+        "runId": "astra-bird",
+        "directory": "artifacts/graphics/astra-bird/approved/bird"
+      },
+      "bounds": {
+        "min": [
+          -0.041667,
+          -0.002021,
+          -0.021667
+        ],
+        "max": [
+          0.041667,
+          0.002643,
+          0.014667
+        ],
+        "size": [
+          0.083333,
+          0.004663,
+          0.036333
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "feathers",
+        "breast",
+        "tips"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 110
+      },
+      "hashes": {
+        "bird.glb": "FEA81FB4848B8B179AE3B2BE7DA78E88F3710A1D5DA337BE3DF1FCCD4684FD71",
+        "bird-preview.png": "4611888302197DC2A2CFB8E721C9B5D20770087BC4BD8AED32AA55C645CE6140"
+      }
     }
   ]
 }

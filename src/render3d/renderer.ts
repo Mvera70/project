@@ -137,6 +137,8 @@ export const WANTED = [
   'gate-timber',
   // P-2 · la fuente publicada de la plaza.
   'fountain',
+  // La golondrina de Astra (26 sep 2026), para las bandadas del cielo.
+  'bird',
   // M-3 · el arado ya tiene GLB; el barril sigue usando el respaldo procedural.
   // `WANTED` puede incluirlo antes de publicarlo para que aparezca al llegar.
   'barrel', 'plough',
@@ -920,7 +922,7 @@ export async function createGraphicsRenderer(
       world.remove(ambience.group);
       ambience.dispose();
     }
-    ambience = createAmbience(state.map);
+    ambience = createAmbience(state.map, library.get('bird')?.original);
     world.add(ambience.group);
     if (puddles !== null) {
       world.remove(puddles.group);

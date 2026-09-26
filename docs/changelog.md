@@ -1,5 +1,15 @@
 # The Valley — Registro de cambios
 
+## v4.65 · 26 sep 2026 · Las golondrinas de Astra
+
+Vera: «los pájaros estos no me gustan, hay que hacer modelos 3D». Las
+bandadas del cielo eran una uve dibujada en un plano. Ahora son la golondrina
+que modeló Astra (`bird.glb`, 110 triángulos): cuerpo y dos alas instanciados,
+y cada ala bate sobre su hombro entre las poses que Astra marcó. Aletean a
+ratos y planean a ratos, y se ladean con el vaivén de la bandada. Sin el
+modelo, como en las pruebas o en el respaldo de Canvas, vuelve la uve.
+`tools/art/adopt-models.mjs` admite ya modelos nuevos con su procedencia.
+
 ## v4.64 · 26 sep 2026 · Agua que choca, salpica, se llena y cae
 
 Las cuatro cosas que v4.63 dejó al alcance, pedidas por Vera:

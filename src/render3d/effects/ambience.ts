@@ -12,10 +12,18 @@
 //
 // Una malla por capa, instanciada, y sin azar: todo sale de un hash del índice.
 // Lo que cambia con la hora es la opacidad y cuántas se dibujan.
+//
+// **Desde el 26 sep 2026 los pájaros son el modelo de Astra** (`bird.glb`, una
+// golondrina de 110 triángulos). Vera: «los pájaros estos no me gustan, hay que
+// hacer modelos 3D». Cuerpo y alas son tres mallas instanciadas, y cada ala
+// gira sobre su hombro entre las dos poses que Astra dejó en el README (−55° y
+// +35°). Sin el modelo —las pruebas, el respaldo en Canvas— siguen siendo la
+// uve dibujada.
 
 import {
-  AdditiveBlending, CanvasTexture, Color, DynamicDrawUsage, Group, InstancedMesh, Matrix4,
-  MeshBasicMaterial, PlaneGeometry, Quaternion, Vector3, type Camera, type Texture,
+  AdditiveBlending, CanvasTexture, Color, DynamicDrawUsage, Euler, Group, InstancedMesh, Matrix4,
+  MeshBasicMaterial, PlaneGeometry, Quaternion, Vector3, type BufferGeometry, type Camera, type Material, type Mesh,
+  type Object3D, type Texture,
 } from 'three';
 import { hash32 } from '@engine/rng';
 import { TERRAIN_CODE, type ValleyMap } from '@engine/state';
@@ -25,6 +33,39 @@ import { hourAt } from './day-phases';
 
 const MIST = 40;
 const BIRDS = 18;
+/**
+ * A cuánto se escala la golondrina de Astra: mide 0,083 celdas de punta a
+ * punta, que es lo que mide una golondrina, y a diez celdas de altura con la
+ * cámara de reposo no se vería. TUNE visual: ×10, lo que ocupaba la uve.
+ */
+const BIRD_SCALE = 10;
+/** El batir: las poses del README de Astra, en radianes, alrededor del eje Z del ala. */
+const WING_UP = (-55 * Math.PI) / 180;
+const WING_DOWN = (35 * Math.PI) / 180;
+
+/** Las tres piezas del pájaro, y dónde está cada una respecto a la raíz del modelo. */
+interface BirdPart { geometry: BufferGeometry; material: Material; local: Matrix4 }
+
+function birdParts(model: Object3D): { body: BirdPart[]; left: BirdPart[]; right: BirdPart[] } | null {
+  model.updateMatrixWorld(true);
+  const root = new Matrix4().copy(model.matrixWorld).invert();
+  // Una pieza con dos materiales llega como un grupo con una malla por
+  // material: se toman todas, y el ala gira sobre el origen del grupo.
+  const part = (name: string): BirdPart[] => {
+    const node = model.getObjectByName(name);
+    if (node === undefined) return [];
+    const pieces: BirdPart[] = [];
+    node.traverse((object) => {
+      const mesh = object as Mesh;
+      if (mesh.isMesh !== true) return;
+      const material = (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material) as Material;
+      pieces.push({ geometry: mesh.geometry, material: material.clone(), local: new Matrix4().multiplyMatrices(root, mesh.matrixWorld) });
+    });
+    return pieces;
+  };
+  const body = part('bird_body'), left = part('bird_wing_l'), right = part('bird_wing_r');
+  return body.length === 0 || left.length === 0 || right.length === 0 ? null : { body, left, right };
+}
 const FLIES = 90;
 
 function unit(index: number, what: string): number {
@@ -106,7 +147,7 @@ export function fliesAt(hour: number, season: Season, sky: SkyKind): number {
   return 0;
 }
 
-export function createAmbience(map: ValleyMap): Ambience {
+export function createAmbience(map: ValleyMap, bird?: Object3D): Ambience {
   const group = new Group();
   group.name = 'Valley_Ambience';
   const soft = softTexture();
@@ -125,12 +166,28 @@ export function createAmbience(map: ValleyMap): Ambience {
   const birds = new InstancedMesh(plane, birdMaterial, BIRDS);
   const flyMaterial = new MeshBasicMaterial({ color: new Color('#d9ff7a'), transparent: true, depthWrite: false, blending: AdditiveBlending, opacity: 0, fog: false, ...(soft === null ? {} : { map: soft }) });
   const flies = new InstancedMesh(plane, flyMaterial, FLIES);
-  for (const mesh of [mist, birds, flies]) {
+  // La golondrina de Astra, si ha llegado: cuerpo, ala izquierda y derecha.
+  const parts = bird === undefined ? null : birdParts(bird);
+  const pieces = parts === null ? [] : [
+    ...parts.body.map((part) => ({ part, wing: 0 })),
+    ...parts.left.map((part) => ({ part, wing: 1 })),
+    ...parts.right.map((part) => ({ part, wing: -1 })),
+  ];
+  const flock = pieces.map(({ part }) => {
+    part.material.transparent = true;
+    return new InstancedMesh(part.geometry, part.material, BIRDS);
+  });
+  for (const mesh of [mist, birds, flies, ...flock]) {
     mesh.frustumCulled = false;
     mesh.instanceMatrix.setUsage(DynamicDrawUsage);
     mesh.count = 0;
     group.add(mesh);
   }
+  const heading = new Quaternion();
+  const flight = new Matrix4();
+  const wing = new Matrix4();
+  const hinge = new Matrix4();
+  const tilt = new Euler();
   const mistSpots = Array.from({ length: MIST }, (_, n) => spot(n, 'mist'));
   const flySpots = Array.from({ length: FLIES }, (_, n) => spot(n, 'fly'));
 
@@ -165,7 +222,38 @@ export function createAmbience(map: ValleyMap): Ambience {
       // Los pájaros: tres bandadas que cruzan el mapa, cada una a su altura.
       const birdAmount = birdsAt(hour, sky);
       birdMaterial.opacity = 0.85 * birdAmount;
-      birds.count = birdAmount > 0 ? BIRDS : 0;
+      birds.count = birdAmount > 0 && parts === null ? BIRDS : 0;
+      if (parts !== null) {
+        const count = birdAmount > 0 ? BIRDS : 0;
+        for (const mesh of flock) {
+          mesh.count = count;
+          (mesh.material as Material).opacity = birdAmount;
+        }
+        for (let n = 0; n < count; n += 1) {
+          const band = n % 3;
+          const period = 40 + band * 12;
+          const t = ((time + band * 17) % period) / period;
+          const x = -10 + t * (map.width + 20) + (unit(n, 'bx') - 0.5) * 4;
+          const sway = Math.cos(time * 0.4 + band) * 3 * 0.4;
+          const z = map.height * (0.25 + band * 0.25) + (unit(n, 'bz') - 0.5) * 4 + Math.sin(time * 0.4 + band) * 3;
+          at.set(x, 9 + band * 1.5 + unit(n, 'by') * 1.5, z);
+          // Vuela hacia +x (el modelo mira a +z), ladeándose con el vaivén.
+          tilt.set(0, Math.atan2(map.width + 20, period * sway), -sway * 0.25);
+          heading.setFromEuler(tilt);
+          flight.compose(at, heading, size.setScalar(BIRD_SCALE));
+          // Bate a ratos y planea a ratos: las golondrinas no aletean sin parar.
+          const gliding = Math.sin(time * 0.7 + n * 1.7) < -0.35;
+          const beat = gliding ? 0.35 : 0.5 + 0.5 * Math.sin(time * 11 + n);
+          const angle = WING_UP + (WING_DOWN - WING_UP) * beat;
+          pieces.forEach(({ part, wing: side }, k) => {
+            wing.multiplyMatrices(flight, part.local);
+            // El ala gira sobre su hombro, que es el origen de su pieza.
+            if (side !== 0) wing.multiply(hinge.makeRotationZ(side * angle));
+            flock[k]!.setMatrixAt(n, wing);
+          });
+        }
+        for (const mesh of flock) mesh.instanceMatrix.needsUpdate = true;
+      }
       for (let n = 0; n < birds.count; n += 1) {
         const flock = n % 3;
         const period = 40 + flock * 12;
@@ -196,13 +284,15 @@ export function createAmbience(map: ValleyMap): Ambience {
       flies.instanceMatrix.needsUpdate = true;
 
       shown.mist = mist.count;
-      shown.birds = birds.count;
+      shown.birds = parts === null ? birds.count : flock[0]!.count;
       shown.flies = flies.count;
     },
     dispose(): void {
       plane.dispose();
       mistMaterial.dispose();
       birdMaterial.dispose();
+      // Las geometrías son del modelo compartido; los materiales, copias nuestras.
+      for (const mesh of flock) (mesh.material as Material).dispose();
       flyMaterial.dispose();
       soft?.dispose();
       birdMap?.dispose();

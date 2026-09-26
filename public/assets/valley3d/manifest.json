@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-25T14:12:12.822Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids partridge",
+  "generatedAt": "2026-09-26T21:34:17.818Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bird",
   "assets": [
     {
       "id": "axis-marker",
@@ -1323,6 +1323,17 @@
         "kind": "original",
         "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, partridge.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
         "license": "Project original"
+      }
+    },
+    {
+      "id": "bird",
+      "file": "bird.glb",
+      "sha256": "FEA81FB4848B8B179AE3B2BE7DA78E88F3710A1D5DA337BE3DF1FCCD4684FD71",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/bird-candidate, rama art/astra-modelos, commit 350648d): golondrina en vuelo, alas en el hombro.",
+        "license": "project-original"
       }
     }
   ]

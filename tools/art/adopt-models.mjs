@@ -11,6 +11,11 @@
 //
 // La lista: [{ "id", "glb", "preview"?, "motion"? }, …], con `motion` la que
 // imprime `rigid-clips.mjs` para los animales.
+//
+// Desde el 26 sep 2026 también admite un modelo **nuevo**, que no estaba en el
+// catálogo (el pájaro de Astra), y cada uno puede traer su procedencia:
+// `round` (la carpeta y el lote), `recipe`, `source` y `license`. Sin ellos,
+// lo de siempre: los modelos de Vera del lote 63db59c.
 
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -100,7 +105,10 @@ function inspect(bytes) {
 
 for (const item of list) {
   const bytes = readFileSync(item.glb);
-  const directory = `artifacts/graphics/marked-models/approved/${item.id}`;
+  const round = item.round ?? ROUND;
+  const directory = item.round === undefined
+    ? `artifacts/graphics/marked-models/approved/${item.id}`
+    : `artifacts/graphics/${item.round}/approved/${item.id}`;
   mkdirSync(directory, { recursive: true });
   writeFileSync(`${directory}/${item.id}.glb`, bytes);
   const hashes = { [`${item.id}.glb`]: sha(bytes) };
@@ -110,17 +118,22 @@ for (const item of list) {
   }
   const seen = inspect(bytes);
   const motion = (item.motion ?? []).slice().sort((a, b) => seen.clips.indexOf(a.name) - seen.clips.indexOf(b.name));
-  const index = catalog.assets.findIndex((asset) => asset.id === item.id);
-  if (index < 0) throw new Error(`'${item.id}' no está en el catálogo`);
+  let index = catalog.assets.findIndex((asset) => asset.id === item.id);
+  if (index < 0) {
+    // Nuevo: entra con lo mínimo que el esquema pide, y lo demás se rellena abajo.
+    if (item.source === undefined) throw new Error(`'${item.id}' no está en el catálogo: un modelo nuevo trae \`source\``);
+    catalog.assets.push({ id: item.id, blenderVersion: '5.2.1 LTS', provenance: { kind: 'original', license: item.license ?? 'project-original' } });
+    index = catalog.assets.length - 1;
+  }
   const previous = catalog.assets[index];
+  const recipe = item.recipe ?? 'deliverables/marked-models-trial/build-models.py';
   catalog.assets[index] = {
     ...previous,
     artifactRound: 'G-40',
     status: 'study',
-    recipe: 'deliverables/marked-models-trial/build-models.py',
-    generator: item.motion === undefined ? 'deliverables/marked-models-trial/build-models.py'
-      : 'deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs',
-    approved: { runId: ROUND, directory },
+    recipe,
+    generator: item.motion === undefined ? recipe : `${recipe} · tools/art/rigid-clips.mjs`,
+    approved: { runId: round, directory },
     bounds: seen.bounds,
     recipeSha256: null,
     materials: seen.materials,
@@ -135,9 +148,9 @@ for (const item of list) {
     hashes,
     provenance: {
       kind: 'original',
-      source: `Modelado por Vera para The Valley (deliverables/marked-models-trial, ${basename(item.glb)}; commit 63db59c)`
-        + (item.motion === undefined ? '.' : '; clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.'),
-      license: previous.provenance.license,
+      source: item.source ?? (`Modelado por Vera para The Valley (deliverables/marked-models-trial, ${basename(item.glb)}; commit 63db59c)`
+        + (item.motion === undefined ? '.' : '; clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.')),
+      license: item.license ?? previous.provenance.license,
     },
   };
   process.stdout.write(`${item.id}: ${seen.statistics.triangles} tri, ${seen.statistics.meshes} mallas, ${seen.materials.length} materiales, clips ${seen.clips.join('/') || '—'}\n`);

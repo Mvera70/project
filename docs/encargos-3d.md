@@ -130,8 +130,7 @@ tira. Pendiente, por orden de lo que se vería:
 - ~~Las gotas atraviesan la pared; el vado no salpica; los charcos no crecen;
   no hay cascadas.~~ Hecho en v4.64. Queda: la cascada del lago se ve estrecha
   desde la cámara de reposo, y la niebla al pie de las cascadas no existe.
-- **Los pájaros son una uve dibujada**: encargados a Astra
-  (`encargos/encargo-astra-modelos.md`, final).
+- ~~**Los pájaros son una uve dibujada**~~: la golondrina de Astra, en v4.65.
 
 ## Montañas y gargantas (26 sep 2026)
 
