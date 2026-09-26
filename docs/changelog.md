@@ -1,5 +1,22 @@
 # The Valley — Registro de cambios
 
+## v4.59 · 26 sep 2026 · Montañas facetadas y entradas en garganta
+
+Lo pidió Vera: «darle vida y estilo a las montañas y alrededores del valle»; la
+sierra era una loma lisa sin rocas y las dos entradas, pasillos largos y
+planos. Eligió el facetado low-poly y la garganta de roca. La sierra se arma
+sin índices y con `flatShading`, y cada cara toma un solo color por su altura
+y su pendiente (`world/mountains.ts`): prado al pie, pedrera, roca en tres
+franjas, acantilado donde es vertical y nieve en las cumbres que sube y baja
+con la estación. El ruido de cresta hace aristas en vez de cúpulas. El cinturón
+de montaña de dentro del mapa lleva una piel facetada que no toca el suelo
+jugable. Hay peñascos agrupados dentro y fuera (novecientos, instanciados en
+cinco formas), y el pinar sube por la ladera hasta media altura. En los
+dieciocho últimos tramos de cada extremo el valle se cierra en garganta: el
+llano pasa de once celdas a tres a cada lado del río y las paredes se
+empinan; un mojón de cuatro piedras marca cada entrada, fuera del mapa. Todo
+es decorado: no cambia el motor ni una celda jugable.
+
 ## v4.58 · 26 sep 2026 · El informe del valle
 
 Para medir y comparar antes de balancear (lo pidió Vera: «un sitio

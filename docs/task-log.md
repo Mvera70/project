@@ -1,5 +1,25 @@
 # Cuaderno de tareas — el rework
 
+## 26 sep 2026 · Montañas facetadas y entradas en garganta (v4.59)
+
+`src/render3d/world/mountains.ts` (nuevo): el color por cara (`faceColour`,
+`paintFacets`), la piel del cinturón del mapa, los peñascos (`placeCrags`,
+`buildCrags`) y los mojones. `valley-profile.ts` añade `gorgeAt` y estrecha el
+hombro en los extremos; `ground.ts` empina ahí el cinturón; `ridge.ts` hace la
+sierra facetada y con crestas; `backdrop.ts` monta todo y sube el pinar; el
+renderer pasa la nieve de la estación. Prueba: `tests/fast/graphics-mountains.test.ts`
+(garganta en los dos extremos y llano en medio, una cara un color, nieve en
+invierno, ni peñasco ni mojón en el agua, en tres semillas); en
+`graphics-ridge.test.ts` el recuento pasa a ser sin índices. Capturas:
+`artifacts/graphics/env/before-sheet.png` contra `after5-sheet.png`.
+**Suite rápida: 6 rojas que ya lo estaban en HEAD 56d5f28** (comprobado en una
+copia limpia): `art-props` (receta del gate), `graphics-picking` (la ficha),
+`graphics-world` (manifiesto contra catálogo), `module-graph` (world/),
+`pines` (semilla 41, el corro de uno) y `watchtower` (A4). Sin tocar.
+**Abierto:** el suelo gris del fondo de la garganta norte sigue ancho donde
+las celdas no son montaña (el decorado no puede levantarlas), y quedan motas
+verdes sueltas al pie del cinturón.
+
 ## 26 sep 2026 · El informe del valle, para el balance
 
 `tools/reports/valley-report.ts` + `valley-report-page.ts`; la escalera de hitos

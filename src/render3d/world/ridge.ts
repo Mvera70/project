@@ -32,6 +32,7 @@ import { PALETTES, type Palette } from '@derive/palette';
 import { GROUND_BIAS } from '../visual-config';
 import { elevationAt, groundBorderNormalAt, groundColourAt } from './ground';
 import { valleyShoulder } from './valley-profile';
+import { paintFacets } from './mountains';
 import { riverExtensionAt } from './river-extension';
 
 /**
@@ -162,7 +163,11 @@ export function ridgeAt(map: ValleyMap, seed: number, x: number, z: number): num
   // para que la silueta no sea un arco de circunferencia.
   const big = noise(seed, x, z, 11);
   const fine = noise(seed + 811, x, z, 4);
-  const rough = 0.5 + big * 0.9 + fine * 0.15;
+  // Y crestas: un ruido «de arista» (1 − |2n − 1|) hace líneas de cumbre en
+  // vez de cúpulas. Sin él la sierra eran lomas redondas (Vera, 26 sep 2026:
+  // «las montañas tienen una textura muy mejorable»).
+  const crest = 1 - Math.abs(2 * noise(seed + 419, x, z, 7) - 1);
+  const rough = 0.42 + big * 0.75 + crest * 0.45 + fine * 0.2;
 
   // En la salida del río la ribera se mantiene bajo su lámina de agua.
   const wet = exteriorWaterAt(map, seed, x, z, 2.8);
@@ -199,8 +204,15 @@ export function exteriorWaterAt(map: ValleyMap, seed: number, x: number, z: numb
     && riverExtensionAt(map, seed, x, z, halfWidth);
 }
 
-/** Los colores de la malla siguen la misma paleta que el prado y el bosque. */
-export function seasonRidge(mesh: Mesh, map: ValleyMap, palette: Palette): void {
+/**
+ * Los colores de la malla siguen la misma paleta que el prado y el bosque.
+ *
+ * Desde el 26 sep 2026 cada cara tiene **un solo color**, el de su altura y su
+ * pendiente (`faceColour`, `mountains.ts`): la sierra es facetada, como el
+ * resto del valle. Sólo la franja que toca el borde del mapa conserva el
+ * degradado por vértice, que es lo que casa su color con el del suelo.
+ */
+export function seasonRidge(mesh: Mesh, map: ValleyMap, palette: Palette, snow = 0): void {
   const position = mesh.geometry.getAttribute('position');
   const colour = mesh.geometry.getAttribute('color') as BufferAttribute;
   const values = colour.array as Float32Array;
@@ -233,7 +245,15 @@ export function seasonRidge(mesh: Mesh, map: ValleyMap, palette: Palette): void 
     values[at + 2] = tint.b;
   }
   colour.needsUpdate = true;
+  // La franja del borde conserva el color del suelo sólo donde es llana: en
+  // la garganta es pared, y con el prado salían láminas verdes pegadas a ella.
+  paintFacets(mesh.geometry, palette, snow, (y) => y - GROUND_BIAS,
+    (x, z, rise, up) => up > 0.9 && rise < 1.2
+      && Math.hypot(Math.max(0, -x, x - map.width), Math.max(0, -z, z - map.height)) < SEAM);
 }
+
+/** Lo ancha que es la franja del borde que conserva el color fundido con el suelo, en celdas. */
+const SEAM = 3;
 
 /**
  * La sierra que rodea el valle, como una sola malla.
@@ -242,7 +262,7 @@ export function seasonRidge(mesh: Mesh, map: ValleyMap, palette: Palette): void 
  * cambian nunca, así que se construyen al cargar el valle y no se vuelven a
  * tocar. El coste por fotograma es el de dibujar un objeto más.
  */
-export function buildRidge(map: ValleyMap, seed: number, palette: Palette = PALETTES.spring): Mesh {
+export function buildRidge(map: ValleyMap, seed: number, palette: Palette = PALETTES.spring, snow = 0): Mesh {
   // Tres celdas a cada lado del empalme tienen paso uno; lejos, dos y seis.
   const axis = (size: number): number[] => {
     const values = new Set<number>([0, size, -SKIRT, size + SKIRT]);
@@ -378,7 +398,12 @@ export function buildRidge(map: ValleyMap, seed: number, palette: Palette = PALE
   }
 
   const texture = rockTexture(seed);
-  const rock = new Mesh(shape, new MeshStandardMaterial({
+  // Sin índices, para que cada cara pueda tener su propio color; la luz
+  // facetada la pone `flatShading`.
+  const faceted = shape.toNonIndexed();
+  shape.dispose();
+  const rock = new Mesh(faceted, new MeshStandardMaterial({
+    flatShading: true,
     vertexColors: true,
     map: texture,
     bumpMap: texture,
@@ -401,6 +426,6 @@ export function buildRidge(map: ValleyMap, seed: number, palette: Palette = PALE
   // No proyecta: con el sol bajo, la sierra del este echaría una sombra sobre
   // medio pueblo y lo que hay que ver es el pueblo.
   rock.castShadow = false;
-  seasonRidge(rock, map, palette);
+  seasonRidge(rock, map, palette, snow);
   return rock;
 }

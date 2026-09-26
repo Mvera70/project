@@ -122,6 +122,15 @@ contra ella, pero **no va y viene del agua**: el cubo está siempre lleno. Una
 cadena de cubos desde el pozo o el río sería más fiel. Tampoco se ve la
 brigada en una captura todavía: está probada en `fire-brigade.test.ts`.
 
+## Montañas y gargantas (26 sep 2026)
+
+- **El camino que sale por la garganta.** Vera lo eligió con la garganta
+  («un camino que sale») y no está: el río sale entre las paredes, pero no hay
+  senda de tierra que se vea irse del valle.
+- **El suelo de la garganta norte**, dentro del mapa, sigue siendo un llano
+  gris ancho donde las celdas no son de montaña; el decorado no puede
+  levantarlas sin cambiar el mapa del motor.
+
 ## El valle más vivo (25 sep 2026)
 
 Lo que la tanda dejó a medias, y lo que se hizo después el mismo día:

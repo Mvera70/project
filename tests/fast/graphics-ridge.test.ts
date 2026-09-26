@@ -112,10 +112,10 @@ describe('V-14 · el valle', () => {
     const state = village(7);
     const ridge = buildRidge(state.map, state.terrainSeed);
     const position = ridge.geometry.getAttribute('position');
-    const index = ridge.geometry.getIndex();
     expect(position.count, 'tiene vértices').toBeGreaterThan(100);
-    expect(index, 'y caras').not.toBeNull();
-    const triangles = index!.count / 3;
+    // Sin índices desde la sierra facetada (26 sep 2026): cada cara lleva su
+    // propio color, así que cada tres vértices son un triángulo.
+    const triangles = (ridge.geometry.getIndex()?.count ?? position.count) / 3;
     expect(triangles, `la malla exterior tiene ${triangles} triángulos`).toBeLessThan(16_000);
     expect(ridge.geometry.getAttribute('color'), 'el color va por vértice').toBeDefined();
     // Y ningún vértice de dentro del valle se despega del suelo: el suelo de
@@ -127,7 +127,9 @@ describe('V-14 · el valle', () => {
     for (let i = 0; i < position.count; i += 1) {
       const x = position.getX(i);
       const z = position.getZ(i);
-      if (x > 0 && z > 0 && x < state.map.width && z < state.map.height) {
+      // Con el borde incluido: sin índices, la malla ya no guarda los vértices
+      // del interior que ninguna cara usaba, y el empalme es el propio borde.
+      if (x >= 0 && z >= 0 && x <= state.map.width && z <= state.map.height) {
         expect(position.getY(i), 'un vértice despegado del suelo dentro del valle')
           .toBeCloseTo(GROUND_BIAS + elevationAt(state.map, x, z), 5);
         inside += 1;

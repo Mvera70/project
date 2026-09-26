@@ -18,7 +18,7 @@ import type { ValleyMap } from '@engine/state';
 import type { Palette } from '@derive/palette';
 import type { Era } from '@derive/era';
 import { GROUND_BIAS } from '../visual-config';
-import { valleyShoulder } from './valley-profile';
+import { gorgeAt, valleyShoulder } from './valley-profile';
 
 /**
  * How much a cell's colour varies from its neighbours of the same kind.
@@ -309,6 +309,13 @@ const RISES = new WeakMap<ValleyMap, Float32Array>();
 const MOUNTAIN_SLOPE = 0.6;
 /** TUNE: y hasta dónde. Seis celdas son dieciocho metros: una ladera, no un pico. */
 const MOUNTAIN_RISE = 6;
+/**
+ * TUNE visual: en la garganta, 1,8 por celda hasta 10 celdas. Con la ladera de
+ * siempre las paredes del paso subían tan despacio que la entrada seguía
+ * leyéndose como un pasillo llano (captura de la entrada norte, semilla 11).
+ */
+const GORGE_SLOPE = 1.8;
+const GORGE_RISE = 10;
 
 function risesOf(map: ValleyMap): Float32Array {
   const known = RISES.get(map);
@@ -344,7 +351,12 @@ function risesOf(map: ValleyMap): Float32Array {
     const deep = depth[cell] as number;
     const from = deep < 0 ? MOUNTAIN_RISE / MOUNTAIN_SLOPE : deep;
     const shoulder = valleyShoulder(map, cell % map.width + 0.5, Math.floor(cell / map.width) + 0.5);
-    rises[cell] = Math.min(MOUNTAIN_RISE, from * MOUNTAIN_SLOPE) * shoulder;
+    // En la garganta de las entradas la roca sube más deprisa y más alto: son
+    // las paredes del paso (`gorgeAt`, `valley-profile.ts`, 26 sep 2026).
+    const gorge = gorgeAt(map, Math.floor(cell / map.width) + 0.5);
+    const slope = MOUNTAIN_SLOPE + (GORGE_SLOPE - MOUNTAIN_SLOPE) * gorge;
+    const top = MOUNTAIN_RISE + (GORGE_RISE - MOUNTAIN_RISE) * gorge;
+    rises[cell] = Math.min(top, from * slope) * shoulder;
   }
   RISES.set(map, rises);
   return rises;

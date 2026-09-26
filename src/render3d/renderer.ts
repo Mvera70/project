@@ -759,7 +759,7 @@ export async function createGraphicsRenderer(
     appearancePalette = blendedPalette;
     appearanceSnow = snowFrom + (snowTarget - snowFrom) * eased;
     forest?.season(blendedPalette);
-    backdrop?.season(blendedPalette);
+    backdrop?.season(blendedPalette, appearanceSnow);
     greatOak?.season(blendedPalette);
     village.season(appearanceSnow, blendedPalette.accent);
     treeFalls.season(blendedPalette);
@@ -801,7 +801,7 @@ export async function createGraphicsRenderer(
     snowTarget = snow;
     appearanceElapsed = 0;
     forest?.season(appearancePalette);
-    backdrop?.season(appearancePalette);
+    backdrop?.season(appearancePalette, appearanceSnow);
     greatOak?.season(appearancePalette);
     village.season(appearanceSnow, appearancePalette.accent);
     treeFalls.season(appearancePalette);
@@ -889,7 +889,7 @@ export async function createGraphicsRenderer(
     }
     // El decorado de las laderas usa pinos; el arbolado de hoja queda en la aldea.
     backdrop = buildBackdrop(state.map, state.terrainSeed, palette,
-      library.get(TREE_PINE)?.original as Object3D | undefined);
+      library.get(TREE_PINE)?.original as Object3D | undefined, appearanceSnow);
     world.add(backdrop.group);
     // El roble va con el mapa, como la sierra: su sitio sale del lago.
     if (greatOak !== null) {
