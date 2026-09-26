@@ -97,6 +97,7 @@ propio documento con medidas y presupuesto de triángulos.
 | `encargos/encargo-e3-emplazamiento-accesible.md` | Selección de muros aptos para que la escalera opcional aparezca en partidas históricas reales |
 | `encargos/encargo-arado.md` | La malla del arado (M-3) |
 | `encargos/encargo-fuente.md` | La fuente de la plaza (P-3) |
+| `encargos/encargo-astra-modelos.md` | **Los modelos 3D que faltan, para Astra** (26 sep 2026): sala del rey, puestos, cantera, kit de roca, roble, casa quemada, y el prompt listo para pegar |
 | `encargos/respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos |
 
 ## Histórico: se conserva por el porqué — `docs/historico/`

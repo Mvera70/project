@@ -11,7 +11,8 @@ import { PALETTES } from '@derive/palette';
 import { Color, type Mesh, type MeshStandardMaterial } from 'three';
 import { buildRidge, exteriorWaterAt, ridgeAt } from '../../src/render3d/world/ridge';
 import { gorgeAt, valleyAxis, valleyShoulder } from '../../src/render3d/world/valley-profile';
-import { buildCairns, faceColour, MOUNTAIN_PEAK, placeCrags } from '../../src/render3d/world/mountains';
+import { buildCairns, buildGorgeRoads, faceColour, MOUNTAIN_PEAK, placeCrags } from '../../src/render3d/world/mountains';
+import { TERRAIN_CODE } from '@engine/state';
 
 const SEEDS = [7, 11, 23];
 
@@ -76,6 +77,33 @@ describe('las montañas y las entradas', () => {
         expect(exteriorWaterAt(map, terrainSeed, cairn.position.x, cairn.position.z, 1.8)).toBe(false);
       }
       (cairns.userData.dispose as () => void)();
+    }
+  });
+});
+
+describe('el camino que sale por la garganta', () => {
+  it('sale del valle por las dos entradas, por tierra y sin mojarse', () => {
+    for (const seed of SEEDS) {
+      const { map, terrainSeed } = foundGame(seed);
+      const roads = buildGorgeRoads(map, terrainSeed, PALETTES.spring, (x, z) => ridgeAt(map, terrainSeed, x, z),
+        (x, z) => exteriorWaterAt(map, terrainSeed, x, z, 1.4),
+        (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))));
+      const position = roads.mesh.geometry.getAttribute('position');
+      let north = false, south = false, inside = 0;
+      for (let i = 0; i < position.count; i += 1) {
+        const x = position.getX(i), z = position.getZ(i);
+        if (z < -20) north = true;
+        if (z > map.height + 20) south = true;
+        if (z > 0 && z < map.height) {
+          inside += 1;
+          // Dentro del mapa, sólo la ribera: nunca el cauce.
+          const cell = map.terrain[Math.floor(z) * map.width + Math.floor(x)];
+          expect(cell, `semilla ${seed}: la senda pisa el río en ${x.toFixed(1)}, ${z.toFixed(1)}`).not.toBe(TERRAIN_CODE.water);
+        }
+      }
+      expect(north && south, `semilla ${seed}: sale por las dos entradas`).toBe(true);
+      expect(inside, 'y empieza dentro del valle').toBeGreaterThan(0);
+      roads.dispose();
     }
   });
 });

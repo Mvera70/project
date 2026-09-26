@@ -18,7 +18,7 @@ import type { ValleyMap } from '@engine/state';
 import type { Palette } from '@derive/palette';
 import type { Era } from '@derive/era';
 import { GROUND_BIAS } from '../visual-config';
-import { gorgeAt, valleyShoulder } from './valley-profile';
+import { gorgeAt, valleyAxis, valleyShoulder } from './valley-profile';
 
 /**
  * How much a cell's colour varies from its neighbours of the same kind.
@@ -316,6 +316,10 @@ const MOUNTAIN_RISE = 6;
  */
 const GORGE_SLOPE = 1.8;
 const GORGE_RISE = 10;
+/** Lo ancha que es la orilla de la garganta a cada lado del eje del río, en celdas: el río y dos de ribera, como el mapa. */
+const GORGE_BANK = 3;
+/** Cuántas celdas alrededor de un lago de montaña conservan la subida de siempre. TUNE visual. */
+const LAKE_CALM = 5;
 
 function risesOf(map: ValleyMap): Float32Array {
   const known = RISES.get(map);
@@ -344,13 +348,52 @@ function risesOf(map: ValleyMap): Float32Array {
     }
   }
 
+  // Lo lejos que queda cada celda del lago de montaña más cercano: alrededor
+  // del lago la roca conserva su subida de siempre, porque la lámina del lago
+  // es plana y una pared pegada a ella la dejaba en el fondo de un pozo.
+  const shoreline = new Int16Array(cells).fill(-1);
+  const lakeQueue: number[] = [];
+  for (let cell = 0; cell < cells; cell += 1) {
+    if (map.terrain[cell] !== TERRAIN_CODE.lake) continue;
+    shoreline[cell] = 0;
+    lakeQueue.push(cell);
+  }
+  for (let head = 0; head < lakeQueue.length; head += 1) {
+    const cell = lakeQueue[head] as number;
+    if ((shoreline[cell] as number) >= LAKE_CALM) continue;
+    const x = cell % map.width;
+    const y = Math.floor(cell / map.width);
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue;
+      const next = ny * map.width + nx;
+      if (shoreline[next] !== -1) continue;
+      shoreline[next] = (shoreline[cell] as number) + 1;
+      lakeQueue.push(next);
+    }
+  }
+
   const rises = new Float32Array(cells);
   for (let cell = 0; cell < cells; cell += 1) {
     // Una montaña rodeada de montaña hasta el borde del mapa no tiene fondo
     // conocido: cuenta como lo más alto, que es lo que hay pegado a la sierra.
     const deep = depth[cell] as number;
-    const from = deep < 0 ? MOUNTAIN_RISE / MOUNTAIN_SLOPE : deep;
-    const shoulder = valleyShoulder(map, cell % map.width + 0.5, Math.floor(cell / map.width) + 0.5);
+    const reached = deep < 0 ? MOUNTAIN_RISE / MOUNTAIN_SLOPE : deep;
+    // En la garganta, lo que cuenta es lo lejos que está del río, no del prado
+    // más cercano: un lago de montaña o un claro metidos en la roca dejaban
+    // hundido todo lo de alrededor, y el paso se veía como un llano gris ancho
+    // (captura de la entrada norte, semilla 11, 26 sep 2026).
+    const across = Math.max(0, Math.abs(cell % map.width + 0.5 - valleyAxis(map, Math.floor(cell / map.width) + 0.5)) - GORGE_BANK);
+    const shore = shoreline[cell] as number;
+    const calm = shore < 0 ? 1 : Math.max(0, (shore - 1) / (LAKE_CALM - 1));
+    const inGorge = gorgeAt(map, Math.floor(cell / map.width) + 0.5);
+    const from = reached + (Math.max(reached, across) - reached) * inGorge * calm;
+    // Y en la garganta el hombro del valle deja de aplastar la roca: el llano
+    // ancho del centro no llega a los extremos, donde el mapa ya es un paso de
+    // dos celdas de ribera a cada lado del río.
+    const open = valleyShoulder(map, cell % map.width + 0.5, Math.floor(cell / map.width) + 0.5);
+    const shoulder = open + (1 - open) * Math.min(1, inGorge * 2) * calm;
     // En la garganta de las entradas la roca sube más deprisa y más alto: son
     // las paredes del paso (`gorgeAt`, `valley-profile.ts`, 26 sep 2026).
     const gorge = gorgeAt(map, Math.floor(cell / map.width) + 0.5);

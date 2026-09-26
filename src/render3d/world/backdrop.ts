@@ -11,7 +11,7 @@ import { hash32 } from '@engine/rng';
 import { GROUND_BIAS } from '../visual-config';
 import { piecesOf, tintFoliage } from './forest';
 import { buildRidge, exteriorWaterAt, ridgeAt, seasonRidge, SKIRT } from './ridge';
-import { buildCairns, buildCrags, buildMountainSkin, MOUNTAIN_PEAK, placeCrags } from './mountains';
+import { buildCairns, buildCrags, buildGorgeRoads, buildMountainSkin, MOUNTAIN_PEAK, placeCrags } from './mountains';
 import { valleyAxis } from './valley-profile';
 import { elevationAt } from './ground';
 import { TERRAIN_CODE } from '@engine/state';
@@ -206,6 +206,9 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
   const cairns = buildCairns(map, palette, (x, z) => ridgeAt(map, seed, x, z),
     (x, z) => exteriorWaterAt(map, seed, x, z, 1.8), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))));
   group.add(cairns);
+  const roads = buildGorgeRoads(map, seed, palette, (x, z) => ridgeAt(map, seed, x, z),
+    (x, z) => exteriorWaterAt(map, seed, x, z, 1.4), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))));
+  group.add(roads.mesh);
   const water = outerWater(map, seed, palette);
   if (water !== null) group.add(water);
   const forest = tree === undefined ? null : outerTrees(map, seed, tree, palette);
@@ -217,6 +220,7 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
       seasonRidge(ridge, map, next, cover);
       skin?.season(next, cover);
       crags.season(next);
+      roads.season(next);
       if (water !== null) (water.material as MeshStandardMaterial).color.set(next.water);
       forest?.season(next);
     },
@@ -227,6 +231,7 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
       forest?.dispose();
       skin?.dispose();
       crags.dispose();
+      roads.dispose();
       (cairns.userData.dispose as () => void)();
       ridge.geometry.dispose();
       const ridgeMaterial = ridge.material as MeshStandardMaterial;

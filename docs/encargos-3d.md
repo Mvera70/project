@@ -124,12 +124,15 @@ brigada en una captura todavía: está probada en `fire-brigade.test.ts`.
 
 ## Montañas y gargantas (26 sep 2026)
 
-- **El camino que sale por la garganta.** Vera lo eligió con la garganta
-  («un camino que sale») y no está: el río sale entre las paredes, pero no hay
-  senda de tierra que se vea irse del valle.
-- **El suelo de la garganta norte**, dentro del mapa, sigue siendo un llano
-  gris ancho donde las celdas no son de montaña; el decorado no puede
-  levantarlas sin cambiar el mapa del motor.
+- ~~**El camino que sale por la garganta.**~~ Hecho en v4.60: una senda de
+  tierra por la orilla, de dentro del valle a la sierra (`buildGorgeRoads`).
+- ~~**El suelo de la garganta norte.**~~ Hecho en v4.60: no era el mapa, que
+  ya es estrecho en los extremos, sino cómo se medía la subida de la roca.
+- **Los peñascos y el mojón** son primitivas por código: en el encargo a
+  Astra como kit de roca (`docs/encargos/encargo-astra-modelos.md`).
+
+**Los modelos que faltan, en una lista y con su prompt:**
+`docs/encargos/encargo-astra-modelos.md` (26 sep 2026).
 
 ## El valle más vivo (25 sep 2026)
 

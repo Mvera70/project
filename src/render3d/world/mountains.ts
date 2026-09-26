@@ -22,7 +22,7 @@
 // sale del mapa y de un hash, así que el mismo valle da siempre la misma sierra.
 
 import {
-  BufferAttribute, BufferGeometry, Color, DynamicDrawUsage, Euler, Group, IcosahedronGeometry, InstancedMesh,
+  BufferAttribute, BufferGeometry, Color, DoubleSide, DynamicDrawUsage, Euler, Group, IcosahedronGeometry, InstancedMesh,
   Matrix4, Mesh, MeshStandardMaterial, Quaternion, Vector3,
 } from 'three';
 import { hash32 } from '@engine/rng';
@@ -66,7 +66,9 @@ export function faceColour(out: Color, palette: Palette, rise: number, up: numbe
     // alternos por cara el cinturón parecía confeti, y con el listón en 1,6 y
     // 0,8 salían dientes verdes clavados en la roca (capturas del 26 sep): sólo
     // lo bajo **y** llano es prado.
-    out.set(palette.meadow).lerp(new Color(palette.meadowAlt), Math.min(1, rise / 0.9)).offsetHSL(0, 0, jitter * 0.025);
+    // Y apagado hacia la pedrera: el verde del prado, suelto entre la roca,
+    // se leía como motas chillonas al pie de las laderas.
+    out.set(palette.meadowAlt).lerp(new Color(palette.rock), 0.2 + Math.min(1, rise / 0.9) * 0.25).offsetHSL(0, 0, jitter * 0.025);
     return out;
   }
   if (rise < 4 && up < 0.85) {
@@ -347,3 +349,111 @@ export function buildCairns(
   group.userData.dispose = (): void => { shape.dispose(); stone.dispose(); };
   return group;
 }
+
+// --- el camino que sale ------------------------------------------------------
+
+/**
+ * La senda de tierra que se va del valle por cada garganta (Vera la eligió con
+ * ella: «un camino que sale»). Arranca dentro del mapa, en la ribera del paso,
+ * y sigue la orilla hasta perderse en la sierra: una cinta de tierra pegada al
+ * suelo, del color de los caminos del pueblo, que se afina y se funde al irse.
+ *
+ * Decorado: no es un camino de la partida ni de la capa de vida. Por eso sólo
+ * pisa la ribera de la garganta, donde no se levanta nunca nada.
+ */
+export interface GorgeRoads { mesh: Mesh; season(palette: Palette): void; dispose(): void }
+
+/** Hasta dónde entra en el mapa y hasta dónde se aleja por fuera, en celdas. TUNE visual. */
+const ROAD_IN = 14;
+const ROAD_OUT = 42;
+/** Ancho de la senda, y su distancia al eje del río. TUNE visual: el río ocupa dos celdas. */
+const ROAD_WIDTH = 0.75;
+const ROAD_OFFSETS = [1.9, 2.3, 2.8, 3.4, 4, 4.6];
+/** El paso de muestreo de la senda y cuántas muestras a cada lado promedia el suavizado. */
+const ROAD_STEP = 0.5;
+const ROAD_SMOOTH = 6;
+
+export function buildGorgeRoads(
+  map: ValleyMap, seed: number, palette: Palette, heightAt: (x: number, z: number) => number,
+  wet: (x: number, z: number) => boolean, axis: (z: number) => number,
+): GorgeRoads {
+  const points: number[] = [];
+  const fades: number[] = [];
+  const length = ROAD_IN + ROAD_OUT;
+  const count = Math.round(length / ROAD_STEP);
+  for (const end of [0, 1] as const) {
+    // Cada entrada saca su senda por una orilla, la que diga el hash.
+    const side = unit(seed, `road:${end}`) > 0.5 ? 1 : -1;
+    const zOf = (t: number): number => (end === 0 ? ROAD_IN - t : map.height - ROAD_IN + t);
+    // Primero lo lejos del eje que puede ir sin mojarse, muestra a muestra; y
+    // luego suavizado, que con los saltos de una orilla a otra la senda salía
+    // en zigzag y trepaba por la pared (captura del 26 sep).
+    const offsets: number[] = [];
+    for (let i = 0; i <= count; i += 1) {
+      const z = zOf(i * ROAD_STEP);
+      const off = ROAD_OFFSETS.find((o) => !wet(axis(z) + side * o, z)
+        && !soggy(map, axis(z) + side * (o - ROAD_WIDTH * 0.5 - ROAD_SMOOTH_SLACK), z)
+        && !soggy(map, axis(z) + side * (o + ROAD_WIDTH * 0.5 + ROAD_SMOOTH_SLACK), z)) ?? ROAD_OFFSETS.at(-1)!;
+      offsets.push(off + Math.sin(i * 0.23 + unit(seed, `road:w:${end}`) * 6) * 0.18);
+    }
+    const centre = offsets.map((_, i) => {
+      let sum = 0, n = 0;
+      for (let k = Math.max(0, i - ROAD_SMOOTH); k <= Math.min(count, i + ROAD_SMOOTH); k += 1) { sum += offsets[k]!; n += 1; }
+      const z = zOf(i * ROAD_STEP);
+      // Nunca más cerca del río que la muestra cruda: el promedio suaviza el
+      // trazado, pero no puede meterlo en el agua.
+      return { x: axis(z) + side * Math.max(sum / n, offsets[i]!), z };
+    });
+    const fadeAt = (i: number): number => Math.max(0, Math.min(1, (length - i * ROAD_STEP) / 12));
+    const edge = (i: number, s: number): number[] => {
+      const p = centre[i]!;
+      const x = p.x + s * ROAD_WIDTH * 0.5 * (0.5 + 0.5 * fadeAt(i));
+      return [x, heightAt(x, p.z) + GROUND_BIAS + ROAD_LIFT, p.z];
+    };
+    for (let i = 0; i < count; i += 1) {
+      const a = edge(i, -1), b = edge(i, 1), c = edge(i + 1, -1), d = edge(i + 1, 1);
+      points.push(...a, ...c, ...b, ...b, ...c, ...d);
+      const f0 = fadeAt(i), f1 = fadeAt(i + 1);
+      fades.push(f0, f1, f0, f0, f1, f1);
+    }
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(new Float32Array(points), 3));
+  geometry.setAttribute('color', new BufferAttribute(new Float32Array(points.length), 3));
+  geometry.computeVertexNormals();
+  const material = new MeshStandardMaterial({
+    vertexColors: true, roughness: 1, metalness: 0, side: DoubleSide,
+    // Encima del suelo sin pelearse con él por la profundidad.
+    polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+  });
+  const mesh = new Mesh(geometry, material);
+  mesh.name = 'Valley_Gorge_Roads';
+  mesh.receiveShadow = true;
+  const season = (next: Palette): void => {
+    const colour = geometry.getAttribute('color') as BufferAttribute;
+    const dirt = new Color(next.path);
+    const rock = new Color(next.rock);
+    const tint = new Color();
+    for (let i = 0; i < fades.length; i += 1) {
+      // Al irse se funde con la pedrera, en vez de acabar de golpe.
+      tint.copy(rock).lerp(dirt, fades[i]!);
+      colour.setXYZ(i, tint.r, tint.g, tint.b);
+    }
+    colour.needsUpdate = true;
+  };
+  season(palette);
+  return { mesh, season, dispose(): void { geometry.dispose(); material.dispose(); } };
+}
+
+/** El margen que se deja al agua porque el suavizado puede acercar la senda a la orilla. */
+const ROAD_SMOOTH_SLACK = 0.35;
+
+/** Si en ese punto del mapa hay agua o marisma; fuera del mapa, nunca (eso lo mira `wet`). */
+function soggy(map: ValleyMap, x: number, z: number): boolean {
+  if (x < 0 || z < 0 || x >= map.width || z >= map.height) return false;
+  const t = map.terrain[Math.floor(z) * map.width + Math.floor(x)];
+  return t === TERRAIN_CODE.water || t === TERRAIN_CODE.lake || t === TERRAIN_CODE.marsh || t === TERRAIN_CODE.ford;
+}
+
+/** Lo que la senda se levanta sobre el suelo, en celdas. TUNE: con 0,02 el suelo, que no es plano entre vértices, la tapaba a trozos. */
+const ROAD_LIFT = 0.07;

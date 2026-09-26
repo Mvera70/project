@@ -1,5 +1,20 @@
 # Cuaderno de tareas — el rework
 
+## 26 sep 2026 · El camino de la garganta, el fondo cerrado y el encargo a Astra (v4.60)
+
+`buildGorgeRoads` en `world/mountains.ts` (montado en `backdrop.ts`);
+`risesOf` en `ground.ts` mide la roca de la garganta desde el eje del río
+(`GORGE_BANK` 3), deja de aplastarla con el hombro y respeta cinco celdas
+alrededor del lago (`LAKE_CALM`). Prueba nueva en `graphics-mountains.test.ts`:
+la senda sale por las dos entradas y no pisa el río, en tres semillas (la
+semilla 7 y la 23 lo pisaban antes de mirar las celdas del mapa y de impedir
+que el suavizado la acercara al agua). Capturas: `artifacts/graphics/env/after9-sheet.png`.
+Suite rápida: las mismas 6 rojas de HEAD, ninguna nueva. **El encargo a
+Astra** está en `docs/encargos/encargo-astra-modelos.md`: seis modelos por
+prioridad —sala del rey, puestos del mercado, cara de cantera, kit de roca,
+roble y casa quemada— y el prompt listo para pegar. **Pendiente de Vera:** si
+el roble y la casa quemada entran en la tanda.
+
 ## 26 sep 2026 · Montañas facetadas y entradas en garganta (v4.59)
 
 `src/render3d/world/mountains.ts` (nuevo): el color por cara (`faceColour`,

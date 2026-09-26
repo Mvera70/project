@@ -1,5 +1,20 @@
 # The Valley — Registro de cambios
 
+## v4.60 · 26 sep 2026 · El camino que sale, y la garganta cerrada
+
+Lo que v4.59 dejó abierto, pedido por Vera. **La senda de tierra** sale del
+valle por cada garganta: arranca en la ribera dentro del mapa, sigue la orilla
+sin pisar el agua y se funde con la pedrera al perderse en la sierra
+(`buildGorgeRoads`, `world/mountains.ts`). **El fondo gris de la entrada norte
+no era el mapa**: el mapa ya deja sólo dos celdas de ribera a cada lado del
+río en los extremos, pero el dibujo medía la subida de la roca desde el prado
+más cercano —el lago de montaña contaba— y el perfil del valle la aplastaba.
+Ahora, en la garganta, la roca sube por su distancia al río y el perfil no la
+aplasta; alrededor del lago conserva su subida de siempre, para que no quede
+en un pozo. Y el verde suelto al pie de las laderas va apagado hacia la
+pedrera. Todo es decorado. Además, **el encargo a Astra** de los modelos 3D
+que faltan: `docs/encargos/encargo-astra-modelos.md`, con la lista y el prompt.
+
 ## v4.59 · 26 sep 2026 · Montañas facetadas y entradas en garganta
 
 Lo pidió Vera: «darle vida y estilo a las montañas y alrededores del valle»; la
