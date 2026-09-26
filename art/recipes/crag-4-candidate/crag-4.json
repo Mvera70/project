@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "id": "crag-4",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de receta; una unidad GLB es una celda de 3 m.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "note": "Astra 26 sep 2026 \u00b7 prioridades 1\u20134, candidato sin integrar.",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "crag-4",
+    "footprint": [
+      1,
+      1
+    ]
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "Crag",
+      "location": [
+        0,
+        0,
+        0.9
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        3,
+        2.45,
+        1.8
+      ],
+      "segments": 7,
+      "rings": 4
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "referenceRender": {
+    "width": 640,
+    "height": 640,
+    "cameraLocation": [
+      5,
+      -7,
+      6
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 5,
+    "worldRole": "sky"
+  },
+  "candidateBuild": {
+    "adapter": "../hall-candidate/build.py",
+    "triangleLimit": 80,
+    "notes": "Ancho exacto 3 m. Variante facetada; escala de juego prevista 0,15\u20131,3. La deformaci\u00f3n determinista de facetas est\u00e1 declarada en candidateBuild.cragVariant.",
+    "doorPivot": null,
+    "cragVariant": 4
+  }
+}

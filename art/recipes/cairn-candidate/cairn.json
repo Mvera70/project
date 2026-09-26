@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "id": "cairn",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de receta; una unidad GLB es una celda de 3 m.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "note": "Astra 26 sep 2026 \u00b7 prioridades 1\u20134, candidato sin integrar.",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "cairn",
+    "footprint": [
+      1,
+      1
+    ]
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "Cairn_Stone_0",
+      "location": [
+        0.0,
+        0,
+        0.3
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        1.5,
+        1.2,
+        0.6
+      ],
+      "segments": 6,
+      "rings": 4
+    },
+    {
+      "type": "sphere",
+      "name": "Cairn_Stone_1",
+      "location": [
+        0.04,
+        0,
+        0.875
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        1.13,
+        0.91,
+        0.55
+      ],
+      "segments": 6,
+      "rings": 4
+    },
+    {
+      "type": "sphere",
+      "name": "Cairn_Stone_2",
+      "location": [
+        0.0,
+        0,
+        1.4
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        0.77,
+        0.68,
+        0.5
+      ],
+      "segments": 6,
+      "rings": 4
+    },
+    {
+      "type": "sphere",
+      "name": "Cairn_Stone_3",
+      "location": [
+        0.04,
+        0,
+        1.875
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        0.43,
+        0.4,
+        0.45
+      ],
+      "segments": 6,
+      "rings": 4
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "referenceRender": {
+    "width": 640,
+    "height": 640,
+    "cameraLocation": [
+      5,
+      -7,
+      6
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 5,
+    "worldRole": "sky"
+  },
+  "candidateBuild": {
+    "adapter": "../hall-candidate/build.py",
+    "triangleLimit": 200,
+    "notes": "Cuatro piedras, altura exacta 2,1 m (0,7 celdas).",
+    "doorPivot": null
+  }
+}

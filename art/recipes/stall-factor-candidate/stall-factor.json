@@ -1,0 +1,598 @@
+{
+  "schemaVersion": 1,
+  "id": "stall-factor",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de receta; una unidad GLB es una celda de 3 m.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "note": "Astra 26 sep 2026 \u00b7 prioridades 1\u20134, candidato sin integrar.",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "stall-factor",
+    "footprint": [
+      1,
+      1
+    ]
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.95
+    },
+    {
+      "name": "paper",
+      "role": "neighborLinen",
+      "roughness": 0.95
+    },
+    {
+      "name": "dark",
+      "role": "timberDark",
+      "roughness": 0.95
+    },
+    {
+      "name": "metal",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "sack",
+      "role": "path",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Table_Plank_0",
+      "location": [
+        0,
+        0.27999999999999997,
+        0.78
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "dimensions": [
+        1.5,
+        0.26599999999999996,
+        0.09
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Table_Plank_1",
+      "location": [
+        0,
+        -0.0,
+        0.78
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "dimensions": [
+        1.5,
+        0.26599999999999996,
+        0.09
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Table_Plank_2",
+      "location": [
+        0,
+        -0.27999999999999997,
+        0.78
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "dimensions": [
+        1.5,
+        0.26599999999999996,
+        0.09
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle__0_5700000000000001__1",
+      "location": [
+        -0.5700000000000001,
+        0.294,
+        0.385
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.06,
+      "depth": 0.710157728958856,
+      "vertices": 6,
+      "rotationDegrees": [
+        13.684019752247506,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle__0_5700000000000001_1",
+      "location": [
+        -0.5700000000000001,
+        -0.294,
+        0.385
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.06,
+      "depth": 0.710157728958856,
+      "vertices": 6,
+      "rotationDegrees": [
+        13.684019752247506,
+        0,
+        180.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle_Rail__0_5700000000000001",
+      "location": [
+        -0.5700000000000001,
+        -0.0,
+        0.32
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.05,
+      "depth": 0.7223999999999999,
+      "vertices": 6,
+      "rotationDegrees": [
+        90.0,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle_0_5700000000000001__1",
+      "location": [
+        0.5700000000000001,
+        0.294,
+        0.385
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.06,
+      "depth": 0.710157728958856,
+      "vertices": 6,
+      "rotationDegrees": [
+        13.684019752247506,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle_0_5700000000000001_1",
+      "location": [
+        0.5700000000000001,
+        -0.294,
+        0.385
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.06,
+      "depth": 0.710157728958856,
+      "vertices": 6,
+      "rotationDegrees": [
+        13.684019752247506,
+        0,
+        180.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Trestle_Rail_0_5700000000000001",
+      "location": [
+        0.5700000000000001,
+        -0.0,
+        0.32
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.05,
+      "depth": 0.7223999999999999,
+      "vertices": 6,
+      "rotationDegrees": [
+        90.0,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Table_Stretcher",
+      "location": [
+        0.0,
+        -0.0,
+        0.3
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "radius": 0.05,
+      "depth": 1.1400000000000001,
+      "vertices": 6,
+      "rotationDegrees": [
+        90.0,
+        0,
+        90.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Ledger_Page__1",
+      "location": [
+        -0.45,
+        -0.02,
+        0.885
+      ],
+      "material": "paper",
+      "parent": "Root",
+      "dimensions": [
+        0.235,
+        0.36,
+        0.035
+      ],
+      "rotationDegrees": [
+        0,
+        -7,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Ledger_Page_1",
+      "location": [
+        -0.21000000000000002,
+        -0.02,
+        0.885
+      ],
+      "material": "paper",
+      "parent": "Root",
+      "dimensions": [
+        0.235,
+        0.36,
+        0.035
+      ],
+      "rotationDegrees": [
+        0,
+        7,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Ledger_Spine",
+      "location": [
+        -0.33,
+        -0.02,
+        0.875
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "dimensions": [
+        0.04,
+        0.36,
+        0.06
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Ledger_Line_0",
+      "location": [
+        -0.45,
+        0.09,
+        0.907
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "dimensions": [
+        0.12,
+        0.011,
+        0.003
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Ledger_Line_1",
+      "location": [
+        -0.45,
+        0.03,
+        0.907
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "dimensions": [
+        0.12,
+        0.011,
+        0.003
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Ledger_Line_2",
+      "location": [
+        -0.45,
+        -0.03,
+        0.907
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "dimensions": [
+        0.12,
+        0.011,
+        0.003
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Ledger_Line_3",
+      "location": [
+        -0.45,
+        -0.09,
+        0.907
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "dimensions": [
+        0.12,
+        0.011,
+        0.003
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Scale_Base",
+      "location": [
+        0.4,
+        0,
+        0.87
+      ],
+      "material": "metal",
+      "parent": "Root",
+      "radius": 0.14,
+      "depth": 0.09,
+      "vertices": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Scale_Stem",
+      "location": [
+        0.4,
+        -0.0,
+        1.18
+      ],
+      "material": "metal",
+      "parent": "Root",
+      "radius": 0.0225,
+      "depth": 0.5599999999999999,
+      "vertices": 6,
+      "rotationDegrees": [
+        0.0,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Scale_Crossbar",
+      "location": [
+        0.39999999999999997,
+        -0.0,
+        1.43
+      ],
+      "material": "metal",
+      "parent": "Root",
+      "radius": 0.0175,
+      "depth": 0.6,
+      "vertices": 6,
+      "rotationDegrees": [
+        90.0,
+        0,
+        90.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Scale_Cord_0_1__0_095",
+      "location": [
+        0.1,
+        0.0475,
+        1.285
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "radius": 0.009,
+      "depth": 0.30516389039334263,
+      "vertices": 6,
+      "rotationDegrees": [
+        161.86191784440268,
+        0,
+        180.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Scale_Cord_0_1_0_095",
+      "location": [
+        0.1,
+        -0.0475,
+        1.285
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "radius": 0.009,
+      "depth": 0.30516389039334263,
+      "vertices": 6,
+      "rotationDegrees": [
+        161.86191784440268,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Scale_Pan_0_1",
+      "location": [
+        0.1,
+        0,
+        1.12
+      ],
+      "material": "metal",
+      "parent": "Root",
+      "radius": 0.13,
+      "depth": 0.025,
+      "vertices": 8,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Scale_Cord_0_7__0_095",
+      "location": [
+        0.7,
+        0.0475,
+        1.285
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "radius": 0.009,
+      "depth": 0.30516389039334263,
+      "vertices": 6,
+      "rotationDegrees": [
+        161.86191784440268,
+        0,
+        180.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Scale_Cord_0_7_0_095",
+      "location": [
+        0.7,
+        -0.0475,
+        1.285
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "radius": 0.009,
+      "depth": 0.30516389039334263,
+      "vertices": 6,
+      "rotationDegrees": [
+        161.86191784440268,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Scale_Pan_0_7",
+      "location": [
+        0.7,
+        0,
+        1.12
+      ],
+      "material": "metal",
+      "parent": "Root",
+      "radius": 0.13,
+      "depth": 0.025,
+      "vertices": 8,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Folded_Sack_0",
+      "location": [
+        1.03,
+        0.08,
+        0.04
+      ],
+      "material": "sack",
+      "parent": "Root",
+      "dimensions": [
+        0.49,
+        0.4,
+        0.075
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Folded_Sack_1",
+      "location": [
+        1.03,
+        0.08,
+        0.13
+      ],
+      "material": "sack",
+      "parent": "Root",
+      "dimensions": [
+        0.49,
+        0.4,
+        0.075
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        12
+      ]
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "referenceRender": {
+    "width": 640,
+    "height": 640,
+    "cameraLocation": [
+      5,
+      -7,
+      6
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 5,
+    "worldRole": "sky"
+  },
+  "candidateBuild": {
+    "adapter": "../hall-candidate/build.py",
+    "triangleLimit": 600,
+    "notes": "",
+    "doorPivot": null
+  }
+}

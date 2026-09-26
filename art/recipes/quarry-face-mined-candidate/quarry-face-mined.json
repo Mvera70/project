@@ -1,0 +1,433 @@
+{
+  "schemaVersion": 1,
+  "id": "quarry-face-mined",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de receta; una unidad GLB es una celda de 3 m.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "note": "Astra 26 sep 2026 \u00b7 prioridades 1\u20134, candidato sin integrar.",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "quarry-face-mined",
+    "footprint": [
+      2,
+      1
+    ]
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "rock",
+      "role": "stone",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Front_Block_0",
+      "location": [
+        -2.4,
+        -0.38,
+        1.2
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "dimensions": [
+        1.18,
+        1.9,
+        2.4
+      ]
+    },
+    {
+      "type": "sphere",
+      "name": "Crown_0",
+      "location": [
+        -2.4,
+        0.18,
+        2.28
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        1.2,
+        1.65,
+        0.28
+      ],
+      "segments": 6,
+      "rings": 3
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Ledge_0",
+      "location": [
+        -2.4,
+        1.06,
+        1.05
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "dimensions": [
+        1.19,
+        0.84,
+        2.1
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Block_1",
+      "location": [
+        -1.2,
+        -0.38,
+        1.2
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "dimensions": [
+        1.18,
+        1.9,
+        2.4
+      ]
+    },
+    {
+      "type": "sphere",
+      "name": "Crown_1",
+      "location": [
+        -1.2,
+        0.18,
+        2.28
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        1.2,
+        1.65,
+        0.28
+      ],
+      "segments": 6,
+      "rings": 3
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Ledge_1",
+      "location": [
+        -1.2,
+        1.06,
+        1.05
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "dimensions": [
+        1.19,
+        0.84,
+        2.1
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Block_2",
+      "location": [
+        0.0,
+        0.12,
+        0.625
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "dimensions": [
+        1.18,
+        0.9,
+        1.25
+      ]
+    },
+    {
+      "type": "sphere",
+      "name": "Crown_2",
+      "location": [
+        0.0,
+        0.42,
+        1.13
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        1.2,
+        0.9,
+        0.28
+      ],
+      "segments": 6,
+      "rings": 3
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Ledge_2",
+      "location": [
+        0.0,
+        1.06,
+        1.05
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "dimensions": [
+        1.19,
+        0.84,
+        2.1
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Block_3",
+      "location": [
+        1.1999999999999997,
+        0.12,
+        0.625
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "dimensions": [
+        1.18,
+        0.9,
+        1.25
+      ]
+    },
+    {
+      "type": "sphere",
+      "name": "Crown_3",
+      "location": [
+        1.1999999999999997,
+        0.42,
+        1.13
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        1.2,
+        0.9,
+        0.28
+      ],
+      "segments": 6,
+      "rings": 3
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Ledge_3",
+      "location": [
+        1.1999999999999997,
+        1.06,
+        1.05
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "dimensions": [
+        1.19,
+        0.84,
+        2.1
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Block_4",
+      "location": [
+        2.4,
+        -0.38,
+        1.2
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "dimensions": [
+        1.18,
+        1.9,
+        2.4
+      ]
+    },
+    {
+      "type": "sphere",
+      "name": "Crown_4",
+      "location": [
+        2.4,
+        0.18,
+        2.28
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        1.2,
+        1.65,
+        0.28
+      ],
+      "segments": 6,
+      "rings": 3
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Ledge_4",
+      "location": [
+        2.4,
+        1.06,
+        1.05
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "dimensions": [
+        1.19,
+        0.84,
+        2.1
+      ]
+    },
+    {
+      "type": "sphere",
+      "name": "Rubble_0",
+      "location": [
+        -2.35,
+        -1.15,
+        0.12
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        0.48,
+        0.42,
+        0.24
+      ],
+      "segments": 5,
+      "rings": 3
+    },
+    {
+      "type": "sphere",
+      "name": "Rubble_1",
+      "location": [
+        -1.23,
+        -1.15,
+        0.15
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        0.48,
+        0.42,
+        0.3
+      ],
+      "segments": 5,
+      "rings": 3
+    },
+    {
+      "type": "sphere",
+      "name": "Rubble_2",
+      "location": [
+        -0.10999999999999988,
+        -1.15,
+        0.12
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        0.48,
+        0.42,
+        0.24
+      ],
+      "segments": 5,
+      "rings": 3
+    },
+    {
+      "type": "sphere",
+      "name": "Rubble_3",
+      "location": [
+        1.0100000000000002,
+        -1.15,
+        0.15
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        0.48,
+        0.42,
+        0.3
+      ],
+      "segments": 5,
+      "rings": 3
+    },
+    {
+      "type": "sphere",
+      "name": "Rubble_4",
+      "location": [
+        2.1300000000000003,
+        -1.15,
+        0.12
+      ],
+      "material": "rock",
+      "parent": "Root",
+      "radius": 1,
+      "dimensions": [
+        0.48,
+        0.42,
+        0.24
+      ],
+      "segments": 5,
+      "rings": 3
+    },
+    {
+      "type": "cube",
+      "name": "Cut_Block",
+      "location": [
+        0.4,
+        -0.62,
+        0.25
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "dimensions": [
+        0.75,
+        0.67,
+        0.5
+      ]
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "referenceRender": {
+    "width": 640,
+    "height": 640,
+    "cameraLocation": [
+      5,
+      -7,
+      6
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 5,
+    "worldRole": "sky"
+  },
+  "candidateBuild": {
+    "adapter": "../hall-candidate/build.py",
+    "triangleLimit": 700,
+    "notes": "Frente hacia +Z; cantera de 6\u00d73 m de parcela. Los tres estados comparten origen y posici\u00f3n. rock usa el rol stone existente; no se a\u00f1ade color.",
+    "doorPivot": null
+  }
+}
