@@ -20,6 +20,7 @@
   "valley": {
     "note": "Común a toda la aldea. Sale de la dirección B: formas suaves y verdes vivos, que separan mejor la casa del campo.",
     "sky": "#DDE3C4",
+    "saltWhite": "#F4F2EC",
     "ground": "#94AE68",
     "soil": "#866044",
     "stone": "#9B958A",

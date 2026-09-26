@@ -28,7 +28,7 @@
     },
     {
       "name": "salt",
-      "role": "sky",
+      "role": "saltWhite",
       "roughness": 0.95
     }
   ],
@@ -272,7 +272,7 @@
   "candidateBuild": {
     "adapter": "../hall-candidate/build.py",
     "triangleLimit": 600,
-    "notes": "La paleta no contiene blanco puro: salt usa sky (#DDE3C4), el color m\u00e1s claro autorizado. Pregunta para Vera: \u00bfaprobar ese marfil verdoso para sal o autorizar un blanco nuevo en una ronda posterior?",
+    "notes": "Sal en blanco suave (#F4F2EC), con un matiz c\u00e1lido muy leve para conservar la lectura de blanco sin deslumbrar. Color aprobado por Vera; sin preguntas pendientes.",
     "doorPivot": null
   }
 }
