@@ -48,9 +48,9 @@
       "type": "sphere",
       "name": "Sack_0",
       "location": [
-        -0.27,
-        0,
-        0.27
+        -0.30,
+        -0.18,
+        0.225
       ],
       "material": "sack",
       "parent": "Root",
@@ -60,16 +60,17 @@
         0.53,
         0.54
       ],
-      "segments": 7,
-      "rings": 4
+      "segments": 10,
+      "rings": 6,
+      "flattenBottom": true
     },
     {
       "type": "cylinder",
       "name": "Sack_Neck_0",
       "location": [
-        -0.27,
-        0,
-        0.515
+        -0.30,
+        -0.18,
+        0.47
       ],
       "material": "sack",
       "parent": "Root",
@@ -86,9 +87,9 @@
       "type": "cylinder",
       "name": "Sack_Tie_0",
       "location": [
-        -0.27,
-        0,
-        0.55
+        -0.30,
+        -0.18,
+        0.505
       ],
       "material": "wood",
       "parent": "Root",
@@ -105,9 +106,9 @@
       "type": "sphere",
       "name": "Sack_1",
       "location": [
-        0.18,
-        0.4,
-        0.28
+        0.30,
+        -0.18,
+        0.235
       ],
       "material": "sack",
       "parent": "Root",
@@ -117,16 +118,17 @@
         0.53,
         0.56
       ],
-      "segments": 7,
-      "rings": 4
+      "segments": 10,
+      "rings": 6,
+      "flattenBottom": true
     },
     {
       "type": "cylinder",
       "name": "Sack_Neck_1",
       "location": [
-        0.18,
-        0.4,
-        0.535
+        0.30,
+        -0.18,
+        0.49
       ],
       "material": "sack",
       "parent": "Root",
@@ -143,9 +145,9 @@
       "type": "cylinder",
       "name": "Sack_Tie_1",
       "location": [
-        0.18,
-        0.4,
-        0.5700000000000001
+        0.30,
+        -0.18,
+        0.525
       ],
       "material": "wood",
       "parent": "Root",
@@ -162,9 +164,9 @@
       "type": "sphere",
       "name": "Sack_2",
       "location": [
-        -0.09,
-        0.17,
-        0.72
+        0,
+        0.36,
+        0.205
       ],
       "material": "sack",
       "parent": "Root",
@@ -172,18 +174,19 @@
       "dimensions": [
         0.55,
         0.53,
-        0.42
+        0.50
       ],
-      "segments": 7,
-      "rings": 4
+      "segments": 10,
+      "rings": 6,
+      "flattenBottom": true
     },
     {
       "type": "cylinder",
       "name": "Open_Rim",
       "location": [
-        -0.09,
-        0.17,
-        0.92
+        0,
+        0.36,
+        0.44
       ],
       "material": "sack",
       "parent": "Root",
@@ -200,9 +203,9 @@
       "type": "cone",
       "name": "Salt_Heap",
       "location": [
-        -0.09,
-        0.17,
-        0.973
+        0,
+        0.36,
+        0.493
       ],
       "material": "salt",
       "parent": "Root",

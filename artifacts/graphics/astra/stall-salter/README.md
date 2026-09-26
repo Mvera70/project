@@ -1,7 +1,7 @@
 # stall-salter · candidato Astra
 
-- Medida real X × alto × fondo: 1.346 × 1.112 × 1.025 m. GLB en celdas (1 celda = 3 m).
-- Triángulos: 280 / 600. Caras planas, sin texturas.
+- Medida real X × alto × fondo: 1.376 × 1.107 × 1.070 m. GLB en celdas (1 celda = 3 m).
+- Triángulos: 454 / 600. Caras planas, sin texturas.
 - Materiales: sack = #D3C1A0, wood = #9A744C, salt = #F4F2EC.
 - `sheet.png`: arriba izquierda tres cuartos desde arriba; arriba derecha frente (+Z); abajo izquierda perfil; abajo derecha escala con villager y house publicados, sin reescalarlos.
 - Receta: `art/recipes/stall-salter-candidate/stall-salter.json`.

@@ -34,6 +34,12 @@ def build(id):
     for raw in r['primitives']:
         spec={'rotationDegrees':[0,0,0],'smooth':False,'bevel':0,**raw}
         obj=create_primitive(spec,materials)
+        if spec.get('flattenBottom') and spec['type']=='sphere':
+            # El saco apoya en una base ancha, no en el polo de la esfera.
+            bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+            floor=-spec['dimensions'][2]*0.4
+            for vertex in obj.data.vertices:
+                vertex.co.z=max(floor,vertex.co.z)
         if spec['type']=='cube':
             obj.rotation_euler=[math.radians(v) for v in spec['rotationDegrees']]
             bpy.ops.object.transform_apply(location=False,rotation=True,scale=True)
