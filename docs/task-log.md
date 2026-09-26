@@ -1,5 +1,14 @@
 # Cuaderno de tareas — el rework
 
+## 26 sep 2026 · La sierra, fundida (v4.61)
+
+`paintFacets` (`world/mountains.ts`) pinta por vértice con `sharedUps`, la
+pendiente media de cada punto entre todas sus caras. `faceColour` usa un
+ruido suave, y las franjas de roca son una onda. La piel del cinturón funde
+su pie con `groundColourAt` por peso de altura y llanura. Prueba:
+`graphics-mountains.test.ts` exige continuidad de color en cada vértice
+compartido. Captura: `artifacts/graphics/env/blend1-sheet.png`.
+
 ## 26 sep 2026 · El camino de la garganta, el fondo cerrado y el encargo a Astra (v4.60)
 
 `buildGorgeRoads` en `world/mountains.ts` (montado en `backdrop.ts`);

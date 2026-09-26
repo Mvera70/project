@@ -33,21 +33,30 @@ describe('las montañas y las entradas', () => {
     }
   });
 
-  it('la sierra es facetada: cada cara tiene un solo color', () => {
-    const { map, terrainSeed } = foundGame(11);
-    const ridge = buildRidge(map, terrainSeed, PALETTES.spring) as Mesh;
-    const geometry = ridge.geometry;
-    expect(geometry.index).toBeNull();
-    expect((ridge.material as MeshStandardMaterial).flatShading).toBe(true);
-    const colour = geometry.getAttribute('color');
-    let mixed = 0;
-    for (let i = 0; i < colour.count; i += 3) {
-      for (let k = 1; k < 3; k += 1) {
-        if (Math.abs(colour.getX(i) - colour.getX(i + k)) > 1e-6) { mixed += 1; break; }
+  it('la sierra es facetada de forma, pero el color se funde de cara a cara', () => {
+    // Vera, 26 sep 2026: la forma facetada sí, el corte de color en cada
+    // arista no. Un mismo punto lleva el mismo color en todas las caras que lo
+    // comparten, así que el tono pasa de una a otra en degradado.
+    for (const seed of SEEDS) {
+      const { map, terrainSeed } = foundGame(seed);
+      const ridge = buildRidge(map, terrainSeed, PALETTES.spring, 0.5) as Mesh;
+      const geometry = ridge.geometry;
+      expect(geometry.index).toBeNull();
+      expect((ridge.material as MeshStandardMaterial).flatShading).toBe(true);
+      const position = geometry.getAttribute('position');
+      const colour = geometry.getAttribute('color');
+      const seen = new Map<string, number>();
+      let cuts = 0;
+      for (let i = 0; i < position.count; i += 1) {
+        const key = `${Math.round(position.getX(i) * 256)}:${Math.round(position.getZ(i) * 256)}`;
+        const r = colour.getX(i) + colour.getY(i) * 3 + colour.getZ(i) * 9;
+        const before = seen.get(key);
+        if (before === undefined) seen.set(key, r);
+        else if (Math.abs(before - r) > 1e-4) cuts += 1;
       }
+      expect(cuts, `semilla ${seed}: ${cuts} vértices con otro color en otra cara`).toBe(0);
+      geometry.dispose();
     }
-    // Sólo la franja del borde, que funde su color con el suelo, puede mezclar.
-    expect(mixed / (colour.count / 3)).toBeLessThan(0.1);
   });
 
   it('la nieve cubre las cumbres en invierno y no en verano', () => {

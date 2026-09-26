@@ -9,7 +9,8 @@
 // Aquí vive lo que comparten la sierra de fuera (`ridge.ts`) y el cinturón de
 // montaña de dentro del mapa (la piel de `buildMountainSkin`):
 //
-//   · **el color de cada cara**, por su altura y su pendiente: prado en lo bajo
+//   · **el color**, por la altura y la pendiente de cada punto, fundido de
+//     vértice a vértice (la forma es facetada, el color no): prado en lo bajo
 //     y suave, pedrera al pie, roca en franjas a media ladera, acantilado oscuro
 //     en lo empinado y nieve en las cumbres, que baja con el invierno;
 //   · **la piel facetada** de las celdas de montaña del mapa, a la cota del
@@ -45,7 +46,11 @@ const unit = (seed: number, what: string): number => hash32(seed, what) / 4_294_
  * sierra en capturas panorámicas del valle (semillas 11 y 23), no medidos.
  */
 export function faceColour(out: Color, palette: Palette, rise: number, up: number, x: number, z: number, snow: number): Color {
-  const jitter = unit(Math.floor(x * 7) * 131 + Math.floor(z * 7), 'facet') - 0.5;
+  // Un ruido suave, no uno por cara: el color se funde de vértice a vértice
+  // (Vera, 26 sep 2026: «que un color se degrade con el otro», como el resto
+  // del terreno) y un salto por punto lo habría vuelto moteado.
+  const jitter = 0.5 * Math.sin(x * 0.37 + z * 0.21) * Math.cos(z * 0.29 - x * 0.13)
+    + 0.25 * Math.sin(x * 1.1 - z * 0.8);
   // La nieve: arriba y en lo que no es pared. La cota baja con el invierno.
   // Proporcional a lo que llega la cresta (hasta 1,8 veces `MOUNTAIN_PEAK`):
   // con 0,74 veces la primera captura salió la sierra entera blanca en verano.
@@ -78,16 +83,25 @@ export function faceColour(out: Color, palette: Palette, rise: number, up: numbe
   }
   // La roca en franjas: tres tonos que se turnan con la altura, con la frontera
   // movida por el ruido para que no sean rayas de regla.
-  const band = ((Math.floor((rise + jitter * 1.4) / 1.9) % 3) + 3) % 3;
-  out.set(palette.stone).offsetHSL(0, -0.02, [0.05, -0.02, 0.1][band]! + jitter * 0.04);
+  // Ondulan con la altura en vez de saltar, para que se fundan entre sí.
+  const band = Math.sin((rise + jitter * 1.4) * 1.1);
+  out.set(palette.stone).offsetHSL(0, -0.02, 0.04 + band * 0.05 + jitter * 0.04);
   // Y en las repisas suaves de media ladera, un poco de hierba.
   if (up > 0.95 && rise < MOUNTAIN_PEAK * 0.45) out.lerp(new Color(palette.meadowAlt), 0.3);
   return out;
 }
 
 /**
- * Da a cada triángulo de una malla sin índices un solo color, el de su cara.
- * `riseOf` dice la altura de un punto sobre el prado.
+ * Pinta una malla sin índices **fundiendo** el color de vértice a vértice.
+ *
+ * La forma sigue facetada —la luz dura la da `flatShading`—, pero el color no:
+ * cada punto toma el de su altura y de su pendiente **media**, la de todas las
+ * caras que lo comparten, así que dos caras vecinas llevan el mismo color en
+ * su arista y el tono pasa de una a otra en degradado. Con un color por cara
+ * cada arista era un corte (Vera, 26 sep 2026: «no hacemos triángulos que
+ * cambien de color en cada borde; lo texturizamos y un color se degrada con
+ * el otro»). `riseOf` dice la altura de un punto sobre el prado; `keep` deja
+ * un punto como está.
  */
 export function paintFacets(
   geometry: BufferGeometry, palette: Palette, snow: number,
@@ -95,17 +109,41 @@ export function paintFacets(
 ): void {
   const position = geometry.getAttribute('position') as BufferAttribute;
   const colour = geometry.getAttribute('color') as BufferAttribute;
-  const normal = geometry.getAttribute('normal') as BufferAttribute;
+  const ups = sharedUps(geometry);
   const tint = new Color();
-  for (let i = 0; i < position.count; i += 3) {
-    const x = (position.getX(i) + position.getX(i + 1) + position.getX(i + 2)) / 3;
-    const y = (position.getY(i) + position.getY(i + 1) + position.getY(i + 2)) / 3;
-    const z = (position.getZ(i) + position.getZ(i + 1) + position.getZ(i + 2)) / 3;
-    if (keep?.(x, z, riseOf(y), normal.getY(i)) === true) continue;
-    faceColour(tint, palette, riseOf(y), normal.getY(i), x, z, snow);
-    for (let k = 0; k < 3; k += 1) colour.setXYZ(i + k, tint.r, tint.g, tint.b);
+  for (let i = 0; i < position.count; i += 1) {
+    const x = position.getX(i), z = position.getZ(i);
+    const rise = riseOf(position.getY(i));
+    if (keep?.(x, z, rise, ups[i]!) === true) continue;
+    faceColour(tint, palette, rise, ups[i]!, x, z, snow);
+    colour.setXYZ(i, tint.r, tint.g, tint.b);
   }
   colour.needsUpdate = true;
+}
+
+/**
+ * Cuánto mira al cielo cada vértice, promediado entre todas las caras que lo
+ * comparten. En una malla sin índices el mismo punto está repetido una vez por
+ * cara; se juntan por su posición.
+ */
+export function sharedUps(geometry: BufferGeometry): Float32Array {
+  const position = geometry.getAttribute('position') as BufferAttribute;
+  const normal = geometry.getAttribute('normal') as BufferAttribute;
+  const key = (i: number): string => `${Math.round(position.getX(i) * 256)}:${Math.round(position.getZ(i) * 256)}`;
+  const sums = new Map<string, [number, number]>();
+  for (let i = 0; i < position.count; i += 1) {
+    const k = key(i);
+    const sum = sums.get(k) ?? [0, 0];
+    sum[0] += normal.getY(i);
+    sum[1] += 1;
+    sums.set(k, sum);
+  }
+  const ups = new Float32Array(position.count);
+  for (let i = 0; i < position.count; i += 1) {
+    const [total, n] = sums.get(key(i))!;
+    ups[i] = total / n;
+  }
+  return ups;
 }
 
 /** Cuánto por encima del suelo va la piel, para no pelearse con él. */
@@ -153,19 +191,23 @@ export function buildMountainSkin(map: ValleyMap, palette: Palette, snow = 0): M
     // El pie de la piel toma el color del suelo que tapa: con el prado de
     // `faceColour` salían triángulos verdes sueltos sobre la piedra del
     // cinturón (captura del flanco oeste, semilla 11).
+    // Fundido, como el resto: cuanto más bajo y más llano el punto, más color
+    // del suelo, y en la arista con el prado, todo.
     const position = geometry.getAttribute('position') as BufferAttribute;
     const colour = geometry.getAttribute('color') as BufferAttribute;
-    const normal = geometry.getAttribute('normal') as BufferAttribute;
+    const ups = sharedUps(geometry);
     const tint = new Color();
-    for (let i = 0; i < position.count; i += 3) {
-      const y = (position.getY(i) + position.getY(i + 1) + position.getY(i + 2)) / 3 - GROUND_BIAS;
-      // Y sólo si además es llano: una cara empinada con el verde del suelo es
-      // un diente de hierba en mitad de la pedrera.
-      if (y >= SKIN_OWN || normal.getY(i) < 0.88) continue;
-      const x = (position.getX(i) + position.getX(i + 1) + position.getX(i + 2)) / 3;
-      const z = (position.getZ(i) + position.getZ(i + 1) + position.getZ(i + 2)) / 3;
-      tint.copy(groundColourAt(map, x, z, next));
-      for (let k = 0; k < 3; k += 1) colour.setXYZ(i + k, tint.r, tint.g, tint.b);
+    const ground = new Color();
+    for (let i = 0; i < position.count; i += 1) {
+      const y = position.getY(i) - GROUND_BIAS;
+      const low = Math.max(0, Math.min(1, (SKIN_OWN - y) / SKIN_OWN));
+      const flat = Math.max(0, Math.min(1, (ups[i]! - 0.7) / 0.25));
+      const weight = low * low * (0.35 + 0.65 * flat);
+      if (weight <= 0) continue;
+      tint.setRGB(colour.getX(i), colour.getY(i), colour.getZ(i));
+      ground.copy(groundColourAt(map, position.getX(i), position.getZ(i), next));
+      tint.lerp(ground, weight);
+      colour.setXYZ(i, tint.r, tint.g, tint.b);
     }
     colour.needsUpdate = true;
   };

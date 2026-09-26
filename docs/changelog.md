@@ -1,5 +1,16 @@
 # The Valley — Registro de cambios
 
+## v4.61 · 26 sep 2026 · La sierra, fundida
+
+Vera: la forma facetada le gusta, pero no que cada triángulo cambie de color
+de golpe en su arista; «como hacemos con otro tipo de terreno, lo texturizamos
+y un color se degrada con el otro». La forma sigue facetada, porque la luz
+dura la da `flatShading`, pero el color se calcula por punto con la pendiente
+media de las caras que lo comparten, y se funde de vértice a vértice. El ruido
+de color es suave, las franjas de roca ondulan en vez de saltar y el pie de la
+piel del cinturón entra en el prado en degradado. La prueba pasa de «un color
+por cara» a «un punto, un color», en tres semillas.
+
 ## v4.60 · 26 sep 2026 · El camino que sale, y la garganta cerrada
 
 Lo que v4.59 dejó abierto, pedido por Vera. **La senda de tierra** sale del

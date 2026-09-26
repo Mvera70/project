@@ -207,10 +207,10 @@ export function exteriorWaterAt(map: ValleyMap, seed: number, x: number, z: numb
 /**
  * Los colores de la malla siguen la misma paleta que el prado y el bosque.
  *
- * Desde el 26 sep 2026 cada cara tiene **un solo color**, el de su altura y su
- * pendiente (`faceColour`, `mountains.ts`): la sierra es facetada, como el
- * resto del valle. Sólo la franja que toca el borde del mapa conserva el
- * degradado por vértice, que es lo que casa su color con el del suelo.
+ * Desde el 26 sep 2026 el color sale de la altura y la pendiente de cada punto
+ * (`faceColour`, `mountains.ts`) y se funde de vértice a vértice: la forma es
+ * facetada, el color no corta en las aristas. La franja que toca el borde del
+ * mapa conserva su degradado propio, que es lo que casa su color con el suelo.
  */
 export function seasonRidge(mesh: Mesh, map: ValleyMap, palette: Palette, snow = 0): void {
   const position = mesh.geometry.getAttribute('position');
