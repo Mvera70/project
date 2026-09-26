@@ -18,6 +18,7 @@ import type { ValleyMap } from '@engine/state';
 import type { Palette } from '@derive/palette';
 import type { Era } from '@derive/era';
 import { GROUND_BIAS } from '../visual-config';
+import { liveWater, SHARED_WATER } from './water-surface';
 import { gorgeAt, valleyAxis, valleyShoulder } from './valley-profile';
 
 /**
@@ -469,6 +470,8 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
 
   const positions = new Float32Array(cells.length * 4 * 3);
   const colours = new Float32Array(cells.length * 4 * 3);
+  const shores = new Float32Array(cells.length * 4);
+  const flows = new Float32Array(cells.length * 4 * 2);
   const indices = new Uint32Array(cells.length * 6);
   const river = new Color(palette.water);
   const lake = new Color(palette.lake);
@@ -492,6 +495,12 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
       colours[at] = isLake ? lake.r / river.r : 1;
       colours[at + 1] = isLake ? lake.g / river.g : 1;
       colours[at + 2] = isLake ? lake.b / river.b : 1;
+      // El agua viva (`water-surface.ts`): la orilla y hacia dónde corre.
+      const [cx, cz] = points[vertex] ?? [0, 0];
+      shores[corner + vertex] = shoreAt(map, cx, cz);
+      const flow = isLake ? { x: 0, z: 0 } : flowAt(map, cz);
+      flows[(corner + vertex) * 2] = flow.x;
+      flows[(corner + vertex) * 2 + 1] = flow.z;
     }
     const face = index * 6;
     indices[face] = corner;
@@ -505,6 +514,8 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new BufferAttribute(positions, 3));
   geometry.setAttribute('color', new BufferAttribute(colours, 3));
+  geometry.setAttribute('waterShore', new BufferAttribute(shores, 1));
+  geometry.setAttribute('waterFlow', new BufferAttribute(flows, 2));
   geometry.setIndex(new BufferAttribute(indices, 1));
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
@@ -520,6 +531,7 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
     opacity: 0.86,
     side: DoubleSide,
   });
+  liveWater(material, SHARED_WATER);
   const mesh = new Mesh(geometry, material);
   mesh.name = 'Valley_Water';
   // No recibe sombra: un rio a la sombra de sus propios arboles se veia negro,
@@ -529,16 +541,120 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
 }
 
 /**
- * Cuanto sube y baja la superficie del agua, en celdas.
- *
- * TUNE: dos centesimas, seis centimetros. Lo que se ve desde arriba no es la
- * ola: es que la luz cambia al inclinarse la superficie, y con seis centimetros
- * ya cambia. Con mas, el rio parece el mar.
+ * Cuánto toca tierra una esquina de celda: 1 si dos o más de las cuatro celdas
+ * que la comparten son tierra —es orilla—, 0,5 si sólo una —una esquina que
+ * toca tierra en diagonal, que con 1 tiraba una raya de espuma cruzando el
+ * río—, y 0 si es agua abierta. Fuera del mapa cuenta como agua, porque por
+ * ahí el río sigue y no hay orilla.
  */
-const RIPPLE = 0.02;
+function shoreAt(map: ValleyMap, x: number, z: number): number {
+  let dry = 0;
+  for (const [dx, dz] of [[-1, -1], [0, -1], [-1, 0], [0, 0]] as const) {
+    const cx = x + dx, cz = z + dz;
+    if (cx < 0 || cz < 0 || cx >= map.width || cz >= map.height) continue;
+    const t = map.terrain[cz * map.width + cx];
+    if (t !== TERRAIN_CODE.water && t !== TERRAIN_CODE.lake) dry += 1;
+  }
+  return dry >= 2 ? 1 : dry === 1 ? 0.5 : 0;
+}
 
-/** Cuanto tarda la onda en recorrer una celda, en segundos. */
-const RIPPLE_SECONDS = 2.2;
+/**
+ * Hacia dónde corre el río a esta altura del valle, en celdas por segundo de
+ * presentación: a lo largo del eje, del norte al sur. TUNE visual: 0,6, que
+ * desde la cámara de reposo se lee como corriente y no como rápido.
+ */
+const RIVER_SPEED = 0.6;
+function flowAt(map: ValleyMap, z: number): { x: number; z: number } {
+  const bend = (valleyAxis(map, Math.min(map.height - 1, z + 1)) - valleyAxis(map, Math.max(0, z - 1))) / 2;
+  const length = Math.hypot(bend, 1);
+  return { x: (bend / length) * RIVER_SPEED, z: RIVER_SPEED / length };
+}
+
+/**
+ * La riada (R-1, `river_flood`). Hasta ahora sólo se veía a la gente reunida
+ * en el vado: el agua no subía. Esta lámina cubre la ribera hasta
+ * `FLOOD_REACH` celdas del cauce, a la cota del río, así que queda bajo el
+ * prado; cuando hay riada **sube con el río** y asoma donde la orilla es más
+ * baja que el agua. El suelo la tapa donde no llega: no hay que decidir qué
+ * se inunda, lo decide el relieve.
+ */
+const FLOOD_REACH = 2;
+/** Lo que se hunde el borde de la lámina de la riada, en celdas. TUNE visual. */
+const FLOOD_SINK = 0.35;
+
+/** Si una esquina toca alguna celda fuera de lo que la riada cubre. */
+function floodRim(map: ValleyMap, reach: Int8Array, x: number, z: number): boolean {
+  for (const [dx, dz] of [[-1, -1], [0, -1], [-1, 0], [0, 0]] as const) {
+    const cx = x + dx, cz = z + dz;
+    if (cx < 0 || cz < 0 || cx >= map.width || cz >= map.height) continue;
+    if (reach[cz * map.width + cx] === -1) return true;
+  }
+  return false;
+}
+/** Cuánto sube el agua en la riada, en celdas. TUNE visual: 0,22, sesenta y seis centímetros. */
+export const FLOOD_RISE = 0.22;
+
+function buildFloodSheet(map: ValleyMap, material: MeshStandardMaterial): Mesh | null {
+  // Lo lejos que queda cada celda del río, hasta `FLOOD_REACH`.
+  const reach = new Int8Array(map.width * map.height).fill(-1);
+  const queue: number[] = [];
+  for (let cell = 0; cell < reach.length; cell += 1) {
+    if (map.terrain[cell] !== TERRAIN_CODE.water) continue;
+    reach[cell] = 0;
+    queue.push(cell);
+  }
+  for (let head = 0; head < queue.length; head += 1) {
+    const cell = queue[head]!;
+    if (reach[cell]! >= FLOOD_REACH) continue;
+    const x = cell % map.width, z = Math.floor(cell / map.width);
+    for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+      const nx = x + dx, nz = z + dz;
+      if (nx < 0 || nz < 0 || nx >= map.width || nz >= map.height) continue;
+      const next = nz * map.width + nx;
+      const t = map.terrain[next];
+      if (reach[next] !== -1 || t === TERRAIN_CODE.mountain || t === TERRAIN_CODE.lake) continue;
+      reach[next] = reach[cell]! + 1;
+      queue.push(next);
+    }
+  }
+  const positions: number[] = [];
+  const shores: number[] = [];
+  const flows: number[] = [];
+  const colours: number[] = [];
+  const indices: number[] = [];
+  for (let cell = 0; cell < reach.length; cell += 1) {
+    if (reach[cell]! < 1) continue;
+    const x = cell % map.width, z = Math.floor(cell / map.width);
+    const base = positions.length / 3;
+    for (const [cx, cz] of [[x, z], [x + 1, z], [x + 1, z + 1], [x, z + 1]] as const) {
+      const moved = wobbleAt(map, cx, cz);
+      // El borde de lo inundado se hunde: la lámina baja hacia el suelo y la
+      // línea del agua la dibuja el relieve donde se cortan, no el contorno
+      // de las celdas, que salía como un recorte de polígonos.
+      const rim = floodRim(map, reach, cx, cz);
+      positions.push(moved.x, GROUND_BIAS + WATER_LEVEL - (rim ? FLOOD_SINK : 0), moved.z);
+      // Espuma sólo en el frente, la última celda de lo inundado: la ribera
+      // anegada es agua turbia y lisa, no espuma.
+      shores.push(reach[cell]! >= FLOOD_REACH ? 0.9 : 0);
+      const flow = flowAt(map, cz);
+      flows.push(flow.x * 0.6, flow.z * 0.6);
+      colours.push(1, 1, 1);
+    }
+    indices.push(base, base + 2, base + 1, base, base + 3, base + 2);
+  }
+  if (indices.length === 0) return null;
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
+  geometry.setAttribute('color', new BufferAttribute(new Float32Array(colours), 3));
+  geometry.setAttribute('waterShore', new BufferAttribute(new Float32Array(shores), 1));
+  geometry.setAttribute('waterFlow', new BufferAttribute(new Float32Array(flows), 2));
+  geometry.setIndex(new BufferAttribute(new Uint32Array(indices), 1));
+  geometry.computeVertexNormals();
+  const mesh = new Mesh(geometry, material);
+  mesh.name = 'Valley_Flood';
+  mesh.visible = false;
+  return mesh;
+}
 
 /**
  * La cota del suelo en un punto cualquiera, en celdas.
@@ -588,7 +704,7 @@ export interface Ground {
    * La hora sale del reloj de presentacion y de nada mas, asi que el mismo
    * instante da siempre la misma onda (§4.3).
    */
-  ripple(presentationSeconds: number): void;
+  ripple(presentationSeconds: number, flooding?: number): void;
   dispose(): void;
 }
 
@@ -673,36 +789,29 @@ export function buildGround(map: ValleyMap, palette: Palette, plaza?: Plaza, era
   // que saber que ademas hay un rio: se mueven y se sueltan juntos siempre.
   const water = buildWater(map, palette);
   if (water !== null) mesh.add(water);
-  // El reposo se guarda una vez: la onda se calcula desde el, no desde donde
-  // quedo el fotograma anterior, que acumularia error hasta hundir el rio.
-  const still = water === null
-    ? null
-    : Float32Array.from((water.geometry.getAttribute('position') as BufferAttribute).array);
+  // La lámina de la riada cuelga del agua: sube con ella y comparte material.
+  const flood = water === null ? null : buildFloodSheet(map, water.material as MeshStandardMaterial);
+  if (water !== null && flood !== null) water.add(flood);
 
   return {
     mesh,
     water,
-    ripple(presentationSeconds: number): void {
-      if (water === null || still === null) return;
-      const surface = water.geometry.getAttribute('position') as BufferAttribute;
-      const turn = (presentationSeconds / RIPPLE_SECONDS) * Math.PI * 2;
-      for (let vertex = 0; vertex < surface.count; vertex += 1) {
-        const at = vertex * 3;
-        const px = still[at] ?? 0;
-        const pz = still[at + 2] ?? 0;
-        // La onda viaja en diagonal y lleva dos frecuencias: una sola deja un
-        // oleaje de piscina, con dos el patron tarda en repetirse.
-        const wave = Math.sin((px + pz) * 1.7 - turn) + 0.5 * Math.sin((px - pz * 1.3) * 0.9 - turn * 0.6);
-        surface.setY(vertex, (still[at + 1] ?? 0) + wave * RIPPLE * 0.5);
-      }
-      surface.needsUpdate = true;
-      water.geometry.computeVertexNormals();
+    ripple(presentationSeconds: number, flooding = 0): void {
+      // Desde el 26 sep 2026 la onda la pinta el material (`water-surface.ts`):
+      // la de antes movía cuatro vértices por celda y recalculaba las normales
+      // del río en cada fotograma, en la CPU, para que la luz cambiara un poco.
+      SHARED_WATER.uWaterTime.value = presentationSeconds;
+      SHARED_WATER.uWaterFlood.value = flooding;
+      if (water === null) return;
+      water.position.y = flooding * FLOOD_RISE;
+      if (flood !== null) flood.visible = flooding > 0.02;
     },
     dispose(): void {
       geometry.dispose();
       material.dispose();
       if (water !== null) {
         mesh.remove(water);
+        flood?.geometry.dispose();
         water.geometry.dispose();
         (water.material as MeshStandardMaterial).dispose();
       }

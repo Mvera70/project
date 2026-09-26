@@ -1,5 +1,47 @@
 # Cuaderno de tareas — el rework
 
+## 26 sep 2026 · El agua viva (v4.63), y el alcance del agua
+
+**Hecho.** `world/water-surface.ts` parchea el material del agua con
+`onBeforeCompile`. La geometría trae `waterShore` y `waterFlow`, y los mandos
+son compartidos (`SHARED_WATER`: hora, lluvia, riada). Pinta la corriente, las
+vetas, la espuma de la orilla (sólo donde dos celdas son tierra: con una, las
+esquinas en diagonal tiraban rayas cruzando el río), los anillos de lluvia y el
+barro de la riada. El color de la riada es café con leche y **no se mezcla con
+el azul**: azul y marrón dan gris, y así salió dos veces. `ground.ts` quita la
+onda de CPU, añade `buildFloodSheet` (hasta 2 celdas de ribera, con el borde
+hundido 0,35 para que la línea del agua la dibuje el relieve) y
+`ripple(t, flooding)`. `derive/flood.ts` (`floodOf`) da 1 la semana de la
+riada, 0,5 la siguiente y 0 después. El renderer suaviza la riada y la lluvia
+(`FLOOD_EASE`, `RAIN_EASE`) y tiene el gancho `__valleyHoldFlood`.
+`effects/water-throws.ts` sustituye el agua de `work-chips` en `douse` y pinta
+los anillos de lluvia en tierra. Pruebas: `tests/fast/water.test.ts` y, en
+`graphics-world.test.ts`, el agua: sigue plana, recibe la hora, tiene orilla y
+corriente, y sube con la riada. Capturas: `artifacts/graphics/env/water5-sheet.png`
+(riada), `water3-sheet.png` (río) y `throw-sheet.png` (el chorro, en una escena
+aparte porque ninguna herramienta monta un fuego).
+Suite rápida: las mismas 6 rojas de siempre.
+
+**Rendimiento.** Un material para todo el agua, sin texturas: tres muestras
+de ruido por píxel para la normal y una rejilla de anillos que sólo se evalúa
+si llueve. La CPU ahorra la onda por vértice. Hay 240 gotas y 96 anillos en dos
+`InstancedMesh`. Falta medirlo en un móvil de verdad (como todo el 3D, G-09).
+
+**El alcance: hasta dónde se puede llegar.**
+- *Hecho en esta ronda:* el río y el lago vivos, la lluvia sobre el agua y la
+  tierra, la riada que se ve, y el cubo que se tira.
+- *Al alcance, en una tanda:* que las gotas del cubo choquen con la pared de
+  la casa en vez de atravesarla (hace falta la caja de la casa en el efecto);
+  que quien cruza el vado salpique y abra anillos; que los charcos crezcan
+  mientras llueve y no sólo aparezcan; y una cascada en la entrada de las
+  gargantas o en el circo del lago, con su espuma y su niebla (el mapa no
+  tiene saltos de agua: habría que ponerla como decorado).
+- *Más lejos, y no ahora:* la nieve que se acumula y el deshielo. El deshielo
+  ya existe como mecánica, porque la riada sale en primavera con días de lluvia,
+  y ahora se ve. Agua con física de fluido de verdad (partículas SPH, Rapier con
+  cuerpos por gota) no cabe en el presupuesto de un móvil y no se vería mejor
+  desde esta cámara.
+
 ## 26 sep 2026 · Rocas romas y la senda pegada al río (v4.62)
 
 `rockShape` (`world/mountains.ts`): `DodecahedronGeometry`, empuje de 0,88 a

@@ -66,6 +66,8 @@ import { Cast } from './world/cast';
 import { VILLAGER_MODELS, modelChainFor } from './world/models';
 import { dayNumber, dayPhase } from './presentation-clock';
 import { boltPlace, boltsInDay, overcastOf, skyAt, type SkyKind } from '../derive/weather';
+import { floodOf } from '../derive/flood';
+import { SHARED_WATER } from './world/water-surface';
 import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
@@ -94,6 +96,13 @@ const TREE = 'tree';
 const TREE_PINE = 'tree-pine';
 const ROCK = 'rock';
 const REED = 'reed';
+/**
+ * Lo deprisa que el agua sigue a la riada y a la lluvia, por segundo de
+ * presentación. TUNE visual: la riada tarda unos segundos en subir, que es lo
+ * que la hace creíble; la lluvia empieza a picar el agua en uno o dos.
+ */
+const FLOOD_EASE = 0.25;
+const RAIN_EASE = 0.8;
 const SCRUB = 'scrub';
 const FORD = 'ford-stone';
 
@@ -418,7 +427,7 @@ export async function createGraphicsRenderer(
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, coins.mesh, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, coins.mesh, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1233,6 +1242,10 @@ export async function createGraphicsRenderer(
   let forcedVisits: HappeningId[] | null = null;
   let forcedDeal = false;
   let heldSky: SkyKind | null = null;
+  // El agua viva: lo crecido que va el río y lo que llueve encima, suavizados
+  // para que la riada suba y baje y la lluvia empiece y pare poco a poco.
+  let heldFlood: number | null = null;
+  let flooding = 0;
   window.__valleyObserveLive = () => { observingLive = true; };
   // Gancho de observación del rayo: cae uno en el centro de la vista. Los de
   // una tormenta caen donde quieren y duran medio segundo, así que esperarlos
@@ -1244,6 +1257,8 @@ export async function createGraphicsRenderer(
   // Gancho de observación: fija el cielo (lluvia, nieve…) para mirar lo que
   // sólo pasa con él —los charcos, la ropa recogida—; `null` lo suelta.
   window.__valleyHoldSky = (kind: SkyKind | null) => { heldSky = kind; life = null; };
+  // Para mirar la riada sin esperar a que el motor la tire: 0 a 1, o `null`.
+  window.__valleyHoldFlood = (level: number | null) => { heldFlood = level; if (level !== null) flooding = level; };
   // Gancho de observación: cuelga la decoración de fiesta sin esperar a una
   // boda. No toca el motor.
   window.__valleyFestoon = (on: boolean) => { forceFestoon = on; };
@@ -1652,6 +1667,7 @@ export async function createGraphicsRenderer(
       cast.show(lastActors, life.physics?.ragdolls ?? []);
       // IA-anim · las astillas van con el reloj de la escena: en pausa, quietas.
       cast.chips.step(frame.deltaSeconds, groundFloor);
+      cast.waters.step(frame.deltaSeconds, groundFloor);
       cast.stains.step(frame.deltaSeconds);
       stepShakes(frame.deltaSeconds);
       // D.7 · sólo el robledal realmente interpuesto ante el encuentro pierde
@@ -1712,8 +1728,12 @@ export async function createGraphicsRenderer(
       // un día tarde, con la casa ya en ruina (primera captura de E4). Así la
       // casa arde todavía en pie y al amanecer se derrumba bajo las llamas.
       fires.update(state, frame.presentationSeconds);
-      // Y el rio corre. Un rio quieto es un suelo azul.
-      ground?.ripple(frame.presentationSeconds);
+      // Y el rio corre. Un rio quieto es un suelo azul. Y crece con la riada
+      // (`derive/flood.ts`): sube a lo largo de unas horas de presentación, no
+      // de golpe al cambiar de semana.
+      const floodTarget = heldFlood ?? floodOf(shown);
+      flooding += (floodTarget - flooding) * Math.min(1, frame.deltaSeconds * FLOOD_EASE);
+      ground?.ripple(frame.presentationSeconds, flooding);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
       // congelado entre semana y semana sería peor que no tenerlo.
       // El lobo del corral viene de la vida; los dos de la montaña son solo
@@ -1735,6 +1755,10 @@ export async function createGraphicsRenderer(
         : options.previewSky === 'rain'
           ? { kind: 'rain' as const, intensity: naturalSky.kind === 'rain' ? naturalSky.intensity : 1 }
           : naturalSky;
+      // La lluvia sobre el agua: anillos que se abren (`water-surface.ts`).
+      const rainTarget = sky.kind === 'rain' || sky.kind === 'storm' ? Math.max(0.5, sky.intensity) : 0;
+      const rainNow = SHARED_WATER.uWaterRain.value;
+      SHARED_WATER.uWaterRain.value = rainNow + (rainTarget - rainNow) * Math.min(1, frame.deltaSeconds * RAIN_EASE);
       if (sky.kind !== paintedSky) {
         weather.set(sky.kind, sky.intensity);
         windFor(sky.kind);
@@ -1769,6 +1793,9 @@ export async function createGraphicsRenderer(
       // rayo, que dura 0,12 s y no hay captura que lo alcance corriendo.
       const flashDelta = frame.speed === 0 ? 0 : frame.realDeltaSeconds;
       weather.step(frame.deltaSeconds, view.view.centre, flashDelta);
+      // Y la lluvia salpica la tierra; la del río la pinta el agua viva.
+      cast.waters.rain(SHARED_WATER.uWaterRain.value, view.view.centre, frame.deltaSeconds, groundFloor,
+        (x, z) => !wetCell(shown.map, x, z));
       // El viento sopla en tiempo de presentación: en pausa, quieto (§11.4).
       stepWind(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       stepClouds(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
@@ -2161,6 +2188,7 @@ declare global {
     __valleyHoldPhase?: (value: number | null) => void;
     __valleyFestoon?: (on: boolean) => void;
     __valleyHoldSky?: (kind: SkyKind | null) => void;
+    __valleyHoldFlood?: (level: number | null) => void;
     __valleyVisit?: (kind?: HappeningId, dealt?: boolean) => void;
   }
 }
@@ -2252,4 +2280,11 @@ interface LifeSnapshot {
     readonly talking: boolean; readonly arguing: boolean;
     readonly occupation: string | null;
   }[];
+}
+
+/** Si en ese punto hay agua del mapa: ahí la lluvia la pinta el agua viva, no los anillos de tierra. */
+function wetCell(map: GameState['map'], x: number, z: number): boolean {
+  if (x < 0 || z < 0 || x >= map.width || z >= map.height) return false;
+  const t = map.terrain[Math.floor(z) * map.width + Math.floor(x)];
+  return t === TERRAIN_CODE.water || t === TERRAIN_CODE.lake;
 }

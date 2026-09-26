@@ -129,3 +129,26 @@ Reglas que no se negocian:
 Al acabar, di en español qué modelos están, cuántos triángulos tiene cada uno,
 dónde están las capturas y qué preguntas quedan para Vera.
 ````
+
+---
+
+## Añadido el 26 sep 2026 · Los pájaros del cielo
+
+Vera: «los pájaros estos no me gustan, hay que hacer modelos 3D». Hoy son una
+uve dibujada en un plano (`src/render3d/effects/ambience.ts`, `birdTexture`):
+dieciocho que cruzan el cielo de día en tres bandadas. Y Vera pidió que a
+Astra no se le dé tanta información como en el primer encargo, así que el
+prompt es corto:
+
+````text
+Astra: modela un pájaro pequeño en vuelo para The Valley (repo
+D:\DESARROLLO\PROYECTOS\VALLEY\project), estilo low-poly facetado como el resto
+del valle, colores de public/assets/models/palette.json. Tipo golondrina o
+vencejo, 25 cm de envergadura (0,08 celdas; una celda son 3 m). Tres mallas
+separadas y con estos nombres: bird_body, bird_wing_l y bird_wing_r, cada ala
+con el origen en el hombro para que el código la bata girándola. Máximo 120
+triángulos en total. Sólo el modelo: receta en art/recipes/bird-candidate/,
+GLB en artifacts/graphics/astra/bird/ y una hoja de capturas (arriba, lado y
+alas arriba/abajo). No toques src/ ni public/. Rama art/astra-modelos. Si te
+falta algo, pregúntalo en el README y sigue.
+````

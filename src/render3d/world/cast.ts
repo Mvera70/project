@@ -19,6 +19,7 @@ import type { LoadedAsset } from '../assets';
 import { actionClips } from '../action-clips';
 import { clipTime, combatClip, STRIKE_AT, STRIKE_HEAD, VILLAGER_CLIPS, type ClipName } from '../clips';
 import { WorkChips } from '../effects/work-chips';
+import { WaterThrows } from '../effects/water-throws';
 import { Stains } from '../effects/stains';
 import { handTool } from '../hand-tools';
 import { displayScaleFor, modelFor } from './models';
@@ -171,6 +172,8 @@ export class Cast {
   readonly group = new Group();
   /** IA-anim · Astillas de los golpes de hacha y pico; el renderer las avanza. */
   readonly chips: WorkChips;
+  /** El agua de los cubos y la de la lluvia en el suelo (`effects/water-throws.ts`). */
+  readonly waters = new WaterThrows();
   /** E4 · Las manchas donde cae alguien; el renderer las avanza con las astillas. */
   readonly stains = new Stains();
   /** IA-anim · Aviso de cada golpe, para que el árbol lo acuse. */
@@ -615,8 +618,14 @@ export class Cast {
       const hand = player.object.getObjectByName('hand_r');
       if (hand === undefined) return;
       const from = hand.getWorldPosition(new Vector3());
-      const kind = actor.clip === 'sow' ? 'seed' : actor.clip === 'spread' ? 'muck' : 'water';
-      this.chips.hit(from, kind, actor.id * 1009 + player.strikes);
+      if (actor.clip === 'douse') {
+        // El cubo se vacía hacia donde mira quien lo lleva, que es el fuego.
+        const forward = player.object.getWorldDirection(new Vector3()).setY(0);
+        if (forward.lengthSq() < 1e-6) forward.set(0, 0, 1);
+        this.waters.throw(from, forward.normalize(), actor.id * 1009 + player.strikes);
+        return;
+      }
+      this.chips.hit(from, actor.clip === 'sow' ? 'seed' : 'muck', actor.id * 1009 + player.strikes);
       return;
     }
     const tool = player.held.get(actor.clip);
@@ -700,6 +709,7 @@ export class Cast {
   clear(): void {
     for (const id of [...this.players.keys()]) this.retire(id);
     this.stains.clear();
+    this.waters.clear();
   }
 
   dispose(): void {
@@ -707,6 +717,7 @@ export class Cast {
     (this.ring.material as Material).dispose();
     this.clear();
     this.stains.dispose();
+    this.waters.dispose();
   }
 }
 

@@ -1,5 +1,22 @@
 # The Valley — Registro de cambios
 
+## v4.63 · 26 sep 2026 · El agua viva
+
+Vera: «mejorar el agua … que se vea viva, que se sienta con físicas; ahora
+mismo es un poco floja». El río y el lago eran una lámina translúcida de un
+color, y la CPU movía cuatro vértices por celda y recalculaba las normales en
+cada fotograma. Ahora el material del agua (`world/water-surface.ts`) pinta
+una superficie que **corre río abajo**, con vetas de espuma a lo largo de la
+corriente, una línea de espuma contra la orilla y **anillos de lluvia** cuando
+llueve. La CPU ya no toca el agua en cada fotograma. **La riada** (R-1), que
+hasta hoy sólo se veía como gente reunida en el vado, sube el río y anega la
+ribera baja con agua turbia de barro; el relieve decide qué se inunda
+(`derive/flood.ts`). **La brigada de cubos** ya no suelta cinco astillas de
+tres centímetros: vacía un chorro de veinte gotas con su parábola hacia lo que
+arde, y al caer salpican y abren un anillo (`effects/water-throws.ts`). Y la
+lluvia salpica la tierra alrededor de lo que se mira. Todo es decorado: no
+toca el motor.
+
 ## v4.62 · 26 sep 2026 · Rocas romas y la senda, pegada al río
 
 Vera: «algunas piedras son demasiado puntiagudas». Los peñascos y el mojón

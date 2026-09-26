@@ -32,7 +32,8 @@ import { castOf } from '../../src/render3d/life/cast';
 import { LIFE_STEP } from '../../src/render3d/life/clock';
 import { PALETTES } from '@derive/palette';
 import { buildForest, shoreCells } from '../../src/render3d/world/forest';
-import { buildGround, cellColour, elevationAt } from '../../src/render3d/world/ground';
+import { buildGround, cellColour, elevationAt, FLOOD_RISE } from '../../src/render3d/world/ground';
+import { SHARED_WATER } from '../../src/render3d/world/water-surface';
 import type { PlannedBuilding } from '../../src/render3d/world/plan';
 import { groundSignature, isQuiet, planChange, planFor } from '../../src/render3d/world/plan';
 import { fingerprint } from '../helpers/fingerprint';
@@ -446,24 +447,33 @@ describe('G-06 · el suelo', () => {
         expect(position.getY(index * 4 + corner)).toBeCloseTo(level, 6);
       }
     }
-    // Plana en reposo, no quieta: el río corre, y lo que se ve desde arriba no
-    // es la ola sino que la luz cambia al inclinarse la superficie.
+    // Plana en reposo, no quieta: el río corre. Desde el 26 sep 2026 la onda la
+    // pinta el material (`water-surface.ts`), así que la lámina **no** se
+    // mueve en la CPU y no puede hundirse; lo que corre es el reloj que recibe
+    // el material, y la superficie trae orilla y corriente para pintarla.
+    for (let step = 0; step < 50; step += 1) ground.ripple(step * 0.05);
     ground.ripple(0.8);
-    let moved = 0;
+    expect(SHARED_WATER.uWaterTime.value).toBe(0.8);
     for (let vertex = 0; vertex < position.count; vertex += 1) {
-      if (Math.abs(position.getY(vertex) - (still[vertex * 3 + 1] ?? 0)) > 1e-4) moved += 1;
+      expect(position.getY(vertex)).toBeCloseTo(still[vertex * 3 + 1] ?? 0, 6);
     }
-    expect(moved).toBeGreaterThan(position.count / 2);
-    // Y la onda se calcula desde el reposo: si se acumulara sobre el fotograma
-    // anterior, el río se iría hundiendo hasta desaparecer.
-    let deepest = 0;
-    for (let step = 0; step < 200; step += 1) {
-      ground.ripple(step * 0.05);
-      for (let vertex = 0; vertex < position.count; vertex += 1) {
-        deepest = Math.max(deepest, Math.abs(position.getY(vertex) - (still[vertex * 3 + 1] ?? 0)));
-      }
+    const shore = surface.geometry.getAttribute('waterShore');
+    const flow = surface.geometry.getAttribute('waterFlow');
+    let banks = 0, open = 0, running = 0;
+    for (let vertex = 0; vertex < shore.count; vertex += 1) {
+      if (shore.getX(vertex) > 0.5) banks += 1; else open += 1;
+      if (Math.hypot(flow.getX(vertex), flow.getY(vertex)) > 0.1) running += 1;
     }
-    expect(deepest).toBeLessThan(0.05);
+    expect(banks, 'hay orilla').toBeGreaterThan(0);
+    expect(open, 'y agua abierta').toBeGreaterThan(0);
+    expect(running, 'y el río corre').toBeGreaterThan(0);
+    // Y con la riada sube, con la ribera detrás; al pasar, vuelve a su cota.
+    ground.ripple(1, 1);
+    expect(surface.position.y).toBeCloseTo(FLOOD_RISE, 6);
+    expect(surface.getObjectByName('Valley_Flood')?.visible).toBe(true);
+    ground.ripple(2, 0);
+    expect(surface.position.y).toBe(0);
+    expect(surface.getObjectByName('Valley_Flood')?.visible).toBe(false);
     // Cuelga del suelo: quien pone el valle en la escena no tiene que saber
     // ademas que hay un rio.
     expect(surface.parent).toBe(ground.mesh);

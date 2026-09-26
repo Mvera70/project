@@ -11,6 +11,7 @@ import { hash32 } from '@engine/rng';
 import { GROUND_BIAS } from '../visual-config';
 import { piecesOf, tintFoliage } from './forest';
 import { buildRidge, exteriorWaterAt, ridgeAt, seasonRidge, SKIRT } from './ridge';
+import { liveWater, SHARED_WATER } from './water-surface';
 import { buildCairns, buildCrags, buildGorgeRoads, buildMountainSkin, MOUNTAIN_PEAK, placeCrags } from './mountains';
 import { valleyAxis } from './valley-profile';
 import { elevationAt } from './ground';
@@ -142,6 +143,8 @@ function outerTrees(map: ValleyMap, seed: number, source: Object3D, palette: Pal
 /** Dos cintas continuas desde las salidas del río, sin celdas cuadradas. */
 function outerWater(map: ValleyMap, seed: number, palette: Palette): Mesh | null {
   const positions: number[] = [];
+  const shores: number[] = [];
+  const flows: number[] = [];
   const indices: number[] = [];
   for (const north of [true, false]) {
     let previous = -1;
@@ -154,6 +157,11 @@ function outerWater(map: ValleyMap, seed: number, palette: Palette): Mesh | null
         section.left, GROUND_BIAS - 0.10, z,
         section.right, GROUND_BIAS - 0.10, z,
       );
+      // El agua viva, como la de dentro: corre hacia el sur y tiene espuma en
+      // las dos orillas. La cinta sólo tiene dos vértices de ancho, así que la
+      // orilla va a medias o sería toda espuma.
+      shores.push(0.55, 0.55);
+      flows.push(0, 0.6, 0, 0.6);
       if (previous >= 0) indices.push(previous, at, previous + 1, previous + 1, at, at + 1);
       previous = at;
     }
@@ -161,12 +169,15 @@ function outerWater(map: ValleyMap, seed: number, palette: Palette): Mesh | null
   if (indices.length === 0) return null;
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
+  geometry.setAttribute('waterShore', new BufferAttribute(new Float32Array(shores), 1));
+  geometry.setAttribute('waterFlow', new BufferAttribute(new Float32Array(flows), 2));
   geometry.setIndex(new BufferAttribute(new Uint32Array(indices), 1));
   geometry.computeVertexNormals();
   const material = new MeshStandardMaterial({
     color: palette.water, roughness: 0.18, metalness: 0.1,
     transparent: true, opacity: 0.86, side: DoubleSide, depthWrite: false,
   });
+  liveWater(material, SHARED_WATER);
   const mesh = new Mesh(geometry, material);
   mesh.name = 'Valley_Backdrop_Water';
   mesh.receiveShadow = false;
