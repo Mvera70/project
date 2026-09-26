@@ -40,7 +40,16 @@ const opt = (name: string, fallback: string): string => {
   return i >= 0 && args[i + 1] !== undefined ? args[i + 1]! : fallback;
 };
 const YEARS = Number(opt('years', '60'));
-const POLICY = opt('policy', 'prudent') as Policy & string;
+// Las políticas que contestan las encrucijadas (`src/engine/sim.ts`). Un nombre
+// mal escrito no puede pasar: el motor contestaría en silencio siempre la
+// primera opción y el informe diría otra cosa.
+const POLICIES = ['prudent', 'worst', 'random', 'first', 'last'] as const;
+const POLICY = opt('policy', 'prudent') as (typeof POLICIES)[number] & Policy;
+if (!POLICIES.includes(POLICY)) {
+  process.stderr.write(`--policy '${POLICY}' no existe. Elige una de: ${POLICIES.join(', ')}.
+`);
+  process.exit(1);
+}
 const SEEDS = args.includes('--seeds')
   ? opt('seeds', '7').split(',').map(Number)
   : Array.from({ length: Number(opt('count', '6')) }, (_, i) => 3 + i * 7);
