@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 26 sep 2026 · El informe del valle, para el balance
+
+`tools/reports/valley-report.ts` + `valley-report-page.ts`; la escalera de hitos
+se sacó a `tools/reports/ladder.ts` y la comparten `pace-report.ts` y el informe
+nuevo. Salida en `artifacts/reports/valley/<fecha>-<etiqueta>/` (`data.json` y
+`report.html`) y el índice `artifacts/reports/valley/index.html`. Seis valles de
+sesenta años tardan 94 s. Primera lectura (6 semillas, prudent, 60 años), sólo
+como dato y no como alarma: 12–13 sucesos al año; la riña en la plaza es el más
+frecuente (2,1 al año); muertes por hambre ~1 al año y por peste ~0,5; la villa
+cerrada llega en 4 de 6 valles, mediana 423 h a ×1; un valle tomado al año 31.
+
 ## 26 sep 2026 · Las monedas del trato, el despegue de la perdiz y el esqueleto del zorro
 
 - **Pagar** (`Village.payments`, `effects/coins.ts`): el vendedor que compra

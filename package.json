@@ -21,6 +21,7 @@
     "bundle": "tsx tools/graphics/bundle-game.ts",
     "assets:publish": "tsx tools/graphics/publish-assets.ts",
     "art": "tsx tools/art/index.ts",
+    "report:valley": "tsx tools/reports/valley-report.ts",
     "eligibility": "tsx tools/reports/eligibility-report.ts",
     "balance:report": "tsx tools/reports/balance-report.ts",
     "test:shots": "playwright test --config playwright.config.ts",

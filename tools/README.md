@@ -34,6 +34,7 @@ las encrucijadas y con ellas se van sus consecuencias y sus obras. Se juega con
 
 | Herramienta | Qué mide | Cómo se lanza |
 |---|---|---|
+| `valley-report.ts` · `valley-report-page.ts` · `ladder.ts` | **El informe del valle**: juega una o varias semillas y escribe un HTML autocontenido con gráficos semana a semana (gente, existencias, ánimo, ganado, obras, bosque, clan), la escalera del ritmo en horas de reloj, los sucesos, muertes y obras contados, la crónica entera con filtros y las decisiones; y un índice de todas las ejecuciones en `artifacts/reports/valley/index.html`. **El sitio donde medir y comparar para el balance**. `ladder.ts` es la escalera, compartida con `pace-report.ts` | `npm run report:valley -- [--count 6 \| --seeds 7,23] [--years 60] [--policy prudent] [--label nombre]` |
 | `pace-report.ts` | **El ritmo del juego en horas de reloj a ×1**, que es la unidad en la que el dueño pone los objetivos. Se vuelve a pasar cada vez que se toca `REAL_MS_PER_TICK` o un umbral de §12 | `npx tsx tools/reports/pace-report.ts` |
 | `agency-report.ts` | Cuánto importa lo que hace el jugador: varias maneras de jugar sobre las mismas semillas. **Es la medida que cierra cada fase de los medios** (M-0 a M-4) | `npx tsx tools/reports/agency-report.ts [--seeds 16] [--years 60]` |
 | `eligibility-report.ts` | Por qué medio catálogo de encrucijadas no sale nunca, separando «nunca es elegible» de «pierde el sorteo» | `npm run eligibility` |

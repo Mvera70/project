@@ -1,5 +1,17 @@
 # The Valley — Registro de cambios
 
+## v4.58 · 26 sep 2026 · El informe del valle
+
+Para medir y comparar antes de balancear (lo pidió Vera: «un sitio
+centralizado donde hacer pruebas y medir resultados»). `npm run report:valley`
+juega una o varias semillas y escribe un HTML autocontenido —se abre con doble
+clic, sin red— con los gráficos semana a semana de gente, existencias, ánimo,
+ganado, obras, bosque y clan, con la mediana de todas las semillas; la escalera
+del ritmo en horas de reloj; los sucesos, las muertes por causa y las obras
+contados por semilla y al año; la crónica entera, filtrable por peso, clase y
+texto; las decisiones; y las series de cada semilla en CSV. Cada ejecución se
+guarda y el índice las lista juntas. No cambia nada del motor.
+
 ## v4.57 · 26 sep 2026 · Las monedas pasan de mano, y la perdiz despega
 
 En un trato cerrado ya se ve pagar: el buhonero y el factor pagan en mano cada
