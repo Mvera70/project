@@ -33,6 +33,12 @@
 //     · las pantallas y sus estados, con la interfaz puesta
 //   crecimiento estaciones escenas cerco
 //     · el metraje del tráiler, sin interfaz
+//   raros
+//     · lo que casi no se ve: la carga, el valle fundándose, el parte de
+//       bienvenida tras una ausencia, el panel al tocar el valle,
+//       la caza, los avisos de amenaza y las obras, el render de respaldo en
+//       lienzo y el banco de batallas. (La cartela de hito ya no existe: desde
+//       el rediseño los hitos salen como la frase de la bandeja.)
 //
 //   npx tsx tools/graphics/bundle-game.ts --out artifacts/graphics/press/game
 //   node tools/graphics/press-kit.mjs
@@ -741,6 +747,172 @@ if (want('cerco')) {
       console.log(`  ojo: cerco-ano-${edad} no se pudo capturar: ${String(error).slice(0, 120)}`);
     }
   }
+}
+
+// ------------------------------------------------------------ lo que casi no se ve
+// Lo pidió Vera el 27 sep 2026: «todas y cada una de las pantallas del juego…
+// incluso la pantalla de carga de espera y cosas del estilo que no se ven
+// mucho». Cada captura va en su propio intento: una que no salga no tumba las
+// demás, y se dice en voz alta.
+if (want('raros')) {
+  const attempt = async (name, run) => {
+    try { await run(); } catch (error) { console.log(`  ojo: ${name} no se pudo capturar: ${String(error).slice(0, 140)}`); }
+  };
+  const debugQuery = (extra) => `?debug=1&live=1&seed=${seed}&year=${year}&season=summer${extra}`;
+  const settled = async (tab) => {
+    await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 45000 }).catch(() => {});
+    await tab.waitForTimeout(6000);
+  };
+
+  // La carga: lo primero que ve quien abre el juego, antes del menú. Dura
+  // décimas de segundo, así que se fotografía en cuanto hay documento.
+  await attempt('carga', async () => {
+    const tab = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: scale });
+    await tab.goto(pathToFileURL(resolve(pageArg)).href, { waitUntil: 'commit' });
+    await tab.waitForLoadState('domcontentloaded').catch(() => {});
+    await shot(tab, 'carga', 'La carga del juego, antes de que salga el menú');
+    await tab.close();
+  });
+
+  // Fundar desde el menú: lo que se ve mientras el valle se prepara.
+  await attempt('fundando', async () => {
+    const tab = await open();
+    await tab.locator('.title-scrim').waitFor({ timeout: 8000 }).catch(() => {});
+    await tab.locator('#valley-seed').fill(seed).catch(() => {});
+    await tab.locator('.title-new').click();
+    await tab.waitForTimeout(250);
+    await shot(tab, 'fundando-0', 'Tras tocar «nuevo valle»: el primer instante');
+    await tab.waitForTimeout(1200);
+    await shot(tab, 'fundando-1', 'El valle montándose, al segundo y medio');
+    await tab.close();
+  });
+
+  // Volver tras una ausencia: el parte de bienvenida (el letargo es tan corto
+  // que su captura salía igual que ésta).
+  await attempt('bienvenida', async () => {
+    const tab = await open();
+    await found(tab);
+    await dismiss(tab);
+    await tab.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+      document.dispatchEvent(new Event('visibilitychange'));
+      const real = Date.now.bind(Date);
+      Date.now = () => real() + 9 * 3600 * 1000;
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await tab.waitForFunction(() => document.documentElement.classList.contains('welcome-open'), { timeout: 60000 });
+    await tab.waitForTimeout(1500);
+    await shot(tab, 'bienvenida', 'El parte de bienvenida: lo que pasó mientras no estabas');
+    await tab.close();
+  });
+
+  // Tocar el valle: el panel de lo que hay bajo el dedo.
+  await attempt('tocar', async () => {
+    const tab = await open(debugQuery(''));
+    await settled(tab);
+    const spots = [];
+    for (let y = 0.3; y <= 0.7; y += 0.08) for (let x = 0.2; x <= 0.8; x += 0.12) spots.push([x, y]);
+    let taken = 0;
+    for (const [x, y] of spots) {
+      await tab.mouse.click(width * x, height * y);
+      await tab.waitForTimeout(700);
+      const open = await tab.locator('.valley-panel').isVisible().catch(() => false);
+      if (!open) continue;
+      const kind = await tab.locator('.valley-panel').innerText().catch(() => '');
+      taken += 1;
+      await shot(tab, `tocar-${taken}`, `Tocando el valle: ${kind.split('\n')[0]?.slice(0, 60) ?? 'un panel'}`);
+      await tab.keyboard.press('Escape').catch(() => {});
+      await tab.locator('.valley-panel-back').click({ timeout: 1000 }).catch(() => {});
+      await tab.waitForTimeout(500);
+      if (taken >= 3) break;
+    }
+    if (taken === 0) console.log('  ojo: ningún toque abrió un panel');
+    await tab.close();
+  });
+
+  // La caza: el botón, la elección del arma, apuntando y el encuentro.
+  await attempt('caza', async () => {
+    const tab = await open();
+    await tab.locator('.title-scrim').waitFor({ timeout: 8000 }).catch(() => {});
+    await tab.locator('#valley-seed').fill('3').catch(() => {});
+    await tab.locator('.title-new').click();
+    await tab.waitForTimeout(7000);
+    const button = tab.locator('.valley-hunt-action');
+    await button.waitFor({ state: 'visible', timeout: 30000 });
+    await shot(tab, 'caza-boton', 'Hay presa cerca: el botón de caza');
+    await button.click();
+    await tab.waitForTimeout(500);
+    await shot(tab, 'caza-arma', 'La caza: elegir con qué');
+    await tab.locator('.hunt-prompt-weapon').first().click();
+    await tab.waitForTimeout(1200);
+    await shot(tab, 'caza-apuntando', 'La caza: apuntando');
+    await button.click();
+    await tab.waitForTimeout(900);
+    await shot(tab, 'caza-encuentro', 'La caza: el encuentro');
+    await tab.waitForTimeout(6000);
+    await shot(tab, 'caza-resuelta', 'La caza, resuelta');
+    await tab.close();
+  });
+
+  // Los avisos de amenaza y lo que queda después, que el grupo del asedio no tenía.
+  for (const [name, extra, note] of [
+    ['amenaza-aviso', '&warning=8', 'La crónica avisa: un clan vecino se acerca'],
+    ['amenaza-pendiente', '&warning=pending', 'El aviso sin leer todavía'],
+    ['amenaza-sin-preparar', '&coming=2', 'La víspera sin prepararse'],
+    ['despues-saqueo', '&aftermath=1', 'Después del saqueo'],
+    ['despues-bestia', '&aftermath=1&beast=1', 'Después de una bestia'],
+    ['obra-porton', '&wallwork=gate&progress=0.35', 'El portón en obras'],
+    ['obra-muralla', '&wallwork=wall&progress=0.35', 'La muralla en obras'],
+  ]) {
+    await attempt(name, async () => {
+      const tab = await open(debugQuery(extra));
+      await settled(tab);
+      await shot(tab, name, note);
+      await tab.close();
+    });
+  }
+
+  // El render de respaldo, la puerta de vuelta al 2D.
+  await attempt('canvas', async () => {
+    const tab = await open('?render=canvas');
+    await found(tab);
+    await dismiss(tab);
+    await shot(tab, 'render-canvas', 'El render de respaldo en lienzo 2D (?render=canvas)');
+    await tab.close();
+  });
+
+  // El banco de batallas: su aviso de carga, el panel plegado y desplegado, y la pelea.
+  await attempt('banco', async () => {
+    // El aviso dura un fotograma: el montaje empieza a los 60 ms y bloquea
+    // la página. Para fotografiarlo se estira esa espera, y sólo ésa.
+    const tab = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: scale });
+    await tab.addInitScript(() => {
+      const plain = window.setTimeout.bind(window);
+      let stretched = false;
+      window.setTimeout = (fn, ms, ...rest) => {
+        if (!stretched && ms === 60) { stretched = true; return plain(fn, 3000, ...rest); }
+        return plain(fn, ms, ...rest);
+      };
+    });
+    const url = pathToFileURL(resolve(pageArg));
+    url.search = '?sandbox=battle';
+    await tab.goto(url.href);
+    await tab.waitForTimeout(1200);
+    await shot(tab, 'banco-cargando', 'El banco de batallas: «preparando la villa»');
+    await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 90000 }).catch(() => {});
+    await tab.waitForTimeout(5000);
+    await shot(tab, 'banco', 'El banco de batallas con su panel');
+    const fold = tab.locator('.battle-sandbox [data-act="fold"]');
+    if (await fold.count() > 0) {
+      await fold.click().catch(() => {});
+      await tab.waitForTimeout(600);
+      await shot(tab, 'banco-panel-otro', 'El banco de batallas con el panel del otro modo (plegado o desplegado)');
+    }
+    await tab.waitForTimeout(25000);
+    await shot(tab, 'banco-pelea', 'El banco de batallas, medio minuto después');
+    await tab.close();
+  });
 }
 
 await browser.close();
