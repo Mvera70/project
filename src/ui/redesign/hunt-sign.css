@@ -1,0 +1,18 @@
+/* La señal de caza (`app.ts`, skill `senales-en-el-mapa`): un redondo pequeño
+   de madera y latón encima de la presa, que la sigue fotograma a fotograma.
+   Se coloca con `transform` desde la esquina de la página; sin transición,
+   porque va pegado a algo que se mueve. Late despacio para que se vea en un
+   valle lleno de cosas sin gritar. */
+.hunt-sign {
+  position: fixed; left: 0; top: 0; z-index: 28;
+  width: 34px; height: 34px; min-width: 34px; min-height: 34px; padding: 0;
+  border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  color: var(--skin-ink, #2b1a0e);
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.hunt-sign[hidden] { display: none; }
+.hunt-sign svg { width: 20px; height: 20px; animation: hunt-sign-beat 1.6s ease-in-out infinite; }
+/* Un área de toque de dedo alrededor del redondo pequeño. */
+.hunt-sign::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; }
+@keyframes hunt-sign-beat { 50% { transform: scale(1.12); } }
+@media (prefers-reduced-motion: reduce) { .hunt-sign svg { animation: none; } }

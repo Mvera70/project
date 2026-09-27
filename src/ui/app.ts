@@ -28,7 +28,7 @@ import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, PlayerAct, SaveFile } from '@engine/state';
 import { huntOpportunity, type HuntOpportunity } from '@engine/world/hunting';
 import { createHud } from './redesign/hud';
-import { showHuntEvent } from './redesign/hunt-event';
+import './redesign/hunt-sign.css';
 import { hash32 } from '@engine/rng';
 import { createInspectPanel } from './redesign/inspect-panel';
 import { cartPanel } from './redesign/cart';
@@ -257,11 +257,8 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
    * mandos— pueda llamarlo sin depender del orden en que se monta la interfaz.
    */
   let dropBareView: () => void = () => {};
-  let closeHuntPrompt: (() => void) | null = null;
 
   function navigate(route: SheetRoute): void {
-    closeHuntPrompt?.();
-    closeHuntPrompt = null;
     currentRoute = route;
     // UI-V10 · **con la pantalla despejada no se abre una hoja.** Sin esto, la
     // crónica se montaría sobre un valle sin cabecera y sin barra de abajo, o
@@ -473,15 +470,13 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     paintBare();
   };
 
-  // La caza, como evento aleatorio (`redesign/hunt-event.ts`, 27 sep 2026:
-  // Vera pidió quitar el botón «Hunt» y después los minijuegos). Una ocasión
-  // por semana del motor: la tarjeta sale una vez, y si pasa sin aceptarla, la
-  // presa se va. Aceptada, el arma la elige la suerte entre las que hay, y la
-  // escena caza sola hasta entregar su parte.
+  // La caza, como señal en el mapa (skill `senales-en-el-mapa`, 27 sep 2026).
+  // Vera quitó el botón «Hunt», luego la tarjeta y luego los minijuegos: queda
+  // un icono pequeño **encima de la presa**, que sólo ve quien mira el valle.
+  // Tocarlo es aceptar; el arma la elige la suerte, sale el aldeano libre más
+  // cercano desde donde está y la escena caza sola hasta entregar su parte.
   let huntOpportunityTick = -1;
   let currentHuntOffer: HuntOpportunity | null = null;
-  /** La semana cuya ocasión ya se ofreció (elegida, dejada ir o caducada). */
-  let huntOfferedTick = -1;
   let huntInProgress = false;
   let huntPreviousSpeed: Speed | null = null;
   const endHunt = (): void => {
@@ -489,17 +484,32 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     if (huntPreviousSpeed !== null) app.setSpeed(huntPreviousSpeed);
     huntPreviousSpeed = null;
   };
-  const offerHunt = (offer: HuntOpportunity): void => {
-    huntOfferedTick = offer.tick;
-    closeHuntPrompt = showHuntEvent(offer, () => {
-      closeHuntPrompt = null;
-      if (state.tick !== offer.tick || backend.live.kind !== 'pilot3d') return;
-      const weapon = offer.weapons[hash32(state.seed, `hunt:weapon:${offer.tick}`) % offer.weapons.length]!;
-      if (!backend.live.startHunt(state, offer.species, weapon)) return;
-      huntInProgress = true;
-      huntPreviousSpeed = speed;
-      app.setSpeed(1);
-    }, () => { closeHuntPrompt = null; });
+  const huntSign = document.createElement('button');
+  huntSign.type = 'button';
+  huntSign.className = 'hunt-sign skin-plate skin-plate--round';
+  huntSign.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none"'
+    + ' stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M5 3c9 2 12 8 14 18M5 3c-2 8 2 14 14 18M7 5l12 14"/></svg>';
+  huntSign.hidden = true;
+  huntSign.addEventListener('click', () => {
+    const offer = currentHuntOffer;
+    if (offer === null || huntInProgress || state.tick !== offer.tick || backend.live.kind !== 'pilot3d') return;
+    const weapon = offer.weapons[hash32(state.seed, `hunt:weapon:${offer.tick}`) % offer.weapons.length]!;
+    if (!backend.live.startHunt(state, offer.species, weapon)) return;
+    huntSign.hidden = true;
+    huntInProgress = true;
+    huntPreviousSpeed = speed;
+    app.setSpeed(1);
+  });
+  /** La señal sigue a su presa: se coloca después de pintar, con la cámara de ese fotograma. */
+  const placeHuntSign = (): void => {
+    const at = huntInProgress || currentRoute.kind !== 'valley' || state.crossroad !== null
+      || state.ended !== null || backend.live.kind !== 'pilot3d' ? null : backend.live.huntSign();
+    huntSign.hidden = at === null;
+    if (at === null) return;
+    const box = backend.live.surface.getBoundingClientRect();
+    huntSign.style.transform = `translate(${Math.round(box.left + at.x)}px, ${Math.round(box.top + at.y)}px) translate(-50%, -100%)`;
+    huntSign.setAttribute('aria-label', renderUiText(`hunt.sign.${at.species}`));
   };
 
   const hudRight = document.createElement('div');
@@ -512,7 +522,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   cameraControls = mountCameraControls(() => backend.live, () => backend.live.surface);
   hudRight.append(bareToggle, hud.speedControls, hud.speedBadge);
 
-  root.append(canvas, hud.header, hudRight, cameraControls.compass, shell.element);
+  root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, shell.element);
 
   /**
    * **UI-R1 · la pila del mensaje, y el fallo concreto que esta ronda tiene
@@ -736,14 +746,6 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
       huntOpportunityTick = state.tick;
       currentHuntOffer = huntOpportunity(state);
     }
-    const offer = currentHuntOffer;
-    // La ocasión sale una vez por semana, y sólo si se puede mirar: el valle a
-    // la vista en 3D, sin decisión encima, sin otra caza en marcha.
-    if (offer !== null && huntOfferedTick !== offer.tick && !huntInProgress && closeHuntPrompt === null
-      && backend.live.kind === 'pilot3d' && currentRoute.kind === 'valley'
-      && state.crossroad === null && state.ended === null) {
-      offerHunt(offer);
-    }
     // U-11 · la altura de la vista, en la raíz, como `data-tick`: es lo único
     // que permite mirar el vuelo de entrada desde una secuencia de capturas o
     // desde un recorrido, sin abrir el renderer.
@@ -887,6 +889,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     // VZ-4 · la cámara va detrás de quien se sigue, fotograma a fotograma.
     if (trackedId !== null) renderer.track(trackedId);
     renderer.paint(state, fraction);
+    placeHuntSign();
     // El resultado físico llega en un fotograma, no al cabo de otra semana
     // de reloj real. Se entrega al motor justo después de pintar el impacto.
     if (huntInProgress) {
@@ -1237,8 +1240,6 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   const finish = (): void => {
     if (state.ended === null || finishing) return;
     finishing = true;
-    closeHuntPrompt?.();
-    closeHuntPrompt = null;
     loop?.stop();
     loop = undefined;
     // La jornada terminal sigue pasos físicos fijos, pero el último `paint`

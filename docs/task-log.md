@@ -1,5 +1,23 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · La caza, señal en el mapa (v4.82)
+
+Fundamento nuevo: skill `.claude/skills/senales-en-el-mapa/` (enlazada desde
+`piel-del-valle` §8). `renderer.ts`: `huntSighting` (la presa suelta se crea
+con `createWildPrey` al abrirse la ocasión y pace con el paso congelado; ciervo y
+oso son de `life.wildlife`), `huntSign()` proyecta su posición, `startHunt` usa
+esa presa y el cuerpo de `nearestHunter` (adulto 16–60, fuera de casa, sin
+huida ni escena), su actor lleva la pose de la escena y la cámara lo sigue;
+`hunt()` lo devuelve a su día (`hunting = false`, `rethinkAt`). `village.ts`:
+`Dweller.hunting` saca el cuerpo de la rutina. `hunt-encounter.ts`: `extras`
+(`hunter`, `prey`), `auto` con `LUCK` (fallo 42, roce 35, susto 30/45, cinco
+zarpazos del oso). `sim.ts`: `hunt.wounded.*` si `hits > 0` y no murió. UI:
+`.hunt-sign` (`redesign/hunt-sign.css`) colocado tras pintar; fuera
+`hunt-event.*`. Medido en el navegador (semilla 3): la señal sale sobre la
+perdiz, al tocarla ningún aldeano salta de sitio, la cámara sigue al cazador y
+la caza se resuelve. **Queda**: las candidatas de la skill (buhonero, riada,
+niño perdido…), cada una con Vera antes.
+
 ## 27 sep 2026 · La caza como eventos rápidos (v4.81)
 
 `ui/redesign/hunt-event.ts` + `.css` (nuevos): `showHuntEvent` (tarjeta,

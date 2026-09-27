@@ -76,8 +76,8 @@ export interface HuntEncounter {
   readonly completed: HuntReport | null;
   /**
    * El jugador ordena un golpe; espera a alcance y recuperación del arma.
-   * `precision` (0 a 1) es la puntería del evento rápido (`ui/redesign/
-   * hunt-event.ts`): con 0 el tiro se desvía y la lanzada no toca; por encima,
+   * `precision` (0 a 1) es la puntería del golpe (en el juego la tira la
+   * suerte, `LUCK`): con 0 el tiro se desvía y la lanzada no toca; por encima,
    * cuanto más alta, más centrado. Devuelve `false` si el arma se está
    * recargando, y entonces el toque no cuenta.
    */
@@ -108,8 +108,16 @@ export function createHuntEncounter(
   ground: (x: number, z: number) => number, wildlife: readonly Animal[], seed: number,
   den: Point | null = null,
   auto = false,
+  /**
+   * `hunter`: el cuerpo de un aldeano de verdad, que sale desde donde está
+   * (`senales-en-el-mapa`: nadie aparece de la nada). `prey`: la presa que ya
+   * estaba a la vista con su señal encima. Sin ellos, como antes: un cazador
+   * junto a la presa y una presa nueva (las pruebas).
+   */
+  extras: { hunter?: Body; prey?: WildPrey | null } = {},
 ): HuntEncounter | null {
-  const wild: WildPrey | null = species === 'partridge' || species === 'rabbit' || species === 'boar'
+  const wild: WildPrey | null = extras.prey !== undefined && extras.prey !== null ? extras.prey
+    : species === 'partridge' || species === 'rabbit' || species === 'boar'
     ? createWildPrey(state as GameState, land, seed,
       (() => { const core = valleyCore(state as GameState); return { x: core.x, z: core.y }; })(), species as WildKind)
     : null;
@@ -121,10 +129,10 @@ export function createHuntEncounter(
   const initialAt = wild === null
     ? { x: initialTarget!.x, z: initialTarget!.y }
     : { x: wild.body.x, z: wild.body.z };
-  const spawn = findHunter(land, initialAt, seed);
+  const spawn = extras.hunter ?? findHunter(land, initialAt, seed);
   if (spawn === null) return null;
 
-  const hunterBody: Body = { id: HUNTER_ID + (hash32(seed, 'hunt-hunter-id') % 10_000),
+  const hunterBody: Body = extras.hunter ?? { id: HUNTER_ID + (hash32(seed, 'hunt-hunter-id') % 10_000),
     x: spawn.x, z: spawn.z, vx: 0, vz: 0,
     facing: Math.atan2(initialAt.x - spawn.x, initialAt.z - spawn.z),
     radius: HUNTER_RADIUS, pace: SPEED };

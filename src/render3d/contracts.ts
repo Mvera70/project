@@ -256,6 +256,8 @@ export interface GraphicsRenderer {
   /** Ordena un tiro o golpe en el encuentro activo. */
   /** Un golpe de caza con la puntería del evento rápido (0 a 1). */
   attackHunt(precision?: number): boolean;
+  /** Dónde va la señal de caza en la pantalla (`senales-en-el-mapa`), o `null`. */
+  huntSign(): { x: number; y: number; species: HuntSpecies } | null;
   /** Parte de la cacería, entregado una sola vez al motor. */
   hunt(): { sourceTick: number;
     species: HuntSpecies;

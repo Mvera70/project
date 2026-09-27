@@ -313,6 +313,12 @@ decisión y los círculos de velocidad. La versión anterior de esta sección de
 «lo que flota lee la altura de la bandeja»; el dueño del diseño la llamó una
 chapuza y tenía razón: la respuesta no era anclar mejor, era no flotar.
 
+**La frontera con las señales del mapa** (27 sep 2026): un icono pequeño
+pegado a algo del mundo —la caza, sobre la presa— no es algo que «flota sobre el
+valle»: es parte del valle, sigue a su cosa y se aprovecha tocándolo. Cómo se
+hacen está en la skill `senales-en-el-mapa`. Lo que sigue prohibido son las
+tarjetas, cartelas y píldoras sueltas encima del valle.
+
 Reglas que salen de ahí:
 
 - **Una frase que no quepa en dos líneas rompe la promesa.** El tope medido es

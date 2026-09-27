@@ -81,6 +81,9 @@ import { createVillage, type Village as LifeVillage } from './life/village';
 import type { PhysicsSnapshot } from './life/physics';
 import { garrisonAs, type Arm } from '@derive/garrison';
 import { createHuntEncounter, type HuntEncounter, type HuntReport } from './life/hunt-encounter';
+import { createWildPrey, stepWildPrey, wildPreyPosition, type WildKind, type WildPrey } from './life/wild-prey';
+import { indoors } from './life/home';
+import type { Dweller } from './life/village';
 import { createBear } from './life/bear';
 import { huntOpportunity, type HuntSpecies, type HuntWeapon } from '@engine/world/hunting';
 import { valleyCore } from '@derive/anchors';
@@ -103,6 +106,10 @@ import type { Physics } from './life/physics';
 
 /** Lo que cambia en un aparato táctil. TUNE: medido el 27 sep 2026 (ver `adaptResolution`). */
 const HANDHELD = { pixelRatio: 1.5, shadowMapSize: 1024 } as const;
+/** La señal de caza flota esta altura sobre la presa, en celdas. TUNE visual. */
+const HUNT_SIGN_LIFT = 0.9;
+/** Quién puede salir de caza: adultos, ni niños ni viejos. TUNE. */
+const HUNTER_AGE = { min: 16, max: 60 } as const;
 /**
  * Cada cuántos fotogramas se rehace el mapa de sombras si la cámara no se ha
  * movido (27 sep 2026). Rehacerlo es dibujar otra vez todo lo que da sombra:
@@ -664,6 +671,16 @@ export async function createGraphicsRenderer(
   let life: LifeVillage | null = null;
   let denVisual: Object3D | null = null;
   let huntScene: HuntEncounter | null = null;
+  /**
+   * La ocasión de caza, a la vista (`senales-en-el-mapa`, 27 sep 2026): la
+   * presa ya está en el valle con su señal encima mientras dure la semana, y
+   * al tocarla sale a por ella el aldeano libre más cercano. `prey` es la presa
+   * suelta de perdiz, conejo o jabalí; ciervo y oso son de `life.wildlife`.
+   */
+  let huntSighting: { tick: number; species: HuntSpecies; prey: WildPrey | null; targetId: number | null } | null = null;
+  let huntSightingTick = -1;
+  /** Quién caza ahora, para seguirlo y devolverlo a su día al acabar. */
+  let huntHunter: Dweller | null = null;
   let huntReport: HuntReport | null = null;
   let lifeDay = -1;
   let lifeState: GameState | null = null;
@@ -1506,6 +1523,35 @@ export async function createGraphicsRenderer(
     renderer.setPixelRatio(Math.min(viewport.pixelRatio, pixelCap) * renderScale);
     renderer.setSize(viewport.widthCss, viewport.heightCss, false);
   };
+  /** La presa de la ocasión, ya en el valle: la suelta se crea; ciervo y oso ya están. */
+  function sightingFor(state: Readonly<GameState>, species: HuntSpecies): typeof huntSighting {
+    if (life === null) return null;
+    if (species === 'partridge' || species === 'rabbit' || species === 'boar') {
+      const core = valleyCore(state as GameState);
+      const prey = createWildPrey(state as GameState, life.land, state.seed ^ state.tick,
+        { x: core.x, z: core.y }, species as WildKind);
+      return prey === null ? null : { tick: state.tick, species, prey, targetId: prey.body.id };
+    }
+    const found = life.wildlife.find(animal => animal.kind === species);
+    return { tick: state.tick, species, prey: null, targetId: found?.id ?? null };
+  }
+  /** El adulto libre más cercano a la presa: fuera de casa, sin huida, sin escena. */
+  function nearestHunter(state: Readonly<GameState>, at: { x: number; z: number }): Dweller | null {
+    if (life === null) return null;
+    const year = clockOf(state.tick).year;
+    const ages = new Map(state.people.villagers.map(villager => [villager.id, year - clockOf(villager.bornTick).year]));
+    let best: Dweller | null = null, bestD = Infinity;
+    for (const dweller of life.dwellers) {
+      const age = ages.get(dweller.villager) ?? 0;
+      if (age < HUNTER_AGE.min || age > HUNTER_AGE.max || indoors(dweller)) continue;
+      if ((dweller.flight !== null && dweller.flight !== undefined) || dweller.scene !== null
+        || dweller.elevated !== undefined || dweller.payoff !== undefined || dweller.warning !== undefined) continue;
+      const d = Math.hypot(dweller.body.x - at.x, dweller.body.z - at.z);
+      if (d < bestD) { best = dweller; bestD = d; }
+    }
+    return best;
+  }
+
   const graphics: GraphicsRenderer = {
     resize(next: GraphicsViewport): void {
       if (disposed) return;
@@ -1640,6 +1686,9 @@ export async function createGraphicsRenderer(
       if (frame.discontinuity || (!holdPresentation && (life === null || lifeState !== shown))) {
         const previous = life;
         huntScene = null;
+        huntSighting = null;
+        huntSightingTick = -1;
+        if (huntHunter !== null) { huntHunter.hunting = false; huntHunter = null; }
         clearBattleDebris();
         pendingBrokenGate = null;
         // Los tendederos y huertos se colocan antes de abrir la jornada, con las
@@ -1789,6 +1838,9 @@ export async function createGraphicsRenderer(
         if (huntScene !== null) {
           huntScene.step(life.wildlife);
           if (huntScene.completed !== null && huntReport === null) huntReport = huntScene.completed;
+        } else if (huntSighting !== null && huntSighting.prey !== null) {
+          // Esperando: pace a su aire; con el paso congelado en 0 no caduca.
+          stepWildPrey(huntSighting.prey, life.land, state.seed ^ huntSighting.tick, 0, []);
         }
         rememberDoors();
         lifeCarry -= LIFE_STEP;
@@ -1850,16 +1902,27 @@ export async function createGraphicsRenderer(
         const weapon = arms.get(actor.id);
         return weapon === undefined ? actor : { ...actor, weapon, shield: weapon === 'spear' };
       });
-      if (huntScene !== null) {
+      if (huntScene !== null && huntHunter !== null) {
+        // El cazador es el aldeano: su propio actor, con la pose de la escena.
         const hunter = huntScene.hunter;
-        const cell = Math.floor(hunter.z) * life.land.width + Math.floor(hunter.x);
-        lastActors.push({ id: hunter.id, x: hunter.x, z: hunter.z, facing: hunter.facing,
+        const scene = huntScene;
+        const villager = huntHunter.villager;
+        lastActors = lastActors.map(actor => actor.id !== villager ? actor : {
+          ...actor, x: hunter.x, z: hunter.z, facing: hunter.facing,
           activity: hunter.clip === 'walk' ? 'walking' : 'resting',
           clip: hunter.clip, load: null, poseSeconds: frame.presentationSeconds,
           clipSeconds: frame.presentationSeconds, travelled: hunter.travelled,
-          cell, named: false, age: 30, talking: false, arguing: false,
-          occupation: null, role: 'stranger', weapon: huntScene.completed === null
-            ? huntScene.weapon : null });
+          weapon: scene.completed === null ? scene.weapon : null,
+        });
+        // Y la cámara va detrás, como con el seguimiento de la ficha.
+        if (scene.completed === null) { cast.highlight(villager); view.look(hunter.x, hunter.z); }
+      }
+      // La ocasión: se abre con la semana que la ofrece y se cierra con ella.
+      if (huntScene === null && huntReport === null && lifeState !== null && state.seed === lifeState.seed
+        && state.tick !== huntSightingTick) {
+        huntSightingTick = state.tick;
+        const offer = huntOpportunity(state);
+        huntSighting = offer === null ? null : sightingFor(state, offer.species);
       }
       // V-09b: la pelota, el palo, el cubo, el haz de leña.
       props.update(propsOf(life), groundFloor);
@@ -1981,6 +2044,7 @@ export async function createGraphicsRenderer(
       // paisaje, derivados de la semilla y del tiempo sin tocar el motor.
       fauna.update(shown, phase, [...life.wildlife.filter(animal => animal.id !== huntScene?.targetId),
         ...(huntScene?.animals ?? []),
+        ...(huntScene === null ? wildPreyPosition(huntSighting?.prey ?? null) : []),
         ...mountainWolves(shown.map, shown.terrainSeed, frame.presentationSeconds),
         ...life.beasts.map(beast => ({
         id: beast.dweller.body.id, kind: beast.kind, x: beast.dweller.body.x, y: beast.dweller.body.z,
@@ -2159,6 +2223,7 @@ export async function createGraphicsRenderer(
       if (state.seed !== lifeState.seed) return false;
       const offer = huntOpportunity(state);
       if (offer?.species !== species || !offer.weapons.includes(weapon)) return false;
+      const sighting = huntSighting?.species === species && huntSighting.tick === state.tick ? huntSighting : null;
       const liveBear = species === 'bear' && life.bearDen === null
         ? createBear(state as GameState, life.land,
           (() => { const core = valleyCore(state as GameState); return { x: core.x, z: core.y }; })())
@@ -2174,9 +2239,17 @@ export async function createGraphicsRenderer(
         ? [...life.wildlife, { id: 50_000, kind: 'bear' as const,
           x: den.clearingX, y: den.clearingZ }]
         : life.wildlife;
+      // Dónde está la presa, para elegir al cazador más cercano.
+      const sightedPrey = sighting?.prey ?? null;
+      const preyAt = sightedPrey !== null ? { x: sightedPrey.body.x, z: sightedPrey.body.z }
+        : (() => { const found = wildlife.find(animal => animal.kind === species); return found === undefined ? null : { x: found.x, z: found.y }; })();
+      if (preyAt === null) return false;
+      const hunter = nearestHunter(state, preyAt);
+      if (hunter === null) return false;
       const scene = createHuntEncounter(state, life.land, species, weapon,
         groundFloor, wildlife, state.seed ^ state.tick,
-        den === null ? null : { x: den.x, z: den.z }, true);
+        den === null ? null : { x: den.x, z: den.z }, true,
+        { hunter: hunter.body, prey: sighting?.prey ?? null });
       if (scene === null) return false;
       if (species === 'bear' && den !== null && denVisual === null) {
         denVisual = library.instance('bear-den') ?? null;
@@ -2187,25 +2260,43 @@ export async function createGraphicsRenderer(
         }
       }
       huntScene = scene;
-      const target = scene.animals[0];
-      if (target !== undefined) {
-        flight = null;
-        focusFlight = null;
-        disturbed = true;
-        // La presa ocupa menos de una celda: el plano general la haría
-        // invisible incluso con la cámara apuntando al sitio correcto.
-        view.zoom(Math.min(1, 13 / view.view.height),
-          viewport.widthCss / 2, viewport.heightCss / 2);
-        view.look((target.x + scene.hunter.x) / 2,
-          (target.y + scene.hunter.z) / 2);
-      }
+      huntSighting = null;
+      hunter.hunting = true;
+      hunter.doing = null;
+      huntHunter = hunter;
+      flight = null;
+      focusFlight = null;
+      disturbed = true;
+      // De cerca, para ver la pieza, sin alejar a quien ya está más cerca.
+      view.zoom(Math.min(1, 13 / view.view.height), viewport.widthCss / 2, viewport.heightCss / 2);
       return true;
+    },
+    /** Dónde va la señal de caza en la pantalla, o `null` si no hay ocasión a la vista. */
+    huntSign(): { x: number; y: number; species: HuntSpecies } | null {
+      if (huntScene !== null || huntSighting === null || life === null) return null;
+      const at = huntSighting.prey !== null
+        ? { x: huntSighting.prey.body.x, z: huntSighting.prey.body.z }
+        : (() => { const found = life.wildlife.find(animal => animal.kind === huntSighting!.species); return found === undefined ? null : { x: found.x, z: found.y }; })();
+      if (at === null) return null;
+      const point = new Vector3(at.x, groundFloor(at.x, at.z) + HUNT_SIGN_LIFT, at.z).project(camera);
+      if (point.z > 1 || point.x < -1.05 || point.x > 1.05 || point.y < -1.05 || point.y > 1.05) return null;
+      return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, species: huntSighting.species };
     },
     attackHunt(precision?: number): boolean { return huntScene?.attack(precision) ?? false; },
     hunt(): HuntReport | null {
       const report = huntReport;
       huntReport = null;
-      if (report !== null) huntScene = null;
+      if (report !== null) {
+        huntScene = null;
+        // El cazador vuelve a su día desde donde terminó, sin saltos.
+        if (huntHunter !== null && life !== null) {
+          huntHunter.hunting = false;
+          huntHunter.doing = null;
+          huntHunter.rethinkAt = life.steps;
+          cast.highlight(null);
+        }
+        huntHunter = null;
+      }
       return report;
     },
 

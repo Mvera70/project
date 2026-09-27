@@ -109,6 +109,12 @@ export interface Dweller {
   combat?: { clip: 'bow_draw' | 'bow_loose' | 'spear_thrust' | 'hit_take' | 'fall'; since: number; facing: number };
   /** E1: huida efímera de esta jornada; no es combate ni estado del motor. */
   flight?: Flight | null;
+  /**
+   * De caza (27 sep 2026, `senales-en-el-mapa`): su cuerpo lo mueve la escena
+   * de caza del renderer, no su rutina. Al acabar se replantea el día desde
+   * donde terminó. Efímero; nunca sale al motor.
+   */
+  hunting?: boolean;
   readonly residence?: HomeRoutine;
   readonly body: Body;
   /** E3a · Estado privado de la escalera; nunca sale al motor ni al router. */
@@ -1766,6 +1772,9 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           dweller.flight = null;
           continue;
         }
+
+        // De caza: el cuerpo es de la escena mientras dure.
+        if (dweller.hunting === true) continue;
 
         // La escalera posee el cuerpo antes de avisos, escenas, regreso y
         // movimiento ordinario: ninguna rutina de suelo puede recuperar su X/Z

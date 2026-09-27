@@ -60,6 +60,8 @@ interface ValleyBackend {
   /** Start one physical hunt using the player's chosen weapon. */
   startHunt(state: Readonly<GameState>, species: HuntSpecies, weapon: HuntWeapon): boolean;
   attackHunt(precision?: number): boolean;
+  /** Dónde va la señal de caza en la pantalla, o `null`. */
+  huntSign(): { x: number; y: number; species: HuntSpecies } | null;
   /** Completed hunt report, consumed once by the UI and forwarded to the engine. */
   hunt(): { sourceTick: number; species: HuntSpecies; weapon: HuntWeapon; hits: number; killed: boolean } | null;
   /**
@@ -175,6 +177,7 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     battle() { return null; },
     startHunt() { return false; },
     attackHunt() { return false; },
+    huntSign() { return null; },
     hunt() { return null; },
     siege() { return null; },
     ending() { return null; },
@@ -404,6 +407,7 @@ export function attachBackend(
         battle() { return renderer.battle(); },
         startHunt(state, species, weapon) { return renderer.startHunt(state, species, weapon); },
         attackHunt(precision) { return renderer.attackHunt(precision); },
+        huntSign() { return renderer.huntSign(); },
         hunt() { return renderer.hunt(); },
         siege() { return renderer.siege(); },
         ending() { return renderer.ending(); },

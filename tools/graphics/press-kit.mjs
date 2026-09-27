@@ -860,18 +860,17 @@ if (want('raros')) {
     await tab.close();
   });
 
-  // La caza, como evento aleatorio: la ocasión, la caza y lo que queda.
+  // La caza, como señal en el mapa: el icono sobre la presa, la caza y lo que queda.
   await attempt('caza', async () => {
     const tab = await open();
     await tab.locator('.title-scrim').waitFor({ timeout: 8000 }).catch(() => {});
     await tab.locator('#valley-seed').fill('3').catch(() => {});
     await tab.locator('.title-new').click();
-    await tab.locator('.hunt-event').waitFor({ state: 'visible', timeout: 60000 });
-    await shot(tab, 'caza-ocasion', 'La ocasión de caza: la tarjeta con «Ir de caza» y su tiempo');
-    // La tarjeta caduca en nueve segundos, que sin GPU son pocos fotogramas.
-    await tab.locator('.hunt-event-go').click({ force: true });
+    await tab.locator('.hunt-sign').waitFor({ state: 'visible', timeout: 60000 });
+    await shot(tab, 'caza-senal', 'La ocasión de caza: el icono encima de la presa');
+    await tab.locator('.hunt-sign').click({ force: true });
     await tab.waitForTimeout(3000);
-    await shot(tab, 'caza-en-marcha', 'La caza en marcha: el cazador va solo a por la presa');
+    await shot(tab, 'caza-en-marcha', 'La caza en marcha: un aldeano sale desde donde estaba y la cámara lo sigue');
     await tab.waitForTimeout(20000);
     await shot(tab, 'caza-resuelta', 'La caza, resuelta');
     await tab.close();

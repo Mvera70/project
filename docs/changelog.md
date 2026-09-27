@@ -1,5 +1,25 @@
 # The Valley — Registro de cambios
 
+## v4.82 · 27 sep 2026 · La caza, una señal en el mapa
+
+Vera, tras tres versiones de la caza en un día (un botón, una tarjeta, unos
+aros de puntería): «sólo quiero que aparezca la posibilidad de cazar y sea
+aleatorio, que tú simplemente aceptes; todo lo que pase después debe ser random:
+el animal consigue huir, o lo cazas, o se va malherido», y «la alerta debe ser
+pequeña, un simple icono de caza encima de la presa … el aldeano debe salir
+desde donde esté, con el follow que tenemos. Así tienes que estar pendiente del
+mapa». Queda así: mientras dure la ocasión de la semana, **la presa está en el
+valle con un icono pequeño encima** que la sigue; si nadie mira, pasa. **Tocarlo
+es aceptar**: el arma la elige la suerte, **sale el adulto libre más cercano
+desde donde está** —su cuerpo, no uno nuevo junto a la presa— y **la cámara lo
+sigue** con el aro del seguimiento. Cada tiro es una tirada: se desvía, roza o
+toca, y un fallo o un roce pueden espantar a la presa. Tres finales —cobrada,
+escapada ilesa, **escapada malherida**, con su línea de crónica nueva
+(`hunt.wounded.*`) y su ilustración pedida—; medido en 60 semillas por presa:
+la mitad cobrada, un cuarto malherida, un quinto ilesa, y el oso cae uno de cada
+seis. Al acabar, el cazador sigue su día desde donde terminó. **Y el patrón queda
+como fundamento** para más mecánicas: skill `senales-en-el-mapa`.
+
 ## v4.81 · 27 sep 2026 · La caza, como eventos rápidos
 
 Vera: «la opción de hunt debe quitarse; el botón debe ser un evento rápido; si

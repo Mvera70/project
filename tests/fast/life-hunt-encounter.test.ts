@@ -147,4 +147,19 @@ describe('encuentro físico de caza', () => {
     expect(bear.killed, 'el oso cae alguna vez').toBeGreaterThan(0);
     expect(bear.killed, 'pero no casi siempre').toBeLessThan(30);
   });
+
+  // `senales-en-el-mapa`: caza un aldeano de verdad, que parte de donde está, y
+  // la presa que ya estaba a la vista, no una nueva.
+  it('el cazador parte del aldeano que se le da, sin aparecer junto a la presa', () => {
+    const state = foundTwenty(31);
+    const land = { width: 50, height: 50, blocked: new Uint8Array(2500) };
+    const deer: Animal = { id: 40_000, kind: 'deer', x: 25, y: 25 };
+    const villager = { id: 7, x: 12, z: 30, vx: 0, vz: 0, facing: 0, radius: 0.32, pace: 1 };
+    const encounter = createHuntEncounter(state, land, 'deer', 'bow', () => 0, [deer], 31, null, true, { hunter: villager })!;
+    expect(encounter.hunter).toMatchObject({ x: 12, z: 30 });
+    for (let step = 0; step < 30; step += 1) encounter.step([deer]);
+    // Anda hacia la presa desde su sitio, y el cuerpo movido es el suyo.
+    expect(Math.hypot(villager.x - 12, villager.z - 30)).toBeGreaterThan(0.3);
+    expect(Math.hypot(villager.x - 12, villager.z - 30)).toBeLessThan(2);
+  });
 });

@@ -25,21 +25,26 @@ await page.locator('.title-scrim').waitFor();
 await page.locator('#valley-seed').fill(seed);
 await page.locator('.title-new').click();
 await page.waitForTimeout(6500);
-// La caza como evento aleatorio (27 sep 2026): la ocasión sale sola como
-// tarjeta (`.hunt-event`), se acepta con «Ir de caza» y la escena caza sola.
-const card = page.locator('.hunt-event');
-const offered = await card.waitFor({ state: 'visible', timeout: 60000 }).then(() => true, () => false);
-console.log('hunt event offered', offered);
+// La caza como señal en el mapa (27 sep 2026, skill `senales-en-el-mapa`): un
+// icono encima de la presa (`.hunt-sign`); tocarlo manda al aldeano libre más
+// cercano, que sale desde donde está, y la suerte decide el resto.
+const sign = page.locator('.hunt-sign');
+const offered = await sign.waitFor({ state: 'visible', timeout: 60000 }).then(() => true, () => false);
+console.log('hunt sign shown', offered, await sign.getAttribute('aria-label').catch(() => null));
 if (offered) {
-  // Sin GPU la página va a un fotograma por segundo y la tarjeta caduca en
-  // nueve: se acepta antes de fotografiar nada, sin esperar a que se asiente.
-  await page.locator('.hunt-event-go').click({ force: true });
+  await page.screenshot({ path: resolve(out, 'before.png') });
+  const people = async () => page.evaluate(() => Object.fromEntries((window.__valleyLife?.()?.renderedPeople ?? []).map((p) => [p.id, [p.x, p.z]])));
+  const before = await people();
+  await sign.click({ force: true });
+  await page.waitForTimeout(800);
+  const after = await people();
+  // Nadie aparece de la nada: ningún aldeano salta de sitio al empezar.
+  console.log('jumps', Object.keys(after).filter((id) => before[id]
+    && Math.hypot(after[id][0] - before[id][0], after[id][1] - before[id][1]) > 1.5));
   await page.waitForTimeout(2500);
   await page.screenshot({ path: resolve(out, 'hunting.png') });
   await page.waitForTimeout(25000);
   await page.screenshot({ path: resolve(out, 'resolved.png') });
-  const life = await page.evaluate(() => window.__valleyLife?.() ?? null);
-  console.log('scene', { animals: life?.renderedAnimals?.length, actors: life?.actors.filter(a => a.id >= 80000) });
 }
 console.log('errors', errors);
 await browser.close();
