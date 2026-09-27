@@ -127,8 +127,7 @@ brigada en una captura todavía: está probada en `fire-brigade.test.ts`.
 - **La Edad del Hierro: el castillo y el evento de coronación.** Hasta
   entonces el que manda es «leader» y se le da un bastón de mando (Vera). El
   icono de la corona (`#crown`) en la ficha y la lista sigue a la vista.
-- **La sala del líder**: Vera encargó a Astra un modelo nuevo; el primero no
-  parecía de la Edad Media. Hasta que llegue, la caja de respaldo.
+- ~~**La sala del líder**~~: la casa larga de Astra, en v4.67.
 
 ## El agua (26 sep 2026)
 

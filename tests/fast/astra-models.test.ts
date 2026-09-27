@@ -4,8 +4,13 @@
 // usan el de Astra; sin él, el respaldo de siempre. Y la cantera cambia de
 // estado con lo que la obra lleva sacado.
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { Box3, BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
+import { buildFromAsset } from '../../src/render3d/world/buildings';
+import type { PlannedBuilding } from '../../src/render3d/world/plan';
 import { createStalls, STALL_ASSETS } from '../../src/render3d/effects/stalls';
 import { createQuarryFace, quarryStage } from '../../src/render3d/world/quarry-face';
 import { buildCrags, rockGeometry } from '../../src/render3d/world/mountains';
@@ -49,5 +54,26 @@ describe('los modelos de Astra', () => {
     const mesh = crags.group.children[0] as Mesh;
     expect(shapes).toContain(mesh.geometry);
     crags.dispose();
+  });
+});
+
+describe('la sala del líder', () => {
+  it('cae dentro de su solar de 3 × 3 y trae la puerta que abre el juego', async () => {
+    // La casa larga de Astra (27 sep 2026) sale de 0 a 3 en Z, como el bastión
+    // G-26: colocada con la regla de los demás caería tres celdas al sur.
+    const bytes = readFileSync(resolve(import.meta.dirname, '..', '..', 'public/assets/valley3d/hall.glb'));
+    const gltf = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer, '');
+    const planned = {
+      id: 1, kind: 'hall', x: 10, z: 20, w: 3, h: 3, ruin: false, walls: 0.93, roof: 0.62,
+      wallColour: '#ffffff', roofColour: '#773B42', roofed: true, asset: 'hall',
+    } as unknown as PlannedBuilding;
+    const model = buildFromAsset(planned, gltf.scene);
+    model.object.updateMatrixWorld(true);
+    const bounds = new Box3().setFromObject(model.object);
+    expect(bounds.min.x).toBeGreaterThanOrEqual(10 - 0.05);
+    expect(bounds.max.x).toBeLessThanOrEqual(13 + 0.05);
+    expect(bounds.min.z).toBeGreaterThanOrEqual(20 - 0.05);
+    expect(bounds.max.z).toBeLessThanOrEqual(23 + 0.05);
+    expect(model.object.getObjectByName('hall_door')).toBeDefined();
   });
 });

@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · La sala del líder (v4.67)
+
+`hall.glb` de Astra (commit 725a512 de `art/astra-modelos`) adoptado en el
+lote `astra-models` y publicado. Sale de 0 a 3 en Z como el bastión G-26, así
+que `buildFromAsset` la coloca con `planned.z` y no con `planned.z + h`.
+`PENDING_MESH` queda vacío en `graphics-world.test.ts`. La prueba nueva en
+`astra-models.test.ts` carga el GLB real y comprueba que cae en su solar de
+3 × 3 y trae `hall_door`. **Sin captura en el juego**: una sala sólo se levanta
+con un valle coronado y tiempo; la hoja de Astra está en
+`deliverables/astra/hall-sheet.png`.
+
 ## 27 sep 2026 · Líder y no rey; los modelos de Astra (v4.66)
 
 - **Textos**: `bank.en.ts` reescribe las 40 frases de la corona (crónica,

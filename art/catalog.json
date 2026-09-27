@@ -6534,6 +6534,62 @@
         "cairn.glb": "19D4CACDF6C319D9F146A00190514FB1FDF6DCE3EC0ABFACCD072BEC27FE94A7",
         "cairn-preview.png": "78FB6C53553A91913EE50F6C0EE27A8A86616635D32CEB914B19C9A5BB1C1D42"
       }
+    },
+    {
+      "id": "hall",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/hall-candidate, rama art/astra-modelos, commit 725a512): casa larga medieval del líder, con hall_door.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/hall-candidate/hall.json",
+      "generator": "art/recipes/hall-candidate/hall.json",
+      "approved": {
+        "runId": "astra-models",
+        "directory": "artifacts/graphics/astra-models/approved/hall"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          0.003824
+        ],
+        "max": [
+          3,
+          1.92277,
+          2.965
+        ],
+        "size": [
+          3,
+          1.92277,
+          2.961176
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "door",
+        "plaster",
+        "roof",
+        "stone",
+        "window",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 6,
+        "meshes": 6,
+        "materials": 6,
+        "triangles": 1328
+      },
+      "hashes": {
+        "hall.glb": "53C212439D616B9A699BA0A35C1C6D6CE1AE6DDD98F8A455E456C98E7BFF4940",
+        "hall-preview.png": "3DD11C49E564E9FF810C8A570EF2409BF97774DEBBB91AE7F1350953884E5240"
+      }
     }
   ]
 }

@@ -1,5 +1,13 @@
 # The Valley — Registro de cambios
 
+## v4.67 · 27 sep 2026 · La sala del líder, casa larga medieval
+
+La segunda sala de Astra, después de que Vera descartara la primera por no
+parecer de la Edad Media: casa larga con paja gruesa en hiladas, entramado de
+madera oscura, porche con riostras, escalones y puerta de dos hojas
+(`hall_door`, que el juego abre). Tiene 1.328 triángulos. Era el último tipo de
+edificio que se dibujaba con la caja de respaldo: ya no queda ninguno.
+
 ## v4.66 · 27 sep 2026 · Líder y no rey; los modelos de Astra
 
 **Líder, no rey, hasta la Edad del Hierro.** Vera: «podríamos al principio

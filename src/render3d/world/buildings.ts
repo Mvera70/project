@@ -114,10 +114,10 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
   chapel: 'chapel',
   church: 'church',
   well: 'well',
-  // K-4 · la sala del rey. **Todavía sin malla**: el encargo de arte está en
-  // `docs/historico/plan-rey.md` §8, y hasta que exista el render la dibuja con su propio
-  // aspecto —más alta que una casa y con el tejado burdeos del jefe— por el
-  // mismo camino que el barril y el arado.
+  // K-4 · la sala del líder. **Desde el 27 sep 2026 con malla**: la casa larga
+  // medieval de Astra (`art/recipes/hall-candidate`, la segunda que hizo: Vera
+  // descartó la primera por no parecer de la Edad Media), con la hoja
+  // `hall_door`. Sin el recurso, la caja más alta con el tejado burdeos.
   hall: 'hall',
 };
 
@@ -234,8 +234,10 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D, walkw
   // G-26 es la excepción deliberada: su caja local es 0..1 en X/Z, así que
   // sumarle la altura la echaría una celda al sur. No se normaliza el catálogo
   // entero por una pieza nueva; se conserva la colocación validada de cada una.
+  // La sala de Astra (27 sep 2026) sale como G-26, de 0 a 3 en Z.
   group.position.set(planned.x, 0,
     planned.asset === 'bastion' || planned.asset === 'bastion-access-candidate' || planned.asset === 'e3b-bastion-joint-candidate'
+      || planned.asset === 'hall'
       ? planned.z : planned.z + planned.h);
   group.userData.buildingId = planned.id;
   let model = source;
