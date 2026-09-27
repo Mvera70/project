@@ -525,6 +525,8 @@ export class Village {
    * setecientas llamadas de dibujo— y la muralla no se mueve.
    */
   private wallBatch: { group: Object3D; geometries: BufferGeometry[] } | null = null;
+  /** Las casas que tapa ahora la malla del incendio (`coverBurning`). */
+  private covered = new Set<BuildingId>();
   private readonly gateRecoils = new Map<BuildingId, { x: number; z: number; axis: 'x' | 'z'; object: Group }>();
   /** Portones que han cedido en esta escena efímera. */
   private readonly brokenGates = new Set<BuildingId>();
@@ -591,7 +593,21 @@ export class Village {
 
   /** La casa incendiada la sustituye temporalmente la malla que cae con el fuego. */
   coverBurning(ids: ReadonlySet<BuildingId>): void {
-    for (const [id, model] of this.models) model.object.visible = !ids.has(id);
+    // Sólo se tocan las que entran o salen del fuego. Poner `visible` a todas
+    // en cada fotograma volvía a enseñar los tramos que el lote de muralla
+    // esconde (`batchWalls`), y la villa dibujaba la muralla dos veces: de 421
+    // a 957 llamadas.
+    for (const id of this.covered) {
+      if (ids.has(id)) continue;
+      const model = this.models.get(id);
+      const batched = this.wallBatch !== null && (this.kinds.get(id) === 'wall' || this.kinds.get(id) === 'palisade');
+      if (model !== undefined && !batched) model.object.visible = true;
+    }
+    for (const id of ids) {
+      const model = this.models.get(id);
+      if (model !== undefined) model.object.visible = false;
+    }
+    this.covered = new Set(ids);
   }
 
   add(planned: PlannedBuilding): void {
