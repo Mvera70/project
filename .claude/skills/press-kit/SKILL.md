@@ -38,8 +38,17 @@ medias sigue siendo usable) y `manifest.json`.
 
 Con interfaz puesta, `--only <grupo>`:
 
-`menu` `entrada` `valle` `horas` `cronica` `gente` `carro` `encrucijada`
-`asedio` `estados` `final`
+`menu` `annals` `entrada` `valle` `horas` `cronica` `gente` `carro`
+`encrucijada` `asedio` `estados` `lapidas` `final`
+
+Y `raros` (27 sep 2026, Vera: «incluso la pantalla de carga de espera y cosas
+del estilo que no se ven mucho»): la carga antes del menú, el valle fundándose,
+el parte de bienvenida tras una ausencia, el panel al tocar un edificio, la caza
+(botón, arma, apuntando, encuentro, resuelta), los avisos de amenaza, lo que
+queda tras un saqueo o una bestia, las obras de muralla y portón, y el banco de
+batallas con su aviso de carga. **No** entran el render de respaldo en lienzo
+ni el letargo —Vera los tachó: no son del producto final, y el letargo es tan
+corto que salía igual que la bienvenida—.
 
 El metraje del tráiler, **sin interfaz** (con el botón de pantalla despejada de
 UI-V10, así que sale el valle solo — sin cabecera, sin bandeja, sin barra):
@@ -105,7 +114,17 @@ Dilo en vez de improvisar un plano que no existe.
 
 ## Cerrar
 
-Cuando el paquete esté completo (o la parte que se pidió), enseña la hoja de
-contactos (`artifacts/graphics/press/index.html`) y no las capturas sueltas —es
-para eso que existe—, y dile al dueño del diseño qué grupos quedan si el
-paquete se hizo por partes.
+1. **Mira la hoja de contactos** (`artifacts/graphics/press/index.html`) antes
+   de dar nada por bueno. El 27 sep salieron mal tres cosas que sólo se veían
+   mirando: la entrada fotografiaba el menú con «Founding…», la crónica con el
+   sello fotografiaba el valle, y lápida y cuentas salían iguales. Repite con
+   `--only` lo que salga mal, o déjalo fuera con `--skip` al archivar.
+2. **Archívala como versión de la interfaz** (Vera, 27 sep 2026: «guárdalas en
+   una carpeta en docs como versión actual de la interfaz, y cada vez que
+   tengamos que hacer una nueva, podamos ir haciendo esta tanda»):
+   `python tools/graphics/press-archive.py --date AAAA-MM-DD --skip …` →
+   `docs/interfaz/<fecha>/`, en JPG a 780 de ancho con su índice. Una versión
+   no se pisa; añade su fila en `docs/interfaz/README.md`.
+3. **Pásaselas a Vera una a una** si las pide así (`SendUserFile`, una por
+   llamada, con su pie), y dile qué grupos quedan si el paquete se hizo por
+   partes.

@@ -36,8 +36,7 @@
 //   raros
 //     · lo que casi no se ve: la carga, el valle fundándose, el parte de
 //       bienvenida tras una ausencia, el panel al tocar el valle,
-//       la caza, los avisos de amenaza y las obras, el render de respaldo en
-//       lienzo y el banco de batallas. (La cartela de hito ya no existe: desde
+//       la caza, los avisos de amenaza y las obras, y el banco de batallas. (La cartela de hito ya no existe: desde
 //       el rediseño los hitos salen como la frase de la bandeja.)
 //
 //   npx tsx tools/graphics/bundle-game.ts --out artifacts/graphics/press/game
@@ -163,9 +162,16 @@ async function found(tab, settleMs = 9000, whichYear = year) {
  */
 async function dismiss(tab) {
   if (!await tab.evaluate(() => document.documentElement.classList.contains('crossroad-open'))) return;
-  await tab.mouse.move(width / 2, height * 0.35);
+  // El deslizamiento sólo cuenta si empieza en la cabecera de la carta
+  // (`crossroad.ts`, `head` escucha `pointerdown`). Desde el rediseño la carta
+  // está más abajo, y arrastrar desde un punto fijo seleccionaba su texto en
+  // vez de cerrarla: así salieron los años 22 y 60 del crecimiento (27 sep).
+  const head = await tab.locator('.crossroad-head').boundingBox().catch(() => null);
+  const x = head === null ? width / 2 : head.x + head.width / 2;
+  const y = head === null ? height * 0.35 : head.y + head.height / 2;
+  await tab.mouse.move(x, y);
   await tab.mouse.down();
-  await tab.mouse.move(width / 2, height * 0.92, { steps: 12 });
+  await tab.mouse.move(x, Math.min(height - 4, y + height * 0.5), { steps: 12 });
   await tab.mouse.up();
   await tab.waitForTimeout(1200);
 }
@@ -370,7 +376,12 @@ if (want('annals')) {
 // ------------------------------------------------- la entrada desde lo alto
 if (want('entrada')) {
   const tab = await open();
-  await found(tab, 600);
+  await found(tab, 0);
+  // Jugar los años del campo «año» tarda, y el vuelo empieza cuando el menú
+  // se va: esperar un tiempo fijo fotografiaba el menú con «Founding…» (27 sep).
+  await tab.waitForFunction(() => !document.documentElement.classList.contains('title-open'),
+    { timeout: 90000, polling: 50 }).catch(() => {});
+  await tab.waitForTimeout(150);
   await shot(tab, 'entrada-alto', 'U-11 · el vuelo de entrada, desde lo alto');
   await tab.waitForTimeout(1200);
   await shot(tab, 'entrada-bajando', 'U-11 · bajando al valle');
@@ -580,8 +591,13 @@ if (want('estados')) {
   const tab = await open(`?debug=1&live=1&seed=${seed}&year=${year}&season=summer&crossroad=1`);
   await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 30000 }).catch(() => {});
   await tab.waitForTimeout(7000);
+  // La decisión abierta tapa la barra: se aparta primero (queda sellada) y el
+  // documento está al final de la crónica.
+  await dismiss(tab);
   await tab.locator('.ui-shell-nav button').nth(1).click().catch(() => {});
   await tab.waitForTimeout(1600);
+  await tab.locator('.chronicle-scrim').evaluate((el) => { el.scrollTop = el.scrollHeight; }).catch(() => {});
+  await tab.waitForTimeout(700);
   await shot(tab, 'sello-cronica', 'El documento sellado, al final de la crónica');
   await tab.close();
 }
@@ -597,9 +613,9 @@ if (want('lapidas')) {
     try {
       const tab = await open(`?debug=1&live=1&seed=${seed}&year=${year}&season=summer&ended=${cause}`);
       await tab.waitForTimeout(3000);
-      await shot(tab, `lapida-${cause}`, `${note}: la lápida y su inscripción`);
-      await tab.waitForTimeout(3200);
-      await shot(tab, `lapida-${cause}-cuentas`, `${note}: la hoja de cuentas`);
+      // Desde el rediseño la pantalla final abre ya en la hoja de cuentas: la
+      // segunda captura salía igual que ésta (27 sep).
+      await shot(tab, `lapida-${cause}`, `${note}: la pantalla final`);
       await tab.close();
     } catch (error) {
       console.log(`  ojo: lapida-${cause} no se pudo capturar: ${String(error).slice(0, 120)}`);
@@ -612,10 +628,13 @@ if (want('final')) {
   for (const cause of ['stormed', 'extinction']) {
     const tab = await open();
     await found(tab);
+    await dismiss(tab);
     await tab.evaluate((c) => window.__valleyEnd?.(c), cause).catch(() => {});
-    await tab.waitForTimeout(1200);
-    await shot(tab, `final-${cause}-lapida`, `El final (${cause}): la lápida grabándose`);
-    await tab.waitForTimeout(3200);
+    // El valle tomado se queda un instante a la vista antes de la hoja
+    // (`stormed-transition.ts`); las otras causas van directas.
+    await tab.waitForTimeout(250);
+    if (cause === 'stormed') await shot(tab, 'final-stormed-transicion', 'El final (valle tomado): el instante antes de la hoja');
+    await tab.waitForTimeout(4200);
     await shot(tab, `final-${cause}-cuentas`, `El final (${cause}): la hoja de cuentas`);
     await tab.locator('.epitaph-scrim, .epitaph-sheet').evaluate((el) => { el.scrollTop = 800; }).catch(() => {});
     await tab.waitForTimeout(700);
@@ -700,6 +719,16 @@ if (want('escenas')) {
       await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 30000 }).catch(() => {});
       await tab.waitForTimeout(9000);
       await dismiss(tab);
+      // De día y de cerca (27 sep): de lejos y al anochecer las diez escenas
+      // salían iguales —no se distinguía una riña de un buhonero—.
+      await atHour(tab);
+      await dismiss(tab);
+      for (let notch = 0; notch < 4; notch += 1) {
+        await tab.mouse.move(width / 2, height * 0.45);
+        await tab.mouse.wheel(0, -120);
+        await tab.waitForTimeout(120);
+      }
+      await tab.waitForTimeout(900);
       await bare(tab);
       await shot(tab, `escena-${id}`, note);
       await tab.waitForTimeout(6000);
@@ -872,15 +901,6 @@ if (want('raros')) {
       await tab.close();
     });
   }
-
-  // El render de respaldo, la puerta de vuelta al 2D.
-  await attempt('canvas', async () => {
-    const tab = await open('?render=canvas');
-    await found(tab);
-    await dismiss(tab);
-    await shot(tab, 'render-canvas', 'El render de respaldo en lienzo 2D (?render=canvas)');
-    await tab.close();
-  });
 
   // El banco de batallas: su aviso de carga, el panel plegado y desplegado, y la pelea.
   await attempt('banco', async () => {

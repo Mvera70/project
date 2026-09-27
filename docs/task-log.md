@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · La interfaz, archivada por versión
+
+`docs/interfaz/2026-09-27/`: 107 capturas del paquete de prensa (43 copiadas a
+`ui/`), con `tools/graphics/press-archive.py`. `press-kit.mjs` gana el grupo
+`raros` (carga, bienvenida, panel al tocar, caza, avisos, obras, banco de
+batallas) y arreglos que sólo se vieron mirando la hoja: la encrucijada se
+aparta desde su cabecera (arrastrar desde un punto fijo seleccionaba texto),
+la entrada espera a que se vaya el menú, la crónica sellada aparta antes la
+decisión, las escenas van de día y de cerca, y el final del valle tomado
+captura su transición. Tachadas por Vera: el render en lienzo y el letargo.
+**Queda**: el vuelo de entrada (necesita un valle de año 1 sin taller) y el
+cerco del año 40 de cerca.
+
 ## 27 sep 2026 · Las ramas perdidas, recogidas (v4.72)
 
 Inventario completo (ramas locales y remotas, worktrees, stash) con `git

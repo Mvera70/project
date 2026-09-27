@@ -45,6 +45,7 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `task-log.md` | **El cuaderno de tareas.** El punto exacto: en vuelo, cifras, abierto |
 | `plan-meta.md` | **El plan hacia la meta** (§1b), con prioridad, dificultad y agente |
 | `encargos-3d.md` | **Todo lo que el juego no enseña todavía**: mallas, animaciones y mecánicas sin representación, apuntado en la misma ronda en que se descubre |
+| `interfaz/` | **La interfaz, versión a versión**: una carpeta por fecha con todas las pantallas y estados del juego (skill `press-kit`), para comparar qué cambió |
 | `plan-arte-pendiente.md` | La cola del arte: cada crónica nueva trae aquí su imagen pedida |
 | `plan-audio.md` | **Inventario maestro de audio**: ambiente, interfaz, economía, hitos, fases y asedio. En curso |
 | `agents.md` | Cómo se delega y se audita |
