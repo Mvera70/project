@@ -1,0 +1,283 @@
+// El banco de batallas. 27 sep 2026.
+//
+// Vera: «un sandbox muy simple donde se puedan ver batallas y métricas en
+// directo … yo mismo quiero ver y probar cómo se reproduce el combate para
+// corregirlo: físicas, animaciones, gore». `?sandbox=battle` abre una villa
+// amurallada de verdad —la de la semilla 7 en el verano del año 60, la escena
+// de referencia del adarve (E3b)— con un asalto que llega hoy, y encima un
+// panel con los mandos y las cifras.
+//
+// **Es el combate del juego, no una copia.** No hay campo vacío porque el
+// combate lee la partida entera —los puestos salen de la muralla y el portón,
+// los asaltantes andan por las rutas de la villa—; lo que el banco cambia es
+// cuántos cuerpos hay a cada lado (`window.__valleyBattle`, en la capa de vida:
+// `garrisonAs` y sin el tope de `BAND_SHOWN`). El motor no sabe nada.
+//
+// **Y no guarda nunca**: la partida es efímera (`boot(…, { ephemeral: true })`),
+// porque en el móvil comparte navegador con la partida de verdad.
+//
+// Es una herramienta de taller: el texto va en español y no sale del banco de
+// plantillas, que es para lo que lee el jugador.
+
+import { MEANS_IDS, SCHEMA_VERSION, type MeansId } from '@engine/state';
+import { boot } from './app';
+import { giveNow, raidNow, stateAt } from './debug';
+import type { BattleStats } from '../render3d/renderer';
+
+export interface BattleSetup {
+  readonly seed: number;
+  readonly year: number;
+  readonly defenders: number;
+  readonly arm: 'bow' | 'spear';
+  readonly raiders: number;
+}
+
+/** Lo que pide la dirección, con valores por omisión que dan una batalla corta. */
+export function battleSetupFrom(search: string): BattleSetup {
+  const query = new URLSearchParams(search);
+  const number = (key: string, fallback: number, low: number, high: number): number => {
+    const value = Number(query.get(key));
+    return Number.isFinite(value) && query.get(key) !== null ? Math.max(low, Math.min(high, Math.round(value))) : fallback;
+  };
+  return {
+    seed: number('seed', 7, 1, 1_000_000),
+    year: number('year', 60, 1, 200),
+    defenders: number('defenders', 6, 0, 60),
+    arm: query.get('arm') === 'spear' ? 'spear' : 'bow',
+    raiders: number('raiders', 12, 1, 80),
+  };
+}
+
+/** La dirección que abre esta misma batalla. */
+export function battleUrl(setup: BattleSetup, path: string = location.pathname): string {
+  const query = new URLSearchParams({
+    sandbox: 'battle', seed: String(setup.seed), year: String(setup.year),
+    defenders: String(setup.defenders), arm: setup.arm, raiders: String(setup.raiders),
+  });
+  return `${path}?${query.toString()}`;
+}
+
+/** Cuánto tardó, en qué acabó y con qué cifras: lo que se copia para comparar. */
+export interface BattleSummary {
+  readonly setup: BattleSetup;
+  readonly seconds: number;
+  readonly outcome: string;
+  readonly defendersLost: number;
+  readonly raidersDown: number;
+  readonly arrowsLoosed: number;
+  readonly arrowHits: number;
+  readonly gateHits: number;
+  readonly gateBroken: boolean;
+  readonly entered: boolean;
+  readonly fps: number;
+  readonly physicsMs: number;
+}
+
+/** Las fases en que un asaltante ya no pelea. */
+const OUT = new Set(['down', 'gone', 'leaving']);
+
+/**
+ * El estado de la batalla a partir de las cifras. Puro, para poder probarlo:
+ * empieza cuando algún asaltante ha llegado (deja de estar `coming`) y acaba
+ * cuando no queda ninguno en pie y peleando, o cuando han entrado.
+ */
+export function battleOutcome(stats: BattleStats): 'waiting' | 'fighting' | 'held' | 'stormed' {
+  if (stats.raiders === 0) return 'waiting';
+  const arrived = Object.entries(stats.phases).some(([phase, count]) => phase !== 'coming' && count > 0);
+  if (!arrived) return 'waiting';
+  if (stats.defence?.gate?.entered === true) return 'stormed';
+  const fighting = Object.entries(stats.phases).reduce((sum, [phase, count]) => sum + (OUT.has(phase) ? 0 : count), 0);
+  return fighting === 0 ? 'held' : 'fighting';
+}
+
+export function openBattleSandbox(root: HTMLElement): void {
+  const setup = battleSetupFrom(location.search);
+  const state = stateAt({ seed: setup.seed, year: setup.year, season: 'summer' });
+  // Con qué se defienden: armas y arcos dados, como en la toma del asedio.
+  for (const means of ['arms', 'bows'] as const) {
+    if ((MEANS_IDS as readonly string[]).includes(means)) giveNow(state, means as MeansId);
+  }
+  raidNow(state, setup.raiders, true);
+  boot(root, {
+    schema: SCHEMA_VERSION, savedAtMs: Date.now(), state, decisions: [...state.history], archive: [],
+  }, { ephemeral: true });
+  // La interfaz del juego, fuera: la pantalla despejada de UI-V10.
+  document.documentElement.classList.add('bare');
+  const gate = state.buildings.find((building) => building.kind === 'gate' && building.lostTick === null);
+  mountPanel(setup, gate === undefined ? null : { x: gate.x + 0.5, y: gate.y + 0.5 });
+}
+
+function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): void {
+  const panel = document.createElement('aside');
+  panel.className = 'battle-sandbox';
+  panel.innerHTML = `
+    <style>
+      .battle-sandbox { position: fixed; top: calc(8px + env(safe-area-inset-top, 0px)); left: 8px; z-index: 50;
+        width: min(300px, calc(100vw - 16px)); max-height: calc(100vh - 16px); overflow: auto;
+        background: rgba(22, 20, 17, 0.82); color: #efe6d2; font: 12px/1.35 system-ui, sans-serif;
+        border-radius: 10px; padding: 10px 12px; box-shadow: 0 4px 18px rgba(0,0,0,.35); }
+      .battle-sandbox h1 { font-size: 13px; margin: 0 0 6px; display: flex; justify-content: space-between; align-items: center; }
+      .battle-sandbox h2 { font-size: 11px; margin: 10px 0 4px; text-transform: uppercase; letter-spacing: .06em; color: #c9b88f; }
+      .battle-sandbox label { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 3px 0; }
+      .battle-sandbox input, .battle-sandbox select { width: 72px; font: inherit; background: #2d2922; color: inherit;
+        border: 1px solid #5a5040; border-radius: 5px; padding: 3px 5px; }
+      .battle-sandbox button { font: inherit; background: #4a4131; color: inherit; border: 1px solid #6d6049;
+        border-radius: 6px; padding: 6px 8px; min-height: 32px; cursor: pointer; }
+      .battle-sandbox button[aria-pressed="true"] { background: #8a6d3b; border-color: #b8914a; }
+      .battle-sandbox .row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+      .battle-sandbox dl { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; margin: 0; }
+      .battle-sandbox dt { color: #cfc3a8; } .battle-sandbox dd { margin: 0; font-variant-numeric: tabular-nums; text-align: right; }
+      .battle-sandbox .outcome { font-weight: 600; }
+      .battle-sandbox.folded .body { display: none; }
+      .battle-sandbox .brief { margin: 0; color: #e8dcc0; font-variant-numeric: tabular-nums; }
+      .battle-sandbox:not(.folded) .brief { display: none; }
+      @media (max-width: 600px) { .battle-sandbox { width: calc(100vw - 16px); padding: 8px 10px; }
+        .battle-sandbox.folded { background: rgba(22, 20, 17, 0.7); } }
+    </style>
+    <h1><span>Banco de batallas</span><button type="button" data-act="fold" aria-label="Plegar">–</button></h1>
+    <p class="brief" data-brief></p>
+    <div class="body">
+      <h2>Batalla</h2>
+      <label>Defensores <input type="number" min="0" max="60" data-set="defenders" value="${setup.defenders}"></label>
+      <label>Arma <select data-set="arm"><option value="bow"${setup.arm === 'bow' ? ' selected' : ''}>Arco</option>
+        <option value="spear"${setup.arm === 'spear' ? ' selected' : ''}>Lanza</option></select></label>
+      <label>Asaltantes <input type="number" min="1" max="80" data-set="raiders" value="${setup.raiders}"></label>
+      <div class="row"><button type="button" data-act="launch">Lanzar asalto</button>
+        <button type="button" data-act="restart">Reiniciar</button></div>
+      <h2>Tiempo</h2>
+      <div class="row" data-group="time">
+        <button type="button" data-time="0">Pausa</button>
+        <button type="button" data-time="0.25">×¼</button>
+        <button type="button" data-time="1" aria-pressed="true">×1</button>
+        <button type="button" data-time="4">×4</button>
+      </div>
+      <h2>En directo</h2>
+      <dl data-live></dl>
+      <div class="row"><button type="button" data-act="copy">Copiar métricas</button></div>
+    </div>`;
+  document.body.append(panel);
+  const live = panel.querySelector<HTMLDListElement>('[data-live]')!;
+  const brief = panel.querySelector<HTMLParagraphElement>('[data-brief]')!;
+  const fold = panel.querySelector<HTMLButtonElement>('[data-act="fold"]')!;
+  // En un móvil el panel entero tapa media pantalla: empieza plegado, con el
+  // resumen de una línea, y se despliega con un toque.
+  if (window.matchMedia('(max-width: 600px)').matches) { panel.classList.add('folded'); fold.textContent = '+'; }
+
+  const read = (): BattleSetup => ({
+    ...setup,
+    defenders: Number(panel.querySelector<HTMLInputElement>('[data-set="defenders"]')!.value) || 0,
+    arm: panel.querySelector<HTMLSelectElement>('[data-set="arm"]')!.value === 'spear' ? 'spear' : 'bow',
+    raiders: Number(panel.querySelector<HTMLInputElement>('[data-set="raiders"]')!.value) || 1,
+  });
+  panel.addEventListener('click', (event) => {
+    const target = (event.target as HTMLElement).closest('button');
+    if (target === null) return;
+    const act = target.dataset['act'];
+    if (act === 'fold') { panel.classList.toggle('folded'); target.textContent = panel.classList.contains('folded') ? '+' : '–'; }
+    // Lanzar y reiniciar abren la batalla de nuevo: una partida limpia cada vez.
+    if (act === 'launch') location.assign(battleUrl(read()));
+    if (act === 'restart') location.reload();
+    if (act === 'copy') void copy(JSON.stringify(summary(), null, 2), target);
+    const time = target.dataset['time'];
+    if (time !== undefined) {
+      const value = Number(time);
+      window.__valleySpeed?.(value === 0 ? 0 : value >= 4 ? 4 : 1);
+      window.__valleyTimeScale?.(value > 0 && value < 1 ? value : 1);
+      for (const button of panel.querySelectorAll<HTMLButtonElement>('[data-time]')) {
+        button.setAttribute('aria-pressed', String(button === target));
+      }
+    }
+  });
+
+  // En cuanto el renderer está, se le dice la batalla y se mira al portón.
+  let told = false;
+  let frames = 0;
+  let fps = 0;
+  let lastFps = performance.now();
+  let startedAt: number | null = null;
+  let endedAt: number | null = null;
+  let last: BattleStats | null = null;
+  const countFrame = (): void => {
+    frames += 1;
+    const now = performance.now();
+    if (now - lastFps >= 1000) { fps = (frames * 1000) / (now - lastFps); frames = 0; lastFps = now; }
+    requestAnimationFrame(countFrame);
+  };
+  requestAnimationFrame(countFrame);
+
+  const summary = (): BattleSummary => {
+    const d = last?.defence ?? null;
+    return {
+      setup: read(),
+      seconds: startedAt === null ? 0 : Math.round(((endedAt ?? performance.now()) - startedAt) / 100) / 10,
+      outcome: last === null ? 'waiting' : battleOutcome(last),
+      defendersLost: d?.lost ?? 0,
+      raidersDown: d?.fallen ?? 0,
+      arrowsLoosed: d?.loosed ?? 0,
+      arrowHits: d?.hits ?? 0,
+      gateHits: d?.gate?.hits ?? 0,
+      gateBroken: d?.gate?.broken ?? false,
+      entered: d?.gate?.entered ?? false,
+      fps: Math.round(fps),
+      physicsMs: Math.round((last?.physics?.stepMsAverage ?? 0) * 100) / 100,
+    };
+  };
+
+  const OUTCOME: Readonly<Record<string, string>> = {
+    waiting: 'Esperando a la partida', fighting: 'Peleando', held: 'Aguantaron', stormed: 'Entraron',
+  };
+  const tick = (): void => {
+    if (!told && window.__valleyBattle !== undefined) {
+      window.__valleyBattle({ raiders: setup.raiders, hands: setup.defenders, arm: setup.arm });
+      if (gate !== null) window.__valleyLook?.(gate.x, gate.y);
+      told = true;
+    }
+    const stats = window.__valleyBattleStats?.() ?? null;
+    if (stats !== null) {
+      last = stats;
+      const outcome = battleOutcome(stats);
+      if (outcome !== 'waiting' && startedAt === null) startedAt = performance.now();
+      if ((outcome === 'held' || outcome === 'stormed') && endedAt === null) endedAt = performance.now();
+      if (outcome === 'fighting') endedAt = null;
+    }
+    const s = summary();
+    const physics = last?.physics ?? null;
+    const rows: [string, string][] = [
+      ['Estado', `<span class="outcome">${OUTCOME[s.outcome] ?? s.outcome}</span>`],
+      ['Duración', `${s.seconds.toFixed(1)} s`],
+      ['Defensores en pie', `${Math.max(0, (last?.garrison ?? 0) - s.defendersLost)} / ${last?.garrison ?? 0}`],
+      ['Asaltantes en pie', `${Math.max(0, (last?.raiders ?? 0) - s.raidersDown)} / ${last?.raiders ?? 0}`],
+      ['Bajas (def · asalt)', `${s.defendersLost} · ${s.raidersDown}`],
+      ['Flechas · aciertos', `${s.arrowsLoosed} · ${s.arrowHits} (${s.arrowsLoosed === 0 ? 0 : Math.round((100 * s.arrowHits) / s.arrowsLoosed)} %)`],
+      ['Portón', `${s.gateHits} / 60 golpes${s.gateBroken ? ' · roto' : ''}${s.entered ? ' · dentro' : ''}`],
+      ['FPS', `${s.fps}`],
+      ['Física por paso', physics === null ? 'arranca al llegar' : `${physics.stepMs.toFixed(2)} ms (media ${physics.stepMsAverage.toFixed(2)})`],
+      ['Cuerpos físicos', physics === null ? '—' : `${physics.bodies}`],
+      ['Cayendo (ragdoll)', physics === null ? '—' : `${physics.activeRagdolls} de ${physics.ragdolls} (tope 24)`],
+      ['Cascotes', physics === null ? '—' : `${physics.debris}`],
+      ['Llamadas de dibujo', `${last?.drawCalls ?? 0}`],
+      ['Triángulos', `${(last?.triangles ?? 0).toLocaleString('es-ES')}`],
+    ];
+    live.innerHTML = rows.map(([name, value]) => `<dt>${name}</dt><dd>${value}</dd>`).join('');
+    brief.textContent = `${OUTCOME[s.outcome] ?? s.outcome} · ${Math.max(0, (last?.garrison ?? 0) - s.defendersLost)} vs `
+      + `${Math.max(0, (last?.raiders ?? 0) - s.raidersDown)} · ${s.arrowsLoosed} flechas · portón ${s.gateHits}/60 · ${s.fps} fps`;
+  };
+  window.setInterval(tick, 250);
+}
+
+/** Al portapapeles; si el navegador no deja, se enseña para copiarlo a mano. */
+async function copy(text: string, button: HTMLElement): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = 'Copiado';
+  } catch {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.style.cssText = 'position:fixed;inset:10% 5%;z-index:60;font:11px monospace';
+    document.body.append(area);
+    area.select();
+    area.addEventListener('blur', () => area.remove());
+    button.textContent = 'Selecciónalo y cópialo';
+  }
+  window.setTimeout(() => { button.textContent = 'Copiar métricas'; }, 1600);
+}

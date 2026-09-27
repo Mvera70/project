@@ -183,10 +183,17 @@ function freshSeed(excluding: ReadonlySet<number> = new Set()): number {
  */
 const WHEEL_STEP = 1.18;
 
-export function boot(root: HTMLElement, save?: SaveFile): App {
+/**
+ * `ephemeral`: la partida no se guarda nunca. Lo usa el banco de batallas
+ * (`?sandbox=battle`), que monta una partida de prueba y no puede pisar la
+ * que el jugador tiene guardada en el mismo navegador.
+ */
+export function boot(root: HTMLElement, save?: SaveFile, options: { readonly ephemeral?: boolean } = {}): App {
   let state = save?.state ?? foundGame(freshSeed());
   const archive: ArchivedGame[] = save !== undefined ? [...save.archive] : [];
   let speed: Speed = 1;
+  // El banco de batallas (`?sandbox=battle`): la cámara lenta. El juego, 1.
+  let timeScale = 1;
   let lastFraction = 0;
   root.replaceChildren();
   root.className = 'valley-app';
@@ -1162,6 +1169,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // visibilitychange/pagehide saves between two batches.
   let savedAtOverride: number | null = null;
   const persist = (): void => {
+    if (options.ephemeral === true) return;
     // Freeze the value now, before either the live loop or "Begin again" can
     // mutate it, and serialize writes in request order. Two independent IDB
     // opens could otherwise let the final dead-village write land after the
@@ -1274,6 +1282,14 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
    * las cuatro maneras de acabar tienen cada una su lápida, y esperar a que un
    * valle se muera de cada una para fotografiarlas es esperar horas de reloj.
    */
+  /**
+   * El banco de batallas (`src/ui/sandbox.ts`): la velocidad y la cámara lenta
+   * desde fuera, porque el banco esconde la interfaz. El juego no los llama.
+   */
+  window.__valleySpeed = (value: Speed): void => { app.setSpeed(value); };
+  window.__valleyTimeScale = (value: number): void => { timeScale = Math.max(0.05, Math.min(1, value)); };
+  window.__valleyLook = (x: number, y: number): void => { backend.live.look(x, y); };
+
   window.__valleyEnd = (cause: string): void => {
     if (state.ended !== null) return;
     const known = (['extinction', 'abandoned', 'dispersed', 'stormed'] as const)
@@ -1413,7 +1429,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     if (state.tick % TIME.SAVE_EVERY_TICKS === 0) persist();
   };
   const beginLoop = (): void => {
-    loop = startLoop(() => speed, runTick, paint);
+    loop = startLoop(() => speed, runTick, paint, () => timeScale);
   };
 
   /**
@@ -1529,5 +1545,8 @@ declare global {
   interface Window {
     __valleyEnd?: (cause: string) => void;
     __valleyBurn?: () => { x: number; y: number } | null;
+    __valleySpeed?: (value: Speed) => void;
+    __valleyTimeScale?: (value: number) => void;
+    __valleyLook?: (x: number, y: number) => void;
   }
 }

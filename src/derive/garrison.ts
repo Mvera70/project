@@ -100,6 +100,20 @@ export function postsOf(state: GameState): Post[] {
 }
 
 /**
+ * La guarnición que pide el banco de batallas (`?sandbox=battle`, 27 sep 2026):
+ * los mismos puestos y en el mismo orden que la de verdad, pero con las manos y
+ * el arma que se elijan, sin el tope de `defenders` (§12). El portón se sigue
+ * sujetando con lanzas. **Sólo para el banco**: el juego usa `garrisonOf`.
+ */
+export function garrisonAs(state: GameState, hands: number, arm: Arm): Garrison {
+  const posts = postsOf(state)
+    .map((post): Post => post.on === 'gate' ? post : { ...post, arm })
+    .slice(0, Math.max(0, Math.floor(hands)));
+  if (posts.length === 0) return NOBODY;
+  return { manned: true, why: 'arrived', hands: posts.length, posts };
+}
+
+/**
  * La guarnición de hoy. Pura: lee el estado, no consume azar y no escribe nada.
  */
 export function garrisonOf(state: GameState): Garrison {

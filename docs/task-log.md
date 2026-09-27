@@ -1,5 +1,21 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · El banco de batallas (v4.69)
+
+`?sandbox=battle` → `src/ui/sandbox.ts`. `garrisonAs` (`derive/garrison.ts`),
+la opción `battle` de `createVillage` y `garrisonPlaces(…, chosen)` ponen los
+cuerpos pedidos a cada lado. Ganchos: `__valleyBattle`, `__valleyBattleStats`
+(renderer), `__valleySpeed`, `__valleyTimeScale` y `__valleyLook` (app). La
+cámara lenta es `startLoop(…, scale)`. `physics.ts` mide `stepMs` y su media.
+`boot(…, { ephemeral })` no guarda. Medido sin navegador
+(`tools/reports/battle-report.ts`, semilla 7/año 60): 6 contra 12 acaba en ~51 s
+de escena, 28 flechas, el portón cae a los 60 golpes y 2 defensores caen; 10
+contra 24 dispara 83 flechas y deja 22 asaltantes en el suelo; la física va a
+0,03–0,08 ms por paso. En el navegador sin GPU de las capturas (~1 fps) la
+semana se acaba antes de que lleguen: la batalla no se ve entera ahí, sí en un
+equipo normal. Captura del panel en móvil: `artifacts/graphics/env/sbmob2-small.png`.
+Prueba: `tests/fast/battle-sandbox.test.ts`. Skill: `.claude/skills/battle-sandbox/`.
+
 ## 27 sep 2026 · La documentación, al día (v4.68)
 
 - **`design.md`** v4.68: §1b (fases 3 y 4, fuego y gore), §6.7 (líder y la sala

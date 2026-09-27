@@ -76,6 +76,8 @@ import { stoneWork } from './life/resource-sites';
 import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
+import type { PhysicsSnapshot } from './life/physics';
+import { garrisonAs, type Arm } from '@derive/garrison';
 import { createHuntEncounter, type HuntEncounter, type HuntReport } from './life/hunt-encounter';
 import { createBear } from './life/bear';
 import { huntOpportunity, type HuntSpecies, type HuntWeapon } from '@engine/world/hunting';
@@ -1274,6 +1276,31 @@ export async function createGraphicsRenderer(
   let heldFlood: number | null = null;
   let flooding = 0;
   window.__valleyObserveLive = () => { observingLive = true; };
+  // El banco de batallas (`?sandbox=battle`, `src/ui/sandbox.ts`, 27 sep 2026):
+  // cuántos asaltantes y qué guarnición, y se rehace la jornada con ellos. Es
+  // la capa de vida la que los pone —`garrisonAs`, sin el tope de §12—; el
+  // motor sigue sin saber nada. `null` vuelve a lo que diga el motor.
+  let battleChoice: { raiders: number; hands: number; arm: Arm } | null = null;
+  window.__valleyBattle = (choice) => { battleChoice = choice; life = null; };
+  // Y lo que el banco enseña en directo, en una llamada ligera: sin posiciones
+  // en pantalla, que es lo caro de `__valleyLife`.
+  window.__valleyBattleStats = () => {
+    const info = renderer.info;
+    const raiders = life?.raiders ?? [];
+    const phases: Record<string, number> = {};
+    for (const raider of raiders) phases[raider.phase] = (phases[raider.phase] ?? 0) + 1;
+    return {
+      garrison: life?.manned.length ?? 0,
+      archers: life?.manned.filter(post => post.post.arm === 'bow').length ?? 0,
+      raiders: raiders.length,
+      phases,
+      defence: life?.defence ?? null,
+      physics: life?.physics?.stats ?? null,
+      drawCalls: info.render.calls,
+      triangles: info.render.triangles,
+      actors: cast.count,
+    };
+  };
   // Gancho de observación del rayo: cae uno en el centro de la vista. Los de
   // una tormenta caen donde quieren y duran medio segundo, así que esperarlos
   // para juzgar cómo se ven es imposible. En pausa se queda puesto (§11.4).
@@ -1470,6 +1497,9 @@ export async function createGraphicsRenderer(
           ragdollSeed: (id, bornAt, placement) => cast.captureRagdoll(id, bornAt, placement),
           ...(forcedVisits === null ? {} : { visits: forcedVisits, dealt: forcedDeal }),
           ...(heldSky === null ? {} : { sky: heldSky }),
+          ...(battleChoice === null ? {} : { battle: {
+            raiders: battleChoice.raiders, garrison: garrisonAs(shown, battleChoice.hands, battleChoice.arm),
+          } }),
         });
         if (denVisual !== null) world.remove(denVisual);
         denVisual = null;
@@ -2240,6 +2270,8 @@ declare global {
     __valleyHoldSky?: (kind: SkyKind | null) => void;
     __valleyHoldFlood?: (level: number | null) => void;
     __valleyVisit?: (kind?: HappeningId, dealt?: boolean) => void;
+    __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm } | null) => void;
+    __valleyBattleStats?: () => BattleStats;
   }
 }
 
@@ -2362,4 +2394,17 @@ function wadingCell(map: GameState['map'], x: number, z: number): boolean {
   if (x < 0 || z < 0 || x >= map.width || z >= map.height) return false;
   const t = map.terrain[Math.floor(z) * map.width + Math.floor(x)];
   return t === TERRAIN_CODE.ford || t === TERRAIN_CODE.water;
+}
+
+/** Lo que el banco de batallas lee en directo (`window.__valleyBattleStats`). */
+export interface BattleStats {
+  readonly garrison: number;
+  readonly archers: number;
+  readonly raiders: number;
+  readonly phases: Readonly<Record<string, number>>;
+  readonly defence: LifeVillage['defence'] | null;
+  readonly physics: PhysicsSnapshot['stats'] | null;
+  readonly drawCalls: number;
+  readonly triangles: number;
+  readonly actors: number;
 }

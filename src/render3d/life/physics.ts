@@ -147,6 +147,11 @@ export interface PhysicsSnapshot {
   readonly stats: {
     readonly steps: number; readonly bodies: number; readonly ragdolls: number;
     readonly activeRagdolls: number; readonly debris: number;
+    /**
+     * Lo que tardó el último paso de Rapier y su media móvil, en milisegundos.
+     * Lo lee el banco de batallas (`?sandbox=battle`); el juego no lo usa.
+     */
+    readonly stepMs: number; readonly stepMsAverage: number;
   };
 }
 
@@ -235,10 +240,15 @@ export async function createPhysics(land: Terrain, options: PhysicsOptions = {})
     return shown;
   }
 
+  let lastStepMs = 0;
+  let averageStepMs = 0;
   const api: Physics = {
     step(): void {
       if (disposed) return;
+      const started = performance.now();
       world.step(); steps += 1;
+      lastStepMs = performance.now() - started;
+      averageStepMs = steps === 1 ? lastStepMs : averageStepMs * 0.95 + lastStepMs * 0.05;
       for (const body of [...bodies]) if (body.ttlSteps !== null && steps - body.bornAt >= body.ttlSteps) body.remove();
       for (const entry of ragdolls.values()) if (!entry.sleeping
         && steps - entry.createdAt >= RAGDOLL_ACTIVE_STEPS) {
@@ -280,6 +290,7 @@ export async function createPhysics(land: Terrain, options: PhysicsOptions = {})
         steps, bodies: bodies.size + entries.reduce((sum, entry) => sum + entry.runtime.bodyCount, 0),
         ragdolls: entries.length, activeRagdolls: entries.filter((entry) => !entry.sleeping).length,
         debris: [...bodies].filter((body) => body.kind === 'debris').length,
+        stepMs: lastStepMs, stepMsAverage: averageStepMs,
       } };
     },
     clearBattle(): void {

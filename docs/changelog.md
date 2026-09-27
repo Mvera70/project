@@ -1,5 +1,23 @@
 # The Valley — Registro de cambios
 
+## v4.69 · 27 sep 2026 · El banco de batallas
+
+Vera: «un sandbox muy simple donde se puedan ver batallas y métricas en
+directo … yo mismo quiero ver y probar cómo se reproduce el combate para
+corregirlo». **`?sandbox=battle`** abre la villa amurallada de la semilla 7 en
+el año 60 con un asalto que llega hoy, sin la interfaz del juego. Un panel
+permite elegir los defensores, su arma (arco o lanza) y los asaltantes, lanzar
+y reiniciar, y cambiar el tiempo (pausa, ×¼ en cámara lenta, ×1, ×4). En
+directo enseña quién sigue en pie, las bajas, las flechas y su acierto, los
+golpes al portón, la duración, los FPS, los milisegundos de cada paso de
+Rapier, los cuerpos físicos y los ragdolls, las llamadas de dibujo y los
+triángulos, y copia las métricas para comparar. Funciona en el móvil. **Es el
+combate del juego**: el banco sólo cambia cuántos cuerpos hay a cada lado, en
+la capa de vida (`garrisonAs`, sin los topes de §12 ni de `BAND_SHOWN`), y el
+motor no se entera. **No guarda nunca** (`boot` efímero), para no pisar la
+partida del navegador. Con él, `tools/reports/battle-report.ts` —la misma
+batalla sin navegador— y la skill `battle-sandbox` para quien lo use o lo amplíe.
+
 ## v4.68 · 27 sep 2026 · La documentación, al día
 
 Lo pidió Vera: «restructuración y limpieza entera». Una auditoría de solo

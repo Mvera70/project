@@ -9,6 +9,7 @@ import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
 import { openTitle, type TitleChoice } from './ui/screens/title';
+import { openBattleSandbox } from './ui/sandbox';
 
 /**
  * U-10 · la partida con la que se arranca según lo elegido en el menú. Un
@@ -50,7 +51,11 @@ if (root) {
   const query = new URLSearchParams(window.location.search);
   const request = parseDebugRequest(window.location.search);
   const annals = query.get('annals');
-  if (annals !== null) {
+  if (query.get('sandbox') === 'battle') {
+    // El banco de batallas (`src/ui/sandbox.ts`, 27 sep 2026): una villa con
+    // un asalto que llega hoy, mandos y cifras en directo. Nunca guarda.
+    openBattleSandbox(root);
+  } else if (annals !== null) {
     // F3d · `?annals=3` abre el menú de inicio con **tres valles acabados en el
     // archivo**, que es la única forma de fotografiar el cronicón: el índice
     // sólo tiene algo que enseñar cuando alguien ha acabado varios, y eso son

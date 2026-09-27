@@ -9,6 +9,7 @@
 // una coma en `GameState`.
 
 import { skyAt, type SkyKind } from '../../derive/weather';
+import type { Garrison } from '@derive/garrison';
 import { homeRoutine, indoors, isNight, stepHome, type HomeRoutine } from './home';
 import { shelterUnder } from './decide';
 import { statureAt } from '../world/models';
@@ -441,6 +442,13 @@ export interface DayOptions {
   readonly dealt?: boolean;
   /** Gancho de observación: el cielo de hoy, en vez del de `skyAt` (`window.__valleyHoldSky`). */
   readonly sky?: SkyKind;
+  /**
+   * El banco de batallas (`?sandbox=battle`, 27 sep 2026): cuántos asaltantes
+   * salen —sin el tope de `BAND_SHOWN`— y qué guarnición sube, con sus manos y
+   * su arma. **Nunca lo pone el juego**: sólo el banco, para ver y corregir el
+   * combate con el número de cuerpos que se quiera.
+   */
+  readonly battle?: { readonly raiders: number; readonly garrison: Garrison };
   readonly land?: Terrain;
   /**
    * D2 · **El mundo físico, si quien llama ya lo tiene.**
@@ -769,7 +777,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // día que llegan, porque `garrisonOf` sólo los da entonces. Van después del
   // corazón a propósito: el corazón se calcula con los sitios de la aldea, y una
   // guardia en la muralla no es un sitio donde viva nadie.
-  const manned = garrisonPlaces(state, land, heart, shore, options.ground, options.walkwayOf, options.ringOf, options.rampartOf);
+  const manned = garrisonPlaces(state, land, heart, shore, options.ground, options.walkwayOf, options.ringOf, options.rampartOf,
+    options.battle?.garrison);
   places.push(...manned.map((post) => post.place));
   // **Y sólo cuentan los sitios de esta orilla.** El río no se cruza, así que un
   // sitio del otro lado no es un sitio para esta gente: dejar a alguien allí era
@@ -1103,7 +1112,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // no pasos.
   // D3 · la partida, si el motor dice que llegó esta semana. Se monta una vez
   // al abrir la jornada, como los animales: no se sortea cada paso.
-  const bandSize = raidToday(state);
+  const bandSize = raidToday(state) === 0 ? 0 : options.battle?.raiders ?? raidToday(state);
   // D3b · y si lo de hoy es un **asalto** —el motor lo marca cuando la partida
   // da para tomar el valle (B3)— vienen a por la puerta y no a mirarla.
   const assault = assaultToday(state);

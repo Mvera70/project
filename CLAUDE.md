@@ -129,6 +129,10 @@ npm run test:pwa     # instalable y sin conexión, sobre el build real
 npm run chronicle -- --seed 7 --years 60   # runner del hito 0
 npm run eligibility  # por qué medio catálogo no sale nunca
 npx tsx tools/reports/pace-report.ts       # la escalera del juego en horas de reloj a ×1
+# ?sandbox=battle   **el banco de batallas**: una villa con un asalto, mandos
+                     # (defensores, arma, asaltantes, ×¼…×4) y métricas en directo,
+                     # también en el móvil; no guarda nunca. Skill `battle-sandbox`,
+                     # y sin navegador: npx tsx tools/reports/battle-report.ts
 ```
 
 **El resto de las herramientas está en `tools/README.md`**, repartidas en seis

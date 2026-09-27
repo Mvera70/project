@@ -19,7 +19,7 @@
 // muralla porque le apetezca, y una aldea en paz no tiene puestos que ofrecer
 // porque `garrisonOf` no los da.
 
-import { garrisonOf, type Arm, type Post } from '@derive/garrison';
+import { garrisonOf, type Arm, type Garrison, type Post } from '@derive/garrison';
 import { bastionAccessOf } from '@derive/bastion-access';
 import { bastionWalkwayOf, type BastionWalkway } from '@derive/bastion-walkway';
 import type { ElevatedRing } from '@derive/elevated-ring';
@@ -155,8 +155,10 @@ export function garrisonPlaces(
   walkwayOf: WalkwaySelector = bastionWalkwayOf,
   ringOf?: RingSelector,
   rampartOf?: RampartSelector,
+  // El banco de batallas trae su propia guarnición (`garrisonAs`); el juego, no.
+  chosen?: Garrison,
 ): Manned[] {
-  const garrison = garrisonOf(state);
+  const garrison = chosen ?? garrisonOf(state);
   if (!garrison.manned) return [];
   const manned: Manned[] = [];
   const taken = new Set<number>();

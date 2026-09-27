@@ -30,6 +30,10 @@ export function startLoop(
   speed: () => Speed,
   step: () => void,
   paint: (fraction: number) => void,
+  // El banco de batallas frena el tiempo real que entra en el bucle: a 0,25
+  // todo va a un cuarto —cuerpos, animaciones, hora—, porque todo cuelga del
+  // tick y su fracción. El juego no lo toca: vale 1.
+  scale: () => number = () => 1,
 ): Loop {
   let frameId = 0;
   let previous: number | null = null;
@@ -47,7 +51,7 @@ export function startLoop(
       frameId = requestAnimationFrame(frame);
       return;
     }
-    const advanced = advanceAccumulator(remainder, now - previous, speed());
+    const advanced = advanceAccumulator(remainder, (now - previous) * scale(), speed());
     previous = now;
     remainder = advanced.remainderMs;
     for (let i = 0; i < advanced.ticks; i += 1) step();
