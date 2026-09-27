@@ -484,7 +484,7 @@ export interface GorgeRoads {
 }
 
 /** El puente de la garganta, en celdas: tablas, barandas y lo que sube sobre la senda. TUNE visual. */
-const BRIDGE = { deck: 0.05, over: 0.02, rail: 0.14, post: 0.04, margin: 0.12, ramp: 1.2, timber: '#6b4a2e', planks: '#8f6b45' } as const;
+const BRIDGE = { deck: 0.05, over: 0.12, arch: 0.3, rail: 0.14, post: 0.04, timber: '#6b4a2e', planks: '#8f6b45' } as const;
 
 /** Hasta dónde entra en el mapa y hasta dónde se aleja por fuera, en celdas. TUNE visual. */
 const ROAD_IN = 14;
@@ -516,36 +516,63 @@ export function buildGorgeRoads(
   const planks = new MeshStandardMaterial({ color: BRIDGE.planks, roughness: 0.9, metalness: 0 });
   const timber = new MeshStandardMaterial({ color: BRIDGE.timber, roughness: 0.9, metalness: 0 });
   const bridgeGeometries: BufferGeometry[] = [];
-  const bridgeAt = (from: { x: number; z: number; y: number }, to: { x: number; z: number; y: number }, floor: number): void => {
-    const dx = to.x - from.x, dz = to.z - from.z;
-    const span = Math.hypot(dx, dz) + BRIDGE.margin * 2;
-    const angle = Math.atan2(-dz, dx);
-    const at = { x: (from.x + to.x) / 2, z: (from.z + to.z) / 2 };
+  // El puente sigue la senda: un tablero por tramo, de muestra en muestra, en
+  // arco —sube de la cota del camino a un palmo sobre el agua y vuelve a
+  // bajar—, con baranda a los dos lados. Una tabla recta cruzaba en otra
+  // dirección que la senda y sus rampas salían torcidas (captura del 27 sep).
+  const plank = (from: Vector3, to: Vector3, width: number, thick: number, material: MeshStandardMaterial): Mesh => {
+    const run = to.clone().sub(from);
+    const piece = new Mesh(new BoxGeometry(run.length() + 0.02, thick, width), material);
+    piece.position.copy(from).add(to).multiplyScalar(0.5);
+    piece.quaternion.setFromUnitVectors(new Vector3(1, 0, 0), run.normalize());
+    return piece;
+  };
+  const bridgeAt = (samples: readonly { x: number; z: number; y: number }[], peak: number): void => {
     const bridge = new Group();
-    bridge.position.set(at.x, floor, at.z);
-    bridge.rotation.y = angle;
-    const deck = new Mesh(new BoxGeometry(span, BRIDGE.deck, ROAD_WIDTH + 0.12), planks);
-    deck.position.y = BRIDGE.over;
-    deck.castShadow = true;
-    bridge.add(deck);
-    // Las rampas: la senda va nivelada por la ladera y las tablas tienen que
-    // pasar por encima del agua, así que a cada lado baja una tabla inclinada
-    // hasta la cota de la senda. Sin ellas el puente flotaba sobre el camino.
-    for (const [end, y] of [[-1, from.y], [1, to.y]] as const) {
-      const drop = floor + BRIDGE.over - y;
-      const run = BRIDGE.ramp;
-      const ramp = new Mesh(new BoxGeometry(Math.hypot(run, drop), BRIDGE.deck, ROAD_WIDTH + 0.12), planks);
-      ramp.position.set(end * (span / 2 + run / 2), BRIDGE.over - drop / 2, 0);
-      ramp.rotation.z = -end * Math.atan2(drop, run);
-      bridge.add(ramp);
+    // Cuatro tablas por tramo de senda: con uno solo, el arco salía en pico.
+    const path: { x: number; z: number; y: number }[] = [];
+    for (let k = 0; k < samples.length - 1; k += 1) {
+      for (let n = 0; n < 4; n += 1) {
+        const a = samples[k]!, b = samples[k + 1]!, u = n / 4;
+        path.push({ x: a.x + (b.x - a.x) * u, z: a.z + (b.z - a.z) * u, y: a.y + (b.y - a.y) * u });
+      }
     }
-    for (const side of [-1, 1]) {
-      const rail = new Mesh(new BoxGeometry(span, 0.03, 0.03), timber);
-      rail.position.set(0, BRIDGE.over + BRIDGE.rail, side * (ROAD_WIDTH / 2 + 0.04));
-      bridge.add(rail);
-      for (const end of [-1, 1]) {
-        const post = new Mesh(new BoxGeometry(BRIDGE.post, BRIDGE.rail + BRIDGE.over, BRIDGE.post), timber);
-        post.position.set(end * (span / 2 - BRIDGE.post), (BRIDGE.rail + BRIDGE.over) / 2, side * (ROAD_WIDTH / 2 + 0.04));
+    path.push(samples[samples.length - 1]!);
+    // Y en planta, suavizado: la senda trae quiebros de muestra a muestra, y
+    // un puente de tablas no dobla en ángulo. Los estribos no se mueven.
+    for (let pass = 0; pass < 6; pass += 1) {
+      for (let k = 1; k < path.length - 1; k += 1) {
+        path[k] = { ...path[k]!, x: (path[k - 1]!.x + path[k]!.x * 2 + path[k + 1]!.x) / 4, z: (path[k - 1]!.z + path[k]!.z * 2 + path[k + 1]!.z) / 4 };
+      }
+    }
+    const last = path.length - 1;
+    const deckAt = path.map((p, k) => {
+      const t = k / last;
+      // Lo que sube sobre la recta entre los dos estribos, no sobre cada punto.
+      const base = path[0]!.y + (path[last]!.y - path[0]!.y) * t;
+      const rise = Math.min(BRIDGE.arch, Math.max(0, peak - base));
+      return new Vector3(p.x, Math.max(p.y, base + rise * Math.sin(Math.PI * t)), p.z);
+    });
+    const sideAt = (k: number): Vector3 => {
+      const a = deckAt[Math.max(0, k - 1)]!, b = deckAt[Math.min(last, k + 1)]!;
+      return new Vector3(-(b.z - a.z), 0, b.x - a.x).normalize().multiplyScalar(ROAD_WIDTH / 2 + 0.04);
+    };
+    for (let k = 0; k < last; k += 1) {
+      const deck = plank(deckAt[k]!, deckAt[k + 1]!, ROAD_WIDTH + 0.12, BRIDGE.deck, planks);
+      deck.castShadow = true;
+      bridge.add(deck);
+      for (const side of [-1, 1]) {
+        const up = new Vector3(0, BRIDGE.rail, 0);
+        const from = deckAt[k]!.clone().addScaledVector(sideAt(k), side).add(up);
+        const to = deckAt[k + 1]!.clone().addScaledVector(sideAt(k + 1), side).add(up);
+        bridge.add(plank(from, to, 0.03, 0.03, timber));
+      }
+    }
+    for (const k of [0, Math.floor(last / 2), last]) {
+      for (const side of [-1, 1]) {
+        const post = new Mesh(new BoxGeometry(BRIDGE.post, BRIDGE.rail, BRIDGE.post), timber);
+        post.position.copy(deckAt[k]!).addScaledVector(sideAt(k), side);
+        post.position.y += BRIDGE.rail / 2;
         bridge.add(post);
       }
     }
@@ -611,22 +638,26 @@ export function buildGorgeRoads(
       const x = p.x + s * ROAD_WIDTH * 0.5 * (0.5 + 0.5 * fadeAt(i));
       return [x, level[i]! + GROUND_BIAS + ROAD_LIFT, p.z];
     };
-    // Los tramos que caen dentro de una cascada, de uno en uno, con un margen
-    // a cada lado, y las tablas por encima de la roca más alta del tramo: la
-    // senda va nivelada y la ladera puede asomar por encima de ella.
+    // Los tramos que caen dentro de una cascada, con una muestra de margen a
+    // cada lado: ahí va el puente y **no** se pinta la senda, que tapaba el
+    // agua. El tablero sube hasta un palmo sobre la roca más alta del tramo.
+    const bridged = new Set<number>();
     for (let i = 0; i < count; i += 1) {
       if (!crossing(centre[i]!.x, centre[i]!.z)) continue;
       let j = i;
       while (j + 1 < count && crossing(centre[j + 1]!.x, centre[j + 1]!.z)) j += 1;
-      let floor = -Infinity;
-      for (let k = Math.max(0, i - 1); k <= Math.min(count, j + 1); k += 1) {
-        floor = Math.max(floor, level[k]! + ROAD_LIFT, raw[k]! + 0.06);
-      }
-      const a = Math.max(0, i - 1), b = Math.min(count, j + 1);
-      bridgeAt({ ...centre[a]!, y: GROUND_BIAS + level[a]! + ROAD_LIFT }, { ...centre[b]!, y: GROUND_BIAS + level[b]! + ROAD_LIFT }, GROUND_BIAS + floor);
+      const a = Math.max(0, i - 2), b = Math.min(count, j + 2);
+      // Un palmo sobre el agua que cruza, no sobre toda la ladera del tramo.
+      let peak = -Infinity;
+      for (let k = i; k <= j; k += 1) peak = Math.max(peak, GROUND_BIAS + raw[k]! + BRIDGE.over);
+      const path = [];
+      for (let k = a; k <= b; k += 1) path.push({ ...centre[k]!, y: GROUND_BIAS + level[k]! + ROAD_LIFT });
+      bridgeAt(path, peak);
+      for (let k = a; k < b; k += 1) bridged.add(k);
       i = j;
     }
     for (let i = 0; i < count; i += 1) {
+      if (bridged.has(i)) continue;
       const a = edge(i, -1), b = edge(i, 1), c = edge(i + 1, -1), d = edge(i + 1, 1);
       points.push(...a, ...c, ...b, ...b, ...c, ...d);
       const f0 = fadeAt(i), f1 = fadeAt(i + 1);

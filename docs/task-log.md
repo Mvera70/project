@@ -14,7 +14,11 @@ una cascada; `backdrop.ts` le pasa el corredor. La caída al lago usa
 (mezclaba carriles). **Roja de antes, no mía**: `graphics-world` «el agua es
 una lámina propia» (1630 ≠ 1296 vértices) viene del río nuevo de 224b4fc.
 Medido: aldea 11/21 a 357 llamadas (335 en `main` sin el agua nueva).
-**Queda**: verlo en un aparato real; la boca sólo se distingue de cerca.
+**Y el puente, rehecho** tras la captura de Vera («no está bien colocado y el
+agua sigue sin pasar»): ahora sigue la senda tramo a tramo en arco suave
+(`BRIDGE.arch`, suavizado en planta, estribos en la cota del camino) y la
+senda **no se pinta** bajo él, que era la franja de tierra que tapaba la
+cascada. **Queda**: verlo en un aparato real; la boca sólo se distingue de cerca.
 
 ## 27 sep 2026 · La interfaz, archivada por versión
 
