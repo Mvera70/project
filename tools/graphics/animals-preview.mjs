@@ -5,7 +5,7 @@ import {homedir} from 'node:os';
 import {pathToFileURL} from 'node:url';
 import {chromium} from '@playwright/test';
 const id=process.argv[2],dir='artifacts/graphics/G-23/delivery';mkdirSync(dir,{recursive:true});
-if(!['cow','pig','hen','wolf','crow','fish'].includes(id))throw Error('Id inválido');
+if(!['cow','pig','hen','wolf','crow','fish','deer'].includes(id))throw Error('Id inválido');
 const assets='public/assets/valley3d/',all=JSON.parse(readFileSync(assets+'manifest.json'));
 const manifest={...all,assets:all.assets.filter(a=>a.id===id)};
 const bytes=Object.fromEntries(manifest.assets.map(a=>[a.id,readFileSync(assets+a.file).toString('base64')]));

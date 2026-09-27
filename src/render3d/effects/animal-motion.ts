@@ -79,10 +79,11 @@ export class AnimalMotion {
     this.attack?.setLoop(LoopOnce, 1);
     if (this.attack !== undefined) this.attack.clampWhenFinished = true;
     const declaredStride = asset.motion.find(clip => clip.name === 'walk' || clip.name === 'hop')?.strideLength ?? 0.2;
-    // Los recursos antiguos del ciervo declaraban 0,2 celdas y ciclaban tan
-    // deprisa que las patas parecían fijas entre fotogramas. La receta nueva
-    // declara 0,55; este mínimo mantiene compatibles las partidas ya abiertas.
-    this.stride = kind === 'deer' ? Math.max(0.55, declaredStride) : declaredStride;
+    // La zancada es la que declara el clip, también la del ciervo. Hasta el 27
+    // sep se le imponía un mínimo de 0,55 celdas, que su pata (0,30 de largo)
+    // no podía dar: el casco patinaba. Su paso nuevo (`plant-gait.cjs`) planta
+    // el casco y declara lo que de verdad avanza, 0,333.
+    this.stride = declaredStride;
     this.phase = ((Math.imul(id, 2654435761) >>> 0) % 1000) / 1000;
   }
 

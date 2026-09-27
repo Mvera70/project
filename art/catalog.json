@@ -410,8 +410,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-23T08-46-13-774Z-11776",
-        "directory": "artifacts/graphics/G-33/approved/e17c6853030f962c"
+        "runId": "2026-09-27T18-16-23-788Z-35320",
+        "directory": "artifacts/graphics/G-33/approved/8f8e553a93e64c81"
       },
       "bounds": {
         "min": [
@@ -430,7 +430,7 @@
           0.279999
         ]
       },
-      "recipeSha256": "232D25AABE31E94191C0499D915A1DFF5BF55DCE5008FBA8E3C895AA92523532",
+      "recipeSha256": "0A9657137E0C7D09D92AA89E04454DEE4E29C7F78ECFEAB7A9CD37DA63858728",
       "materials": [
         "coat",
         "warm",
@@ -453,7 +453,7 @@
           "name": "walk",
           "seconds": 2.0416666666666665,
           "loop": true,
-          "strideLength": 0.2
+          "strideLength": 0.333
         }
       ],
       "connectors": [],
@@ -464,14 +464,14 @@
         "triangles": 2972
       },
       "hashes": {
-        "deer.blend": "DFAB7016CE246CF100DA122D4BE6C423C8EACD7B47B1B5E92D2673654F874ED8",
-        "deer.glb": "E17C6853030F962CA93A66B55B8032B17CB2215EDA98CA57EB29993E01ACD0F4",
-        "deer-blender.png": "92A6D00C7A186CC8CB5FBBDF3E211D6325A00B1E135C0756DE17280714013129",
-        "capture-1.png": "6BE994B66CBA29DF9976E98509FDAF7C63F16C6D601CE794495919CFF139C388",
-        "capture-1-gray.png": "DD3DC9CF5666FE85EA954F5CDF8EF88B8FCFB130920F50E820A2DABBB3468771",
-        "capture.json": "470DA68FF84BE9FED7AF17965FF55C00CA1E0F5861B2786A6778B01CDD04B641",
-        "build.json": "D05E0722AB3F459CD3F11B8E7882D2B3896754B47E60F7B03B83B20A98D6CCED",
-        "validation.json": "223C95D144F29128D21E033F45AD97DB2763847B27E93263087A7FAC6FD69211"
+        "deer.blend": "8A604227BE7E6D8C899652D4BD07D152C517A515BAE5B6B34484453B02D05E64",
+        "deer.glb": "8F8E553A93E64C81D31BE0025C1DBDA447F825A3CC9D0D06E353B4A4A538A176",
+        "deer-blender.png": "82A1E19C012F82A964E83D8D2C500AE8ACCC79D6880DCAF149E5A72057485F10",
+        "capture-1.png": "2CB6884DB41401FA6FED7C41EEA4FBF70CF695839C875142D1D42419CD6BDD27",
+        "capture-1-gray.png": "2DF1114DE99BFC9C94886350E4045FF1A306EB63AEC385B0B2D55A462B048D3B",
+        "capture.json": "ECFCD367751C511C245ED405D4E7D0B1AB931589DF34C16213E4660C4505C40A",
+        "build.json": "5039D764B7403F8FB53FD11B1D17D5A42CA9B4EC1B5E6664EAC2F3A5E9D16BB8",
+        "validation.json": "A4A8A1C058575316C22656872BC11E500CB85E910B7CC62459365343911748C6"
       },
       "provenance": {
         "kind": "original",
@@ -5850,16 +5850,11 @@
     },
     {
       "id": "bird",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/bird-candidate, rama art/astra-modelos, commit 350648d): golondrina en vuelo, alas en el hombro.",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/bird-candidate/bird.json",
       "generator": "art/recipes/bird-candidate/bird.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-bird",
         "directory": "artifacts/graphics/astra-bird/approved/bird"
@@ -5899,20 +5894,20 @@
       "hashes": {
         "bird.glb": "FEA81FB4848B8B179AE3B2BE7DA78E88F3710A1D5DA337BE3DF1FCCD4684FD71",
         "bird-preview.png": "4611888302197DC2A2CFB8E721C9B5D20770087BC4BD8AED32AA55C645CE6140"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/bird-candidate, rama art/astra-modelos, commit 350648d): golondrina en vuelo, alas en el hombro.",
+        "license": "project-original"
       }
     },
     {
       "id": "stall-pedlar",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/stall-pedlar-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/stall-pedlar-candidate/stall-pedlar.json",
       "generator": "art/recipes/stall-pedlar-candidate/stall-pedlar.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/stall-pedlar"
@@ -5956,20 +5951,20 @@
       "hashes": {
         "stall-pedlar.glb": "901642F9CA87C5E0BE15519EE3066F4365BEAFB039978092E950AFD341B9A3D8",
         "stall-pedlar-preview.png": "047BF0798CC888CB8F5F0BDB2477CA3195ABFF5F9B860B7D654B4152F88E33BA"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/stall-pedlar-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "stall-factor",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/stall-factor-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/stall-factor-candidate/stall-factor.json",
       "generator": "art/recipes/stall-factor-candidate/stall-factor.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/stall-factor"
@@ -6011,20 +6006,20 @@
       "hashes": {
         "stall-factor.glb": "BA4AF4A7B3AB5AB70D724DEB8623B43E5F9FCB75019CC7597EB30A819C70E63B",
         "stall-factor-preview.png": "8AC46014025FBE55334436F955D423ED7C7D546671757B450D37B170A1F9D407"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/stall-factor-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "stall-salter",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/stall-salter-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/stall-salter-candidate/stall-salter.json",
       "generator": "art/recipes/stall-salter-candidate/stall-salter.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/stall-salter"
@@ -6064,20 +6059,20 @@
       "hashes": {
         "stall-salter.glb": "C609F3A5BE13266FCA7651F182175CF7FFF81C1E930692542166CA1C3A4896CB",
         "stall-salter-preview.png": "7BD62E48BE9E35246C2C99FACAE17FDED66CCD5C3BC8960E9D481630B4900DB7"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/stall-salter-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "quarry-face-intact",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-intact-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/quarry-face-intact-candidate/quarry-face-intact.json",
       "generator": "art/recipes/quarry-face-intact-candidate/quarry-face-intact.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/quarry-face-intact"
@@ -6116,20 +6111,20 @@
       "hashes": {
         "quarry-face-intact.glb": "A55959AE9D6FCDED58E03394015F3E0E8F155E0461660EDF20183D63C074D18F",
         "quarry-face-intact-preview.png": "036AC7FE475BAC27AAECB34725A9EE0863AB14BA89DB9F92BD144D68DFC5B1A7"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-intact-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "quarry-face-mined",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-mined-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/quarry-face-mined-candidate/quarry-face-mined.json",
       "generator": "art/recipes/quarry-face-mined-candidate/quarry-face-mined.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/quarry-face-mined"
@@ -6168,20 +6163,20 @@
       "hashes": {
         "quarry-face-mined.glb": "EC953113434D0EE65173947031827834CC1B7E65E84D251CAFA9A46895A67A1A",
         "quarry-face-mined-preview.png": "AD01899FEBE4CB32BD8233A331303936B4942CE8A323EFA1319E14A35123EAC1"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-mined-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "quarry-face-exhausted",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-exhausted-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/quarry-face-exhausted-candidate/quarry-face-exhausted.json",
       "generator": "art/recipes/quarry-face-exhausted-candidate/quarry-face-exhausted.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/quarry-face-exhausted"
@@ -6220,20 +6215,20 @@
       "hashes": {
         "quarry-face-exhausted.glb": "AE47B3DD1C388783B824EAB1BCB5458E8605021B3C6BD7B30F30C2F4CADB47E6",
         "quarry-face-exhausted-preview.png": "80D979E64A48573DAF2620A3401375BBEED859A88C03DE0B670F42DBF16A1F36"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/quarry-face-exhausted-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "crag-1",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/crag-1-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/crag-1-candidate/crag-1.json",
       "generator": "art/recipes/crag-1-candidate/crag-1.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/crag-1"
@@ -6271,20 +6266,20 @@
       "hashes": {
         "crag-1.glb": "219D689B0BFDA2CDEC4BA8D7BAB8C28D3761CCA16263AB88D88B6053F2DBD4C4",
         "crag-1-preview.png": "C147A9CD09656508B55397DBEFCB6815D6683A58A5E0FA11B089DABA5CCFDA25"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-1-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "crag-2",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/crag-2-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/crag-2-candidate/crag-2.json",
       "generator": "art/recipes/crag-2-candidate/crag-2.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/crag-2"
@@ -6322,20 +6317,20 @@
       "hashes": {
         "crag-2.glb": "6629F65F716B2477F5C3AE37229708D35AB501251CFAEAA702E058941EEEE5CF",
         "crag-2-preview.png": "F48B8BD3AA63930EC9D8D1E779BE9E4780B4D91AF9AC8FB84838C2A0555AFCB5"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-2-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "crag-3",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/crag-3-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/crag-3-candidate/crag-3.json",
       "generator": "art/recipes/crag-3-candidate/crag-3.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/crag-3"
@@ -6373,20 +6368,20 @@
       "hashes": {
         "crag-3.glb": "D06A46492F56C1E141B325378D42B02AE98BCF6011667ECF1D14D5B34472BC40",
         "crag-3-preview.png": "20AA80971E7AC28719434C5F9ACC3CD2BA84D9FB1DD1EFCECA6C63E690443584"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-3-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "crag-4",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/crag-4-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/crag-4-candidate/crag-4.json",
       "generator": "art/recipes/crag-4-candidate/crag-4.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/crag-4"
@@ -6424,20 +6419,20 @@
       "hashes": {
         "crag-4.glb": "8E663EF5A6ACB595C26F0C502F49FE1C0003330355E06E4EF2B5BA08628B3176",
         "crag-4-preview.png": "C554BF475EEEFE143B927BBFC7E753CECD5275BC2B95169CB0625B6176A16FE2"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-4-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "crag-5",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/crag-5-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/crag-5-candidate/crag-5.json",
       "generator": "art/recipes/crag-5-candidate/crag-5.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/crag-5"
@@ -6475,20 +6470,20 @@
       "hashes": {
         "crag-5.glb": "862A95297E32637555AEA449F704426EC25A55247A3805C624A3CACF661B81C4",
         "crag-5-preview.png": "D3B5ADCB3BAD322BDCBEDCFFAF12B2418CAE3587B627DB878DF227A6DD934C1B"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/crag-5-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "cairn",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/cairn-candidate, rama art/astra-modelos, commit 8fc1826).",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/cairn-candidate/cairn.json",
       "generator": "art/recipes/cairn-candidate/cairn.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/cairn"
@@ -6526,20 +6521,20 @@
       "hashes": {
         "cairn.glb": "19D4CACDF6C319D9F146A00190514FB1FDF6DCE3EC0ABFACCD072BEC27FE94A7",
         "cairn-preview.png": "78FB6C53553A91913EE50F6C0EE27A8A86616635D32CEB914B19C9A5BB1C1D42"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/cairn-candidate, rama art/astra-modelos, commit 8fc1826).",
+        "license": "project-original"
       }
     },
     {
       "id": "hall",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/hall-candidate, rama art/astra-modelos, commit 725a512): casa larga medieval del líder, con hall_door.",
-        "license": "project-original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/hall-candidate/hall.json",
       "generator": "art/recipes/hall-candidate/hall.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "astra-models",
         "directory": "artifacts/graphics/astra-models/approved/hall"
@@ -6582,20 +6577,20 @@
       "hashes": {
         "hall.glb": "53C212439D616B9A699BA0A35C1C6D6CE1AE6DDD98F8A455E456C98E7BFF4940",
         "hall-preview.png": "3DD11C49E564E9FF810C8A570EF2409BF97774DEBBB91AE7F1350953884E5240"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Astra para The Valley (art/recipes/hall-candidate, rama art/astra-modelos, commit 725a512): casa larga medieval del líder, con hall_door.",
+        "license": "project-original"
       }
     },
     {
       "id": "gate-timber",
-      "blenderVersion": "5.2.1 LTS",
-      "provenance": {
-        "kind": "original",
-        "source": "Portón de madera G-24 aprobado previamente para The Valley; conservado para la empalizada.",
-        "license": "Project original"
-      },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "art/recipes/gate/gate.json",
       "generator": "art/recipes/gate/gate.json",
+      "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "G-24-timber",
         "directory": "artifacts/graphics/G-24-timber/approved/gate-timber"
@@ -6634,6 +6629,11 @@
       },
       "hashes": {
         "gate-timber.glb": "6A631196325241E1C6C6D53CDA4041D24DADCF6FC4FABF0C437F5CF4631FE679"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Portón de madera G-24 aprobado previamente para The Valley; conservado para la empalizada.",
+        "license": "Project original"
       }
     },
     {

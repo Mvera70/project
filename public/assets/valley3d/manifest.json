@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-27T11:11:10.931Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids great-oak",
+  "generatedAt": "2026-09-27T18:16:30.614Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids deer",
   "assets": [
     {
       "id": "axis-marker",
@@ -961,30 +961,6 @@
       }
     },
     {
-      "id": "deer",
-      "file": "deer.glb",
-      "sha256": "E17C6853030F962CA93A66B55B8032B17CB2215EDA98CA57EB29993E01ACD0F4",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4.041666666666667,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.0416666666666665,
-          "loop": true,
-          "strideLength": 0.2
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Original procedural stag modeled for The Valley on 23 Sep 2026; no external provider.",
-        "license": "Project original"
-      }
-    },
-    {
       "id": "rabbit",
       "file": "rabbit.glb",
       "sha256": "FBEA726A5B1F5251B8ADDBD4379A4C9D42F1762FD66B1012721D1428AF302EF6",
@@ -1547,6 +1523,30 @@
       "provenance": {
         "kind": "original",
         "source": "Modelo original de The Valley, fuente art/recipes/great-oak-candidate/build.py.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "deer",
+      "file": "deer.glb",
+      "sha256": "8F8E553A93E64C81D31BE0025C1DBDA447F825A3CC9D0D06E353B4A4A538A176",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4.041666666666667,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.0416666666666665,
+          "loop": true,
+          "strideLength": 0.333
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Original procedural stag modeled for The Valley on 23 Sep 2026; no external provider.",
         "license": "Project original"
       }
     }

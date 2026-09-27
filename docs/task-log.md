@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · El ciervo anda de verdad (v4.75)
+
+El GLB del ciervo era anterior a `repair-gait.cjs` (huella de receta `232D…`
+en el catálogo contra `970F…` en disco): las patas giraban sobre su Y local.
+Reconstruido con `npm run art -- all deer` + `publish-assets.ts --ids deer`.
+El paso, regenerado con `art/recipes/deer/plant-gait.cjs` (IK de dos huesos,
+casco plantado, `GAIT` en el guion); `animal-motion.ts` ya no fuerza la
+zancada mínima de 0,55 al ciervo. Pruebas: `animal-gait-axis.test.ts` añade el
+GLB publicado (eje y casco plantado). `animals-preview.mjs` admite `deer`.
+**Queda**: el oso de las recetas comparte rig, pero el oso del juego es el de
+Vera (nodos rígidos, `rigid-clips.mjs`), así que no se tocó.
+
 ## 27 sep 2026 · Las cascadas, blancas y con boca (v4.74)
 
 Sobre el agua de la otra sesión (`art/astra-modelos`, 9f3b929), juntado en

@@ -1,5 +1,25 @@
 # The Valley — Registro de cambios
 
+## v4.75 · 27 sep 2026 · El ciervo anda de verdad
+
+Vera: «la animación del ciervo al andar está rota: las patas siguen girando
+sobre sí mismas, se supone que se arregló en su día, y siguen pareciendo que
+deslizan». Dos causas, medidas en el GLB publicado. **Una: el arreglo nunca
+llegó al juego.** `repair-gait.cjs` corrigió la receta (flexionar sobre Z, no
+girar sobre el eje de la pierna), pero el GLB publicado era anterior —el
+catálogo guardaba la huella de la receta vieja— y la prueba sólo miraba la
+receta. **Dos: el paso era un péndulo.** Las patas iban adelante y atrás con el
+casco a ras de suelo todo el ciclo, así que apoyado iba tanto hacia delante
+como hacia atrás: patinaba el 99 %. Y se le imponía una zancada de 0,55 celdas
+que su pata, de 0,30, no podía dar. Ahora el paso se genera con el casco
+plantado (`art/recipes/deer/plant-gait.cjs`, cinemática inversa de dos
+huesos): apoyado retrocede en línea recta a la velocidad del cuerpo, en el aire
+vuelve levantado, la mano dobla hacia delante y la pata de atrás con el
+corvejón hacia atrás. Zancada real, 0,333. Patinado medido: del 99 % a menos
+del 15 %. **Y dos pruebas nuevas sobre el GLB publicado** —no giran sobre su
+eje, y el casco plantado va a la velocidad del cuerpo—, que fallan con el
+ciervo viejo.
+
 ## v4.74 · 27 sep 2026 · Las cascadas, blancas y con boca, y un puente
 
 Vera: «las cascadas y caídas de agua todavía no me convencen». Eran del color
