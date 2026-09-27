@@ -2,7 +2,7 @@
 // cadenas de llamadas que llevan a una función dada (27 sep 2026). Hace falta
 // el juego **sin minificar** para leer nombres:
 //   npx tsx tools/graphics/bundle-game.ts --no-minify --out artifacts/graphics/alive/unmin
-//   node tools/graphics/cpu-profile.mjs <valley.html> "<query>" <espera s> <perfil s> <función>
+//   node tools/graphics/performance/cpu-profile.mjs <valley.html> "<query>" <espera s> <perfil s> <función>
 // Con SwiftShader, «(program)» es el dibujo por software y ronda el 90 %: lo
 // que sirve es el reparto del resto.
 import { chromium } from '@playwright/test';

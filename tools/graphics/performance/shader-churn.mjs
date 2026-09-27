@@ -3,7 +3,7 @@
 // fiesta y al apagarla. Cada enlace de más es un tirón en una tablet: así se
 // vio que cambiar el número de luces puntuales recompilaba todos los
 // materiales (de 33 a 86 programas), que es lo que arregla `LightPool`.
-//   node tools/graphics/shader-churn.mjs <valley.html> "<query>"
+//   node tools/graphics/performance/shader-churn.mjs <valley.html> "<query>"
 import { chromium } from '@playwright/test';
 import { readdirSync } from 'node:fs';
 import { homedir } from 'node:os';
