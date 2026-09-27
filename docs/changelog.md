@@ -1,5 +1,32 @@
 # The Valley — Registro de cambios
 
+## v4.78 · 27 sep 2026 · Corredores geométricos de garganta
+
+Las fotos de tablet demostraron que v4.77 no bastaba: apoyar el eje de una
+senda o el tronco de un pino no protege su anchura. Se pidió sustituir los
+arreglos puntuales por reglas de espacio compartidas.
+
+- `gorgeRoadPaths` es el trazado común de senda y exclusión de pinos, dentro
+  y fuera del mapa. La cota protege ±0,36 y muestras intermedias; las copas
+  dejan libre el camino. En semillas 7/11/23/41, las muestras norte con roca
+  sobre el ancho pasaron de 21/15/21/23 a cero (déficit máximo previo 0,751).
+- La lámina de riada reserva también la montaña y sólo hunde su borde final
+  bajo el terreno. Una continuación exterior conserva el perfil de entrada,
+  además de compartir curso y flujo. En z=0 había 6 celdas de lámina interior
+  frente a 2 exteriores; ahora las alas exteriores completan las mismas 6,
+  con cota 0,122 a riada plena. La prueba compara perfiles en ambas salidas,
+  con y sin riada, sin fijar el número de vértices.
+- Los pinos se filtran por la geometría real del follaje transformado, sin
+  elevar troncos para esconder colisiones. El diagnóstico circular previo
+  señaló 7 posibles intrusiones entre 294 pinos; la prueba usa el GLB real.
+- La espuma queda dentro de la huella de agua, y el último tramo de cinta,
+  su pie para las salpicaduras y la poza suben juntos. En semilla 7 había
+  10 vértices de borde de poza sobre tierra seca con riada; ahora ninguno.
+
+Motor y guardados intactos; sólo presentación determinista. Vera no dispone
+del número de su valle: no se afirma reproducir su partida exacta. Evidencia
+en `artifacts/graphics/gorge/`, año 21, primavera, semillas 23 y 41, riada 0/1.
+
 ## v4.77 · 27 sep 2026 · La garganta con la riada: sendas, cauce, pinos y cascadas
 
 Capturas de Vera desde su tablet, con el río crecido: «con la riada las cascadas

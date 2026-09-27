@@ -1,7 +1,7 @@
 // El paisaje de fuera del mapa: bosque, cauce y suelo lejano. Es decorado;
 // ninguna de estas piezas entra en el motor ni altera una celda jugable.
 import {
-  BufferAttribute, BufferGeometry, Color, DoubleSide, Group, InstancedMesh,
+  Box3, BufferAttribute, BufferGeometry, Color, DoubleSide, Group, InstancedMesh,
   Matrix4, Mesh, MeshStandardMaterial, PlaneGeometry, Quaternion, Vector3,
   type Material, type Object3D,
 } from 'three';
@@ -12,9 +12,9 @@ import { GROUND_BIAS } from '../visual-config';
 import { piecesOf, tintFoliage } from './forest';
 import { buildRidge, exteriorWaterAt, ridgeAt, seasonRidge, SKIRT } from './ridge';
 import { liveWater, SHARED_WATER } from './water-surface';
-import { buildCairns, buildCrags, buildGorgeRoads, buildMountainSkin, MOUNTAIN_PEAK, mountainSurfaceAt, placeCrags, type RockModels } from './mountains';
+import { buildCairns, buildCrags, buildGorgeRoads, clearsGorgeRoad, gorgeRoadPaths, buildMountainSkin, MOUNTAIN_PEAK, mountainSurfaceAt, placeCrags, type RockModels } from './mountains';
 import { valleyAxis } from './valley-profile';
-import { FLOOD_RISE, elevationAt, floodReach } from './ground';
+import { FLOOD_RISE, elevationAt, floodReach, floodWaterLevelAt, waterCourseAt, waterFlowAt } from './ground';
 import { TERRAIN_CODE } from '@engine/state';
 import { riverExtensionAt, riverSection } from './river-extension';
 import { waterfallCorridorAt, waterfallSites } from './waterfalls';
@@ -51,6 +51,10 @@ function outerTrees(map: ValleyMap, seed: number, source: Object3D, palette: Pal
   const group = new Group();
   group.name = 'Valley_Backdrop_Forest';
   const places: { x: number; y: number; z: number; size: number; turn: number }[] = [];
+  const paths = gorgeRoadPaths(map, seed);
+  const bounds = new Box3().setFromObject(source);
+  const crownRadius = Math.hypot(Math.max(Math.abs(bounds.min.x), Math.abs(bounds.max.x)),
+    Math.max(Math.abs(bounds.min.z), Math.abs(bounds.max.z)));
   const band = PINE_BAND;
   for (let z = -band; z < map.height + band; z += 1) {
     for (let x = -band; x < map.width + band; x += 1) {
@@ -73,10 +77,12 @@ function outerTrees(map: ValleyMap, seed: number, source: Object3D, palette: Pal
       if (random(seed, x, z, 1) >= density) continue;
       const atX = px + (random(seed, x, z, 2) - 0.5) * 0.58;
       const atZ = pz + (random(seed, x, z, 3) - 0.5) * 0.58;
+      const size = 0.76 + random(seed, x, z, 4) * 0.54;
+      if (!clearsGorgeRoad(paths, atX, atZ, crownRadius * size)) continue;
       places.push({
         x: atX, z: atZ,
         y: ridgeAt(map, seed, atX, atZ),
-        size: 0.76 + random(seed, x, z, 4) * 0.54,
+        size,
         turn: random(seed, x, z, 5) * Math.PI * 2,
       });
     }
@@ -165,8 +171,11 @@ function outerWater(map: ValleyMap, seed: number, palette: Palette): Mesh | null
       // El centro conserva profundidad; las orillas usan el mismo gradiente
       // que el río del mapa para que la salida no cambie de material.
       shores.push(1, 0, 1);
-      flows.push(0, 0.6, 0, 0.6, 0, 0.6);
-      courses.push(-1, z, 0, z, 1, z);
+      const flow = waterFlowAt(map, z);
+      flows.push(flow.x, flow.z, flow.x, flow.z, flow.x, flow.z);
+      courses.push(waterCourseAt(map, section.left, z), z,
+        waterCourseAt(map, (section.left + section.right) * 0.5, z), z,
+        waterCourseAt(map, section.right, z), z);
       if (previous >= 0) {
         for (let lane = 0; lane < 2; lane += 1) {
           indices.push(previous + lane, at + lane, previous + lane + 1,
@@ -192,6 +201,65 @@ function outerWater(map: ValleyMap, seed: number, palette: Palette): Mesh | null
   const mesh = new Mesh(geometry, material);
   mesh.name = 'Valley_Backdrop_Water';
   mesh.receiveShadow = false;
+  return mesh;
+}
+
+/** Une las alas de la riada con el cauce estrecho de fuera del mapa. */
+function outerFloodMouth(map: ValleyMap, seed: number, material: MeshStandardMaterial): Mesh | null {
+  const reach = floodReach(map);
+  const positions: number[] = [], shores: number[] = [], flows: number[] = [], courses: number[] = [];
+  const indices: number[] = [];
+  for (const north of [true, false]) {
+    const edgeZ = north ? 0 : map.height;
+    const row = north ? 0 : map.height - 1;
+    const edge = riverSection(map, seed, edgeZ);
+    if (edge === null) continue;
+    for (const side of [-1, 1]) {
+      const bank = side < 0 ? edge.left : edge.right;
+      let width = 0;
+      while (width < map.width) {
+        const cellX = side < 0 ? bank - width - 1 : bank + width;
+        if (cellX < 0 || cellX >= map.width || reach[row * map.width + cellX]! < 1) break;
+        width += 1;
+      }
+      if (width === 0) continue;
+      let previous = -1;
+      for (let distance = 0; distance <= SKIRT - 4; distance += 1) {
+        const z = north ? -distance : map.height + distance;
+        const section = riverSection(map, seed, z)!;
+        const offset = (side < 0 ? section.left : section.right) - bank;
+        const start = positions.length / 3;
+        for (let lane = 0; lane <= width; lane += 1) {
+          const x = bank + side * lane + offset;
+          const edgeY = floodWaterLevelAt(map, bank + side * lane, edgeZ, reach);
+          const outerY = lane === width ? Math.min(GROUND_BIAS - 0.10,
+            GROUND_BIAS + ridgeAt(map, seed, x, z) - FLOOD_RISE - 0.015) : GROUND_BIAS - 0.10;
+          const t = Math.min(1, distance / 4);
+          positions.push(x, edgeY + (outerY - edgeY) * t * t * (3 - 2 * t), z);
+          shores.push(lane >= width - 1 ? 0.9 : 0);
+          const flow = waterFlowAt(map, Math.max(0, Math.min(map.height, z)));
+          flows.push(flow.x, flow.z);
+          courses.push(waterCourseAt(map, x - offset, edgeZ), z);
+          if (previous >= 0 && lane < width) {
+            const a = previous + lane, b = start + lane;
+            indices.push(a, b, a + 1, a + 1, b, b + 1);
+          }
+        }
+        previous = start;
+      }
+    }
+  }
+  if (indices.length === 0) return null;
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
+  geometry.setAttribute('waterShore', new BufferAttribute(new Float32Array(shores), 1));
+  geometry.setAttribute('waterFlow', new BufferAttribute(new Float32Array(flows), 2));
+  geometry.setAttribute('waterCourse', new BufferAttribute(new Float32Array(courses), 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  const mesh = new Mesh(geometry, material);
+  mesh.name = 'Valley_Backdrop_Flood_Mouth';
+  mesh.visible = false;
   return mesh;
 }
 
@@ -250,7 +318,11 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
     (x, z) => waterfallCorridorAt(falls, x, z));
   group.add(roads.mesh, roads.bridges);
   const water = outerWater(map, seed, palette);
-  if (water !== null) group.add(water);
+  const floodMouth = water === null ? null : outerFloodMouth(map, seed, water.material as MeshStandardMaterial);
+  if (water !== null) {
+    if (floodMouth !== null) water.add(floodMouth);
+    group.add(water);
+  }
   const forest = tree === undefined ? null : outerTrees(map, seed, tree, palette);
   if (forest !== null) group.add(forest.group);
   return {
@@ -271,6 +343,7 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
       // El río de fuera sube con el de dentro: si no, en la boca de la
       // garganta la lámina daba un escalón justo en el borde del mapa.
       if (water !== null) water.position.y = level * FLOOD_RISE;
+      if (floodMouth !== null) floodMouth.visible = level > 0.02;
     },
     dispose(): void {
       forest?.dispose();
@@ -282,7 +355,10 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
       const ridgeMaterial = ridge.material as MeshStandardMaterial;
       ridgeMaterial.map?.dispose();
       ridgeMaterial.dispose();
-      if (water !== null) { water.geometry.dispose(); (water.material as Material).dispose(); }
+      if (water !== null) {
+        floodMouth?.geometry.dispose();
+        water.geometry.dispose(); (water.material as Material).dispose();
+      }
       ground.geometry.dispose();
       (ground.material as Material).dispose();
       group.clear();

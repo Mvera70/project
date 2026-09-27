@@ -20,7 +20,7 @@ import { TERRAIN_CODE } from '@engine/state';
 import type { Palette } from '@derive/palette';
 import { forestLooks, type ForestState } from './forest-state';
 import { elevationAt } from './ground';
-import { mountainSurfaceAt } from './mountains';
+import { clearsGorgeRoad, gorgeRoadPaths, mountainSurfaceAt } from './mountains';
 import {
   forestOccluders, type ForestOccluder, type ForestRevealTarget,
 } from './forest-occlusion';
@@ -198,13 +198,76 @@ export function pineScaleAt(cell: number): number {
 }
 
 /**
+ * Comprueba la copa contra la superficie que se pinta, con la geometría real.
+ * Los vértices, puntos medios de arista y centros de triángulo evitan tratar la
+ * copa como un disco lleno: sólo se omiten pinos cuya hoja atraviesa la roca.
+ */
+interface PineGeometryProfile {
+  readonly foliage: readonly Vector3[];
+  readonly radius: number;
+}
+
+function pineGeometryProfile(pine: Object3D): PineGeometryProfile {
+  const foliage: Vector3[] = [];
+  let radius = 0;
+  pine.updateMatrixWorld(true);
+  pine.traverse(object => {
+    const mesh = object as Object3D & { isMesh?: boolean; geometry?: BufferGeometry; material?: Material | Material[] };
+    if (mesh.isMesh !== true || mesh.geometry === undefined || mesh.material === undefined) return;
+    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    if (!materials.some(material => material.name.includes('leaf'))) return;
+    const position = mesh.geometry.getAttribute('position');
+    const index = mesh.geometry.getIndex();
+    const vertex = (slot: number): Vector3 => new Vector3(
+      position.getX(index === null ? slot : index.getX(slot)),
+      position.getY(index === null ? slot : index.getX(slot)),
+      position.getZ(index === null ? slot : index.getX(slot)),
+    ).applyMatrix4(mesh.matrixWorld);
+    const count = index === null ? position.count : index.count;
+    for (let first = 0; first + 2 < count; first += 3) {
+      const a = vertex(first), b = vertex(first + 1), c = vertex(first + 2);
+      foliage.push(a, b, c,
+        a.clone().add(b).multiplyScalar(0.5),
+        b.clone().add(c).multiplyScalar(0.5),
+        c.clone().add(a).multiplyScalar(0.5),
+        a.clone().add(b).add(c).multiplyScalar(1 / 3));
+      radius = Math.max(radius, Math.hypot(a.x, a.z), Math.hypot(b.x, b.z), Math.hypot(c.x, c.z));
+    }
+  });
+  return { foliage, radius };
+}
+
+function pineClearsMountain(map: ValleyMap, profile: PineGeometryProfile, cell: number): boolean {
+  const at = scatterTransform(map.width, cell);
+  const scale = at.scale * pineScaleAt(cell);
+  const base = mountainSurfaceAt(map, at.x, at.z);
+  const cosine = Math.cos(at.facing), sine = Math.sin(at.facing);
+  if (profile.foliage.length === 0) return false;
+  return profile.foliage.every(point => {
+    const worldX = at.x + (point.x * cosine + point.z * sine) * scale;
+    const worldZ = at.z + (-point.x * sine + point.z * cosine) * scale;
+    return base + point.y * scale + 1e-4 >= mountainSurfaceAt(map, worldX, worldZ);
+  });
+}
+
+function selectedPineCells(map: ValleyMap, pine: Object3D, terrainSeed?: number): number[] {
+  const profile = pineGeometryProfile(pine);
+  const paths = terrainSeed === undefined ? [] : gorgeRoadPaths(map, terrainSeed);
+  return [...pineCells(map)].filter(cell => {
+    const at = scatterTransform(map.width, cell);
+    return pineClearsMountain(map, profile, cell)
+      && clearsGorgeRoad(paths, at.x, at.z, profile.radius * at.scale * pineScaleAt(cell));
+  });
+}
+
+/**
  * Planta un árbol en cada celda de bosque del mapa.
  *
  * Se rehace cuando el suelo cambia, que es cuando alguien tala: unas pocas veces
  * al año, no sesenta veces por segundo.
  */
 export function buildForest(
-  state: ForestState,
+  state: ForestState & { readonly terrainSeed?: number },
   tree: Object3D,
   palette?: Palette,
   suppressed: ReadonlySet<number> = new Set(),
@@ -234,7 +297,7 @@ export function buildForest(
   // Y los pinos, en la loma, con su tamaño propio. No dependen de `forestLooks`
   // —no son bosque que se tale— así que su escala es sólo la del pino.
   const conifers = pine === undefined ? null : scatterCells(state.map, pine,
-    [...pineCells(state.map)], palette, false, false,
+    selectedPineCells(state.map, pine, state.terrainSeed), palette, false, false,
     (cell) => pineScaleAt(cell));
   const group = conifers === null ? scattered.group : new Group();
   if (conifers !== null) { group.name = 'Valley_Forest'; group.add(scattered.group, conifers.group); }

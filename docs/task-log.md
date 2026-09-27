@@ -1,5 +1,35 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · Corredores de garganta (v4.78)
+
+Reglas: **un trazado compartido, la senda libre en toda su anchura, las copas
+fuera de roca y camino, la riada continua a ambos lados del mapa y la cascada
+unida a su agua receptora**. Implementación limitada a `world/mountains.ts`,
+`backdrop.ts`, `ground.ts`, `forest.ts` y `waterfalls.ts`; sin tocar el motor.
+`gorgeRoadPaths`/`clearsGorgeRoad` comparten la reserva entre la senda y los
+pinos. `floodReach` incluye la montaña como soporte oculto de agua; el borde
+terminal se hunde según el relieve y las alas exteriores continúan el perfil.
+
+Medidas en 7/11/23/41: senda norte, 21/15/21/23 muestras bajo roca a ±0,36 → 0;
+máximo previo 0,751 celdas. Agua en z=0: cota igual antes y después (0,122 con
+riada), anchura total interior/exterior 6/2 → 6/6. Copas: diagnóstico conservador
+7/294 sospechosas, peor intrusión 1,829; el filtro y la prueba posteriores usan
+triángulos reales del GLB. Pozas: 10/1/0/6 vértices sobre terreno seco con
+riada → 0/0/0/0. No confundir sospechas de envolvente circular con penetraciones
+exactas del GLB.
+
+Pruebas nuevas: `gorge-corridors.test.ts` (senda y cascada),
+`gorge-water.test.ts` (perfiles de ambas salidas) y `gorge-pines.test.ts`
+(instancias reales de pinos y camino libre). Capturas antes/después en
+`artifacts/graphics/gorge/`, semillas 23 y 41, año 21, primavera, riada 0/1;
+medidas por muestra en `road-before.json` y `road-after.json`.
+**Limitación:** Vera no conoce el número de su valle; se reprodujeron los
+defectos en otras semillas, no su partida guardada. Pendiente comprobarlo en
+su tablet. **Puerta verde:** typecheck, lint, pruebas focales y `npm test`: 201
+archivos, 2.006 pruebas, 192,37 s. Las ocho capturas se abrieron y revisaron;
+comparativa en `artifacts/graphics/gorge/index.html`. Trabajo sobre el worktree
+de `main` (base 461b939); la carpeta principal sigue en `art/astra-modelos`.
+
 ## 27 sep 2026 · La garganta con la riada (v4.77)
 
 `forest.ts`: `position.y = mountainSurfaceAt` en `scatterCells`. `ground.ts`:

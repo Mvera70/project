@@ -429,10 +429,12 @@ export function buildWaterfalls(map: ValleyMap, seed: number, heightAt: (x: numb
   const mistTexture = veilTexture();
   const mistMaterial = mistTexture === null ? null
     : new SpriteMaterial({ map: mistTexture, color: '#eef6f7', transparent: true, depthWrite: false, opacity: 0 });
-  const veils: { sprite: Sprite; foot: { x: number; y: number; z: number }; phase: number; ox: number; oz: number; rises: boolean }[] = [];
+  const veils: { sprite: Sprite; foot: { x: number; y: number; z: number }; phase: number; ox: number; oz: number }[] = [];
   const pools: { mesh: Mesh; base: number }[] = [];
+  const risingRibbons: { geometry: BufferGeometry; base: Float32Array }[] = [];
+  const risingFeet: { foot: { x: number; y: number; z: number }; base: number }[] = [];
   let floodLift = 0;
-  const veilsAt = (at: { x: number; y: number; z: number }, count: number, tag: string, rises = false): void => {
+  const veilsAt = (at: { x: number; y: number; z: number }, count: number, tag: string): void => {
     if (mistMaterial === null) return;
     for (let n = 0; n < count; n += 1) {
       const sprite = new Sprite(mistMaterial.clone());
@@ -440,11 +442,27 @@ export function buildWaterfalls(map: ValleyMap, seed: number, heightAt: (x: numb
       sprite.renderOrder = 4;
       feetGroup.add(sprite);
       const k = `${tag}:${feet.length}:${n}`;
-      veils.push({ sprite, foot: at, phase: n / count, ox: (unit(seed, `mist:x:${k}`) - 0.5) * 0.5, oz: (unit(seed, `mist:z:${k}`) - 0.5) * 0.5, rises });
+      veils.push({ sprite, foot: at, phase: n / count, ox: (unit(seed, `mist:x:${k}`) - 0.5) * 0.5, oz: (unit(seed, `mist:z:${k}`) - 0.5) * 0.5 });
     }
   };
   const settleFoot = (foot: { x: number; y: number; z: number }, kind: Site['kind']): void => {
-    const pool = new Mesh(new CircleGeometry(POOL_RADIUS[kind], 24), poolMaterial);
+    // La espuma ocupa agua, nunca el disco ideal que invade la ribera.
+    // Cada radio termina antes del primer contacto con la superficie real.
+    const geometry = new CircleGeometry(POOL_RADIUS[kind], 48);
+    const rim = geometry.getAttribute('position');
+    const water = kind === 'gorge' ? -0.10 : -0.23;
+    for (let vertex = 1; vertex < rim.count; vertex += 1) {
+      const dx = rim.getX(vertex), dz = -rim.getY(vertex);
+      let fraction = 0;
+      for (let step = 1; step <= 32; step += 1) {
+        const t = step / 32;
+        if (mountainSurfaceAt(map, foot.x + dx * t, foot.z + dz * t) >= water - 0.015) break;
+        fraction = t;
+      }
+      rim.setXYZ(vertex, dx * fraction, -dz * fraction, 0);
+    }
+    geometry.computeBoundingSphere();
+    const pool = new Mesh(geometry, poolMaterial);
     pool.name = 'Valley_WaterfallPool';
     pool.rotation.x = -Math.PI / 2;
     pool.position.set(foot.x, GROUND_BIAS + foot.y + 0.015, foot.z);
@@ -452,8 +470,11 @@ export function buildWaterfalls(map: ValleyMap, seed: number, heightAt: (x: numb
     feetGroup.add(pool);
     geometries.push(pool.geometry);
     // El lago no crece con la riada; el río sí, y la poza con él.
-    if (kind === 'gorge') pools.push({ mesh: pool, base: pool.position.y });
-    veilsAt(foot, MIST.veils, 'foot', kind === 'gorge');
+    if (kind === 'gorge') {
+      pools.push({ mesh: pool, base: pool.position.y });
+      risingFeet.push({ foot, base: foot.y });
+    }
+    veilsAt(foot, MIST.veils, 'foot');
   };
   const feet: { x: number; y: number; z: number }[] = [];
   const geometries: BufferGeometry[] = [];
@@ -565,6 +586,7 @@ export function buildWaterfalls(map: ValleyMap, seed: number, heightAt: (x: numb
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
     geometries.push(geometry);
+    risingRibbons.push({ geometry, base: new Float32Array(positions) });
     const mesh = new Mesh(geometry, material);
     mesh.name = 'Valley_Waterfall';
     mesh.renderOrder = 2;
@@ -588,15 +610,30 @@ export function buildWaterfalls(map: ValleyMap, seed: number, heightAt: (x: numb
       // del choque; los cuatro de un pie van desfasados un cuarto de vuelta.
       for (const veil of veils) {
         const life = ((time.value / FLOW) / MIST.seconds + veil.phase) % 1;
-        veil.sprite.position.set(veil.foot.x + veil.ox, veil.foot.y + (veil.rises ? floodLift : 0) + 0.12 + life * MIST.rise, veil.foot.z + veil.oz);
+        veil.sprite.position.set(veil.foot.x + veil.ox, veil.foot.y + 0.12 + life * MIST.rise, veil.foot.z + veil.oz);
         const size = MIST.size + life * MIST.grow;
         veil.sprite.scale.set(size, size * 0.8, 1);
         (veil.sprite.material as SpriteMaterial).opacity = MIST.opacity * (1 - life) * Math.min(1, life * 6);
       }
     },
     flood(level): void {
+      if (floodLift === level * FLOOD_RISE) return;
       floodLift = level * FLOOD_RISE;
       for (const pool of pools) pool.mesh.position.y = pool.base + floodLift;
+      for (const entry of risingFeet) entry.foot.y = entry.base + floodLift;
+      // El último tramo acompaña al agua receptora: la poza y la cinta
+      // comparten el mismo pie incluso durante la transición de la riada.
+      for (const ribbon of risingRibbons) {
+        const position = ribbon.geometry.getAttribute('position') as BufferAttribute;
+        const progress = ribbon.geometry.getAttribute('fallProgress');
+        for (let vertex = 0; vertex < position.count; vertex += 1) {
+          const t = Math.max(0, (progress.getX(vertex) - 0.65) / 0.35);
+          position.setY(vertex, ribbon.base[vertex * 3 + 1]! + floodLift * t * t * (3 - 2 * t));
+        }
+        position.needsUpdate = true;
+        ribbon.geometry.computeVertexNormals();
+        ribbon.geometry.computeBoundingSphere();
+      }
     },
     dispose(): void {
       for (const geometry of geometries) geometry.dispose();

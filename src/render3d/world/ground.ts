@@ -521,14 +521,6 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
   const indices = new Uint32Array(cells.length * 12);
   const river = new Color(palette.water);
   const lake = new Color(palette.lake);
-  const left = new Float32Array(map.height).fill(map.width);
-  const right = new Float32Array(map.height);
-  for (const cell of cells) {
-    if (map.terrain[cell] === TERRAIN_CODE.lake) continue;
-    const row = Math.floor(cell / map.width), x = cell % map.width;
-    left[row] = Math.min(left[row]!, x);
-    right[row] = Math.max(right[row]!, x + 1);
-  }
   for (let index = 0; index < cells.length; index += 1) {
     const cell = cells[index] ?? 0;
     const isLake = map.terrain[cell] === TERRAIN_CODE.lake;
@@ -550,17 +542,12 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
       colours[at + 2] = isLake ? lake.b / river.b : 1;
       const point = points[vertex];
       shores[corner + vertex] = point === undefined ? 0 : shoreAt(map, point[0], point[1]);
-      const flow = isLake ? { x: 0, z: 0 } : flowAt(map, point?.[1] ?? z + 0.5);
+      const flow = isLake ? { x: 0, z: 0 } : waterFlowAt(map, point?.[1] ?? z + 0.5);
       flows[(corner + vertex) * 2] = flow.x;
       flows[(corner + vertex) * 2 + 1] = flow.z;
       // Coordenada continua a través de TODO el ancho del río. No depende de
       // qué celda está dibujando la copia de este vértice compartido.
-      const row = Math.max(0, Math.min(map.height - 1, moved[vertex]!.z - 0.5));
-      const lo = Math.floor(row), hi = Math.min(map.height - 1, lo + 1), blend = row - lo;
-      const bankLeft = left[lo]! * (1 - blend) + left[hi]! * blend;
-      const bankRight = right[lo]! * (1 - blend) + right[hi]! * blend;
-      courses[(corner + vertex) * 2] = isLake ? 0
-        : (moved[vertex]!.x - (bankLeft + bankRight) * 0.5) / Math.max(0.5, (bankRight - bankLeft) * 0.5);
+      courses[(corner + vertex) * 2] = isLake ? 0 : waterCourseAt(map, moved[vertex]!.x, moved[vertex]!.z);
       courses[(corner + vertex) * 2 + 1] = moved[vertex]!.z;
     }
     for (let edge = 0; edge < 4; edge += 1) {
@@ -625,10 +612,30 @@ function shoreAt(map: ValleyMap, x: number, z: number): number {
  * desde la cámara de reposo se lee como corriente y no como rápido.
  */
 const RIVER_SPEED = 0.6;
-function flowAt(map: ValleyMap, z: number): { x: number; z: number } {
+export function waterFlowAt(map: ValleyMap, z: number): { x: number; z: number } {
   const bend = (valleyAxis(map, Math.min(map.height - 1, z + 1)) - valleyAxis(map, Math.max(0, z - 1))) / 2;
   const length = Math.hypot(bend, 1);
   return { x: (bend / length) * RIVER_SPEED, z: RIVER_SPEED / length };
+}
+
+/** Coordenada de cauce compartida por el agua interior y sus dos salidas. */
+export function waterCourseAt(map: ValleyMap, x: number, z: number): number {
+  const row = Math.max(0, Math.min(map.height - 1, z - 0.5));
+  const lo = Math.floor(row), hi = Math.min(map.height - 1, lo + 1), blend = row - lo;
+  const banks = (at: number): { left: number; right: number } => {
+    let left: number = map.width, right = 0;
+    for (let col = 0; col < map.width; col += 1) {
+      const t = map.terrain[at * map.width + col];
+      if (t !== TERRAIN_CODE.water && t !== TERRAIN_CODE.ford) continue;
+      left = Math.min(left, col);
+      right = Math.max(right, col + 1);
+    }
+    return { left, right };
+  };
+  const a = banks(lo), b = banks(hi);
+  const left = a.left * (1 - blend) + b.left * blend;
+  const right = a.right * (1 - blend) + b.right * blend;
+  return (x - (left + right) * 0.5) / Math.max(0.5, (right - left) * 0.5);
 }
 
 /**
@@ -640,25 +647,26 @@ function flowAt(map: ValleyMap, z: number): { x: number; z: number } {
  * se inunda, lo decide el relieve.
  */
 const FLOOD_REACH = 2;
-/** Lo que se hunde el borde de la lámina de la riada, en celdas. TUNE visual. */
-const FLOOD_SINK = 0.35;
-
-/** Si una esquina toca alguna celda fuera de lo que la riada cubre. */
-function floodRim(map: ValleyMap, reach: Int8Array, x: number, z: number): boolean {
-  for (const [dx, dz] of [[-1, -1], [0, -1], [-1, 0], [0, 0]] as const) {
-    const cx = x + dx, cz = z + dz;
-    if (cx < 0 || cz < 0 || cx >= map.width || cz >= map.height) continue;
-    if (reach[cz * map.width + cx] === -1) return true;
-  }
-  return false;
-}
 /** Cuánto sube el agua en la riada, en celdas. TUNE visual: 0,22, sesenta y seis centímetros. */
 export const FLOOD_RISE = 0.22;
 
+/** Cota de la lámina bajo el terreno, para que el relieve dibuje la orilla. */
+export function floodWaterLevelAt(map: ValleyMap, x: number, z: number, reach = floodReach(map)): number {
+  const rim = [[-1, -1], [0, -1], [-1, 0], [0, 0]].some(([dx, dz]) => {
+    const col = x + dx!, row = z + dz!;
+    return col >= 0 && row >= 0 && col < map.width && row < map.height
+      && reach[row * map.width + col]! < 0;
+  });
+  // Sólo el borde terminal se oculta. Hundir también el interior anula la riada.
+  return rim ? Math.min(GROUND_BIAS + WATER_LEVEL,
+    GROUND_BIAS + heightAt(map, x, z) - FLOOD_RISE - 0.015) : GROUND_BIAS + WATER_LEVEL;
+}
+
 /**
  * Lo lejos que queda cada celda del río, hasta `FLOOD_REACH`: 0 el cauce, 1 y
- * 2 la ribera que la riada cubre, -1 lo que no se inunda. Lo usa la lámina de
- * la riada y también la senda de la garganta, que va por donde no se inunda.
+ * 2 el corredor reservado, -1 lo que queda fuera. Incluye montaña: la roca
+ * tapa el agua y dibuja su orilla, no el tipo de celda. La senda respeta la
+ * misma reserva, aunque parte de la lámina quede oculta bajo la ladera.
  */
 export function floodReach(map: ValleyMap): Int8Array {
   const reach = new Int8Array(map.width * map.height).fill(-1);
@@ -677,7 +685,7 @@ export function floodReach(map: ValleyMap): Int8Array {
       if (nx < 0 || nz < 0 || nx >= map.width || nz >= map.height) continue;
       const next = nz * map.width + nx;
       const t = map.terrain[next];
-      if (reach[next] !== -1 || t === TERRAIN_CODE.mountain || t === TERRAIN_CODE.lake) continue;
+      if (reach[next] !== -1 || t === TERRAIN_CODE.lake) continue;
       reach[next] = reach[cell]! + 1;
       queue.push(next);
     }
@@ -693,26 +701,35 @@ function buildFloodSheet(map: ValleyMap, material: MeshStandardMaterial): Mesh |
   const courses: number[] = [];
   const colours: number[] = [];
   const indices: number[] = [];
+  const vertices = new Map<number, number>();
+  const vertex = (x: number, z: number): number => {
+    const key = z * (map.width + 1) + x;
+    const cached = vertices.get(key);
+    if (cached !== undefined) return cached;
+    const moved = wobbleAt(map, x, z);
+    const index = positions.length / 3;
+    positions.push(moved.x, floodWaterLevelAt(map, x, z, reach), moved.z);
+    // Un atributo compartido evita juntas de espuma entre celdas inundadas.
+    let front = false;
+    for (const [dx, dz] of [[-1, -1], [0, -1], [-1, 0], [0, 0]] as const) {
+      const cx = x + dx, cz = z + dz;
+      if (cx >= 0 && cz >= 0 && cx < map.width && cz < map.height
+        && reach[cz * map.width + cx]! >= FLOOD_REACH) front = true;
+    }
+    shores.push(front ? 0.9 : 0);
+    const flow = waterFlowAt(map, z);
+    flows.push(flow.x, flow.z);
+    courses.push(waterCourseAt(map, moved.x, moved.z), moved.z);
+    colours.push(1, 1, 1);
+    vertices.set(key, index);
+    return index;
+  };
   for (let cell = 0; cell < reach.length; cell += 1) {
     if (reach[cell]! < 1) continue;
     const x = cell % map.width, z = Math.floor(cell / map.width);
-    const base = positions.length / 3;
-    for (const [cx, cz] of [[x, z], [x + 1, z], [x + 1, z + 1], [x, z + 1]] as const) {
-      const moved = wobbleAt(map, cx, cz);
-      // El borde de lo inundado se hunde: la lámina baja hacia el suelo y la
-      // línea del agua la dibuja el relieve donde se cortan, no el contorno
-      // de las celdas, que salía como un recorte de polígonos.
-      const rim = floodRim(map, reach, cx, cz);
-      positions.push(moved.x, GROUND_BIAS + WATER_LEVEL - (rim ? FLOOD_SINK : 0), moved.z);
-      // Espuma sólo en el frente, la última celda de lo inundado: la ribera
-      // anegada es agua turbia y lisa, no espuma.
-      shores.push(reach[cell]! >= FLOOD_REACH ? 0.9 : 0);
-      const flow = flowAt(map, cz);
-      flows.push(flow.x * 0.6, flow.z * 0.6);
-      courses.push(0, moved.z);
-      colours.push(1, 1, 1);
-    }
-    indices.push(base, base + 2, base + 1, base, base + 3, base + 2);
+    const a = vertex(x, z), b = vertex(x + 1, z);
+    const c = vertex(x + 1, z + 1), d = vertex(x, z + 1);
+    indices.push(a, c, b, a, d, c);
   }
   if (indices.length === 0) return null;
   const geometry = new BufferGeometry();
