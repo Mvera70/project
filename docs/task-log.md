@@ -1,5 +1,19 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · La garganta con la riada (v4.77)
+
+`forest.ts`: `position.y = mountainSurfaceAt` en `scatterCells`. `ground.ts`:
+`floodReach(map)` exportado (era el BFS de `buildFloodSheet`). `backdrop.ts`:
+la senda evita `reach >= 0`, su cota es `max(ridgeAt, mountainSurfaceAt)` y
+`Backdrop.flood(level)` sube el agua de fuera `FLOOD_RISE`. `mountains.ts`:
+`level = max(promedio, raw)` y `startAt` (afilado interior). `waterfalls.ts`:
+`flood(level)` sube pozas y velos de garganta; el renderer lo llama junto a
+`ground.ripple`. Medido en el valle 11 con `__valleyHoldFlood(1)`: la poza asoma
+sobre la riada, el río sale del mapa sin escalón, la senda entera sobre la
+roca, los pinos de pie en la ladera. **Efecto lateral**: al alejarse de la
+ribera, el puente cruza más arriba en la pared y sale más largo y con un
+quiebro donde la senda sube; no se ha tocado. **Queda**: verlo en la tablet.
+
 ## 27 sep 2026 · El modo taller, visible y con cifras (v4.76)
 
 `wood.css`: `.title-sheet:has(.title-continue-row)` encoge viñeta y logotipo

@@ -1973,6 +1973,8 @@ export async function createGraphicsRenderer(
       const floodTarget = heldFlood ?? floodOf(shown);
       flooding += (floodTarget - flooding) * Math.min(1, frame.deltaSeconds * FLOOD_EASE);
       ground?.ripple(frame.presentationSeconds, flooding);
+      waterfalls?.flood(flooding);
+      backdrop?.flood(flooding);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
       // congelado entre semana y semana sería peor que no tenerlo.
       // El lobo del corral viene de la vida; los dos de la montaña son solo

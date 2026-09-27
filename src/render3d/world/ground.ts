@@ -655,8 +655,12 @@ function floodRim(map: ValleyMap, reach: Int8Array, x: number, z: number): boole
 /** Cuánto sube el agua en la riada, en celdas. TUNE visual: 0,22, sesenta y seis centímetros. */
 export const FLOOD_RISE = 0.22;
 
-function buildFloodSheet(map: ValleyMap, material: MeshStandardMaterial): Mesh | null {
-  // Lo lejos que queda cada celda del río, hasta `FLOOD_REACH`.
+/**
+ * Lo lejos que queda cada celda del río, hasta `FLOOD_REACH`: 0 el cauce, 1 y
+ * 2 la ribera que la riada cubre, -1 lo que no se inunda. Lo usa la lámina de
+ * la riada y también la senda de la garganta, que va por donde no se inunda.
+ */
+export function floodReach(map: ValleyMap): Int8Array {
   const reach = new Int8Array(map.width * map.height).fill(-1);
   const queue: number[] = [];
   for (let cell = 0; cell < reach.length; cell += 1) {
@@ -678,6 +682,11 @@ function buildFloodSheet(map: ValleyMap, material: MeshStandardMaterial): Mesh |
       queue.push(next);
     }
   }
+  return reach;
+}
+
+function buildFloodSheet(map: ValleyMap, material: MeshStandardMaterial): Mesh | null {
+  const reach = floodReach(map);
   const positions: number[] = [];
   const shores: number[] = [];
   const flows: number[] = [];

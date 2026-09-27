@@ -20,6 +20,7 @@ import { TERRAIN_CODE } from '@engine/state';
 import type { Palette } from '@derive/palette';
 import { forestLooks, type ForestState } from './forest-state';
 import { elevationAt } from './ground';
+import { mountainSurfaceAt } from './mountains';
 import {
   forestOccluders, type ForestOccluder, type ForestRevealTarget,
 } from './forest-occlusion';
@@ -512,7 +513,10 @@ export function scatterCells(
             x = Math.max(left - rotated.min.x * scale, Math.min(x, left + 1 - rotated.max.x * scale));
             z = Math.max(top - rotated.min.z * scale, Math.min(z, top + 1 - rotated.max.z * scale));
           }
-          position.set(x, 0, z);
+          // A la cota de la superficie, también en la ladera: los pinos de la
+          // loma iban a cero y quedaban metidos en la roca hasta la copa
+          // (Vera, 27 sep: «algunos árboles atraviesan la montaña»).
+          position.set(x, mountainSurfaceAt(map, x, z), z);
           // Girar cada uno lo suyo: una copa asimétrica repetida sin girar deja
           // un patrón que se ve desde arriba como un papel pintado.
           turn.setFromAxisAngle(up, facing);

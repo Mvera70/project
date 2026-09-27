@@ -1,5 +1,22 @@
 # The Valley — Registro de cambios
 
+## v4.77 · 27 sep 2026 · La garganta con la riada: sendas, cauce, pinos y cascadas
+
+Capturas de Vera desde su tablet, con el río crecido: «con la riada las cascadas
+no se ven igual de bien; los caminos se cortan, el cauce del río tiene cortes
+poco naturales, algunos árboles atraviesan la montaña». Cinco causas, cinco
+arreglos. **Los pinos de la loma iban a cota cero** y quedaban metidos en la roca
+hasta la copa: ahora todo árbol pisa la superficie, también la piel de la sierra.
+**La senda de la garganta se hundía en la piel de la montaña** —su plataforma
+nivelada quedaba bajo las facetas y salía a trozos— y **empezaba de golpe** en
+mitad del prado: ya no baja de la roca que pisa y nace afilada a lo largo de
+tres celdas. **Con la riada asomaban trozos de senda entre el agua**: la senda
+va ahora por donde la riada no llega (`floodReach`, la misma cuenta que la
+lámina de la riada). **El río de fuera del mapa no subía con la riada** y en la
+boca de la garganta la lámina daba un escalón: sube lo mismo. Y **la poza y la
+neblina de las cascadas de garganta suben con el río**, en vez de quedarse
+bajo el agua crecida.
+
 ## v4.76 · 27 sep 2026 · El modo taller vuelve a verse, y trae sus cifras
 
 Vera: «el modo desarrollador ha desaparecido». No había desaparecido: con una

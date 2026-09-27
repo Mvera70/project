@@ -623,6 +623,10 @@ export function buildGorgeRoads(
       return { x: axis(z) + side * (sum / (to - from + 1) + sway), z };
     });
     const fadeAt = (i: number): number => Math.max(0, Math.min(1, (length - i * ROAD_STEP) / 12));
+    // Y por dentro no empieza de golpe: se afila hasta morir en la hierba a
+    // lo largo de tres celdas. Un corte recto en mitad del prado era una de
+    // las sendas que se cortan de las capturas de Vera (27 sep).
+    const startAt = (i: number): number => Math.max(0.08, Math.min(1, (i * ROAD_STEP) / 3));
     // La cota va suavizada a lo largo y plana de lado a lado, como una
     // plataforma: copiando cada bache de la ladera, con la cámara en diagonal
     // cada subida se leía como un quiebro y la senda salía en dientes de sierra
@@ -631,11 +635,14 @@ export function buildGorgeRoads(
     const level = raw.map((_, i) => {
       let sum = 0, n = 0;
       for (let k = Math.max(0, i - ROAD_LEVEL); k <= Math.min(count, i + ROAD_LEVEL); k += 1) { sum += raw[k]!; n += 1; }
-      return sum / n;
+      // Nivelada, pero nunca por debajo de la roca que pisa: el promedio se
+      // hundía en la piel de la sierra y la senda salía a trozos entre las
+      // facetas («los caminos se cortan», capturas de Vera, 27 sep).
+      return Math.max(sum / n, raw[i]!);
     });
     const edge = (i: number, s: number): number[] => {
       const p = centre[i]!;
-      const x = p.x + s * ROAD_WIDTH * 0.5 * (0.5 + 0.5 * fadeAt(i));
+      const x = p.x + s * ROAD_WIDTH * 0.5 * (0.5 + 0.5 * fadeAt(i)) * startAt(i);
       return [x, level[i]! + GROUND_BIAS + ROAD_LIFT, p.z];
     };
     // Los tramos que caen dentro de una cascada, con una muestra de margen a

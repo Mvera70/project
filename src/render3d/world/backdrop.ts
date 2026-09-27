@@ -12,9 +12,9 @@ import { GROUND_BIAS } from '../visual-config';
 import { piecesOf, tintFoliage } from './forest';
 import { buildRidge, exteriorWaterAt, ridgeAt, seasonRidge, SKIRT } from './ridge';
 import { liveWater, SHARED_WATER } from './water-surface';
-import { buildCairns, buildCrags, buildGorgeRoads, buildMountainSkin, MOUNTAIN_PEAK, placeCrags, type RockModels } from './mountains';
+import { buildCairns, buildCrags, buildGorgeRoads, buildMountainSkin, MOUNTAIN_PEAK, mountainSurfaceAt, placeCrags, type RockModels } from './mountains';
 import { valleyAxis } from './valley-profile';
-import { elevationAt } from './ground';
+import { FLOOD_RISE, elevationAt, floodReach } from './ground';
 import { TERRAIN_CODE } from '@engine/state';
 import { riverExtensionAt, riverSection } from './river-extension';
 import { waterfallCorridorAt, waterfallSites } from './waterfalls';
@@ -26,6 +26,8 @@ export interface Backdrop {
   /** La nieve de las cumbres baja con el invierno (`snowCover`, de 0 a 1). */
   season(palette: Palette, snow?: number): void;
   light(daylight: number): void;
+  /** La riada, de 0 a 1: el río de fuera del mapa sube lo mismo que el de dentro. */
+  flood(level: number): void;
   dispose(): void;
 }
 
@@ -229,8 +231,22 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
   const cairns = buildCairns(map, palette, (x, z) => ridgeAt(map, seed, x, z),
     (x, z) => exteriorWaterAt(map, seed, x, z, 1.8), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))), rocks?.cairn);
   group.add(cairns);
-  const roads = buildGorgeRoads(map, seed, palette, (x, z) => ridgeAt(map, seed, x, z),
-    (x, z) => exteriorWaterAt(map, seed, x, z, 1.4), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))),
+  // La senda va por donde no se inunda: dentro del mapa, fuera del alcance de
+  // la riada. Si no, con el río crecido asomaban trozos de senda entre el agua
+  // (capturas de Vera, 27 sep).
+  const reach = floodReach(map);
+  const flooded = (x: number, z: number): boolean => {
+    const cx = Math.floor(x), cz = Math.floor(z);
+    return cx >= 0 && cz >= 0 && cx < map.width && cz < map.height && reach[cz * map.width + cx]! >= 0;
+  };
+  // La cota de la senda es la de la piel de la sierra donde la hay: dentro del
+  // mapa la piel facetada va por encima de la cota del relieve.
+  const roadFloor = (x: number, z: number): number => {
+    const inside = x >= 0 && z >= 0 && x < map.width && z < map.height;
+    return inside ? Math.max(ridgeAt(map, seed, x, z), mountainSurfaceAt(map, x, z)) : ridgeAt(map, seed, x, z);
+  };
+  const roads = buildGorgeRoads(map, seed, palette, roadFloor,
+    (x, z) => exteriorWaterAt(map, seed, x, z, 1.4) || flooded(x, z), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))),
     (x, z) => waterfallCorridorAt(falls, x, z));
   group.add(roads.mesh, roads.bridges);
   const water = outerWater(map, seed, palette);
@@ -250,6 +266,11 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
     },
     light(daylight): void {
       forest?.light(daylight);
+    },
+    flood(level): void {
+      // El río de fuera sube con el de dentro: si no, en la boca de la
+      // garganta la lámina daba un escalón justo en el borde del mapa.
+      if (water !== null) water.position.y = level * FLOOD_RISE;
     },
     dispose(): void {
       forest?.dispose();
