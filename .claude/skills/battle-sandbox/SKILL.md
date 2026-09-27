@@ -37,6 +37,13 @@ Parámetros (todos opcionales, con tope):
 
 El asalto es siempre **asalto** (van a por el portón), no saqueo.
 
+**La semana está congelada** (`__valleyHoldTicks(true)`): el motor no avanza, así que la
+partida no se acaba, no sale la lápida y el asalto no se resuelve por su cuenta. La capa
+de vida monta el asalto en cada jornada de la semana, así que **cada jornada de escena
+(unos 2 minutos a ×1) empieza uno nuevo** con los mismos números; el panel lo detecta
+(las cuentas bajan) y vuelve a medir de cero. Al abrir, un aviso «preparando la villa»
+cubre los segundos que tarda en jugar los sesenta años.
+
 **No guarda nunca.** `boot(…, { ephemeral: true })` anula `persist`: en el móvil el banco
 comparte navegador con la partida de Vera, y la pisaría. Si tocas `boot` o `persist`,
 esto no se puede perder (hay que mantener la guarda en `app.ts`).
@@ -50,7 +57,9 @@ esto no se puede perder (hay que mantener la guarda en `app.ts`).
   todo a la vez —cuerpos, animaciones, hora— porque todo cuelga del tick y su fracción.
 - **En directo** (cada 250 ms): estado (esperando · peleando · aguantaron · entraron),
   duración en segundos reales, defensores y asaltantes en pie, bajas de cada lado,
-  flechas y aciertos (%), golpes al portón (de 60), roto y dentro; FPS, ms del paso de
+  flechas y **aciertos de flecha** (%, `defence.arrowHits`), golpes de lanza
+  (`hits − arrowHits`), golpes al portón (de 60), roto y «han entrado» (se recuerda
+  aunque el que entró caiga después: es el `breached` del motor); FPS, ms del paso de
   Rapier (último y media), cuerpos físicos, ragdolls activos (**tope 24**), cascotes,
   llamadas de dibujo y triángulos.
 - **Copiar métricas**: JSON del resumen (`BattleSummary`) al portapapeles, para
@@ -70,7 +79,7 @@ iguales acaban distinto. Para comparar, se repite varias veces y se miran medias
 | La jornada | `src/render3d/life/village.ts` · opción `battle: { raiders, garrison }` | Sustituye el número de asaltantes y la guarnición **sólo si hay asalto hoy** |
 | Puestos | `src/render3d/life/garrison.ts` · `garrisonPlaces(…, chosen)` | Usa la guarnición dada en vez de `garrisonOf` |
 | Ganchos del renderer | `src/render3d/renderer.ts` | `window.__valleyBattle(choice \| null)` fija la batalla y rehace la jornada; `window.__valleyBattleStats()` devuelve `BattleStats` (ligero, sin posiciones de pantalla) |
-| Ganchos de la app | `src/ui/app.ts` | `__valleySpeed(0\|1\|4)`, `__valleyTimeScale(0.05–1)`, `__valleyLook(x, y)` |
+| Ganchos de la app | `src/ui/app.ts` | `__valleySpeed(0\|1\|4)`, `__valleyTimeScale(0.05–1)`, `__valleyLook(x, y)`, `__valleyHoldTicks(on)` |
 | Física | `src/render3d/life/physics.ts` | `stats.stepMs` y `stats.stepMsAverage` (media móvil 0,95) alrededor de `world.step()` |
 | Sin navegador | `tools/reports/battle-report.ts` | La misma batalla paso a paso con Rapier, impresa |
 | Pruebas | `tests/fast/battle-sandbox.test.ts` | Dirección y topes, `garrisonAs`, la jornada con más cuerpos que el juego sin tocar el motor, y `battleOutcome` |
@@ -130,5 +139,7 @@ el dibujo, `renderer.info.render`.
 - Los asaltantes vienen por el camino de la villa y tardan en llegar; la duración
   empieza a contar cuando llega el primero.
 - Los puestos son los que tiene el cerco: con 60 defensores y 30 puestos, suben 30.
-- Una batalla que no acaba antes de que cambie la jornada se rehace al día siguiente
-  (la capa de vida monta el asalto cada jornada de la semana del asalto).
+- Una batalla que no acaba antes de que cambie la jornada se corta y empieza otra (la
+  capa de vida monta el asalto cada jornada de la semana, que está congelada).
+- El acierto de flecha cuenta sólo flechas (`arrowHits` en `raiders.ts`/`archery.ts`);
+  `hits` suma también las estocadas de lanza de `melee.ts`.

@@ -73,6 +73,9 @@ describe('el banco de batallas', () => {
     expect(battleOutcome(stats({ coming: 12 }))).toBe('waiting');
     expect(battleOutcome(stats({ coming: 4, breaking: 8 }))).toBe('fighting');
     expect(battleOutcome(stats({ down: 10, gone: 2 }))).toBe('held');
-    expect(battleOutcome(stats({ down: 3, inside: 9 }, true))).toBe('stormed');
+    expect(battleOutcome(stats({ down: 3, inside: 9 }, true))).toBe('fighting');
+    expect(battleOutcome(stats({ down: 12 }, true))).toBe('stormed');
+    // El que entró y cayó después sigue contando: entraron.
+    expect(battleOutcome(stats({ down: 12 }), true)).toBe('stormed');
   });
 });

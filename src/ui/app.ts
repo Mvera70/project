@@ -194,6 +194,9 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   let speed: Speed = 1;
   // El banco de batallas (`?sandbox=battle`): la cámara lenta. El juego, 1.
   let timeScale = 1;
+  // Y la semana congelada: el motor no avanza, así que la partida no se acaba
+  // ni el asalto se resuelve por su cuenta. El juego nunca la congela.
+  let ticksHeld = false;
   let lastFraction = 0;
   root.replaceChildren();
   root.className = 'valley-app';
@@ -1289,6 +1292,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   window.__valleySpeed = (value: Speed): void => { app.setSpeed(value); };
   window.__valleyTimeScale = (value: number): void => { timeScale = Math.max(0.05, Math.min(1, value)); };
   window.__valleyLook = (x: number, y: number): void => { backend.live.look(x, y); };
+  window.__valleyHoldTicks = (on: boolean): void => { ticksHeld = on; };
 
   window.__valleyEnd = (cause: string): void => {
     if (state.ended !== null) return;
@@ -1429,7 +1433,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     if (state.tick % TIME.SAVE_EVERY_TICKS === 0) persist();
   };
   const beginLoop = (): void => {
-    loop = startLoop(() => speed, runTick, paint, () => timeScale);
+    loop = startLoop(() => speed, () => { if (!ticksHeld) runTick(); }, paint, () => timeScale);
   };
 
   /**
@@ -1548,5 +1552,6 @@ declare global {
     __valleySpeed?: (value: Speed) => void;
     __valleyTimeScale?: (value: number) => void;
     __valleyLook?: (x: number, y: number) => void;
+    __valleyHoldTicks?: (on: boolean) => void;
   }
 }

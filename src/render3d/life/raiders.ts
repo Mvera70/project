@@ -95,6 +95,8 @@ export interface Raider extends MeleeGesture {
    * entonces vive aquí, que es donde pasó.
    */
   hits: number;
+  /** De esos golpes, los de flecha: el banco de batallas mide el acierto con ellos. */
+  arrowHits?: number;
   /**
    * D3b · Si éste **pasó por el portón**.
    *
@@ -340,6 +342,7 @@ export function createRaiders(
       standingUntil: 0,
       forced: false,
       hits: 0,
+      arrowHits: 0,
       entered: false,
       load: null,
     });

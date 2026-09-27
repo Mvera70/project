@@ -66,6 +66,7 @@ export interface BattleSummary {
   readonly raidersDown: number;
   readonly arrowsLoosed: number;
   readonly arrowHits: number;
+  readonly spearHits: number;
   readonly gateHits: number;
   readonly gateBroken: boolean;
   readonly entered: boolean;
@@ -79,18 +80,31 @@ const OUT = new Set(['down', 'gone', 'leaving']);
 /**
  * El estado de la batalla a partir de las cifras. Puro, para poder probarlo:
  * empieza cuando algún asaltante ha llegado (deja de estar `coming`) y acaba
- * cuando no queda ninguno en pie y peleando, o cuando han entrado.
+ * cuando no queda ninguno en pie y peleando. **Si alguno entró, acaba como
+ * «entraron» aunque caiga después**: es lo que el motor llama `breached`, y el
+ * panel lo recuerda en `enteredEver` porque la escena lo olvida al caer.
  */
-export function battleOutcome(stats: BattleStats): 'waiting' | 'fighting' | 'held' | 'stormed' {
+export function battleOutcome(stats: BattleStats, enteredEver = false): 'waiting' | 'fighting' | 'held' | 'stormed' {
   if (stats.raiders === 0) return 'waiting';
   const arrived = Object.entries(stats.phases).some(([phase, count]) => phase !== 'coming' && count > 0);
   if (!arrived) return 'waiting';
-  if (stats.defence?.gate?.entered === true) return 'stormed';
   const fighting = Object.entries(stats.phases).reduce((sum, [phase, count]) => sum + (OUT.has(phase) ? 0 : count), 0);
-  return fighting === 0 ? 'held' : 'fighting';
+  if (fighting > 0) return 'fighting';
+  return enteredEver || stats.defence?.gate?.entered === true ? 'stormed' : 'held';
 }
 
 export function openBattleSandbox(root: HTMLElement): void {
+  // Preparar la villa es jugar sesenta años: segundos en un móvil. Se avisa y
+  // se deja pintar el aviso antes de ponerse a ello.
+  const notice = document.createElement('p');
+  notice.textContent = 'Banco de batallas · preparando la villa (unos segundos)…';
+  notice.style.cssText = 'position:fixed;inset:0;display:grid;place-items:center;margin:0;'
+    + 'background:#1c1a16;color:#efe6d2;font:15px system-ui,sans-serif;z-index:60';
+  document.body.append(notice);
+  window.setTimeout(() => { prepare(root); notice.remove(); }, 60);
+}
+
+function prepare(root: HTMLElement): void {
   const setup = battleSetupFrom(location.search);
   const state = stateAt({ seed: setup.seed, year: setup.year, season: 'summer' });
   // Con qué se defienden: armas y arcos dados, como en la toma del asedio.
@@ -101,6 +115,10 @@ export function openBattleSandbox(root: HTMLElement): void {
   boot(root, {
     schema: SCHEMA_VERSION, savedAtMs: Date.now(), state, decisions: [...state.history], archive: [],
   }, { ephemeral: true });
+  // La semana del asalto, congelada: el motor no avanza, la partida no se
+  // acaba y el asalto no se resuelve solo. Cada jornada de escena (unos dos
+  // minutos a ×1) vuelve a empezar uno, con los mismos números.
+  window.__valleyHoldTicks?.(true);
   // La interfaz del juego, fuera: la pantalla despejada de UI-V10.
   document.documentElement.classList.add('bare');
   const gate = state.buildings.find((building) => building.kind === 'gate' && building.lostTick === null);
@@ -197,6 +215,7 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
   let startedAt: number | null = null;
   let endedAt: number | null = null;
   let last: BattleStats | null = null;
+  let enteredEver = false;
   const countFrame = (): void => {
     frames += 1;
     const now = performance.now();
@@ -210,14 +229,15 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
     return {
       setup: read(),
       seconds: startedAt === null ? 0 : Math.round(((endedAt ?? performance.now()) - startedAt) / 100) / 10,
-      outcome: last === null ? 'waiting' : battleOutcome(last),
+      outcome: last === null ? 'waiting' : battleOutcome(last, enteredEver),
       defendersLost: d?.lost ?? 0,
       raidersDown: d?.fallen ?? 0,
       arrowsLoosed: d?.loosed ?? 0,
-      arrowHits: d?.hits ?? 0,
+      arrowHits: d?.arrowHits ?? 0,
+      spearHits: Math.max(0, (d?.hits ?? 0) - (d?.arrowHits ?? 0)),
       gateHits: d?.gate?.hits ?? 0,
       gateBroken: d?.gate?.broken ?? false,
-      entered: d?.gate?.entered ?? false,
+      entered: enteredEver,
       fps: Math.round(fps),
       physicsMs: Math.round((last?.physics?.stepMsAverage ?? 0) * 100) / 100,
     };
@@ -234,8 +254,14 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
     }
     const stats = window.__valleyBattleStats?.() ?? null;
     if (stats !== null) {
+      // Un asalto nuevo —la jornada siguiente vuelve a empezar uno— se nota en
+      // que las cuentas bajan: se empieza a medir de cero.
+      const restarted = last !== null && ((stats.defence?.loosed ?? 0) < (last.defence?.loosed ?? 0)
+        || (stats.defence?.fallen ?? 0) < (last.defence?.fallen ?? 0));
+      if (restarted) { startedAt = null; endedAt = null; enteredEver = false; }
       last = stats;
-      const outcome = battleOutcome(stats);
+      if (stats.defence?.gate?.entered === true) enteredEver = true;
+      const outcome = battleOutcome(stats, enteredEver);
       if (outcome !== 'waiting' && startedAt === null) startedAt = performance.now();
       if ((outcome === 'held' || outcome === 'stormed') && endedAt === null) endedAt = performance.now();
       if (outcome === 'fighting') endedAt = null;
@@ -249,7 +275,8 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
       ['Asaltantes en pie', `${Math.max(0, (last?.raiders ?? 0) - s.raidersDown)} / ${last?.raiders ?? 0}`],
       ['Bajas (def · asalt)', `${s.defendersLost} · ${s.raidersDown}`],
       ['Flechas · aciertos', `${s.arrowsLoosed} · ${s.arrowHits} (${s.arrowsLoosed === 0 ? 0 : Math.round((100 * s.arrowHits) / s.arrowsLoosed)} %)`],
-      ['Portón', `${s.gateHits} / 60 golpes${s.gateBroken ? ' · roto' : ''}${s.entered ? ' · dentro' : ''}`],
+      ['Golpes de lanza', `${s.spearHits}`],
+      ['Portón', `${s.gateHits} / 60 golpes${s.gateBroken ? ' · roto' : ''}${enteredEver ? ' · han entrado' : ''}`],
       ['FPS', `${s.fps}`],
       ['Física por paso', physics === null ? 'arranca al llegar' : `${physics.stepMs.toFixed(2)} ms (media ${physics.stepMsAverage.toFixed(2)})`],
       ['Cuerpos físicos', physics === null ? '—' : `${physics.bodies}`],

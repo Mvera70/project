@@ -370,6 +370,8 @@ export interface Village {
   readonly defence: {
     readonly loosed: number;
     readonly hits: number;
+    /** De `hits`, los de flecha (el resto son de lanza). */
+    readonly arrowHits: number;
     readonly fallen: number;
     /** D4 · Los de la aldea que han caído defendiendo su puesto. */
     readonly lost: number;
@@ -1492,6 +1494,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       return {
         loosed: archers.reduce((sum, archer) => sum + archer.loosed, 0),
         hits: raiders.reduce((sum, raider) => sum + raider.hits, 0),
+        arrowHits: raiders.reduce((sum, raider) => sum + (raider.arrowHits ?? 0), 0),
         fallen: raiders.filter((raider) => raider.phase === 'down').length,
         // D4 · los nuestros que han caído defendiendo. Es el `lost` del parte
         // de B4, y es la primera vez que este número no es cero.

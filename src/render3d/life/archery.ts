@@ -334,6 +334,7 @@ export function stepArchery(
       if (Math.hypot(raider.body.x - at.x, raider.body.z - at.z) > HIT_REACH) continue;
       arrow.spent = true;
       raider.hits += 1;
+      raider.arrowHits = (raider.arrowHits ?? 0) + 1;
       // **Una flecha basta**, y es la decisión honesta mientras no haya cuerpo
       // a cuerpo ni ragdoll: un hombre alcanzado en el pecho deja de subir por
       // la ladera. Cuántas hacen falta de verdad es balance, y el nivelado va
