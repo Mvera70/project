@@ -31,7 +31,7 @@ const VIEW = new Vector3(1, 0.9, 1.15);
  * vista de partida sea **la misma al bit** que antes de que esto existiera: si
  * alguien ajusta `VIEW`, los dos ángulos le siguen.
  */
-const BASE_YAW = Math.atan2(VIEW.x, VIEW.z);
+export const BASE_YAW = Math.atan2(VIEW.x, VIEW.z);
 const BASE_PITCH = Math.atan2(VIEW.y, Math.hypot(VIEW.x, VIEW.z));
 
 /**

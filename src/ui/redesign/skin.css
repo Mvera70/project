@@ -807,6 +807,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 .hud-round-btn svg { display: block; }
+/* La brújula (`camera-controls.ts`): la rosa gira sobre su centro con la vista,
+   y el botón se arrastra de lado a lado, así que no desplaza la página. */
+.valley-compass { touch-action: none; }
+.valley-compass-rose { width: 26px; height: 26px; transform-origin: 50% 50%; }
 .valley-speed-badge.hud-round-btn {
   font-family: var(--skin-font-voice);
   font-weight: 600;

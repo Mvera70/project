@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · La brújula y los controles de ordenador (v4.79)
+
+`ui/camera-controls.ts` (nuevo): brújula (`.valley-compass`, arrastrar = girar,
+clic = norte animado 320 ms, oculta sin cámara) y teclado (`code`: WASD/flechas,
+Q/E, R/F, +/−, N; se ignora escribiendo o con Ctrl/Alt/Meta). `app.ts`: botón
+derecho o central del ratón = girar/inclinar (`orbiting`), sin `pick` al
+soltar, sin menú contextual sobre el valle. Cámara: `heading()` en contrato,
+renderer y backend (`BASE_YAW` exportado de `camera.ts`). Textos
+`app.compass`/`app.compass.help` en inglés y español. Medido en el navegador:
+cada control mueve la cámara (centro con `__valleyStrike`, aguja con su
+`transform`). **Sin prueba automática**: el módulo necesita DOM y la suite rápida
+corre en Node; queda para un recorrido de `tools/shots/`.
+
 ## 27 sep 2026 · El manifiesto de modelos, de la red primero (v4.78)
 
 `public/sw.js`: `/assets/valley3d/manifest.json` va por `networkFirst`; caché

@@ -1,5 +1,19 @@
 # The Valley — Registro de cambios
 
+## v4.79 · 27 sep 2026 · La brújula, el botón derecho y el teclado
+
+Vera: «es muy incómodo moverse, y con el ratón no me sé todos los controles:
+sólo mover la cámara en el ángulo que viene puesta». Girar ya existía —dos
+dedos en el móvil, mayúsculas y arrastrar en el ordenador— pero nada lo decía.
+Ahora hay **una brújula** en el rincón de mandos: su aguja marca el norte del
+valle, arrastrarla gira la vista uno a uno con el dedo o el ratón, tocarla
+vuelve al norte con un giro corto, y al pasar el ratón enseña todos los
+controles. En el ordenador, **el botón derecho (o la rueda pulsada) gira e
+inclina** como en cualquier juego de estrategia, sin abrir fichas, y hay
+**teclado**: WASD o flechas mueven, Q/E giran, R/F inclinan, +/− acercan y N
+vuelve al norte. Se descartó el joystick que se pensó al principio: gira a
+velocidad fija mientras se pulsa, que para encuadrar con calma es impreciso.
+
 ## v4.78 · 27 sep 2026 · Los modelos nuevos llegan a los aparatos que ya visitaron
 
 Vera, en su tablet: «¿las casas se han roto o están a media construcción? … se

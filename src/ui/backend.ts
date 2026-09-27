@@ -83,6 +83,8 @@ interface ValleyBackend {
   pan(dxCss: number, dyCss: number): void;
   /** Gira la vista, en radianes. Canvas no puede: no tiene desde dónde mirar. */
   orbit(dYaw: number, dPitch: number): void;
+  /** Cuánto se ha girado la vista desde la de partida, en radianes; 0 en Canvas. */
+  heading(): number;
   resetView(): void;
   /** U-11 · el vuelo de entrada; el 2D, sin cámara, no hace nada. */
   flyIn(seconds: number): void;
@@ -179,6 +181,7 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     // El 2D es una proyección fija del mapa entero dibujada a mano: no hay ángulo
     // que girar, y por eso `movesCamera` es `false` y quien llama no lo intenta.
     orbit() { /* idem */ },
+    heading() { return 0; },
     resetView() { /* idem */ },
     flyIn() { /* idem */ },
     stats() { return null; },
@@ -419,6 +422,7 @@ export function attachBackend(
         zoom(factor, atX, atY) { renderer.zoom(factor, atX, atY); },
         pan(dx, dy) { renderer.pan(dx, dy); },
         orbit(dYaw, dPitch) { renderer.orbit(dYaw, dPitch); },
+        heading() { return renderer.heading(); },
         resetView() { renderer.resetView(); },
         flyIn(seconds) { renderer.flyIn(seconds); },
         stats() { return renderer.stats(); },

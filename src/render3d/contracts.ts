@@ -307,6 +307,8 @@ export interface GraphicsRenderer {
    * juego y no toca el estado, igual que `zoom` y `pan`.
    */
   orbit(dYaw: number, dPitch: number): void;
+  /** Cuánto se ha girado la vista desde la de partida, en radianes (la brújula). */
+  heading(): number;
   resetView(): void;
   /**
    * U-11 · El vuelo de entrada: la vista se aparta hasta la sierra y baja

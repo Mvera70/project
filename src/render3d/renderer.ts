@@ -24,7 +24,7 @@ import { clockOf } from '@engine/time';
 import { paletteFor, snowCover } from '@derive/palette';
 import type { Palette } from '@derive/palette';
 import { moodsFor } from '@derive/moods';
-import { createValleyCamera } from './camera';
+import { createValleyCamera, BASE_YAW } from './camera';
 import { TERRAIN_CODE, type GameState, type HappeningId, type VillagerId } from '@engine/state';
 import { BUILDINGS } from '@engine/balance';
 import { loadAssets, type AssetLibrary } from './assets';
@@ -2319,6 +2319,10 @@ export async function createGraphicsRenderer(
       focusFlight = null;
       disturbed = true;
       view.orbit(dYaw, dPitch);
+    },
+
+    heading(): number {
+      return view.angles.yaw - BASE_YAW;
     },
 
     resetView(): void {

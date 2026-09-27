@@ -52,6 +52,7 @@ import { isSpeed, type Speed } from './speed';
 import { accentFor, createSoundEngine } from './sound';
 import { openWelcome } from './welcome';
 import { devPreference, startDevHud, type DevHud } from './dev-hud';
+import { mountCameraControls, type CameraControls } from './camera-controls';
 import {
   SILENT,
   clearOffer, dismissHint,
@@ -189,6 +190,8 @@ const WHEEL_STEP = 1.18;
  * (`?sandbox=battle`), que monta una partida de prueba y no puede pisar la
  * que el jugador tiene guardada en el mismo navegador.
  */
+/** La brújula y el teclado de la cámara vivos (`ui/camera-controls.ts`): uno solo. */
+let cameraControls: CameraControls | null = null;
 /** El panel de taller vivo, si lo hay (`ui/dev-hud.ts`). */
 let devHud: DevHud | null = null;
 
@@ -516,7 +519,9 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   // borde, que era la altura de la barra estrecha de antes del rediseño, y
   // con la bandeja nueva los dos círculos caían dentro de ella.
   hudRight.className = 'valley-hud-right hud-speed-corner';
-  hudRight.append(bareToggle, hud.speedControls, hud.speedBadge, huntAction);
+  cameraControls?.dispose();
+  cameraControls = mountCameraControls(() => backend.live, () => backend.live.surface);
+  hudRight.append(cameraControls.compass, bareToggle, hud.speedControls, hud.speedBadge, huntAction);
 
   root.append(canvas, hud.header, hudRight, shell.element);
 
@@ -975,6 +980,13 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   let midStart: number | null = null;
   let lastTapMs = -Infinity;
   let zoom = 1;
+  /**
+   * Los punteros que giran en vez de arrastrar: el botón derecho o la rueda
+   * pulsada del ratón (27 sep 2026, Vera: «con el ratón no me sé todos los
+   * controles»). Es lo que hace cualquier juego de estrategia; mayúsculas y
+   * arrastrar sigue valiendo.
+   */
+  const orbiting = new Set<number>();
 
   /**
    * Cuánto se tarda como mucho entre dos toques para que cuenten como uno doble.
@@ -1016,6 +1028,11 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     sound.arm();
     if (!onValley(event)) return;
     root.setPointerCapture(event.pointerId);
+    if (event.pointerType === 'mouse' && (event.button === 1 || event.button === 2)) {
+      orbiting.add(event.pointerId);
+      // La rueda pulsada abre el desplazamiento automático del navegador.
+      event.preventDefault();
+    }
     trace.set(event.pointerId, [{ x: event.clientX, y: event.clientY, atMs: event.timeStamp }]);
     if (trace.size === 2) {
       const starts = [...trace.values()].map((points) => points[0]!);
@@ -1041,7 +1058,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     if (trace.size === 1 && previous !== undefined && backend.live.movesCamera) {
       const dx = event.clientX - previous.x;
       const dy = event.clientY - previous.y;
-      if (event.shiftKey) backend.live.orbit(-dx * ORBIT_PER_PX, dy * PITCH_PER_PX);
+      if (event.shiftKey || orbiting.has(event.pointerId)) backend.live.orbit(-dx * ORBIT_PER_PX, dy * PITCH_PER_PX);
       else backend.live.pan(dx, dy);
     }
     if (pinchStart !== null && trace.size === 2) {
@@ -1090,6 +1107,8 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   root.addEventListener('pointerup', (event) => {
     const points = trace.get(event.pointerId);
     trace.delete(event.pointerId);
+    // Un giro con el botón derecho no es un toque: no abre ninguna ficha.
+    if (orbiting.delete(event.pointerId)) { if (trace.size < 2) { pinchStart = null; twistStart = null; midStart = null; } return; }
     if (trace.size < 2) { pinchStart = null; twistStart = null; midStart = null; }
     // UI-R2 · sin un `pointerdown` de este mismo dedo capturado antes —es
     // decir, sin que `onValley` diera cierto entonces—, no hay gesto del
@@ -1149,6 +1168,9 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
       else if (gesture === 'swipe_up') actions.navigate({ kind: 'chronicle' });
     }
   });
+
+  // Sin el menú del botón derecho sobre el valle: ese botón gira la vista.
+  root.addEventListener('contextmenu', (event) => { if (onValley(event)) event.preventDefault(); });
 
   // La rueda del raton, que en un movil no existe y en un navegador de
   // escritorio es **la unica manera de acercarse**: alli no hay dos dedos que
