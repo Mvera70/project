@@ -68,18 +68,20 @@ describe('los pinos suben la loma', () => {
   });
 
   it('en corros de uno, dos y tres, y nunca en manchas', () => {
-    // Las tres medidas existen en las cuatro semillas, con el dos como el más
-    // común: un corro de tres necesita dos vecinas libres y la reserva de la
-    // vecindad se las lleva a menudo. Lo que **no** puede pasar es una mancha:
-    // un corro de cuatro o más sería un pinar, y eso es otra cosa.
+    // Lo que **no** puede pasar, en ninguna semilla, es una mancha: un corro
+    // de cuatro o más sería un pinar, y eso es otra cosa. Las tres medidas se
+    // exigen **sumando las semillas** y no en cada una (Vera, 27 sep 2026):
+    // medido en sesenta semillas, ninguna mancha, y en cuatro —8, 41, 42 y 50—
+    // ningún pino suelto, sólo corros de dos y de tres. Un umbral no se fija
+    // con una semilla (CLAUDE.md), y la 41 era justo una de esas cuatro.
+    const seen = new Set<number>();
     for (const seed of SEEDS) {
       const state = foundGame(seed);
       const sizes = groupsOf(state.map, pineCells(state.map));
       expect(Math.max(...sizes), `semilla ${seed}: ${JSON.stringify(sizes)}`).toBeLessThanOrEqual(3);
-      for (const size of [1, 2, 3]) {
-        expect(sizes.includes(size), `semilla ${seed}: falta el corro de ${size}`).toBe(true);
-      }
+      for (const size of sizes) seen.add(size);
     }
+    for (const size of [1, 2, 3]) expect(seen.has(size), `falta el corro de ${size} en todas las semillas`).toBe(true);
   });
 
   it('y de tres alturas, para que la ladera no sea un patrón', () => {

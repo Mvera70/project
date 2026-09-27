@@ -41,7 +41,9 @@ describe('Modelos originales: presupuestos y contratos de exportación', () => {
     expect(recipe.scale).toBeCloseTo(1 / 3);
     expect(asset.statistics?.triangles).toBeGreaterThan(0);
     expect(asset.statistics?.triangles).toBeLessThanOrEqual(budget);
-    expect(asset.statistics?.materials).toBeLessThanOrEqual(3);
+    // El portón de piedra (24 sep 2026) lleva además el hierro de sus
+    // refuerzos: un cuarto material buscado, aprobado por Vera el 27 sep.
+    expect(asset.statistics?.materials).toBeLessThanOrEqual(id === 'gate' ? 4 : 3);
     expect(asset.connectors).toEqual(recipe.connectors);
     expect(asset.bounds?.size.every((size) => Number.isFinite(size) && size > 0)).toBe(true);
     expect(asset.hashes?.[`${id}.glb`]).toMatch(/^[0-9A-F]{64}$/u);

@@ -1,6 +1,6 @@
 # Cuaderno de tareas — el rework
 
-## 27 sep 2026 · Las rojas de la suite: de 6 a 2
+## 27 sep 2026 · Las rojas de la suite: de 6 a 0
 
 Llevaban en rojo desde antes del 26 sep (comprobado en una copia limpia de
 56d5f28).
@@ -17,10 +17,11 @@ Llevaban en rojo desde antes del 26 sep (comprobado en una copia limpia de
   `run`: 19 de 20 torres por dentro, media 2,52, máxima 3,4. El listón pasa de 2
   a 3,5.
 
-**Quedan dos, pendientes de Vera:** `art-props` (el portón de piedra del 24
-sep tiene 4 materiales con el hierro, y el tope es 3) y `pines` (en 60
-semillas nunca hay manchas, pero en 4 —8, 41, 42 y 50— no sale ningún pino
-suelto, y la prueba exige los tres tamaños en cada semilla).
+**Y las dos que decidió Vera:** `art-props`, con el tope del portón en 4
+materiales, porque el hierro de la piedra es buscado; y `pines`, donde los
+tres tamaños se exigen sumando las semillas (en 60 semillas no hay ninguna
+mancha, pero en 4 —8, 41, 42 y 50— no sale ningún pino suelto). **La suite
+rápida queda en verde.**
 
 ## 27 sep 2026 · La sala del líder (v4.67)
 
