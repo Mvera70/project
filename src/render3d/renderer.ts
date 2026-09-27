@@ -60,6 +60,7 @@ import {
 } from './world/forest';
 import type { ForestRevealTarget } from './world/forest-occlusion';
 import { BUILDING_ASSETS, ELEVATED_RING_ASSETS, Village } from './world/buildings';
+import { HOUSE_FORM_ASSETS } from './world/house-variation';
 import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
 import { isNight, type HomeRoutine } from './life/home';
 import { fitsCircle, penetration } from './life/body';
@@ -190,11 +191,14 @@ export const WANTED = [
   // M-3 · el arado ya tiene GLB; el barril sigue usando el respaldo procedural.
   // `WANTED` puede incluirlo antes de publicarlo para que aparezca al llegar.
   'barrel', 'plough',
+  'burnt-house', 'great-oak',
   ...FAUNA,
   // E3 · el plan sustituye el bastión por esta variante cuando cabe su escalera.
   'bastion-access-candidate', 'e3b-bastion-joint-candidate', 'e3b-walkway-entry-candidate',
   ...Object.values(ELEVATED_RING_ASSETS),
   ...new Set(Object.values(BUILDING_ASSETS)),
+  ...HOUSE_FORM_ASSETS.house.slice(1),
+  ...HOUSE_FORM_ASSETS.stone_house.slice(1),
 ];
 
 /**
@@ -499,7 +503,7 @@ export async function createGraphicsRenderer(
   const weather = createWeather(scene);
   const tells = new Tells();
   // E4 · los edificios que arden (`effects/fires.ts`).
-  const fires = createFires();
+  const fires = createFires((id) => library.instance(id));
   const fauna = new Fauna((kind) => library.instance(kind), (kind) => library.get(kind));
   const bubbles = new Bubbles();
   const props = new Props((id) => library.instance(id));
@@ -1010,7 +1014,7 @@ export async function createGraphicsRenderer(
       world.remove(greatOak.group);
       greatOak.dispose();
     }
-    greatOak = buildGreatOak(state.map, palette);
+    greatOak = buildGreatOak(state.map, palette, (id) => library.instance(id));
     world.add(greatOak.group);
     // Las cascadas de las gargantas y del lago: decorado del mapa, como el roble.
     if (waterfalls !== null) {
@@ -1955,6 +1959,7 @@ export async function createGraphicsRenderer(
       // un día tarde, con la casa ya en ruina (primera captura de E4). Así la
       // casa arde todavía en pie y al amanecer se derrumba bajo las llamas.
       fires.update(state, frame.presentationSeconds);
+      village.coverBurning(fires.covered);
       // Y el rio corre. Un rio quieto es un suelo azul. Y crece con la riada
       // (`derive/flood.ts`): sube a lo largo de unas horas de presentación, no
       // de golpe al cambiar de semana.

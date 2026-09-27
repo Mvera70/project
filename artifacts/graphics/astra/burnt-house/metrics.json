@@ -1,0 +1,77 @@
+{
+  "id": "burnt-house",
+  "triangles": 996,
+  "triangleLimit": 1200,
+  "boundsRuntimeCells": {
+    "min": [
+      0.0,
+      0.0,
+      -2.0
+    ],
+    "max": [
+      2.0,
+      1.489025354385376,
+      -0.0
+    ]
+  },
+  "materials": {
+    "char": "#3F2B22",
+    "soot": "#08090B",
+    "ash": "#77796F",
+    "stone": "#9B958A",
+    "wood": "#6B4932"
+  },
+  "pivotsRuntimeCells": {
+    "base": [
+      1.0,
+      0.0,
+      -1.0
+    ],
+    "wall_front": [
+      1.0,
+      0.07666666666666667,
+      -0.17666666666666667
+    ],
+    "wall_back": [
+      1.0,
+      0.07666666666666667,
+      -1.8233333333333333
+    ],
+    "wall_left": [
+      0.17666666666666667,
+      0.07666666666666667,
+      -1.0
+    ],
+    "wall_right": [
+      1.8233333333333333,
+      0.07666666666666667,
+      -1.0
+    ],
+    "roof_left": [
+      1.0,
+      1.4666666666666668,
+      -1.0
+    ],
+    "roof_right": [
+      1.0,
+      1.4666666666666668,
+      -1.0
+    ],
+    "chimney": [
+      1.4933333333333334,
+      0.06666666666666667,
+      -1.58
+    ]
+  },
+  "meshNames": [
+    "burnt_house_base",
+    "burnt_house_wall_front",
+    "burnt_house_wall_back",
+    "burnt_house_wall_left",
+    "burnt_house_wall_right",
+    "burnt_house_roof_left",
+    "burnt_house_roof_right",
+    "burnt_house_chimney"
+  ],
+  "textures": 0
+}

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-27T06:36:45.820Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids hall",
+  "generatedAt": "2026-09-27T11:11:10.931Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids great-oak",
   "assets": [
     {
       "id": "axis-marker",
@@ -121,8 +121,13 @@
     {
       "id": "stone-house",
       "file": "stone-house.glb",
-      "sha256": "110F59506B8E4BCD05666168A66CC04A72B5CB19634829C579E794F9FF12A10B",
-      "motion": []
+      "sha256": "1FDBB0252A67B294E94D99A596B22264FCD2DB249C47A83E13B8757D9CF6A599",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Revisión original de mampostería para The Valley, receta G-41.",
+        "license": "Project original"
+      }
     },
     {
       "id": "field",
@@ -1477,6 +1482,72 @@
         "kind": "original",
         "source": "Modelado por Astra para The Valley (art/recipes/hall-candidate, rama art/astra-modelos, commit 725a512): casa larga medieval del líder, con hall_door.",
         "license": "project-original"
+      }
+    },
+    {
+      "id": "house-twin-gable",
+      "file": "house-twin-gable.glb",
+      "sha256": "1CA974DB811E5FE1F695F3A3F99A93A899D2DD9C9BA29C14061DF7D6CE35C278",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de house para The Valley, receta G-41.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "house-hip-roof",
+      "file": "house-hip-roof.glb",
+      "sha256": "FE50B95E7424526A60359271DB733426698DE2436797C20A5C881D8532316C9F",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de house para The Valley, receta G-41.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "stone-house-cross-gable",
+      "file": "stone-house-cross-gable.glb",
+      "sha256": "60FAF162B003CED0FA9D51BE804C3805A0B9BE1A27B0035DF1CD54BCFEF3F216",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de stone-house para The Valley, receta G-41.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "stone-house-tower-loft",
+      "file": "stone-house-tower-loft.glb",
+      "sha256": "F2FC99979406D6826280D80CED2B77D218F4BB8114BD7BEE149DA037C53D0F95",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de stone-house para The Valley, receta G-41.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "burnt-house",
+      "file": "burnt-house.glb",
+      "sha256": "7B489DB61B304A7281040264147CDDE7305437D7768288C4D122179526079018",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelo original de The Valley, fuente art/recipes/burnt-house-candidate/build.py.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "great-oak",
+      "file": "great-oak.glb",
+      "sha256": "93696AD8B889C731E5D9DE3BCDFD4756023AF09F03D70EB891A43C559B787D43",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelo original de The Valley, fuente art/recipes/great-oak-candidate/build.py.",
+        "license": "Project original"
       }
     }
   ]

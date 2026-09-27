@@ -1,0 +1,35 @@
+{
+  "id": "stone-house-cross-gable",
+  "triangles": 1176,
+  "triangleLimit": 1200,
+  "recipePrimitiveTriangles": 856,
+  "dimensionsMetres": [
+    6.000000357627869,
+    4.6875,
+    6.000000357627869
+  ],
+  "boundsBlenderCells": {
+    "min": [
+      -1.1920928955078125e-07,
+      -1.1920928955078125e-07,
+      -0.0025000572204589844
+    ],
+    "max": [
+      2.0,
+      2.0,
+      1.559999942779541
+    ]
+  },
+  "doorPivotMetres": [
+    2.475,
+    0.25,
+    0
+  ],
+  "materials": {
+    "stone": "#9B958A",
+    "roof": "#7A382B",
+    "wood": "#6B4932",
+    "window": "#3F2B22",
+    "door": "#6B4932"
+  }
+}

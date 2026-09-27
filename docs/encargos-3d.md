@@ -40,6 +40,13 @@ queda, no el estado anterior a las rondas del 20 de septiembre.
 | **El saqueador que cae** (D2) | Una flecha lo deja `down` | Caída física articulada y apoyo en terreno/obstáculos; `fall` animado como respaldo | Sangre sin decidir (E4) |
 | ~~**La muralla de piedra**~~ (A4, transición) · **hecha el 21 sep 2026** | El cerco cerrado mejora estacas a piedra | `wall.glb` se ve terminado; E0d añade el hueco y solar de obra intermedio, sin ocultar defensas vecinas | Cerrado para transición, sin cascotes ni animación de derribo. [Informe](historico/life-rounds/E0d-transiciones-muralla.md) |
 | **La era del valle** (A4, A5) | El valle es caserío, aldea o villa cerrada, y eso ya se puede preguntar (`derive/era.ts`) | La cabecera lo dice desde A5; E0e añade color de caminos existentes, bancos de plaza y humo por era. §7.4b fija tierra pisada → piedra parcial → piedra completa. Doce tomas históricas sin rótulo, dos semillas y móvil/tableta fueron clasificadas 12/12 por otro agente | **Aceptada con reserva:** la separación aldea/villa tiene poco margen en algunos encuadres y la piedra sigue lisa, sin juntas. Ese detalle sería arte de superficie futuro. [Brief](historico/encargos/encargo-e0e-aceptacion-historica.md) e [informe](historico/life-rounds/E0e-ambiente-eras.md) |
+
+**Actualización G-41 (27 sep 2026):** la reserva de las paredes lisas queda
+atendida con juntas y leve relieve en `stone-house` y sus dos variantes. Las
+cuatro siluetas nuevas se eligen de forma estable por parcela: las viviendas de
+madera diversifican caserío y aldea; al mejorarse a piedra, la misma parcela
+conserva su índice de forma y la villa reúne tres perfiles de piedra. El asedio
+no añade una categoría de vivienda.
 | ~~**Guardia en la atalaya**~~ (C1, C2) | Ocupan puestos de defensa | Puestos ocupados, armas, tensado y suelta | ~~Adarve y apoyo elevado real (E3)~~: hechos, E3a (22 sep) y E3b.3 (24 sep) |
 
 ## 2 · Mallas que faltan
@@ -102,20 +109,22 @@ juega.
 
 ## El roble del valle (24 sep 2026)
 
-Hecho **por código** (`src/render3d/world/great-oak.ts`): primitivas facetadas,
-tronco con raíces, cinco ramas y copa ancha. Es el emblema del título a la
-orilla del lago. **Pendiente, si Vera lo quiere:** encargarlo en Blender con
-más carácter —corteza, raíces que abracen el suelo, copa con huecos— y
-cambiar sólo ese fichero por el modelo. Tampoco hace nada todavía: podría ser
-un sitio de la capa de vida (descansar a su sombra, reunirse en fiesta).
+**G-42:** `great-oak.glb` sustituye las primitivas cuando está publicado. Toma
+la silueta del árbol del escudo: raíces abiertas, tronco bifurcado, ramas
+horizontales y grupos de hojas separados por huecos. Mide 3,4 celdas de alto,
+mantiene el color estacional y queda a la orilla del agua. Las primitivas
+anteriores sólo son respaldo si falta el recurso. En valles con bosque denso,
+algunos árboles vecinos pueden taparlo desde ciertos ángulos. Todavía no es
+un lugar de actividad de la capa de vida.
 
 ## E4 · El fuego (25 sep 2026)
 
-La casa que arde se pinta **sobre la ruina** desde el primer amanecer: no hay
-modelo de casa ardiendo ni se ve el derrumbe. Pendiente si se quiere más: la
-casa en pie tiznándose y un derrumbe animado al acabar la llama. Y nadie
-reacciona todavía al fuego —la gente pasa al lado—; que acudan con cubos es la
-tanda 4 (flechas incendiarias y defensa).
+**G-42:** la casa de madera arde carbonizada en pie con `burnt-house.glb`.
+Durante el tercer día caen tejado y paredes, dejando a la vista `ruin-wood.glb`.
+Al terminar el fuego, la ruina persistente de la parcela ocupa el mismo sitio.
+La transición está revisada en tres capturas de juego de
+`artifacts/graphics/G-42/fire-transition/`. Quedan fuera de esta entrega los
+derrumbes de otros tipos de edificio.
 
 **Y la brigada de cubos (tanda 4):** la gente rodea la casa y vacía cubos
 contra ella, pero **no va y viene del agua**: el cubo está siempre lleno. Una

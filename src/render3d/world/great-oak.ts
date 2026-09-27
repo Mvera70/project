@@ -1,11 +1,8 @@
 // UI-W · El roble del valle, en 3D: el árbol del escudo del título a la orilla
 // del lago (`derive/landmark.ts` dice dónde).
 //
-// Hecho por código y no con un modelo del pipeline de arte, igual que las
-// herramientas de mano cuando empezaron: es una pieza, sin animación, y su
-// forma sale de pocas primitivas facetadas —las del resto del valle son
-// low-poly— puestas con un hash fijo, así que es el mismo árbol en cada valle y
-// en cada máquina. Si un día se encarga en Blender, se cambia este fichero.
+// La malla del catálogo conserva la silueta del árbol del escudo. Las
+// primitivas anteriores quedan de respaldo si falta el GLB en una publicación.
 //
 // Es **más grande que cualquier árbol del bosque** a propósito: es el que se
 // reconoce desde lejos, el emblema. Tronco ancho con raíces que asoman, ramas
@@ -13,15 +10,15 @@
 // estación como las del bosque (`tintFoliage`): el verde lo decide la paleta.
 
 import {
-  ConeGeometry, CylinderGeometry, Group, IcosahedronGeometry, Mesh, MeshStandardMaterial,
-  type Material,
+  Color, ConeGeometry, CylinderGeometry, Group, IcosahedronGeometry, Mesh, MeshStandardMaterial,
+  type Material, type Object3D,
 } from 'three';
 import { hash32 } from '@engine/rng';
 import type { Palette } from '@derive/palette';
 import type { ValleyMap } from '@engine/state';
 import { greatOakCell } from '@derive/landmark';
 import { elevationAt } from './ground';
-import { tintFoliage } from './forest';
+import { seasonTree, tintFoliage } from './forest';
 
 export interface GreatOak {
   readonly group: Group;
@@ -31,17 +28,47 @@ export interface GreatOak {
   dispose(): void;
 }
 
-/** Tamaño del conjunto, en celdas. TUNE visual: unas 3,4 celdas de alto. */
+/** Escala del respaldo procedural; el GLB ya llega medido en celdas. */
 const SCALE = 1.35;
+
+function tintOakFoliage(material: Material, palette: Palette): void {
+  const painted = material as Material & { color?: Color };
+  if (painted.color === undefined) return;
+  if (material.name.includes('foliage_shadow')) painted.color.set(palette.forestDark);
+  else if (material.name.includes('foliage_light')) painted.color.set(palette.forest).multiplyScalar(1.35);
+  else if (material.name.includes('foliage')) painted.color.set(palette.forest);
+}
 
 function unit(key: string): number {
   return hash32(0x0a4c, `great-oak:${key}`) / 4_294_967_296;
 }
 
-export function buildGreatOak(map: ValleyMap, palette: Palette): GreatOak {
+export function buildGreatOak(map: ValleyMap, palette: Palette, instance?: (id: string) => Object3D | undefined): GreatOak {
   const group = new Group();
   group.name = 'Valley_GreatOak';
   const cell = greatOakCell(map);
+  const model = cell === null ? undefined : instance?.('great-oak');
+  if (cell !== null && model !== undefined) {
+    const materials = seasonTree(model, palette);
+    for (const material of materials) tintOakFoliage(material, palette);
+    model.traverse((object) => {
+      const mesh = object as Object3D & { isMesh?: boolean; castShadow?: boolean; receiveShadow?: boolean };
+      if (mesh.isMesh !== true) return;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+    });
+    group.add(model);
+    const x = cell % map.width + .5;
+    const z = Math.floor(cell / map.width) + .5;
+    group.position.set(x, elevationAt(map, x, z), z);
+    group.rotation.y = unit('facing') * Math.PI * 2;
+    return {
+      group,
+      cell,
+      season(next: Palette): void { for (const material of materials) tintOakFoliage(material, next); },
+      dispose(): void { for (const material of materials) material.dispose(); },
+    };
+  }
   const bark = new MeshStandardMaterial({ name: 'great-oak-bark', color: '#5b4130', roughness: 1, flatShading: true });
   const leaf = new MeshStandardMaterial({ name: 'great-oak-leaf', color: palette.forestDark, roughness: .9, flatShading: true });
   const leafLight = new MeshStandardMaterial({ name: 'great-oak-leaf-light', color: palette.forest, roughness: .9, flatShading: true });

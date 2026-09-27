@@ -1,0 +1,13 @@
+# quarry-face-exhausted · candidato Astra
+
+- Medida real X × alto × fondo: 6.018 × 0.870 × 2.208 m. GLB en celdas (1 celda = 3 m).
+- Triángulos: 452 / 700. Caras planas, sin texturas.
+- Materiales: stone = #9B958A, rock = #9B958A.
+- `sheet.png`: arriba izquierda tres cuartos desde arriba; arriba derecha frente (+Z); abajo izquierda perfil; abajo derecha escala con villager y house publicados, sin reescalarlos.
+- Receta: `art/recipes/quarry-face-exhausted-candidate/quarry-face-exhausted.json`.
+- Reconstrucción desde la raíz: `"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" --background --python art/recipes/hall-candidate/build.py -- quarry-face-exhausted`.
+- El adaptador reutiliza las primitivas de tools/art, aplica los giros de cubos, conserva la bisagra declarada y esculpe las variantes de peñasco declaradas. Reimporta el GLB para las capturas. No requiere Blender abierto.
+
+Frente hacia +Z; cantera de 6×3 m de parcela. Los tres estados comparten origen y posición. rock usa el rol stone existente; no se añade color.
+
+Candidato de revisión; integración y publicación pendientes en otra sesión. No se han ejecutado tests ni modificado catálogo/public.

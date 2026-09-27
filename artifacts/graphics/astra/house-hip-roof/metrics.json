@@ -1,0 +1,36 @@
+{
+  "id": "house-hip-roof",
+  "triangles": 664,
+  "triangleLimit": 900,
+  "recipePrimitiveTriangles": 702,
+  "dimensionsMetres": [
+    5.999999821186066,
+    4.9675003588199615,
+    5.999999821186066
+  ],
+  "boundsBlenderCells": {
+    "min": [
+      5.960464477539063e-08,
+      5.960464477539063e-08,
+      -0.0025000274181365967
+    ],
+    "max": [
+      2.0,
+      2.0,
+      1.6533334255218506
+    ]
+  },
+  "doorPivotMetres": [
+    2.5,
+    0.28,
+    0
+  ],
+  "materials": {
+    "plaster": "#E2CC9B",
+    "roof": "#C7984A",
+    "wood": "#9A744C",
+    "stone": "#9B958A",
+    "window": "#6B4C32",
+    "door": "#9A744C"
+  }
+}

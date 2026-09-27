@@ -1282,5 +1282,31 @@
     ],
     "orthoScale": 3.7,
     "worldRole": "sky"
+  },
+  "candidateBuild": {
+    "adapter": "build-candidates.py",
+    "triangleLimit": 1200,
+    "doorPivot": [
+      2.475,
+      0.25,
+      0
+    ],
+    "removeBuriedFaces": true,
+    "masonry": [
+      {
+        "primitive": "Stone_Walls",
+        "rows": 4,
+        "columns": 3,
+        "relief": 0.035,
+        "joint": 0.035
+      },
+      {
+        "primitive": "Stone_EntryUpperWall",
+        "rows": 1,
+        "columns": 2,
+        "relief": 0.025,
+        "joint": 0.035
+      }
+    ]
   }
 }

@@ -96,7 +96,23 @@ for (const y of [.6,1.45,2.3,3.7,4.55,5.4]) {
 for (const x of [3.72,5.68]) for (const y of [3.72,5.68]) {
   loft.primitives.push(cube(`Stone_LoftQuoin_${x}_${y}`,[x,y,4.1],[.22,.22,.65],'stone'));
 }
-for (const recipe of [wood,stone,hip,loft]) {
+// Candidato de la base: nunca se sobrescribe el recurso aprobado durante autoría.
+const stoneBase = await read('../stone-house/stone-house.json');
+stoneBase.metadata.note += ' Revisión 27 sep: juntas y relieve facetado de mampostería, sin texturas.';
+for (const recipe of [wood,stone,hip,loft,stoneBase]) {
+  const isStone = recipe.id.startsWith('stone-house');
+  const door = recipe.primitives.find(p => p.name === (isStone ? 'Stone_Door' : 'House_Door'));
+  recipe.candidateBuild = {
+    adapter: 'build-candidates.py',
+    triangleLimit: isStone ? 1200 : 900,
+    doorPivot: [door.location[0] - door.dimensions[0]/2, door.location[1], 0],
+    removeBuriedFaces: true,
+    masonry: isStone ? [
+      { primitive: 'Stone_Walls', rows: 4, columns: 3, relief: 0.035, joint: 0.035 },
+      ...(recipe.id === 'stone-house-cross-gable' ? [{ primitive: 'Stone_EntryUpperWall', rows: 1, columns: 2, relief: 0.025, joint: 0.035 }] : []),
+      ...(recipe.id === 'stone-house-tower-loft' ? [{ primitive: 'Stone_LoftWalls', rows: 2, columns: 2, relief: 0.025, joint: 0.035 }] : []),
+    ] : [],
+  };
   for (const p of recipe.primitives) p.name=p.name.replaceAll('.', '_').replaceAll('-', 'n');
   await writeFile(new URL(`${recipe.id}.json`,here), JSON.stringify(recipe,null,2)+'\n');
 }
