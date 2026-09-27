@@ -7297,6 +7297,16 @@ de roca y cae libre hasta el agua, sin repisas ni soportes añadidos. Se evitan
 árboles y peñascos y se comprueba también la oclusión por la sierra: si el
 origen, el cuerpo o el pie quedarían tapados, ese lago no lleva cascada.
 
+**Y blanca, con boca y con pie (v4.74).** El agua que cae va batida: la cinta
+es blanca por vetas y masas que bajan a golpes, con el azul sólo en los huecos,
+y luce por sí misma lo justo para no apagarse en la sombra de la garganta.
+Nace en una **boca**: un hueco oscuro en la roca con una visera de piedra,
+para que no empiece en mitad de la ladera. Al pie, una **poza de espuma** con
+anillos que se abren y **neblina** que sube del choque; en las gargantas, dos
+velos más a media caída. Y donde la senda de la garganta cruza una cascada,
+**un puente de tablas** con baranda y rampas, y el agua pasa por debajo. La
+caída al lago exige el mismo salto mínimo que la de garganta (`LEAST_DROP`).
+
 Todo esto es decorado: no cambia el motor ni una celda jugable.
 
 #### D.6.10 · El agua viva (v4.63–v4.64)

@@ -230,8 +230,9 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
     (x, z) => exteriorWaterAt(map, seed, x, z, 1.8), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))), rocks?.cairn);
   group.add(cairns);
   const roads = buildGorgeRoads(map, seed, palette, (x, z) => ridgeAt(map, seed, x, z),
-    (x, z) => exteriorWaterAt(map, seed, x, z, 1.4), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))));
-  group.add(roads.mesh);
+    (x, z) => exteriorWaterAt(map, seed, x, z, 1.4), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))),
+    (x, z) => waterfallCorridorAt(falls, x, z));
+  group.add(roads.mesh, roads.bridges);
   const water = outerWater(map, seed, palette);
   if (water !== null) group.add(water);
   const forest = tree === undefined ? null : outerTrees(map, seed, tree, palette);

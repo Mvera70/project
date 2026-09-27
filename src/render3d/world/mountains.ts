@@ -23,7 +23,7 @@
 // sale del mapa y de un hash, así que el mismo valle da siempre la misma sierra.
 
 import {
-  BufferAttribute, BufferGeometry, Color, DodecahedronGeometry, DoubleSide, DynamicDrawUsage, Euler, Group, InstancedMesh,
+  BoxGeometry, BufferAttribute, BufferGeometry, Color, DodecahedronGeometry, DoubleSide, DynamicDrawUsage, Euler, Group, InstancedMesh,
   Matrix4, Mesh, MeshStandardMaterial, Quaternion, Vector3, type Object3D,
 } from 'three';
 import { hash32 } from '@engine/rng';
@@ -475,7 +475,16 @@ export function buildCairns(
  * Decorado: no es un camino de la partida ni de la capa de vida. Por eso sólo
  * pisa la ribera de la garganta, donde no se levanta nunca nada.
  */
-export interface GorgeRoads { mesh: Mesh; season(palette: Palette): void; dispose(): void }
+export interface GorgeRoads {
+  mesh: Mesh;
+  /** Los puentes: donde la senda cruza una cascada, unas tablas por encima del agua. */
+  bridges: Group;
+  season(palette: Palette): void;
+  dispose(): void;
+}
+
+/** El puente de la garganta, en celdas: tablas, barandas y lo que sube sobre la senda. TUNE visual. */
+const BRIDGE = { deck: 0.05, over: 0.02, rail: 0.14, post: 0.04, margin: 0.12, ramp: 1.2, timber: '#6b4a2e', planks: '#8f6b45' } as const;
 
 /** Hasta dónde entra en el mapa y hasta dónde se aleja por fuera, en celdas. TUNE visual. */
 const ROAD_IN = 14;
@@ -495,9 +504,54 @@ const ROAD_SEARCH = 6;
 export function buildGorgeRoads(
   map: ValleyMap, seed: number, palette: Palette, heightAt: (x: number, z: number) => number,
   wet: (x: number, z: number) => boolean, axis: (z: number) => number,
+  crossing: (x: number, z: number) => boolean = () => false,
 ): GorgeRoads {
   const points: number[] = [];
   const fades: number[] = [];
+  // Los puentes (Vera, 27 sep 2026: «podrías poner un puente»): donde la senda
+  // cruza el corredor de una cascada, unas tablas con baranda por encima del
+  // agua, y el agua pasa por debajo. Antes la senda tapaba la cinta.
+  const bridges = new Group();
+  bridges.name = 'Valley_Gorge_Bridges';
+  const planks = new MeshStandardMaterial({ color: BRIDGE.planks, roughness: 0.9, metalness: 0 });
+  const timber = new MeshStandardMaterial({ color: BRIDGE.timber, roughness: 0.9, metalness: 0 });
+  const bridgeGeometries: BufferGeometry[] = [];
+  const bridgeAt = (from: { x: number; z: number; y: number }, to: { x: number; z: number; y: number }, floor: number): void => {
+    const dx = to.x - from.x, dz = to.z - from.z;
+    const span = Math.hypot(dx, dz) + BRIDGE.margin * 2;
+    const angle = Math.atan2(-dz, dx);
+    const at = { x: (from.x + to.x) / 2, z: (from.z + to.z) / 2 };
+    const bridge = new Group();
+    bridge.position.set(at.x, floor, at.z);
+    bridge.rotation.y = angle;
+    const deck = new Mesh(new BoxGeometry(span, BRIDGE.deck, ROAD_WIDTH + 0.12), planks);
+    deck.position.y = BRIDGE.over;
+    deck.castShadow = true;
+    bridge.add(deck);
+    // Las rampas: la senda va nivelada por la ladera y las tablas tienen que
+    // pasar por encima del agua, así que a cada lado baja una tabla inclinada
+    // hasta la cota de la senda. Sin ellas el puente flotaba sobre el camino.
+    for (const [end, y] of [[-1, from.y], [1, to.y]] as const) {
+      const drop = floor + BRIDGE.over - y;
+      const run = BRIDGE.ramp;
+      const ramp = new Mesh(new BoxGeometry(Math.hypot(run, drop), BRIDGE.deck, ROAD_WIDTH + 0.12), planks);
+      ramp.position.set(end * (span / 2 + run / 2), BRIDGE.over - drop / 2, 0);
+      ramp.rotation.z = -end * Math.atan2(drop, run);
+      bridge.add(ramp);
+    }
+    for (const side of [-1, 1]) {
+      const rail = new Mesh(new BoxGeometry(span, 0.03, 0.03), timber);
+      rail.position.set(0, BRIDGE.over + BRIDGE.rail, side * (ROAD_WIDTH / 2 + 0.04));
+      bridge.add(rail);
+      for (const end of [-1, 1]) {
+        const post = new Mesh(new BoxGeometry(BRIDGE.post, BRIDGE.rail + BRIDGE.over, BRIDGE.post), timber);
+        post.position.set(end * (span / 2 - BRIDGE.post), (BRIDGE.rail + BRIDGE.over) / 2, side * (ROAD_WIDTH / 2 + 0.04));
+        bridge.add(post);
+      }
+    }
+    bridge.traverse((node) => { if (node instanceof Mesh) bridgeGeometries.push(node.geometry as BufferGeometry); });
+    bridges.add(bridge);
+  };
   const length = ROAD_IN + ROAD_OUT;
   const count = Math.round(length / ROAD_STEP);
   for (const end of [0, 1] as const) {
@@ -557,6 +611,21 @@ export function buildGorgeRoads(
       const x = p.x + s * ROAD_WIDTH * 0.5 * (0.5 + 0.5 * fadeAt(i));
       return [x, level[i]! + GROUND_BIAS + ROAD_LIFT, p.z];
     };
+    // Los tramos que caen dentro de una cascada, de uno en uno, con un margen
+    // a cada lado, y las tablas por encima de la roca más alta del tramo: la
+    // senda va nivelada y la ladera puede asomar por encima de ella.
+    for (let i = 0; i < count; i += 1) {
+      if (!crossing(centre[i]!.x, centre[i]!.z)) continue;
+      let j = i;
+      while (j + 1 < count && crossing(centre[j + 1]!.x, centre[j + 1]!.z)) j += 1;
+      let floor = -Infinity;
+      for (let k = Math.max(0, i - 1); k <= Math.min(count, j + 1); k += 1) {
+        floor = Math.max(floor, level[k]! + ROAD_LIFT, raw[k]! + 0.06);
+      }
+      const a = Math.max(0, i - 1), b = Math.min(count, j + 1);
+      bridgeAt({ ...centre[a]!, y: GROUND_BIAS + level[a]! + ROAD_LIFT }, { ...centre[b]!, y: GROUND_BIAS + level[b]! + ROAD_LIFT }, GROUND_BIAS + floor);
+      i = j;
+    }
     for (let i = 0; i < count; i += 1) {
       const a = edge(i, -1), b = edge(i, 1), c = edge(i + 1, -1), d = edge(i + 1, 1);
       points.push(...a, ...c, ...b, ...b, ...c, ...d);
@@ -589,7 +658,16 @@ export function buildGorgeRoads(
     colour.needsUpdate = true;
   };
   season(palette);
-  return { mesh, season, dispose(): void { geometry.dispose(); material.dispose(); } };
+  return {
+    mesh, bridges, season,
+    dispose(): void {
+      geometry.dispose();
+      material.dispose();
+      for (const one of bridgeGeometries) one.dispose();
+      planks.dispose();
+      timber.dispose();
+    },
+  };
 }
 
 /** El margen que se deja al agua porque el suavizado puede acercar la senda a la orilla. */
