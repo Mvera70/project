@@ -24,7 +24,7 @@ import { BUILDING_LOOKS, RUIN, type BuildingLook } from '../visual-config';
 import { DEFENCE_DIAGONALS, defenceConnections } from './defences';
 import { forestLooks, forestSignature } from './forest-state';
 import { scatterTransform } from './forest';
-import { houseVariant } from './house-variation';
+import { houseFormAsset, houseVariant } from './house-variation';
 import { bastionAccessOf, type BastionAccess } from '@derive/bastion-access';
 import { bastionWalkwayOf, type BastionWalkway } from '@derive/bastion-walkway';
 import { elevatedRingOf, type ElevatedRing, type ElevatedRingSegment, type ElevatedRingVariant, type RingCell, type RingPoint } from '@derive/elevated-ring';
@@ -651,7 +651,10 @@ export function planFor(state: GameState): ScenePlan {
           gateCornerLinks: gateAsset(building) === 'gate' ? gateCornerLinks(building) : 0,
         } : {}),
         ...((building.kind === 'house' || building.kind === 'stone_house') && building.lostTick === null
-          ? { variant: houseVariant(state.seed, building.x, building.y) } : {}),
+          ? {
+            asset: houseFormAsset(building.kind, state.seed, building.x, building.y),
+            variant: houseVariant(state.seed, building.x, building.y),
+          } : {}),
         ...(connections.has(building.id) ? { connections: connections.get(building.id)! } : {}),
         ...(gates.has(building.id) ? { gate: gates.get(building.id)! } : {}),
         ...(access === null ? {} : walkway === null

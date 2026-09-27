@@ -1107,5 +1107,16 @@
     ],
     "orthoScale": 3.7,
     "worldRole": "sky"
+  },
+  "candidateBuild": {
+    "adapter": "build-candidates.py",
+    "triangleLimit": 900,
+    "doorPivot": [
+      2.5,
+      0.28,
+      0
+    ],
+    "removeBuriedFaces": true,
+    "masonry": []
   }
 }

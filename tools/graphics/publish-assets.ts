@@ -3,7 +3,8 @@
  *
  * Publicar es una admisión selectiva, nunca una limpieza de `public/`: los
  * binarios existentes pueden pertenecer a otras rondas. Se comprueba el lote
- * entero antes de escribir uno solo y se rechaza cualquier colisión de bytes.
+ * entero antes de escribir uno solo. Una revisión sólo reemplaza los bytes
+ * anteriores si coinciden con el hash que ya figura en el manifiesto.
  */
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
@@ -119,12 +120,12 @@ async function assertDestinations(candidates: readonly Candidate[], manifest: Pu
       throw new Error(`Refusing a symlinked destination: ${relative(ROOT, destination)}`);
     }
     const destinationHash = sha256(await readFile(destination));
-    if (destinationHash !== candidate.sha256) {
-      throw new Error(`Refusing to overwrite ${relative(ROOT, destination)}: its bytes differ from approved '${candidate.asset.id}'.`);
-    }
     const recorded = manifest.assets.find(asset => asset.file === candidate.file);
     if (recorded !== undefined && recorded.id !== candidate.asset.id) {
       throw new Error(`Refusing to claim ${candidate.file}: manifest assigns it to '${recorded.id}'.`);
+    }
+    if (destinationHash !== candidate.sha256 && destinationHash !== recorded?.sha256) {
+      throw new Error(`Refusing to overwrite ${relative(ROOT, destination)}: its bytes match neither the approved asset nor the published manifest.`);
     }
   }
 }
@@ -156,7 +157,9 @@ async function main(): Promise<void> {
   await mkdir(OUTPUT, { recursive: true });
   for (const candidate of candidates) {
     const destination = resolve(OUTPUT, candidate.file);
-    if (!existsSync(destination)) await writeFile(destination, candidate.bytes);
+    if (!existsSync(destination) || sha256(await readFile(destination)) !== candidate.sha256) {
+      await writeFile(destination, candidate.bytes);
+    }
     const copied = await readFile(destination);
     if (sha256(copied) !== candidate.sha256) {
       throw new Error(`'${candidate.asset.id}' destination failed verification after copy.`);

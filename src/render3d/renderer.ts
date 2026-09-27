@@ -57,6 +57,7 @@ import {
 } from './world/forest';
 import type { ForestRevealTarget } from './world/forest-occlusion';
 import { BUILDING_ASSETS, ELEVATED_RING_ASSETS, Village } from './world/buildings';
+import { HOUSE_FORM_ASSETS } from './world/house-variation';
 import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
 import { isNight, type HomeRoutine } from './life/home';
 import { fitsCircle, penetration } from './life/body';
@@ -135,6 +136,8 @@ export const WANTED = [
   'bastion-access-candidate', 'e3b-bastion-joint-candidate', 'e3b-walkway-entry-candidate',
   ...Object.values(ELEVATED_RING_ASSETS),
   ...new Set(Object.values(BUILDING_ASSETS)),
+  ...HOUSE_FORM_ASSETS.house.slice(1),
+  ...HOUSE_FORM_ASSETS.stone_house.slice(1),
 ];
 
 /**

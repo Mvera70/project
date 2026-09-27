@@ -2242,14 +2242,14 @@
     },
     {
       "id": "stone-house",
-      "artifactRound": "G-21",
+      "artifactRound": "G-41",
       "status": "study",
-      "recipe": "art/recipes/stone-house/stone-house.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "art/recipes/house-variant-candidate/stone-house.json",
+      "generator": "art/recipes/house-variant-candidate/build-candidates.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T22-04-25-239Z-21428",
-        "directory": "artifacts/graphics/G-21/approved/110f59506b8e4bcd"
+        "runId": "astra-1fdbb0252a67",
+        "directory": "artifacts/graphics/G-41/approved/1fdbb0252a67b294"
       },
       "bounds": {
         "min": [
@@ -2268,36 +2268,29 @@
           2
         ]
       },
-      "recipeSha256": "D83590050B7B91F55D7581397AAAA02E4166BC1F3275CB4031DD57EEFBC2E765",
+      "recipeSha256": "6F8D60C03FDEEE432399F5D8548E7BDD51A1887A156FF34B2FC7F6A72D8F2309",
       "materials": [
-        "stone",
+        "door",
         "roof",
-        "wood",
+        "stone",
         "window",
-        "door"
+        "wood"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 6,
+        "objects": 5,
         "meshes": 5,
         "materials": 5,
-        "triangles": 764
+        "triangles": 1048
       },
       "hashes": {
-        "stone-house.blend": "BABA12CF70A3EE42CE0220E3FEDCF242C77D64B335F5BADABC187EFBE1330693",
-        "stone-house.glb": "110F59506B8E4BCD05666168A66CC04A72B5CB19634829C579E794F9FF12A10B",
-        "stone-house-blender.png": "D0C3E03D40FEBE74224B1BFB22B5725E6111F1DD5451F37B2482DEC283C47CAB",
-        "capture-1.png": "A004B792B6258EA25AF41820FF066F517113CD00D2D9221BC7A923B143A655F8",
-        "capture-1-gray.png": "5131565ABAD0243CA3D8F02C9F787B94E4AED82F298471E76D40FB18179F236C",
-        "capture.json": "B447FCD9CE8AD9C60CFE1840082F8D69B9F6A9B84F81B596792D4ECDC3DEB488",
-        "build.json": "538F67D13360DBEB61898CE26D0921B9069DD6E7151AFA9375BAADC4829E3E87",
-        "validation.json": "03CC127233CA7975596661581B77F953ADAFFD50B7F8694B7C1270B672D08843"
+        "stone-house.glb": "1FDBB0252A67B294E94D99A596B22264FCD2DB249C47A83E13B8757D9CF6A599"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: vivienda de piedra y teja, contratos de parcela y ventanas conservados.",
+        "source": "Revisión original de mampostería para The Valley, receta G-41.",
         "license": "Project original"
       }
     },
@@ -5853,6 +5846,224 @@
         "kind": "original",
         "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
         "license": "project-original"
+      }
+    },
+    {
+      "id": "house-twin-gable",
+      "artifactRound": "G-41",
+      "status": "study",
+      "recipe": "art/recipes/house-variant-candidate/house-twin-gable.json",
+      "generator": "art/recipes/house-variant-candidate/build-candidates.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "astra-1ca974db811e",
+        "directory": "artifacts/graphics/G-41/approved/1ca974db811e5fe1"
+      },
+      "bounds": {
+        "min": [
+          0,
+          -0.0025,
+          -2
+        ],
+        "max": [
+          2,
+          1.561,
+          0
+        ],
+        "size": [
+          2,
+          1.5635,
+          2
+        ]
+      },
+      "recipeSha256": "37AF90439F4E69802B3287C93B4C757CFABD751F0C4FA73AEDF4721ECFE7AD03",
+      "materials": [
+        "door",
+        "plaster",
+        "roof",
+        "stone",
+        "window",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 6,
+        "meshes": 6,
+        "materials": 6,
+        "triangles": 708
+      },
+      "hashes": {
+        "house-twin-gable.glb": "1CA974DB811E5FE1F695F3A3F99A93A899D2DD9C9BA29C14061DF7D6CE35C278"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de house para The Valley, receta G-41.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "house-hip-roof",
+      "artifactRound": "G-41",
+      "status": "study",
+      "recipe": "art/recipes/house-variant-candidate/house-hip-roof.json",
+      "generator": "art/recipes/house-variant-candidate/build-candidates.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "astra-fe50b95e7424",
+        "directory": "artifacts/graphics/G-41/approved/fe50b95e7424526a"
+      },
+      "bounds": {
+        "min": [
+          0,
+          -0.0025,
+          -2
+        ],
+        "max": [
+          2,
+          1.653333,
+          0
+        ],
+        "size": [
+          2,
+          1.655833,
+          2
+        ]
+      },
+      "recipeSha256": "199F9EDE9991F5FF6F56CF376B7D8849D166B330B498F934BD6ACBD82C2B549E",
+      "materials": [
+        "door",
+        "plaster",
+        "roof",
+        "stone",
+        "window",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 6,
+        "meshes": 6,
+        "materials": 6,
+        "triangles": 664
+      },
+      "hashes": {
+        "house-hip-roof.glb": "FE50B95E7424526A60359271DB733426698DE2436797C20A5C881D8532316C9F"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de house para The Valley, receta G-41.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "stone-house-cross-gable",
+      "artifactRound": "G-41",
+      "status": "study",
+      "recipe": "art/recipes/house-variant-candidate/stone-house-cross-gable.json",
+      "generator": "art/recipes/house-variant-candidate/build-candidates.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "astra-60faf162b003",
+        "directory": "artifacts/graphics/G-41/approved/60faf162b003ced0"
+      },
+      "bounds": {
+        "min": [
+          0,
+          -0.0025,
+          -2
+        ],
+        "max": [
+          2,
+          1.56,
+          0
+        ],
+        "size": [
+          2,
+          1.5625,
+          2
+        ]
+      },
+      "recipeSha256": "FE4218099BA00DDDC75408FC2AFD88B56B3C9F72D7B215D07C50E4B2D8621A75",
+      "materials": [
+        "door",
+        "roof",
+        "stone",
+        "window",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 5,
+        "meshes": 5,
+        "materials": 5,
+        "triangles": 1176
+      },
+      "hashes": {
+        "stone-house-cross-gable.glb": "60FAF162B003CED0FA9D51BE804C3805A0B9BE1A27B0035DF1CD54BCFEF3F216"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de stone-house para The Valley, receta G-41.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "stone-house-tower-loft",
+      "artifactRound": "G-41",
+      "status": "study",
+      "recipe": "art/recipes/house-variant-candidate/stone-house-tower-loft.json",
+      "generator": "art/recipes/house-variant-candidate/build-candidates.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "astra-f2fc99979406",
+        "directory": "artifacts/graphics/G-41/approved/f2fc99979406d682"
+      },
+      "bounds": {
+        "min": [
+          0,
+          -0.0025,
+          -2
+        ],
+        "max": [
+          2,
+          1.876667,
+          0
+        ],
+        "size": [
+          2,
+          1.879167,
+          2
+        ]
+      },
+      "recipeSha256": "8440BEE3776136DE7C27C0AC6FE6F0F17E2E9C59E2AE7FA05DFF0306AB6806C1",
+      "materials": [
+        "door",
+        "roof",
+        "stone",
+        "window",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 5,
+        "meshes": 5,
+        "materials": 5,
+        "triangles": 1198
+      },
+      "hashes": {
+        "stone-house-tower-loft.glb": "F2FC99979406D6826280D80CED2B77D218F4BB8114BD7BEE149DA037C53D0F95"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de stone-house para The Valley, receta G-41.",
+        "license": "Project original"
       }
     }
   ]
