@@ -12,6 +12,12 @@ un cuerpo azul verdoso que llega al río o al lago; la espuma queda al pie y se
 retiran los anillos concéntricos. Revisado con capturas del juego real en
 `artifacts/graphics/water-review/` (semillas 7 y 11, cauce, lago y garganta).
 
+Corrección posterior: Vera vio que una caída atravesaba la roca y un pino.
+Ahora las gargantas siguen también la superficie visible de la montaña y
+buscan un corredor libre de árboles y peñascos. La caída al lago solo se dibuja
+si su recorrido se ve libre desde la cámara de reposo; cuando existe, cae
+directamente desde la roca al agua, sin una repisa añadida.
+
 ## v4.72 · 27 sep 2026 · Lo que se quedó en ramas
 
 Vera: «nos dejamos trabajo sin subir en ramas perdidas… revisa al completo».

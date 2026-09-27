@@ -7290,9 +7290,12 @@ en la sierra. Cruza la marisma en vez de rodearla, y va a una cota suavizada y
 plana de lado a lado, como una plataforma.
 
 **Cascadas (v4.64).** Una baja por la pared de cada garganta hasta el río, y
-otra al lago si hay roca detrás (`world/waterfalls.ts`, `gorgeAt` decide dónde
-hay pared de garganta): una cinta pegada a la roca con vetas que bajan y
-espuma al pie, y se elige la pared que mira a la cámara.
+otra al lago cuando haya roca, recorrido despejado y una caída visible desde
+la cámara de reposo (`world/waterfalls.ts`, `gorgeAt` decide dónde hay pared
+de garganta). Las gargantas siguen el relieve; la del lago nace en una cara
+de roca y cae libre hasta el agua, sin repisas ni soportes añadidos. Se evitan
+árboles y peñascos y se comprueba también la oclusión por la sierra: si el
+origen, el cuerpo o el pie quedarían tapados, ese lago no lleva cascada.
 
 Todo esto es decorado: no cambia el motor ni una celda jugable.
 

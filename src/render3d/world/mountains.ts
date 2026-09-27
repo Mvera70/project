@@ -30,7 +30,7 @@ import { hash32 } from '@engine/rng';
 import { TERRAIN_CODE, type ValleyMap } from '@engine/state';
 import type { Palette } from '@derive/palette';
 import { GROUND_BIAS } from '../visual-config';
-import { elevationAt, groundColourAt } from './ground';
+import { elevationAt, groundColourAt, groundSurfaceAt } from './ground';
 
 /** Lo alto que llega la sierra de fuera, en celdas (`ridge.ts`): la escala de las franjas. */
 export const MOUNTAIN_PEAK = 19;
@@ -152,6 +152,26 @@ const SKIN_LIFT = 0.012;
 const SKIN_FROM = 0.35;
 /** Hasta qué altura la piel lleva el color del suelo que tapa, en celdas. */
 const SKIN_OWN = 1.6;
+
+/** Envolvente visible: suelo desplazado y piel con sus diagonales alternas.
+ * El agua debe apoyarse sobre ambas mallas, no sólo sobre la altura bilineal.
+ */
+export function mountainSurfaceAt(map: ValleyMap, x: number, z: number): number {
+  const floor = groundSurfaceAt(map, x, z);
+  const col = Math.floor(x), row = Math.floor(z);
+  if (col < 0 || row < 0 || col >= map.width || row >= map.height
+    || map.terrain[row * map.width + col] !== TERRAIN_CODE.mountain) return floor;
+  const a = elevationAt(map, col, row), b = elevationAt(map, col + 1, row);
+  const c = elevationAt(map, col, row + 1), d = elevationAt(map, col + 1, row + 1);
+  if (Math.max(a, b, c, d) < SKIN_FROM) return floor;
+  const u = x - col, v = z - row;
+  const skin = (col + row) % 2 === 0
+    ? (u + v <= 1 ? a + (b - a) * u + (c - a) * v
+      : d + (c - d) * (1 - u) + (b - d) * (1 - v))
+    : (u >= v ? a + (b - a) * u + (d - b) * v
+      : a + (d - c) * u + (c - a) * v);
+  return Math.max(floor, skin + SKIN_LIFT);
+}
 
 export interface MountainSkin {
   readonly mesh: Mesh;

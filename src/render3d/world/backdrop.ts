@@ -17,6 +17,7 @@ import { valleyAxis } from './valley-profile';
 import { elevationAt } from './ground';
 import { TERRAIN_CODE } from '@engine/state';
 import { riverExtensionAt, riverSection } from './river-extension';
+import { waterfallCorridorAt, waterfallSites } from './waterfalls';
 
 export interface Backdrop {
   readonly group: Group;
@@ -214,13 +215,16 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
   // de dentro y de fuera (`mountains.ts`).
   const skin = buildMountainSkin(map, palette, snow);
   if (skin !== null) group.add(skin.mesh);
+  const falls = waterfallSites(map, seed, (x, z) => elevationAt(map, x, z));
   const inside = placeCrags(seed, { x0: 0.5, x1: map.width, z0: 0.5, z1: map.height }, 1,
     (x, z) => elevationAt(map, x, z),
     (x, z) => map.terrain[Math.floor(z) * map.width + Math.floor(x)] !== TERRAIN_CODE.mountain, CRAGS_INSIDE);
   const outside = placeCrags(seed + 1, { x0: -40, x1: map.width + 40, z0: -40, z1: map.height + 40 }, 1.6,
     (x, z) => ridgeAt(map, seed, x, z),
     (x, z) => (x > 0 && x < map.width && z > 0 && z < map.height) || exteriorWaterAt(map, seed, x, z, 2.2), CRAGS_OUTSIDE);
-  const crags = buildCrags([...inside, ...outside], palette, rocks?.crags);
+  // El cauce precede al decorado: ningún peñasco se planta atravesándolo.
+  const clearInside = inside.filter(rock => !waterfallCorridorAt(falls, rock.x, rock.z, rock.size * 1.5));
+  const crags = buildCrags([...clearInside, ...outside], palette, rocks?.crags);
   group.add(crags.group);
   const cairns = buildCairns(map, palette, (x, z) => ridgeAt(map, seed, x, z),
     (x, z) => exteriorWaterAt(map, seed, x, z, 1.8), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))), rocks?.cairn);
