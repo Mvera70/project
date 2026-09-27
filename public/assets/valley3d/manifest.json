@@ -1231,7 +1231,7 @@
     {
       "id": "bear",
       "file": "bear.glb",
-      "sha256": "25EFA025A83F3DC3308E0269C967563AD7D5C501F63454E730BC27401A9EA2F3",
+      "sha256": "B7581168250260DE7EADEA519F7950AD97473AB9C8C73A93DE9E5DC0110D2E1E",
       "motion": [
         {
           "name": "attack",
@@ -1254,7 +1254,7 @@
       ],
       "provenance": {
         "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, bear.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
+        "source": "Modelo original de The Valley (deliverables/marked-models-trial/bear-v3.glb); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
         "license": "Project original"
       }
     },

@@ -336,17 +336,17 @@
         "min": [
           -0.701,
           0,
-          -0.2405
+          -0.268343
         ],
         "max": [
           0.459,
-          0.730356,
-          0.2405
+          0.75,
+          0.268343
         ],
         "size": [
           1.16,
-          0.730356,
-          0.481
+          0.75,
+          0.536685
         ]
       },
       "recipeSha256": null,
@@ -387,18 +387,18 @@
       ],
       "connectors": [],
       "statistics": {
-        "objects": 82,
-        "meshes": 63,
+        "objects": 84,
+        "meshes": 65,
         "materials": 8,
-        "triangles": 3168
+        "triangles": 3560
       },
       "hashes": {
-        "bear.glb": "25EFA025A83F3DC3308E0269C967563AD7D5C501F63454E730BC27401A9EA2F3",
-        "bear-preview.png": "70F2878BDF603FD3AA57B0C49EF658C24005ADFF48B8805E086B1F03A18A63AB"
+        "bear.glb": "B7581168250260DE7EADEA519F7950AD97473AB9C8C73A93DE9E5DC0110D2E1E",
+        "bear-preview.png": "8442477D9282F43B149B80BEB74C9DEA9110F4B887FE333C432626770A52F608"
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, bear.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
+        "source": "Modelo original de The Valley (deliverables/marked-models-trial/bear-v3.glb); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
         "license": "Project original"
       }
     },
