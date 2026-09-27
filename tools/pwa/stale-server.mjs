@@ -22,6 +22,7 @@ const TYPES = {
   '.png': 'image/png',
   '.webmanifest': 'application/manifest+json',
   '.map': 'application/json',
+  '.json': 'application/json',
 };
 
 let version = 1;
@@ -40,6 +41,12 @@ createServer(async (req, res) => {
     if (path.endsWith('index.html')) {
       // The marker a test can read without depending on anything the game draws.
       body = Buffer.from(body.toString().replace('<title>The Valley</title>', `<title>V${version}</title>`));
+    }
+    if (path.endsWith('/assets/valley3d/manifest.json')) {
+      // Y el manifiesto de modelos, marcado igual: un despliegue que trae
+      // modelos nuevos los trae en él, y no llegaba (27 sep 2026).
+      const manifest = JSON.parse(body.toString());
+      body = Buffer.from(JSON.stringify({ ...manifest, deployment: version }));
     }
     res.writeHead(200, {
       'Content-Type': TYPES[extname(path)] ?? 'application/octet-stream',

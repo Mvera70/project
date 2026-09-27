@@ -5,6 +5,7 @@
 // policies, and §13.4 makes the split normative:
 //
 //   the document        network first, cache as the fallback
+//   the model manifest  network first too (see below)
 //   everything else     cache first, and stored on the way through
 //
 // The document has to come from the network when there is one, or a new
@@ -25,7 +26,9 @@
 // ocupando sitio y sin servir a nadie. Cuesta volver a bajar 2,7 MB una vez, y
 // es lo que hace que los animales rediseñados lleguen al iPad del dueño del
 // diseño, que es donde se vio el problema.
-const CACHE = 'valley-v6';
+// v7 · 27 sep 2026: el manifiesto de modelos se quedaba congelado (abajo). Subir
+// el nombre tira la caché vieja y con ella ese manifiesto rancio.
+const CACHE = 'valley-v7';
 
 const SHELL = ['./', './index.html', './manifest.webmanifest'];
 
@@ -189,5 +192,12 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   if (new URL(request.url).origin !== self.location.origin) return;
 
-  event.respondWith(request.mode === 'navigate' ? networkFirst(request) : cacheFirst(request));
+  // **El manifiesto de los modelos, de la red primero**, como el documento. Es
+  // el único recurso que el juego pide sin huella en el nombre —las huellas
+  // salen de él—, así que con «caché primero» se quedaba el de la primera
+  // visita para siempre: la tablet de Vera no supo nunca que existían las
+  // casas nuevas, el ciervo arreglado ni el oso v3, y ponía cajas de reserva
+  // en su lugar (27 sep 2026). Sin red, sirve el guardado.
+  const manifest = new URL(request.url).pathname.endsWith('/assets/valley3d/manifest.json');
+  event.respondWith(request.mode === 'navigate' || manifest ? networkFirst(request) : cacheFirst(request));
 });

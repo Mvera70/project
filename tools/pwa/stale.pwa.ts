@@ -30,6 +30,12 @@ test('un despliegue nuevo alcanza a un cliente que ya visitó, con las cabeceras
   // por debajo del service worker y la red no se llega a tocar.
   await page.goto(BASE);
   test.expect(await page.title()).toBe('V2');
+  // Y el manifiesto de los modelos también es el nuevo: con «caché primero»
+  // se quedaba el de la primera visita, y los modelos nuevos no existían para
+  // ese aparato (la tablet de Vera ponía cajas en vez de las casas nuevas).
+  const deployment = await page.evaluate(async () =>
+    (await (await fetch('./assets/valley3d/manifest.json')).json() as { deployment?: number }).deployment);
+  test.expect(deployment).toBe(2);
 
   // Y sigue abriendo sin red después de la actualización.
   await page.context().setOffline(true);

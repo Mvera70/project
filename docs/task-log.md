@@ -1,5 +1,15 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · El manifiesto de modelos, de la red primero (v4.78)
+
+`public/sw.js`: `/assets/valley3d/manifest.json` va por `networkFirst`; caché
+`valley-v7`. `tools/pwa/stale-server.mjs` marca el manifiesto con
+`deployment` en cada `__bump`; `stale.pwa.ts` lo comprueba tras el despliegue.
+Síntoma: cajas de reserva en lugar de las variantes de casa en la tablet de
+Vera (los GLB estaban publicados y bien; el manifiesto cacheado no los listaba).
+**Ojo**: cualquier recurso nuevo que el juego pida sin huella en el nombre
+tiene que ir también de la red primero, o se congela igual.
+
 ## 27 sep 2026 · Corredores de garganta (v4.78)
 
 Reglas: **un trazado compartido, la senda libre en toda su anchura, las copas

@@ -1,5 +1,19 @@
 # The Valley — Registro de cambios
 
+## v4.78 · 27 sep 2026 · Los modelos nuevos llegan a los aparatos que ya visitaron
+
+Vera, en su tablet: «¿las casas se han roto o están a media construcción? … se
+hicieron variedades de casas que no veo». Ni una cosa ni otra: eran las **cajas
+de reserva** que el juego pone cuando no conoce el modelo de un edificio. El
+service worker servía de su caché, para siempre, el manifiesto de los modelos
+—el único recurso sin huella en el nombre, porque las huellas salen de él—, así
+que la tablet se quedó con el de su primera visita: no sabía que existían las
+casas nuevas, ni el ciervo arreglado, ni el oso v3. Ahora el manifiesto se pide
+**primero a la red**, como el documento, con la caché sólo sin conexión, y la
+caché sube a `valley-v7` para tirar la rancia. La prueba de la PWA que ya
+comprobaba que un despliegue nuevo llega a quien ya visitó mira ahora también
+el manifiesto; con el worker viejo falla (recibe el del despliegue 1).
+
 ## v4.78 · 27 sep 2026 · Corredores geométricos de garganta
 
 Las fotos de tablet demostraron que v4.77 no bastaba: apoyar el eje de una
