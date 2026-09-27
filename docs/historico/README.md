@@ -105,6 +105,7 @@ desde `design.md` para explicar una decisión concreta.
 | `graphics-rounds/` | Las rondas de gráficos **G-00 a G-32**, E3b y P-1a/P-1b, con informes, traspasos, encargos de Blender y evidencia de rendimiento |
 | `life-rounds/` | Las rondas de la vida del valle: **V-00 a V-14** (la capa de vida) e **IA-0 a IA-18** (la IA escénica), más la sonda de línea base y la evidencia en capturas |
 | `sesiones/` | Notas de sesión |
+| `agent-phase/` · `agent-work-phase.md` | La tanda P0–P7 de Codex (Terra y Luna, 17 sep): la guía, un informe por fase y la revisión final. Archivada el 27 sep desde una rama sin fusionar; lo aceptado entró en `main` (e980c81) |
 
 ---
 
