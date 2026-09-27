@@ -131,6 +131,7 @@ export const WANTED = [
   // M-3 · el arado ya tiene GLB; el barril sigue usando el respaldo procedural.
   // `WANTED` puede incluirlo antes de publicarlo para que aparezca al llegar.
   'barrel', 'plough',
+  'burnt-house', 'great-oak',
   ...FAUNA,
   // E3 · el plan sustituye el bastión por esta variante cuando cabe su escalera.
   'bastion-access-candidate', 'e3b-bastion-joint-candidate', 'e3b-walkway-entry-candidate',
@@ -396,7 +397,7 @@ export async function createGraphicsRenderer(
   const weather = createWeather(scene);
   const tells = new Tells();
   // E4 · los edificios que arden (`effects/fires.ts`).
-  const fires = createFires();
+  const fires = createFires((id) => library.instance(id));
   const fauna = new Fauna((kind) => library.instance(kind), (kind) => library.get(kind));
   const bubbles = new Bubbles();
   const props = new Props((id) => library.instance(id));
@@ -899,7 +900,7 @@ export async function createGraphicsRenderer(
       world.remove(greatOak.group);
       greatOak.dispose();
     }
-    greatOak = buildGreatOak(state.map, palette);
+    greatOak = buildGreatOak(state.map, palette, (id) => library.instance(id));
     world.add(greatOak.group);
     if (ambience !== null) {
       world.remove(ambience.group);
@@ -1715,6 +1716,7 @@ export async function createGraphicsRenderer(
       // un día tarde, con la casa ya en ruina (primera captura de E4). Así la
       // casa arde todavía en pie y al amanecer se derrumba bajo las llamas.
       fires.update(state, frame.presentationSeconds);
+      village.coverBurning(fires.covered);
       // Y el rio corre. Un rio quieto es un suelo azul.
       ground?.ripple(frame.presentationSeconds);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño

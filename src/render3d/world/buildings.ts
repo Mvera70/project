@@ -567,6 +567,11 @@ export class Village {
     for (const model of this.models.values()) model.weather(snow, colour);
   }
 
+  /** La casa incendiada la sustituye temporalmente la malla que cae con el fuego. */
+  coverBurning(ids: ReadonlySet<BuildingId>): void {
+    for (const [id, model] of this.models) model.object.visible = !ids.has(id);
+  }
+
   add(planned: PlannedBuilding): void {
     // `add` reemplaza una malla durante la misma escena (nieve, ruina, cambio
     // de recurso). No puede resucitar una hoja que ya rompió la física. Sólo

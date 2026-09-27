@@ -20,7 +20,7 @@
 
 import {
   AdditiveBlending, CanvasTexture, Group, NormalBlending, PointLight, Sprite, SpriteMaterial,
-  type Texture,
+  type Euler, type Object3D, type Texture, type Vector3,
 } from 'three';
 import { BURNING } from '@engine/balance';
 import { SCENIC_DAY_SECONDS } from '../presentation-clock';
@@ -126,6 +126,74 @@ interface Flame { sprite: Sprite; material: SpriteMaterial; texture: Texture; se
 interface Puff { sprite: Sprite; material: SpriteMaterial; seed: number }
 interface Spark { sprite: Sprite; material: SpriteMaterial; seed: number }
 
+interface CollapsePart {
+  readonly node: Object3D;
+  readonly position: Vector3;
+  readonly rotation: Euler;
+  readonly drift: readonly [number, number, number];
+  readonly turn: readonly [number, number, number];
+}
+
+interface BurnVisual {
+  readonly shell: Object3D;
+  readonly pile: Object3D;
+  readonly parts: readonly CollapsePart[];
+}
+
+/** Cada pieza gira desde el pivote que trae el GLB; la base queda hasta caer. */
+const COLLAPSE: Readonly<Record<string, {
+  drift: readonly [number, number, number]; turn: readonly [number, number, number];
+}>> = {
+  burnt_house_wall_front: { drift: [0, -0.55, 0.28], turn: [0.62, 0, 0] },
+  burnt_house_wall_back: { drift: [0, -0.48, -0.24], turn: [-0.58, 0, 0] },
+  burnt_house_wall_left: { drift: [-0.32, -0.5, 0], turn: [0, 0, 0.65] },
+  burnt_house_wall_right: { drift: [0.32, -0.5, 0], turn: [0, 0, -0.65] },
+  burnt_house_roof_left: { drift: [-0.25, -0.92, 0.08], turn: [0, 0, 0.82] },
+  burnt_house_roof_right: { drift: [0.25, -0.98, -0.06], turn: [0, 0, -0.86] },
+  burnt_house_chimney: { drift: [0.12, -0.7, 0.12], turn: [0.25, 0, 0.32] },
+};
+
+function burnVisual(instance: (id: string) => Object3D | undefined, group: Group, buildingId: number): BurnVisual | null {
+  const shell = instance('burnt-house');
+  const pile = instance('ruin-wood');
+  if (shell === undefined || pile === undefined) return null;
+  shell.userData.buildingId = buildingId;
+  pile.userData.buildingId = buildingId;
+  const position = new Group();
+  position.position.set(-1, 0, 1);
+  pile.visible = false;
+  position.add(shell, pile);
+  group.add(position);
+  const parts: CollapsePart[] = [];
+  for (const [name, motion] of Object.entries(COLLAPSE)) {
+    const node = shell.getObjectByName(name);
+    if (node === undefined) continue;
+    parts.push({ node, position: node.position.clone(), rotation: node.rotation.clone(), ...motion });
+  }
+  return { shell, pile, parts };
+}
+
+function collapseVisual(visual: BurnVisual, days: number): void {
+  const range = BURNING.COLLAPSE_END_DAYS - BURNING.COLLAPSE_START_DAYS;
+  const fraction = Math.max(0, Math.min(1, (days - BURNING.COLLAPSE_START_DAYS) / range));
+  const eased = fraction * fraction * (3 - 2 * fraction);
+  visual.shell.visible = fraction < 1;
+  visual.pile.visible = fraction > 0;
+  for (const part of visual.parts) {
+    part.node.position.set(
+      part.position.x + part.drift[0] * eased,
+      part.position.y + part.drift[1] * eased,
+      part.position.z + part.drift[2] * eased,
+    );
+    part.node.rotation.set(
+      part.rotation.x + part.turn[0] * eased,
+      part.rotation.y + part.turn[1] * eased,
+      part.rotation.z + part.turn[2] * eased,
+      part.rotation.order,
+    );
+  }
+}
+
 interface Blaze {
   readonly id: number;
   readonly group: Group;
@@ -138,6 +206,7 @@ interface Blaze {
   readonly startSeconds: number;
   /** Si la aldea la está apagando: llama corta y vapor blanco. */
   readonly doused: boolean;
+  readonly visual: BurnVisual | null;
   light: PointLight | null;
 }
 
@@ -145,6 +214,8 @@ export interface Fires {
   readonly group: Group;
   /** Cuántos edificios arden ahora mismo (para la traza y las pruebas del navegador). */
   readonly burning: number;
+  /** Edificios cuyo dibujo normal queda cubierto por el derrumbe visible. */
+  readonly covered: ReadonlySet<number>;
   update(state: Readonly<GameState>, presentationSeconds: number): void;
   clear(): void;
   dispose(): void;
@@ -171,13 +242,14 @@ export function dousedBuildings(state: Readonly<GameState>): Building[] {
   });
 }
 
-export function createFires(): Fires {
+export function createFires(instance: (id: string) => Object3D | undefined = () => undefined): Fires {
   const group = new Group();
   group.name = 'Valley_Fires';
   const sheet = flameSheet();
   const puff = puffTexture();
   const spark = sparkTexture();
   const blazes = new Map<number, Blaze>();
+  const covered = new Set<number>();
   const totalDays = BURNING.FLAME_DAYS + BURNING.EMBER_DAYS;
 
   const build = (state: Readonly<GameState>, building: Building, presentationSeconds: number, doused: boolean): Blaze => {
@@ -219,6 +291,8 @@ export function createFires(): Fires {
       sparks.push({ sprite, material, seed: building.id * 53 + i });
     }
     blazeGroup.position.set(cx, cy, cz);
+    const visual = !doused && building.kind === 'house' && building.w === 2 && building.h === 2
+      ? burnVisual(instance, blazeGroup, building.id) : null;
     group.add(blazeGroup);
     // Si el fuego ya llevaba días —una partida cargada, un salto de velocidad—
     // se estrena donde iba, no desde el primer chispazo.
@@ -226,7 +300,7 @@ export function createFires(): Fires {
     const startSeconds = presentationSeconds - alreadyWeeks * 7 * SCENIC_DAY_SECONDS;
     return {
       id: building.id, group: blazeGroup, centre: { x: cx, y: cy, z: cz },
-      spread: { w: building.w, h: building.h }, flames, puffs, sparks, startSeconds, doused, light: null,
+      spread: { w: building.w, h: building.h }, flames, puffs, sparks, startSeconds, doused, visual, light: null,
     };
   };
 
@@ -242,7 +316,9 @@ export function createFires(): Fires {
   return {
     group,
     get burning() { return blazes.size; },
+    get covered() { return covered; },
     update(state: Readonly<GameState>, presentationSeconds: number): void {
+      covered.clear();
       const live = new Set<number>();
       for (const building of burningBuildings(state)) {
         live.add(building.id);
@@ -260,6 +336,10 @@ export function createFires(): Fires {
         const lastDays = blaze.doused ? BURNING.DOUSED_FLAME_DAYS + BURNING.DOUSED_STEAM_DAYS : totalDays;
         const afterDays = lastDays - flameDays;
         if (!live.has(blaze.id) || days > lastDays) { drop(blaze); continue; }
+        if (blaze.visual !== null) {
+          collapseVisual(blaze.visual, days);
+          covered.add(blaze.id);
+        }
         if (firstDays < 0) firstDays = days;
         // Cuánta llama: sube en medio día, arde entera y se apaga al final de
         // los días de llama; después queda un rescoldo que se consume.
@@ -332,6 +412,7 @@ export function createFires(): Fires {
     },
     clear(): void {
       for (const blaze of [...blazes.values()]) drop(blaze);
+      covered.clear();
     },
     dispose(): void {
       for (const blaze of [...blazes.values()]) drop(blaze);

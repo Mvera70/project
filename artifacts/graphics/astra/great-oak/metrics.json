@@ -1,0 +1,71 @@
+{
+  "id": "great-oak",
+  "triangles": 2346,
+  "triangleLimit": 3500,
+  "boundsRuntimeCells": {
+    "min": [
+      -1.8955013751983643,
+      0.0,
+      -1.786677360534668
+    ],
+    "max": [
+      1.8534427881240845,
+      3.4000000953674316,
+      1.7197552919387817
+    ]
+  },
+  "materials": {
+    "bark": "#735338",
+    "bark_dark": "#3F2B22",
+    "foliage_shadow": "#344D35",
+    "foliage": "#62864F",
+    "foliage_light": "#7F9F64"
+  },
+  "pivotsRuntimeCells": {
+    "great_oak_trunk": [
+      0,
+      0,
+      0
+    ],
+    "great_oak_roots": [
+      0,
+      0,
+      0
+    ],
+    "great_oak_branches": [
+      0,
+      0,
+      0
+    ],
+    "great_oak_twigs": [
+      0,
+      0,
+      0
+    ],
+    "great_oak_canopy_mid": [
+      0,
+      0,
+      0
+    ],
+    "great_oak_canopy_shadow": [
+      0,
+      0,
+      0
+    ],
+    "great_oak_canopy_light": [
+      0,
+      0,
+      0
+    ]
+  },
+  "meshNames": [
+    "great_oak_trunk",
+    "great_oak_roots",
+    "great_oak_branches",
+    "great_oak_twigs",
+    "great_oak_canopy_mid",
+    "great_oak_canopy_shadow",
+    "great_oak_canopy_light"
+  ],
+  "textures": 0
+}

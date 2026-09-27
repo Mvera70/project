@@ -109,31 +109,22 @@ juega.
 
 ## El roble del valle (24 sep 2026)
 
-Hecho **por código** (`src/render3d/world/great-oak.ts`): primitivas facetadas,
-tronco con raíces, cinco ramas y copa ancha. Es el emblema del título a la
-orilla del lago. **Pendiente, si Vera lo quiere:** encargarlo en Blender con
-más carácter —corteza, raíces que abracen el suelo, copa con huecos— y
-cambiar sólo ese fichero por el modelo. Tampoco hace nada todavía: podría ser
-un sitio de la capa de vida (descansar a su sombra, reunirse en fiesta).
-
-**Valoración tras G-41:** el roble actual ya tiene escala de hito, raíces,
-ramas y color estacional. Una nueva malla aportaría más personalidad a la copa,
-pero puede esperar a una referencia visual aprobada; no bloquea la lectura de
-las eras ni la variedad de viviendas.
+**G-42:** `great-oak.glb` sustituye las primitivas cuando está publicado. Toma
+la silueta del árbol del escudo: raíces abiertas, tronco bifurcado, ramas
+horizontales y grupos de hojas separados por huecos. Mide 3,4 celdas de alto,
+mantiene el color estacional y queda a la orilla del agua. Las primitivas
+anteriores sólo son respaldo si falta el recurso. En valles con bosque denso,
+algunos árboles vecinos pueden taparlo desde ciertos ángulos. Todavía no es
+un lugar de actividad de la capa de vida.
 
 ## E4 · El fuego (25 sep 2026)
 
-La casa que arde se pinta **sobre la ruina** desde el primer amanecer: no hay
-modelo de casa ardiendo ni se ve el derrumbe. Pendiente si se quiere más: la
-casa en pie tiznándose y un derrumbe animado al acabar la llama. Y nadie
-reacciona todavía al fuego —la gente pasa al lado—; que acudan con cubos es la
-tanda 4 (flechas incendiarias y defensa).
-
-**Valoración tras G-41:** la casa quemada es el hueco visual más claro de los
-dos. Su encargo debe incluir estado de vivienda en pie carbonizada y transición
-a la ruina; un GLB aislado no resolvería el salto que hoy se ve al primer
-amanecer. Queda como siguiente ronda de fuego, sin añadirla a esta entrega de
-viviendas.
+**G-42:** la casa de madera arde carbonizada en pie con `burnt-house.glb`.
+Durante el tercer día caen tejado y paredes, dejando a la vista `ruin-wood.glb`.
+Al terminar el fuego, la ruina persistente de la parcela ocupa el mismo sitio.
+La transición está revisada en tres capturas de juego de
+`artifacts/graphics/G-42/fire-transition/`. Quedan fuera de esta entrega los
+derrumbes de otros tipos de edificio.
 
 **Y la brigada de cubos (tanda 4):** la gente rodea la casa y vacía cubos
 contra ella, pero **no va y viene del agua**: el cubo está siempre lleno. Una

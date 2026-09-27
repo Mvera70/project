@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-27T09:56:58.763Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids house-twin-gable,house-hip-roof,stone-house-cross-gable,stone-house-tower-loft,stone-house",
+  "generatedAt": "2026-09-27T11:11:10.931Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids great-oak",
   "assets": [
     {
       "id": "axis-marker",
@@ -1371,6 +1371,28 @@
       "provenance": {
         "kind": "original",
         "source": "Revisión original de mampostería para The Valley, receta G-41.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "burnt-house",
+      "file": "burnt-house.glb",
+      "sha256": "7B489DB61B304A7281040264147CDDE7305437D7768288C4D122179526079018",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelo original de The Valley, fuente art/recipes/burnt-house-candidate/build.py.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "great-oak",
+      "file": "great-oak.glb",
+      "sha256": "93696AD8B889C731E5D9DE3BCDFD4756023AF09F03D70EB891A43C559B787D43",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelo original de The Valley, fuente art/recipes/great-oak-candidate/build.py.",
         "license": "Project original"
       }
     }

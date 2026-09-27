@@ -6065,6 +6065,114 @@
         "source": "Variante original de stone-house para The Valley, receta G-41.",
         "license": "Project original"
       }
+    },
+    {
+      "id": "burnt-house",
+      "artifactRound": "G-42",
+      "status": "study",
+      "recipe": "art/recipes/burnt-house-candidate/build.py",
+      "generator": "art/recipes/burnt-house-candidate/build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "astra-7b489db61b30",
+        "directory": "artifacts/graphics/G-42/approved/7b489db61b304a72"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          2,
+          1.489025,
+          0
+        ],
+        "size": [
+          2,
+          1.489025,
+          2
+        ]
+      },
+      "recipeSha256": "2C1F15C8185B2CA50A29E71C71937067E1E691B636BB79F02D472C90ADCCA1F7",
+      "materials": [
+        "char",
+        "stone",
+        "ash",
+        "soot",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 8,
+        "meshes": 8,
+        "materials": 5,
+        "triangles": 996
+      },
+      "hashes": {
+        "burnt-house.glb": "7B489DB61B304A7281040264147CDDE7305437D7768288C4D122179526079018"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelo original de The Valley, fuente art/recipes/burnt-house-candidate/build.py.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "great-oak",
+      "artifactRound": "G-42",
+      "status": "study",
+      "recipe": "art/recipes/great-oak-candidate/build.py",
+      "generator": "art/recipes/great-oak-candidate/build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "astra-93696ad8b889",
+        "directory": "artifacts/graphics/G-42/approved/93696ad8b889c731"
+      },
+      "bounds": {
+        "min": [
+          -1.895501,
+          0,
+          -1.786677
+        ],
+        "max": [
+          1.853443,
+          3.4,
+          1.719755
+        ],
+        "size": [
+          3.748944,
+          3.4,
+          3.506432
+        ]
+      },
+      "recipeSha256": "729804EE9AC4794176027B81A94014923AA232EF7EE1953495B2B2EA5D5069FB",
+      "materials": [
+        "great_oak_bark",
+        "great_oak_bark_dark",
+        "great_oak_foliage_light",
+        "great_oak_foliage",
+        "great_oak_foliage_shadow"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 7,
+        "meshes": 7,
+        "materials": 5,
+        "triangles": 2346
+      },
+      "hashes": {
+        "great-oak.glb": "93696AD8B889C731E5D9DE3BCDFD4756023AF09F03D70EB891A43C559B787D43"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelo original de The Valley, fuente art/recipes/great-oak-candidate/build.py.",
+        "license": "Project original"
+      }
     }
   ]
 }

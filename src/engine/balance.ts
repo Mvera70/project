@@ -443,6 +443,10 @@ export const BURNING = {
   // borra sola: nadie arrastra un incendio de un año para otro.
   FLAME_DAYS: 3,
   EMBER_DAYS: 4,
+  // TUNE: la estructura carbonizada aguanta dos días y cae durante el
+  // tercero; la pila de ruinas queda a la vista antes de apagarse la llama.
+  COLLAPSE_START_DAYS: 2,
+  COLLAPSE_END_DAYS: 3,
   // TUNE: la casa que la aldea salva con cubos (flechas incendiarias, E4):
   // arde menos de un día y luego humea vapor blanco otro día.
   DOUSED_FLAME_DAYS: 0.8,
