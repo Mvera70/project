@@ -678,9 +678,11 @@ export function tick(
       const done = settleHunt(state, act);
       state.acts.push({ tick: state.tick, act, done });
       if (done) say({ kind: 'forage',
+        // Tres finales: cobrada, escapada ilesa y escapada malherida (con
+        // algún toque que no bastó), que es la que Vera pidió el 27 sep 2026.
         templateKey: act.killed
           ? `${firstKill ? 'hunt.first' : 'hunt.kill'}.${act.species}`
-          : `hunt.escape.${act.species}`,
+          : `${act.hits > 0 ? 'hunt.wounded' : 'hunt.escape'}.${act.species}`,
         params: { year: year(), weapon: act.weapon },
         weight: firstKill ? 3 : 2 });
     } else {

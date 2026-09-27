@@ -353,6 +353,15 @@ La del oso ocurre **fuera** de la guarida; no hay interior ni pantalla jugable
 dentro de ella. Las huidas usan el mismo motivo sin cadáver. Los modelos 3D
 aprobados ya cubren la escena en vivo; esta tarea es solo para la crónica.
 
+**Y desde el 27 sep 2026, la presa malherida** (la caza aleatoria tiene tres
+finales): `hunt.wounded.partridge`, `hunt.wounded.rabbit`, `hunt.wounded.deer`,
+`hunt.wounded.boar` y `hunt.wounded.bear`. Fichero por clave en
+`public/ui/art/` (640 × 512, sepia) y su entrada en `index.json`. Qué enseñar:
+la presa **huyendo herida** —una flecha clavada o una mancha oscura en el
+flanco, el rastro en la hierba— y los cazadores atrás, sin alcanzarla. La del
+oso, entrando en su cueva con una lanza rota a sus pies. Distinta de la huida
+ilesa, que no lleva herida.
+
 ## Pendiente · el año del campo (IA-fields, 24 sep 2026)
 
 Pedido por Vera: cada fase del campo es un suceso de la crónica («la primera

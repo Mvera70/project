@@ -860,27 +860,19 @@ if (want('raros')) {
     await tab.close();
   });
 
-  // La caza, como eventos rápidos: la ocasión, los aros de puntería y lo que queda.
+  // La caza, como evento aleatorio: la ocasión, la caza y lo que queda.
   await attempt('caza', async () => {
     const tab = await open();
     await tab.locator('.title-scrim').waitFor({ timeout: 8000 }).catch(() => {});
     await tab.locator('#valley-seed').fill('3').catch(() => {});
     await tab.locator('.title-new').click();
     await tab.locator('.hunt-event').waitFor({ state: 'visible', timeout: 60000 });
-    await shot(tab, 'caza-ocasion', 'La ocasión de caza: la tarjeta con las armas y su tiempo');
+    await shot(tab, 'caza-ocasion', 'La ocasión de caza: la tarjeta con «Ir de caza» y su tiempo');
     // La tarjeta caduca en nueve segundos, que sin GPU son pocos fotogramas.
-    await tab.locator('.hunt-event-weapon').first().click({ force: true });
-    await tab.locator('.hunt-qte').waitFor({ state: 'visible', timeout: 10000 });
-    await tab.waitForTimeout(600);
-    await shot(tab, 'caza-aros', 'La caza: los aros de puntería sobre el valle');
-    await tab.keyboard.press('Space');
-    await tab.waitForTimeout(250);
-    await shot(tab, 'caza-veredicto', 'La caza: el veredicto del toque');
-    for (let n = 0; n < 60 && await tab.locator('.hunt-qte').isVisible(); n += 1) {
-      await tab.keyboard.press('Space');
-      await tab.waitForTimeout(150);
-    }
-    await tab.waitForTimeout(1500);
+    await tab.locator('.hunt-event-go').click({ force: true });
+    await tab.waitForTimeout(3000);
+    await shot(tab, 'caza-en-marcha', 'La caza en marcha: el cazador va solo a por la presa');
+    await tab.waitForTimeout(20000);
     await shot(tab, 'caza-resuelta', 'La caza, resuelta');
     await tab.close();
   });

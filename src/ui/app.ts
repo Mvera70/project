@@ -28,7 +28,8 @@ import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, PlayerAct, SaveFile } from '@engine/state';
 import { huntOpportunity, type HuntOpportunity } from '@engine/world/hunting';
 import { createHud } from './redesign/hud';
-import { showHuntEvent, startHuntQte } from './redesign/hunt-event';
+import { showHuntEvent } from './redesign/hunt-event';
+import { hash32 } from '@engine/rng';
 import { createInspectPanel } from './redesign/inspect-panel';
 import { cartPanel } from './redesign/cart';
 import { peoplePanel } from './redesign/people-panel';
@@ -472,34 +473,32 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     paintBare();
   };
 
-  // La caza, como eventos rápidos (`redesign/hunt-event.ts`, 27 sep 2026:
-  // Vera pidió quitar el botón «Hunt»). Una ocasión por semana del motor: la
-  // tarjeta sale una vez, y si pasa sin elegir, la presa se va. Elegida, los
-  // aros de puntería cubren el valle hasta que la escena entrega su parte.
+  // La caza, como evento aleatorio (`redesign/hunt-event.ts`, 27 sep 2026:
+  // Vera pidió quitar el botón «Hunt» y después los minijuegos). Una ocasión
+  // por semana del motor: la tarjeta sale una vez, y si pasa sin aceptarla, la
+  // presa se va. Aceptada, el arma la elige la suerte entre las que hay, y la
+  // escena caza sola hasta entregar su parte.
   let huntOpportunityTick = -1;
   let currentHuntOffer: HuntOpportunity | null = null;
   /** La semana cuya ocasión ya se ofreció (elegida, dejada ir o caducada). */
   let huntOfferedTick = -1;
   let huntInProgress = false;
   let huntPreviousSpeed: Speed | null = null;
-  let closeHuntQte: (() => void) | null = null;
   const endHunt = (): void => {
     huntInProgress = false;
-    closeHuntQte?.();
-    closeHuntQte = null;
     if (huntPreviousSpeed !== null) app.setSpeed(huntPreviousSpeed);
     huntPreviousSpeed = null;
   };
   const offerHunt = (offer: HuntOpportunity): void => {
     huntOfferedTick = offer.tick;
-    closeHuntPrompt = showHuntEvent(offer, (weapon) => {
+    closeHuntPrompt = showHuntEvent(offer, () => {
       closeHuntPrompt = null;
       if (state.tick !== offer.tick || backend.live.kind !== 'pilot3d') return;
+      const weapon = offer.weapons[hash32(state.seed, `hunt:weapon:${offer.tick}`) % offer.weapons.length]!;
       if (!backend.live.startHunt(state, offer.species, weapon)) return;
       huntInProgress = true;
       huntPreviousSpeed = speed;
       app.setSpeed(1);
-      closeHuntQte = startHuntQte(root, (precision) => backend.live.attackHunt(precision));
     }, () => { closeHuntPrompt = null; });
   };
 
@@ -1240,8 +1239,6 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     finishing = true;
     closeHuntPrompt?.();
     closeHuntPrompt = null;
-    closeHuntQte?.();
-    closeHuntQte = null;
     loop?.stop();
     loop = undefined;
     // La jornada terminal sigue pasos físicos fijos, pero el último `paint`

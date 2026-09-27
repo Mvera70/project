@@ -25,31 +25,21 @@ await page.locator('.title-scrim').waitFor();
 await page.locator('#valley-seed').fill(seed);
 await page.locator('.title-new').click();
 await page.waitForTimeout(6500);
-// La caza como eventos rápidos (27 sep 2026): la ocasión sale sola como tarjeta
-// (`.hunt-event`), el arma se elige ahí y la puntería son los aros (`.hunt-qte`),
-// que se tocan con Espacio en el momento en que coinciden (`window.__huntQte`
-// no existe: se toca cada décima y cuenta sólo el toque bueno).
+// La caza como evento aleatorio (27 sep 2026): la ocasión sale sola como
+// tarjeta (`.hunt-event`), se acepta con «Ir de caza» y la escena caza sola.
 const card = page.locator('.hunt-event');
 const offered = await card.waitFor({ state: 'visible', timeout: 60000 }).then(() => true, () => false);
 console.log('hunt event offered', offered);
 if (offered) {
   // Sin GPU la página va a un fotograma por segundo y la tarjeta caduca en
-  // nueve: se elige antes de fotografiar nada, sin esperar a que se asiente.
-  await page.locator('.hunt-event-weapon').first().click({ force: true });
-  await page.locator('.hunt-qte').waitFor({ state: 'visible', timeout: 10000 });
-  await page.screenshot({ path: resolve(out, 'aim.png') });
-  const frames = resolve(out, 'frames');
-  mkdirSync(frames, { recursive: true });
-  for (let attempt = 0; attempt < 80; attempt += 1) {
-    if (!(await page.locator('.hunt-qte').isVisible())) break;
-    await page.keyboard.press('Space');
-    await page.waitForTimeout(150);
-    if (attempt % 4 === 0) await page.screenshot({ path: resolve(frames, `f${String(attempt).padStart(3, '0')}.png`) });
-  }
-  console.log('resolved', !(await page.locator('.hunt-qte').isVisible()), await page.locator('.hud-stat').allTextContents());
+  // nueve: se acepta antes de fotografiar nada, sin esperar a que se asiente.
+  await page.locator('.hunt-event-go').click({ force: true });
+  await page.waitForTimeout(2500);
+  await page.screenshot({ path: resolve(out, 'hunting.png') });
+  await page.waitForTimeout(25000);
   await page.screenshot({ path: resolve(out, 'resolved.png') });
   const life = await page.evaluate(() => window.__valleyLife?.() ?? null);
-  console.log('scene', { animals: life?.renderedAnimals, actors: life?.actors.filter(a => a.id >= 80000) });
+  console.log('scene', { animals: life?.renderedAnimals?.length, actors: life?.actors.filter(a => a.id >= 80000) });
 }
 console.log('errors', errors);
 await browser.close();

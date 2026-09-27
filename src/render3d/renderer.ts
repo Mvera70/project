@@ -2176,7 +2176,7 @@ export async function createGraphicsRenderer(
         : life.wildlife;
       const scene = createHuntEncounter(state, life.land, species, weapon,
         groundFloor, wildlife, state.seed ^ state.tick,
-        den === null ? null : { x: den.x, z: den.z });
+        den === null ? null : { x: den.x, z: den.z }, true);
       if (scene === null) return false;
       if (species === 'bear' && den !== null && denVisual === null) {
         denVisual = library.instance('bear-den') ?? null;

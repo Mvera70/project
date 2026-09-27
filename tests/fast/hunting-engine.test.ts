@@ -119,4 +119,19 @@ describe('progresión de la caza', () => {
     state.flags['hunt:bear'] = 0;
     expect(huntOpportunity(state)?.species).not.toBe('bear');
   });
+
+  // 27 sep 2026 · la caza aleatoria tiene tres finales, y la crónica los cuenta.
+  it('una presa tocada que se escapa se cuenta como malherida, y la ilesa como escapada', () => {
+    for (const [hits, key] of [[1, 'hunt.wounded.partridge'], [0, 'hunt.escape.partridge']] as const) {
+      const state = foundTwenty(11);
+      let offer = huntOpportunity(state);
+      for (let wait = 0; wait < 100 && offer === null; wait += 1) { state.tick += 1; offer = huntOpportunity(state); }
+      expect(offer?.species).toBe('partridge');
+      tick(state, CATALOG, undefined, [{ kind: 'hunt', sourceTick: state.tick,
+        species: 'partridge', weapon: 'sling', hits, killed: false }]);
+      const line = state.chronicle.find(entry => entry.templateKey.startsWith('hunt.'));
+      expect(line?.templateKey).toBe(key);
+      expect(line === undefined ? '' : renderEntry(line, state.rng)).not.toMatch(/\{|\}/);
+    }
+  });
 });

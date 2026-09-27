@@ -30,6 +30,25 @@ const SPEAR_STEPS = Math.round(0.9 / LIFE_STEP);
  * radio, así que casi siempre toca); uno fuera, 1,1, que no toca nunca.
  */
 const AIM_SPREAD = { inWindow: 0.3, miss: 1.1 } as const;
+/**
+ * La caza sola (27 sep 2026, Vera: «que tú simplemente aceptes ir a la caza;
+ * todo lo que pase después debe ser random: o lo cazas, o se va malherido»).
+ * En modo `auto` el cazador tira en cuanto el arma está lista y la suerte hace
+ * el resto, con dos tiradas por la semilla del encuentro:
+ *
+ *   · `miss`: la parte de tiros que se desvían o de lanzadas que no tocan;
+ *   · `graze`: la parte de los que tocan que sólo rozan —hieren, no matan—.
+ *     Un roce no suma al daño, así que una presa rozada que se escapa a tiempo
+ *     se va malherida (`hits > 0`, `killed: false`).
+ *
+ *   · `spook`: la presa que oye fallar o siente el roce huye. Sin esto se
+ *     cobraba casi todo: la presa no se enteraba de los fallos (medido: de 54
+ *     a 60 de 60 según la especie).
+ *
+ * TUNE, sobre cien. Medido en 60 semillas por especie y arma
+ * (`life-hunt-encounter.test.ts` guarda que salgan los tres finales).
+ */
+const LUCK = { miss: 42, graze: 35, spookMiss: 30, spookGraze: 45, bearSwipes: 5 } as const;
 
 export interface HuntReport {
   readonly sourceTick: number;
@@ -88,6 +107,7 @@ export function createHuntEncounter(
   state: Readonly<GameState>, land: Terrain, species: HuntSpecies, weapon: HuntWeapon,
   ground: (x: number, z: number) => number, wildlife: readonly Animal[], seed: number,
   den: Point | null = null,
+  auto = false,
 ): HuntEncounter | null {
   const wild: WildPrey | null = species === 'partridge' || species === 'rabbit' || species === 'boar'
     ? createWildPrey(state as GameState, land, seed,
@@ -112,6 +132,23 @@ export function createHuntEncounter(
   let stepNumber = 0;
   let travelled = 0;
   let hits = 0;
+  /** Lo que cuenta para matar: los toques que no fueron roces. */
+  let damage = 0;
+  let rolls = 0;
+  const roll = (what: string): number => hash32(seed, `hunt:${what}:${rolls++}`) % 100;
+  /** Un toque: siempre suma a `hits`; al daño, sólo si no fue un roce. */
+  /** La presa espantada: el encuentro acaba como esté, con los toques que lleve. */
+  let spooked = false;
+  const wound = (): void => {
+    hits += 1;
+    if (!auto || roll('graze') >= LUCK.graze) damage += 1;
+    else if (roll('spook') < LUCK.spookGraze) spooked = true;
+  };
+  const missed = (): void => {
+    if (auto && roll('spook') < LUCK.spookMiss) spooked = true;
+  };
+  // El oso no se espanta: embiste, y se retira a su cueva por su propia regla.
+  const skittish = species !== 'bear';
   // El primer disparo necesita un gesto legible antes de soltar la cuerda.
   let lastShot = 0;
   let clip: ClipName = weapon === 'spear' ? 'walk' : 'bow_draw';
@@ -241,12 +278,18 @@ export function createHuntEncounter(
       }
       if (distance > 0.01) turnTo(hunterBody, Math.atan2(dx, dz), LIFE_STEP);
 
+      if (auto && !requested && (!fired || stepNumber - lastShot >= (weapon === 'spear' ? SPEAR_STEPS : SHOT_STEPS))) {
+        requested = true;
+        // Un tiro que se desvía, o uno más o menos centrado.
+        const luck = roll('aim');
+        precision = luck < LUCK.miss ? 0 : 0.5 + 0.5 * ((luck - LUCK.miss) / (100 - LUCK.miss));
+      }
       if (weapon === 'spear') {
         clip = moving ? 'walk' : stepNumber - lastShot < 18 ? 'spear_thrust' : 'idle';
         if (requested && !moving && stepNumber - lastShot >= SPEAR_STEPS
           && spearCanHit(hunterBody, target, wild?.body.radius ?? 0.34)) {
           // Una lanzada a destiempo se da igual, pero no toca.
-          if (precision > 0) hits += 1;
+          if (precision > 0) wound(); else missed();
           lastShot = stepNumber;
           fired = true;
           requested = false;
@@ -266,6 +309,8 @@ export function createHuntEncounter(
           const aim = { x: target.x - (lz / along) * spread * side, y: targetY(target), z: target.z + (lx / along) * spread * side };
           const shot = launchHuntShot(from, aim, weapon, hunterBody.id, 100_000 + shotsMade++);
           if (shot !== null) {
+            // El fallo se oye al soltar: la flecha que va desviada, espanta.
+            if (precision === 0) missed();
             shots.push(shot);
             lastShot = stepNumber;
             fired = true;
@@ -277,8 +322,15 @@ export function createHuntEncounter(
 
       const hitTargets: HuntTarget[] = [{ id: targetId, x: target.x, y: targetY(target), z: target.z,
         radius: wild?.body.radius ?? (species === 'bear' ? 0.52 : species === 'deer' ? 0.34 : 0.38), alive: true }];
-      hits += stepHuntShots(shots, hitTargets, ground).length;
-      if (hits >= HIT_POINTS[species]) {
+      for (let landed = stepHuntShots(shots, hitTargets, ground).length; landed > 0; landed -= 1) wound();
+      if (spooked && skittish && damage < HIT_POINTS[species]) {
+        report = { sourceTick: state.tick, species, weapon, hits, killed: false };
+        if (wild !== null) wild.phase = 'gone';
+        hunterBody.vx = 0; hunterBody.vz = 0;
+        clip = 'idle';
+        return;
+      }
+      if (damage >= HIT_POINTS[species]) {
         report = { sourceTick: state.tick, species, weapon, hits, killed: true };
         corpseUntil = stepNumber + CORPSE_STEPS;
         if (wild !== null) { wild.phase = 'down'; wild.health = 0; }
@@ -291,7 +343,9 @@ export function createHuntEncounter(
         lastBearSwipe = stepNumber;
         bearWounds += 1;
         clip = 'hit_take';
-        if (bearWounds >= 3) retreatSince = stepNumber;
+        // En la caza aleatoria el cazador aguanta más: con tres zarpazos el oso
+        // no caía nunca (0 de 60 semillas); con cinco cae alguna vez.
+        if (bearWounds >= (auto ? LUCK.bearSwipes : 3)) retreatSince = stepNumber;
       }
       stepNumber += 1;
     },

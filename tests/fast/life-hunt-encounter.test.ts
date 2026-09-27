@@ -121,4 +121,30 @@ describe('encuentro físico de caza', () => {
     expect(fired).toBe(true);
     expect(encounter.attack(1), 'recién disparado').toBe(false);
   });
+
+  // La caza aleatoria (`auto`): aceptar y que la suerte decida. En sesenta
+  // semillas salen los tres finales, y el oso, el más difícil, cae alguna vez.
+  it('sola, la caza acaba de las tres maneras según la suerte', () => {
+    const state = foundTwenty(31);
+    const land = { width: 50, height: 50, blocked: new Uint8Array(2500) };
+    const outcomes = (species: 'deer' | 'bear', weapon: 'bow' | 'spear') => {
+      const tally = { killed: 0, wounded: 0, clean: 0 };
+      for (let seed = 1; seed <= 60; seed += 1) {
+        const animal: Animal = { id: species === 'bear' ? 50_000 : 40_000, kind: species, x: 25, y: 25 };
+        const encounter = createHuntEncounter(state, land, species, weapon, () => 0, [animal], seed * 7919,
+          species === 'bear' ? { x: 25, z: 25 } : null, true)!;
+        for (let step = 0; step < 900 && encounter.completed === null; step += 1) encounter.step([animal]);
+        const report = encounter.completed!;
+        if (report.killed) tally.killed += 1; else if (report.hits > 0) tally.wounded += 1; else tally.clean += 1;
+      }
+      return tally;
+    };
+    const deer = outcomes('deer', 'bow');
+    expect(deer.killed, 'se cobra').toBeGreaterThan(10);
+    expect(deer.wounded, 'se va malherida').toBeGreaterThan(5);
+    expect(deer.clean, 'se escapa ilesa').toBeGreaterThan(5);
+    const bear = outcomes('bear', 'spear');
+    expect(bear.killed, 'el oso cae alguna vez').toBeGreaterThan(0);
+    expect(bear.killed, 'pero no casi siempre').toBeLessThan(30);
+  });
 });
