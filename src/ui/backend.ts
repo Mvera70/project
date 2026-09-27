@@ -127,7 +127,7 @@ declare const VALLEY_ASSETS_URL: string | undefined;
  * Qué pinta el valle. **Desde G-12, el 3D: ya no es el piloto, es el juego.**
  *
  * Lo decidió el dueño del diseño el 14 sep 2026 con el riesgo escrito delante
- * (`docs/roadmap.md`, «Decisiones tomadas»): todo lo medido de rendimiento es
+ * (`docs/historico/roadmap.md`, «Decisiones tomadas»): todo lo medido de rendimiento es
  * de un portátil, porque G-09 quedó parcial por no haber un móvil de verdad.
  *
  * **La puerta de vuelta se queda puesta, y a propósito.** `?render=canvas`

@@ -2691,7 +2691,7 @@ export const UI_BANK: Record<string, string> = {
   'epitaph.summary': '{years} years. {peak} people at its height.',
 
   // ---------------------------------------------------------------------------
-  // F3 · La lápida y la hoja de cuentas. docs/plan-final.md
+  // F3 · La lápida y la hoja de cuentas. docs/historico/plan-final.md
   //
   // **La inscripción no dice «game over»** (decisión 1 del plan): dice la causa
   // y el año, en versales, porque es la única frase de todo el juego que

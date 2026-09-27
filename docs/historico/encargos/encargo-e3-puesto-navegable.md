@@ -13,7 +13,7 @@ implementa; **no hay nueva intervención de Astra ni nuevo modelo 3D**.
 ## Depende de
 
 - `docs/design.md` §1b, §2–4, D.4 y E.1/E.3/E.6/E.7.
-- `docs/encargos/encargo-e3-acceso-elevado.md` y
+- `docs/historico/encargos/encargo-e3-acceso-elevado.md` y
   `art/recipes/bastion-access-candidate/README.md`: geometría, dirección,
   anchura y criterios de fallo.
 - `docs/historico/graphics-rounds/G-27.md`: GLB aprobado, colocación y

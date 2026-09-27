@@ -114,13 +114,13 @@ instalados en la máquina (Playwright pide uno exacto y no puede bajarlo).
 
 ## Lo que el arte le debe a la vida
 
-Hay trabajo parado esperando modelos, y está anotado en `docs/roadmap.md` §5:
+Hay trabajo parado esperando modelos, y está anotado en `docs/historico/roadmap.md` §5:
 
 - **Los trastos de V-09 se pintan con primitivas** —una esfera roja para la
   pelota, un cilindro para el resto— porque no hay modelo. Hacen falta
   `ball`, `stick`, `bucket` y `bundle` por la vía de D.4. Están ya colocados,
   se cogen y se tiran: sólo falta con qué dibujarlos.
-- **El aldeano no tiene frente** (`handover.md` §5.5): por delante y por detrás
+- **El aldeano no tiene frente** (`historico/handover.md` §5.5): por delante y por detrás
   es casi la misma silueta, y en el valle giran hacia donde caminan. La vía
   propuesta y nunca decidida es un peto en el terracota de la paleta más una
   cuña en la cabeza. A veinte píxeles el color separa mejor que la forma — y a

@@ -1,11 +1,13 @@
 # P-1 · Rendimiento de la aldea histórica
 
+> **Histórico desde el 27 sep 2026.** P-1 se cerró el 22 sep 2026 para seguir la hoja de ruta. Sigue sin medirse en un móvil real.
+
 **Estado (22 sep 2026): P-1 cerrada para continuar la hoja de ruta.** Vera
 considera suficiente el rendimiento actual. P-1a.1 y P-1a.2 produjeron una
 línea de base de la app real; P-1b.1 se acepta y P-1b.2 se retira tras medir.
 El banco del renderer comparó día y noche bajo lluvia;
 la app real ya tiene tres réplicas de día despejado, noche despejada y noche
-lluviosa. [Medidas y límites](medidas/p1a-rendimiento-seed11-year21-2026-09-22.md).
+lluviosa. [Medidas y límites](../medidas/p1a-rendimiento-seed11-year21-2026-09-22.md).
 Ninguna corrida mide INP real: la observación anterior de 912–1.144 ms queda
 sin resolver como métrica del navegador y se retomará si reaparece. Esta fase
 precede al adarve E3.
@@ -97,7 +99,7 @@ de INP/Edge interactivo y atribución de las tareas largas de entrada.
 ### Cierre P-1a.1 · Comparación controlada
 
 Las nueve muestras y sus límites cierran sólo la comparación de cielo/hora.
-[Informe de ronda](historico/graphics-rounds/P-1a1-comparacion-controlada.md).
+[Informe de ronda](graphics-rounds/P-1a1-comparacion-controlada.md).
 El empate nocturno en p95/p99 descarta retocar la lluvia por intuición en este
 equipo. En ese corte todavía faltaban una medida comparable de respuesta y la
 atribución de CPU; P-1a.2 cubrió ambas rutas, salvo el INP del navegador.
@@ -145,7 +147,7 @@ coste o rechazar la hipótesis. Si la demora de 900 ms no reaparece en Edge
 interactivo, no se optimiza un proxy: se documenta esa falsación y se solicita
 la condición exacta en la que Vera la observa.
 
-**Cierre de la ruta medida.** [Informe P-1a.2](historico/graphics-rounds/P-1a2-entrada-y-respuesta.md):
+**Cierre de la ruta medida.** [Informe P-1a.2](graphics-rounds/P-1a2-entrada-y-respuesta.md):
 se ejecutaron tres réplicas frías y tres calientes en Edge visible, con perfil
 CPU de entrada separado de la cadencia y seis clics posteriores por réplica.
 La primera tarea larga, 505–531 ms también en caliente, coincide con el avance
@@ -205,7 +207,7 @@ redujeron el Event Timing del clic de entrada de 528–872 ms a 16 ms o por deba
 del umbral de 16 ms, sin penalización visible en los seis clics posteriores ni
 en p95 de RAF. La mediana hasta 3D utilizable aumentó ~0,6 s en ambas cachés;
 se acepta el intercambio de tiempo de carga por respuesta. INP sigue sin
-medirse. [Informe P-1b.1](historico/graphics-rounds/P-1b1-avance-cooperativo.md).
+medirse. [Informe P-1b.1](graphics-rounds/P-1b1-avance-cooperativo.md).
 
 ### Brief P-1b.2 · Primera tarea de montaje 3D
 
@@ -248,7 +250,7 @@ la mayor tarea del primer fotograma bajó de 255 a 167 ms en frío y de 237 a
 subió de 1,600 a 1,787 s; el p95 de los clics posteriores pasó de 24 a 32 ms.
 Las capturas conservan composición y luz, pero no certifican la transición
 inicial. Dado que el rendimiento actual basta para continuar, se retira la
-partición y se conserva P-1b.1. [Informe P-1b.2 y datos crudos](historico/graphics-rounds/P-1b2-primer-fotograma.md).
+partición y se conserva P-1b.1. [Informe P-1b.2 y datos crudos](graphics-rounds/P-1b2-primer-fotograma.md).
 
 **Puerta.** Una intervención concreta, comparación con las mismas condiciones
 frías/calientes y tres réplicas por caché, sin perfil durante cadencia. Conservar

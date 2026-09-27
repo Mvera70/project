@@ -1,6 +1,6 @@
 # E1 · El disparo único — 20 sep 2026
 
-El brief `docs/plan-disparo-unico.md` queda entregado tras la ampliación
+El brief `docs/historico/plan-disparo-unico.md` queda entregado tras la ampliación
 autorizada descrita al final. E1 global no se cierra: faltan sus otros clips.
 
 ## Revisión anterior al código

@@ -67,6 +67,6 @@ La selección es estable por id y no consume RNG del motor.
 ## Estado
 
 **Entregado el 20 sep 2026.** El cierre y las medidas viven en
-[`../historico/life-rounds/E0b-aviso.md`](../historico/life-rounds/E0b-aviso.md).
+[`../historico/life-rounds/E0b-aviso.md`](../life-rounds/E0b-aviso.md).
 E0 completo sigue abierto por el pago, la semana posterior y las transiciones
 de muralla; este encargo no los incluye.

@@ -13,7 +13,7 @@ introducido en la ronda anterior.
 `state.happenings` guarda, para `quarrel_in_the_square`, **los `id`** de los dos
 nombrados en `who` (R-1, §7.10). Ésa es la pieza que llevaba meses faltando: la
 crónica sólo guardaba los **nombres**, así que la capa de vida no podía saber de
-quién hablaba, y `docs/roadmap.md` lo tenía anotado como decisión 3 del dueño
+quién hablaba, y `docs/historico/roadmap.md` lo tenía anotado como decisión 3 del dueño
 del diseño, «la riña de §7.9 hay que revisarla».
 
 - **`staging.ts`, `quarrelToday(state)`**: lee `state.happenings` buscando una

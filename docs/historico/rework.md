@@ -606,7 +606,7 @@ cada impulso) y deciden poco que se vea. Que decidan.
      en `params`. Añade a sus `params` `aId` y `bId` (números; el banco los
      ignora) y `render/reactions.ts` y `staging.ts` pueden leerlos. Es un cambio
      del motor **sin tirada nueva**, así que no mueve el determinismo. Decisión
-     3 del dueño en `docs/roadmap.md`.
+     3 del dueño en `docs/historico/roadmap.md`.
 2. **Un rasgo, una ocupación que se ve.** Para cada rasgo de `TEMPER`, una
    preferencia de oferta en `decide.ts` (`worth`, que ya recibe `traits`): el
    perezoso puntúa ×1,5 el banco (`rest`), el devoto ×1,5 la capilla, el
@@ -831,7 +831,7 @@ ofertas, el diezmo, y la cabecera con cinco cosas y una cara.
    arranca en 0,5, que es lo que la vida ya hace: `life/day.ts` da a la
    cantera `buildingDays / 2`); cada cantero produce `WORLD.STONE_PER_WEEK`
    (TUNE: 2, calibrar para que la primera piedra siga cayendo en los años 42 a
-   45, `handover.md` §2.1); el proyecto de piedra **no arranca** hasta tener su
+   45, `historico/handover.md` §2.1); el proyecto de piedra **no arranca** hasta tener su
    `stone` en el montón, y al arrancar lo descuenta (donde hoy descuenta la
    madera: búscalo por `woodCostOf`). `canQuarry` se queda. `TRAITS` de
    `bare_hills` sigue actuando por el mapa, sin tocar.
@@ -1186,7 +1186,7 @@ crónica, objeto en escena). `redesign/orders.ts` y `answerFor` se borran.
 `docs/design.md` §11.2 describe el carro y retira las órdenes; §12 recibe los
 números de `MEANS`, `TRADE`, `LORD` y `FATE` con su medida; **se remide la
 suite de balance** (§5 lo tenía para después: aquí ya toca, porque el motor ha
-cambiado tres veces desde R-1) y se reescriben §12.9 y `handover.md` §5.5.
+cambiado tres veces desde R-1) y se reescriben §12.9 y `historico/handover.md` §5.5.
 
 **Criterio.** Seis medios en el carro, cada uno con su fila en
 `tools/reports/agency-report.ts`; el informe entero en `docs/` con la tabla de distancias
@@ -1207,7 +1207,7 @@ divertido, que es la única medida que no cabe en un script.
 ## 5. Lo que va después, y **no ahora** (decisión 5)
 
 - Remedir la suite de balance (`npm run test:balance`, 37 aserciones de §12.9)
-  con R-1 dentro y reescribir los números de §12.9 y `docs/handover.md` §5.5.
+  con R-1 dentro y reescribir los números de §12.9 y `docs/historico/handover.md` §5.5.
 - Afinar `FATE.WEIGHT` con el informe.
 - Planes de prueba de la jugabilidad (una sesión de cinco minutos a ×64 con
   un suceso visible; la comparación de dos valles).
@@ -1239,7 +1239,7 @@ divertido, que es la única medida que no cabe en un script.
   `node tools/graphics/shot.mjs --page http://127.0.0.1:8127/valley.html --seed N --settle S --sequence 12 --every 0.8`.
   Enviárselas al dueño; él juzga. No declarar nada «sólido».
 - **Documentar mientras se hace:** `docs/changelog.md` (una fila por versión,
-  con el motivo), `docs/handover.md` §2.1 y §4 (lo medido y las trampas),
+  con el motivo), `docs/historico/handover.md` §2.1 y §4 (lo medido y las trampas),
   `docs/design.md` (la regla vigente), `CLAUDE.md` (sólo lo que hay que tener
   siempre en la cabeza), y este documento (§3.6 y la tabla de §7).
 

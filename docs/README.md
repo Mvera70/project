@@ -10,6 +10,10 @@ docs actuales e histórico, para no mezclar lo antiguo con lo vigente».
 que le falta al arte está en `encargos/`. Un documento que no encaje en ninguna
 de las cuatro es un documento que nadie sabrá dónde buscar.
 
+**Y se limpió el 27 sep 2026**: seis planes y veintiocho encargos entregados
+pasaron a `historico/` con sus citas reescritas, y `design.md` volvió a
+describir el juego vivo.
+
 **Al mover, se reescribieron las referencias.** Son 398, repartidas por 130
 ficheros —código, pruebas, herramientas y los propios documentos—, y esas citas
 son la mitad del valor: dicen *por qué* una línea es como es. Si mueves un
@@ -40,15 +44,9 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `changelog.md` | **El porqué de cada revisión.** Antes de deshacer una decisión, se busca aquí |
 | `task-log.md` | **El cuaderno de tareas.** El punto exacto: en vuelo, cifras, abierto |
 | `plan-meta.md` | **El plan hacia la meta** (§1b), con prioridad, dificultad y agente |
-| `plan-rendimiento.md` | **P-1: rendimiento antes de más contenido**; evidencia inicial, medición reproducible y puerta para optimizar |
-| `plan-espacial.md` | Aldea orgánica: caminos, plaza, viviendas y cierre real del recinto; aceptada localmente tras recuperación dirigida por Sol |
-| `plan-disparo-unico.md` | **El brief de Astra** (19 sep): lo que ha pasado en dos días para que lo revise, y la tarea — clips que ocurren en un instante y sostienen su última pose. Desbloquea E1 y con ella el bloque de arte entero |
-| `plan-final.md` | **El final de una partida**: la lápida, la hoja de cuentas y el cronicón (F3), con fases por agente y las decisiones que son del dueño |
-| `encargos-3d.md` | **Todo lo que hace falta de Blender**, apuntado en la misma ronda en que se descubre |
+| `encargos-3d.md` | **Todo lo que el juego no enseña todavía**: mallas, animaciones y mecánicas sin representación, apuntado en la misma ronda en que se descubre |
 | `plan-arte-pendiente.md` | La cola del arte: cada crónica nueva trae aquí su imagen pedida |
-| `plan-audio.md` | **Inventario maestro de audio**: ambiente, interfaz, economía, hitos, fases y asedio |
-| `handover.md` | El estado exacto de cada pieza y las trampas que ya costaron tiempo |
-| `roadmap.md` | Qué falta en total, y qué no puede hacer ningún agente |
+| `plan-audio.md` | **Inventario maestro de audio**: ambiente, interfaz, economía, hitos, fases y asedio. En curso |
 | `agents.md` | Cómo se delega y se audita |
 | `dos-sesiones.md` | Quién toca qué cuando hay dos sesiones a la vez |
 
@@ -68,37 +66,19 @@ Las herramientas que las produjeron están en `tools/reports/`.
 | `medidas/letalidad-por-decision-2026-09-19.md` | **Qué decisiones acumulan la caída (G4)**, por contrafactual: lo que mata es no prepararse para el asedio, y es lo que elige la política prudente |
 | `medidas/banco-de-balance-2026-09-19.md` | **El banco remedido (G2)**: 11 rojas de 37 y 31 minutos, no 19 y 45; las cuatro rojas con su causa; y que el catálogo no tenía contenido muerto, lo tenía el banco que lo medía |
 | `medidas/p1a-rendimiento-seed11-year21-2026-09-22.md` | P-1a: renderer y app real en semilla 11/año 21; comparación controlada de día/noche/lluvia, datos crudos y límites |
+| `medidas/auditoria-cosas-a-medias-2026-09-24.md` | **Lo que la aldea dejaba a medias** (24 sep), pedido por el dueño tras probar la demo: material tirado, herrería vacía, granero sin nadie, gente reunida sin hacer nada. Sólo observación, con `observe-life.mjs` |
 
 ## Encargos de arte abiertos — `docs/encargos/`
 
 `encargos-3d.md` (en la raíz) es el índice de todo; éstos son los que tienen su
-propio documento con medidas y presupuesto de triángulos.
+propio documento. **Los entregados están en `historico/encargos/`** (27 sep
+2026): veintiocho, del arado y la fuente a toda la familia del bastión y el
+adarve.
 
 | Documento | Qué pide |
 |---|---|
-| `encargos/encargo-combate.md` | **Los seis clips de combate (E1)**, el camino largo de la fase 4 |
-| `encargos/encargo-integracion-y-defensa.md` | Alcance de los puntos 1 y 2: siete modelos y combate sin arqueros; cierre en `historico/life-rounds/E2-integracion-y-defensa.md` |
-| `encargos/encargo-visibilidad-y-huida.md` | Puntos 3 y 4: oclusión selectiva del bosque, contactos de atacantes y carrera civil `flee` |
-| `encargos/encargo-d6-acabado-fisico.md` | Contrato de D6 y acabado físico entregados el 20 sep; evidencia en el informe de ronda |
-| `encargos/encargo-e0-preparacion.md` | Contrato de E0a: preparación visible antes del asedio; cierre en `historico/life-rounds/E0a-preparacion.md` |
-| `encargos/encargo-e0-aviso.md` | Contrato de E0b: mensajero post-decisión desde el acceso real; cierre en `historico/life-rounds/E0b-aviso.md` |
-| `encargos/encargo-e0-semana-posterior.md` | Contrato de E0c: reservas volcadas y corral abierto durante la semana posterior al saqueo |
-| `encargos/encargo-e0-transiciones-muralla.md` | Contrato de E0d: solar visible y hueco durante segunda puerta y estacada a piedra |
-| `encargos/encargo-e0-ambiente-eras.md` | Contrato de E0e: caminos, plaza y humo según era; código y aceptación histórica entregados en `historico/life-rounds/E0e-ambiente-eras.md` |
-| `encargos/encargo-e0e-aceptacion-historica.md` | Plan de cierre de E0e: historias reales, controles separados, lectura sin rótulos y regresiones |
-| `encargos/encargo-e2-clan-vecino.md` | Contrato de la figura del clan vecino E2 y su integración; cierre en `historico/graphics-rounds/G-28.md` |
-| `encargos/encargo-e3-modelo-bastion.md` | Sólo modelo 3D del bastión E3; fuente validada y apariencia aprobada por Vera |
-| `encargos/encargo-e3-integracion-bastion.md` | Admisión y conexión visual del bastión E3 aprobado; el adarve navegable queda aparte |
-| `encargos/encargo-e3-acceso-elevado.md` | Contrato de subida real al puesto del bastión; separa ese alcance del adarve continuo sobre toda la muralla |
-| `encargos/encargo-e3-puesto-navegable.md` | Ejecución acotada E3a: ruta privada, cota, arquería y física; cierre en `historico/graphics-rounds/G-29.md` |
-| `encargos/encargo-e3b-adarve-continuo.md` | Brief de E3b: continuidad del adarve y criterio de prueba en el juego |
-| `encargos/encargo-e3b2b-modelos-candidatos.md` | Modelos candidatos pendientes para giro, diagonal y portón; inventario en `historico/graphics-rounds/E3b2a-inventario-topologia.md` |
-| `encargos/encargo-e3-escalera-visual.md` | Integración visual acotada de la escalera aceptada; navegación elevada diferida |
-| `encargos/encargo-e3-emplazamiento-accesible.md` | Selección de muros aptos para que la escalera opcional aparezca en partidas históricas reales |
-| `encargos/encargo-arado.md` | La malla del arado (M-3) |
-| `encargos/encargo-fuente.md` | La fuente de la plaza (P-3) |
-| `encargos/encargo-astra-modelos.md` | **Los modelos 3D que faltan, para Astra** (26 sep 2026): sala del rey, puestos, cantera, kit de roca, roble, casa quemada, y el prompt listo para pegar |
-| `encargos/respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos |
+| `encargos/encargo-astra-modelos.md` | **Los modelos 3D para Astra**, con el prompt listo para pegar. Entregados la sala del líder, los puestos, la cantera, las rocas y la golondrina; **quedan el roble y la casa quemada**, a la espera de que Vera decida |
+| `encargos/respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos, con decisiones que el dueño dejó sin contestar |
 
 ## Histórico: se conserva por el porqué — `docs/historico/`
 
@@ -116,7 +96,14 @@ una decisión vieja, nunca para saber qué hacer ahora — para eso está
 | `historico/next-plan.md` | Los briefs de la auditoría (15 sep) | **Entregado**: U-10 a U-14 |
 | `historico/brief-reloj.md` | Qué costaba afinar el tick (14 sep) | **Entregado**: v3.72, el reloj con horas |
 | `historico/life-ai-proposal.md` | Propuesta de IA para aldeanos y fauna (16 sep) | **Superada** por las rondas IA-1 a IA-18, que sí están implementadas |
-| `historico/graphics-rounds/` | El informe de cada ronda de gráficos (G-xx, E3b) | G-32 publicó candidatos y E3b.2a midió el anillo; E3 sigue parcial porque falta el adarve continuo |
+| `historico/handover.md` | El estado exacto de cada pieza y sus trampas, a 15 sep | **Foto del 15 sep.** El estado vivo está en `task-log.md` y `plan-meta.md`; sus trampas siguen valiendo por el porqué |
+| `historico/roadmap.md` | Qué faltaba en total y qué no podía hacer ningún agente (15 sep) | **Superado** por `plan-meta.md` (A–H); sus decisiones del dueño —el rework, los hitos 0 y 6 descartados— siguen citadas desde el código |
+| `historico/plan-rendimiento.md` | P-1: rendimiento antes de más contenido (22 sep) | **P-1 cerrada** para seguir la hoja de ruta; la medida está en `medidas/p1a-…` |
+| `historico/plan-disparo-unico.md` | El brief de Astra del 19 sep: clips que ocurren en un instante | **Entregado** con E1 (20 sep) |
+| `historico/plan-final.md` | El final de una partida: lápida, hoja de cuentas y cronicón (F3) | **F3a–F3e hechas** (18–19 sep); sólo queda F3f, sin prioridad, en `plan-meta.md` |
+| `historico/plan-espacial.md` | La aldea orgánica: caminos, plaza, viviendas y cierre real del recinto | **Aceptada** el 21 sep |
+| `historico/encargos/` | Los veintiocho encargos de arte entregados o superados (27 sep) | Arado, fuente, combate, cuerpo a cuerpo, D6, E0a–E0e, E2 y la familia del bastión y el adarve, cerrada con E3b.3 |
+| `historico/graphics-rounds/` | El informe de cada ronda de gráficos (G-xx, E3b) | Cerradas hasta E3b.3 (24 sep): el adarve se genera desde el anillo y E3 está completa |
 | `historico/life-rounds/` | El informe de cada ronda de la vida del valle (V-xx, IA-xx) | Cerradas: V-00 a V-14, IA-0 a IA-18 |
 | `historico/sesiones/` | Notas de sesión | — |
 

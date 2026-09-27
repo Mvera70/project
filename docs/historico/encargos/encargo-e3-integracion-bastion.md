@@ -11,7 +11,7 @@ crea un puesto navegable sobre el adarve ni cambia el combate.
 ## Depende de
 
 - `docs/design.md` §1–4, §7.3–7.4c y D.3–D.4, D.9 y D.12.
-- `docs/encargos/encargo-e3-modelo-bastion.md` y
+- `docs/historico/encargos/encargo-e3-modelo-bastion.md` y
   `art/recipes/bastion/README.md` (fuente y evidencia del candidato).
 - `src/render3d/world/{buildings,defences,plan}.ts`,
   `tools/art/index.ts`, `tools/graphics/publish-assets.ts` y

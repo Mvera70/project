@@ -59,7 +59,7 @@ const STYLE = `
 .epitaph-open .hud-plate-date,
 .epitaph-open .valley-orders-now { visibility: hidden; }
 
-/* F3c · **La lápida.** docs/plan-final.md §1.
+/* F3c · **La lápida.** docs/historico/plan-final.md §1.
  *
  * Lo pidió el dueño del diseño: «una animación de game over que se superponga
  * encima de la pantalla con una letra estilo medieval, siguiendo el estilo que
@@ -121,7 +121,7 @@ const STYLE = `
     animation: none; clip-path: none; }
 }
 
-/* F3b · **La hoja de cuentas.** docs/plan-final.md §2.
+/* F3b · **La hoja de cuentas.** docs/historico/plan-final.md §2.
  *
  * Tres cifras grandes que se comparan de un vistazo y debajo la relación larga,
  * como la de un mayordomo: cifras tabulares, filete de oro entre filas y las
@@ -176,7 +176,7 @@ function ensureStyle(): void {
  *
  * Se monta antes que la hoja y se quita cuando la hoja sube: el momento y el
  * documento son dos cosas, y el orden es lo que hace que el final se lea como
- * un final y no como una pantalla más (`docs/plan-final.md` §1).
+ * un final y no como una pantalla más (`docs/historico/plan-final.md` §1).
  */
 function raiseStone(game: ArchivedGame): HTMLElement {
   const stone = document.createElement('div');

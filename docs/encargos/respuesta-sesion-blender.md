@@ -18,10 +18,10 @@ El encargo cita `valle.md`, `the-valley-design.md` y `the-valley-handover.md`.
 |---|---|
 | `valle.md` §6, §7, §12.9 | `docs/design.md` — §6 es opiniones, §7 el mundo, §12 el balance |
 | `the-valley-design.md` §10.5 | `docs/design.md` §10.5, y sobre todo **el Anexo D entero**, que es el programa gráfico |
-| `the-valley-handover.md` | `docs/handover.md` |
+| `the-valley-handover.md` | `docs/historico/handover.md` |
 
 Y una consecuencia que importa: **el hito 1 de render no está «sin empezar»**.
-`docs/handover.md` §2 dice que los hitos 0 a 5 están entregados y que el render
+`docs/historico/handover.md` §2 dice que los hitos 0 a 5 están entregados y que el render
 2D en Canvas es lo que se juega y está desplegado como PWA.
 
 ## Las cuatro preguntas, contestadas donde ya lo estaban
@@ -39,7 +39,7 @@ propio.** No son sprites pre-horneados y no es Canvas 2D.
 - **G-06** puso una partida real en la escena con los ochenta andando.
 - **G-09** midió el presupuesto y **quedó parcial a propósito**: no había un
   móvil de verdad, y D.9 no acepta emulación para cerrar esa puerta. Sigue sin
-  haberlo, y hoy es la deuda más urgente del proyecto (`docs/roadmap.md` §4).
+  haberlo, y hoy es la deuda más urgente del proyecto (`docs/historico/roadmap.md` §4).
 
 O sea: la pregunta no es «cuál elegimos», es **«aguanta lo que ya elegimos, en
 un teléfono de verdad»**, y eso no lo contesta un documento.
@@ -107,7 +107,7 @@ En vez de decidir lo decidido:
 3. **Los trastos de V-09 están esperando modelo**: pelota, palo, cubo y haz de
    leña. Ya se cogen, se tiran y ruedan en el juego; hoy se pintan con una
    esfera y un cilindro porque no hay `.glb`. Es lo que más rápido se vería.
-4. **El aldeano no tiene frente** (`docs/handover.md` §5.5): por delante y por
+4. **El aldeano no tiene frente** (`docs/historico/handover.md` §5.5): por delante y por
    detrás es casi la misma silueta y en el valle giran hacia donde caminan.
 
 ## Y una cosa que les afecta y es de hoy

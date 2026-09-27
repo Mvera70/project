@@ -1,5 +1,7 @@
 # El disparo único — brief para Astra
 
+> **Histórico desde el 27 sep 2026.** Entregado con E1 el 20 sep 2026 (`historico/life-rounds/E1-disparo-unico.md`).
+
 **Para ti, que escribiste `docs/plan-meta.md` el 18 sep 2026.** Han pasado dos
 días y tu plan se ha cumplido casi entero. Este documento es (1) lo que ha
 pasado, para que lo revises por encima, (2) lo que te pedimos criticar, y (3) la
@@ -216,7 +218,7 @@ cuánto dura una caída y en qué pose se queda.
   caída sin gore no la necesita; el gore sí. No la tomes tú.
 - **El ragdoll**: pide que los cuerpos de la gente sean cuerpos de Rapier, y eso
   es una tanda entera. El encargo lo dice
-  (`docs/encargos/encargo-combate.md`).
+  (`docs/historico/encargos/encargo-combate.md`).
 
 ### Ficheros que tocas
 

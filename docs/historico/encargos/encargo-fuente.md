@@ -1,6 +1,6 @@
 # Encargo: la fuente de la plaza (`fountain`)
 
-Para quien modele en Blender. Mismo formato que `docs/encargos/encargo-arado.md`, que se
+Para quien modele en Blender. Mismo formato que `docs/historico/encargos/encargo-arado.md`, que se
 entregó el 17 sep 2026 y sirvió: medidas, piezas, materiales, presupuesto y los
 tres pasos para meterla en la escena.
 

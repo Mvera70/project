@@ -11,7 +11,7 @@
 // Esta prueba mide sobre partidas **reales** (`foundGame` + `run`, la política
 // `prudent`, el mismo camino que `tools/reports/eligibility-report.ts`) si `requires`
 // llega a cumplirse alguna vez — no si la plantilla llega a plantearse, que
-// depende del peso y del sorteo y es otra pregunta (`docs/roadmap.md` §1). Una
+// depende del peso y del sorteo y es otra pregunta (`docs/historico/roadmap.md` §1). Una
 // condición que nunca se cumple en ninguna partida real, sea cual sea la
 // semilla, es un error de construcción: un umbral fuera del rango que el motor
 // puede alcanzar. Una condición que se cumple poco no lo es.

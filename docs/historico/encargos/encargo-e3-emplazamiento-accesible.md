@@ -13,7 +13,7 @@ escalera que atraviese árbol, agua, edificio o otra defensa.
 
 ## Depende de
 
-- `docs/encargos/encargo-e3-escalera-visual.md` y G-27;
+- `docs/historico/encargos/encargo-e3-escalera-visual.md` y G-27;
   `docs/design.md` §1–4, §7.4 y §12 (cupo y orden de mejoras).
 - `src/engine/world/upgrade.ts`, `src/derive/bastion-access.ts`,
   `src/render3d/world/plan.ts`, `src/render3d/life/terrain.ts`.

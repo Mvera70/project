@@ -10,7 +10,7 @@ de acabado separada.
 
 ## Depende de
 
-- `docs/encargos/encargo-e0-ambiente-eras.md`, incluida la autorización del 22
+- `docs/historico/encargos/encargo-e0-ambiente-eras.md`, incluida la autorización del 22
   sep 2026; `docs/historico/life-rounds/E0e-ambiente-eras.md` y
   `docs/plan-meta.md` §2.
 - `src/derive/era.ts`, `src/render3d/world/ground.ts`, `tools/graphics/shot.mjs`.

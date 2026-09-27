@@ -414,7 +414,7 @@ Los tres textos de `crossroad.succession.*` de pantalla se reescriben neutros (K
 
 ## 8. Encargo de arte · la sala del rey (`hall`)
 
-**Para la sesión de Blender.** Mismo formato que `docs/encargos/encargo-arado.md` y `docs/encargos/encargo-fuente.md`. El dueño lo anotó el 18 sep 2026: «debe tener una casa que se diferencie; eso queda anotado para hacerlo más adelante en 3D». Hasta que exista, el juego la dibuja como una caja de 3×3 con el tejado burdeos (`BUILDING_LOOKS.hall`), que se distingue pero no se mira.
+**Para la sesión de Blender.** Mismo formato que `docs/historico/encargos/encargo-arado.md` y `docs/historico/encargos/encargo-fuente.md`. El dueño lo anotó el 18 sep 2026: «debe tener una casa que se diferencie; eso queda anotado para hacerlo más adelante en 3D». Hasta que exista, el juego la dibuja como una caja de 3×3 con el tejado burdeos (`BUILDING_LOOKS.hall`), que se distingue pero no se mira.
 
 ### 8.1 Qué es, en una frase
 

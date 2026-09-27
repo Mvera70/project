@@ -1,17 +1,17 @@
 # E3b · Adarve continuo — brief de viabilidad y primera entrega
 
 **Estado:** la primera junta y dos tramos tienen recetas candidatas; su
-[exportación aislada](../historico/graphics-rounds/E3b0-exportacion-candidata.md)
+[exportación aislada](../graphics-rounds/E3b0-exportacion-candidata.md)
 pasó Blender, `game-dev asset inspect` y GLTFLoader. Los tres GLB se publicaron
-como [G-32](../historico/graphics-rounds/G-32-e3b-candidatos.md), la primera
+como [G-32](../graphics-rounds/G-32-e3b-candidatos.md), la primera
 junta ya se selecciona y monta en escena mediante E3b.1a/b. E3b.1c conecta
 la ruta privada del guardia y sus colliders; las pruebas focales pasan y
-[E3b.1d](../historico/graphics-rounds/E3b1d-revision-app.md) observó la junta
+[E3b.1d](../graphics-rounds/E3b1d-revision-app.md) observó la junta
 en la app real, en un escenario controlado. El
-[inventario E3b.2a](../historico/graphics-rounds/E3b2a-inventario-topologia.md)
+[inventario E3b.2a](../graphics-rounds/E3b2a-inventario-topologia.md)
 midió las formas del anillo y prepara candidatos de giro, diagonal y portón.
 E3a ya entrega el puesto navegable del bastión
-([G-29](../historico/graphics-rounds/G-29.md)).
+([G-29](../graphics-rounds/G-29.md)).
 
 ## Objetivo
 

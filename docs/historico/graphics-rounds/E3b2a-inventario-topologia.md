@@ -39,7 +39,7 @@ móvil. Un tramo de madera no puede recibir la pasarela de piedra por analogía:
 queda excluido hasta tener variante validada. Ninguna pieza se marcará
 navegable por existir en el dibujo: primero habrá superficie continua de
 ancho ≥0,70, después ruta privada y colisiones correspondientes. El
-[encargo de modelos](../../encargos/encargo-e3b2b-modelos-candidatos.md)
+[encargo de modelos](../encargos/encargo-e3b2b-modelos-candidatos.md)
 recoge los casos que este inventario destapó.
 
 No se modificaron `src/engine/`, escena, GLB ni guardados; sin benchmark,

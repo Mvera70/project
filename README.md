@@ -16,9 +16,9 @@ teléfono para aceptar el hito 6.
 - [Cuaderno de tareas](docs/task-log.md): el punto exacto — qué está en vuelo,
   qué cifras mandan y qué está abierto.
 - [Registro de cambios](docs/changelog.md): qué cambió en cada revisión y por qué.
-- [Traspaso](docs/handover.md): estado exacto, y las trampas que ya han costado
+- [Traspaso](docs/historico/handover.md): estado exacto, y las trampas que ya han costado
   tiempo.
-- [Hoja de ruta](docs/roadmap.md): qué falta en total, y qué no puede hacer
+- [Hoja de ruta](docs/historico/roadmap.md): qué falta en total, y qué no puede hacer
   ningún agente.
 - [Catálogo de herramientas](tools/README.md): qué mide cada informe, qué
   fotografía cada captura y cómo se lanza.

@@ -1,4 +1,4 @@
-// F3a · El libro de cuentas de una partida. docs/plan-final.md §2.
+// F3a · El libro de cuentas de una partida. docs/historico/plan-final.md §2.
 //
 // **Una hoja de estadísticas miente muy fácil y nadie se entera.** Un número
 // mal contado en una pantalla de final no rompe nada, no sale en ninguna traza

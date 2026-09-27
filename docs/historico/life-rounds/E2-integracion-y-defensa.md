@@ -1,7 +1,7 @@
 # Integración y defensa sin arqueros · 20 sep 2026
 
 Alcance autorizado: puntos 1 y 2 del siguiente paso, y detenerse al terminarlos.
-[Brief](../../encargos/encargo-integracion-y-defensa.md). Integración delegada
+[Brief](../encargos/encargo-integracion-y-defensa.md). Integración delegada
 en Terra y auditoría de recursos en Luna; revisión final y punto 2 por el principal.
 
 ## Punto 2 · Fallo reproducido y corregido

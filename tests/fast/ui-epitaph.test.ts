@@ -1,5 +1,5 @@
 // F3b/F3c · La lápida y la hoja de cuentas, en lo que se puede probar sin DOM.
-// docs/plan-final.md §1 y §2.
+// docs/historico/plan-final.md §1 y §2.
 //
 // **El proyecto no trae `jsdom`** (`docs/ui-redesign/rounds/UI-R1.md` §4), así
 // que de una pantalla se prueba aquí lo que no toca el DOM y lo demás se
@@ -10,7 +10,7 @@
 // clase de cosa que nadie ve hasta que la ve un jugador.
 //
 // Y una propiedad de diseño que sí se puede afirmar sin pintar nada: **la
-// inscripción no dice «game over»** (decisión 1 de `plan-final.md` §5). Es la
+// inscripción no dice «game over»** (decisión 1 de `docs/historico/plan-final.md` §5). Es la
 // única frase del juego que hablaría del juego y no del valle, y si algún día
 // alguien la mete, esto se pone rojo.
 

@@ -9,7 +9,7 @@
 // se dio cuenta porque la prueba que vigilaba la reunión llamaba a `actorsFor`
 // directamente, así que siguió verde sobre un camino que el juego ya no
 // recorría. V-12 borró ese camino y **este fichero se quedó rojo a propósito,
-// con la propiedad del brief intacta**, que es lo que `docs/roadmap.md` manda
+// con la propiedad del brief intacta**, que es lo que `docs/historico/roadmap.md` manda
 // hacer con lo que no llega.
 //
 // **V-11 lo cierra (15 sep 2026):** `life/staging.ts` baja las órdenes del
@@ -217,7 +217,7 @@ describe('V-11 · la reunión de §11.8 en la capa de vida', () => {
   // que dos fuerzas puedan cancelarse exactas sin desempate, y eso no lo ha
   // tocado nadie. Deja de estar declarada porque una prueba que espera fallar y
   // pasa es una prueba roja, y el estado de este fichero tiene que decir la
-  // verdad (`docs/handover.md`, la lección de v3.79).
+  // verdad (`docs/historico/handover.md`, la lección de v3.79).
   // IA-anim (24 sep 2026): verde con la aldea entera en el corro (ver arriba).
   it('y la aldea junta cabe en un corro, no en el valle entero (semilla 23)', () => {
     expect(spread(firstDay(summon(village(12, 23)))), 'semilla 23').toBeLessThan(14);

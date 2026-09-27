@@ -126,7 +126,8 @@ con conducta civil de refugio y carrera procedural.
 Los siete modelos de la primera tanda están aceptados e integrados en el juego
 (20 sep). También se corrige D4 sin arqueros: ya no depende de inicializar Rapier.
 [Integración y defensa](historico/life-rounds/E2-integracion-y-defensa.md).
-  E2 está cerrado y E3 sigue parcial: falta el adarve. La rotura del
+  E2 está cerrado y E3 también, desde el 24 sep: el adarve se genera desde el
+  anillo (E3b.3). La rotura del
   portón queda resuelta por código en D6, sin requerir otra variante GLB.
 
 **El arte sigue parcial:** los siete gestos de E1 tienen representación
@@ -135,7 +136,7 @@ procedural; no son nuevos clips embebidos en el GLB.
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
 | E1 · Clips de combate · **entregados por código, 20 sep 2026** | `bow_draw`, `bow_loose`, `gate_strike`, `fall`, `spear_thrust` y `hit_take` fechados por hechos; `flee` cíclico con refugio civil. Reacción de puerta y armas integradas. Oclusión selectiva del robledal y separación de raiders verificadas, con límites documentados. [Cierre y evidencia](historico/life-rounds/E3-visibilidad-y-huida.md) | Hecho | Alta | Sol + revisión Terra | — |
-| E0 · **Lo que todavía pasa y no se ve** · *E0a–E0e cerrados, 22 sep 2026* | E0e conecta caminos, plaza y humo a la era real sin cambiar motor ni navegación. §7.4b fija tierra pisada → piedra parcial → piedra completa. Doce tomas históricas sin rótulo, dos semillas y móvil/tableta fueron clasificadas 12/12 por otro agente; cuatro lecturas de plaza tuvieron confianza media. La piedra lisa sin juntas queda como deuda de acabado. [Brief](encargos/encargo-e0e-aceptacion-historica.md) e [informe](historico/life-rounds/E0e-ambiente-eras.md) | Hecho | Media-alta | Sol dirige · Terra revisa | — |
+| E0 · **Lo que todavía pasa y no se ve** · *E0a–E0e cerrados, 22 sep 2026* | E0e conecta caminos, plaza y humo a la era real sin cambiar motor ni navegación. §7.4b fija tierra pisada → piedra parcial → piedra completa. Doce tomas históricas sin rótulo, dos semillas y móvil/tableta fueron clasificadas 12/12 por otro agente; cuatro lecturas de plaza tuvieron confianza media. La piedra lisa sin juntas queda como deuda de acabado. [Brief](historico/encargos/encargo-e0e-aceptacion-historica.md) e [informe](historico/life-rounds/E0e-ambiente-eras.md) | Hecho | Media-alta | Sol dirige · Terra revisa | — |
 | E2 · Modelos del asedio · **hecho, 22 sep 2026** | Arco, flecha, lanza y escudo están integrados. El clan vecino lleva `villager-neighbor`, aldeano de otro valle con gorro y esclavina propios; conserva rig/clips y respaldo al forastero civil. Se verificó en aproximación y puerta del juego real, sin cambiar mecánica. No se añade espada: ninguna conducta actual la pide. La captura no certifica ragdoll visual. [G-28](historico/graphics-rounds/G-28.md) | Hecho | Alta | Astra sólo modelo · Terra integra · Sol revisa | — |
 | E3 · Portón, muralla de piedra, torre · **hecho, 24 sep 2026** | Portón, hoja articulada, rotura procedural, muralla y atalaya integrados; E3a sube al puesto de la torre. **E3b cerrada: el adarve se genera desde el anillo real** —rectas, codos, diagonales y portón— con pretiles sobre el borde de la unión de suelos. El guardia sube directo a su puesto y hace la ronda sin enemigos a la vista: vuelta cerrada en la villa 91, ida y vuelta hasta el primer corte en 23, 7 y 42. Suelo en todas las muestras, holgura ≥ 0,325 contra un cuerpo de 0,32, cero bordes abiertos; en asalto las torres tiran. Falta medir su coste en un móvil real. [G-27](historico/graphics-rounds/G-27.md) · [G-29](historico/graphics-rounds/G-29.md) · [E3b.3](historico/graphics-rounds/E3b3-adarve-generado.md) | Hecho | Media-alta | Claude (Opus) implementa y mide | A2, A3, A4 |
 | ~~E4 · Fuego, humo, gore~~ · **hecho, 25 sep 2026** | **Decidido por el dueño:** gore *contenido*, fuego en las cuatro formas y llamas de *textura dibujada animada*. (1) La casa que arde se ve tres días de llama y cuatro de brasa, con humo negro, chispas y luz (`effects/fires.ts`, marca `burnt:<id>`). (2) Salpicadura corta al golpe y mancha que se va en ocho horas (`GORE`, `effects/stains.ts`). (3) Villa tomada: arden las tres casas más cercanas al portón; aldea abierta saqueada: una, nunca la última. (4) Flechas incendiarias cuando el cerco aguanta: uno o dos tejados junto a la muralla, **salvados si hay agua a 6 celdas** (mediana medida en 84 casas de seis semillas), y la brigada de cubos acude. Todo sin dados. **Límites:** la mancha y la brigada están probadas en pruebas, no vistas en captura. | Hecho | Alta | — | D5, D6 |
@@ -147,7 +148,7 @@ procedural; no son nuevos clips embebidos en el GLB.
 |---|---|---|---|---|---|
 | F1 · Textos del banco | Todo lo nuevo en `bank.en.ts`: el aviso, el asalto, el portón, las bajas, el cierre | P2 | Baja | Luna, Terra | cada fase que los pida |
 | ~~F2 · La alerta y el HUD del asedio~~ · **hecha el 19 sep 2026** | **Lo que faltaba era que el valle lo dijera mientras pasa**: la crónica contaba el aviso y el asalto y la línea de estado seguía diciendo que se levantaba un granero (`docs/encargos-3d.md` §1). Cinco frases en la tira, ninguna cifra flotando (§11.1). Tres las pone el motor por `doing.ts` —la víspera con su cuenta atrás (`doing.raid_coming`), y el clan encima, que dice «en la puerta» **sólo si hay puerta** (`doing.besieged` / `doing.besieged_open`)— y dos la escena por `backend.live.siege()`: `doing.gate_holding`, `doing.gate_giving` (a `GATE_GIVING` = 2/3 de los sesenta golpes de D3b) y `doing.gate_broken`. **El reparto de la puerta es puro y vive en `gateNow` (`src/ui/doing.ts`), no en el bucle de pintado**, que es lo que lo hace probable desde la suite rápida. **Medido**: seis semillas × sesenta años, los seis valles ven la línea, 1.048 semanas de víspera y 131 con el clan encima — el 4,0 % del tiempo. Y en el navegador (`?raid=24&assault=1`, semilla 7, año 30, 390 × 844): los tres estados de la puerta salen —11 golpes «holding», 47 «giving way», 60 y dentro «down»—, cero errores de página, capturas en `artifacts/graphics/F2/`. **Las bajas no llevan línea propia, y es una decisión**: §11.1 dice que el valle es el HUD y que las cifras viven en la tira y en las fichas, y las de la batalla ya las cuenta la crónica al cerrar la semana (`raid.held`, con `{slain}` y `{fallen}`). Un marcador en vivo sería la única cifra flotante de la pantalla. **Y el defecto lo cazó la captura, no la prueba**: la primera versión hablaba de un portón a un valle sin cerco | Hecho | Media | — | — |
-| ~~F3 · La pantalla del final~~ · **F3a, F3b, F3c y F3e hechas el 18 sep 2026** (plan y medidas en `plan-final.md`): el libro de cuentas (`engine/chronicle/ledger.ts`, y **sin subir el esquema** porque casi todo se recuenta de la crónica), la hoja de cuentas con tres cifras grandes y quince filas sobre el documento que ya existía, y la lápida —capitular de la palabra que nombra el final e inscripción en Cinzel que se graba sobre el valle atenuado, con el HUD escondido—. Fotografiadas las cuatro causas. **F3d hecha el 19 sep 2026**: el cronicón, en `src/ui/screens/annals.ts`, al que se entra desde el menú de inicio. Dos decisiones del dueño ese día: **las lápidas una al lado de otra** —capitular de la causa, inscripción, `ANNO {año} · VALLE {semilla}` y dos cifras de la hoja de cuentas— y **empieza vacío y se llena**, así que la página vacía es una pantalla del juego con su línea y no un hueco. **No guarda nada nuevo y no sube el esquema**: el archivo existe desde M-25 y esto es la primera pantalla que lo lee entero. No dibuja ni una pieza nueva: la lápida es la de F3c reducida, el papel y el canto son los de la piel. **Y la captura cazó tres defectos que ninguna prueba vio**, uno de ellos de la ronda anterior: `{count}` se escribe con letra por debajo de trece, así que `doing.besieged` —de F2, esta misma mañana— decía «six of them are at the gate.» con minúscula cuando bajaban seis; la captura de F2 usó una partida de 24 y por eso enseñó un número. Arreglado en las tres frases y con guardia en `ui-keys.test.ts`. Los otros dos: la fila decía «ANNO 39» y «38 years» dos líneas más abajo (el año de la crónica va en base 1 y los vividos no), y la página vacía subía como una tira de cuatro dedos. **Queda F3f** (la hoja como imagen, sin prioridad) | P4 (lo que queda) | Media | Sol | B3 hecha |
+| ~~F3 · La pantalla del final~~ · **F3a, F3b, F3c y F3e hechas el 18 sep 2026** (plan y medidas en `historico/plan-final.md`): el libro de cuentas (`engine/chronicle/ledger.ts`, y **sin subir el esquema** porque casi todo se recuenta de la crónica), la hoja de cuentas con tres cifras grandes y quince filas sobre el documento que ya existía, y la lápida —capitular de la palabra que nombra el final e inscripción en Cinzel que se graba sobre el valle atenuado, con el HUD escondido—. Fotografiadas las cuatro causas. **F3d hecha el 19 sep 2026**: el cronicón, en `src/ui/screens/annals.ts`, al que se entra desde el menú de inicio. Dos decisiones del dueño ese día: **las lápidas una al lado de otra** —capitular de la causa, inscripción, `ANNO {año} · VALLE {semilla}` y dos cifras de la hoja de cuentas— y **empieza vacío y se llena**, así que la página vacía es una pantalla del juego con su línea y no un hueco. **No guarda nada nuevo y no sube el esquema**: el archivo existe desde M-25 y esto es la primera pantalla que lo lee entero. No dibuja ni una pieza nueva: la lápida es la de F3c reducida, el papel y el canto son los de la piel. **Y la captura cazó tres defectos que ninguna prueba vio**, uno de ellos de la ronda anterior: `{count}` se escribe con letra por debajo de trece, así que `doing.besieged` —de F2, esta misma mañana— decía «six of them are at the gate.» con minúscula cuando bajaban seis; la captura de F2 usó una partida de 24 y por eso enseñó un número. Arreglado en las tres frases y con guardia en `ui-keys.test.ts`. Los otros dos: la fila decía «ANNO 39» y «38 years» dos líneas más abajo (el año de la crónica va en base 1 y los vividos no), y la página vacía subía como una tira de cuatro dedos. **Queda F3f** (la hoja como imagen, sin prioridad) | P4 (lo que queda) | Media | Sol | B3 hecha |
 | F4 · La captura de cada fase | Ninguna ronda de interfaz se cierra sin captura (`npm run shot`) | — | Baja | Luna, Terra | — |
 
 ### G · Ritmo, balance y letalidad (transversal, y va después)
@@ -170,8 +171,8 @@ meta**, pero hay que ir bajando:
 | Qué | Dificultad | Agente |
 |---|---|---|
 | La reunión de §11.8 no cabe en una aldea de 70 (se junta el 54 %) | Media | Sol (capa de vida) |
-| Las once jornadas rojas de la familia R-1 y la del devoto | Baja (medir y declarar) · Media (arreglar) | Luna, Terra → Sol |
-| La malla de la sala del rey y la identidad del clan siguen pendientes; bastión y escalera visual están aceptados en escena real, pero el acceso elevado navegable y el adarve continuo siguen abiertos. Arado y fuente están publicados e integrados | Media | Sesión de arte |
+| ~~Las once jornadas rojas de la familia R-1 y la del devoto~~ **Hecho**: quedan 128 de 130, y las dos rojas son a propósito y declaradas (`task-log.md`, «Las jornadas rojas») | — | — |
+| ~~La malla de la sala y la identidad del clan~~ **hechas**: la casa larga de Astra (v4.67, 27 sep) y el clan vecino de E2 (22 sep). Bastión y escalera visual están aceptados en escena real; el puesto elevado navegable (E3a) y el adarve continuo (E3b, generado desde el anillo) se cerraron el 22 y el 24 sep. Arado y fuente están publicados e integrados. **Queda de esta fila:** medir el coste del adarve en un móvil real | Baja | Cualquiera, con un móvil |
 | El hacha es el medio más flojo; `quiet_years` no sale | Baja | Dueño (decisión) → Luna |
 
 ---
@@ -187,8 +188,8 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
 1. **Hecho, 22 sep** — E0e se aceptó en partida histórica: doce capturas sin
    rótulo clasificadas 12/12 por otro agente, con contraste moderado entre
    aldea y villa en algunos encuadres. La piedra lisa queda como deuda menor.
-   La [revisión espacial](plan-espacial.md) está aceptada localmente.
-2. **Cerrado para continuar, 22 sep** — [P-1 rendimiento](plan-rendimiento.md):
+   La [revisión espacial](historico/plan-espacial.md) está aceptada localmente.
+2. **Cerrado para continuar, 22 sep** — [P-1 rendimiento](historico/plan-rendimiento.md):
    la app real tiene línea de base de entrada, cadencia y condiciones de
    día/noche. P-1b.1 mejoró claramente el clic del preset; P-1b.2 se midió y
    se retiró. Vera considera suficiente el rendimiento actual. El INP anterior
@@ -197,7 +198,7 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
 3. **Cerrado el 24 sep 2026** — E3b: el adarve se genera desde el anillo
    real ([E3b.3](historico/graphics-rounds/E3b3-adarve-generado.md)); lo que
    sigue es historia del camino por piezas aprobadas. **Antes**, E3: **adarve continuo**. El
-   [brief E3b](encargos/encargo-e3b-adarve-continuo.md) acota geometría,
+   [brief E3b](historico/encargos/encargo-e3b-adarve-continuo.md) acota geometría,
    navegación y colisiones del enlace bastión → muro. Primero,
    el [modelo recto candidato](../art/recipes/e3b-walkway-candidate/README.md)
    reveló que el pretil lateral de G-27 bloqueaba la unión. La
@@ -213,7 +214,7 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
    la autoría de cada flecha y el defecto previo de sombras no quedan
    resueltos por esa captura. El [inventario E3b.2a](historico/graphics-rounds/E3b2a-inventario-topologia.md)
    midió rectas, diagonales, portones y árboles junto al tablero en dos villas;
-   el [encargo E3b.2b](encargos/encargo-e3b2b-modelos-candidatos.md) prepara
+   el [encargo E3b.2b](historico/encargos/encargo-e3b2b-modelos-candidatos.md) prepara
    variantes de giro, diagonal y portón. La [sonda E3b.2b](historico/graphics-rounds/E3b2b-candidatos-y-puertas.md)
     deja el codo condicionado a sus juntas; la segunda sonda mide el paso
     diagonal; la primera alma falló 22 de 95 puntos sobre el muro real. Una
@@ -221,7 +222,7 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
     puentea la costura y queda condicional. El GLB del portón deja 0,667 de
     abertura visual frente a 0,84 de paso lógico. La variante de marco amplio
     se exportó en aislamiento y
-    pasó geometría estática y giro de hoja, sin aprobarse en partida. El [contrato E3b.2c](encargos/encargo-e3b2c-integracion-selectiva.md)
+    pasó geometría estática y giro de hoja, sin aprobarse en partida. El [contrato E3b.2c](historico/encargos/encargo-e3b2c-integracion-selectiva.md)
    queda preparado, sin despachar integración hasta aprobar geometría.
    E3b.2 sigue abierta y la tala cercana
    debe hacer visible el espacio ganado al bosque.

@@ -1,6 +1,6 @@
 # Puntos 3 y 4 · Visibilidad, cuerpos y huida · 20 sep 2026
 
-Ronda cerrada. [Brief](../../encargos/encargo-visibilidad-y-huida.md).
+Ronda cerrada. [Brief](../encargos/encargo-visibilidad-y-huida.md).
 Dos agentes Sol implementaron oclusión y vida/animación respectivamente;
 Terra auditó y el principal arbitró y observó. No nuevos modelos ni proveedor de arte.
 

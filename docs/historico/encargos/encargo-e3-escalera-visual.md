@@ -11,7 +11,7 @@ adarve. Si el acceso transitable lleva mucho trabajo, se hará después.
 ## Depende de
 
 - `docs/design.md` §1–4, §7.4, D.3–D.4, D.9, E.1/E.3/E.6/E.7.
-- `docs/encargos/encargo-e3-acceso-elevado.md` y
+- `docs/historico/encargos/encargo-e3-acceso-elevado.md` y
   `art/recipes/bastion-access-candidate/README.md` (contrato geométrico exacto).
 - G-26 aprobado y publicado, hash `F3596D92…8663F`, no se sustituye a ciegas.
 

@@ -1,7 +1,7 @@
 # E3b.1a · Selector de la primera junta y ruta privada pura
 
 **Estado:** implementado y verificado el 22 sep 2026. Es la primera entrega de código de E3b.1;
-esta ronda no abre el juego. La [geometría candidata](../../art/recipes/e3b-bastion-joint-candidate/README.md)
+esta ronda no abre el juego. La [geometría candidata](../../../art/recipes/e3b-bastion-joint-candidate/README.md)
 ya pasó Blender, `game-dev asset inspect` y GLTFLoader aislados. E3b no se
 cierra con esta ronda.
 
@@ -18,7 +18,7 @@ vuelta. La siguiente ronda conectará mallas, asignación y colisiones.
   [E3a](encargo-e3-puesto-navegable.md).
 - `src/engine/world/bastion-access.ts`: su `bastionAccessOf` **manda** sobre la
   orientación de la escalera; no inventar otra.
-- [Cotas del modelo](../../art/recipes/e3b-bastion-joint-candidate/README.md):
+- [Cotas del modelo](../../../art/recipes/e3b-bastion-joint-candidate/README.md):
   suelo Y=1,02; giro local `(0,50;0,72) → (0,95;0,72) →
   (1,20;0,79) → (1,50;0,79)` en X/Z; ancho neto 0,70.
 

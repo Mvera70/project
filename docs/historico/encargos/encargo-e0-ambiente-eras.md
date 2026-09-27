@@ -7,7 +7,7 @@ Que el mismo valle permita reconocer **caserío, aldea y villa cerrada** desde l
 ## Depende de
 
 - `src/derive/era.ts`: `Era = 'hamlet' | 'village' | 'town'` y `eraOf(state)`. La fragua alcanzada abre aldea; `flags['wall_closed']` abre villa. La era es monótona; el asedio no es una cuarta era.
-- `docs/plan-espacial.md`: plaza persistente, caminos accesibles y cerco honesto, aceptados localmente. E0e se apoya en ellos y no reabre trazado, colocación ni navegación.
+- `docs/historico/plan-espacial.md`: plaza persistente, caminos accesibles y cerco honesto, aceptados localmente. E0e se apoya en ellos y no reabre trazado, colocación ni navegación.
 - `src/render3d/world/plan.ts`: plan/diff de escena y firma del suelo; `src/render3d/world/ground.ts`: `cellColour`, `buildGround`; `src/render3d/world/plaza.ts`: fuente actual; `src/derive/tells.ts`: humo sólo en casas ocupadas, vivas y no apagadas; `src/render3d/effects/tells.ts`: representación 3D de esa señal.
 - `docs/encargos-3d.md` §1, fila **La era del valle**, y `docs/plan-meta.md` §E/orden vivo. E0a–E0d ya tienen cierre propio; esta ronda trata sólo el ambiente restante.
 

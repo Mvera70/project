@@ -21,7 +21,7 @@ Esta sección la escribió el agente que cerró los tres primeros pasos del due�
 del diseño, a petición suya: *«deja anotado todo lo que tengas en mente seguir
 haciendo, detallado para el siguiente agente»*. Está escrita para un agente que
 no ha visto nada de esto. Si sólo lees una sección del proyecto, que sea ésta,
-y después `CLAUDE.md` y `docs/handover.md` §2.1 y §4.
+y después `CLAUDE.md` y `docs/historico/handover.md` §2.1 y §4.
 
 > **Actualizado el 15 sep por la noche, al cerrar R-1 (v3.75).** El plan que
 > manda desde entonces es **`docs/historico/rework.md`**: lo que el dueño ha decidido en
@@ -68,7 +68,7 @@ y después `CLAUDE.md` y `docs/handover.md` §2.1 y §4.
 | Suite rápida | 67 ficheros, 1 073 verdes, ~25 s | `npm test` |
 | Jornadas | 116 verdes (~5 min) | `npm run test:journeys` |
 | Playwright | 12 verdes + 3 declaradas (`test.fail`) | `npm run test:shots` |
-| Balance | **16 rojas de 37** — antes de la pareja eran 11 | `npm run test:balance`, 25 min; `docs/handover.md` §5.5 dice cuáles y por qué |
+| Balance | **16 rojas de 37** — antes de la pareja eran 11 | `npm run test:balance`, 25 min; `docs/historico/handover.md` §5.5 dice cuáles y por qué |
 
 **Nada de v3.70 a v3.73 vuelve a medir el balance, y es a propósito:** el menú,
 el inicio guiado, el reloj y el cielo no tocan el motor salvo la tabla de
@@ -469,7 +469,7 @@ fallo del juego, es higiene.
 **Qué hacer.** Escribe `tools/graphics/serve.mjs`: sirve ese directorio en el
 8127, **avisa si el puerto ya está ocupado en vez de fallar** y se cierra con
 Ctrl+C. Añádelo a `package.json` como `npm run serve:shots` y menciónalo en
-`docs/handover.md` §6, donde están los comandos de mirar el juego.
+`docs/historico/handover.md` §6, donde están los comandos de mirar el juego.
 
 **Hecho cuando** `npm run serve:shots` sirve la página y `shot.mjs` la
 fotografía.
@@ -501,7 +501,7 @@ números eran de tick y cuáles de pared.
 `data-sky`, `data-bolts` y `data-screen`. Es el mecanismo con el que se
 comprueba el juego desde fuera, y no hay una lista.
 
-**Qué hacer.** Una tabla en `docs/handover.md` §6 con cada atributo, qué dice,
+**Qué hacer.** Una tabla en `docs/historico/handover.md` §6 con cada atributo, qué dice,
 quién lo escribe y para qué prueba existe. Sácalos con
 `grep -rn "dataset\." src/ui src/render3d`.
 
@@ -568,7 +568,7 @@ un hueco sin rellenar, y la prueba lo vigila.
 - **`test:balance` tarda 25–45 min y el `Bash` de la herramienta se corta a
   10.** Lánzalo desapegado:
   `Start-Process cmd -ArgumentList '/c npm run test:balance > log 2>&1' -WindowStyle Hidden`
-  y lee el log. Las 16 rojas actuales están explicadas en `docs/handover.md`
+  y lee el log. Las 16 rojas actuales están explicadas en `docs/historico/handover.md`
   §5.5; no las «arregles» tocando números sin el dueño.
 - **Publicar la demo:** `npx tsx tools/graphics/bundle-game.ts --split` escribe
   `artifacts/graphics/G-10/game/artifact.html` (0,97 MB) y
@@ -632,7 +632,7 @@ un hueco sin rellenar, y la prueba lo vigila.
 
 **Esto manda sobre el orden de abajo.** Es la primera vez que alguien juega la
 demo del 3D con la interfaz nueva puesta, y es la clase de veredicto que
-`docs/handover.md` §1 dice que no se puede sustituir por una medición. Transcrito
+`docs/historico/handover.md` §1 dice que no se puede sustituir por una medición. Transcrito
 por áreas, sin suavizarlo:
 
 ### El mapa es pequeño, y tiene que ser el centro de algo más ancho
@@ -876,7 +876,7 @@ prueba de `ashore` con techo 0,4 se borra por innecesaria, y hay captura.
 ## Carril B · El ritmo de decisión — lo que decide si hay juego
 
 **No lo hace un agente.** Es la pregunta de diseño central: *¿cada cuánto quiere
-el juego que decidas?* La decisión está tomada (`docs/roadmap.md`, 14 sep): las
+el juego que decidas?* La decisión está tomada (`docs/historico/roadmap.md`, 14 sep): las
 tres cosas —arreglar los fallos, relajar condiciones y escribir plantillas de
 menor peso—, en ese orden y **remidiendo cada paso**, porque relajar y añadir a
 la vez hace imposible saber cuál de los dos movió qué.

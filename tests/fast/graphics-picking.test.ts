@@ -202,7 +202,7 @@ describe('G-07 · qué backend pinta el valle', () => {
     // **G-12: el piloto deja de ser el piloto.** Hasta aquí esta prueba exigía
     // Canvas por defecto, porque D.5 prohibía que el piloto sustituyera a
     // `src/render/` antes de P3. El dueño del diseño cerró esa puerta el 14 sep
-    // 2026 con el riesgo escrito delante (`docs/roadmap.md`): el 3D es el
+    // 2026 con el riesgo escrito delante (`docs/historico/roadmap.md`): el 3D es el
     // juego. La prueba cambia de lado porque cambió la decisión, no para que
     // pasara.
     expect(backendFrom('', null)).toBe('pilot3d');

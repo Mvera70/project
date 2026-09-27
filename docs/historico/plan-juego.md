@@ -137,7 +137,7 @@ juega en `https://claude.ai/artifact/CbbvpwDfa5NUoog9E7XiMK`.
 
 **Lo que vino después, en la misma sesión:** el reloj a velocidad entera, los
 tres defectos de los mensajes, el mapa grande y el vado. Todo con su medida en
-`docs/handover.md` §2.1.
+`docs/historico/handover.md` §2.1.
 
 **Lo que esta ronda midió y dejó abierto:** la última década de una partida de
 sesenta años está vacía —con los dieciséis a piedra y la empalizada levantados,
@@ -148,7 +148,7 @@ problema es el final de la partida y no su medio.
 **Y una advertencia que costó media página de conclusiones falsas:** la primera
 versión de esa medida avanzaba el mundo con `tick` sin contestar las
 encrucijadas y decía «de 0,3 a 0,5 obras al año y la piedra nunca». Está contado
-en `docs/handover.md` §2.1.
+en `docs/historico/handover.md` §2.1.
 
 ---
 

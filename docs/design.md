@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v4.34 · 22 de septiembre de 2026 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v4.68 · 27 de septiembre de 2026 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -72,7 +72,7 @@ Las de `valle.md` siguen todas en pie. Estas son las que se cierran aquí.
 | Decisión | Elegido | Motivo |
 |---|---|---|
 | Título | **The Valley** | El contenido va en inglés; el título acompaña |
-| Evolución gráfica | **3D estilizado con cámara ortográfica, y es el juego** desde G-12 (14 sep 2026); Anexo D | Se validó por rondas —belleza, animación, legibilidad— conservando motor y guardados. El coste móvil sigue **sin medir en un dispositivo real**, y el riesgo se aceptó por escrito al migrar (`docs/roadmap.md`) |
+| Evolución gráfica | **3D estilizado con cámara ortográfica, y es el juego** desde G-12 (14 sep 2026); Anexo D | Se validó por rondas —belleza, animación, legibilidad— conservando motor y guardados. El coste móvil sigue **sin medir en un dispositivo real**, y el riesgo se aceptó por escrito al migrar (`docs/historico/roadmap.md`) |
 | Render 2D | **Se queda como puerta de vuelta**, en `?render=canvas` | **La condición que justificaba esta fila ya se cumplió** (UI-R0, 16 sep 2026): el dueño del diseño abrió el juego en su iPad y su iPhone el 15 sep y funciona. Lo que sigue sin existir es una medida de fotogramas en dispositivo, así que la puerta se queda **por si acaso y no porque haga falta**, y borrarla dejó de ser un paso bloqueado: es una decisión suya cuando quiera tomarla |
 | Vida del valle | Una capa de agentes deterministas y efímera entre motor y render; Anexo E | El render dibujaba una fórmula del tiempo y por eso nadie podía chocar, perseguir ni encontrarse; una capa que simula cuerpos con paso fijo lo da, sin escribir en el motor ni romper partidas |
 | Producción de arte | Fuentes reproducibles, Blender por scripts y revisión en el navegador | Permitir iteración y revisión remotas sin depender de operaciones manuales en el escritorio |
@@ -144,12 +144,12 @@ no muera nadie no preocupa; el juego se irá haciendo más difícil por ahí.
 **Cuatro fases, y ya se leen en la escalera del ritmo** (§12.1, horas de reloj a
 ×1):
 
-| Fase | Qué es | Estado el 18 sep 2026 |
+| Fase | Qué es | Estado el 27 sep 2026 |
 |---|---|---|
 | 1 · El caserío | Dos personas, las primeras casas, la primera decisión | Hecha: primera decisión a las 14 h |
 | 2 · La aldea | Oficios, capilla, la piedra | Hecha: edad de piedra a las 61 h |
-| 3 · La villa cerrada | El primer anillo completo, su portón y bastiones; lo de dentro pasa a piedra. El anillo final de cierre de partida queda fuera de esta fase | Hecha: el cierre se celebra, la era se muestra y la piedra se construye; el bastión tiene malla propia publicada y conexión visual con el muro. La lectura de esa unión en la escena real sigue por revisar |
-| 4 · El asedio | Lo acumulado y lo decidido atraen asaltos; la aldea se defiende con lo que se le dio; el valle cae o aguanta | Hecha de punta a punta: aviso, guarnición, flechas, cuerpo a cuerpo, portón, saqueo y final. Quedan representación ambiental, identidad del clan, fuego y la decisión de gore |
+| 3 · La villa cerrada | El primer anillo completo, su portón y bastiones; lo de dentro pasa a piedra. El anillo final de cierre de partida queda fuera de esta fase | Hecha: el cierre se celebra, la era se muestra y la piedra se construye; el bastión tiene malla propia publicada y conexión visual con el muro, y el adarve se genera desde el propio anillo (E3b, v4.38, 24 sep 2026) |
+| 4 · El asedio | Lo acumulado y lo decidido atraen asaltos; la aldea se defiende con lo que se le dio; el valle cae o aguanta | Hecha de punta a punta, con su representación: aviso, guarnición, flechas, cuerpo a cuerpo, portón, saqueo y final. El clan vecino tiene malla propia (`villager-neighbor.glb`, E2, 22 sep 2026) y el fuego con su humo, la quema de casas al entrar y el gore contenido llegaron con E4 (v4.45–v4.48, 25 sep 2026). Queda la persistencia de restos —cadáveres, portón astillado— entre jornadas |
 
 **La regla nueva, y es una frontera y no una excepción: el asalto se resuelve
 en físico, y el motor lo apunta.** Hasta aquí el motor decide todo y la capa de
@@ -181,9 +181,21 @@ flechas, la guarnición y el cuerpo a cuerpo usan la capa de vida; Rapier sirve
 la balística, once segmentos por cuerpo y seis tablas por portón roto. Siete
 gestos procedurales expresan el combate sin añadir clips embebidos al GLB. El
 saqueo tiene objetivos, cargas, huellas y salida; el final conserva 8–12 s de
-escena antes de la lápida. Lo que sigue fuera del cierre es el fuego, la
-persistencia de restos entre jornadas y el gore. Cómo se hace el gore está por
-decidir; que exista esa decisión, no.
+escena antes de la lápida.
+
+**Y con E4 (v4.45–v4.48, 25 sep 2026) el fuego y el gore dejaron de estar
+pendientes.** La quema —el rayo de §7.10 y el incendio anual de §5.9, y ahora
+también la casa que arde en un asalto o un saqueo— se ve: tres días de llama y
+cuatro de brasa, con chispas, humo que se aclara y una luz naranja
+(`effects/fires.ts`). Las flechas incendiarias sólo llegan contra un cerco que
+aguanta, y la aldea las apaga con cubos si tiene agua a `THREAT.SAVE_REACH`
+celdas; si no llega a tiempo, arde. Y el gore es **contenido**, por decisión
+del dueño del diseño: un golpe o una caída sueltan una salpicadura corta desde
+el pecho y dejan una mancha oscura que se va en horas de juego, sin rojo
+vivo, que a la distancia de este juego se leería como una señal de interfaz.
+Lo que sigue fuera del cierre es **la persistencia de restos entre
+jornadas**: un cadáver o un portón astillado no sobreviven al cambio de día
+(`docs/encargos-3d.md`).
 
 #### Las cuatro decisiones del 18 sep 2026
 
@@ -1230,7 +1242,7 @@ terminar una obra pasan a la siguiente de la cola.
 
 ### 7.4 Colocación
 
-**Revisión espacial del 21 sep 2026:** [plan-espacial.md](plan-espacial.md).
+**Revisión espacial del 21 sep 2026:** [historico/plan-espacial.md](historico/plan-espacial.md).
 Las viviendas se ordenan por bandas de proximidad a la plaza, contacto con
 camino y desempate hash de semilla/parcela. No consumen RNG. Se reservan calles
 usadas y acceso por al menos dos fachadas; la sala comunal conserva separación
@@ -1248,6 +1260,7 @@ posición válida y se elige la mejor; empate por índice menor.
 | `smithy` | En el borde del núcleo — el fuego lejos de las casas |
 | `well` | Lo más cerca posible del centroide de las casas |
 | `palisade` | Envolvente convexa del núcleo, dilatada 2 celdas |
+| `watchtower` | Contra el anillo por dentro, si hay uno decidido; si no, lo más cerca posible de la plaza |
 
 Ninguna colocación puede pisar `water` ni `ruins` de piedra. `marsh` sólo admite
 defensas de una celda (empalizada, muro, portón, bastión): estacas de ribera,
@@ -1256,6 +1269,18 @@ libre de construcción. Esta excepción espacial se añade el 21 sep 2026.
 Las ruinas
 de madera **sí** se pueden edificar encima; la ruina desaparece del mapa pero
 queda en la crónica.
+
+**La atalaya se pega al cerco por dentro, y desde el 24 sep 2026 no al muro
+mismo, sino a la calle del adarve.** `watchtower` es 2×2 sobre un anillo de una
+celda, así que pegarla al muro tapaba el paso de ronda; el motor deja libre
+una celda junto a la cara interior del muro para esa calle
+(`inRingCorridor`, `world/placement.ts`), lo que sube el mínimo de una torre
+por dentro a 2,5 celdas del muro (media celda de muro, una de calle, una de
+media torre). Medido el 27 sep 2026 en doce semillas a ochenta años jugadas
+con `run`: de veinte torres, **19 de 20 quedan por dentro, con una distancia
+media de 2,52 celdas** (la mayor, 3,4). Sin anillo decidido todavía, vale lo
+de antes: la torre llega también por carro (C1) o por encrucijada (§8.4) y se
+coloca lo más cerca posible de la plaza.
 
 **Escombros de vivienda (24 sep 2026).** La huella y `lostTick` permanecen en
 la partida; su aspecto cambia sin crear un sistema de limpieza. Durante el
@@ -1615,7 +1640,7 @@ no lo comprobaba—. La fiesta se iba andando detrás de él.
 
 ---
 
-### 6.7 El rey (K-1 a K-5, 18 sep 2026)
+### 6.7 El rey (K-1 a K-8, 18 sep 2026)
 
 **El jugador no manda; dice quién manda.** Es el principio de los medios (§7.12)
 aplicado a una persona: la corona es una cosa que se da, se paga con lo del valle
@@ -1631,8 +1656,20 @@ personas, y **no consume azar**.
 **El asiento no se renombra.** El rey ocupa el mismo puesto que el jefe de la
 fundación: siete plantillas de encrucijada reparten `{as:'A', role:'leader'}` y la
 puerta de la migración depende de que exista. Lo que cambia es quién lo ocupa —el
-jugador, una vez— y qué hace el que lo ocupa. La palabra «king» la pone
-`derive/crown.ts`; el identificador se queda para siempre (§2.2).
+jugador, una vez— y qué hace el que lo ocupa. La palabra que lee el jugador la
+pone `derive/crown.ts`; el identificador se queda para siempre (§2.2).
+
+**Y el jugador lee «leader», no «king», hasta la Edad del Hierro** (v4.66, 27
+sep 2026). Lo pidió el dueño del diseño: «podríamos al principio llamarlo
+líder, en lugar de rey; a efectos prácticos es un rey, pero lo dejamos para la
+edad de hierro, cuando hagamos el castillo y el evento de coronación». El
+sistema de la corona no cambia —sigue siendo K-1 a K-6, y las claves internas
+siguen siendo `crown.*` y `role.king`—; sólo cambia lo que lee el jugador: en
+el carro se da **un bastón de mando** («A staff of office»), quien lo recibe
+pasa a ser **leader**, la sala es **leader's hall** y la crónica dice «was
+chosen to lead» y «took the staff» donde antes decía «king». La distinción es
+de vocabulario y no de mecánica: es la misma corona con otro nombre hasta que
+exista el castillo.
 
 **Los cuatro estilos**, por el oficio de antes:
 
@@ -1665,8 +1702,12 @@ vale para un jefe y para un rey.
 casas, y como las casas son el techo de la población, coronar bajaba la población
 de 42 a 31–39 en las cuatro variantes. Un impuesto por coronar no es una elección.
 Es la casa del rey —se muda a ella y cuenta cinco camas— y arde como cualquier
-casa de madera. Su malla está encargada (`docs/historico/plan-rey.md` §8); hasta que llegue,
-el render la dibuja más alta que una casa y con el tejado burdeos del jefe.
+casa de madera. **Y ya tiene malla propia** (v4.67, 27 sep 2026): la segunda
+sala que le pidió Astra, después de que Vera descartara la primera por no
+parecer de la Edad Media —una casa larga con paja gruesa en hiladas, entramado
+de madera oscura, porche con riostras y puerta de dos hojas (`hall_door`, que
+el juego abre), 1.328 triángulos. Era el último tipo de edificio que se
+dibujaba con la caja de respaldo; ya no queda ninguno.
 
 **Y el rey se ve** (K-8). Lo dijo el dueño del diseño al probarlo: «cuando
 selecciones un rey, tiene que destacar después en la lista. No se ve rey en
@@ -1731,7 +1772,7 @@ el estado: `world/ground.ts` lo deriva de `Era`. El empedrado íntegro desde el
 primer día era una regla de presentación anterior, no parte de la reserva del
 motor; las capturas E0e demostraron que tres tonos de piedra no distinguían
 bien aldea y villa, sobre todo en tableta. La malla de la fuente está encargada
-(`docs/encargos/encargo-fuente.md`); mientras no exista, `PlazaFountain` dibuja un pilón,
+(`docs/historico/encargos/encargo-fuente.md`); mientras no exista, `PlazaFountain` dibuja un pilón,
 el agua y una columna con tres primitivas, por la misma razón que el barril y el
 arado (§7.14). **Su celda está cerrada al paso**: la gente rodea la fuente, no la
 atraviesa.
@@ -2232,7 +2273,7 @@ con los números, es §12.10; y el código que la lee es `weightOf` en
 | Suceso | Cuándo | Qué hace | Se ve |
 |---|---|---|---|
 | El rayo | semana de tormenta, madera en pie | quema un edificio (casas antes) | la ruina |
-| La riada | primavera tras tres jornadas de lluvia | se lleva grano | la aldea en el vado |
+| La riada | primavera tras tres jornadas de lluvia | se lleva grano | el río sube y anega la ribera baja |
 | Los lobos en el corral | invierno, con gallinas | una o dos gallinas menos | el corral vacío |
 | La boda | seis adultos | ánimo y fe | la aldea en la capilla, dos días |
 | El buhonero | verano, leña de sobra | leña por grano | la plaza |
@@ -2243,6 +2284,13 @@ con los números, es §12.10; y el código que la lee es `weightOf` en
 | El oso en el bosque | verano u otoño, bosque | una bandera dos semanas, ánimo | — |
 | El niño perdido | hay niños | ánimo; si es nombrado, con su nombre | el vado |
 | El forastero | salvo valle hostil | ánimo | la plaza |
+
+**Y desde v4.63 (26 sep 2026) la riada se ve en el río, no sólo en el vado.**
+Hasta entonces `river_flood` sólo se enseñaba con gente reunida en el vado; el
+agua no subía. `derive/flood.ts` (`floodOf`) dice, puro y sin tocar el estado,
+lo crecido que va el río esta semana, de 0 a 1: **1 la semana de la riada, 0,5
+la siguiente mientras baja, y 0 después**. Con ese número el relieve decide qué
+se inunda con agua turbia de barro; el motor sigue sin saber que existe.
 
 **Lo que esto cambia en el resto del sistema.** La riña de la plaza es **el
 empujón que las opiniones nunca recibían**: baja la opinión mutua de los dos
@@ -2449,7 +2497,7 @@ cubre, y hay prueba de §8.3 que lo exige.
 lista de candidatos cambia el flujo `crossroads` y con él **la trayectoria de
 todas las semillas**: medido, la prueba de la cadena de pases de V-09 pasó de
 encontrar una cadena de cinco a no encontrar ninguna de tres en treinta
-muestras. Es la trampa que `docs/handover.md` §4 ya tenía escrita —*tocar la
+muestras. Es la trampa que `docs/historico/handover.md` §4 ya tenía escrita —*tocar la
 elegibilidad de una sola plantilla mueve el balance entero*— y por eso va con
 el carril del ritmo de decisión, donde el recalibrado está presupuestado, y no
 de propina en una ronda de texto. Queda declarado en `tests/fast/chronicle.test.ts`.
@@ -2808,7 +2856,7 @@ comparten— no importa nada que dibuje.
 **Cuándo se borra §10.** Cuando alguien haya abierto el juego en un teléfono de
 verdad y funcione. Todo lo medido de rendimiento es de un portátil (G-09 quedó
 parcial por no haber dispositivo), así que hasta entonces hace falta algo a lo
-que volver esa misma tarde. Está escrito en §1 y en `docs/roadmap.md`.
+que volver esa misma tarde. Está escrito en §1 y en `docs/historico/roadmap.md`.
 
 ### 10.0 El Canvas, de aquí abajo
 
@@ -4471,6 +4519,18 @@ aserciones se escribieron cuando sólo las encrucijadas movían el mundo. No se
 números nuevos, **cuando el dueño lo pida** (`docs/historico/rework.md` §5). Hasta
 entonces la puerta es la suite rápida y las jornadas.
 
+**El informe del valle, para medir antes de balancear** (v4.58, 26 sep 2026).
+Vera pidió «un sitio centralizado donde hacer pruebas y medir resultados».
+`npm run report:valley` (`tools/reports/valley-report.ts`) juega una o varias
+semillas con `run` y una política —`prudent`, `worst`, `random`, `first` o
+`last`— y escribe un HTML autocontenido, sin red, con la gente, las
+existencias, el ánimo, el ganado, las obras, el bosque y el clan semana a
+semana, con la mediana de todas las semillas; la escalera del ritmo en horas
+de reloj a ×1; los sucesos, las muertes por causa y las obras contadas por
+semilla y al año; la crónica entera filtrable por peso, clase y texto; las
+decisiones; y las series de cada semilla en CSV. Cada ejecución se guarda y el
+índice las lista juntas. No cambia nada del motor.
+
 ### 12.10 Los sucesos del valle (`FATE`, R-1)
 
 La tabla de §7.10 con sus números. Todo vive en `FATE` (`balance.ts`), con
@@ -4609,7 +4669,7 @@ justo eso: volver al día siguiente y encontrar dos años de crónica.
 
 **Y una pestaña que se oculta recupera a la velocidad que estaba puesta**
 (`resumeAfterHidden`, v3.72), no a ×1. El arranque en frío no puede: el guardado
-no lleva la velocidad. Queda anotado como deuda en `docs/handover.md`.
+no lleva la velocidad. Queda anotado como deuda en `docs/historico/handover.md`.
 
 Se ejecutan esos ticks en lotes de 64 dentro de `requestAnimationFrame`, con una
 pantalla de progreso que ya muestra el valle dibujándose. 960 ticks tardan menos
@@ -6653,6 +6713,30 @@ la misma silueta, y en el valle giran hacia donde caminan. Es asunto de
 geometría y de P1, no del rig. Informe completo en
 `docs/historico/graphics-rounds/G-04.md`.
 
+#### D.4.2 · Modelos adoptados, sin receta propia (v4.56–v4.66)
+
+**La receta de D.4 no es la única forma de tener un modelo.** Vera rehizo once
+modelos con su propio script de Blender
+(`deliverables/marked-models-trial/build-models.py`, v4.56: lobo, oso, perdiz,
+jabalí, perro, mula, azada, cubo, flecha, escudo y pico) y Astra ha entregado
+otros por encargo (`docs/encargos/encargo-astra-modelos.md`, v4.60): los tres
+puestos de quien visita, la cara de la cantera en sus tres estados —entera,
+explotada y agotada, según la piedra que la obra lleva sacada (`quarryStage`,
+`world/quarry-face.ts`)—, los peñascos y el mojón de las gargantas, la
+golondrina (`bird.glb`, 110 triángulos, v4.65: sustituye la uve dibujada del
+cielo, y sin el modelo —en las pruebas o en el respaldo de Canvas— vuelve a
+salir la uve) y la sala del líder (v4.67, §6.7).
+
+**`tools/art/adopt-models.mjs` los admite en el catálogo** con el mismo
+recibo que un modelo de receta —carpeta de aprobados, hash, estadísticas, caja,
+clips y marcha—, para que `publish-assets.ts` los publique por el camino de
+siempre y las pruebas comprueben sus bytes igual que a los demás. A los
+animales sin animación de andar o de reposo se las pone `tools/art/rigid-clips.mjs`
+sobre sus nodos rígidos, con el pie apoyado en línea recta para que no patine.
+Desde v4.65 cada modelo admitido declara además su **procedencia** —`round`,
+`recipe`, `source` y `license`—; sin ellas, se asume el lote de Vera
+(`marked-models-63db59c`).
+
 ### D.5 Fronteras de software y contrato propuesto
 
 Flujo de datos: `GameState` → adaptación de solo lectura → escena derivada →
@@ -6793,7 +6877,7 @@ el pueblo indiscriminadamente. Los objetos decorativos no interceptan la ficha.
 **Asalto, puntos 3/4 (20 sep 2026):** la oclusión selectiva del robledal se
 limita a árboles delante del portón y del frente activo, respecto de la cámara.
 Es reversible y sólo visual: no tala, no cambia colisiones ni recursos.
-El contrato y la verificación viven en `encargos/encargo-visibilidad-y-huida.md`.
+El contrato y la verificación viven en `historico/encargos/encargo-visibilidad-y-huida.md`.
 Los atacantes vivos participan en los contactos de la capa de vida, no reciben
 desplazamientos cosméticos. Al hecho existente de entrada hostil, los civiles
 exteriores —no defensores ni caídos— buscan refugio alcanzable y corren con
@@ -6809,7 +6893,7 @@ no carga la física, conserva `fall`. La hoja rota deja fragmentos físicos
 acotados. La escena terminal de un `stormed` visto en esta sesión dispone de
 una breve continuidad visual antes del epitafio, con resultado guardado y motor
 parado. Cargar una partida ya terminada no repite la escena. El contrato y los
-criterios están en `encargos/encargo-d6-acabado-fisico.md`; sangre y fuego siguen
+criterios están en `historico/encargos/encargo-d6-acabado-fisico.md`; sangre y fuego siguen
 fuera de esta ronda. Límites de presentación verificados: 24 ragdolls de once
 segmentos y 24 fragmentos dinámicos; seis tablas por portón. Un ragdoll duerme
 a los ocho segundos conservando su pose; las tablas liberan física a 3600 pasos
@@ -7169,6 +7253,70 @@ ni afectan a la simulación.
 
 Las cotas visuales de montaña cambian; sus reglas y celdas del motor se conservan.
 El paisaje añadido empieza fuera de los límites del mapa.
+
+#### D.6.9 · La sierra facetada, la garganta y el camino que sale (v4.59–v4.64)
+
+Vera: «darle vida y estilo a las montañas y alrededores del valle»; la sierra
+era una loma lisa sin rocas y las dos entradas, pasillos largos y planos.
+
+**Facetado low-poly (v4.59).** La sierra se arma sin índices y con
+`flatShading` (`world/mountains.ts`): cada cara toma un color por su altura y
+su pendiente —prado al pie, pedrera, roca en tres franjas, acantilado donde es
+vertical y nieve en las cumbres que sube y baja con la estación—. Novecientos
+peñascos instanciados en cinco formas, y el pinar sube por la ladera hasta
+media altura.
+
+**La sierra, fundida (v4.61).** El facetado se conserva —la luz dura la sigue
+dando `flatShading`— pero el color ya no salta de golpe en cada arista: se
+calcula por punto con la pendiente media de las caras que lo comparten y se
+funde de vértice a vértice, así que las franjas de roca ondulan en vez de
+saltar.
+
+**La garganta (v4.59/v4.60).** En los dieciocho últimos tramos de cada extremo
+el valle se cierra en **garganta**: el llano pasa de once celdas a tres a cada
+lado del río y las paredes se empinan; un mojón de cuatro piedras marca cada
+entrada, fuera del mapa. `gorgeAt` (`world/valley-profile.ts`) dice cuánto
+entra la garganta por la distancia al río, y dentro de ella la roca sube por
+esa distancia y no por el perfil del valle, que si no la aplastaba —era el
+fondo gris de la entrada norte, que no era el mapa—. Los peñascos y el mojón
+salen de un dodecaedro con la cima aplastada, no de un vértice solo, para que
+no se lean como puntas (v4.62).
+
+**El camino que sale (v4.60/v4.62).** La senda de tierra sale del valle por
+cada garganta (`buildGorgeRoads`, `world/mountains.ts`): arranca en la ribera
+dentro del mapa, sigue **la orilla real del río** —no el eje del valle, que la
+hacía zigzaguear y subir por la pared— y se funde con la pedrera al perderse
+en la sierra. Cruza la marisma en vez de rodearla, y va a una cota suavizada y
+plana de lado a lado, como una plataforma.
+
+**Cascadas (v4.64).** Una baja por la pared de cada garganta hasta el río, y
+otra al lago si hay roca detrás (`world/waterfalls.ts`, `gorgeAt` decide dónde
+hay pared de garganta): una cinta pegada a la roca con vetas que bajan y
+espuma al pie, y se elige la pared que mira a la cámara.
+
+Todo esto es decorado: no cambia el motor ni una celda jugable.
+
+#### D.6.10 · El agua viva (v4.63–v4.64)
+
+Vera: «mejorar el agua … que se vea viva, que se sienta con físicas; ahora
+mismo es un poco floja». El río y el lago eran una lámina translúcida de un
+color, con la CPU recalculando normales por celda en cada fotograma.
+
+**El material** (`world/water-surface.ts`, v4.63) pinta una superficie que
+corre río abajo, con vetas de espuma a lo largo de la corriente, una línea de
+espuma contra la orilla y anillos de lluvia cuando llueve, con sus uniformes
+compartidos entre el río y el lago; la CPU ya no toca el agua en cada
+fotograma.
+
+**Lo que choca con ella (v4.64).** El agua de la brigada de cubos ya no
+atraviesa la pared de la casa: choca, escurre por ella hasta el suelo y un
+poco rebota hacia atrás; el cubo mismo vacía un chorro de veinte gotas con su
+propia parábola hacia lo que arde (`effects/water-throws.ts`), y al caer
+salpican y abren un anillo. Quien cruza el vado o el cauce salpica a cada
+pisada: un anillo y dos gotas. Y los charcos de los caminos y la plaza
+(`effects/puddles.ts`, v4.53) ya no aparecen hechos: **crecen mientras
+llueve**, cada uno asoma a su tiempo y se ensancha a lo largo de un tercio de
+jornada. Todo esto es decorado: no toca el motor.
 
 ### D.8b Los pinos de la ladera, y la sombra que parpadeaba (18 sep 2026)
 
@@ -7597,7 +7745,7 @@ Ninguna de las cuatro era difícil de arreglar. Las cuatro eran invisibles.
 
 **Objetivo:** activar solo lo demostrado y cerrar convivencia temporal.
 **Depende de:** G-00–G-11 y aceptación visual remota.
-**Ficheros:** `docs/design.md`, `CLAUDE.md`, `docs/handover.md` por orquestador;
+**Ficheros:** `docs/design.md`, `CLAUDE.md`, `docs/historico/handover.md` por orquestador;
 activación por agente de integración con brief acotado sobre app/config.
 **Contrato:** §10/§11 y briefs M afectados describen ahora el comportamiento
 aprobado; fuente única de reloj/constantes/presupuestos. **Reglas:** conservar
@@ -7911,6 +8059,19 @@ El total en producción son **1 873 líneas** en once ficheros, con 60 pruebas
 propias que corren en la suite rápida. El descarte son otras 1 715 en
 `life/spike/`, que **V-12 borra** cuando V-07 y V-09 hayan portado de él lo que
 falta.
+
+**Y «el valle más vivo», en piezas sueltas que no son una fase con su propio
+número** (v4.49–v4.57, 25 sep 2026): visitas que hasta entonces sólo existían
+en la crónica —el buhonero, el forastero y las visitas de M-0— llegan andando
+por el camino a la plaza, se quedan hasta media tarde y muestran a qué vienen
+—el tenderete, la mesa del factor, los sacos del salinero— y se van
+(`life/visitors.ts`); un trato cerrado se ve pagar, con monedas que saltan en
+arco de una mano a la otra (`effects/coins.ts`); conejos salen a la linde del
+bosque al alba y al atardecer y huyen de quien se acerca (`life/rabbits.ts`);
+ropa tendida y huertos junto a las casas con un lado libre, que siguen la
+lluvia, la noche y la estación (`derive/yards.ts`); y la perdiz de caza
+despega poco a poco con el arranque de vuelo del modelo de Vera, en vez de
+saltar de golpe a su altura. Nada de esto toca el motor.
 
 ### E.6 Por qué la demo en el juego es peor que el descarte
 

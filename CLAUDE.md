@@ -52,6 +52,10 @@ aserto.
 **El estado es plano y serializable.** Sin clases, sin `Map`, sin `Set`, sin
 referencias circulares. Objetos, arrays y referencias por `id`.
 
+**El que manda es «leader», no «king», hasta la Edad del Hierro** (Vera, 27
+sep 2026: el castillo y el evento de coronación traerán el rey). Las claves
+siguen siendo `crown.*`; el jugador lee un bastón de mando, un líder y su sala.
+
 **Nada de texto en el código.** Todo lo que lee el jugador va en inglés y sale
 del banco de plantillas de `src/engine/chronicle/bank.en.ts`. Los sistemas
 empujan claves y parámetros, no frases.
@@ -97,7 +101,7 @@ npm run dev          # servidor con recarga en caliente
 npm run typecheck    # tsc --noEmit
 npm test             # suite rápida — **y rápida de verdad**: las cuatro partidas
                      # largas del motor viven en las jornadas (ver abajo)
-npm run test:journeys # jornadas y siglos en varias semillas — menos de 5 min, mide 221 s
+npm run test:journeys # jornadas y siglos en varias semillas — menos de 5 min, mide 284 s
 npm run test:all     # las dos de arriba
 npm run test:balance # siglos en sesenta semillas — minutos, se lanza aparte
 npm run lint
@@ -160,10 +164,10 @@ por no haber dispositivo—, pero eso es un dato que falta y no un riesgo: el 3D
 se sostiene. La puerta de vuelta se queda por si acaso, no porque haga falta.
 
 **Cerrado:** el motor (M-01 a M-39), el render (G-00 a G-12), la interfaz (U-01 a
-U-14), la vida del valle (V-00 a V-10, V-12, V-13, V-14).
+U-14), la vida del valle (V-00 a V-14) y las rondas de IA (IA-0 a IA-18).
 
 **Y la versión 2.0, del 15 sep 2026, entregada** (`docs/historico/plan-juego.md`, con sus
-medidas en `docs/handover.md` §2.1). El juego tiene un verbo: tres palancas de
+medidas en `docs/historico/handover.md` §2.1). El juego tiene un verbo: tres palancas de
 órdenes permanentes —cuánto se siembra, dónde van las manos que sobran, qué se
 levanta antes—, la aldea contesta cuando no puede obedecer, cada cifra dice
 hacia dónde va, y cada valle saca dos rasgos de cuatro. Con ellas: el reloj a
@@ -181,7 +185,7 @@ consecuencias, sus semillas y las obras que conceden. Así medí «de 0,3 a 0,5
 obras al año, la piedra nunca, 1,04 sucesos por sesión» y estuve a un paso de
 relajar A.16 por eso. Jugada con `run` y la política prudente: **67 a 99 obras
 en sesenta años, piedra en los años 42 a 45, 1,45 sucesos por sesión.** Está
-contado en `docs/handover.md` §2.1.
+contado en `docs/historico/handover.md` §2.1.
 
 **Y desde v3.69 la aldea la fundan dos** —un hombre y una mujer— y crece con
 los que llegan (§12.2, §5.7). Es decisión del dueño del diseño, con la premisa
@@ -305,10 +309,11 @@ casi entero») y la primera fase está en `main`: **R-1, los sucesos del valle**
 `fate` contra doce sucesos —rayo, riada, lobos, boda, buhonero, pesca, tejado
 bajo la nieve, fiesta de la cosecha, riña en la plaza, oso, niño perdido,
 forastero— y el que sale cambia el estado, se cuenta y se ve. Medido: trece al
-año, rencores donde antes no había ninguno. **Lo siguiente es la IA de animales
-y personas** («atraviesan paredes, dan vueltas sobre sí mismos»: `docs/historico/rework.md`
-§3, con diagnóstico, medida y orden de arreglo), después R-2/R-5 (gente
-distinta, escenas) y R-3 (diez rasgos de valle). Las encrucijadas se quedan y
+año, rencores donde antes no había ninguno. La IA de animales y personas que
+venía después («atraviesan paredes, dan vueltas sobre sí mismos»:
+`docs/historico/rework.md` §3) está hecha, en las rondas IA-0 a IA-18; lo que
+queda del rework es R-2/R-5 (gente distinta, escenas) y R-3 (diez rasgos de
+valle). Las encrucijadas se quedan y
 **no se afinan**.
 
 **Y desde el 17 sep 2026, la parada de las mecánicas: el juego de los
@@ -330,9 +335,10 @@ Tres cosas del dueño que mandan sobre cualquier otra regla de este fichero:
 **el caos es el juego** («que haya partidas que se rompan es la idea»: las dos
 puertas del rayo que R-1 puso hay que quitarlas, `docs/historico/rework.md` §2.6); **los planes
 de prueba y el nivelado van después**, la puerta es la suite rápida y las
-jornadas y nada más; y **nueve jornadas están rojas por la trayectoria nueva**
-(`docs/historico/rework.md` §2.8, cada una con su causa), sin tocar porque pidió parar y
-documentar. **Y desde v3.75 la aldea de veinte años de cualquier semilla ya no
+jornadas y nada más; y **las jornadas rojas por la trayectoria nueva ya
+están resueltas**: eran once (`docs/historico/rework.md` §2.8) y quedan dos,
+rojas a propósito y declaradas —la de los catorce avisos y la de la palanca del
+bosque— (`docs/task-log.md`, «Las jornadas rojas», 128 de 130 en 284 s). **Y desde v3.75 la aldea de veinte años de cualquier semilla ya no
 es la de antes** (16 personas en la semilla 7): un cambio del motor mueve todas
 las pruebas que midan una aldea hecha, y cada listón movido lleva su causa
 escrita (`docs/historico/rework.md` §2.7).
@@ -365,10 +371,10 @@ cada cosa y qué entregó.
 | **Qué herramienta mide qué, y cómo se lanza** | **`tools/README.md` — el catálogo; ninguna herramienta vive fuera de él** |
 | Las reglas vigentes | `docs/design.md` — §1–4 primero |
 | Cómo se llegó a ellas | `docs/changelog.md` — el motivo de cada revisión |
-| En qué estado exacto está todo, y qué trampas ya costaron tiempo | `docs/handover.md` |
+| En qué estado exacto está todo | `docs/task-log.md`; las trampas viejas, con su porqué, en `docs/historico/handover.md` (foto del 15 sep) |
 | **El plan hacia la meta: puntos, fases, prioridad, dificultad y a qué agente** | **`docs/plan-meta.md`** |
 | **Lo que el juego no enseña todavía** — mallas, animaciones y **mecánicas que no se ven**; se apunta **en la misma ronda** que se diseña | **`docs/encargos-3d.md`** |
-| Qué falta en total, y qué no puede hacer ningún agente | `docs/roadmap.md` |
+| Qué falta en total | `docs/plan-meta.md` (la sección H es la deuda medida); las decisiones del 15 sep, en `docs/historico/roadmap.md` |
 | Cómo se delega y se audita | `docs/agents.md` |
 | Quién es dueño de qué, si hay dos sesiones | `docs/dos-sesiones.md` |
 | Por qué el catálogo no sale | `docs/medidas/findings-drama.md` |

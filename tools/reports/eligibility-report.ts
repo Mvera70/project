@@ -21,7 +21,7 @@
 //
 // No decide nada: imprime. Qué hacer con esto —relajar condiciones, añadir
 // plantillas ligeras que salgan a menudo, o aceptar el ritmo— es la pregunta de
-// diseño de `docs/roadmap.md` §1, y la contesta el dueño del diseño.
+// diseño de `docs/historico/roadmap.md` §1, y la contesta el dueño del diseño.
 
 import { CATALOG } from '@engine/crossroads/catalog';
 import { all, evaluate } from '@engine/crossroads/conditions';

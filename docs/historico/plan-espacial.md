@@ -1,5 +1,7 @@
 # Aldea orgánica y recinto honesto
 
+> **Histórico desde el 27 sep 2026.** Aceptado el 21 sep 2026: la aldea orgánica está en el juego.
+
 Encargo autorizado el 21 sep 2026. Dirección y núcleo: Astra; auditoría
 independiente: Terra. Se ejecuta antes del ambiente cosmético por eras.
 
@@ -60,10 +62,10 @@ decisiones y medidas en el documento canónico, actualizado a v4.28.
 
 ### Evidencia
 
-- [Medida final del motor](medidas/spatial-engine.md): semillas 7/23/41 cerradas
+- [Medida final del motor](../medidas/spatial-engine.md): semillas 7/23/41 cerradas
   a los años 40 y 60, radios 13/14/11, una puerta. La 11 cae antes de construir;
   sí dispone de trazado viable, no se modifica economía o amenaza.
-- [Auditoría de plaza](medidas/spatial-plaza.md): detectada una plaza falsa a
+- [Auditoría de plaza](../medidas/spatial-plaza.md): detectada una plaza falsa a
   6,71–21,21 celdas de la real. El claro se confundía espacialmente con ella.
 - Capturas inspeccionadas del juego 3D, sin errores de página:
   `artifacts/graphics/spatial/final-seed-{7,23,41}-year-40.png`.

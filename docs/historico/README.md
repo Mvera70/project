@@ -25,6 +25,22 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 | `next-plan.md` | Los briefs de la auditoría del 15 sep 2026 | **U-10 a U-14**: el menú de inicio, el inicio guiado desde lo alto, el reloj con horas y las tormentas con rayos |
 | `brief-reloj.md` | Qué costaba afinar el tick (14 sep 2026) | **v3.72**: una semana son catorce minutos a ×1, y la cabecera puede decir la hora |
 | `life-ai-proposal.md` | Propuesta de IA para aldeanos y fauna (16 sep 2026) | **Superada** por las rondas IA-1 a IA-18, que sí están implementadas. Se lee por el diagnóstico, no por el plan |
+| `handover.md` | El estado de cada pieza a 15 sep 2026, con las trampas que ya habían costado tiempo | Una foto: el estado vivo pasó a `task-log.md` y `plan-meta.md`. Se conserva por las trampas y porque el código lo cita (§2.1, las medidas de v2.0) |
+| `roadmap.md` | Qué faltaba en total a 15 sep 2026 | Las decisiones del dueño de ese día —el rework, los hitos humanos 0 y 6 descartados—. Superado por `plan-meta.md` |
+| `plan-rendimiento.md` | P-1, rendimiento antes de más contenido (22 sep 2026) | La medida reproducible y la puerta; P-1 se cerró para seguir la hoja de ruta. Falta medir en un móvil real |
+| `plan-disparo-unico.md` | El brief a Astra del 19 sep 2026 | Los clips de un solo disparo que sostienen su última pose: desbloqueó E1 |
+| `plan-final.md` | El final de una partida (18 sep 2026) | F3a–F3e: la lápida, la hoja de cuentas y el cronicón. F3f sigue en `plan-meta.md` |
+| `plan-espacial.md` | La aldea orgánica | Caminos, plaza, viviendas y el cierre real del recinto (21 sep 2026) |
+
+## Los encargos entregados — `encargos/`
+
+Veintiocho briefs de arte cuyo trabajo ya está en el juego o se superó, movidos
+el 27 sep 2026 con sus citas reescritas: el arado y la fuente; el combate, el
+cuerpo a cuerpo y el acabado físico de D6; E0a–E0e; el clan vecino (E2); la
+integración y la defensa; la visibilidad y la huida; y toda la familia del
+bastión y el adarve (E3, E3a, E3b.1a–d, E3b.2b–c), que cerró E3b.3 al generar el
+adarve desde el anillo. Los dos de E3b.2b y E3b.2c no llegaron a despacharse:
+el cambio a código los dejó sin objeto.
 
 ## Los informes de ronda
 

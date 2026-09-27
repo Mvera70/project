@@ -1127,7 +1127,7 @@ export interface Threat {
  * misma división que tiene la crónica entre lo que pasó y cómo se cuenta.
  */
 export interface Ledger {
-  // ---- las tres grandes (plan-final.md §5, decisión 2) --------------------
+  // ---- las tres grandes (docs/historico/plan-final.md §5, decisión 2) --------------------
   /** Los años que duró el valle. */
   years: number;
   /** La gente que tuvo en su mejor momento. */
@@ -1175,7 +1175,7 @@ export interface ArchivedGame {
   chronicle: ChronicleEntry[];
   ruins: Uint8Array; // building mask, WIDTH*HEIGHT
   /**
-   * F3a · **Las cuentas de esa partida** (`docs/plan-final.md`).
+   * F3a · **Las cuentas de esa partida** (`docs/historico/plan-final.md`).
    *
    * Casi todas se pueden recontar de `chronicle`, y de hecho una partida
    * archivada antes de F3a se recuenta así al enseñarla. Se guardan de todos

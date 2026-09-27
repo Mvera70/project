@@ -1,5 +1,14 @@
 # Encargo a Astra · los modelos 3D que faltan
 
+> **Estado al 27 sep 2026.** Entregados, publicados e integrados: la **sala del
+> líder** (la segunda versión, la casa larga medieval, v4.67; la primera se
+> descartó por no parecer de la Edad Media), los **tres puestos**, la **cara de
+> cantera** en sus tres estados, los **cinco peñascos y el mojón** (v4.66) y,
+> fuera de esta lista, la **golondrina** (v4.65). **Siguen abiertos el 5 (el
+> roble) y el 6 (la casa quemada)**, a la espera de que Vera decida si entran.
+> Lo que sigue es el encargo tal como se escribió. «Sala del rey» se lee hoy
+> «sala del líder»: el rey vuelve en la Edad del Hierro.
+
 **26 sep 2026.** Lo pidió Vera: «todo el tema de los assets en 3D, hazme una
 lista y un prompt para pasárselo a Astra, que lo haga él». Por su regla de
 delegación, **Astra hace sólo el modelo**: la receta, el GLB candidato y su
@@ -95,7 +104,7 @@ Lee primero, en este orden:
    presupuestos. Es tu brief.
 2. docs/historico/plan-rey.md §8: la sala del rey, completa.
 3. tools/README.md, sección «art/ — de la receta al GLB», y
-   docs/encargos/encargo-fuente.md como ejemplo de cómo se escribe y se
+   docs/historico/encargos/encargo-fuente.md como ejemplo de cómo se escribe y se
    construye una receta (art/recipes/<id>/<id>.json, en metros, con los
    materiales de la paleta).
 4. public/assets/models/palette.json: los únicos colores que valen.

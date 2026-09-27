@@ -298,7 +298,7 @@ imposible para que el catálogo se quede en dos plantillas repitiéndose.
   commit. Está hecho y esperando en la rama `worktree-agent-afdfba3b92d4bb7ee`.
   Es lo primero que hay que retomar, y confirma con número lo que la decisión de
   ritmo ya avisaba: tocar la elegibilidad mueve el balance entero.
-- Lo otro es la pregunta de `docs/roadmap.md` §1: **¿cada cuánto quiere el juego
+- Lo otro es la pregunta de `docs/historico/roadmap.md` §1: **¿cada cuánto quiere el juego
   que decidas?** Hoy son tres veces por década y dos de cada cuatro son la misma
   plantilla. Relajar las estaciones, bajar umbrales o añadir plantillas ligeras
   que salgan a menudo son tres respuestas distintas con consecuencias distintas

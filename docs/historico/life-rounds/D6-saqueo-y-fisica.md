@@ -1,6 +1,6 @@
 # D6 · Saqueo y acabado físico · 20 sep 2026
 
-Ronda cerrada. [Contrato](../../encargos/encargo-d6-acabado-fisico.md).
+Ronda cerrada. [Contrato](../encargos/encargo-d6-acabado-fisico.md).
 Sol implementó escena/transición y física articulada; Terra, la rotura visible,
 fragmentos y cierre de integración. El principal revisó, corrigió la
 instrumentación y observó. No se abre otra tarea ni se hace push/despliegue.

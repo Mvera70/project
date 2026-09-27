@@ -74,6 +74,7 @@ servidor de desarrollo.
 | `animals.shots.ts` | Los animales del valle en Canvas 2D (§7.7) |
 | `pass-title.ts` | Pasar el menú de inicio como lo pasa el dedo. **Vive suelto y sin `test()` dentro a propósito**: importar un fichero de pruebas de Playwright registra sus pruebas |
 | `screenshots.ts` | Capturas de móvil, comprobación en gris y hoja de contactos (M-19) |
+| `dev-presets.shots.ts` | **Los accesos de taller del menú**: con Dev pulsado, las tres partidas preparadas (años 1, 21 y 60) se ven y abren la villa con un toque, desde el menú real y no desde una prueba de motor |
 
 `npm run test:shots` corre la reja; `npm run shots` toma las capturas.
 
@@ -109,6 +110,8 @@ silencio y la prueba pasa sin probar nada.
 | `capture.ts` | El motor de captura compartido |
 | `capture-chronicle-sheet.mjs` | Fotografía la hoja de contactos de los grabados de la crónica. **Espera un `chronicle-contact-sheet.html` servido en la raíz**, que se monta a mano para la ronda y no vive en el árbol |
 | `animal-gestures-bench.mjs` · `animal-gestures-bench.ts` | **Los gestos fabricados del perro** (`effects/animal-gestures.ts`: correr, ladrar, jugar) sobre el GLB publicado y el `Fauna` del juego, una fila por gesto: `node tools/graphics/animal-gestures-bench.mjs`. Para comprobar que un perro nuevo sigue sirviendo |
+| `hunt-smoke.mjs` | **La entrada de caza, de humo**: abre el juego (`--seed=N`, `--mobile`), entra en la caza y fotografía su escena 3D en `artifacts/graphics/hunt-smoke/`. Prueba manual reproducible, no una reja |
+| `animal-gait-compare.mjs` | **La marcha de dos GLB candidatos contra la publicada**: doce fases de `walk` del ciervo y del oso, con rodillas y tobillos marcados. `npx tsx tools/graphics/animal-gait-compare.mjs --candidate-dir <carpeta>`; su README es `animal-gait-compare-README.md` |
 | `model-sheet.mjs` · `model-sheet.ts` | **La hoja de todos los modelos publicados**: cada GLB de `public/assets/valley3d` con la misma luz y la misma cámara, agrupados por familia y con su tamaño en celdas. `node tools/graphics/model-sheet.mjs [--out artifacts/graphics/models]`. Lo que se dibuja por código (roble, hoguera, tendederos, fuego) no sale: no es un GLB |
 | `contact-sheet.py` | Monta la hoja de contactos de una ronda gráfica, para juzgarla de un vistazo |
 | `villager-sheet.py` | La hoja de los dieciséis aldeanos (G-19), a la escala real de la cámara: veinte píxeles |
@@ -203,4 +206,8 @@ busque: `tools/diag-ia4-temp.ts` (desde `src/render3d/life/beasts.ts`),
 `docs/design.md` y `docs/ui-redesign/`), `tools/graphics/bench-life.ts`,
 `tools/graphics/bundle-pilot.ts`, `tools/graphics/consequence-scenarios.ts`,
 `tools/graphics/probe-models.ts`, `tools/graphics/skin-bench.ts` y
-`tools/ui/chronicle-ornaments.py` (desde la skill `calcar-iconos`).
+`tools/ui/chronicle-ornaments.py` (desde la skill `calcar-iconos`). Y
+`tools/art/_test_build_priest.py` (desde `docs/dos-sesiones.md` y los encargos
+de Blender de `historico/graphics-rounds/`): el script de prueba de la sesión de
+Blender del 15 sep, con rutas fijas a otra carpeta, que aquellos encargos
+pedían no subir nunca y acabó versionado; se retiró el 27 sep.

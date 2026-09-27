@@ -1,7 +1,7 @@
 # E3b.1d · Revisión de la primera junta en la app real
 
 **Estado:** revisión realizada el 22 sep 2026; evidencia en
-[E3b.1d](../historico/graphics-rounds/E3b1d-revision-app.md).
+[E3b.1d](../graphics-rounds/E3b1d-revision-app.md).
 Vera autorizó abrir la app y usar GPU.
 E3b.1a/b/c pasaron pruebas focales. Esta ronda valida lo que éstas no ven:
 unión visible, guardia en movimiento y tiro en el navegador.

@@ -18,7 +18,7 @@
 // nuevo y **mirar las capturas**, que es justo lo que ningún agente puede hacer
 // solo. Bajarles el listón hasta que pasen sería peor que tenerlos rojos.
 //
-// Así que quedan declarados, con el patrón que `docs/roadmap.md` fija para lo
+// Así que quedan declarados, con el patrón que `docs/historico/roadmap.md` fija para lo
 // que no llega: se escribe lo medido y se deja la propiedad intacta. El brief
 // de la ronda que los recalibra está en `docs/historico/next-plan.md`.
 // ---------------------------------------------------------------------------

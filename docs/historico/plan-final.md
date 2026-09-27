@@ -1,5 +1,7 @@
 # El final de una partida — la lápida y la hoja de cuentas
 
+> **Histórico desde el 27 sep 2026.** F3a–F3e hechas el 18 y 19 sep 2026; F3f (la hoja como imagen, sin prioridad) sigue en `docs/plan-meta.md`.
+
 **Lo pidió el dueño del diseño el 18 sep 2026**, con las palabras que mandan
 sobre este plan:
 

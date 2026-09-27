@@ -1,5 +1,27 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · La documentación, al día (v4.68)
+
+- **`design.md`** v4.68: §1b (fases 3 y 4, fuego y gore), §6.7 (líder y la sala
+  de Astra), §7.4 (la atalaya y la calle del adarve), §7.10 (la riada), el
+  informe del valle, §D.4.2 (modelos adoptados), §D.6.9 (montañas y gargantas),
+  §D.6.10 (el agua) y la vida ambiental de §E.5.
+- **A `historico/`**: `handover.md` y `roadmap.md` (fotos del 15 sep, con aviso
+  de cabecera), `plan-rendimiento.md`, `plan-disparo-unico.md`, `plan-final.md`,
+  `plan-espacial.md`, y 28 encargos en `historico/encargos/`. Citas reescritas
+  en 70 ficheros; el script resolvía rutas desde la raíz, enlaces relativos
+  según el sitio de cada fichero y nombres sueltos relativos a `docs/`.
+- **Enlaces**: de 93 rotos a 25. Los 25 que quedan apuntan a `artifacts/` (no se
+  versiona) y a cinco capturas de `visual-reference/evidence/` que no están en
+  el repositorio.
+- **Estados corregidos**: la fila H de `plan-meta.md` (sala, clan, jornadas y
+  adarve hechos), la fila «El asalto» y las del adarve en `encargos-3d.md`, el
+  encargo de Astra (quedan el roble y la casa quemada), `docs/README.md` y
+  `historico/README.md`, y cuatro frases caducadas de `CLAUDE.md`, que además
+  gana la regla de «leader» hasta la Edad del Hierro.
+- **`tools/README.md`**: filas para `dev-presets.shots.ts`, `hunt-smoke.mjs` y
+  `animal-gait-compare.mjs`; `tools/art/_test_build_priest.py` retirado.
+
 ## 27 sep 2026 · Las rojas de la suite: de 6 a 0
 
 Llevaban en rojo desde antes del 26 sep (comprobado en una copia limpia de
@@ -1022,7 +1044,7 @@ diagonal. El módulo recto G-32 aún no se instancia más allá de la entrada.
 En la semilla 7 quedan 15 árboles adultos visibles contiguos a piedra por
 la heurística interior; cinco tienen posible invasión del voladizo, pendiente
 de medir con orientación y malla reales. Se preparó el
-[encargo E3b.2b](encargos/encargo-e3b2b-modelos-candidatos.md) para las
+[encargo E3b.2b](historico/encargos/encargo-e3b2b-modelos-candidatos.md) para las
 variantes de giro, diagonal y portón. E3b.2 continúa abierta. Sin app, GPU,
 Blender, benchmark, commit ni push.
 
@@ -1041,7 +1063,7 @@ Sin benchmark, commit ni push.
 
 ## 22 sep 2026 · E3b.1c, guardia y física implementados; falta partida real
 
-El [primer enlace navegable](encargos/encargo-e3b1c-navegacion-y-fisica.md)
+El [primer enlace navegable](historico/encargos/encargo-e3b1c-navegacion-y-fisica.md)
 lleva al mismo guardia del bastión al corredor del primer muro y de vuelta,
 sin abrir la máscara pública ni crear un puesto adicional. La física de
 combate usa bastión y muro a Y=1,02, respeta la abertura G-32 y prueba el
@@ -1054,13 +1076,13 @@ commit ni push en esta ronda.
 
 ## 22 sep 2026 · E3b.1b, primera junta integrada en el plan visual
 
-El [ensamblado selectivo](encargos/encargo-e3b1b-escena-selectiva.md) coloca
+El [ensamblado selectivo](historico/encargos/encargo-e3b1b-escena-selectiva.md) coloca
 el bastión abierto y el primer módulo G-32 sólo cuando el selector E3b.1a
 encuentra dos muros rectos de piedra. Gira ambos como una unidad en las cuatro
 caras, conserva el muro original y vuelve a E3a si la junta se pierde o entra
 en obra. Pasan 28 pruebas focales, typecheck, ESLint focal y
 `git diff --check`. No se ha abierto la app; todavía no hay guardia ni física
-de pasarela. Sigue [E3b.1c](encargos/encargo-e3b1c-navegacion-y-fisica.md).
+de pasarela. Sigue [E3b.1c](historico/encargos/encargo-e3b1c-navegacion-y-fisica.md).
 Sin commit ni push.
 
 ## 22 sep 2026 · G-32 publicado y E3b.1a cerrada
@@ -1071,7 +1093,7 @@ registra los hashes contrastados y las 68 entradas anteriores conservadas en
 el manifiesto. No se ha sustituido ningún recurso existente ni se ha abierto
 el juego.
 
-La [ronda E3b.1a](encargos/encargo-e3b1a-selector-y-ruta.md) implementó un
+La [ronda E3b.1a](historico/encargos/encargo-e3b1a-selector-y-ruta.md) implementó un
 selector puro para dos muros rectos de piedra y una ruta privada desde la
 escalera E3a hasta el primer tramo. Niega también conexiones diagonales que
 `buildDefence` montaría con otra forma y ocupación de la franja interior que
@@ -1110,12 +1132,12 @@ juego. El tramo renderizado tiene grosor 0,34, frente al paso libre 0,70 del
 bastión; su coronación está a 0,76 y el suelo del bastión a 1,02. El portón
 llega a 0,93. `buildDefence` escala y recorta el GLB, de modo que ensanchar
 sólo `wall.glb` no daría una pasarela transitable. El nuevo
-[brief E3b](encargos/encargo-e3b-adarve-continuo.md) separa propuesta
+[brief E3b](historico/encargos/encargo-e3b-adarve-continuo.md) separa propuesta
 geométrica, primer enlace navegable y cierre de continuidad sobre rectas,
 giros, diagonales y portón. La
 [auditoría E3b.0](historico/graphics-rounds/E3b0-viabilidad-adarve.md)
 propone una pasarela interior modular separada del muro; sigue pendiente de
-revisión visual. El [encargo de modelo candidato](encargos/encargo-e3b-modelo-candidato.md)
+revisión visual. El [encargo de modelo candidato](historico/encargos/encargo-e3b-modelo-candidato.md)
 fue autorizado y entregó el [módulo recto candidato](../art/recipes/e3b-walkway-candidate/README.md)
 con 0,72 de paso libre, suelo a 1,02 y vistas técnicas por CPU. La junta con
 G-27 **no pasa**: pretiles/almenas laterales la bloquean y el solape útil es
@@ -1253,7 +1275,7 @@ Luna auditó carga y caché: el service worker guarda los GLB descargados, no
 su parseo ni los recursos de GPU; la carga de modelos solicitados es
 secuencial. Terra auditó el bucle y la lluvia: hay trabajo repetido por
 fotograma, pero aún no se ha medido la causa del tirón. Sol verificó ambos
-hallazgos y abrió el [brief P-1](plan-rendimiento.md) antes del adarve E3.
+hallazgos y abrió el [brief P-1](historico/plan-rendimiento.md) antes del adarve E3.
 P-1a añadió un modo reproducible al banco y tres muestras 390×844 @ DPR 2 del
 preset real, con día/noche y vida activa. El cielo derivado resultó lluvia en
 ambas: no hay comparación despejado/lluvia ni atribución del tirón. La evidencia
@@ -1311,7 +1333,7 @@ historias del juego real muestran subida/puesto/bajada sin errores ni deriva;
 una produjo 48 flechas y 9 impactos entre toda la defensa, la otra 13 y
 ningún impacto en su ventana. No se declara resuelta la eficacia en todos los
 emplazamientos. [Informe G-29](historico/graphics-rounds/G-29.md) y
-[contrato](encargos/encargo-e3-puesto-navegable.md).
+[contrato](historico/encargos/encargo-e3-puesto-navegable.md).
 
 Sol dirigió y revisó; Terra hizo ruta/combate y física en encargos acotados.
 **Astra no se usó** y no se pidió modelo nuevo. `typecheck` y lint verdes;
@@ -1329,7 +1351,7 @@ pero la guardia sigue en suelo. La navegación de vida es X/Z, `terrainOf`
 cierra la celda de la escalera y el collider de proyectiles de una celda
 bloqueada mide 2 frente a plataforma a 1,02. Cambiar sólo Y o el origen de
 flecha no da una subida real y arriesga choques invisibles. El contrato
-[E3](encargos/encargo-e3-acceso-elevado.md) registra esta costura. Vera había
+[E3](historico/encargos/encargo-e3-acceso-elevado.md) registra esta costura. Vera había
 permitido aplazar la subida si era costosa; pendiente su elección entre
 retomar un puesto navegable acotado o mantener E3 diferida. No se tocó código
 de navegación, física ni combate en esta auditoría, ni se encargó nuevo 3D.
@@ -1393,7 +1415,7 @@ bastión derecho con el muro sin hueco apreciable; el otro queda parcialmente
 tapado por árboles. La evidencia y sus límites están en
 `historico/graphics-rounds/G-26.md`. La guardia continúa a ras de suelo y el
 bastión aprobado carece de acceso. El nuevo
-[contrato](encargos/encargo-e3-acceso-elevado.md) distingue un puesto elevado
+[contrato](historico/encargos/encargo-e3-acceso-elevado.md) distingue un puesto elevado
 recorrible en el bastión de un adarve continuo por toda la muralla; ninguno se
 declara hecho. Vera autorizó a Astra **sólo** a preparar una revisión 3D
 candidata, sin sustituir G-26 ni integrar. La primera rampa lisa se rechazó
@@ -1427,7 +1449,7 @@ Typecheck, lint y tests focales pasan. La primera captura móvil de año
 render principal que muestra sin hueco apreciable la junta derecha, mientras
 árboles tapan parcialmente la otra (límites en G-26). El adarve/puesto elevado
 navegable sigue pendiente, sin tocar motor ni físicas.
-[Contrato](encargos/encargo-e3-integracion-bastion.md).
+[Contrato](historico/encargos/encargo-e3-integracion-bastion.md).
 
 ## 22 sep 2026 · E3, bastión — modelo candidato sin integrar
 
@@ -1438,7 +1460,7 @@ triángulos, dos mallas/materiales. La comparativa con muro y atalaya muestra
 una torre maciza con plataforma abierta; aún requiere aceptación visual del
 dueño. `art/catalog.json` sigue `study`, `approved: null`; no se tocó `src/`,
 `public/` ni el ensamblador. La integración, la junta real muro–bastión y el
-puesto elevado navegable siguen pendientes. [Brief](encargos/encargo-e3-modelo-bastion.md)
+puesto elevado navegable siguen pendientes. [Brief](historico/encargos/encargo-e3-modelo-bastion.md)
 y evidencia/reproducción en `art/recipes/bastion/README.md`.
 
 ## 22 sep 2026 · E0e, tierra → piedra — cambio autorizado y verificado
@@ -1468,7 +1490,7 @@ sin rótulo. [Informe](historico/life-rounds/E0e-ambiente-eras.md).
 
 ## 21 sep 2026 · E0e, ambiente de eras — código cerrado, visual pendiente
 
-Sol escribió y revisó el [brief](encargos/encargo-e0-ambiente-eras.md); Terra
+Sol escribió y revisó el [brief](historico/encargos/encargo-e0-ambiente-eras.md); Terra
 implementó acabado de caminos existentes, enseres de plaza y humo doméstico
 según `eraOf`, sin tocar motor, navegación ni guardados. 91 pruebas focalizadas,
 typecheck, lint y diff-check verdes. Se tomaron tres eras reales en semillas 7
@@ -1495,7 +1517,7 @@ de clips obsoletos se corrigieron y pasan aislados, y catch-up pasó aislado
 tras fallar su tiempo bajo carga paralela. Fase aceptada **localmente** con
 otros rojos de jornadas sin atribuir; commit local `6fa7fda`, publicación
 remota pendiente de confirmar el destino.
-[Detalle](plan-espacial.md).
+[Detalle](historico/plan-espacial.md).
 
 ## 21 sep 2026 · Aldea orgánica y recinto honesto — implementado, aceptación pendiente
 
@@ -1506,7 +1528,7 @@ casas por bandas/hash y calles, plaza social real, defensas de ribera,
 portones y cierre topológico, uniones diagonales y cuatro acabados de casa.
 Semillas 7/23/41 cierran al año 40; 11 tiene trazado viable pero cae sin cerco
 por condiciones de obra. Guardados sin recolocar. Contrato, pruebas, capturas
-y límites en [plan-espacial.md](plan-espacial.md). Esta entrada cuenta el primer
+y límites en [historico/plan-espacial.md](historico/plan-espacial.md). Esta entrada cuenta el primer
 estado, antes de la recuperación de arriba. E0 sigue siendo otra fase; no se
 hace commit ni publicación por implicación.
 
@@ -1628,7 +1650,7 @@ están, sin publicación todavía. La siguiente prioridad abordada es E1:
 `spear_thrust` y `hit_take` procedurales, fechados por golpes reales en ambos
 bandos. Caída prioritaria, sin cambiar daño, alcance, cadencia ni motor.
 53 pruebas focalizadas, typecheck y lint; observación en 7 y 23, a 15 fps.
-[Contrato](encargos/encargo-cuerpo-a-cuerpo.md) y
+[Contrato](historico/encargos/encargo-cuerpo-a-cuerpo.md) y
 [evidencia y límites](historico/life-rounds/E1b-cuerpo-a-cuerpo.md).
 E1 sigue parcial por `flee`; las armas siguen sin estar en las manos.
 **Bloqueo de empaquetado detectado:** `npm run bundle` exige promover `plough`
@@ -1669,7 +1691,7 @@ mezclado con lo entregado y herramientas sueltas sin documentar. Ahora:
 
 | Sitio | Qué hay | Índice |
 |---|---|---|
-| `docs/` | Lo vivo: `design.md`, `changelog.md`, `task-log.md`, `plan-meta.md`, `plan-final.md`, `plan-audio.md`, `encargos-3d.md`, `plan-arte-pendiente.md`, `handover.md`, `roadmap.md`, `agents.md`, `dos-sesiones.md` | `docs/README.md` |
+| `docs/` | Lo vivo: `design.md`, `changelog.md`, `task-log.md`, `plan-meta.md`, `historico/plan-final.md`, `plan-audio.md`, `encargos-3d.md`, `plan-arte-pendiente.md`, `historico/handover.md`, `historico/roadmap.md`, `agents.md`, `dos-sesiones.md` | `docs/README.md` |
 | `docs/medidas/` | Evidencia medida una vez: `findings-drama.md`, `rey-medida.md`, `dead-code-audit-2026-09-17.md`, `catalogo-historias-y-encrucijadas.md` | — |
 | `docs/encargos/` | Lo que le falta al arte con documento propio: combate, arado, fuente, sesión de Blender | `docs/encargos-3d.md` sigue siendo el índice de todo |
 | `docs/historico/` | Lo que entregó: `rework.md`, `plan-juego.md`, `plan-medios.md`, `plan-rey.md`, `next-plan.md`, `brief-reloj.md`, `life-ai-proposal.md`, y las rondas `graphics-rounds/`, `life-rounds/`, `sesiones/` | `docs/historico/README.md`, con **qué entregó** cada uno |
@@ -1987,19 +2009,19 @@ traído aquí.
 trabajadas, carga sacos, recorre el camino, descarga en almacenamiento real y
 vuelve sin producir grano dos veces. Ya no se ara en invierno ni se eligen
 descargas vacías. Dos semillas observadas; 89 pruebas dirigidas, typecheck y
-lint verdes. [Informe](docs/historico/life-rounds/IA-18.md).
+lint verdes. [Informe](historico/life-rounds/IA-18.md).
 
 **IA-17 · cantera visible:** una obra cuyo coste real incluye piedra reparte
 jornadas entre parcela y roca alcanzable; se ve pico, carga, camino, descarga
 y vuelta, sin inventario paralelo. Semilla 11/año44 completa la entrega antes
 del regreso; 68 pruebas dirigidas, typecheck y lint verdes.
-[Informe](docs/historico/life-rounds/IA-17.md).
+[Informe](historico/life-rounds/IA-17.md).
 
 **IA-16 · bosque visible:** las copas acusan cuatro tramos de existencias; el
 último árbol cae sólo con la transición real a claro, deja tocón y los claros
 aptos muestran un plantón creciente hasta la regeneración. Semilla 67 filmada
 con motor vivo y semilla 1 con rebrote real; 97 pruebas dirigidas, typecheck y
-lint verdes. [Informe](docs/historico/life-rounds/IA-16.md).
+lint verdes. [Informe](historico/life-rounds/IA-16.md).
 
 **Icono PWA renovado (17 sep):** el mosaico plano de M-27 se sustituye por el
 emblema aprobado por el dueño —casa de paja, escudo y cinta sobre fondo cuero
@@ -2085,7 +2107,7 @@ créditos**. Pendiente de escucha; no se integra todavía.
 fundadora dedicada a subsistencia y ciclo `árbol → tala → carga → descarga → vuelta`.
 El tajo coincide con la celda que tala el motor; almiares y pilas responden a reservas
 reales y desaparecen de la fundación. Dos aldeas observadas sin errores, deriva ni
-penetraciones; 72 pruebas, typecheck y lint verdes. [Informe](docs/historico/life-rounds/IA-15.md).
+penetraciones; 72 pruebas, typecheck y lint verdes. [Informe](historico/life-rounds/IA-15.md).
 
 **Localización · primera fase:** la portada ya permite elegir `English` o
 `Español`, la preferencia se conserva y la interfaz principal tiene banco
@@ -2113,11 +2135,11 @@ captura real sin errores. Pendientes monte bajo y más siluetas arbóreas.
 
 **G-25 · roca entregada:** afloramiento facetado y colocación completa dentro de
 su celda, sin ocupar caminos ni solares. 50 pruebas, typecheck y lint verdes.
-Captura real revisada; pendiente continuar vegetación. [Informe](docs/historico/graphics-rounds/G-25.md).
+Captura real revisada; pendiente continuar vegetación. [Informe](historico/graphics-rounds/G-25.md).
 
 **G-25 · paisaje, primer modelo entregado:** árbol tree rehecho con horquillas
 y copa facetada asimétrica. GLB publicado selectivamente, captura real revisada,
-48 pruebas, typecheck y lint verdes. [Informe](docs/historico/graphics-rounds/G-25.md).
+48 pruebas, typecheck y lint verdes. [Informe](historico/graphics-rounds/G-25.md).
 
 **OBS-02 · piloto y comparación cerrados:** tres Luna, un Terra y un Sol revisaron
 los casos archivados; ninguno localizó concretamente marcha lateral ni vado desplazado.
@@ -2128,7 +2150,7 @@ coordinador diagnostica, previa comprobación de calidad del material. No lanzad
 **IA-14 · contacto y marcha:** corregidos radio de contacto humano, giro continuo,
 recorrido posterior a colisiones y zancada proporcional a talla. Comparación
 cercana a 15 fps: desalineación rumbo/avance >60° baja del 45,6 % al 4,0 %.
-68 pruebas, typecheck y lint verdes. Informe [IA-14](docs/historico/life-rounds/IA-14.md).
+68 pruebas, typecheck y lint verdes. Informe [IA-14](historico/life-rounds/IA-14.md).
 
 **OBS-01 · batería de observación con tres agentes Luna: ejecutada y auditada.**
 Informes separados de día, noche y fauna, más revisión de geometría por el
@@ -2144,7 +2166,7 @@ desde la orilla con una búsqueda de hasta catorce celdas. Ahora dibuja únicame
 las celdas de paso que guarda el mapa y conserva la conjetura sólo para partidas
 anteriores a ese terreno. En semilla 7/año 1 quedan dos losas contiguas dentro
 del cauce, separadas del campo. 60 pruebas, typecheck, lint y captura reales
-verdes. Informe [G-24](docs/historico/graphics-rounds/G-24.md).
+verdes. Informe [G-24](historico/graphics-rounds/G-24.md).
 
 **IA-13 · puertas domésticas: hecha.** La IA sí entraba, pero a ×64 podía
 recorrer `opening → entering → sleeping` dentro de un solo fotograma y el
@@ -2176,14 +2198,14 @@ cierre preparados para subida individual. 75 pruebas, typecheck y lint verdes;
 seis bancos visuales, visores con reproducción/pausa y captura del juego.
 Vaca terminada, articulada y conectada al render; 42 pruebas, typecheck y lint
 verdes. Banco de marcha y reposo revisado. Entrega individual preparada para
-subida; siguen cerdo, gallina, lobo, cuervo y pez. Informe [G-23](docs/historico/graphics-rounds/G-23.md).
+subida; siguen cerdo, gallina, lobo, cuervo y pez. Informe [G-23](historico/graphics-rounds/G-23.md).
 
 **Siguiente encargo de Blender · aldea:** alcance preparado para viviendas,
 molino, iglesia/capilla, herrería, pozo, granero, campos, carros y adornos.
-Inventario y tandas en [encargo-blender-aldea](docs/historico/graphics-rounds/encargo-blender-aldea.md).
+Inventario y tandas en [encargo-blender-aldea](historico/graphics-rounds/encargo-blender-aldea.md).
 **G-21: casas de paja, piedra y molino terminados**, con entrega individual por modelo.
 Paja subida en `dcb4cf1` y piedra en `4d2893e`; molino validado con 87 pruebas,
-typecheck, lint y captura del juego. Informe en [G-21](docs/historico/graphics-rounds/G-21.md).
+typecheck, lint y captura del juego. Informe en [G-21](historico/graphics-rounds/G-21.md).
 Molino subido en `1889d40`. Herrería subida en `8d03f5c`;
 validación técnica verde. Su revisión frontal en juego se cierra con la captura
 de la capilla (semilla 2, año 60); detalles y evidencias en el informe G-21.
@@ -2199,7 +2221,7 @@ Pozo subido en `6f8876f`. Campo cultivado terminado, validado y revisado en
 verano dentro del juego; conserva la alternancia estacional. Sigue `field-cut`.
 **G-22 · cultivos:** el dueño rechaza las espigas de G-21 por parecer flechas.
 Trigo rehecho con granos laterales y tallos verdes, validado y revisado en juego.
-Siguen coles, cultivo de hojas y variedades visuales por parcela; informe [G-22](docs/historico/graphics-rounds/G-22.md).
+Siguen coles, cultivo de hojas y variedades visuales por parcela; informe [G-22](historico/graphics-rounds/G-22.md).
 Trigo G-22 subido en `1b834c7`. Coles terminadas y selección estable por parcela
 conectada en el render; 88 pruebas verdes y captura real revisada. Siguen puerros.
 Coles subidas en `0edca57`. Puerros terminados y conectados: trigo, coles y
@@ -2235,7 +2257,7 @@ en Blender y renderer real con estado de prueba. Los cuatro encargados
 están terminados; entrega final validada para commit y subida.
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
-verificados; subida solicitada por el dueño. Véase [G-18](docs/historico/graphics-rounds/G-18.md).
+verificados; subida solicitada por el dueño. Véase [G-18](historico/graphics-rounds/G-18.md).
 
 **U-10b · el menú abre el valle en el año que se le pida (16 sep, `21b11e9`).**
 Lo pidió el dueño porque probar le costaba demasiado: «no tengo manera de
@@ -2263,8 +2285,8 @@ final.
 
 **G-17 · Blender, entrega terminada (16 sep):** `villager`, `villager-smith`,
 `villager-priest` y `villager-farmer`, recetas canónicas, catálogo y cuatro GLB
-publicados. Informe: [G-17](docs/historico/graphics-rounds/G-17.md); prompt de integración:
-[G-17-handoff](docs/historico/graphics-rounds/G-17-handoff.md). No se ha tocado `src/`.
+publicados. Informe: [G-17](historico/graphics-rounds/G-17.md); prompt de integración:
+[G-17-handoff](historico/graphics-rounds/G-17-handoff.md). No se ha tocado `src/`.
 
 Orden fijado por el dueño: auditoría, movimiento, interacciones, hábitos,
 animales, fauna, escenas históricas, **y después interfaz**.
@@ -2577,7 +2599,7 @@ es**.
 | **La temática visual nueva, sin integrar** · subida el 18 sep 2026 | Sesión de piel (`piel-del-valle`) | Cinco grabados de **una sola tinta parda sobre papel crema** —marco de hojas de roble, esquina de vid, sello con el roble, banderola y la hoja—, con las palabras del dueño: «todo debe pasar por nuestra skill» y «la nueva temática es **menos colorida**». Referencia estable y correspondencia pieza a pieza en `docs/visual-reference/engraving/README.md`; tareas en `plan-arte-pendiente.md`; regla en §10 de la skill. **Lo que esto cambia hoy mismo**: los tres prototipos de `ui-prototypes/` siguen mandando en la maquetación y **dejan de mandar en el color**, así que la hoja de roble en oro (`--skin-gold`) y el capitular en rojo son de la versión anterior. Y **la banderola no tiene sitio todavía**, que es el hueco más claro: la fase del valle (A5) se lee en versalitas sueltas y en una banderola sería un rótulo |
 | **Cuatro crónicas sin su imagen** · destapadas al escribir la regla nueva | Sesión de arte | Regla del dueño del 18 sep: «cada vez que crees una crónica hay que ir creando la tarea de pedir las imágenes» (en `CLAUDE.md` y como §4c de la skill `goal`). Las cuatro son de `kind: 'built'`, así que `illustrationFor` las manda al grabado genérico de construcción: **`wall.closed`** —el cierre de la villa, **peso 3**, una vez en la vida de una aldea— comparte dibujo con «se ha levantado un campo», y con ella el portón (A2), la muralla de piedra (A4, que hasta hoy no levantaba ningún valle) y la atalaya (C3). Encargo con clave y qué enseñar en `plan-arte-pendiente.md` |
 | ~~**El barril y el arado en la escena**~~ · **hecho el 18 sep 2026** (§7.14): el barril en el corro de la plaza mientras dura la fiesta, y se bebe de él; el arado apoyado dentro de su campo. **Queda una de las tres**: el arado **acarreado** el día que se da, que es una escena de dos con la carreta y no una colocación | Sesión de vida (`life/props.ts`) | El sitio se midió tres veces tras el aviso del dueño («el posicionamiento no estaba bien hecho»): entre el trigo, luego a las afueras, y al final en una plaza del corro con 0,8 de aire |
-| **La malla del arado** | Sesión de Blender | No existe ninguna: `manifest.json` tiene 57 recursos y ni barril ni arado. **Encargo completo en `docs/encargos/encargo-arado.md`** (medidas, piezas, materiales, presupuesto de 400 triángulos y los tres pasos para meterlo). El barril lo tiene el dueño casi hecho |
+| **La malla del arado** | Sesión de Blender | No existe ninguna: `manifest.json` tiene 57 recursos y ni barril ni arado. **Encargo completo en `docs/historico/encargos/encargo-arado.md`** (medidas, piezas, materiales, presupuesto de 400 triángulos y los tres pasos para meterlo). El barril lo tiene el dueño casi hecho |
 | ~~**Los lobos van al corral**~~ · **esta línea estaba mal anotada**: ya lo hacía IA-5 (`life/wildlife.ts`), y el 18 sep 2026 se rodó para comprobarlo | — | Toma de 90 s en la semilla 11, año 30, con el suceso provocado (`--happening wolves_at_the_coop`): el lobo sale del bosque, se acerca a **1,8 celdas de una gallina y 1,0 del corral**, ronda y se vuelve. Cero errores y cero penetraciones. Lo que faltaba no era el lobo: era poder **provocar** el suceso para verlo |
 | **LA META: la villa cerrada y el asedio** (`design.md` §1b, 18 sep 2026) · **A1, A2, A2c, B1, B2, B3, B4, C1, C2, D1, D2, D3, D4 (el núcleo) y D5 (el portón) hechas** (el cerco es de una capa y tiene dos puertas funcionales; la guarnición sube de una a siete manos la víspera de un asalto y ocupa todos sus puestos; **la muralla dispara**, y en el navegador tumba a 8 y 10 de 12 saqueadores con flechas de Rapier; **y el valle se puede perder**: `stormed` es el final de un valle tomado, y caen 3 de 12 sin dar defensa y 0 de 12 dándola; y **el resultado de la batalla física ya entra al motor** por la puerta de `PlayerAct`, con la semana de espera que deja que la pelea decida; **y el portón se rompe a golpes**: en el navegador, cinco hombres meten 18 de los 60 golpes antes de que las flechas se los coman; y **defender cuesta**: de 0 a 3 bajas propias por asalto) (el mundo físico ya existe y cuesta el 1,2 % del presupuesto; falta medirlo en un móvil de verdad) (el clan vecino baja a las 103 h y saquea; la mitad grande de «caer» espera a la batalla física): el cierre se cuenta con peso 3 y deja marca (`flags['wall_closed']`), y el portón es un edificio que va en el anillo (200 h de reloj); medido, la villa se cierra a las **425 h** de reloj contra las 61 h de la edad de piedra, y ese hueco es lo primero que pedirá el nivelado · **el plan está en `docs/plan-meta.md`**: ocho puntos (A-H), sus fases, prioridad, dificultad y agente (Luna/Terra baja, Sol media, Astra alta), y el orden en seis pasos | Dueño + quien retome | La fase 3 (villa cerrada) está a medias: el anillo existe y se cierra, el cierre no se celebra ni se ve distinto. La fase 4 (asedio) está por hacer entera y tiene tres piezas con coste conocido: flechas y aldeanos-torre (barato), cuerpo a cuerpo y ejército hostil (una tanda como la IA de la vida), gore y destrucción visible (sesión de arte: hoy no hay un solo clip de pelea). Antes de escribir el brief hay que decidir con el dueño qué es «caer» —el motor tiene tres finales y ninguno es una derrota militar— y con qué motor de físicas (balística propia basta para las flechas; el cuerpo a cuerpo con caídas pide más) |
 | ~~**LA LETALIDAD: el valle ya no se rompe**~~ · **respondido por el dueño el 18 sep y resuelto por B3 el mismo día**: `fate-chaos` **está verde** — la letalidad vino por el asedio, como él dijo: un valle al que no se le da defensa lo toma el clan vecino (3 de 12 en ochenta años, 8 de 24 en la escalera del ritmo). Lo que sigue abierto es el nivelado fino (G4) y por dónde muerde el hambre, abajo · lo que contestó: «no pasa nada, todo eso se irá nivelando y haciendo el juego más difícil; si la vas cagando, el valle puede morir. Esa es la clave». La letalidad vendrá por las decisiones y por el asedio (§1b), no por remedir el rayo. `fate-chaos` **ya no**: B3 la puso verde | Decisión tomada | B-1 arregló el ritmo y con ello se llevó el caos: `tests/journeys/fate-chaos.test.ts` mide el principio —«que haya partidas que se rompan es la idea»— y da **0 de 12 valles acabados donde pide 3 o más**; a sesenta años, 1 de 24. La causa está medida y es la misma que arregló el ritmo: con casas a tiempo hay camas, con camas llega gente, y el ánimo pasa de estar por debajo de 25 el 26 % de las semanas al 4 %. La prueba se queda **roja y sin tocar el listón**: bajar la cota sería borrar el principio. Lo que hay que decidir es **por dónde muerde el mundo** — el hambre (el grano toca cero y no mata a nadie, la línea de abajo), los desastres acumulados de M-1, o la gracia de la pareja, que hoy cubre `GRACE_PEOPLE` 6 y `GRACE_YEARS` 5 |
@@ -2591,7 +2613,7 @@ es**.
 | **`quiet_years` deja de salir nunca** | Decisión del dueño (balance) | Es la plantilla de reserva y deja de hacer falta por M-1: al abrir el ladrón y el diezmo a la riqueza, la aldea tiene más preguntas propias. Se queda donde está. **Y desde G2 su silencio se afirma en vez de excusarse** (`tests/journeys/catalogue-coverage.test.ts`): es el canario del catálogo, porque si empieza a salir lo que dice es que el resto se ha quedado sin condiciones que cumplir |
 | **`plague_blame` vive fuera del horizonte de un jugador** | Decisión del dueño (contenido) | Medido en G2: **no sale en sesenta años en ninguna de 24 semillas**, y hacen falta cien para verla. Sesenta años son 672 h de reloj a ×1 y el último peldaño del juego cae a las 350 h, así que hay una plantilla del catálogo que nadie va a ver jugando. No se ha tocado |
 | ~~**`state.intent` en el motor**~~ · **retirado el 18 sep 2026** (K-7): K-2 le quitó el último lector al pasar la cola de obras y el reparto de manos a la voluntad del rey. `PRIORITY_FAMILIES` se queda, que ahora es del rey | Hecho | Sacarlo es una migración entera por limpieza y la limpieza va después (decisión 5). La interfaz ya no lo escribe: `setIntent` y la hoja de órdenes están borradas | La única excepción a §13.1 de la fase, escrita en el changelog: un guardado de la v2.0 con palanca puesta cambia de postura al cargarlo |
-| ~~**LA PLAZA**~~ · **P-1 y P-2 hechos el 18 sep 2026** (§7.4b): se elige al fundar, se guarda (esquema 8), nadie construye dentro, el pueblo se ordena a su alrededor y se ve empedrada con una fuente. **Queda P-3**, la malla de la fuente: encargo en `docs/encargos/encargo-fuente.md` | Blender | Hoy la plaza es **un punto calculado y nada más**: `valleyCore` (`derive/anchors.ts`) es la media de los centros de los edificios en pie, se recalcula cada vez que se pregunta —así que **se mueve sola** mientras la aldea crece—, no se dibuja nada en ella y puede caer dentro de una casa o entre sembrados. El dueño la quiere «un espacio con un círculo grande, con separación, y en el centro quizás una fuente». Eso son tres trabajos y uno es del motor: ver §4.0b | La de apaño son tres primitivas y se ve; la buena son 500 triángulos y cinco piezas |
+| ~~**LA PLAZA**~~ · **P-1 y P-2 hechos el 18 sep 2026** (§7.4b): se elige al fundar, se guarda (esquema 8), nadie construye dentro, el pueblo se ordena a su alrededor y se ve empedrada con una fuente. **Queda P-3**, la malla de la fuente: encargo en `docs/historico/encargos/encargo-fuente.md` | Blender | Hoy la plaza es **un punto calculado y nada más**: `valleyCore` (`derive/anchors.ts`) es la media de los centros de los edificios en pie, se recalcula cada vez que se pregunta —así que **se mueve sola** mientras la aldea crece—, no se dibuja nada en ella y puede caer dentro de una casa o entre sembrados. El dueño la quiere «un espacio con un círculo grande, con separación, y en el centro quizás una fuente». Eso son tres trabajos y uno es del motor: ver §4.0b | La de apaño son tres primitivas y se ve; la buena son 500 triángulos y cinco piezas |
 | ~~**LA MURALLA POR SECCIONES**~~ · **hecha el 18 sep 2026** (§7.4c, esquema 9): anillo escrito en el estado, la muralla crece pegada a sí misma, su línea es suya y el anillo siguiente va tres celdas afuera. Al año 40, un solo tramo en cuatro semillas | Hecho | «¿Podemos también evitar esos cachos sueltos? … la muralla también tendrá que quedarse por secciones: si la aldea crece a un cierto punto, se construye la muralla alrededor y después la siguiente sección de construcción va fuera de la muralla.» Hoy la empalizada se levanta **pieza a pieza sobre la envolvente del núcleo** (§7.4, `onEnvelope`), y la envolvente crece con la aldea, así que las piezas quedan repartidas por envolventes distintas: **de 7 a 19 tramos desconectados por valle al año 60**, medido. Lo que se pide es un **anillo**: cuando la aldea llega a un tamaño se fija un perímetro, se completa sección a sección, y lo que se construye después va fuera. Es un cambio del motor con estado nuevo (el anillo en curso) y toca §7.4, §12 y el trazado de todos los valles |
 | ~~**El rey**~~ · **K-1 a K-8 hechos el 18 sep 2026** (§6.7, esquema 10): se corona desde el carro, ocho pasos del tick leen su voluntad, la corona pasa por la sucesión y tiene su sala. **Queda K-6 a medias y K-7 sin empezar** | Medida en `docs/medidas/rey-medida.md` | «Más adelante». Sus piezas están puestas: tesorería en plata, rasgos que un medio añade, `who` en los sucesos. Nada de M-0 a M-4 lo impide | Lo que no llegó: **el rey del campo no tiene firma** —tres permisos probados y medidos, ninguno se ve— y eso es decisión del dueño (lo que queda sin usar es la cosecha por campo). Y la malla de la sala, encargada en `docs/historico/plan-rey.md` §8. K-7 es retirar `state.intent`, que ya no lo lee nadie. **K-8 lo pidió el dueño al probarlo** —«cuando selecciones un rey, tiene que destacar después en la lista. No se ve rey en chiquitito, parece uno más»— y está hecho: medallón de lacre, chapa con la corona, primer sitio de la lista y a qué atiende el valle con él, en la lista y en la ficha (`artifacts/graphics/K-8/gente-rey.png`) |
 | **Una prueba rápida roja y once jornadas** | Sesión de vida | **B-1 rehízo la cuenta.** Rápida: queda **una**, la del devoto (`life-needs`), y dice algo distinto que antes — no es que nadie rece (0 % contra 0 %, porque no había capillas), es que el devoto reza el 8,6 % del tiempo contra el 6,0 % del resto y la propiedad pide el doble. Las tres de `life-staging` están declaradas con su medida. Jornadas: **9 de 161** (y las nueve son la familia de R-1: `life-beasts` ×3, `life-decide` ×2, `life-places`, `life-props` ×2 y `notices`) — A2c curó `works`, **B3 curó `fate-chaos`** (roja desde B-1) y la tanda de la fase 4 curó `founding`, y B-1 **curó** `founding` («a los diez años es una aldea») y dos de `life-props`; siguen `notices` (16,2 avisos al año contra 6, era 14,1; remedido el 18 sep tras A2c, y lo que habla son los doce sucesos de R-1 —`fate.*` en los doce primeros puestos—, no la muralla), `life-decide` ×2, `life-places` ×1, `life-beasts` ×3 y `life-props` ×2. La familia es la de R-1 §2.8 |

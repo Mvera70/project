@@ -3,9 +3,9 @@
 **Despachado con autorización de Vera el 22 sep 2026; entregado como candidato
 aislado.** Astra preparó la receta y vistas técnicas por CPU. La junta lateral
 con G-27 se rechazó al medir los pretiles y el ancho de paso; véase el
-[resultado y sus cotas](../../art/recipes/e3b-walkway-candidate/README.md).
+[resultado y sus cotas](../../../art/recipes/e3b-walkway-candidate/README.md).
 Vera aclaró después que esa salida debía abrirse. Una
-[variante candidata](../../art/recipes/e3b-bastion-joint-candidate/README.md)
+[variante candidata](../../../art/recipes/e3b-bastion-joint-candidate/README.md)
 con abertura y descansillo pasa la comprobación geométrica por CPU, sin
 modificar el bastión publicado. No se abrió Blender ni el juego, y no se
 publicó un recurso.
@@ -21,7 +21,7 @@ de juego.
 ## Depende de
 
 - [Brief E3b](encargo-e3b-adarve-continuo.md) y
-  [auditoría E3b.0](../historico/graphics-rounds/E3b0-viabilidad-adarve.md).
+  [auditoría E3b.0](../graphics-rounds/E3b0-viabilidad-adarve.md).
 - `art/recipes/{wall,gate,bastion-access-candidate}/` y `docs/design.md`
   D.3–D.4. La malla aprobada de muro se conserva.
 

@@ -1,4 +1,4 @@
-// F3a · El libro de cuentas de una partida. docs/plan-final.md §2.
+// F3a · El libro de cuentas de una partida. docs/historico/plan-final.md §2.
 //
 // **Lo pidió el dueño del diseño** el 18 sep 2026: «estaría muy, muy, muy
 // interesante poder ver una serie de estadísticas, rollo casas construidas,

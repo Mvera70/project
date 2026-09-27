@@ -573,7 +573,7 @@ export function archiveGame(state: GameState): ArchivedGame {
     ruins: ruinMask(state),
     // F3a · **las cuentas, aquí y no al enseñarlas.** Es el último momento en
     // que se puede saber qué quedó en pie, y además lo que sobrevive a la poda
-    // de la crónica de las partidas viejas (`plan-final.md` §5, decisión 3).
+    // de la crónica de las partidas viejas (`docs/historico/plan-final.md` §5, decisión 3).
     ledger: ledgerOf(state),
   };
 }

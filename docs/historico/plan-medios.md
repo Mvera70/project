@@ -421,7 +421,7 @@ fase que se pone delante, porque los medios se pagan con ella.
   así desde el principio, y medido, la cifra engaña—.
 
 **Medida:** en sesenta años con reposo, la piedra llega en los mismos años que
-hoy (42 a 45, `handover.md` §2.1) y la plata **entra y sale** al menos una vez
+hoy (42 a 45, `historico/handover.md` §2.1) y la plata **entra y sale** al menos una vez
 por década; ninguna aldea muere por añadir la mesa (las mismas 2 de 16).
 
 **Y las respuestas a lo que preguntó:** la piedra no se pide: la aldea la cantea

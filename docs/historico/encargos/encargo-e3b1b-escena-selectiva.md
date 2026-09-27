@@ -1,7 +1,7 @@
 # E3b.1b · Primera junta visible, sólo escena
 
 **Estado:** implementado y verificado el 22 sep 2026. Continúa [E3b.1a](encargo-e3b1a-selector-y-ruta.md)
-y usa los [GLB G-32](../historico/graphics-rounds/G-32-e3b-candidatos.md).
+y usa los [GLB G-32](../graphics-rounds/G-32-e3b-candidatos.md).
 No activa todavía la ruta en un cuerpo ni cambia física. E3b sigue abierta.
 
 ## Objetivo

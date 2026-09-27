@@ -292,7 +292,7 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
     // existencia: la obra la cantea con sus propios puntos y la gasta al abrir.
     // Lo que **no** puede cambiar es lo que cuesta una casa de piedra de punta
     // a punta, porque de eso depende cuándo llega la primera (años 42 a 45,
-    // `handover.md` §2.1) y por tanto el balance entero.
+    // `docs/historico/handover.md` §2.1) y por tanto el balance entero.
     const spec = BUILDINGS.stone_house;
     const antes = spec.bp + spec.stone / WORLD.STONE_PER_BP;
     expect(bpCostOf('stone_house')).toBe(spec.bp);

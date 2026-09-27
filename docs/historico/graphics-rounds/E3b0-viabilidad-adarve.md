@@ -72,4 +72,4 @@ malla. Un futuro trabajo de asset seguirá el catálogo nativo del proyecto y
 comprobará el candidato antes de cualquier publicación. No se ejecutó
 `doctor` ni una operación de producción.
 
-[Brief E3b](../../encargos/encargo-e3b-adarve-continuo.md). Sin commit ni push.
+[Brief E3b](../encargos/encargo-e3b-adarve-continuo.md). Sin commit ni push.

@@ -1,5 +1,7 @@
 # Hoja de ruta: qué le falta a esto para ser un juego
 
+> **Histórico desde el 27 sep 2026.** Del 15 sep 2026. Lo que faltaba lo recoge hoy `docs/plan-meta.md` (A–H); se conserva por las decisiones del dueño de ese día.
+
 **14 sep 2026 · estado actualizado el 15 sep, tras la auditoría.**
 `docs/historico/next-plan.md` dice qué se hace **ahora** y con qué agente. Esto dice qué falta **en total**, en qué orden, y —lo más importante—
 **qué no puede hacer ningún agente**, porque depende de una decisión o de una
@@ -111,7 +113,7 @@ de causas concretas. Está a un brief de distancia y es barato (`Tier: medir`).
 - ¿Se relajan las condiciones de elegibilidad, o se añaden plantillas de menor
   peso que salgan a menudo?
 - La suite de balance lleva diez pruebas rojas desde antes de todo esto
-  (`handover.md` §5.7): jugar bien y jugar mal se parecen demasiado — 11,7
+  (`historico/handover.md` §5.7): jugar bien y jugar mal se parecen demasiado — 11,7
   puntos de distancia contra los 20 que pide el diseño. ¿Se arregla o se cambia
   lo que el diseño pide?
 
@@ -186,7 +188,7 @@ Lo encontró la auditoría y no estaba en ninguna hoja de ruta:
   defecto. Se decidió dejar la cámara como está para poder juzgar con números.
   **Si con la interfaz nueva el juego se sigue viendo pobre, esto es lo
   siguiente, y es D.6.2, no interfaz.**
-- **El aldeano no tiene frente** (`handover.md` §5.5): por delante y por detrás
+- **El aldeano no tiene frente** (`historico/handover.md` §5.5): por delante y por detrás
   es casi la misma silueta. A veinte píxeles el color separa mejor que la forma;
   la vía propuesta y no decidida es un peto terracota y una cuña en la cabeza.
 - **Los trastos de V-09 no se pintan** porque no hay modelo. Y no hay Blender en

@@ -2,7 +2,7 @@
 
 **Estado:** encargo preparado; requiere autorización nueva antes de asignar
 modelado 3D o generar/exportar recursos. E3b.1 sólo valida la primera junta
-recta. El [inventario E3b.2a](../historico/graphics-rounds/E3b2a-inventario-topologia.md)
+recta. El [inventario E3b.2a](../graphics-rounds/E3b2a-inventario-topologia.md)
 muestra los casos reales que falta cubrir.
 
 ## Objetivo

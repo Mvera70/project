@@ -1,5 +1,7 @@
 # The Valley — Traspaso
 
+> **Histórico desde el 27 sep 2026.** Foto del 15 sep 2026. El estado vivo está en `docs/task-log.md` y `docs/plan-meta.md`. **Los hitos humanos 0 y 6 que aquí figuran como deuda se descartaron ese mismo día** (`historico/roadmap.md`, decisión 2 del dueño).
+
 **15 de septiembre de 2026 · Al cerrar la auditoría del proyecto**
 
 **La fuente de verdad es `docs/design.md`**, y su historial `docs/changelog.md`.
@@ -90,7 +92,7 @@ antigua y la única que ningún agente puede saldar.
 
 ### Decisiones que enmarcan lo que viene
 
-Tomadas por el dueño del diseño el 14 sep 2026 (`docs/roadmap.md`):
+Tomadas por el dueño del diseño el 14 sep 2026 (`docs/historico/roadmap.md`):
 
 - **El 3D es el juego**, con el riesgo escrito y aceptado: todo lo medido de
   rendimiento es de un portátil. **Probarlo en un móvil pasó a ser urgente.**

@@ -70,6 +70,6 @@ en `artifacts/graphics/E3b2-candidates/round-3/`. Queda **condicional**:
 estas sondas no prueban capacidad portante, giros, árboles, GLB ni marcha.
 
 No publicar ni montar ninguna de las variantes. La
-[integración E3b.2c](../../encargos/encargo-e3b2c-integracion-selectiva.md)
+[integración E3b.2c](../encargos/encargo-e3b2c-integracion-selectiva.md)
 queda preparada como contrato, pero depende de geometría aprobada. La primera
 junta recta E3b.1 se conserva; E3b continúa abierta.

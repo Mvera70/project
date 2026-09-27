@@ -10,7 +10,7 @@ del repositorio con Blender 5.2.1 LTS, sin proveedor ni generación de pago.
 del runner sólo admite `G-XX`. Vera aprobó la apariencia el 22 sep 2026; la
 entrada de catálogo conserva `status: study` como los demás activos publicados,
 pero ya tiene recibo `approved` y hash. La integración en escena se contrasta
-por separado en `docs/encargos/encargo-e3-integracion-bastion.md`.
+por separado en `docs/historico/encargos/encargo-e3-integracion-bastion.md`.
 
 ## Forma y coordenadas
 

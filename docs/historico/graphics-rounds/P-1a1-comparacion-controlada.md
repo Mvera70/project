@@ -36,4 +36,4 @@ código 0 y conservó nueve muestras sin sobrescribir las anteriores. La puerta
 de esta comparación queda cerrada. P-1a requiere medir respuesta real en Edge
 interactivo, distinguir entrada de interacción posterior y atribuir la carga
 antes de elegir un candidato de P-1b. El brief sigue en
-[plan-rendimiento.md](../../plan-rendimiento.md).
+[historico/plan-rendimiento.md](../plan-rendimiento.md).

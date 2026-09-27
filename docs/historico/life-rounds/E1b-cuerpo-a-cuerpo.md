@@ -1,7 +1,7 @@
 # E1b · Contacto y reacción — 20 sep 2026
 
 Siguiente prioridad pedida por el dueño tras aceptar los siete modelos.
-[Contrato](../../encargos/encargo-cuerpo-a-cuerpo.md). Motor y modelos intactos.
+[Contrato](../encargos/encargo-cuerpo-a-cuerpo.md). Motor y modelos intactos.
 
 ## Entregado
 
