@@ -14,7 +14,7 @@
 import type { AnimationClip, Object3D } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
-import { Mesh, SkinnedMesh, type Material, type Texture } from 'three';
+import { BufferAttribute, Color, Mesh, SkinnedMesh, type Material, type MeshStandardMaterial, type Texture } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 interface AssetMotion {
@@ -143,6 +143,75 @@ function urlOf(base: string, asset: AssetEntry): string {
 }
 
 /**
+ * **Funde las piezas con esqueleto de un mismo cuerpo** (rendimiento, 27 sep
+ * 2026). Aldeanos, gallinas, vacas, cerdos y ciervos llegan del generador con
+ * cuatro o cinco mallas con esqueleto —ropa, adorno, oscuro, piel— que
+ * comparten esqueleto y son de color liso. Cada malla era una llamada de
+ * dibujo: con cincuenta aldeanos y cuarenta animales, 364 llamadas en la villa
+ * grande. Se funden en una malla por cuerpo con **el color de cada pieza en
+ * sus vértices** y un solo material: se ve igual y es una llamada.
+ *
+ * Sólo si todas las piezas comparten esqueleto, padre, posición y matriz de
+ * enlace, no tienen textura y traen los mismos atributos. El material que
+ * queda es el de la primera pieza, en blanco y con `vertexColors`: si las
+ * piezas difieren en rugosidad o metal, gana la primera (en estos modelos son
+ * iguales).
+ */
+export function fuseSkinnedParts(root: Object3D): void {
+  const bodies = new Map<unknown, SkinnedMesh[]>();
+  root.traverse((node) => {
+    if (!(node instanceof SkinnedMesh) || Array.isArray(node.material)) return;
+    const material = node.material as MeshStandardMaterial;
+    if (material.map !== null && material.map !== undefined) return;
+    const list = bodies.get(node.skeleton) ?? [];
+    list.push(node);
+    bodies.set(node.skeleton, list);
+  });
+  for (const parts of bodies.values()) {
+    if (parts.length < 2) continue;
+    const first = parts[0]!;
+    first.updateMatrix();
+    const names = Object.keys(first.geometry.attributes).filter((name) => name !== 'color').sort().join(',');
+    const same = parts.every((part) => {
+      part.updateMatrix();
+      return part.parent === first.parent && part.matrix.equals(first.matrix)
+        && part.bindMatrix.equals(first.bindMatrix)
+        && Object.keys(part.geometry.attributes).filter((name) => name !== 'color').sort().join(',') === names
+        && (part.geometry.index === null) === (first.geometry.index === null);
+    });
+    if (!same) continue;
+    const pieces = parts.map((part) => {
+      const geometry = part.geometry.clone();
+      const colour = (part.material as MeshStandardMaterial).color ?? new Color(1, 1, 1);
+      const count = geometry.getAttribute('position').count;
+      const values = new Float32Array(count * 3);
+      for (let i = 0; i < count; i += 1) { values[i * 3] = colour.r; values[i * 3 + 1] = colour.g; values[i * 3 + 2] = colour.b; }
+      geometry.setAttribute('color', new BufferAttribute(values, 3));
+      return geometry;
+    });
+    const merged = mergeGeometries(pieces, false);
+    for (const piece of pieces) piece.dispose();
+    if (merged === null) continue;
+    const material = (first.material as MeshStandardMaterial).clone();
+    material.vertexColors = true;
+    material.color.set(1, 1, 1);
+    material.name = `${(first.material as Material).name}_fused`;
+    const fused = new SkinnedMesh(merged, material);
+    fused.name = `${first.name}_fused`;
+    fused.position.copy(first.position);
+    fused.quaternion.copy(first.quaternion);
+    fused.scale.copy(first.scale);
+    fused.castShadow = parts.some((part) => part.castShadow);
+    fused.receiveShadow = parts.some((part) => part.receiveShadow);
+    fused.frustumCulled = first.frustumCulled;
+    fused.bind(first.skeleton, first.bindMatrix);
+    const parent = first.parent!;
+    for (const part of parts) parent.remove(part);
+    parent.add(fused);
+  }
+}
+
+/**
  * Los modelos hechos pieza a pieza (Vera, `deliverables/marked-models-trial/`,
  * adoptados con `tools/art/adopt-models.mjs`): nodos rígidos con de 6 a 68
  * mallas sueltas, y cada malla es una llamada de dibujo. Los del generador de
@@ -232,6 +301,7 @@ export async function loadAssets(options: AssetOptions): Promise<AssetLibrary> {
         });
       });
     if (PIECED.has(asset.id)) fuseRigidPieces(gltf.scene, gltf.animations);
+    fuseSkinnedParts(gltf.scene);
     loaded.set(asset.id, {
       id: asset.id,
       original: gltf.scene,

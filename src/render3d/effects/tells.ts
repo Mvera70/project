@@ -13,8 +13,8 @@
 // rondas de balance.
 
 import {
-  Box3, BoxGeometry, Color, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial,
-  SphereGeometry, type Object3D,
+  Box3, BoxGeometry, Color, Group, InstancedBufferAttribute, InstancedMesh, Mesh, MeshBasicMaterial,
+  MeshStandardMaterial, Object3D, SphereGeometry, Vector3,
 } from 'three';
 import type { Building, GameState } from '@engine/state';
 import { BUILDING_ASSETS } from '../world/buildings';
@@ -146,7 +146,12 @@ const GLASS = 0.03;
 /** Elevación necesaria si la geometría real de una señal invade un edificio. */
 function roofLift(mark: Object3D, buildings: readonly Building[]): number {
   mark.updateMatrixWorld(true);
-  const bounds = new Box3().setFromObject(mark);
+  // Una bocanada de humo no tiene malla (la dibuja `Smoke`): su caja es la
+  // de su esfera.
+  const radius = mark.userData.radius as number | undefined;
+  const bounds = radius === undefined
+    ? new Box3().setFromObject(mark)
+    : new Box3().setFromCenterAndSize(mark.position, new Vector3(radius * 2, radius * 2, radius * 2));
   const buried = buildings.some((building) => bounds.min.x < building.x + building.w && bounds.max.x > building.x
     && bounds.min.z < building.y + building.h && bounds.max.z > building.y
     && bounds.min.y < ROOF_CLEAR);
@@ -211,14 +216,13 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined,
       const presence = era === 'hamlet' ? 1 : era === 'village' ? 1.24 : 1.43;
       const base = HEIGHT.smoke + (era === 'hamlet' ? 0 : era === 'village' ? 0.1 : 0.18);
       return Array.from({ length: count }, (_, step) => {
-        const piece = mark(
-          // Material sin luz a proposito. Con luz, un gris oscuro bajo el sol de
-          // este valle sale blanco: las bocanadas se veian como huevos puestos
-          // en el tejado. El humo no se ilumina, se ve.
-          new SphereGeometry((0.09 + step * 0.03) * presence, 6, 5), TONE.smoke, true,
-          tell.x, base, tell.y,
-          Math.min(0.8, (0.18 + tell.intensity * 0.45) * presence),
-        );
+        // Cada bocanada es un marcador sin malla: las dibuja todas de una vez
+        // `Smoke`, abajo (rendimiento, 27 sep 2026: eran 49 llamadas en la
+        // villa grande). El marcador lleva dónde está y cuánto mide.
+        const marker = new Object3D();
+        marker.position.set(tell.x, base, tell.y);
+        marker.userData.radius = (0.09 + step * 0.03) * presence;
+        const piece = { object: marker, dispose(): void {} };
         // Cada bola sube por su cuenta, desfasada un tercio de vuelta: eso es
         // lo que hace columna en vez de tres bolas que suben a la vez. El
         // desfase de la chimenea viene de dónde está, así que dos casas no
@@ -340,6 +344,57 @@ const PLUME_SECONDS = 6;
 /** Lo que sube una bocanada antes de deshacerse, en celdas. */
 const PLUME_RISE = 1.05;
 
+/**
+ * Todo el humo del valle en **una** malla instanciada. Material sin luz a
+ * propósito: con luz, un gris oscuro bajo el sol de este valle sale blanco y
+ * las bocanadas se veían como huevos puestos en el tejado. El humo no se
+ * ilumina, se ve. La opacidad de cada bocanada va en un atributo por
+ * instancia, que el sombreador multiplica por la del material.
+ */
+class Smoke {
+  readonly mesh: InstancedMesh;
+  private readonly opacity: InstancedBufferAttribute;
+  private readonly matrix = new Object3D();
+
+  constructor(capacity: number) {
+    const material = new MeshBasicMaterial({ color: new Color(TONE.smoke), transparent: true, depthWrite: false });
+    material.onBeforeCompile = (shader) => {
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\nattribute float instanceOpacity;\nvarying float vPuff;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvPuff = instanceOpacity;');
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>', '#include <common>\nvarying float vPuff;')
+        .replace('vec4 diffuseColor = vec4( diffuse, opacity );', 'vec4 diffuseColor = vec4( diffuse, opacity * vPuff );');
+    };
+    material.customProgramCacheKey = () => 'valley-smoke';
+    this.mesh = new InstancedMesh(new SphereGeometry(1, 6, 5), material, capacity);
+    this.mesh.name = 'Smoke';
+    // Las bocanadas suben y cambian de casa: la esfera de recorte de la malla
+    // no las sigue, así que no se recorta (es una sola llamada).
+    this.mesh.frustumCulled = false;
+    this.opacity = new InstancedBufferAttribute(new Float32Array(capacity), 1);
+    this.mesh.geometry.setAttribute('instanceOpacity', this.opacity);
+  }
+
+  draw(plumes: readonly Plume[], opacityOf: (plume: Plume) => number): void {
+    plumes.forEach((plume, index) => {
+      this.matrix.position.copy(plume.mesh.position);
+      this.matrix.scale.setScalar(plume.mesh.scale.x * ((plume.mesh.userData.radius as number | undefined) ?? 0.1));
+      this.matrix.updateMatrix();
+      this.mesh.setMatrixAt(index, this.matrix.matrix);
+      this.opacity.setX(index, opacityOf(plume));
+    });
+    this.mesh.count = plumes.length;
+    this.mesh.instanceMatrix.needsUpdate = true;
+    this.opacity.needsUpdate = true;
+  }
+
+  dispose(): void {
+    this.mesh.geometry.dispose();
+    (this.mesh.material as MeshBasicMaterial).dispose();
+  }
+}
+
 interface Plume {
   readonly mesh: Object3D;
   readonly base: number;
@@ -358,6 +413,7 @@ export class Tells {
   private owned: Array<{ dispose(): void }> = [];
   private plumes: Plume[] = [];
   private lamps: Lamp[] = [];
+  private smoke: Smoke | null = null;
   private signature = '';
 
   constructor() {
@@ -411,6 +467,11 @@ export class Tells {
         if (lamp !== undefined) this.lamps.push({ mesh: piece.object, peak: lamp });
       }
     }
+    if (this.plumes.length > 0) {
+      this.smoke = new Smoke(this.plumes.length);
+      this.group.add(this.smoke.mesh);
+      this.drift(0);
+    }
   }
 
   /**
@@ -452,12 +513,11 @@ export class Tells {
       // medio, de cerca eran discos grises del tamano de un tejado. El humo
       // tiene que verse de lejos y no taparle la casa a nadie de cerca.
       plume.mesh.scale.setScalar(1 + turn * 0.7);
-      const mesh = plume.mesh as Object3D & { material?: { opacity: number; transparent: boolean } };
-      if (mesh.material !== undefined) {
-        mesh.material.transparent = true;
-        mesh.material.opacity = plume.peak * 0.62 * Math.max(0, 1 - turn) * (0.35 + 0.65 * Math.min(1, turn * 4));
-      }
     }
+    this.smoke?.draw(this.plumes, (plume) => {
+      const turn = (presentationSeconds / PLUME_SECONDS + plume.phase) % 1;
+      return plume.peak * 0.62 * Math.max(0, 1 - turn) * (0.35 + 0.65 * Math.min(1, turn * 4));
+    });
   }
 
   get count(): number {
@@ -470,6 +530,8 @@ export class Tells {
     this.owned = [];
     this.plumes = [];
     this.lamps = [];
+    this.smoke?.dispose();
+    this.smoke = null;
     this.signature = '';
   }
 

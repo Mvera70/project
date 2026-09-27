@@ -23,6 +23,9 @@ no representan una tablet.** Lo que sí es comparable entre versiones:
 | Programas enlazados | la misma | Sombreadores distintos: cada uno se compila, y en móvil compilar tarda |
 | JS por fotograma (mediana · p90) | la misma | CPU del juego: vida, animación, escena y el envío de las llamadas |
 | Reparto de mallas por grupo | `node tools/graphics/scene-report.mjs "<query>"` (usa `window.__valleySceneReport()`) | De dónde salen las llamadas: mallas visibles, con sombra e instanciadas, por grupo y los edificios por tipo |
+| Recompilaciones | `node tools/graphics/shader-churn.mjs <valley.html> "<query>"` | Programas enlazados tras cargar, tras un rayo y con la fiesta. **Cada uno de más es un tirón en una tablet** |
+| CPU por función | `node tools/graphics/cpu-profile.mjs <valley.html> "<query>" <espera> <perfil> <función>` sobre `bundle-game.ts --no-minify` | Tiempo inclusivo y quién llama a una función |
+| Fotogramas con dibujo por software | contar fotogramas en 40 s, mismo navegador, dos versiones | **Sí sirve para comparar el coste por píxel**: SwiftShader, como una tablet, va limitado por píxeles (así se vio lo que cuesta cada luz) |
 
 Escenas de referencia (siempre las dos, nunca una):
 
@@ -35,10 +38,11 @@ esa versión en otra copia (`git worktree add … <commit>` + un enlace a
 `node_modules`) y se empaqueta igual. La sonda intercepta WebGL desde fuera, así que
 mide cualquier versión.
 
-**El perfil de CPU con CDP no sirve en SwiftShader**: el 94 % sale como `(program)`
-(código nativo del dibujo por software) y los nombres vienen minificados. Para la CPU
-de la capa de vida, mejor medir sin navegador (`tools/reports/battle-report.ts` hace
-6.000 pasos de vida con Rapier en ~4 s: ~0,7 ms por paso).
+**El perfil de CPU con CDP**: el ~90 % sale como `(program)` (el dibujo por software).
+Lo útil es el reparto del resto, y sólo sobre el juego sin minificar
+(`bundle-game.ts --no-minify` + `cpu-profile.mjs`). Así salió que crear animales
+costaba un 2 % por una esfera de recorte mal calculada. Para la capa de vida, también
+sin navegador (`tools/reports/battle-report.ts`: ~0,7 ms por paso con Rapier).
 
 Y la medida que falta y manda: **un aparato real**. Sin un móvil o tablet delante,
 todo lo de arriba es comparativo. El banco del proyecto para eso es
@@ -50,7 +54,13 @@ todo lo de arriba es comparativo. El banco del proyecto para eso es
 |---|---|---|
 | Antes de las rondas del 26–27 sep (56d5f28) | 1.695 · 767 mil · 30 · — | 587 · 604 mil · 28 · — |
 | Con montañas, agua, cascadas, pájaros y Astra | 1.724 · 795 mil · 36 · 16,4/21,7 ms | 607 · 632 mil · 33 · 7,0/9,6 ms |
-| Tras esta ronda (lote de muralla, casas fundidas, animales sin sombra) | **796 · 718 mil · 35 · 14,8/19 ms** | **460 · 605 mil · ~33 · 6,2/8,7 ms** |
+| Tras la primera tanda, v4.70 (lote de muralla, casas fundidas, animales sin sombra) | 796 · 718 mil · 35 · 14,8/19 ms | 460 · 605 mil · ~33 · 6,2/8,7 ms |
+| Tras la segunda, v4.71 (cuerpos fundidos, humo en una malla, sombras cada 2, una luz fija) | **421 · 586 mil · 38 · ~10/15 ms** | **335 · 482 mil · 39 · 5,3/7 ms** |
+
+Pasos de la segunda tanda en la villa: cuerpos fundidos 796 → 598 (aldeanos 187 → 70
+mallas, animales 177 → 43); recorte de animales → 585; humo → 546; sombras cada dos
+fotogramas → 447 (en táctil, cada cuatro: menos aún). Recompilaciones (`shader-churn`,
+aldea): **antes, un rayo 27 programas y la fiesta 26 más; ahora 4 y 2**.
 
 Lo que hay que retener: **las rondas de arte del 26–27 sep sumaron un 1–4 %; el peso
 venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tablet
@@ -88,22 +98,59 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
 8. **`renderer.compileAsync` al montar el valle NO sirve tal cual**: los programas
    enlazados pasaron de 35 a 68 —compiló variantes con otro estado de luces/sombras que
    luego no se usaron— y se retiró. Precompilar bien pide hacerlo con la escena ya
-   iluminada como se va a dibujar (p. ej. tras el primer fotograma). Pendiente.
+   iluminada como se va a dibujar. La causa eran las luces que cambian (lección 12);
+   resuelto en la 13.
 9. **El roble es de Vera** (lo está rehaciendo): no tocar `world/great-oak.ts` sin
    preguntar. Fundido, bajaba de 27 a 3 mallas.
+10. **Los cuerpos con esqueleto se funden al cargar** (`fuseSkinnedParts`,
+    `assets.ts`): las piezas que comparten esqueleto, padre y matriz de enlace y no
+    tienen textura pasan a una malla con **el color de cada pieza en los vértices** y
+    un material blanco con `vertexColors`. El tinte de cada aldeano (`dress`,
+    `cast.ts`) se aplica entonces a los colores de los vértices, en una geometría
+    suya (`userData.ownedGeometry`, se suelta en `retire`); la copia del material se
+    sigue haciendo porque es la que se enciende al seguir a alguien. Un modelo nuevo
+    con textura o con varios esqueletos no se funde, y no pasa nada.
+11. **La esfera de recorte de un `SkinnedMesh`**: `computeBoundingSphere()` recorre
+    cada vértice por los huesos (caro, y con los huesos sin poner da basura). Para
+    recortar vale la de la geometría en reposo, agrandada (`animal-motion.ts`: ×3).
+12. **Cambiar el número de luces recompila todos los materiales.** El número de luces
+    puntuales va escrito en cada programa. La hoguera, los farolillos, el rayo y los
+    fuegos entraban y salían, y cada vez se recompilaba todo: en una tablet, segundos
+    congelada. Ahora hay **un banco fijo** (`effects/light-pool.ts`, `POINT_LIGHTS` en
+    `renderer.ts`): los efectos crean sus `PointLight` como siempre, el banco las saca
+    de la capa de la cámara y copia la más fuerte a la luz fija. **Regla: nunca
+    añadas una luz a la escena ni la escondas con `visible`**; crea la tuya dentro de
+    uno de los grupos que recorre `poolLights` y ponle intensidad 0 cuando no alumbre.
+    Y **una luz apagada cuesta igual**: cuatro fijas quitaban un tercio de los
+    fotogramas (152 contra 229 en 40 s); por eso hay una.
+13. **Precompilar** (`warmUp` en `renderer.ts`): `renderer.compile` encarga los
+    programas antes del primer dibujo y se espera a `isReady()` con tope
+    (`WARM_UP_MS`). **No uses `compileAsync`**: su espera revienta (`currentProgram`
+    indefinido) si un material se suelta mientras compila, y aquí la vida cambia la
+    escena en cada fotograma; la promesa no se resolvía nunca. En SwiftShader no se
+    nota (compila en serie); en un aparato con compilación en paralelo, sí.
+14. **Las sombras no se rehacen en cada fotograma** (`scheduleShadows`,
+    `SHADOW_EVERY`: 2 en ordenador, 4 en táctil). Casi nada de lo que da sombra se
+    mueve (aldeanos y animales no la dan). Un mapa viejo sigue cuadrando consigo mismo
+    —guarda su matriz—, así que sólo hay que rehacerlo al instante cuando deja de
+    cubrir la vista: al mover o acercar la cámara. **Ojo**: el centro de la cámara de
+    sombra baila una fracción de texel en cada fotograma al girar el sol; comparar
+    con igualdad lo rehacía siempre (se compara con un 2 % del alcance).
+15. **El humo va instanciado** (`Smoke` en `tells.ts`), con la opacidad de cada
+    bocanada en un atributo por instancia (`onBeforeCompile`). Las bocanadas siguen
+    en el grupo como marcadores sin malla, porque la lógica y las pruebas las leen ahí.
 
 ## Lo que queda (por lo que pesa)
 
-- **Aldeanos (187 mallas) y animales (177)**: con esqueleto, varios materiales por
-  personaje y `frustumCulled = false` (se dibujan aunque estén fuera de pantalla). Ideas:
-  fundir cada personaje en una malla con el color en los vértices y un solo material;
-  recortar por pantalla con una esfera de límites generosa; animar menos a menudo a los
-  lejanos o fuera de pantalla.
-- **Humo y luces (`Valley_Tells`, 49 mallas)**: candidatos a instanciar.
-- **Precompilar los sombreadores** en el momento bueno (ver 8).
-- **Medir en un aparato real** y apuntar aquí las cifras.
-- El JS por fotograma de la villa (~15 ms en un sobremesa) es mucho para una tablet: hay
-  que saber cuánto es vida, cuánto animación y cuánto envío de llamadas.
+- **Medir en un aparato real** (la tablet de Vera) y apuntar aquí las cifras: FPS, y
+  si siguen los tirones al caer un rayo o empezar una fiesta.
+- **El coste por píxel**: todo es `MeshStandardMaterial` (PBR). Si la tablet sigue
+  limitada por píxeles, pasar lo lejano o lo pequeño a `MeshLambertMaterial`, o bajar
+  la densidad de partida en táctil (hoy 1,5; la adaptativa baja hasta la mitad).
+- **Casas (70 mallas en la villa) y campos (24)**: un lote como el de la muralla pide
+  separar lo que se mueve (puertas) y la nieve de los tejados.
+- **El JS de la villa (~10 ms)**: la vida (`finePathTo`, `stepHome`) es lo que más pesa
+  de lo que no es dibujo. Animar menos a menudo a los lejanos.
 
 ## Reglas para quien añada cosas
 
@@ -112,4 +159,8 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
 - Un modelo estático de muchas piezas se **funde** (`mergeStatic`), salvo lo que se mueve.
 - No actives `castShadow` en lo pequeño o lejano.
 - No pongas `frustumCulled = false` sin necesidad: obliga a dibujar fuera de pantalla.
+- **Ninguna luz nueva en la escena**, ni escondida con `visible`: pasa por el banco
+  (lección 12). Tras tocar luces o materiales, `shader-churn.mjs`.
+- Un personaje nuevo con esqueleto se funde solo si es de colores lisos; con textura,
+  cuenta una llamada por pieza.
 - Tras un cambio que pueda pesar, pasa `gl-probe` en las dos escenas y apunta la cifra.

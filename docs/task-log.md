@@ -1,5 +1,20 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · Rendimiento, segunda tanda (v4.71)
+
+Villa 7/60: 796 → 421 llamadas, JS ~10 ms (mediana); aldea 11/21: 460 → 335.
+Cambios: `fuseSkinnedParts` (`assets.ts`, al cargar) + tinte en vértices en
+`dress` (`cast.ts`); humo instanciado (`Smoke` en `tells.ts`, las bocanadas
+quedan como marcadores); recorte de animales (`animal-motion.ts`); sombras con
+`autoUpdate = false` y `scheduleShadows` (`SHADOW_EVERY`); `LightPool`
+(`effects/light-pool.ts`, `POINT_LIGHTS = 1`); precompilado con `compile` y
+espera propia (`WARM_UP_MS`) — **`compileAsync` revienta** si un material se
+suelta mientras compila. Medido con `shader-churn.mjs`: un rayo recompilaba 27
+programas y la fiesta 26; ahora 4 y 2. **Queda**: medir en un aparato real;
+casas (70 mallas) y campos; el JS de la villa (vida: `finePathTo`). Pruebas:
+`render-batching.test.ts`, `light-pool.test.ts`. **fires.ts no se tocó** (lo
+está cambiando la otra sesión): sus luces pasan por el banco desde fuera.
+
 ## 27 sep 2026 · Rendimiento, primera tanda (v4.70)
 
 Medido con `tools/graphics/gl-probe.mjs` y `scene-report.mjs` (villa 7/60 y aldea

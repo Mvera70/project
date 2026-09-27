@@ -37,7 +37,19 @@ export class AnimalMotion {
     object.traverse(node => {
       // Sin sombra (27 sep 2026): un animal a esta distancia apenas la deja ver,
       // y cada malla con sombra se dibuja dos veces. Eran 177 llamadas en la villa.
-      if (node instanceof Mesh) { node.castShadow = false; node.frustumCulled = false; }
+      if (node instanceof Mesh) node.castShadow = false;
+      // Y se recorta por pantalla (27 sep 2026): antes se dibujaban todos,
+      // estuvieran donde estuvieran. La esfera es la de la geometría en reposo
+      // —compartida y calculada una vez por modelo; la de `SkinnedMesh`
+      // recorre cada vértice por los huesos y costaba un 2 % de la CPU al
+      // crear animales—, agrandada al triple: un ala abierta o un salto no se
+      // salen de ella.
+      if (node instanceof SkinnedMesh) {
+        if (node.geometry.boundingSphere === null) node.geometry.computeBoundingSphere();
+        const sphere = node.geometry.boundingSphere!.clone();
+        sphere.radius *= 3;
+        node.boundingSphere = sphere;
+      }
     });
     this.mixer = new AnimationMixer(object);
     const idle = asset.clips.find(clip => clip.name === 'idle');

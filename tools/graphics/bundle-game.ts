@@ -18,6 +18,8 @@ import { WANTED } from '../../src/render3d/renderer';
 
 /** Con `--split`, la página y los recursos viajan en dos ficheros. */
 const SPLIT = process.argv.includes('--split');
+/** Con `--no-minify`, sin minificar: para leer nombres en un perfil (`cpu-profile.mjs`). */
+const MINIFY = !process.argv.includes('--no-minify');
 /** Cómo se llama el JSON de recursos, y por dónde lo pide la página. */
 const SIDECAR = 'valley-assets.json';
 
@@ -67,6 +69,7 @@ await build({
   build: {
     outDir: OUT,
     emptyOutDir: true,
+    minify: MINIFY,
     assetsInlineLimit: 100_000_000,
     cssCodeSplit: false,
     // Un solo trozo: la pagina no puede pedir nada por la red, asi que no puede

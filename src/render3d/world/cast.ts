@@ -11,7 +11,7 @@
 
 import {
   AnimationMixer, Color, DoubleSide, Group, LoopOnce, Mesh, MeshBasicMaterial, Quaternion, RingGeometry,
-  Vector3, type AnimationClip, type Material, type Object3D,
+  Vector3, type AnimationClip, type BufferGeometry, type Material, type Object3D,
 } from 'three';
 import type { VillagerId } from '@engine/state';
 import type { Actor, RagdollPose, RagdollSeed, RagdollSeedPart } from '../contracts';
@@ -680,6 +680,10 @@ export class Cast {
     // La ropa si era suya: se clono para el y se suelta con el. Lo que no se
     // toca es la geometria, que es de la biblioteca.
     for (const material of player.owned) material.dispose();
+    // Y los colores de sus vértices, si su cuerpo viene fundido (`dress`).
+    player.object.traverse((child) => {
+      if (child instanceof Mesh && child.geometry.userData.ownedGeometry === true) child.geometry.dispose();
+    });
     for (const tool of player.held.values()) if (tool.userData.ownedTool === true) tool.traverse(child => {
       if (child instanceof Mesh) {
         child.geometry.dispose();
@@ -736,21 +740,45 @@ export class Cast {
  */
 function dress(object: Object3D, id: number): Material[] {
   const owned: Material[] = [];
-  const tone = new Color();
-  object.traverse((child) => {
-    const mesh = child as Object3D & { isMesh?: boolean; material?: Material | Material[] };
-    if (mesh.isMesh !== true || mesh.material === undefined || Array.isArray(mesh.material)) return;
-    const source = mesh.material as Material & { color?: Color; clone(): Material };
-    if (source.color === undefined) return;
-    const copy = source.clone() as Material & { color: Color };
-    tone.copy(source.color);
+  const shift = (tone: Color): void => {
     const hsl = { h: 0, s: 0, l: 0 };
     tone.getHSL(hsl);
-    copy.color.setHSL(
+    tone.setHSL(
       (hsl.h + (stable(id, 3) - 0.5) * 2 * CLOTH_HUE + 1) % 1,
       hsl.s,
       Math.max(0.08, Math.min(0.92, hsl.l * (1 + (stable(id, 5) - 0.5) * 2 * CLOTH_LIGHT))),
     );
+  };
+  object.traverse((child) => {
+    const mesh = child as Object3D & { isMesh?: boolean; material?: Material | Material[]; geometry?: BufferGeometry };
+    if (mesh.isMesh !== true || mesh.material === undefined || Array.isArray(mesh.material)) return;
+    const source = mesh.material as Material & { color?: Color; vertexColors: boolean; clone(): Material };
+    if (source.color === undefined) return;
+    // La copia del material se hace siempre, aunque el color vaya en los
+    // vértices: es la que se enciende al seguir a alguien (`light`).
+    const copy = source.clone() as Material & { color: Color };
+    const colours = mesh.geometry?.getAttribute('color');
+    if (source.vertexColors && mesh.geometry !== undefined && colours !== undefined) {
+      // Cuerpo fundido (`fuseSkinnedParts`): cada pieza lleva su color en los
+      // vértices, así que el giro de tono se aplica ahí, en una geometría suya.
+      // Pocos colores distintos por cuerpo: se calcula uno por color.
+      const geometry = mesh.geometry.clone();
+      geometry.userData.ownedGeometry = true;
+      const values = geometry.getAttribute('color');
+      const done = new Map<string, Color>();
+      const tone = new Color();
+      for (let i = 0; i < values.count; i += 1) {
+        tone.setRGB(values.getX(i), values.getY(i), values.getZ(i));
+        const key = tone.getHexString();
+        let shifted = done.get(key);
+        if (shifted === undefined) { shifted = tone.clone(); shift(shifted); done.set(key, shifted); }
+        values.setXYZ(i, shifted.r, shifted.g, shifted.b);
+      }
+      mesh.geometry = geometry;
+    } else {
+      copy.color.copy(source.color);
+      shift(copy.color);
+    }
     mesh.material = copy;
     owned.push(copy);
   });

@@ -1,5 +1,24 @@
 # The Valley — Registro de cambios
 
+## v4.71 · 27 sep 2026 · Rendimiento, segunda tanda: los tirones
+
+Lo que más probablemente congelaba la tablet de Vera no eran las llamadas de
+dibujo sino **los sombreadores**: el número de luces puntuales va escrito en
+cada programa, y cambiaba sin parar —la hoguera al colocar la plaza, seis
+farolillos con cada fiesta, la luz de cada rayo, una por casa que arde—. Cada
+cambio recompilaba todos los materiales: un rayo, 27 programas; la fiesta, 26
+más. **Ahora hay una sola luz puntual, siempre en la escena** (`LightPool`), a
+la que se copia la más fuerte de las que piden los efectos; un rayo o una
+fiesta ya sólo compilan lo suyo. Y una sola porque cada luz se paga en cada
+píxel: con cuatro fijas, un tercio menos de fotogramas. **Los sombreadores se
+compilan antes del primer dibujo**, en paralelo donde el aparato sabe. Además:
+**aldeanos y animales funden sus piezas en una malla por cuerpo** con el color
+en los vértices (el tinte de cada aldeano se conserva), **el humo de todas las
+chimeneas es una malla**, **los animales se recortan por pantalla**, y **el
+mapa de sombras se rehace cada dos fotogramas** (cuatro en táctil) salvo al
+mover la cámara. La villa grande baja de 796 a 421 llamadas y la aldea de 460 a
+335; el JS por fotograma de la villa, de 14,8 a unos 10 ms.
+
 ## v4.70 · 27 sep 2026 · Rendimiento, primera tanda
 
 Vera, desde su tablet: «arranca a 1 FPS», «el rendimiento es nefasto». La villa

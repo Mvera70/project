@@ -93,6 +93,7 @@ import { daylightAt } from './effects/daylight';
 import { Bubbles, type Bubble } from './effects/bubbles';
 import { Fauna } from './effects/fauna';
 import { Tells } from './effects/tells';
+import { LightPool } from './effects/light-pool';
 import { TreeFalls, type TreeFallSighting } from './effects/tree-falls';
 import { FIELD_CROPS, isQuiet, planChange, planFor, sceneRampartPatrolView, sceneRingOf, sceneWalkwayOf, seasonColourStep, type ScenePlan } from './world/plan';
 import { BattleDebris } from './world/battle-debris';
@@ -101,6 +102,33 @@ import type { Physics } from './life/physics';
 
 /** Lo que cambia en un aparato táctil. TUNE: medido el 27 sep 2026 (ver `adaptResolution`). */
 const HANDHELD = { pixelRatio: 1.5, shadowMapSize: 1024 } as const;
+/**
+ * Cada cuántos fotogramas se rehace el mapa de sombras si la cámara no se ha
+ * movido (27 sep 2026). Rehacerlo es dibujar otra vez todo lo que da sombra:
+ * unas 250 llamadas de las ~550 de la villa grande. Lo que da sombra casi no
+ * se mueve —casas, árboles, muralla; aldeanos y animales no la dan— y el sol
+ * gira unas centésimas de grado por fotograma, así que rehacerlo en cada uno
+ * era tirar la mitad del trabajo. Al mover o acercar la cámara se rehace en el
+ * mismo fotograma. TUNE: dos en ordenador, cuatro en un aparato táctil.
+ */
+const SHADOW_EVERY = { desk: 2, handheld: 4 } as const;
+/**
+ * Cuántas luces puntuales hay siempre en la escena (`effects/light-pool.ts`).
+ * Fijo para que cambiar de luces no recompile los sombreadores. Y pocas,
+ * porque **cada luz se paga en cada píxel de cada material**, esté encendida o
+ * no. Medido el 27 sep 2026 en la villa grande con dibujo por software (que,
+ * como una tablet, va limitado por píxeles): con cuatro, 152 fotogramas en
+ * cuarenta segundos; con dos, 198; con una, 229; sin banco (la hoguera
+ * sola), 220. TUNE: una. Con varias pidiendo —la hoguera y una casa que
+ * arde—, se enciende la más fuerte.
+ */
+const POINT_LIGHTS = 1;
+/**
+ * Lo más que se espera a que se compilen los sombreadores antes del primer
+ * dibujo, en milisegundos. Si el aparato no compila en paralelo, se dibuja
+ * igual pasado este tiempo. TUNE.
+ */
+const WARM_UP_MS = 8000;
 /**
  * La resolución adaptativa. TUNE: por debajo de ~28 FPS (0,036 s) baja un 15 %
  * cada 2 s, hasta la mitad de la densidad; con más de ~50 FPS durante 6 s la
@@ -259,6 +287,9 @@ export async function createGraphicsRenderer(
   renderer.toneMappingExposure = TONE_EXPOSURE;
   renderer.shadowMap.enabled = options.quality !== 'low';
   renderer.shadowMap.type = PCFShadowMap;
+  // Se rehace a mano, cuando toca (`SHADOW_EVERY`).
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.needsUpdate = true;
   renderer.setClearColor(new Color(VALLEY_COLOURS.sky));
   markStage('renderer:context-ready');
 
@@ -278,6 +309,18 @@ export async function createGraphicsRenderer(
   sun.shadow.normalBias = SUN_SHADOW.normalBias;
   const ambient = new HemisphereLight('#FFF6DF', '#776F62', 1.5);
   scene.add(ambient, sun, sun.target);
+  const lightPool = new LightPool(POINT_LIGHTS);
+  scene.add(...lightPool.lights);
+  /**
+   * Las luces de los efectos, a las fijas: justo antes de cada dibujo. Se
+   * buscan donde las hay —fuegos, hoguera, fiesta y lo que cuelga directo de
+   * la escena, como el rayo—, no en todo el mundo: recorrer cada hueso de
+   * cada aldeano en cada fotograma costaría más que lo que se ahorra.
+   */
+  const poolLights = (): void => lightPool.step([
+    fires.group, hearth.group, festoon.group,
+    ...scene.children.filter((child) => child !== world && !lightPool.lights.includes(child as never)),
+  ]);
 
   // S-1 · Una sola cascada, pero enfocada y estable. Cubrir siempre el mapa
   // completo desperdicia la mayor parte de los 2048 texels cuando se está
@@ -292,6 +335,28 @@ export async function createGraphicsRenderer(
   const shadowRight = new Vector3();
   const shadowUp = new Vector3();
   const worldUp = new Vector3(0, 1, 0);
+  // Dónde estaba la cámara de sombra la última vez que se rehízo el mapa.
+  const shadowDrawnAt = new Vector3(Number.NaN, 0, 0);
+  let shadowDrawnReach = 0;
+  let shadowAge = 0;
+  /** Pide rehacer el mapa de sombras si toca: por tiempo o porque la cámara se movió. */
+  function scheduleShadows(): void {
+    if (!renderer.shadowMap.enabled) return;
+    shadowAge += 1;
+    // «Moverse» es moverse de verdad: el centro de la cámara de sombra baila
+    // una fracción de texel en cada fotograma al girar el sol (se ajusta a la
+    // rejilla de una base que gira), y comparar con igualdad lo rehacía
+    // siempre. Un mapa viejo sigue cuadrando consigo mismo —su matriz se
+    // guarda con él—; sólo hay que rehacerlo cuando deja de cubrir la vista.
+    const reach = sun.shadow.camera.right;
+    const moved = !(sun.target.position.distanceTo(shadowDrawnAt) <= reach * 0.02)
+      || Math.abs(reach - shadowDrawnReach) > reach * 0.01;
+    if (!moved && shadowAge < (handheld ? SHADOW_EVERY.handheld : SHADOW_EVERY.desk)) return;
+    renderer.shadowMap.needsUpdate = true;
+    shadowAge = 0;
+    shadowDrawnAt.copy(sun.target.position);
+    shadowDrawnReach = reach;
+  }
 
   function stabilizeSunShadow(direction: Readonly<{ x: number; y: number; z: number }>): void {
     if (mapWidth <= 0 || viewport.widthCss <= 1 || viewport.heightCss <= 1) return;
@@ -1280,6 +1345,8 @@ export async function createGraphicsRenderer(
     }
     if (zoom !== 1) view.zoom(zoom, viewport.widthCss / 2, viewport.heightCss / 2);
     revealAssault();
+    poolLights();
+    renderer.shadowMap.needsUpdate = true;
     renderer.render(scene, camera);
     return { image: options.canvas.toDataURL('image/png'), life: window.__valleyLife?.() ?? null };
   };
@@ -1396,6 +1463,13 @@ export async function createGraphicsRenderer(
   };
 
   let firstPaintTraced = false;
+  // Los sombreadores se compilan **antes** del primer dibujo y en paralelo
+  // (`compileAsync`, 27 sep 2026). Dibujar sin más los compilaba uno tras otro
+  // dentro del primer fotograma, con la pantalla congelada: en la tablet de
+  // Vera, segundos. Intentado antes y retirado porque compilaba variantes con
+  // otras luces que luego no se usaban (de 35 programas a 68); con el banco de
+  // luces fijo (`LightPool`) las luces del primer dibujo son las de siempre.
+  let warmUp: 'pending' | 'running' | 'done' = 'pending';
   // **La resolución se adapta a lo que el aparato da.** Se mide el intervalo
   // entre fotogramas; si la media pasa de `ADAPT.slowSeconds` (por debajo de
   // unos 28 FPS) se dibuja con menos píxeles, a pasos, hasta `ADAPT.lowest` de
@@ -1977,7 +2051,29 @@ export async function createGraphicsRenderer(
       if (!sampling && !observingLive) {
         if (firstPaint) markStage('paint:submit-start');
         adaptResolution(frame.realDeltaSeconds);
-        renderer.render(scene, camera);
+        scheduleShadows();
+        poolLights();
+        if (warmUp === 'pending') {
+          warmUp = 'running';
+          // No `compileAsync`: su espera revienta si un material se suelta
+          // mientras compila —y aquí la vida cambia la escena en cada
+          // fotograma—, y la promesa no se resuelve nunca. `compile` sólo
+          // encarga los programas (con compilación en paralelo, el
+          // controlador los hace por detrás) y aquí se espera a que estén.
+          const materials = renderer.compile(scene, camera);
+          const started = performance.now();
+          const ready = (): boolean => [...materials].every((material) => {
+            const program = (renderer.properties.get(material) as { currentProgram?: { isReady?(): boolean } }).currentProgram;
+            return program?.isReady?.() !== false;
+          });
+          const wait = (): void => {
+            if (disposed || ready() || performance.now() - started > WARM_UP_MS) { warmUp = 'done'; return; }
+            setTimeout(wait, 16);
+          };
+          wait();
+        }
+        if (warmUp === 'done') renderer.render(scene, camera);
+        else renderer.shadowMap.needsUpdate = true;
         if (firstPaint) { markStage('paint:submit-end'); firstPaintTraced = true; }
       }
     },
