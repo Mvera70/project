@@ -59,4 +59,7 @@ export default tseslint.config(
 
   // El CLI sí puede escribir por consola y leer argv.
   { files: ['src/cli/**/*.ts', 'tools/**/*.ts', 'tests/**/*.ts'], rules: { 'no-restricted-globals': 'off' } },
+  // Las recetas de Blender de `art/` son guiones CommonJS (`.cjs`) que corren
+  // con Node tal cual: `require` es su forma de importar, no un descuido.
+  { files: ['**/*.cjs'], rules: { '@typescript-eslint/no-require-imports': 'off' } },
 );

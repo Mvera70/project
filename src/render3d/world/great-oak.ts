@@ -9,8 +9,9 @@
 // abiertas y una copa en cúpula de muchos cogollos. Las hojas se tiñen con la
 // estación como las del bosque (`tintFoliage`): el verde lo decide la paleta.
 
-import {
-  Color, ConeGeometry, CylinderGeometry, Group, IcosahedronGeometry, Mesh, MeshStandardMaterial,
+import type {
+  Color} from 'three';
+import { ConeGeometry, CylinderGeometry, Group, IcosahedronGeometry, Mesh, MeshStandardMaterial,
   type Material, type Object3D,
 } from 'three';
 import { hash32 } from '@engine/rng';

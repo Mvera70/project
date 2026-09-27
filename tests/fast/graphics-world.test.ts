@@ -428,15 +428,20 @@ describe('G-06 · el suelo', () => {
     const material = surface.material as unknown as { roughness: number };
     expect(material.roughness).toBeLessThan(0.5);
     const position = surface.geometry.getAttribute('position');
+    // Desde el 27 sep (224b4fc) el vado también lleva lámina, y cada celda
+    // tiene cinco vértices —las cuatro esquinas y un centro, para que hasta
+    // el arroyo de una celda tenga fondo en medio— y cuatro triángulos.
+    const PER_CELL = 5;
     const wetCells = [...state.map.terrain.keys()].filter((cell) =>
-      state.map.terrain[cell] === TERRAIN_CODE.water || state.map.terrain[cell] === TERRAIN_CODE.lake,
+      state.map.terrain[cell] === TERRAIN_CODE.water || state.map.terrain[cell] === TERRAIN_CODE.lake
+      || state.map.terrain[cell] === TERRAIN_CODE.ford,
     );
-    const riverOffset = wetCells.findIndex((cell) => state.map.terrain[cell] === TERRAIN_CODE.water) * 4;
-    const lakeOffset = wetCells.findIndex((cell) => state.map.terrain[cell] === TERRAIN_CODE.lake) * 4;
+    const riverOffset = wetCells.findIndex((cell) => state.map.terrain[cell] === TERRAIN_CODE.water) * PER_CELL;
+    const lakeOffset = wetCells.findIndex((cell) => state.map.terrain[cell] === TERRAIN_CODE.lake) * PER_CELL;
     expect(riverOffset).toBeGreaterThanOrEqual(0);
     expect(lakeOffset).toBeGreaterThanOrEqual(0);
-    expect(position.count).toBe(wetCells.length * 4);
-    expect(surface.geometry.getIndex()?.count).toBe(wetCells.length * 6);
+    expect(position.count).toBe(wetCells.length * PER_CELL);
+    expect(surface.geometry.getIndex()?.count).toBe(wetCells.length * 12);
     const still = Float32Array.from(position.array);
     const riverLevel = position.getY(riverOffset);
     const lakeLevel = position.getY(lakeOffset);
@@ -444,8 +449,8 @@ describe('G-06 · el suelo', () => {
     for (let index = 0; index < wetCells.length; index += 1) {
       const cell = wetCells[index] ?? 0;
       const level = state.map.terrain[cell] === TERRAIN_CODE.lake ? lakeLevel : riverLevel;
-      for (let corner = 0; corner < 4; corner += 1) {
-        expect(position.getY(index * 4 + corner)).toBeCloseTo(level, 6);
+      for (let corner = 0; corner < PER_CELL; corner += 1) {
+        expect(position.getY(index * PER_CELL + corner)).toBeCloseTo(level, 6);
       }
     }
     // Plana en reposo, no quieta: el río corre. Desde el 26 sep 2026 la onda la

@@ -1,7 +1,7 @@
 // Prueba manual reproducible de la entrada de caza y su escena 3D.
 import { chromium } from '@playwright/test';
 import { existsSync, mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { resolve } from 'node:path';
 
 const mobile = process.argv.includes('--mobile');
 const seed = process.argv.find(arg => arg.startsWith('--seed='))?.split('=')[1] ?? '3';

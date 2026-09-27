@@ -1,4 +1,5 @@
-import { AmbientLight, Color, DirectionalLight, Group, Mesh, MeshStandardMaterial, OrthographicCamera, PlaneGeometry, Scene, WebGLRenderer } from 'three';
+import type { Group} from 'three';
+import { AmbientLight, Color, DirectionalLight, Mesh, MeshStandardMaterial, OrthographicCamera, PlaneGeometry, Scene, WebGLRenderer } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { createFires } from '../../src/render3d/effects/fires';
 import { SCENIC_DAY_SECONDS } from '../../src/render3d/presentation-clock';
