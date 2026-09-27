@@ -104,6 +104,7 @@ silencio y la prueba pasa sin probar nada.
 | `film.mjs` | **Rodar el valle**: fotogramas seguidos más la traza de cada cuerpo en cada uno (`window.__valleyLife`) |
 | `film-sheet.py` | Convierte esa película en tira de contactos e informe de anomalías. **Es la única forma de medir la capa de vida como la ejecuta el navegador** |
 | `observe-life.mjs` | Juego real con el reloj del navegador controlado, píxel y traza atómicos. Lo usa la skill `observe-valley-life`. Quien anda por su ruta elevada (escalera, adarve) se cuenta en `elevatedSamples`, no como choque |
+| `evidence-index.mjs` | **El índice verificable de una toma del observatorio**: comprueba que la traza, los fotogramas y el informe de una carpeta de `observe-life.mjs` casan, con su huella, y escribe `evidence-index.json` en la carpeta sin tocar lo demás. `node tools/graphics/evidence-index.mjs <carpeta-toma>` (Codex, ronda de agentes del 17 sep; integrado el 27 sep) |
 | `day-report.mjs` | Resume la traza del renderer (IA-12) — la traza real, no una simulación paralela |
 | `press-kit.mjs` | **El paquete de prensa**: todas las pantallas y todos sus estados en una pasada, con hoja de contactos, y el metraje del tráiler sin interfaz. `--only <grupos>`, `--offset N` |
 | `bundle-game.ts` | Empaqueta el juego entero en una página, para abrirlo desde el móvil |

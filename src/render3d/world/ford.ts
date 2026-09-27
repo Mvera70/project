@@ -12,7 +12,7 @@
 // La búsqueda desde la orilla se conserva sólo para partidas antiguas, cuyos
 // mapas se guardaron antes de que existiera ese código de terreno.
 
-import { Group, type Object3D } from 'three';
+import { Box3, Group, type Object3D } from 'three';
 import type { ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
 
@@ -82,11 +82,19 @@ export function buildFord(map: ValleyMap, x: number, y: number, stone: () => Obj
   for (const cell of cells) {
     const slab = stone();
     if (slab === undefined) break;
-    slab.position.set(cell % map.width, 0, Math.floor(cell / map.width));
+    // El GLB se exportó con el origen en una esquina. La rotación ha de ocurrir
+    // alrededor de su huella, no de esa esquina: el contenedor queda en el
+    // centro de la celda y la losa se compensa en su espacio local.
+    const bounds = new Box3().setFromObject(slab);
+    const pivot = new Group();
+    pivot.position.set((cell % map.width) + 0.5, 0, Math.floor(cell / map.width) + 0.5);
     // Cada losa girada lo suyo: tres piedras iguales y alineadas se leen como
     // un puente de hormigón, y esto son piedras que alguien acarreó.
-    slab.rotation.set(0, ((cell * 37) % 4) * (Math.PI / 2), 0);
-    group.add(slab);
+    pivot.rotation.y = ((cell * 37) % 4) * (Math.PI / 2);
+    slab.position.x -= (bounds.min.x + bounds.max.x) / 2;
+    slab.position.z -= (bounds.min.z + bounds.max.z) / 2;
+    pivot.add(slab);
+    group.add(pivot);
     count += 1;
   }
   return {

@@ -18,7 +18,8 @@ import { ford, run } from '@engine/sim';
 import type { GameState } from '@engine/state';
 import { loadAssets } from '../../src/render3d/assets';
 import { VALLEY_COLOURS } from '../../src/render3d/visual-config';
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
+import { Box3, BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import type { Actor } from '../../src/render3d/contracts';
 import type { LoadedAsset } from '../../src/render3d/assets';
 import { BUILDINGS } from '@engine/balance';
@@ -1107,8 +1108,53 @@ describe('G-10 · el vado', () => {
     expect(built.count).toBe(fordCells(state.map, at.x, at.y).length);
     expect(built.count).toBeGreaterThan(0);
     for (const slab of built.group.children) {
-      expect(state.map.terrain[Math.round(slab.position.z) * state.map.width + Math.round(slab.position.x)])
+      expect(state.map.terrain[Math.floor(slab.position.z) * state.map.width + Math.floor(slab.position.x)])
         .toBe(TERRAIN_CODE.ford);
+    }
+    built.dispose();
+  });
+
+  it('centra una huella asimétrica de origen en esquina en sus cuatro giros', () => {
+    const map = structuredClone(village(1).map);
+    map.terrain.fill(TERRAIN_CODE.meadow);
+    const row = 12;
+    for (let x = 4; x < 8; x += 1) map.terrain[row * map.width + x] = TERRAIN_CODE.ford;
+    const stone = (): Object3D => {
+      const mesh = new Mesh(new BoxGeometry(0.72, 0.12, 0.38), new MeshStandardMaterial());
+      mesh.geometry.translate(0.36, 0, 0.19);
+      return mesh;
+    };
+    const built = buildFord(map, 4, row, stone);
+    expect(built.count).toBe(4);
+    for (const slab of built.group.children) {
+      const bounds = new Box3().setFromObject(slab);
+      const x = Math.floor(slab.position.x), z = Math.floor(slab.position.z);
+      expect(bounds.min.x).toBeGreaterThanOrEqual(x);
+      expect(bounds.max.x).toBeLessThanOrEqual(x + 1);
+      expect(bounds.min.z).toBeGreaterThanOrEqual(z);
+      expect(bounds.max.z).toBeLessThanOrEqual(z + 1);
+    }
+    built.dispose();
+  });
+
+  it('contiene el GLB publicado con sus transformaciones reales', async () => {
+    const bytes = readFileSync(resolve(ROOT, 'public', 'assets', 'valley3d', 'ford-stone.glb'));
+    const source = (await new GLTFLoader().parseAsync(
+      bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '',
+    )).scene;
+    const map = structuredClone(village(1).map);
+    map.terrain.fill(TERRAIN_CODE.meadow);
+    const row = 14;
+    for (let x = 4; x < 8; x += 1) map.terrain[row * map.width + x] = TERRAIN_CODE.ford;
+    const built = buildFord(map, 4, row, () => source.clone(true));
+    expect(built.count).toBe(4);
+    for (const slab of built.group.children) {
+      const bounds = new Box3().setFromObject(slab);
+      const x = Math.floor(slab.position.x), z = Math.floor(slab.position.z);
+      expect(bounds.min.x).toBeGreaterThanOrEqual(x);
+      expect(bounds.max.x).toBeLessThanOrEqual(x + 1);
+      expect(bounds.min.z).toBeGreaterThanOrEqual(z);
+      expect(bounds.max.z).toBeLessThanOrEqual(z + 1);
     }
     built.dispose();
   });

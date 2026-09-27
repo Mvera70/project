@@ -27,6 +27,7 @@ avanzando y `__valleyCapture` dibuja el fotograma sincronizado. No sirve para me
 | `--seed` | Valle reproducible. Predeterminado: 43. |
 | `--year` | Año cargado desde el menú de desarrollo. Predeterminado: 60. |
 | `--lead` | Segundos avanzados sin capturar; 55 sitúa la toma cerca del anochecer y 94 cerca del alba. Rango 0–120. |
+| `--advance` | Semanas enteras que adelanta el reloj controlado antes de la toma; responde la primera encrucijada visible. Predeterminado: 0. |
 | `--seconds` | Duración capturada. |
 | `--fps` | Muestras por segundo; debe dividir 30. Usa 2 para trayectorias y 15 para animación. |
 | `--follow` | Id de aldeano o id del cuerpo animal. La cámara lo sigue. |
@@ -37,8 +38,11 @@ avanzando y `__valleyCapture` dibuja el fotograma sincronizado. No sirve para me
 | `--speed` | Velocidad elegida en la UI en modo vivo; predeterminado 16, ejemplo 64. |
 
 En modo fijo, `lead` y `seconds` son segundos escénicos. En modo vivo son segundos del
-reloj del navegador antes de aplicar velocidad: 42 s a ×64 cubren unas 22 jornadas.
-La fase esperada del modo fijo es `(0.28 + (lead + segundos) / 120) % 1`. El script aborta si un RAF
+reloj del navegador antes de aplicar velocidad: 42 s a ×64 cubren unas 22 jornadas. `--advance`
+adelanta semanas del reloj controlado antes de congelar o observar; no son segundos escénicos.
+En modo fijo, la fase esperada es `(basePhase + segundos / 120) % 1`, donde `basePhase` se
+deduce del primer fotograma como `(phase - segundos / 120 + 1) % 1`; por eso no presupone 0.28 tras `--advance`.
+El script aborta si un RAF
 externo altera esa fase, porque entonces la imagen y el experimento dejan de ser fiables.
 
 ## Archivos de salida
