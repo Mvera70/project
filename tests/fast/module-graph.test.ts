@@ -187,9 +187,12 @@ describe('grafo de módulos del motor', () => {
     ]);
     // A3/E3 · el bastión cuenta su propio tope contra `subsistence/building-counts`
     // (`count`) y consulta su huella local de mundo, porque `withinCap` colapsa
-    // su familia en `'wall'`, que no tiene tope.
+    // su familia en `'wall'`, que no tiene tope. E3b.1a (24 sep 2026) · y el
+    // primer bastión se levanta donde abre el adarve (`bastion-walkway`), que
+    // es hermano de `bastion-access` en la misma capa y sólo mira a él y a `state`.
     expect(importsOf('world/upgrade.ts'))
-      .toEqual(['balance', 'bastion-access', 'placement', 'state', 'subsistence/building-counts']);
+      .toEqual(['balance', 'bastion-access', 'bastion-walkway', 'placement', 'state', 'subsistence/building-counts']);
+    expect(importsOf('world/bastion-walkway.ts')).toEqual(['bastion-access', 'state']);
     // M-15. astar.ts es hoja: el coste del suelo y nada más. paths.ts es quien
     // sabe quién va a dónde, así que mira a people/ y a subsistence/; forest.ts
     // le avisa de que los árboles se han movido, y la flecha no vuelve.

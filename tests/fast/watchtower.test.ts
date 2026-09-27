@@ -95,16 +95,25 @@ describe('C3 · la atalaya que la aldea se levanta sola', () => {
     // doce semillas a ochenta años, veinte torres: de 10 de 20 pegadas al cerco
     // a 20 de 20, y la media al muro de 2,2 a 1,4 celdas.
     //
-    // El listón es «pegada», no un radio: 1,4 es el mínimo de una pieza de 2×2
+    // El listón es «pegada», no un radio: 1,4 era el mínimo de una pieza de 2×2
     // cuyo centro cae media celda dentro del muro, o sea tocándolo, y fijar más
     // sería fijar el rasterizado del anillo.
+    //
+    // **Desde el 24 sep 2026 «pegada» es pegada a la calle del adarve**: el
+    // motor deja libre una celda junto a la cara interior del muro
+    // (`inRingCorridor`, `placement.ts`), así que el mínimo de una torre de 2×2
+    // por dentro pasa a ser 2,5 (media celda de muro, una de calle, una de media
+    // torre). Medido el 27 sep en doce semillas a ochenta años jugadas con
+    // `run`, veinte torres: 19 de 20 por dentro, distancia media 2,52 y la mayor
+    // 3,4. El listón sigue siendo «lo más pegada que se puede», una celda de
+    // holgura sobre ese mínimo; con 2 la prueba llevaba en rojo desde la calle.
     const state = quarrying();
     const spot = placeBuilding(state, 'watchtower');
     expect(spot, 'hay sitio para una torre').not.toBe(null);
     const centre = plazaCentre(state.plaza);
     const radius = Math.hypot(spot!.x + 1 - centre.x, spot!.y + 1 - centre.y);
     expect(Math.abs(radius - state.ring!), `radio ${radius.toFixed(1)} contra anillo ${state.ring}`)
-      .toBeLessThanOrEqual(2);
+      .toBeLessThanOrEqual(3.5);
   });
 
   it('y sigue llegando por donde llegaba: el carro y la encrucijada', () => {

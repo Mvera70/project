@@ -881,6 +881,10 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
       // —una pieza de cerco que además es torre— es trabajo de A3**, con su
       // `ringClosed` y su `wallRuns` de la mano. Apuntado en `plan-meta.md`.
       //
+      // **Y desde el 24 sep 2026, pegada a la calle del adarve**, no al muro: la
+      // celda libre de `inRingCorridor` deja el mínimo en 2,5. Medido el 27 sep
+      // en doce semillas a ochenta años: 19 de 20 por dentro, media 2,52.
+      //
       // Sin anillo decidido no hay a qué pegarse y vale lo de antes: la torre
       // llega también por carro (C1) y por encrucijada (§8.4), y esas no
       // esperan a que el valle tenga cerco.

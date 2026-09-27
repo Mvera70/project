@@ -402,7 +402,14 @@ describe('Los gestos del valle · el veredicto del 15 sep 2026', () => {
     // clica por ella — eso no cambió y no es lo que esta prueba mira.
     const shell = readFileSync(resolve(ROOT, 'src', 'ui', 'redesign', 'shell.ts'), 'utf8');
     expect(shell).toContain("contentClose.className = 'ui-shell-content-close'");
-    expect(shell).toContain("contentClose.addEventListener('click', () => { actions.navigate({ kind: 'valley' }); });");
+    // Y el «×» vuelve al valle. Desde que la hoja se cierra deslizándose
+    // (`finishDrag(true)`, la misma salida que el gesto de arrastrar), el botón
+    // no navega él mismo: cierra la hoja, y la hoja navega a `valley` al acabar
+    // el tramo visual. Se comprueban las dos mitades, no la línea literal, que
+    // es lo que dejó esta prueba en rojo cuando llegó el gesto.
+    expect(shell, 'el botón cierra la hoja').toMatch(/contentClose\.addEventListener\('click', \(\) => \{ finishDrag\(true\); \}\);/u);
+    expect(shell, 'y cerrar la hoja acaba en el valle')
+      .toMatch(/const finishDrag = \(close: boolean\)[\s\S]*?actions\.navigate\(\{ kind: 'valley' \}\);[\s\S]*?\n {2}\};/u);
     const css = readFileSync(resolve(ROOT, 'src', 'ui', 'redesign', 'shell.css'), 'utf8');
     expect(css, 'con área táctil de §11.7').toMatch(/\.ui-shell-content-close \{[^}]*--ui-tap-min[^}]*--ui-tap-min/su);
     const tokens = readFileSync(resolve(ROOT, 'src', 'ui', 'redesign', 'tokens.css'), 'utf8');

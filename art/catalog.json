@@ -6590,6 +6590,58 @@
         "hall.glb": "53C212439D616B9A699BA0A35C1C6D6CE1AE6DDD98F8A455E456C98E7BFF4940",
         "hall-preview.png": "3DD11C49E564E9FF810C8A570EF2409BF97774DEBBB91AE7F1350953884E5240"
       }
+    },
+    {
+      "id": "gate-timber",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Portón de madera G-24 aprobado previamente para The Valley; conservado para la empalizada.",
+        "license": "Project original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/gate/gate.json",
+      "generator": "art/recipes/gate/gate.json",
+      "approved": {
+        "runId": "G-24-timber",
+        "directory": "artifacts/graphics/G-24-timber/approved/gate-timber"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -0.583333
+        ],
+        "max": [
+          1,
+          0.933333,
+          -0.416667
+        ],
+        "size": [
+          1,
+          0.933333,
+          0.166667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "wood",
+        "iron",
+        "plank"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 19,
+        "meshes": 17,
+        "materials": 3,
+        "triangles": 212
+      },
+      "hashes": {
+        "gate-timber.glb": "6A631196325241E1C6C6D53CDA4041D24DADCF6FC4FABF0C437F5CF4631FE679"
+      }
     }
   ]
 }
