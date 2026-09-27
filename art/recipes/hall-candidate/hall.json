@@ -6,7 +6,7 @@
   "mergeByMaterial": true,
   "palette": "../palette.json",
   "house": "thatched",
-  "note": "Astra 26 sep 2026 \u00b7 prioridades 1\u20134, candidato sin integrar.",
+  "note": "Astra 27 sep 2026 \u00b7 revisi\u00f3n pedida por Vera: sala se\u00f1orial con carpinter\u00eda pesada y paja estratificada; se retira el m\u00e1stil.",
   "metadata": {
     "cellUnit": 1,
     "kind": "hall",
@@ -19,37 +19,32 @@
     {
       "name": "stone",
       "role": "stone",
-      "roughness": 0.95
+      "roughness": 0.96
     },
     {
       "name": "plaster",
       "role": "plaster",
-      "roughness": 0.95
+      "roughness": 0.96
     },
     {
       "name": "wood",
-      "role": "timber",
-      "roughness": 0.95
+      "role": "timberDark",
+      "roughness": 0.96
     },
     {
       "name": "roof",
       "role": "roof",
-      "roughness": 0.95
+      "roughness": 0.96
     },
     {
       "name": "door",
       "role": "timber",
-      "roughness": 0.95
+      "roughness": 0.96
     },
     {
       "name": "window",
       "role": "timberDark",
-      "roughness": 0.95
-    },
-    {
-      "name": "banner",
-      "role": "clothAccent",
-      "roughness": 0.95
+      "roughness": 0.96
     }
   ],
   "groups": [
@@ -66,768 +61,1953 @@
   "primitives": [
     {
       "type": "cube",
-      "name": "Foundation",
+      "name": "Stone_Plinth",
       "location": [
         4.5,
-        -3.5,
+        -3.52,
         0.2
       ],
-      "material": "stone",
-      "parent": "Root",
       "dimensions": [
         8.4,
         6,
         0.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Wall_Back",
-      "location": [
-        4.5,
-        -0.65,
-        1.6
       ],
-      "material": "plaster",
+      "material": "stone",
       "parent": "Root",
-      "dimensions": [
-        8.4,
-        0.3,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Wall_Side_4",
-      "location": [
-        0.45,
-        -3.5,
-        1.6
-      ],
-      "material": "plaster",
-      "parent": "Root",
-      "dimensions": [
-        0.3,
-        6,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Wall_Side_85",
-      "location": [
-        8.55,
-        -3.5,
-        1.6
-      ],
-      "material": "plaster",
-      "parent": "Root",
-      "dimensions": [
-        0.3,
-        6,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Wall_Front_18",
-      "location": [
-        1.85,
-        -6.35,
-        1.6
-      ],
-      "material": "plaster",
-      "parent": "Root",
-      "dimensions": [
-        3.1,
-        0.3,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Wall_Front_71",
-      "location": [
-        7.15,
-        -6.35,
-        1.6
-      ],
-      "material": "plaster",
-      "parent": "Root",
-      "dimensions": [
-        3.1,
-        0.3,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Wall_Lintel",
-      "location": [
-        4.5,
-        -6.35,
-        2.65
-      ],
-      "material": "plaster",
-      "parent": "Root",
-      "dimensions": [
-        2.2,
-        0.3,
-        0.3
-      ]
-    },
-    {
-      "type": "gable",
-      "name": "Thatched_Roof",
-      "location": [
-        4.5,
-        -3.5,
-        2.8
-      ],
-      "material": "roof",
-      "parent": "Root",
-      "width": 6.7,
-      "depth": 9,
-      "height": 2.8,
       "rotationDegrees": [
         0,
-        0,
-        90
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Front_Post_35",
-      "location": [
-        0.35,
-        -6.54,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.15,
-        0.18,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Front_Post_155",
-      "location": [
-        1.55,
-        -6.54,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.15,
-        0.18,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Front_Post_275",
-      "location": [
-        2.75,
-        -6.54,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.15,
-        0.18,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Front_Post_625",
-      "location": [
-        6.25,
-        -6.54,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.15,
-        0.18,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Front_Post_745",
-      "location": [
-        7.45,
-        -6.54,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.15,
-        0.18,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Front_Post_865",
-      "location": [
-        8.65,
-        -6.54,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.15,
-        0.18,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Side_Post_35_10",
-      "location": [
-        0.35,
-        -1,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.16,
-        0.14,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Side_Post_35_22",
-      "location": [
-        0.35,
-        -2.2,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.16,
-        0.14,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Side_Post_35_34",
-      "location": [
-        0.35,
-        -3.4,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.16,
-        0.14,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Side_Post_35_46",
-      "location": [
-        0.35,
-        -4.6,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.16,
-        0.14,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Side_Post_35_58",
-      "location": [
-        0.35,
-        -5.8,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.16,
-        0.14,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Side_Post_865_10",
-      "location": [
-        8.65,
-        -1,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.16,
-        0.14,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Side_Post_865_22",
-      "location": [
-        8.65,
-        -2.2,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.16,
-        0.14,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Side_Post_865_34",
-      "location": [
-        8.65,
-        -3.4,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.16,
-        0.14,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Side_Post_865_46",
-      "location": [
-        8.65,
-        -4.6,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.16,
-        0.14,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Side_Post_865_58",
-      "location": [
-        8.65,
-        -5.8,
-        1.6
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.16,
-        0.14,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Wall_Rail_48",
-      "location": [
-        4.5,
-        -0.48,
-        0.65
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        8.4,
-        0.15,
-        0.16
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Wall_Crown_48",
-      "location": [
-        4.5,
-        -0.48,
-        2.7
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        8.4,
-        0.15,
-        0.16
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Wall_Rail_652",
-      "location": [
-        4.5,
-        -6.52,
-        0.65
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        8.4,
-        0.15,
-        0.16
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Wall_Crown_652",
-      "location": [
-        4.5,
-        -6.52,
-        2.7
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        8.4,
-        0.15,
-        0.16
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_27_16",
-      "location": [
-        0.27,
-        -1.6,
-        1.85
-      ],
-      "material": "window",
-      "parent": "Root",
-      "dimensions": [
-        0.08,
-        0.7,
-        0.62
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_Bar_27_16",
-      "location": [
-        0.27,
-        -1.6,
-        1.85
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.12,
-        0.74,
-        0.07
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_27_35",
-      "location": [
-        0.27,
-        -3.5,
-        1.85
-      ],
-      "material": "window",
-      "parent": "Root",
-      "dimensions": [
-        0.08,
-        0.7,
-        0.62
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_Bar_27_35",
-      "location": [
-        0.27,
-        -3.5,
-        1.85
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.12,
-        0.74,
-        0.07
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_27_54",
-      "location": [
-        0.27,
-        -5.4,
-        1.85
-      ],
-      "material": "window",
-      "parent": "Root",
-      "dimensions": [
-        0.08,
-        0.7,
-        0.62
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_Bar_27_54",
-      "location": [
-        0.27,
-        -5.4,
-        1.85
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.12,
-        0.74,
-        0.07
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_873_16",
-      "location": [
-        8.73,
-        -1.6,
-        1.85
-      ],
-      "material": "window",
-      "parent": "Root",
-      "dimensions": [
-        0.08,
-        0.7,
-        0.62
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_Bar_873_16",
-      "location": [
-        8.73,
-        -1.6,
-        1.85
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.12,
-        0.74,
-        0.07
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_873_35",
-      "location": [
-        8.73,
-        -3.5,
-        1.85
-      ],
-      "material": "window",
-      "parent": "Root",
-      "dimensions": [
-        0.08,
-        0.7,
-        0.62
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_Bar_873_35",
-      "location": [
-        8.73,
-        -3.5,
-        1.85
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.12,
-        0.74,
-        0.07
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_873_54",
-      "location": [
-        8.73,
-        -5.4,
-        1.85
-      ],
-      "material": "window",
-      "parent": "Root",
-      "dimensions": [
-        0.08,
-        0.7,
-        0.62
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Shutter_Bar_873_54",
-      "location": [
-        8.73,
-        -5.4,
-        1.85
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.12,
-        0.74,
-        0.07
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Porch_Post_15",
-      "location": [
-        1.5,
-        -8.05,
-        1.35
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.3,
-        0.3,
-        2.7
-      ]
-    },
-    {
-      "type": "cylinder",
-      "name": "Porch_Brace_15",
-      "location": [
-        1.825,
-        -8.05,
-        2.3600000000000003
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "radius": 0.08,
-      "depth": 0.8324061508662702,
-      "vertices": 6,
-      "rotationDegrees": [
-        51.340191745909905,
-        0,
-        90.0
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Porch_Post_75",
-      "location": [
-        7.5,
-        -8.05,
-        1.35
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        0.3,
-        0.3,
-        2.7
-      ]
-    },
-    {
-      "type": "cylinder",
-      "name": "Porch_Brace_75",
-      "location": [
-        7.175,
-        -8.05,
-        2.3600000000000003
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "radius": 0.08,
-      "depth": 0.8324061508662707,
-      "vertices": 6,
-      "rotationDegrees": [
-        51.34019174590993,
-        0,
-        -90.0
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Porch_Lintel",
-      "location": [
-        4.5,
-        -8.05,
-        2.65
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "dimensions": [
-        6.3,
-        0.3,
-        0.22
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Porch_Thatch",
-      "location": [
-        4.5,
-        -7.35,
-        2.8
-      ],
-      "material": "roof",
-      "parent": "Root",
-      "dimensions": [
-        6.6,
-        2.15,
-        0.2
-      ],
-      "rotationDegrees": [
-        8,
         0,
         0
       ]
     },
     {
       "type": "cube",
-      "name": "Threshold",
+      "name": "Rear_Wall",
       "location": [
         4.5,
-        -7,
-        0.15
+        -0.67,
+        1.6
+      ],
+      "dimensions": [
+        8.4,
+        0.3,
+        2.4
+      ],
+      "material": "plaster",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Wall_L",
+      "location": [
+        0.45,
+        -3.52,
+        1.6
+      ],
+      "dimensions": [
+        0.3,
+        6,
+        2.4
+      ],
+      "material": "plaster",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Wall_R",
+      "location": [
+        8.55,
+        -3.52,
+        1.6
+      ],
+      "dimensions": [
+        0.3,
+        6,
+        2.4
+      ],
+      "material": "plaster",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Wall_L",
+      "location": [
+        1.85,
+        -6.369999999999999,
+        1.6
+      ],
+      "dimensions": [
+        3.1,
+        0.3,
+        2.4
+      ],
+      "material": "plaster",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Wall_R",
+      "location": [
+        7.15,
+        -6.369999999999999,
+        1.6
+      ],
+      "dimensions": [
+        3.1,
+        0.3,
+        2.4
+      ],
+      "material": "plaster",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Door_Header_Infill",
+      "location": [
+        4.5,
+        -6.369999999999999,
+        2.65
+      ],
+      "dimensions": [
+        2.2,
+        0.3,
+        0.3
+      ],
+      "material": "plaster",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "gable",
+      "name": "Upper_Hall",
+      "location": [
+        4.5,
+        -3.52,
+        2.8
+      ],
+      "width": 6,
+      "depth": 8.4,
+      "height": 2.62,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "plaster",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Thatch_Front_0",
+      "location": [
+        4.5,
+        -6.58,
+        2.936
+      ],
+      "dimensions": [
+        9,
+        0.9433794067500104,
+        0.25
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        38.037953734390726,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Thatch_Front_1",
+      "location": [
+        4.5,
+        -5.8999999999999995,
+        3.468
+      ],
+      "dimensions": [
+        9,
+        0.9433794067500104,
+        0.25
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        38.037953734390726,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Thatch_Front_2",
+      "location": [
+        4.5,
+        -5.22,
+        4.0
+      ],
+      "dimensions": [
+        9,
+        0.9433794067500104,
+        0.25
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        38.037953734390726,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Thatch_Front_3",
+      "location": [
+        4.5,
+        -4.539999999999999,
+        4.532
+      ],
+      "dimensions": [
+        9,
+        0.9433794067500104,
+        0.25
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        38.037953734390726,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Thatch_Front_4",
+      "location": [
+        4.5,
+        -3.86,
+        5.064
+      ],
+      "dimensions": [
+        9,
+        0.9433794067500104,
+        0.25
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        38.037953734390726,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Thatch_Back_0",
+      "location": [
+        4.5,
+        -0.45999999999999996,
+        2.936
+      ],
+      "dimensions": [
+        9,
+        0.9433794067500104,
+        0.25
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        -38.037953734390726,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Thatch_Back_1",
+      "location": [
+        4.5,
+        -1.1400000000000001,
+        3.468
+      ],
+      "dimensions": [
+        9,
+        0.9433794067500104,
+        0.25
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        -38.037953734390726,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Thatch_Back_2",
+      "location": [
+        4.5,
+        -1.82,
+        4.0
+      ],
+      "dimensions": [
+        9,
+        0.9433794067500104,
+        0.25
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        -38.037953734390726,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Thatch_Back_3",
+      "location": [
+        4.5,
+        -2.5,
+        4.532
+      ],
+      "dimensions": [
+        9,
+        0.9433794067500104,
+        0.25
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        -38.037953734390726,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Thatch_Back_4",
+      "location": [
+        4.5,
+        -3.18,
+        5.064
+      ],
+      "dimensions": [
+        9,
+        0.9433794067500104,
+        0.25
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        -38.037953734390726,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Ridge_Cap",
+      "location": [
+        4.5,
+        -3.52,
+        5.56
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        8.899999999999999
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        90.0,
+        0,
+        90.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Rail_57",
+      "location": [
+        4.5,
+        -0.49,
+        0.58
+      ],
+      "dimensions": [
+        8.4,
+        0.2,
+        0.24
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Rail_268",
+      "location": [
+        4.5,
+        -0.49,
+        2.68
+      ],
+      "dimensions": [
+        8.4,
+        0.2,
+        0.24
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Post_0",
+      "location": [
+        0.43,
+        -0.49,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Post_1",
+      "location": [
+        1.63,
+        -0.49,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Post_2",
+      "location": [
+        2.83,
+        -0.49,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Post_3",
+      "location": [
+        6.17,
+        -0.49,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Post_4",
+      "location": [
+        7.37,
+        -0.49,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Rear_Post_5",
+      "location": [
+        8.57,
+        -0.49,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Rail_57",
+      "location": [
+        4.5,
+        -6.56,
+        0.58
+      ],
+      "dimensions": [
+        8.4,
+        0.2,
+        0.24
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Rail_268",
+      "location": [
+        4.5,
+        -6.56,
+        2.68
+      ],
+      "dimensions": [
+        8.4,
+        0.2,
+        0.24
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Post_0",
+      "location": [
+        0.43,
+        -6.56,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Post_1",
+      "location": [
+        1.63,
+        -6.56,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Post_2",
+      "location": [
+        2.83,
+        -6.56,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Post_3",
+      "location": [
+        6.17,
+        -6.56,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Post_4",
+      "location": [
+        7.37,
+        -6.56,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Post_5",
+      "location": [
+        8.57,
+        -6.56,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.22,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Sill_L",
+      "location": [
+        0.27,
+        -3.52,
+        0.58
+      ],
+      "dimensions": [
+        0.21,
+        6,
+        0.24
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Plate_L",
+      "location": [
+        0.27,
+        -3.52,
+        2.68
+      ],
+      "dimensions": [
+        0.22,
+        6,
+        0.24
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Post_L0",
+      "location": [
+        0.27,
+        -0.62,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.23,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Post_L1",
+      "location": [
+        0.27,
+        -2.42,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.23,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Post_L2",
+      "location": [
+        0.27,
+        -4.319999999999999,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.23,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Post_L3",
+      "location": [
+        0.27,
+        -6.42,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.23,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_L0",
+      "location": [
+        0.27,
+        -1.37,
+        1.77
+      ],
+      "dimensions": [
+        0.245,
+        0.66,
+        0.65
+      ],
+      "material": "window",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_Batten_L0",
+      "location": [
+        0.23500000000000001,
+        -1.37,
+        1.77
+      ],
+      "dimensions": [
+        0.25,
+        0.73,
+        0.09
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_L1",
+      "location": [
+        0.27,
+        -3.37,
+        1.77
+      ],
+      "dimensions": [
+        0.245,
+        0.66,
+        0.65
+      ],
+      "material": "window",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_Batten_L1",
+      "location": [
+        0.23500000000000001,
+        -3.37,
+        1.77
+      ],
+      "dimensions": [
+        0.25,
+        0.73,
+        0.09
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_L2",
+      "location": [
+        0.27,
+        -5.319999999999999,
+        1.77
+      ],
+      "dimensions": [
+        0.245,
+        0.66,
+        0.65
+      ],
+      "material": "window",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_Batten_L2",
+      "location": [
+        0.23500000000000001,
+        -5.319999999999999,
+        1.77
+      ],
+      "dimensions": [
+        0.25,
+        0.73,
+        0.09
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Brace_L0",
+      "location": [
+        0.27,
+        -1.52,
+        1.6400000000000001
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        2.217746604100658
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        39.14398641457105,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Brace_L1",
+      "location": [
+        0.27,
+        -5.345,
+        1.6400000000000001
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        2.3834638658893073
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        43.81005106785757,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Gable_Edge_A_L",
+      "location": [
+        0.27,
+        -2.02,
+        4.095
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        3.9633445472227113
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        49.194862445565875,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Gable_Edge_B_L",
+      "location": [
+        0.27,
+        -5.02,
+        4.095
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        3.9633445472227113
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        130.80513755443414,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Gable_Kingpost_L",
+      "location": [
+        0.27,
+        -3.52,
+        4.074999999999999
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        2.55
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0.0,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Saxon_Cross_L_1",
+      "location": [
+        0.27,
+        -3.52,
+        5.4350000000000005
+      ],
+      "dimensions": [
+        0.15,
+        0.15,
+        0.745184540902453
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        40.100907546212284,
+        0,
+        180.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Saxon_Cross_L1",
+      "location": [
+        0.27,
+        -3.52,
+        5.4350000000000005
+      ],
+      "dimensions": [
+        0.15,
+        0.15,
+        0.745184540902453
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        40.100907546212284,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Sill_R",
+      "location": [
+        8.73,
+        -3.52,
+        0.58
+      ],
+      "dimensions": [
+        0.21,
+        6,
+        0.24
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Plate_R",
+      "location": [
+        8.73,
+        -3.52,
+        2.68
+      ],
+      "dimensions": [
+        0.22,
+        6,
+        0.24
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Post_R0",
+      "location": [
+        8.73,
+        -0.62,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.23,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Post_R1",
+      "location": [
+        8.73,
+        -2.42,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.23,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Post_R2",
+      "location": [
+        8.73,
+        -4.319999999999999,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.23,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Post_R3",
+      "location": [
+        8.73,
+        -6.42,
+        1.6
+      ],
+      "dimensions": [
+        0.23,
+        0.23,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_R0",
+      "location": [
+        8.73,
+        -1.37,
+        1.77
+      ],
+      "dimensions": [
+        0.245,
+        0.66,
+        0.65
+      ],
+      "material": "window",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_Batten_R0",
+      "location": [
+        8.765,
+        -1.37,
+        1.77
+      ],
+      "dimensions": [
+        0.25,
+        0.73,
+        0.09
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_R1",
+      "location": [
+        8.73,
+        -3.37,
+        1.77
+      ],
+      "dimensions": [
+        0.245,
+        0.66,
+        0.65
+      ],
+      "material": "window",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_Batten_R1",
+      "location": [
+        8.765,
+        -3.37,
+        1.77
+      ],
+      "dimensions": [
+        0.25,
+        0.73,
+        0.09
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_R2",
+      "location": [
+        8.73,
+        -5.319999999999999,
+        1.77
+      ],
+      "dimensions": [
+        0.245,
+        0.66,
+        0.65
+      ],
+      "material": "window",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Shutter_Batten_R2",
+      "location": [
+        8.765,
+        -5.319999999999999,
+        1.77
+      ],
+      "dimensions": [
+        0.25,
+        0.73,
+        0.09
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Brace_R0",
+      "location": [
+        8.73,
+        -1.52,
+        1.6400000000000001
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        2.217746604100658
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        39.14398641457105,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Side_Brace_R1",
+      "location": [
+        8.73,
+        -5.345,
+        1.6400000000000001
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        2.3834638658893073
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        43.81005106785757,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Gable_Edge_A_R",
+      "location": [
+        8.73,
+        -2.02,
+        4.095
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        3.9633445472227113
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        49.194862445565875,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Gable_Edge_B_R",
+      "location": [
+        8.73,
+        -5.02,
+        4.095
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        3.9633445472227113
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        130.80513755443414,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Gable_Kingpost_R",
+      "location": [
+        8.73,
+        -3.52,
+        4.074999999999999
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        2.55
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0.0,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Saxon_Cross_R_1",
+      "location": [
+        8.73,
+        -3.52,
+        5.4350000000000005
+      ],
+      "dimensions": [
+        0.15,
+        0.15,
+        0.745184540902453
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        40.100907546212284,
+        0,
+        180.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Saxon_Cross_R1",
+      "location": [
+        8.73,
+        -3.52,
+        5.4350000000000005
+      ],
+      "dimensions": [
+        0.15,
+        0.15,
+        0.745184540902453
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        40.100907546212284,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Raking_L",
+      "location": [
+        1.5450000000000002,
+        -6.59,
+        1.65
+      ],
+      "dimensions": [
+        0.2,
+        0.2,
+        2.5124689052802225
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        47.41950921665634,
+        0,
+        90.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Front_Raking_R",
+      "location": [
+        7.455000000000001,
+        -6.59,
+        1.65
+      ],
+      "dimensions": [
+        0.2,
+        0.2,
+        2.512468905280222
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        47.41950921665632,
+        0,
+        -90.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Foot_L",
+      "location": [
+        1.5,
+        -8.049999999999999,
+        0.2
+      ],
+      "dimensions": [
+        0.5,
+        0.5,
+        0.4
       ],
       "material": "stone",
       "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Post_L",
+      "location": [
+        1.5,
+        -8.049999999999999,
+        1.6
+      ],
       "dimensions": [
-        2.65,
-        1.3,
-        0.3
+        0.34,
+        0.34,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Capital_L",
+      "location": [
+        1.5,
+        -8.049999999999999,
+        2.69
+      ],
+      "dimensions": [
+        0.53,
+        0.49,
+        0.2
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Knee_L",
+      "location": [
+        1.8599999999999999,
+        -8.049999999999999,
+        2.3499999999999996
+      ],
+      "dimensions": [
+        0.21,
+        0.21,
+        0.9372299611087984
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        50.194428907734796,
+        0,
+        90.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Return_L",
+      "location": [
+        1.5,
+        -7.635,
+        2.38
+      ],
+      "dimensions": [
+        0.2,
+        0.2,
+        1.0729864864013894
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        50.67302213992529,
+        0,
+        180.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Foot_R",
+      "location": [
+        7.5,
+        -8.049999999999999,
+        0.2
+      ],
+      "dimensions": [
+        0.5,
+        0.5,
+        0.4
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Post_R",
+      "location": [
+        7.5,
+        -8.049999999999999,
+        1.6
+      ],
+      "dimensions": [
+        0.34,
+        0.34,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Capital_R",
+      "location": [
+        7.5,
+        -8.049999999999999,
+        2.69
+      ],
+      "dimensions": [
+        0.53,
+        0.49,
+        0.2
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Knee_R",
+      "location": [
+        7.140000000000001,
+        -8.049999999999999,
+        2.3499999999999996
+      ],
+      "dimensions": [
+        0.21,
+        0.21,
+        0.9372299611087984
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        50.194428907734796,
+        0,
+        -90.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Return_R",
+      "location": [
+        7.5,
+        -7.635,
+        2.38
+      ],
+      "dimensions": [
+        0.2,
+        0.2,
+        1.0729864864013894
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        50.67302213992529,
+        0,
+        180.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Ceremonial_Lintel",
+      "location": [
+        4.5,
+        -8.049999999999999,
+        2.78
+      ],
+      "dimensions": [
+        6.45,
+        0.38,
+        0.34
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Lintel_Inlay",
+      "location": [
+        4.5,
+        -8.258,
+        2.8
+      ],
+      "dimensions": [
+        5.5,
+        0.035,
+        0.075
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Thatch_Layer_0",
+      "location": [
+        4.5,
+        -6.819999999999999,
+        3.1550000000000002
+      ],
+      "dimensions": [
+        6.6,
+        0.69,
+        0.27
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        14.036243467926479,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Thatch_Layer_1",
+      "location": [
+        4.5,
+        -7.42,
+        3.005
+      ],
+      "dimensions": [
+        6.6,
+        0.69,
+        0.27
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        14.036243467926479,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Thatch_Layer_2",
+      "location": [
+        4.5,
+        -8.02,
+        2.855
+      ],
+      "dimensions": [
+        6.6,
+        0.69,
+        0.27
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "rotationDegrees": [
+        14.036243467926479,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Fascia_L",
+      "location": [
+        1.2,
+        -7.42,
+        2.85
+      ],
+      "dimensions": [
+        0.17,
+        0.17,
+        2.0615528128088303
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        104.03624346792648,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Fascia_R",
+      "location": [
+        7.8,
+        -7.42,
+        2.85
+      ],
+      "dimensions": [
+        0.17,
+        0.17,
+        2.0615528128088303
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        104.03624346792648,
+        0,
+        0.0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Porch_Dark_Ceiling",
+      "location": [
+        4.5,
+        -7.17,
+        2.87
+      ],
+      "dimensions": [
+        6,
+        1.4,
+        0.11
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
       ]
     },
     {
@@ -835,282 +2015,16 @@
       "name": "Door_Plank_0",
       "location": [
         3.54,
-        -6.57,
+        -6.5,
         1.6
       ],
-      "material": "door",
-      "parent": "Root",
       "dimensions": [
-        0.266,
-        0.12,
+        0.26,
+        0.16,
         2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Door_Plank_1",
-      "location": [
-        3.815,
-        -6.57,
-        1.6
       ],
       "material": "door",
       "parent": "Root",
-      "dimensions": [
-        0.266,
-        0.12,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Door_Plank_2",
-      "location": [
-        4.09,
-        -6.57,
-        1.6
-      ],
-      "material": "door",
-      "parent": "Root",
-      "dimensions": [
-        0.266,
-        0.12,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Door_Plank_3",
-      "location": [
-        4.365,
-        -6.57,
-        1.6
-      ],
-      "material": "door",
-      "parent": "Root",
-      "dimensions": [
-        0.266,
-        0.12,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Door_Plank_4",
-      "location": [
-        4.640000000000001,
-        -6.57,
-        1.6
-      ],
-      "material": "door",
-      "parent": "Root",
-      "dimensions": [
-        0.266,
-        0.12,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Door_Plank_5",
-      "location": [
-        4.915,
-        -6.57,
-        1.6
-      ],
-      "material": "door",
-      "parent": "Root",
-      "dimensions": [
-        0.266,
-        0.12,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Door_Plank_6",
-      "location": [
-        5.19,
-        -6.57,
-        1.6
-      ],
-      "material": "door",
-      "parent": "Root",
-      "dimensions": [
-        0.266,
-        0.12,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Door_Plank_7",
-      "location": [
-        5.465,
-        -6.57,
-        1.6
-      ],
-      "material": "door",
-      "parent": "Root",
-      "dimensions": [
-        0.266,
-        0.12,
-        2.4
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Door_Rail_3_95_0_8",
-      "location": [
-        3.95,
-        -6.65,
-        0.8
-      ],
-      "material": "door",
-      "parent": "Root",
-      "dimensions": [
-        1.03,
-        0.07,
-        0.12
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Door_Rail_3_95_2_1",
-      "location": [
-        3.95,
-        -6.65,
-        2.1
-      ],
-      "material": "door",
-      "parent": "Root",
-      "dimensions": [
-        1.03,
-        0.07,
-        0.12
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Door_Rail_5_05_0_8",
-      "location": [
-        5.05,
-        -6.65,
-        0.8
-      ],
-      "material": "door",
-      "parent": "Root",
-      "dimensions": [
-        1.03,
-        0.07,
-        0.12
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Door_Rail_5_05_2_1",
-      "location": [
-        5.05,
-        -6.65,
-        2.1
-      ],
-      "material": "door",
-      "parent": "Root",
-      "dimensions": [
-        1.03,
-        0.07,
-        0.12
-      ]
-    },
-    {
-      "type": "cylinder",
-      "name": "Gable_Cross_0_1__1",
-      "location": [
-        0.1,
-        -3.5,
-        5.45
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "radius": 0.08,
-      "depth": 0.8207313811473278,
-      "vertices": 6,
-      "rotationDegrees": [
-        43.02506598911807,
-        0,
-        180.0
-      ]
-    },
-    {
-      "type": "cylinder",
-      "name": "Gable_Cross_0_1_1",
-      "location": [
-        0.1,
-        -3.5,
-        5.45
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "radius": 0.08,
-      "depth": 0.8207313811473278,
-      "vertices": 6,
-      "rotationDegrees": [
-        43.02506598911807,
-        0,
-        0.0
-      ]
-    },
-    {
-      "type": "cylinder",
-      "name": "Gable_Cross_8_9__1",
-      "location": [
-        8.9,
-        -3.5,
-        5.45
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "radius": 0.08,
-      "depth": 0.8207313811473278,
-      "vertices": 6,
-      "rotationDegrees": [
-        43.02506598911807,
-        0,
-        180.0
-      ]
-    },
-    {
-      "type": "cylinder",
-      "name": "Gable_Cross_8_9_1",
-      "location": [
-        8.9,
-        -3.5,
-        5.45
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "radius": 0.08,
-      "depth": 0.8207313811473278,
-      "vertices": 6,
-      "rotationDegrees": [
-        43.02506598911807,
-        0,
-        0.0
-      ]
-    },
-    {
-      "type": "cylinder",
-      "name": "Banner_Mast",
-      "location": [
-        8.65,
-        -8.5,
-        3.75
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "radius": 0.075,
-      "depth": 7.5,
-      "vertices": 6,
       "rotationDegrees": [
         0,
         0,
@@ -1119,18 +2033,359 @@
     },
     {
       "type": "cube",
-      "name": "Banner",
+      "name": "Door_Plank_1",
       "location": [
-        8,
-        -8.5,
-        6.85
+        3.815,
+        -6.5,
+        1.6
       ],
-      "material": "banner",
-      "parent": "Root",
       "dimensions": [
-        1.2,
-        0.04,
-        0.7
+        0.26,
+        0.16,
+        2.4
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Door_Plank_2",
+      "location": [
+        4.09,
+        -6.5,
+        1.6
+      ],
+      "dimensions": [
+        0.26,
+        0.16,
+        2.4
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Door_Plank_3",
+      "location": [
+        4.365,
+        -6.5,
+        1.6
+      ],
+      "dimensions": [
+        0.26,
+        0.16,
+        2.4
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Door_Plank_4",
+      "location": [
+        4.640000000000001,
+        -6.5,
+        1.6
+      ],
+      "dimensions": [
+        0.26,
+        0.16,
+        2.4
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Door_Plank_5",
+      "location": [
+        4.915,
+        -6.5,
+        1.6
+      ],
+      "dimensions": [
+        0.26,
+        0.16,
+        2.4
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Door_Plank_6",
+      "location": [
+        5.19,
+        -6.5,
+        1.6
+      ],
+      "dimensions": [
+        0.26,
+        0.16,
+        2.4
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Door_Plank_7",
+      "location": [
+        5.465,
+        -6.5,
+        1.6
+      ],
+      "dimensions": [
+        0.26,
+        0.16,
+        2.4
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Door_Rail_00",
+      "location": [
+        3.95,
+        -6.609999999999999,
+        0.82
+      ],
+      "dimensions": [
+        1.02,
+        0.07,
+        0.13
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Door_Rail_01",
+      "location": [
+        3.95,
+        -6.609999999999999,
+        2.15
+      ],
+      "dimensions": [
+        1.02,
+        0.07,
+        0.13
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Door_Rail_10",
+      "location": [
+        5.05,
+        -6.609999999999999,
+        0.82
+      ],
+      "dimensions": [
+        1.02,
+        0.07,
+        0.13
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Door_Rail_11",
+      "location": [
+        5.05,
+        -6.609999999999999,
+        2.15
+      ],
+      "dimensions": [
+        1.02,
+        0.07,
+        0.13
+      ],
+      "material": "door",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Entry_Jamb_0",
+      "location": [
+        3.28,
+        -6.72,
+        1.7
+      ],
+      "dimensions": [
+        0.28,
+        0.33,
+        2.6
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Entry_Jamb_1",
+      "location": [
+        5.72,
+        -6.72,
+        1.7
+      ],
+      "dimensions": [
+        0.28,
+        0.33,
+        2.6
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Entry_Lintel",
+      "location": [
+        4.5,
+        -6.71,
+        2.85
+      ],
+      "dimensions": [
+        2.76,
+        0.38,
+        0.28
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Entry_Step_0",
+      "location": [
+        4.5,
+        -8.57,
+        0.09
+      ],
+      "dimensions": [
+        3.3,
+        0.65,
+        0.18
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Entry_Step_1",
+      "location": [
+        4.5,
+        -8.15,
+        0.19
+      ],
+      "dimensions": [
+        3.05,
+        0.72,
+        0.38
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Entry_Step_2",
+      "location": [
+        4.5,
+        -7.68,
+        0.3
+      ],
+      "dimensions": [
+        2.8,
+        0.85,
+        0.6
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
       ]
     }
   ],
@@ -1154,11 +2409,11 @@
   },
   "candidateBuild": {
     "adapter": "../hall-candidate/build.py",
-    "triangleLimit": 900,
-    "notes": "Dos hojas sugeridas por junta central; hall_door es una malla \u00fanica con pivote en la bisagra izquierda, seg\u00fan contrato actual. Cumbrera 5,6 m, remates 5,83 m y m\u00e1stil 7,5 m. La puerta de 2,4 m comienza sobre el basamento de 0,4 m.",
+    "triangleLimit": 1500,
+    "notes": "Revisi\u00f3n medieval solicitada por Vera: paja de espesor visible e hiladas solapadas, cerchas y entramado de madera oscura, porche carpintero con capiteles/riostras/dintel, acceso escalonado y puerta de dos hojas. M\u00e1stil retirado seg\u00fan pieza opcional de \u00a78.3. Paredes 2,8 m, cumbrera 5,63 m (remates sajones 5,78 m); parcela 9\u00d79 m. Se usa timberDark de la paleta para contrastar la carpinter\u00eda. Las dos hojas forman hall_door con pivote en la bisagra izquierda, como contrato actual. Presupuesto ampliado al m\u00e1ximo 1500 autorizado en el encargo reciente para la carpinter\u00eda y las hiladas. Sin preguntas pendientes.",
     "doorPivot": [
-      3.407,
-      -6.57,
+      3.41,
+      -6.5,
       0.4
     ]
   }
