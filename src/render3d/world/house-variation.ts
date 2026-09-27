@@ -43,15 +43,24 @@ export function varyHouse(source: Object3D, variant: number): () => void {
     if (child instanceof Mesh && child.material instanceof MeshStandardMaterial
       && child.material.name.includes('roof')) base = Math.min(base, new Box3().setFromObject(child).min.y);
   });
+  // Una copia por material de origen, no por pieza: así las piezas de la casa
+  // siguen compartiendo material y se funden en una (`mergeStatic`, 27 sep).
+  const tinted = new Map<MeshStandardMaterial, MeshStandardMaterial>();
   source.traverse((child) => {
     if (!(child instanceof Mesh) || !(child.material instanceof MeshStandardMaterial)) return;
     const roof = child.material.name.includes('roof');
     const wall = child.material.name.includes('plaster') || child.material.name.includes('stone');
     if (roof || wall) {
-      const material = child.material.clone();
-      material.color.multiply(new Color(roof ? finish.roof : finish.wall));
-      child.material = material;
-      owned.push(material);
+      const known = tinted.get(child.material);
+      if (known !== undefined) {
+        child.material = known;
+      } else {
+        const material = child.material.clone();
+        material.color.multiply(new Color(roof ? finish.roof : finish.wall));
+        tinted.set(child.material, material);
+        child.material = material;
+        owned.push(material);
+      }
     }
     if (new Box3().setFromObject(child).max.y <= base) return;
     // El GLB conserva transformaciones de Blender: deformar en Y mundial

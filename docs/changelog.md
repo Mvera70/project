@@ -1,5 +1,21 @@
 # The Valley — Registro de cambios
 
+## v4.70 · 27 sep 2026 · Rendimiento, primera tanda
+
+Vera, desde su tablet: «arranca a 1 FPS», «el rendimiento es nefasto». La villa
+grande pedía 1.724 llamadas de dibujo por fotograma, y medido contra la versión
+de antes de las rondas del 26–27 sep el peso ya estaba ahí (1.695): la mitad
+eran los 347 tramos de muralla, cada uno con su malla y su sombra. **La muralla
+va en lote** —fundida por material, rehecha sólo cuando el plan cambia—, **las
+casas funden sus piezas por material** (y dejan de clonar un material por
+pieza, que era lo que impedía fundirlas), y **los animales dejan de proyectar
+sombra**. La villa baja a 796 llamadas y la aldea de 607 a 460. **En aparatos
+táctiles** se dibuja sin MSAA, con la densidad de píxeles tope en 1,5 y sombras
+de 1024; y **en todos, la resolución se adapta**: si el juego va por debajo de
+unos 28 FPS, baja la densidad por pasos hasta la mitad, y la recupera si sobra.
+Con la skill `performance`, que apunta cómo medir, las cifras y lo aprendido, y
+dos sondas en `tools/graphics/`.
+
 ## v4.69 · 27 sep 2026 · El banco de batallas
 
 Vera: «un sandbox muy simple donde se puedan ver batallas y métricas en

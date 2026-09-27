@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · Rendimiento, primera tanda (v4.70)
+
+Medido con `tools/graphics/gl-probe.mjs` y `scene-report.mjs` (villa 7/60 y aldea
+11/21): villa 1.724 → 796 llamadas y JS por fotograma 16,4 → 14,8 ms; aldea 607 →
+460. Cambios: `Village.batchWalls` + `batchStatic`/`mergeStatic`
+(`world/merge-static.ts`), `varyHouse` y `roofsOf` con una copia por material de
+origen, animales sin sombra, perfil táctil (`HANDHELD`) y `adaptResolution`
+(`ADAPT`) en `renderer.ts`. **Probado y retirado**: `compileAsync` al montar el
+valle duplicaba los programas (35 → 68). **El roble no se toca**: lo rehace Vera.
+**Queda**: aldeanos y animales (364 mallas con esqueleto y sin recorte por
+pantalla), el humo, precompilar bien y medir en un aparato real. Prueba:
+`tests/fast/render-batching.test.ts`. Skill: `.claude/skills/performance/`.
+
 ## 27 sep 2026 · El banco de batallas (v4.69)
 
 `?sandbox=battle` → `src/ui/sandbox.ts`. `garrisonAs` (`derive/garrison.ts`),

@@ -17,6 +17,7 @@ import type { ElevatedRingVariant } from '@derive/elevated-ring';
 import { DEFENCE_DIAGONALS } from './defences';
 import { buildDefence } from './defences';
 import { varyHouse } from './house-variation';
+import { batchStatic, mergeStatic } from './merge-static';
 import { buildRampart, rampartTower, type RampartModel } from './rampart-mesh';
 import type { RampartLayout } from './rampart';
 
@@ -74,6 +75,9 @@ export interface BuildingModel {
  */
 function roofsOf(model: Object3D): Array<{ material: MeshStandardMaterial; base: Color }> {
   const roofs: Array<{ material: MeshStandardMaterial; base: Color }> = [];
+  // Una copia por material de origen, no por pieza: las piezas de un mismo
+  // tejado comparten material y así se pueden fundir en una (`mergeStatic`).
+  const copies = new Map<Material, MeshStandardMaterial>();
   model.traverse((child) => {
     const mesh = child as Object3D & { isMesh?: boolean; material?: Material | Material[] };
     if (mesh.isMesh !== true || mesh.material === undefined || Array.isArray(mesh.material)) return;
@@ -82,7 +86,10 @@ function roofsOf(model: Object3D): Array<{ material: MeshStandardMaterial; base:
     // paleta con el que se autorizó la receta. No se nieva sobre la pared: la
     // nieve cuaja arriba, y una casa blanca entera es una casa de otro color.
     if (!source.name.includes('roof')) return;
+    const known = copies.get(source);
+    if (known !== undefined) { mesh.material = known; return; }
     const copy = source.clone();
+    copies.set(source, copy);
     mesh.material = copy;
     roofs.push({ material: copy, base: copy.color.clone() });
   });
@@ -367,6 +374,10 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D, walkw
     hinge.attach(doorMesh);
   }
   const roofs = roofsOf(model);
+  // Rendimiento (27 sep 2026): las piezas del modelo, fundidas por material.
+  // Después de sacar la puerta a su bisagra y de copiar los tejados, que son
+  // las dos cosas que tienen que seguir sueltas o propias.
+  const merged = mergeStatic(model);
   const snowy = new Color();
   let broken = false;
   return {
@@ -402,6 +413,7 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D, walkw
       // nuestros, porque se copiaron para poder nevar sobre ellos.
       for (const roof of roofs) roof.material.dispose();
       for (const geometry of gateJointGeometries) geometry.dispose();
+      for (const geometry of merged) geometry.dispose();
       roofs.length = 0;
       disposeVariation?.();
       tower?.dispose();
@@ -505,6 +517,14 @@ function buildRuinScar(planned: PlannedBuilding): BuildingModel {
 export class Village {
   readonly group = new Group();
   private readonly models = new Map<BuildingId, BuildingModel>();
+  /** De qué tipo es cada modelo, para saber cuáles van al lote de muralla. */
+  private readonly kinds = new Map<BuildingId, BuildingKind>();
+  /**
+   * El lote de muralla (27 sep 2026): los tramos de muralla y empalizada,
+   * fundidos por material. Eran 347 mallas con sombra en la villa grande —unas
+   * setecientas llamadas de dibujo— y la muralla no se mueve.
+   */
+  private wallBatch: { group: Object3D; geometries: BufferGeometry[] } | null = null;
   private readonly gateRecoils = new Map<BuildingId, { x: number; z: number; axis: 'x' | 'z'; object: Group }>();
   /** Portones que han cedido en esta escena efímera. */
   private readonly brokenGates = new Set<BuildingId>();
@@ -597,6 +617,8 @@ export class Village {
         : buildFromAsset(accessFallbackPlan, accessFallback)
       : source === undefined ? buildBuilding(planned) : buildFromAsset(planned, source, entry, straight);
     this.models.set(planned.id, model);
+    if (planned.ruin) this.kinds.delete(planned.id);
+    else this.kinds.set(planned.id, planned.kind);
     if (planned.kind === 'gate' && !planned.ruin) {
       // Capa visual local: no mueve la huella ni el obstáculo. Si existe hoja,
       // sólo ella acusa; mientras E3 no la entregue, acusa la malla prestada.
@@ -679,12 +701,44 @@ export class Village {
     this.group.remove(model.object);
     model.dispose();
     this.models.delete(id);
+    this.kinds.delete(id);
     this.gateRecoils.delete(id);
     this.doorHolds.delete(id);
     if (forgetBroken) this.brokenGates.delete(id);
   }
 
+  /**
+   * Rehace el lote de muralla con los tramos que haya ahora. Se llama después
+   * de aplicar los cambios del plan: cuesta fundir unas decenas de miles de
+   * triángulos, y la muralla cambia como mucho una vez por semana del motor.
+   */
+  batchWalls(): void {
+    this.unbatchWalls();
+    const walls: Object3D[] = [];
+    for (const [id, model] of this.models) {
+      const kind = this.kinds.get(id);
+      if (kind !== 'wall' && kind !== 'palisade') continue;
+      model.object.visible = true;
+      walls.push(model.object);
+    }
+    if (walls.length < 2) return;
+    this.wallBatch = batchStatic(walls, this.group);
+    for (const wall of walls) wall.visible = false;
+  }
+
+  private unbatchWalls(): void {
+    if (this.wallBatch === null) return;
+    this.group.remove(this.wallBatch.group);
+    for (const geometry of this.wallBatch.geometries) geometry.dispose();
+    this.wallBatch = null;
+    for (const [id, model] of this.models) {
+      const kind = this.kinds.get(id);
+      if (kind === 'wall' || kind === 'palisade') model.object.visible = true;
+    }
+  }
+
   clear(): void {
+    this.unbatchWalls();
     this.rampart(null);
     for (const id of [...this.models.keys()]) this.remove(id);
     // Una jornada/escena nueva no hereda física efímera de la anterior. La

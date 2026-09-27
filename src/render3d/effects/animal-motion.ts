@@ -35,7 +35,9 @@ export class AnimalMotion {
     this.group.name = `Animal_${kind}_${id}`;
     this.group.add(object);
     object.traverse(node => {
-      if (node instanceof Mesh) { node.castShadow = true; node.frustumCulled = false; }
+      // Sin sombra (27 sep 2026): un animal a esta distancia apenas la deja ver,
+      // y cada malla con sombra se dibuja dos veces. Eran 177 llamadas en la villa.
+      if (node instanceof Mesh) { node.castShadow = false; node.frustumCulled = false; }
     });
     this.mixer = new AnimationMixer(object);
     const idle = asset.clips.find(clip => clip.name === 'idle');

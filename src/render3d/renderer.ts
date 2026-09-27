@@ -17,6 +17,7 @@ import {
   Color, DirectionalLight, Fog, Group, HemisphereLight, PCFShadowMap,
   ACESFilmicToneMapping,
   Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type BufferAttribute, type MeshStandardMaterial, type Object3D,
+  type Mesh,
 } from 'three';
 import { ford } from '@engine/sim';
 import { clockOf } from '@engine/time';
@@ -98,6 +99,14 @@ import { BattleDebris } from './world/battle-debris';
 import { Works } from './world/works';
 import type { Physics } from './life/physics';
 
+/** Lo que cambia en un aparato táctil. TUNE: medido el 27 sep 2026 (ver `adaptResolution`). */
+const HANDHELD = { pixelRatio: 1.5, shadowMapSize: 1024 } as const;
+/**
+ * La resolución adaptativa. TUNE: por debajo de ~28 FPS (0,036 s) baja un 15 %
+ * cada 2 s, hasta la mitad de la densidad; con más de ~50 FPS durante 6 s la
+ * recupera un paso.
+ */
+const ADAPT = { slowSeconds: 0.036, easySeconds: 0.02, everySeconds: 2, recoverSeconds: 6, step: 0.15, lowest: 0.5 } as const;
 const VILLAGER = 'villager';
 const TREE = 'tree';
 const TREE_PINE = 'tree-pine';
@@ -220,7 +229,15 @@ export async function createGraphicsRenderer(
   const traceStages = import.meta.env.DEV && new URLSearchParams(window.location.search).get('bench-stages') === '1';
   const markStage = (name: string): void => { if (traceStages) performance.mark(`valley3d:${name}`); };
   markStage('renderer:create-start');
-  const renderer = new WebGLRenderer({ canvas: options.canvas, antialias: options.quality !== 'low' });
+  // Rendimiento (27 sep 2026). Vera: «el rendimiento es nefasto», una tablet a
+  // un fotograma por segundo. **En un aparato táctil** —tablet o móvil, que es
+  // donde se juega— la pantalla tiene el doble de píxeles y la GPU la mitad de
+  // fuerza, así que se dibuja sin MSAA, con la densidad de píxeles tope en 1,5
+  // en vez de 2 y el mapa de sombras a la mitad. En un ordenador, lo de antes.
+  const handheld = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    && window.matchMedia('(pointer: coarse)').matches;
+  const pixelCap = handheld ? HANDHELD.pixelRatio : 2;
+  const renderer = new WebGLRenderer({ canvas: options.canvas, antialias: options.quality !== 'low' && !handheld });
   renderer.outputColorSpace = SRGBColorSpace;
   // **El valle estaba sobreexpuesto, y era la causa de que se viera lavado.**
   //
@@ -255,7 +272,8 @@ export async function createGraphicsRenderer(
 
   const sun = new DirectionalLight('#FFF4D8', 2.6);
   sun.castShadow = options.quality !== 'low';
-  sun.shadow.mapSize.set(SUN_SHADOW.mapSize, SUN_SHADOW.mapSize);
+  const shadowSize = handheld ? HANDHELD.shadowMapSize : SUN_SHADOW.mapSize;
+  sun.shadow.mapSize.set(shadowSize, shadowSize);
   sun.shadow.bias = SUN_SHADOW.bias;
   sun.shadow.normalBias = SUN_SHADOW.normalBias;
   const ambient = new HemisphereLight('#FFF6DF', '#776F62', 1.5);
@@ -289,7 +307,7 @@ export async function createGraphicsRenderer(
       ));
     }
     const reach = Math.max(1, visibleRadius + SUN_SHADOW.focusMargin);
-    const texel = (reach * 2) / SUN_SHADOW.mapSize;
+    const texel = (reach * 2) / shadowSize;
 
     // `direction` va del objetivo hacia el sol; la cámara de sombra mira en
     // sentido contrario. La base rota suavemente con el astro, mientras el
@@ -1276,6 +1294,39 @@ export async function createGraphicsRenderer(
   let heldFlood: number | null = null;
   let flooding = 0;
   window.__valleyObserveLive = () => { observingLive = true; };
+  // Diagnóstico de rendimiento (27 sep 2026): de dónde salen las llamadas de
+  // dibujo. Recorre la escena y cuenta, por grupo con nombre colgado del
+  // mundo, las mallas visibles, las que proyectan sombra y sus triángulos.
+  // Una malla instanciada es una llamada por muchas copias.
+  window.__valleySceneReport = () => {
+    const rows = new Map<string, { meshes: number; shadow: number; instanced: number; triangles: number }>();
+    // Los edificios se desglosan por tipo (`Valley_Buildings/wall`…), que es
+    // donde está el grueso de las llamadas en una villa.
+    const kinds = new Map(observedState?.buildings.map((b) => [b.id, b.kind]) ?? []);
+    const rowOf = (object: Object3D): string => {
+      let node: Object3D | null = object;
+      while (node !== null && node.parent !== world && node.parent !== scene) node = node.parent;
+      const top = node?.name || node?.type || '?';
+      const id = object.userData.buildingId as number | undefined;
+      return top === 'Valley_Buildings' && id !== undefined ? `${top}/${kinds.get(id) ?? '?'}` : top;
+    };
+    scene.traverseVisible((object) => {
+      const mesh = object as Mesh;
+      if (mesh.isMesh !== true) return;
+      const key = rowOf(object);
+      const row = rows.get(key) ?? { meshes: 0, shadow: 0, instanced: 0, triangles: 0 };
+      const geometry = mesh.geometry;
+      const count = geometry.index !== null ? geometry.index.count : (geometry.getAttribute('position')?.count ?? 0);
+      const copies = (mesh as unknown as { isInstancedMesh?: boolean; count: number }).isInstancedMesh === true
+        ? (mesh as unknown as { count: number }).count : 1;
+      row.meshes += 1;
+      if (mesh.castShadow) row.shadow += 1;
+      if (copies !== 1) row.instanced += 1;
+      row.triangles += Math.round((count / 3) * copies);
+      rows.set(key, row);
+    });
+    return [...rows.entries()].map(([group, row]) => ({ group, ...row })).sort((a, b) => b.meshes - a.meshes);
+  };
   // El banco de batallas (`?sandbox=battle`, `src/ui/sandbox.ts`, 27 sep 2026):
   // cuántos asaltantes y qué guarnición, y se rehace la jornada con ellos. Es
   // la capa de vida la que los pone —`garrisonAs`, sin el tope de §12—; el
@@ -1345,11 +1396,36 @@ export async function createGraphicsRenderer(
   };
 
   let firstPaintTraced = false;
+  // **La resolución se adapta a lo que el aparato da.** Se mide el intervalo
+  // entre fotogramas; si la media pasa de `ADAPT.slowSeconds` (por debajo de
+  // unos 28 FPS) se dibuja con menos píxeles, a pasos, hasta `ADAPT.lowest` de
+  // la densidad; si durante un rato sobra, se recupera. Cambiar la densidad
+  // rehace el lienzo, así que se decide como mucho cada `ADAPT.everySeconds`.
+  let renderScale = 1;
+  let frameAverage = 1 / 60;
+  let sinceAdapt = 0;
+  let easySeconds = 0;
+  const adaptResolution = (realDelta: number): void => {
+    if (!(realDelta > 0) || realDelta > 0.5) return;
+    frameAverage = frameAverage * 0.9 + realDelta * 0.1;
+    sinceAdapt += realDelta;
+    easySeconds = frameAverage < ADAPT.easySeconds ? easySeconds + realDelta : 0;
+    if (sinceAdapt < ADAPT.everySeconds) return;
+    let next = renderScale;
+    if (frameAverage > ADAPT.slowSeconds && renderScale > ADAPT.lowest) next = Math.max(ADAPT.lowest, renderScale - ADAPT.step);
+    else if (easySeconds > ADAPT.recoverSeconds && renderScale < 1) next = Math.min(1, renderScale + ADAPT.step);
+    if (next === renderScale) return;
+    renderScale = next;
+    sinceAdapt = 0;
+    easySeconds = 0;
+    renderer.setPixelRatio(Math.min(viewport.pixelRatio, pixelCap) * renderScale);
+    renderer.setSize(viewport.widthCss, viewport.heightCss, false);
+  };
   const graphics: GraphicsRenderer = {
     resize(next: GraphicsViewport): void {
       if (disposed) return;
       viewport = next;
-      renderer.setPixelRatio(Math.min(next.pixelRatio, 2));
+      renderer.setPixelRatio(Math.min(next.pixelRatio, pixelCap) * renderScale);
       renderer.setSize(next.widthCss, next.heightCss, false);
       // Girar el movil cambia cuanto valle cabe, pero no tiene por que
       // devolver al jugador al encuadre de partida si se habia acercado.
@@ -1453,6 +1529,8 @@ export async function createGraphicsRenderer(
       for (const id of change.removed) village.remove(id);
       for (const building of [...change.added, ...change.changed]) village.add(building);
       if (change.rampart) village.rampart(next.rampart);
+      // La muralla, en lote: una llamada por material en vez de una por tramo.
+      if (change.removed.length > 0 || change.added.length > 0 || change.changed.length > 0) village.batchWalls();
       for (const id of change.works.removed) works.remove(id);
       for (const work of [...change.works.added, ...change.works.changed]) works.add(work);
       plan = next;
@@ -1898,6 +1976,7 @@ export async function createGraphicsRenderer(
 
       if (!sampling && !observingLive) {
         if (firstPaint) markStage('paint:submit-start');
+        adaptResolution(frame.realDeltaSeconds);
         renderer.render(scene, camera);
         if (firstPaint) { markStage('paint:submit-end'); firstPaintTraced = true; }
       }
@@ -2272,6 +2351,7 @@ declare global {
     __valleyVisit?: (kind?: HappeningId, dealt?: boolean) => void;
     __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm } | null) => void;
     __valleyBattleStats?: () => BattleStats;
+    __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];
   }
 }
 
