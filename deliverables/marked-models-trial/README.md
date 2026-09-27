@@ -4,6 +4,9 @@ Once modelos rehechos para los señalados por Vera el 25 sep 2026. Se integraron
 en el juego mediante `tools/art/rigid-clips.mjs` y `tools/art/adopt-models.mjs`.
 El zorro y la piedra del vado quedaron fuera. `bear-v3.glb` es la revisión
 vigente del oso; `bear-v2.glb` y `bear.glb` son versiones anteriores.
+`bear-rear-preview.png` y `preview-sheet.png` pertenecen también a las
+pruebas anteriores; no muestran la versión publicada. Se conservan sólo como
+histórico. El archivo que carga el juego es `public/assets/valley3d/bear.glb`.
 
 | ID del juego | Modelo candidato | Vista previa |
 |---|---|---|

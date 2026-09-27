@@ -18,13 +18,13 @@ no representan una tablet.** Lo que sí es comparable entre versiones:
 
 | Cifra | Herramienta | Qué dice |
 |---|---|---|
-| Llamadas de dibujo por fotograma | `node tools/graphics/gl-probe.mjs <valley.html> "<query>" 60` | Lo que más castiga a una tablet con WebGL (CPU del driver + JS de Three por llamada) |
+| Llamadas de dibujo por fotograma | `node tools/graphics/performance/gl-probe.mjs <valley.html> "<query>" 60` | Lo que más castiga a una tablet con WebGL (CPU del driver + JS de Three por llamada) |
 | Triángulos por fotograma | la misma | Carga de vértices (menos crítica que las llamadas) |
 | Programas enlazados | la misma | Sombreadores distintos: cada uno se compila, y en móvil compilar tarda |
 | JS por fotograma (mediana · p90) | la misma | CPU del juego: vida, animación, escena y el envío de las llamadas |
-| Reparto de mallas por grupo | `node tools/graphics/scene-report.mjs "<query>"` (usa `window.__valleySceneReport()`) | De dónde salen las llamadas: mallas visibles, con sombra e instanciadas, por grupo y los edificios por tipo |
-| Recompilaciones | `node tools/graphics/shader-churn.mjs <valley.html> "<query>"` | Programas enlazados tras cargar, tras un rayo y con la fiesta. **Cada uno de más es un tirón en una tablet** |
-| CPU por función | `node tools/graphics/cpu-profile.mjs <valley.html> "<query>" <espera> <perfil> <función>` sobre `bundle-game.ts --no-minify` | Tiempo inclusivo y quién llama a una función |
+| Reparto de mallas por grupo | `node tools/graphics/performance/scene-report.mjs "<query>"` (usa `window.__valleySceneReport()`) | De dónde salen las llamadas: mallas visibles, con sombra e instanciadas, por grupo y los edificios por tipo |
+| Recompilaciones | `node tools/graphics/performance/shader-churn.mjs <valley.html> "<query>"` | Programas enlazados tras cargar, tras un rayo y con la fiesta. **Cada uno de más es un tirón en una tablet** |
+| CPU por función | `node tools/graphics/performance/cpu-profile.mjs <valley.html> "<query>" <espera> <perfil> <función>` sobre `bundle-game.ts --no-minify` | Tiempo inclusivo y quién llama a una función |
 | Fotogramas con dibujo por software | contar fotogramas en 40 s, mismo navegador, dos versiones | **Sí sirve para comparar el coste por píxel**: SwiftShader, como una tablet, va limitado por píxeles (así se vio lo que cuesta cada luz) |
 
 Escenas de referencia (siempre las dos, nunca una):

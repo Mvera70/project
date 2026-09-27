@@ -119,9 +119,23 @@ function wobbleAt(map: ValleyMap, x: number, z: number): { x: number; z: number 
   if (x <= 0 || z <= 0 || x >= map.width || z >= map.height) return { x, z };
   const mixed = Math.imul(x * 73_856_093 + z * 19_349_663 + 1, 2_654_435_761) >>> 0;
   const other = Math.imul(mixed ^ 0x9e37_79b9, 2_246_822_519) >>> 0;
+  // Suavizar el contorno compartido, también en el suelo: desplazar sólo el
+  // agua dejaría huecos. Los dos bordes que llegan a la esquina forman su
+  // tangente; promediarlos quita los escalones sin cambiar ninguna celda.
+  const wet = (cx: number, cz: number): boolean => {
+    const t = map.terrain[Math.max(0, Math.min(map.height - 1, cz)) * map.width
+      + Math.max(0, Math.min(map.width - 1, cx))];
+    return t === TERRAIN_CODE.water || t === TERRAIN_CODE.lake || t === TERRAIN_CODE.ford;
+  };
+  const nw = wet(x - 1, z - 1), ne = wet(x, z - 1);
+  const sw = wet(x - 1, z), se = wet(x, z);
+  const edges = Number(nw !== ne) + Number(sw !== se) + Number(nw !== sw) + Number(ne !== se);
+  const bankX = edges === 2 ? (Number(ne !== se) - Number(nw !== sw)) * 0.30 : 0;
+  const bankZ = edges === 2 ? (Number(sw !== se) - Number(nw !== ne)) * 0.30 : 0;
+  const jitter = edges > 0 ? 0.35 : 1;
   return {
-    x: x + ((mixed % 1000) / 999 - 0.5) * 2 * WOBBLE,
-    z: z + ((other % 1000) / 999 - 0.5) * 2 * WOBBLE,
+    x: x + bankX + ((mixed % 1000) / 999 - 0.5) * 2 * WOBBLE * jitter,
+    z: z + bankZ + ((other % 1000) / 999 - 0.5) * 2 * WOBBLE * jitter,
   };
 }
 
@@ -204,13 +218,13 @@ export function cellColour(
   }
   switch (map.terrain[cell] ?? 0) {
     case 1: return palette.forest;
-    case 2: return palette.water;
+    case 2: return mixed(palette.stone, palette.path);
     case 3: return palette.rock;
     case 4: return palette.forestDark;
     case 5: return palette.field;
     // El mapa grande: piedra desnuda y agua quieta (`docs/historico/next-plan.md`).
     case 6: return palette.stone;
-    case 7: return palette.lake;
+    case 7: return mixed(palette.stone, palette.rock);
     // El vado: el agua del río aclarada con el color de los caminos, que es
     // exactamente lo que es —agua somera con piedras puestas—. No pide color
     // propio en la paleta porque no es un terreno nuevo del valle, es un río
@@ -271,7 +285,7 @@ function mixed(from: string, to: string): string {
  * que proyecta el borde.
  */
 const RELIEF: Readonly<Record<number, number>> = {
-  2: -0.14,   // agua
+  2: -0.30,   // cauce: deja visible la lámina por encima del fondo
   4: -0.05,   // marisma
   3: 0.09,    // roca
   // La montaña no está aquí: su cota **no es una constante por celda**, sube
@@ -281,7 +295,7 @@ const RELIEF: Readonly<Record<number, number>> = {
   // El vado, menos hondo que el cauce: las losas asoman sobre la corriente y
   // por eso se puede cruzar. Si estuviera a la cota del agua, la gente cruzaría
   // el río andando sobre el río.
-  8: -0.06,   // vado
+  8: -0.12,   // vado somero: las piedras siguen por encima del agua
 };
 
 /**
@@ -427,11 +441,13 @@ function heightAt(map: ValleyMap, x: number, z: number): number {
   const rises = risesOf(map);
   let total = 0;
   let seen = 0;
+  let lake = 0;
   for (const [dx, dz] of [[-1, -1], [0, -1], [-1, 0], [0, 0]] as const) {
     const cx = x + dx;
     const cz = z + dz;
     if (cx < 0 || cz < 0 || cx >= map.width || cz >= map.height) continue;
     const cell = cz * map.width + cx;
+    if (map.terrain[cell] === TERRAIN_CODE.lake) lake += 1;
     total += RELIEF[map.terrain[cell] ?? 0] ?? 0;
     // Y lo que la montaña levanta, que depende de dónde está y no sólo de qué es.
     if (map.terrain[cell] === TERRAIN_CODE.mountain) total += rises[cell] as number;
@@ -440,7 +456,34 @@ function heightAt(map: ValleyMap, x: number, z: number): number {
     total += RUT[Math.min(RUT.length - 1, map.path[cell] ?? 0)] ?? 0;
     seen += 1;
   }
+  // Una cota de ribera común evita que cada triángulo de montaña recorte un
+  // diente distinto en el lago. La ladera comienza en el siguiente vértice.
+  if (lake > 0) return lake === seen ? -0.38 : -0.19;
   return seen === 0 ? 0 : total / seen;
+}
+
+/** Altura del triángulo dibujado, para pegar decorado fino al relieve.
+ * Sólo se usa al construir las cascadas: la vida mantiene su consulta barata.
+ */
+export function groundSurfaceAt(map: ValleyMap, x: number, z: number): number {
+  const cx = Math.floor(x), cz = Math.floor(z);
+  for (let row = cz - 1; row <= cz + 1; row += 1) {
+    for (let col = cx - 1; col <= cx + 1; col += 1) {
+      if (col < 0 || row < 0 || col >= map.width || row >= map.height) continue;
+      const corners = [[col, row], [col + 1, row], [col + 1, row + 1], [col, row + 1]] as const;
+      const points = corners.map(([px, pz]) => ({ ...wobbleAt(map, px, pz), y: heightAt(map, px, pz) }));
+      for (const [ia, ib, ic] of [[0, 2, 1], [0, 3, 2]] as const) {
+        const a = points[ia]!, b = points[ib]!, c = points[ic]!;
+        const determinant = (b.z - c.z) * (a.x - c.x) + (c.x - b.x) * (a.z - c.z);
+        const u = ((b.z - c.z) * (x - c.x) + (c.x - b.x) * (z - c.z)) / determinant;
+        const v = ((c.z - a.z) * (x - c.x) + (a.x - c.x) * (z - c.z)) / determinant;
+        if (u >= -1e-6 && v >= -1e-6 && u + v <= 1 + 1e-6) {
+          return a.y * u + b.y * v + c.y * (1 - u - v);
+        }
+      }
+    }
+  }
+  return elevationAt(map, x, z);
 }
 
 /**
@@ -464,51 +507,68 @@ const WATER_LEVEL = -0.10;
 function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
   const cells: number[] = [];
   for (let cell = 0; cell < map.terrain.length; cell += 1) {
-    if (map.terrain[cell] === TERRAIN_CODE.water || map.terrain[cell] === TERRAIN_CODE.lake) cells.push(cell);
+    if (map.terrain[cell] === TERRAIN_CODE.water || map.terrain[cell] === TERRAIN_CODE.lake || map.terrain[cell] === TERRAIN_CODE.ford) cells.push(cell);
   }
   if (cells.length === 0) return null;
 
-  const positions = new Float32Array(cells.length * 4 * 3);
-  const colours = new Float32Array(cells.length * 4 * 3);
-  const shores = new Float32Array(cells.length * 4);
-  const flows = new Float32Array(cells.length * 4 * 2);
-  const indices = new Uint32Array(cells.length * 6);
+  // Un centro por celda permite que hasta el arroyo de una celda tenga
+  // agua profunda en medio y agua somera a ambos lados, sin franjas diagonales.
+  const positions = new Float32Array(cells.length * 5 * 3);
+  const colours = new Float32Array(cells.length * 5 * 3);
+  const shores = new Float32Array(cells.length * 5);
+  const flows = new Float32Array(cells.length * 5 * 2);
+  const courses = new Float32Array(cells.length * 5 * 2);
+  const indices = new Uint32Array(cells.length * 12);
   const river = new Color(palette.water);
   const lake = new Color(palette.lake);
+  const left = new Float32Array(map.height).fill(map.width);
+  const right = new Float32Array(map.height);
+  for (const cell of cells) {
+    if (map.terrain[cell] === TERRAIN_CODE.lake) continue;
+    const row = Math.floor(cell / map.width), x = cell % map.width;
+    left[row] = Math.min(left[row]!, x);
+    right[row] = Math.max(right[row]!, x + 1);
+  }
   for (let index = 0; index < cells.length; index += 1) {
     const cell = cells[index] ?? 0;
     const isLake = map.terrain[cell] === TERRAIN_CODE.lake;
     const x = cell % map.width;
     const z = Math.floor(cell / map.width);
-    const corner = index * 4;
+    const corner = index * 5;
     const points = [[x, z], [x + 1, z], [x + 1, z + 1], [x, z + 1]] as const;
-    for (let vertex = 0; vertex < 4; vertex += 1) {
+    const moved = points.map(([cx, cz]) => wobbleAt(map, cx, cz));
+    let centreX = 0, centreZ = 0;
+    for (const p of moved) { centreX += p.x * 0.25; centreZ += p.z * 0.25; }
+    moved.push({ x: centreX, z: centreZ });
+    for (let vertex = 0; vertex < 5; vertex += 1) {
       const at = (corner + vertex) * 3;
-      // La misma esquina movida que el suelo: si la lamina se quedara en la
-      // cuadricula, el agua asomaria por fuera del cauce.
-      const moved = wobbleAt(map, points[vertex]?.[0] ?? 0, points[vertex]?.[1] ?? 0);
-      positions[at] = moved.x;
+      positions[at] = moved[vertex]!.x;
       positions[at + 1] = GROUND_BIAS + (isLake ? -0.23 : WATER_LEVEL);
-      positions[at + 2] = moved.z;
-      // El renderer anima el color base del agua al cambiar de estación.
-      // El lago conserva su tono hondo en la misma malla y el mismo draw call.
+      positions[at + 2] = moved[vertex]!.z;
       colours[at] = isLake ? lake.r / river.r : 1;
       colours[at + 1] = isLake ? lake.g / river.g : 1;
       colours[at + 2] = isLake ? lake.b / river.b : 1;
-      // El agua viva (`water-surface.ts`): la orilla y hacia dónde corre.
-      const [cx, cz] = points[vertex] ?? [0, 0];
-      shores[corner + vertex] = shoreAt(map, cx, cz);
-      const flow = isLake ? { x: 0, z: 0 } : flowAt(map, cz);
+      const point = points[vertex];
+      shores[corner + vertex] = point === undefined ? 0 : shoreAt(map, point[0], point[1]);
+      const flow = isLake ? { x: 0, z: 0 } : flowAt(map, point?.[1] ?? z + 0.5);
       flows[(corner + vertex) * 2] = flow.x;
       flows[(corner + vertex) * 2 + 1] = flow.z;
+      // Coordenada continua a través de TODO el ancho del río. No depende de
+      // qué celda está dibujando la copia de este vértice compartido.
+      const row = Math.max(0, Math.min(map.height - 1, moved[vertex]!.z - 0.5));
+      const lo = Math.floor(row), hi = Math.min(map.height - 1, lo + 1), blend = row - lo;
+      const bankLeft = left[lo]! * (1 - blend) + left[hi]! * blend;
+      const bankRight = right[lo]! * (1 - blend) + right[hi]! * blend;
+      courses[(corner + vertex) * 2] = isLake ? 0
+        : (moved[vertex]!.x - (bankLeft + bankRight) * 0.5) / Math.max(0.5, (bankRight - bankLeft) * 0.5);
+      courses[(corner + vertex) * 2 + 1] = moved[vertex]!.z;
     }
-    const face = index * 6;
-    indices[face] = corner;
-    indices[face + 1] = corner + 2;
-    indices[face + 2] = corner + 1;
-    indices[face + 3] = corner;
-    indices[face + 4] = corner + 3;
-    indices[face + 5] = corner + 2;
+    for (let edge = 0; edge < 4; edge += 1) {
+      const face = index * 12 + edge * 3;
+      indices[face] = corner + 4;
+      indices[face + 1] = corner + (edge + 1) % 4;
+      indices[face + 2] = corner + edge;
+    }
   }
 
   const geometry = new BufferGeometry();
@@ -516,6 +576,7 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
   geometry.setAttribute('color', new BufferAttribute(colours, 3));
   geometry.setAttribute('waterShore', new BufferAttribute(shores, 1));
   geometry.setAttribute('waterFlow', new BufferAttribute(flows, 2));
+  geometry.setAttribute('waterCourse', new BufferAttribute(courses, 2));
   geometry.setIndex(new BufferAttribute(indices, 1));
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
@@ -523,12 +584,12 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
   const material = new MeshStandardMaterial({
     color: palette.water,
     vertexColors: true,
-    roughness: 0.18,
-    metalness: 0.1,
+    roughness: 0.42,
+    metalness: 0,
     // Translucida lo justo para que el fondo del cauce se intuya. Del todo
     // opaca el rio es una chapa; del todo clara no hay rio.
     transparent: true,
-    opacity: 0.86,
+    opacity: 0.92,
     side: DoubleSide,
   });
   liveWater(material, SHARED_WATER);
@@ -553,7 +614,7 @@ function shoreAt(map: ValleyMap, x: number, z: number): number {
     const cx = x + dx, cz = z + dz;
     if (cx < 0 || cz < 0 || cx >= map.width || cz >= map.height) continue;
     const t = map.terrain[cz * map.width + cx];
-    if (t !== TERRAIN_CODE.water && t !== TERRAIN_CODE.lake) dry += 1;
+    if (t !== TERRAIN_CODE.water && t !== TERRAIN_CODE.lake && t !== TERRAIN_CODE.ford) dry += 1;
   }
   return dry >= 2 ? 1 : dry === 1 ? 0.5 : 0;
 }
@@ -620,6 +681,7 @@ function buildFloodSheet(map: ValleyMap, material: MeshStandardMaterial): Mesh |
   const positions: number[] = [];
   const shores: number[] = [];
   const flows: number[] = [];
+  const courses: number[] = [];
   const colours: number[] = [];
   const indices: number[] = [];
   for (let cell = 0; cell < reach.length; cell += 1) {
@@ -638,6 +700,7 @@ function buildFloodSheet(map: ValleyMap, material: MeshStandardMaterial): Mesh |
       shores.push(reach[cell]! >= FLOOD_REACH ? 0.9 : 0);
       const flow = flowAt(map, cz);
       flows.push(flow.x * 0.6, flow.z * 0.6);
+      courses.push(0, moved.z);
       colours.push(1, 1, 1);
     }
     indices.push(base, base + 2, base + 1, base, base + 3, base + 2);
@@ -648,6 +711,7 @@ function buildFloodSheet(map: ValleyMap, material: MeshStandardMaterial): Mesh |
   geometry.setAttribute('color', new BufferAttribute(new Float32Array(colours), 3));
   geometry.setAttribute('waterShore', new BufferAttribute(new Float32Array(shores), 1));
   geometry.setAttribute('waterFlow', new BufferAttribute(new Float32Array(flows), 2));
+  geometry.setAttribute('waterCourse', new BufferAttribute(new Float32Array(courses), 2));
   geometry.setIndex(new BufferAttribute(new Uint32Array(indices), 1));
   geometry.computeVertexNormals();
   const mesh = new Mesh(geometry, material);

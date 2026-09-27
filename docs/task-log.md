@@ -1,5 +1,21 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · Las cascadas, blancas y con boca (v4.74)
+
+Sobre el agua de la otra sesión (`art/astra-modelos`, 9f3b929), juntado en
+`main` con permiso de Vera. `world/waterfalls.ts`: material blanco con
+vetas, masas y espuma al pie (`onBeforeCompile`, con ruido propio), emisivo
+suave, `FLOW` 0,9 → 1,5, cinta 1,0/1,75 de ancho, `POOL_RADIUS`, `MIST`,
+`MOUTH` (boca: disco oscuro + visera) y la envolvente vuelta a pasar tras
+levantar por triángulo. `world/mountains.ts`: `buildGorgeRoads(…, crossing)`
+levanta un puente (`BRIDGE`) con rampas donde la senda cruza el corredor de
+una cascada; `backdrop.ts` le pasa el corredor. La caída al lago usa
+`LEAST_DROP`. Prueba `water.test.ts`: compara secciones, no vértices sueltos
+(mezclaba carriles). **Roja de antes, no mía**: `graphics-world` «el agua es
+una lámina propia» (1630 ≠ 1296 vértices) viene del río nuevo de 224b4fc.
+Medido: aldea 11/21 a 357 llamadas (335 en `main` sin el agua nueva).
+**Queda**: verlo en un aparato real; la boca sólo se distingue de cerca.
+
 ## 27 sep 2026 · La interfaz, archivada por versión
 
 `docs/interfaz/2026-09-27/`: 107 capturas del paquete de prensa (43 copiadas a
@@ -46,7 +62,7 @@ está cambiando la otra sesión): sus luces pasan por el banco desde fuera.
 
 ## 27 sep 2026 · Rendimiento, primera tanda (v4.70)
 
-Medido con `tools/graphics/gl-probe.mjs` y `scene-report.mjs` (villa 7/60 y aldea
+Medido con `tools/graphics/performance/gl-probe.mjs` y `scene-report.mjs` (villa 7/60 y aldea
 11/21): villa 1.724 → 796 llamadas y JS por fotograma 16,4 → 14,8 ms; aldea 607 →
 460. Cambios: `Village.batchWalls` + `batchStatic`/`mergeStatic`
 (`world/merge-static.ts`), `varyHouse` y `roofsOf` con una copia por material de

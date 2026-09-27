@@ -1,5 +1,39 @@
 # The Valley — Registro de cambios
 
+## v4.74 · 27 sep 2026 · Las cascadas, blancas y con boca, y un puente
+
+Vera: «las cascadas y caídas de agua todavía no me convencen». Eran del color
+del río —una raya turquesa sobre la roca, casi negra en la sombra de la
+garganta— y nacían y acababan de golpe. Ahora **la cinta es blanca**: vetas y
+masas que bajan a golpes, azul sólo en los huecos, bordes deshechos y algo de
+luz propia; **nace en una boca** en la roca («una especie de cuevita, una
+salida; se ve muy abrupta»), un hueco oscuro con su visera de piedra; y **al
+pie hay una poza de espuma y neblina** que sube del choque, más dos velos a
+media caída en las gargantas. Y donde la senda de la garganta cruzaba la
+cascada y la tapaba, **un puente de tablas** («podrías poner un puente»), con
+baranda y rampas hasta la cota de la senda. La caída al lago exige el mismo
+salto mínimo que las de garganta: la de una celda que salía en la semilla 7
+era un reguero, y la prueba lo decía. Coste: unas 22 llamadas de dibujo más en
+la aldea (poza y velos de tres caídas), medido con `gl-probe`.
+
+## v4.73 · 27 sep 2026 · Río, lago y caídas de agua
+
+Vera señaló que el río se veía como una franja azul y que los arroyos de las
+gargantas parecían trazos blancos sobre la roca. El cauce tiene ahora fondo
+terroso visible, canal más hondo y orillas someras; la corriente usa coordenadas
+continuas para evitar abanicos y patrones por celda. El vado conserva el agua
+entre sus losas, y el tramo exterior comparte el mismo acabado. La orilla del
+lago deja de mostrar la trama de diamantes. Las caídas se ajustan a la roca con
+un cuerpo azul verdoso que llega al río o al lago; la espuma queda al pie y se
+retiran los anillos concéntricos. Revisado con capturas del juego real en
+`artifacts/graphics/water-review/` (semillas 7 y 11, cauce, lago y garganta).
+
+Corrección posterior: Vera vio que una caída atravesaba la roca y un pino.
+Ahora las gargantas siguen también la superficie visible de la montaña y
+buscan un corredor libre de árboles y peñascos. La caída al lago solo se dibuja
+si su recorrido se ve libre desde la cámara de reposo; cuando existe, cae
+directamente desde la roca al agua, sin una repisa añadida.
+
 ## v4.72 · 27 sep 2026 · Lo que se quedó en ramas
 
 Vera: «nos dejamos trabajo sin subir en ramas perdidas… revisa al completo».

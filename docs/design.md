@@ -7290,9 +7290,22 @@ en la sierra. Cruza la marisma en vez de rodearla, y va a una cota suavizada y
 plana de lado a lado, como una plataforma.
 
 **Cascadas (v4.64).** Una baja por la pared de cada garganta hasta el río, y
-otra al lago si hay roca detrás (`world/waterfalls.ts`, `gorgeAt` decide dónde
-hay pared de garganta): una cinta pegada a la roca con vetas que bajan y
-espuma al pie, y se elige la pared que mira a la cámara.
+otra al lago cuando haya roca, recorrido despejado y una caída visible desde
+la cámara de reposo (`world/waterfalls.ts`, `gorgeAt` decide dónde hay pared
+de garganta). Las gargantas siguen el relieve; la del lago nace en una cara
+de roca y cae libre hasta el agua, sin repisas ni soportes añadidos. Se evitan
+árboles y peñascos y se comprueba también la oclusión por la sierra: si el
+origen, el cuerpo o el pie quedarían tapados, ese lago no lleva cascada.
+
+**Y blanca, con boca y con pie (v4.74).** El agua que cae va batida: la cinta
+es blanca por vetas y masas que bajan a golpes, con el azul sólo en los huecos,
+y luce por sí misma lo justo para no apagarse en la sombra de la garganta.
+Nace en una **boca**: un hueco oscuro en la roca con una visera de piedra,
+para que no empiece en mitad de la ladera. Al pie, una **poza de espuma** con
+anillos que se abren y **neblina** que sube del choque; en las gargantas, dos
+velos más a media caída. Y donde la senda de la garganta cruza una cascada,
+**un puente de tablas** con baranda y rampas, y el agua pasa por debajo. La
+caída al lago exige el mismo salto mínimo que la de garganta (`LEAST_DROP`).
 
 Todo esto es decorado: no cambia el motor ni una celda jugable.
 

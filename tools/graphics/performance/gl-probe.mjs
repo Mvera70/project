@@ -6,7 +6,7 @@
 // que se pierde enlazando y los milisegundos de JavaScript de cada callback de
 // requestAnimationFrame (mediana y p90). Ver la skill `performance`.
 //
-//   node tools/graphics/gl-probe.mjs <valley.html> "<query>" [segundos]
+//   node tools/graphics/performance/gl-probe.mjs <valley.html> "<query>" [segundos]
 //   p. ej. "debug=1&seed=7&year=60&season=summer&live=1" (la villa grande)
 //
 // **En una máquina sin GPU (SwiftShader) los tiempos no representan una

@@ -1,18 +1,31 @@
 # Las herramientas de The Valley — el catálogo
 
 Se ordenó el 19 sep 2026, a petición del dueño del diseño: «que no haya
-herramientas sueltas sin documentar». **Todo lo que hay en `tools/` está en una
-de las seis carpetas de abajo y tiene su línea en esta tabla.** Una herramienta
-nueva sin fila aquí no está terminada.
+herramientas sueltas sin documentar». Cada herramienta activa tiene una entrada
+aquí o en el README de su lote. Las utilidades de rondas cerradas viven en
+[`history/`](history/README.md). Una herramienta nueva sin entrada no está
+terminada.
+
+**Para encontrar la correcta sin recorrer el catálogo:**
+
+| Necesidad | Entrada recomendada |
+|---|---|
+| Ver el juego o grabar una escena | [`graphics/README.md`](graphics/README.md) → Captura |
+| Medir rendimiento de Three.js | [`graphics/README.md`](graphics/README.md) → Rendimiento |
+| Construir o publicar GLB | [`art/`](#art--de-la-receta-al-glb) y `graphics/publish-assets.ts` |
+| Medir motor y balance | [`reports/`](#reports--medir-el-motor-sin-tocarlo) |
+| Revisar interfaz o PWA | [`shots/`](#shots--la-interfaz-fotografiada), [`pwa/`](#pwa--instalable-y-sin-conexión) y [`ui/`](#ui--la-piel-y-los-iconos) |
+| Reproducir una ronda cerrada | [`history/`](history/README.md) |
 
 | Carpeta | Qué hay dentro |
 |---|---|
 | [`reports/`](#reports--medir-el-motor-sin-tocarlo) | Informes del motor. Miden y no cambian nada |
 | [`shots/`](#shots--la-interfaz-fotografiada) | Recorridos de interfaz en Playwright y capturas |
 | [`pwa/`](#pwa--instalable-y-sin-conexión) | Los recorridos de §13.4 y los servidores que imitan a GitHub Pages |
-| [`graphics/`](#graphics--el-valle-en-3d) | Capturar, rodar, medir y mirar el valle en 3D |
+| [`graphics/`](#graphics--el-valle-en-3d) | Capturar, rodar, medir y mirar el valle en 3D; [índice por tarea](graphics/README.md) |
 | [`ui/`](#ui--la-piel-y-los-iconos) | La piel de la interfaz: pergamino, cantos, iconos, calcos |
 | [`art/`](#art--de-la-receta-al-glb) | El camino de Blender al GLB publicado |
+| [`history/`](history/README.md) | Scripts de rondas cerradas, fuera del flujo habitual |
 
 **Cómo se lee una fila.** Si la herramienta tiene un `npm run`, se usa así; si
 no, se lanza con `npx tsx` o `node` y la ruta entera. Casi todas llevan su
@@ -98,6 +111,9 @@ silencio y la prueba pasa sin probar nada.
 
 ## `graphics/` — el valle en 3D
 
+El [índice corto por tarea](graphics/README.md) separa captura, modelos,
+rendimiento y revisión. La tabla siguiente conserva el detalle de cada script.
+
 | Herramienta | Qué hace |
 |---|---|
 | `shot.mjs` | **Fotografiar el juego montado.** `--seed`, `--year`, `--run`, `--speed`, `--wait moment\|crossroad`, `--look X,Z` para centrar una celda real y `--scene-only` para guardar el PNG WebGL sin HUD/DOM. `--capture-zoom 0.1..1` amplía esa captura del hook y exige `--look` o `--scene-only`. Abre el valle en un año concreto sin falsear el reloj (U-10b) |
@@ -111,17 +127,16 @@ silencio y la prueba pasa sin probar nada.
 | `bundle-game.ts` | Empaqueta el juego entero en una página, para abrirlo desde el móvil |
 | `serve.mjs` | Sirve ese paquete cuando va partido (`--split`), que pide su JSON por la red |
 | `capture.ts` | El motor de captura compartido |
-| `capture-chronicle-sheet.mjs` | Fotografía la hoja de contactos de los grabados de la crónica. **Espera un `chronicle-contact-sheet.html` servido en la raíz**, que se monta a mano para la ronda y no vive en el árbol |
+| `capture-fire-transition.mjs` · `fire-transition.html` · `fire-transition.ts` | Vista reproducible de la casa que arde, cae y deja la ruina. Con Vite local en marcha, captura días 1, 2,45 y 3,3 en `artifacts/graphics/G-42/fire-transition/`. `VITE_PORT` permite usar otro puerto |
 | `animal-gestures-bench.mjs` · `animal-gestures-bench.ts` | **Los gestos fabricados del perro** (`effects/animal-gestures.ts`: correr, ladrar, jugar) sobre el GLB publicado y el `Fauna` del juego, una fila por gesto: `node tools/graphics/animal-gestures-bench.mjs`. Para comprobar que un perro nuevo sigue sirviendo |
 | `hunt-smoke.mjs` | **La entrada de caza, de humo**: abre el juego (`--seed=N`, `--mobile`), entra en la caza y fotografía su escena 3D en `artifacts/graphics/hunt-smoke/`. Prueba manual reproducible, no una reja |
 | `animal-gait-compare.mjs` | **La marcha de dos GLB candidatos contra la publicada**: doce fases de `walk` del ciervo y del oso, con rodillas y tobillos marcados. `npx tsx tools/graphics/animal-gait-compare.mjs --candidate-dir <carpeta>`; su README es `animal-gait-compare-README.md` |
-| `gl-probe.mjs` | **Lo que cuesta cada fotograma, desde fuera**: intercepta WebGL y cuenta llamadas de dibujo, triángulos, programas enlazados, tiempo enlazando y JS por fotograma (mediana y p90). Vale para cualquier versión, también una vieja. `node tools/graphics/gl-probe.mjs <valley.html> "<query>" [segundos]`. Ver la skill `performance` |
-| `scene-report.mjs` | **De dónde salen las llamadas**: mallas visibles, con sombra e instanciadas y triángulos por grupo (los edificios, por tipo), con `window.__valleySceneReport()`. `node tools/graphics/scene-report.mjs "<query>" [valley.html]` |
-| `shader-churn.mjs` | **Cuántos sombreadores se recompilan al pasar cosas**: programas enlazados tras cargar, tras un rayo y al encender y apagar la fiesta. Cada uno de más es un tirón en una tablet. `node tools/graphics/shader-churn.mjs <valley.html> "<query>"` |
-| `cpu-profile.mjs` | **En qué se va la CPU**, con CDP: tiempo inclusivo por función y las cadenas que llevan a una dada. Sobre el juego sin minificar (`bundle-game.ts --no-minify`). `node tools/graphics/cpu-profile.mjs <valley.html> "<query>" <espera> <perfil> <función>` |
-| `model-sheet.mjs` · `model-sheet.ts` | **La hoja de todos los modelos publicados**: cada GLB de `public/assets/valley3d` con la misma luz y la misma cámara, agrupados por familia y con su tamaño en celdas. `node tools/graphics/model-sheet.mjs [--out artifacts/graphics/models]`. Lo que se dibuja por código (roble, hoguera, tendederos, fuego) no sale: no es un GLB |
+| `performance/gl-probe.mjs` | **Lo que cuesta cada fotograma, desde fuera**: intercepta WebGL y cuenta llamadas de dibujo, triángulos, programas enlazados, tiempo enlazando y JS por fotograma (mediana y p90). Vale para cualquier versión, también una vieja. `node tools/graphics/performance/gl-probe.mjs <valley.html> "<query>" [segundos]`. Ver la skill `performance` |
+| `performance/scene-report.mjs` | **De dónde salen las llamadas**: mallas visibles, con sombra e instanciadas y triángulos por grupo (los edificios, por tipo), con `window.__valleySceneReport()`. `node tools/graphics/performance/scene-report.mjs "<query>" [valley.html]` |
+| `performance/shader-churn.mjs` | **Cuántos sombreadores se recompilan al pasar cosas**: programas enlazados tras cargar, tras un rayo y al encender y apagar la fiesta. Cada uno de más es un tirón en una tablet. `node tools/graphics/performance/shader-churn.mjs <valley.html> "<query>"` |
+| `performance/cpu-profile.mjs` | **En qué se va la CPU**, con CDP: tiempo inclusivo por función y las cadenas que llevan a una dada. Sobre el juego sin minificar (`bundle-game.ts --no-minify`). `node tools/graphics/performance/cpu-profile.mjs <valley.html> "<query>" <espera> <perfil> <función>` |
+| `model-sheet.mjs` · `model-sheet.ts` | **La hoja de todos los modelos publicados**: cada GLB de `public/assets/valley3d` con la misma luz y la misma cámara, agrupados por familia y con su tamaño en celdas. `node tools/graphics/model-sheet.mjs [--out artifacts/graphics/models]`. Los efectos dibujados por código (hoguera, tendederos, fuego) no salen; el roble ya es un GLB |
 | `contact-sheet.py` | Monta la hoja de contactos de una ronda gráfica, para juzgarla de un vistazo |
-| `villager-sheet.py` | La hoja de los dieciséis aldeanos (G-19), a la escala real de la cámara: veinte píxeles |
 | `animals-preview.ts` · `animals-preview.mjs` | El banco de fauna (G-23): GLB publicado y controlador del juego con recorrido conocido |
 | `skin-compare.py` | Pone el recorte del prototipo al lado de la captura real. **Es el criterio de hecho de cada ronda de piel** |
 | `gesture-sheet.mjs` · `gesture-sheet.ts` | Hoja de contactos de un gesto fabricado sobre el GLB publicado, sin partida: `node tools/graphics/gesture-sheet.mjs chop [--model villager-mason] [--frames 12]`. Da también la posición de la mano y de la cabeza de la herramienta |
@@ -131,7 +146,6 @@ silencio y la prueba pasa sin probar nada.
 | `doctor.ts` | Diagnóstico del entorno gráfico antes de culpar al código |
 | `viewer.ts` · `viewer.html` | El visor suelto de un GLB |
 | `publish-assets.ts` | Admite un lote explícito aprobado con `--ids bow,spear`; verifica hash, bytes y procedencia antes de copiar, conserva todos los recursos ya publicados y rechaza sobrescribir bytes distintos |
-| `g20-check.mjs` | Comprueba la hoja de evidencia de G-20: cero imágenes rotas, cero errores de página |
 
 P-1b.2: `bench-app.ts --stages true` activa sólo en Vite local las marcas
 `valley3d:` de importación, creación y primer fotograma. Las guarda como
@@ -185,6 +199,8 @@ El estándar visual está en la skill `piel-del-valle`; el calco de dibujos, en
 | `animate.py` | Los clips, separados del rig por el mismo motivo |
 | `rigid-clips.mjs` | **Los clips de un animal de nodos rígidos** (los de Vera, `deliverables/marked-models-trial/`): añade `idle` y `walk` —con apoyo en línea recta, sin patinar— y los que falten (`charge`, `attack`, `flight`) sobre sus nodos, sin tocar la geometría, e imprime la marcha que el catálogo tiene que declarar. `node tools/art/rigid-clips.mjs <entrada.glb> <salida.glb> <especie>` |
 | `adopt-models.mjs` | **Admite en el catálogo un modelo hecho fuera de las recetas**: carpeta de aprobados, hash, estadísticas, caja, clips y marcha, para publicarlo con `publish-assets.ts` por el camino de siempre. `node tools/art/adopt-models.mjs <lista.json>` |
+| `adopt-house-candidates.mjs` · `register-house-variants.mjs` | Admisión reproducible de la ronda G-41: cinco formas de vivienda y selector estable por parcela. Son scripts de esa ronda, no el comando general para otro GLB |
+| `adopt-scenic-model.mjs` | Admite y verifica los GLB de `burnt-house` y `great-oak` de G-42: nombres de malla, triángulos, ausencia de texturas, hash y catálogo. `node tools/art/adopt-scenic-model.mjs burnt-house great-oak` |
 | `rig-single-mesh.py` | **Esqueleto para un animal de una sola malla** (el zorro de Vera): escala, pone los huesos del generador de G-23 leyendo dónde están patas, cuello, cabeza y cola, pesa por regiones y hace `idle`, `walk` y `flee`. `blender --background --python tools/art/rig-single-mesh.py -- <entrada.glb> <salida.glb> <largo-en-celdas>`; escribe al lado `<salida>.json` con la marcha |
 | `lots/` | Cada fichero **escribe** las recetas de un lote en `art/recipes/`. Tiene su propio [README](art/lots/README.md) |
 | `art/recipes/e3b-bastion-anchor-66-candidate/{generate,probe,state,gate-clearance,combined-source,combined-probe}.ts` | Fuentes y sondas CPU del bastión de acceso con retorno diagonal SO (máscara 66). `combined-source.ts --write-combined` genera la unión exclusiva bastión-portón; `combined-probe.ts` comprueba suelo, pretiles, vano, hoja y apoyo geométrico, y escribe medidas en la misma carpeta. La fuente combinada aún no está publicada. |

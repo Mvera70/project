@@ -20,7 +20,7 @@ persona igual de bien en las 16 sin tener que detectar el fondo figura a
 figura, y de paso conserva la escala relativa real entre una figura y otra
 (el nino mas bajo, el anciano encorvado, etc. no se corrigen).
 
-  python tools/graphics/villager-sheet.py  -> artifacts/graphics/G-19/aldeanos.html
+  python tools/history/graphics/villager-sheet.py  -> artifacts/graphics/G-19/aldeanos.html
 """
 import base64
 import io
@@ -28,7 +28,7 @@ import os
 
 from PIL import Image
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 OUT_DIR = os.path.join(ROOT, 'artifacts', 'graphics', 'G-19')
 
 # Recorte comun: aisla a la persona (y su sombra) del fondo del visor,

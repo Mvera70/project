@@ -5,7 +5,7 @@
 // grupo colgado del mundo (los edificios, por tipo). Cada malla visible es una
 // llamada de dibujo, y cada una con sombra, otra más en el mapa de sombras.
 //
-//   node tools/graphics/scene-report.mjs "<query>" [valley.html]
+//   node tools/graphics/performance/scene-report.mjs "<query>" [valley.html]
 //
 import { chromium } from '@playwright/test';
 import { readdirSync } from 'node:fs';
