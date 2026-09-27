@@ -1,5 +1,21 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · Las ramas perdidas, recogidas (v4.72)
+
+Inventario completo (ramas locales y remotas, worktrees, stash) con `git
+cherry` y comparación fichero a fichero contra `main`. Integrado: Astra
+(4df6133 y sus seis anteriores, catálogo y manifiesto juntados por id sin
+choques), oso v3 (2c824e3), Codex aceptado (9db7c66 → e980c81: vado, índice de
+evidencias, prueba de clips). Arreglo al juntar: `coverBurning` (buildings.ts)
+sólo toca las casas que arden; villa 441 llamadas con las casas nuevas
+(+20 por sus materiales). Archivado: `historico/agent-phase/`,
+`historico/agent-work-phase.md`, `graphics-rounds/G-25.md` (apartados 5–7),
+`G-26-medios-codex.md`, `G-04-INTERRUMPIDA.md`. Descartado por Vera: relieve
+de caminos (3609763) y stash del río. Ramas y worktrees de Codex borrados.
+**Se queda `art/astra-modelos`**: Vera sigue trabajando en ella (le falta lo de
+`main` desde v4.70; conviene traer `main` antes de su próxima entrega). **Sin tocar**: los ficheros sueltos de Vera en `deliverables/`
+(zorro, `bear.glb`, previews) y `.codex-remote-attachments/`.
+
 ## 27 sep 2026 · Rendimiento, segunda tanda (v4.71)
 
 Villa 7/60: 796 → 421 llamadas, JS ~10 ms (mediana); aldea 11/21: 460 → 335.

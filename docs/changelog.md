@@ -1,5 +1,24 @@
 # The Valley — Registro de cambios
 
+## v4.72 · 27 sep 2026 · Lo que se quedó en ramas
+
+Vera: «nos dejamos trabajo sin subir en ramas perdidas… revisa al completo».
+Revisadas todas las ramas, worktrees y stashes contra `main`. **Entra**: la
+tanda de Astra (casas variadas con juntas en la piedra, la sala del líder, los
+puestos, el pájaro, la casa que arde y se derrumba en ruina y el roble nuevo,
+que pasa de 27 mallas a 11); **el oso v3**, de torso anatómico, que llevaba un
+día en su rama mientras el juego dibujaba el anterior; y **la ronda aceptada de
+Codex del 17 sep**, con un arreglo real —las losas del vado giraban sobre una
+esquina y podían salirse de su celda— y el índice verificable de evidencias del
+observatorio. Al juntar la casa que arde apareció un choque con el rendimiento:
+`coverBurning` ponía visibles todos los edificios en cada fotograma y
+resucitaba los 347 tramos de muralla que el lote esconde (421 → 957 llamadas);
+ahora sólo toca las casas que arden. **Se archiva** en `docs/historico/` lo que
+eran sólo informes: el diario P0–P7 de Codex, las entregas de G-25 que no
+llegaron y la nota de la ronda G-04 interrumpida. **Se descarta**, por decisión
+de Vera, el relieve de los bordes de camino de Codex, y el brillo de río del
+stash del 19 sep, superado por el agua actual.
+
 ## v4.71 · 27 sep 2026 · Rendimiento, segunda tanda: los tirones
 
 Lo que más probablemente congelaba la tablet de Vera no eran las llamadas de
