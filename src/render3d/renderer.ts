@@ -2201,7 +2201,7 @@ export async function createGraphicsRenderer(
       }
       return true;
     },
-    attackHunt(): boolean { return huntScene?.attack() ?? false; },
+    attackHunt(precision?: number): boolean { return huntScene?.attack(precision) ?? false; },
     hunt(): HuntReport | null {
       const report = huntReport;
       huntReport = null;

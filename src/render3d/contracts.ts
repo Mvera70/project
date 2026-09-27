@@ -254,7 +254,8 @@ export interface GraphicsRenderer {
   /** Inicia una cacería física con el arma escogida para esta semana. */
   startHunt(state: Readonly<GameState>, species: HuntSpecies, weapon: HuntWeapon): boolean;
   /** Ordena un tiro o golpe en el encuentro activo. */
-  attackHunt(): boolean;
+  /** Un golpe de caza con la puntería del evento rápido (0 a 1). */
+  attackHunt(precision?: number): boolean;
   /** Parte de la cacería, entregado una sola vez al motor. */
   hunt(): { sourceTick: number;
     species: HuntSpecies;

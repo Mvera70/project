@@ -1,5 +1,19 @@
 # The Valley — Registro de cambios
 
+## v4.81 · 27 sep 2026 · La caza, como eventos rápidos
+
+Vera: «la opción de hunt debe quitarse; el botón debe ser un evento rápido; si
+no existen, deben crearse». No existían, y se crean dos. **La ocasión**: cuando
+el motor ofrece presa esa semana (`huntOpportunity`, sin cambios), sale una
+tarjeta —«¡Un ciervo junto al bosque!»— con las armas que el valle tiene y una
+barra de nueve segundos; si no se elige, la presa se va hasta la semana que
+viene. **La puntería**: sobre el valle, un aro que se encoge hacia otro fijo;
+se toca (o Espacio) cuando coinciden. Dentro de la ventana el tiro va a la presa
+con poca desviación; fuera, se desvía de lado y no toca, y la lanzada se da pero
+no hiere. Un toque mientras el arma se recarga no cuenta. Se repite hasta
+cobrarla o hasta que huya. El motor recibe el parte igual que antes. Se retiran
+el botón «Hunt», su menú de armas y sus estilos.
+
 ## v4.80 · 27 sep 2026 · La bola de la vista, como la de Blender
 
 Vera, tras ver la brújula: «no como un botón, sino como un objeto 3D que rota

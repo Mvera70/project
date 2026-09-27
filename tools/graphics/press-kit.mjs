@@ -860,26 +860,27 @@ if (want('raros')) {
     await tab.close();
   });
 
-  // La caza: el botón, la elección del arma, apuntando y el encuentro.
+  // La caza, como eventos rápidos: la ocasión, los aros de puntería y lo que queda.
   await attempt('caza', async () => {
     const tab = await open();
     await tab.locator('.title-scrim').waitFor({ timeout: 8000 }).catch(() => {});
     await tab.locator('#valley-seed').fill('3').catch(() => {});
     await tab.locator('.title-new').click();
-    await tab.waitForTimeout(7000);
-    const button = tab.locator('.valley-hunt-action');
-    await button.waitFor({ state: 'visible', timeout: 30000 });
-    await shot(tab, 'caza-boton', 'Hay presa cerca: el botón de caza');
-    await button.click();
-    await tab.waitForTimeout(500);
-    await shot(tab, 'caza-arma', 'La caza: elegir con qué');
-    await tab.locator('.hunt-prompt-weapon').first().click();
-    await tab.waitForTimeout(1200);
-    await shot(tab, 'caza-apuntando', 'La caza: apuntando');
-    await button.click();
-    await tab.waitForTimeout(900);
-    await shot(tab, 'caza-encuentro', 'La caza: el encuentro');
-    await tab.waitForTimeout(6000);
+    await tab.locator('.hunt-event').waitFor({ state: 'visible', timeout: 60000 });
+    await shot(tab, 'caza-ocasion', 'La ocasión de caza: la tarjeta con las armas y su tiempo');
+    // La tarjeta caduca en nueve segundos, que sin GPU son pocos fotogramas.
+    await tab.locator('.hunt-event-weapon').first().click({ force: true });
+    await tab.locator('.hunt-qte').waitFor({ state: 'visible', timeout: 10000 });
+    await tab.waitForTimeout(600);
+    await shot(tab, 'caza-aros', 'La caza: los aros de puntería sobre el valle');
+    await tab.keyboard.press('Space');
+    await tab.waitForTimeout(250);
+    await shot(tab, 'caza-veredicto', 'La caza: el veredicto del toque');
+    for (let n = 0; n < 60 && await tab.locator('.hunt-qte').isVisible(); n += 1) {
+      await tab.keyboard.press('Space');
+      await tab.waitForTimeout(150);
+    }
+    await tab.waitForTimeout(1500);
     await shot(tab, 'caza-resuelta', 'La caza, resuelta');
     await tab.close();
   });

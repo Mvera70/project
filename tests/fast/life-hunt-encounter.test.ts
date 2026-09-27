@@ -87,11 +87,38 @@ describe('encuentro físico de caza', () => {
 
     const won = createHuntEncounter(state, land, 'bear', 'spear', () => 0, [bear], 13, den)!;
     for (let step = 0; step < 700 && won.completed === null; step += 1) {
-      if (step % 25 === 0) won.attack();
+      // Se toca cada paso: sólo cuenta cuando la lanza está lista (evento rápido).
+      won.attack();
       won.step([bear]);
     }
     expect(won.completed?.killed).toBe(true);
     expect(won.completed?.hits).toBe(4);
     expect(won.animals[0]?.action).toBe('down');
+  });
+
+  // El evento rápido (`ui/redesign/hunt-event.ts`) da la puntería de cada toque.
+  it('con la puntería a cero la flecha se desvía y la lanza no toca', () => {
+    const state = foundTwenty(31);
+    const land = { width: 50, height: 50, blocked: new Uint8Array(2500) };
+    const deer: Animal = { id: 40_000, kind: 'deer', x: 25, y: 25 };
+    const bow = createHuntEncounter(state, land, 'deer', 'bow', () => 0, [deer], 31)!;
+    for (let step = 0; step < 400 && bow.completed === null; step += 1) { bow.attack(0); bow.step([deer]); }
+    expect(bow.completed?.killed ?? false, 'arco fallando').toBe(false);
+    const bear: Animal = { id: 50_000, kind: 'bear', x: 25, y: 25 };
+    const spear = createHuntEncounter(state, land, 'bear', 'spear', () => 0, [bear], 13, { x: 25, z: 25 })!;
+    for (let step = 0; step < 700 && spear.completed === null; step += 1) { spear.attack(0); spear.step([bear]); }
+    expect(spear.completed?.hits, 'lanza a destiempo').toBe(0);
+  });
+
+  it('un toque mientras el arma se recarga no cuenta', () => {
+    const state = foundTwenty(31);
+    const land = { width: 50, height: 50, blocked: new Uint8Array(2500) };
+    const deer: Animal = { id: 40_000, kind: 'deer', x: 25, y: 25 };
+    const encounter = createHuntEncounter(state, land, 'deer', 'bow', () => 0, [deer], 31)!;
+    expect(encounter.attack(0)).toBe(true);
+    let fired = false;
+    for (let step = 0; step < 200 && !fired; step += 1) { encounter.step([deer]); fired = encounter.projectiles.length > 0; }
+    expect(fired).toBe(true);
+    expect(encounter.attack(1), 'recién disparado').toBe(false);
   });
 });

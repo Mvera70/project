@@ -25,33 +25,28 @@ await page.locator('.title-scrim').waitFor();
 await page.locator('#valley-seed').fill(seed);
 await page.locator('.title-new').click();
 await page.waitForTimeout(6500);
-const button = page.locator('.valley-hunt-action');
-console.log('hunt button visible', await button.isVisible());
-await page.screenshot({ path: resolve(out, 'before.png') });
-if (await button.isVisible()) {
-  await button.click();
-  await page.screenshot({ path: resolve(out, 'choose.png') });
-  await page.locator('.hunt-prompt-weapon').first().click();
-  await page.waitForTimeout(1200);
+// La caza como eventos rápidos (27 sep 2026): la ocasión sale sola como tarjeta
+// (`.hunt-event`), el arma se elige ahí y la puntería son los aros (`.hunt-qte`),
+// que se tocan con Espacio en el momento en que coinciden (`window.__huntQte`
+// no existe: se toca cada décima y cuenta sólo el toque bueno).
+const card = page.locator('.hunt-event');
+const offered = await card.waitFor({ state: 'visible', timeout: 60000 }).then(() => true, () => false);
+console.log('hunt event offered', offered);
+if (offered) {
+  // Sin GPU la página va a un fotograma por segundo y la tarjeta caduca en
+  // nueve: se elige antes de fotografiar nada, sin esperar a que se asiente.
+  await page.locator('.hunt-event-weapon').first().click({ force: true });
+  await page.locator('.hunt-qte').waitFor({ state: 'visible', timeout: 10000 });
   await page.screenshot({ path: resolve(out, 'aim.png') });
-  const attack = page.locator('.valley-hunt-action');
-  console.log('attack visible', await attack.isVisible(), await attack.getAttribute('aria-label'),
-    await attack.boundingBox());
   const frames = resolve(out, 'frames');
   mkdirSync(frames, { recursive: true });
-  await page.screenshot({ path: resolve(frames, 'f000.png') });
-  await attack.click();
-  await page.screenshot({ path: resolve(out, 'encounter.png') });
-  for (let attempt = 0; attempt < 40; attempt += 1) {
-    const active = await attack.isVisible()
-      && /^(Throw|Strike)$/.test(await attack.getAttribute('aria-label') ?? '');
-    if (active && attempt % 3 === 0) await attack.click();
-    await page.waitForTimeout(180);
-    await page.screenshot({ path: resolve(frames, `f${String(attempt + 1).padStart(3, '0')}.png`) });
-    if (!active && attempt > 8) break;
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    if (!(await page.locator('.hunt-qte').isVisible())) break;
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(150);
+    if (attempt % 4 === 0) await page.screenshot({ path: resolve(frames, `f${String(attempt).padStart(3, '0')}.png`) });
   }
-  console.log('resolved', await attack.textContent(),
-    await page.locator('.hud-stat').allTextContents());
+  console.log('resolved', !(await page.locator('.hunt-qte').isVisible()), await page.locator('.hud-stat').allTextContents());
   await page.screenshot({ path: resolve(out, 'resolved.png') });
   const life = await page.evaluate(() => window.__valleyLife?.() ?? null);
   console.log('scene', { animals: life?.renderedAnimals, actors: life?.actors.filter(a => a.id >= 80000) });

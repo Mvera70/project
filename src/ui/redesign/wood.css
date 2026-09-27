@@ -504,12 +504,6 @@
 
 /** La caza es de la misma familia que los círculos de al lado: mismo aro de
     madera y mismo escalón. */
-:root .valley-hunt-action {
-  border: 2px solid var(--wood-plank);
-  background-color: var(--card);
-  box-shadow: 0 3px 0 var(--wood-plank-deep), 0 6px 12px rgba(0, 0, 0, .25);
-}
-:root .valley-hunt-action-label { font-family: var(--skin-font-display); }
 
 /** Una fila de la gente se abre al tocarla, y no lo decía: lleva su `›`,
     que es la marca de «esto lleva a otra cosa» en cualquier lista de móvil. */

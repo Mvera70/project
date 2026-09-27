@@ -2390,6 +2390,18 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
 
 /** Stable interface copy: unlike chronicle prose, labels do not vary by seed. */
 export const UI_BANK: Record<string, string> = {
+  'hunt.event.say.partridge': 'A partridge in the grass!',
+  'hunt.event.say.rabbit': 'A rabbit near the forest edge!',
+  'hunt.event.say.deer': 'A deer near the forest edge!',
+  'hunt.event.say.boar': 'A boar in the undergrowth!',
+  'hunt.event.say.bear': 'The bear is out of its den!',
+  'hunt.event.ignore': 'Let it go',
+  'hunt.qte.hint': 'Tap when the rings meet (or press Space)',
+  'hunt.qte.perfect': 'Dead on!',
+  'hunt.qte.good': 'On target',
+  'hunt.qte.early': 'Too early',
+  'hunt.qte.late': 'Too late',
+  'hunt.qte.reload': 'Reloading…',
   'hunt.prompt.title': 'Hunt',
   'hunt.prompt.description': 'A {species} is nearby. Choose a weapon.',
   'hunt.prompt.cancel': 'Cancel',

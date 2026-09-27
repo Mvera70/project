@@ -24,6 +24,12 @@ const MAX_DURATION_STEPS = 600;
 const CORPSE_STEPS = 75;
 const SHOT_STEPS = Math.round(2.1 / LIFE_STEP);
 const SPEAR_STEPS = Math.round(0.9 / LIFE_STEP);
+/**
+ * TUNE: cuánto se desvía un tiro según la puntería, en celdas. Un toque dentro
+ * de la ventana se desvía como mucho 0,3 (una presa mide de 0,34 a 0,52 de
+ * radio, así que casi siempre toca); uno fuera, 1,1, que no toca nunca.
+ */
+const AIM_SPREAD = { inWindow: 0.3, miss: 1.1 } as const;
 
 export interface HuntReport {
   readonly sourceTick: number;
@@ -49,8 +55,14 @@ export interface HuntEncounter {
   readonly hunter: HuntHunterPose;
   readonly projectiles: readonly ArrowSighting[];
   readonly completed: HuntReport | null;
-  /** El jugador ordena un golpe; espera a alcance y recuperación del arma. */
-  attack(): boolean;
+  /**
+   * El jugador ordena un golpe; espera a alcance y recuperación del arma.
+   * `precision` (0 a 1) es la puntería del evento rápido (`ui/redesign/
+   * hunt-event.ts`): con 0 el tiro se desvía y la lanzada no toca; por encima,
+   * cuanto más alta, más centrado. Devuelve `false` si el arma se está
+   * recargando, y entonces el toque no cuenta.
+   */
+  attack(precision?: number): boolean;
   step(wildlife: readonly Animal[]): void;
 }
 
@@ -113,6 +125,8 @@ export function createHuntEncounter(
   let retreatSince = -1;
   let retreatRoute: Point[] | null = null;
   let requested = false;
+  let precision = 1;
+  let fired = false;
 
   const currentTarget = (snapshots: readonly Animal[]): Point | null => {
     if (wild !== null) {
@@ -155,9 +169,12 @@ export function createHuntEncounter(
         vx: shot.vx, vy: shot.vy, vz: shot.vz, weapon: shot.weapon }));
     },
     get completed() { return report; },
-    attack() {
+    attack(aim = 1) {
       if (report !== null || retreatSince >= 0) return false;
+      const recovery = weapon === 'spear' ? SPEAR_STEPS : SHOT_STEPS;
+      if (fired && stepNumber - lastShot < recovery) return false;
       requested = true;
+      precision = Math.max(0, Math.min(1, aim));
       return true;
     },
     step(snapshots: readonly Animal[]): void {
@@ -228,8 +245,10 @@ export function createHuntEncounter(
         clip = moving ? 'walk' : stepNumber - lastShot < 18 ? 'spear_thrust' : 'idle';
         if (requested && !moving && stepNumber - lastShot >= SPEAR_STEPS
           && spearCanHit(hunterBody, target, wild?.body.radius ?? 0.34)) {
-          hits += 1;
+          // Una lanzada a destiempo se da igual, pero no toca.
+          if (precision > 0) hits += 1;
           lastShot = stepNumber;
+          fired = true;
           requested = false;
           clip = 'spear_thrust';
         }
@@ -238,11 +257,18 @@ export function createHuntEncounter(
         clip = sinceShot < 18 && shotsMade > 0 ? 'bow_loose' : 'bow_draw';
         if (requested && sinceShot >= SHOT_STEPS) {
           const from = { x: hunterBody.x, y: ground(hunterBody.x, hunterBody.z) + 1.2, z: hunterBody.z };
-          const aim = { x: target.x, y: targetY(target), z: target.z };
+          // La puntería desvía el tiro de lado, perpendicular a la línea de
+          // tiro, alternando el lado para que dos fallos no caigan juntos.
+          const spread = precision > 0 ? (1 - precision) * AIM_SPREAD.inWindow : AIM_SPREAD.miss;
+          const lx = target.x - from.x, lz = target.z - from.z;
+          const along = Math.hypot(lx, lz) || 1;
+          const side = shotsMade % 2 === 0 ? 1 : -1;
+          const aim = { x: target.x - (lz / along) * spread * side, y: targetY(target), z: target.z + (lx / along) * spread * side };
           const shot = launchHuntShot(from, aim, weapon, hunterBody.id, 100_000 + shotsMade++);
           if (shot !== null) {
             shots.push(shot);
             lastShot = stepNumber;
+            fired = true;
             requested = false;
             clip = 'bow_loose';
           }

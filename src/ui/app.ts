@@ -11,7 +11,6 @@ import './redesign/tokens.css';
 // compone, así que si las dos tocan lo mismo manda la de la carcasa.
 import './redesign/skin.css';
 import './redesign/shell.css';
-import './redesign/hunt-action.css';
 // UI-W · la piel de madera, piedra y pergamino del mockup del 24 sep. Va la
 // última: es la capa que viste encima de las otras tres.
 import './redesign/wood.css';
@@ -29,7 +28,7 @@ import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, PlayerAct, SaveFile } from '@engine/state';
 import { huntOpportunity, type HuntOpportunity } from '@engine/world/hunting';
 import { createHud } from './redesign/hud';
-import { showHuntPrompt } from './redesign/hunt-prompt';
+import { showHuntEvent, startHuntQte } from './redesign/hunt-event';
 import { createInspectPanel } from './redesign/inspect-panel';
 import { cartPanel } from './redesign/cart';
 import { peoplePanel } from './redesign/people-panel';
@@ -473,45 +472,36 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     paintBare();
   };
 
-  // H-UI · la ocasión se ofrece como acción voluntaria, nunca como modal
-  // automático. El motor determina la presa disponible; la UI sólo deja elegir.
-  const huntAction = document.createElement('button');
-  huntAction.type = 'button';
-  huntAction.className = 'valley-hunt-action skin-plate skin-plate--round';
-  huntAction.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none"'
-    + ' stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'
-    + '<path d="M5 3c9 2 12 8 14 18M5 3c-2 8 2 14 14 18M7 5l12 14"/></svg>'
-    + '<span class="valley-hunt-action-label"></span>';
-  huntAction.setAttribute('aria-label', renderUiText('hunt.action.open'));
-  huntAction.hidden = true;
+  // La caza, como eventos rápidos (`redesign/hunt-event.ts`, 27 sep 2026:
+  // Vera pidió quitar el botón «Hunt»). Una ocasión por semana del motor: la
+  // tarjeta sale una vez, y si pasa sin elegir, la presa se va. Elegida, los
+  // aros de puntería cubren el valle hasta que la escena entrega su parte.
   let huntOpportunityTick = -1;
   let currentHuntOffer: HuntOpportunity | null = null;
+  /** La semana cuya ocasión ya se ofreció (elegida, dejada ir o caducada). */
+  let huntOfferedTick = -1;
   let huntInProgress = false;
-  let huntWeapon: 'sling' | 'bow' | 'spear' | null = null;
   let huntPreviousSpeed: Speed | null = null;
-  huntAction.addEventListener('click', () => {
-    if (huntInProgress) { backend.live.attackHunt(); return; }
-    if (currentHuntOffer === null || backend.live.kind !== 'pilot3d') return;
-    const offer = currentHuntOffer;
-    closeHuntPrompt = showHuntPrompt(offer, (weapon) => {
+  let closeHuntQte: (() => void) | null = null;
+  const endHunt = (): void => {
+    huntInProgress = false;
+    closeHuntQte?.();
+    closeHuntQte = null;
+    if (huntPreviousSpeed !== null) app.setSpeed(huntPreviousSpeed);
+    huntPreviousSpeed = null;
+  };
+  const offerHunt = (offer: HuntOpportunity): void => {
+    huntOfferedTick = offer.tick;
+    closeHuntPrompt = showHuntEvent(offer, (weapon) => {
       closeHuntPrompt = null;
-      if (state.tick !== offer.tick) {
-        huntOpportunityTick = -1;
-        paint(lastFraction);
-        return;
-      }
-      if (backend.live.startHunt(state, offer.species, weapon)) {
-        huntInProgress = true;
-        huntWeapon = weapon;
-        huntPreviousSpeed = speed;
-        app.setSpeed(1);
-        huntAction.setAttribute('aria-label', renderUiText(weapon === 'spear'
-          ? 'hunt.action.strike' : 'hunt.action.throw'));
-        huntAction.querySelector('.valley-hunt-action-label')!.textContent = renderUiText(
-          weapon === 'spear' ? 'hunt.action.strike' : 'hunt.action.throw');
-      }
+      if (state.tick !== offer.tick || backend.live.kind !== 'pilot3d') return;
+      if (!backend.live.startHunt(state, offer.species, weapon)) return;
+      huntInProgress = true;
+      huntPreviousSpeed = speed;
+      app.setSpeed(1);
+      closeHuntQte = startHuntQte(root, (precision) => backend.live.attackHunt(precision));
     }, () => { closeHuntPrompt = null; });
-  });
+  };
 
   const hudRight = document.createElement('div');
   // UI-V2b · la segunda clase es la que sube el rincón por encima de la
@@ -521,7 +511,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   hudRight.className = 'valley-hud-right hud-speed-corner';
   cameraControls?.dispose();
   cameraControls = mountCameraControls(() => backend.live, () => backend.live.surface);
-  hudRight.append(bareToggle, hud.speedControls, hud.speedBadge, huntAction);
+  hudRight.append(bareToggle, hud.speedControls, hud.speedBadge);
 
   root.append(canvas, hud.header, hudRight, cameraControls.compass, shell.element);
 
@@ -748,16 +738,12 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
       currentHuntOffer = huntOpportunity(state);
     }
     const offer = currentHuntOffer;
-    huntAction.hidden = backend.live.kind !== 'pilot3d' || currentRoute.kind !== 'valley'
-      || state.crossroad !== null || state.ended !== null || (offer === null && !huntInProgress) || bare;
-    if (huntInProgress && huntWeapon !== null) {
-      huntAction.setAttribute('aria-label', renderUiText(huntWeapon === 'spear'
-        ? 'hunt.action.strike' : 'hunt.action.throw'));
-      huntAction.querySelector('.valley-hunt-action-label')!.textContent = renderUiText(
-        huntWeapon === 'spear' ? 'hunt.action.strike' : 'hunt.action.throw');
-    } else if (offer !== null) {
-      huntAction.setAttribute('aria-label', `${renderUiText('hunt.action.open')} · ${renderUiText(`hunt.species.${offer.species}`)}`);
-      huntAction.querySelector('.valley-hunt-action-label')!.textContent = renderUiText('hunt.action.open');
+    // La ocasión sale una vez por semana, y sólo si se puede mirar: el valle a
+    // la vista en 3D, sin decisión encima, sin otra caza en marcha.
+    if (offer !== null && huntOfferedTick !== offer.tick && !huntInProgress && closeHuntPrompt === null
+      && backend.live.kind === 'pilot3d' && currentRoute.kind === 'valley'
+      && state.crossroad === null && state.ended === null) {
+      offerHunt(offer);
     }
     // U-11 · la altura de la vista, en la raíz, como `data-tick`: es lo único
     // que permite mirar el vuelo de entrada desde una secuencia de capturas o
@@ -908,10 +894,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
       const completed = backend.live.hunt();
       if (completed !== null) {
         pendingActs.push({ kind: 'hunt', ...completed });
-        huntInProgress = false;
-        huntWeapon = null;
-        if (huntPreviousSpeed !== null) app.setSpeed(huntPreviousSpeed);
-        huntPreviousSpeed = null;
+        endHunt();
         queueMicrotask(() => { runTick(); paint(lastFraction); });
       }
     }
@@ -1257,6 +1240,8 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     finishing = true;
     closeHuntPrompt?.();
     closeHuntPrompt = null;
+    closeHuntQte?.();
+    closeHuntQte = null;
     loop?.stop();
     loop = undefined;
     // La jornada terminal sigue pasos físicos fijos, pero el último `paint`
@@ -1359,10 +1344,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
       const completed = backend.live.hunt();
       if (completed === null) return;
       pendingActs.push({ kind: 'hunt', ...completed });
-      huntInProgress = false;
-      huntWeapon = null;
-      if (huntPreviousSpeed !== null) app.setSpeed(huntPreviousSpeed);
-      huntPreviousSpeed = null;
+      endHunt();
     }
     const decision = pendingDecision;
     pendingDecision = undefined;

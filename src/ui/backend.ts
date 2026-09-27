@@ -59,7 +59,7 @@ interface ValleyBackend {
   battle(): BattleReport | null;
   /** Start one physical hunt using the player's chosen weapon. */
   startHunt(state: Readonly<GameState>, species: HuntSpecies, weapon: HuntWeapon): boolean;
-  attackHunt(): boolean;
+  attackHunt(precision?: number): boolean;
   /** Completed hunt report, consumed once by the UI and forwarded to the engine. */
   hunt(): { sourceTick: number; species: HuntSpecies; weapon: HuntWeapon; hits: number; killed: boolean } | null;
   /**
@@ -403,7 +403,7 @@ export function attachBackend(
         doing(id) { return renderer.doing(id); },
         battle() { return renderer.battle(); },
         startHunt(state, species, weapon) { return renderer.startHunt(state, species, weapon); },
-        attackHunt() { return renderer.attackHunt(); },
+        attackHunt(precision) { return renderer.attackHunt(precision); },
         hunt() { return renderer.hunt(); },
         siege() { return renderer.siege(); },
         ending() { return renderer.ending(); },

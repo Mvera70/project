@@ -40,7 +40,7 @@ UI_SHOTS = {
     'carro', 'carro-dado', 'encrucijada', 'decision-aplazada', 'sello', 'oferta',
     'amenaza-pendiente', 'corona-lista', 'corona-puesta',
     # caza y paneles
-    'caza-boton', 'caza-arma', 'caza-apuntando', 'caza-encuentro', 'tocar-1', 'tocar-3',
+    'caza-ocasion', 'caza-aros', 'caza-veredicto', 'tocar-1', 'tocar-3',
     'bienvenida',
     # finales
     'final-stormed-transicion', 'lapida-stormed', 'lapida-extinction', 'lapida-abandoned',

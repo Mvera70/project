@@ -1,5 +1,21 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · La caza como eventos rápidos (v4.81)
+
+`ui/redesign/hunt-event.ts` + `.css` (nuevos): `showHuntEvent` (tarjeta,
+`HUNT_EVENT_SECONDS` 9) y `startHuntQte` (aros, `HUNT_QTE`, `qtePrecision` pura).
+`app.ts`: fuera `huntAction`; una ocasión por semana (`huntOfferedTick`), sólo
+en 3D, en el valle, sin encrucijada; `endHunt` cierra los aros al llegar el
+parte. `life/hunt-encounter.ts`: `attack(precision)` (desvío `AIM_SPREAD`,
+lanzada sin daño a precisión 0, rechazo durante la recarga); pasa por
+contrato, renderer y backend. Borrados `hunt-prompt.ts/.css`, `hunt-action.css`
+y su regla en `wood.css`. Pruebas: `hunt-event.test.ts` y dos nuevas en
+`life-hunt-encounter.test.ts`; la del oso ahora toca cada paso (los toques a
+destiempo ya no se acumulan). `hunt-smoke.mjs`, `press-kit.mjs` (grupo `raros`)
+y `press-archive.py` siguen el flujo nuevo. Medido: `hunt-smoke --mobile
+--seed=3` recorre ocasión → arma → aros → parte. **Ojo**: sin GPU la tarjeta
+caduca antes de fotografiarla; las herramientas eligen sin esperar.
+
 ## 27 sep 2026 · La bola de la vista (v4.80)
 
 `camera-controls.ts`: la brújula pasa a gizmo SVG (`projector(yaw, pitch)`
