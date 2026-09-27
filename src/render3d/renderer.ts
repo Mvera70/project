@@ -2325,6 +2325,10 @@ export async function createGraphicsRenderer(
       return view.angles.yaw - BASE_YAW;
     },
 
+    viewAngles(): { yaw: number; pitch: number } {
+      return { yaw: view.angles.yaw, pitch: view.angles.pitch };
+    },
+
     resetView(): void {
       if (disposed) return;
       flight = null;

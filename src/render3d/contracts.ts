@@ -309,6 +309,8 @@ export interface GraphicsRenderer {
   orbit(dYaw: number, dPitch: number): void;
   /** Cuánto se ha girado la vista desde la de partida, en radianes (la brújula). */
   heading(): number;
+  /** Rumbo e inclinación absolutos de la vista, en radianes (el gizmo de navegación). */
+  viewAngles(): { yaw: number; pitch: number };
   resetView(): void;
   /**
    * U-11 · El vuelo de entrada: la vista se aparta hasta la sierra y baja

@@ -2442,8 +2442,9 @@ export const UI_BANK: Record<string, string> = {
   // no qué se esconde, que es lo mismo que hace su icono —el del valle—.
   'app.bare': 'Just the valley',
   'app.bare.off': 'Show the panels again',
-  'app.compass': 'Compass: drag to turn the view, tap to face north',
-  'app.compass.help': 'Drag: move · Right-drag: turn and tilt · Wheel: zoom\nKeys: WASD or arrows move · Q/E turn · R/F tilt · +/− zoom · N north\nOn this compass: drag to turn, click to face north',
+  'app.compass': 'View globe: drag to turn and tilt the view, tap to face north',
+  'app.compass.north': 'N',
+  'app.compass.help': 'Drag: move · Right-drag: turn and tilt · Wheel: zoom\nKeys: WASD or arrows move · Q/E turn · R/F tilt · +/− zoom · N north\nOn this globe: drag to turn and tilt, click to face north',
   'app.speed.controls': 'Simulation speed',
   'app.speed.pause': 'Pause',
   'app.speed.multiplier': '{speed}×',

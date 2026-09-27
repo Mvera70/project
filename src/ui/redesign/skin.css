@@ -807,10 +807,24 @@
   -webkit-tap-highlight-color: transparent;
 }
 .hud-round-btn svg { display: block; }
-/* La brújula (`camera-controls.ts`): la rosa gira sobre su centro con la vista,
-   y el botón se arrastra de lado a lado, así que no desplaza la página. */
-.valley-compass { touch-action: none; }
-.valley-compass-rose { width: 26px; height: 26px; transform-origin: 50% 50%; }
+/* El gizmo de navegación (`camera-controls.ts`), como el de Blender: una bola
+   con sus anillos, abajo a la izquierda (Vera, 27 sep), sobre la bandeja como
+   el rincón de botones, que se arrastra para girar la vista. Se queda en la
+   pantalla despejada: despejar es para mirar, y mirar es girar. */
+.valley-compass {
+  position: absolute; z-index: 30;
+  bottom: calc(var(--ui-stack-height, 60px) + 10px); left: max(10px, env(safe-area-inset-left));
+  width: 86px; height: 86px; padding: 0; border: 0; border-radius: 50%;
+  background: radial-gradient(circle at 42% 36%, rgba(255, 250, 238, .30), rgba(40, 32, 24, .28) 72%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent;
+}
+.valley-compass:active { cursor: grabbing; }
+.valley-compass:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
+.valley-compass svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* Sin bandeja, baja con el rincón de mandos, que ahí empieza por la izquierda:
+   se le deja sitio encima del botón de despejar. */
+html.bare .valley-compass { bottom: calc(env(safe-area-inset-bottom, 0px) + 80px); }
 .valley-speed-badge.hud-round-btn {
   font-family: var(--skin-font-voice);
   font-weight: 600;

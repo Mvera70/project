@@ -5,8 +5,9 @@
 
 export const UI_BANK_ES: Record<string, string> = {
   'app.valley': 'El valle',
-  'app.compass': 'Brújula: arrastra para girar la vista, toca para mirar al norte',
-  'app.compass.help': 'Arrastrar: mover · Botón derecho: girar e inclinar · Rueda: acercar\nTeclas: WASD o flechas mueven · Q/E giran · R/F inclinan · +/− acercan · N norte\nEn esta brújula: arrastra para girar, clic para mirar al norte',
+  'app.compass': 'Bola de la vista: arrastra para girar e inclinar, toca para mirar al norte',
+  'app.compass.north': 'N',
+  'app.compass.help': 'Arrastrar: mover · Botón derecho: girar e inclinar · Rueda: acercar\nTeclas: WASD o flechas mueven · Q/E giran · R/F inclinan · +/− acercan · N norte\nEn esta bola: arrastra para girar e inclinar, clic para mirar al norte',
   // M-0 · las existencias nuevas, la cara del ánimo y la oferta del camino.
   'app.vitals.stone': '{count} de piedra',
   'app.vitals.silver': '{count} de plata',

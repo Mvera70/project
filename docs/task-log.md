@@ -1,5 +1,14 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · La bola de la vista (v4.80)
+
+`camera-controls.ts`: la brújula pasa a gizmo SVG (`projector(yaw, pitch)`
+con la misma base que `camera.ts`; `RINGS`, `RADIUS`, redibujo sólo si cambian
+los ángulos), arrastre en dos ejes (`ORBIT_PER_PX` 0,8°, `PITCH_PER_PX` 0,5°).
+`viewAngles()` nuevo en contrato, renderer y backend. Va suelta en la raíz
+(`.valley-compass`, `skin.css`), abajo a la izquierda sobre la bandeja; con la
+pantalla despejada baja con el rincón. Sin prueba automática (DOM).
+
 ## 27 sep 2026 · La brújula y los controles de ordenador (v4.79)
 
 `ui/camera-controls.ts` (nuevo): brújula (`.valley-compass`, arrastrar = girar,

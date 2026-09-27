@@ -5,8 +5,11 @@
 // en el móvil, mayúsculas y arrastrar en el ordenador— pero nada en pantalla lo
 // decía, y en el teclado no había nada. Esto añade:
 //
-//   · **la brújula**: un redondo más del rincón, con la aguja al norte del
-//     valle. Arrastrarla gira la vista uno a uno con el dedo o el ratón;
+//   · **el gizmo de navegación**, como el de Blender (Vera: «no la brújula
+//     como un botón, sino como un objeto 3D que rota sobre sí mismo como la
+//     tierra»): una bola arriba a la derecha con el horizonte y los dos
+//     meridianos, que gira en directo con la cámara. Arrastrarla a los lados
+//     gira la vista y arriba y abajo la inclina, como girar una bola del mundo;
 //     tocarla vuelve al norte con un giro corto. Al pasar el ratón enseña los
 //     controles, que es donde un jugador de ordenador los busca.
 //   · **el teclado**: WASD o flechas para mover, Q/E para girar, R/F para
@@ -21,13 +24,46 @@ export interface CameraApi {
   readonly movesCamera: boolean;
   /** Cuánto se ha girado desde la vista de partida, en radianes. */
   heading(): number;
+  /** Rumbo e inclinación absolutos, para dibujar la bola como mira la cámara. */
+  viewAngles(): { yaw: number; pitch: number };
   pan(dxCss: number, dyCss: number): void;
   orbit(dYaw: number, dPitch: number): void;
   zoom(factor: number, atXCss: number, atYCss: number): void;
 }
 
-/** Cuánto gira la brújula por píxel arrastrado: como el giro con mayúsculas. */
-const ORBIT_PER_PX = (0.4 * Math.PI) / 180;
+/**
+ * Cuánto gira la bola por píxel arrastrado. TUNE: 0,8° de rumbo y 0,5° de
+ * inclinación por píxel; la bola mide 86, así que cruzarla es más de media
+ * vuelta, que es lo que se siente como girar una bola del mundo con el dedo.
+ */
+const ORBIT_PER_PX = (0.8 * Math.PI) / 180;
+const PITCH_PER_PX = (0.5 * Math.PI) / 180;
+/** El radio de la bola dentro de su caja de 100 × 100: casi hasta el borde del fondo. */
+const RADIUS = 44;
+/** Los anillos: el horizonte, el meridiano norte-sur y el este-oeste. */
+const RINGS = [
+  { axis: [0, 1, 0], colour: '#7fb069' },
+  { axis: [1, 0, 0], colour: '#d9544f' },
+  { axis: [0, 0, 1], colour: '#4f86d9' },
+] as const;
+
+type V3 = readonly [number, number, number];
+const dot = (a: V3, b: V3): number => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const cross = (a: V3, b: V3): V3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const unit3 = (a: V3): V3 => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+
+/**
+ * La bola vista como la ve la cámara: la base de la pantalla sale de los mismos
+ * ángulos que `camera.ts` usa para colocarla (`direction`). Devuelve, para
+ * un punto de la esfera unidad, dónde cae en la caja de 100 y si queda delante.
+ */
+function projector(yaw: number, pitch: number): (p: V3) => { x: number; y: number; front: boolean } {
+  const toCamera: V3 = [Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch)];
+  const forward: V3 = [-toCamera[0], -toCamera[1], -toCamera[2]];
+  const right = unit3(cross(forward, [0, 1, 0]));
+  const up = cross(right, forward);
+  return (p) => ({ x: 50 + dot(p, right) * RADIUS, y: 50 - dot(p, up) * RADIUS, front: dot(p, toCamera) >= 0 });
+}
 /** TUNE: el teclado, por segundo con la tecla pulsada. */
 const KEYS = {
   panPx: 520,
@@ -53,15 +89,71 @@ export interface CameraControls {
 export function mountCameraControls(camera: () => CameraApi, surface: () => HTMLElement): CameraControls {
   const compass = document.createElement('button');
   compass.type = 'button';
-  compass.className = 'valley-compass hud-round-btn skin-plate skin-plate--round';
+  compass.className = 'valley-compass';
   compass.setAttribute('aria-label', renderUiText('app.compass'));
   compass.title = renderUiText('app.compass.help');
-  compass.innerHTML = '<svg class="valley-compass-rose" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
-    + '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".45"/>'
-    + '<path d="M12 3.2 L14.6 12 L12 10.9 L9.4 12 Z" fill="#9b2f24"/>'
-    + '<path d="M12 20.8 L9.4 12 L12 13.1 L14.6 12 Z" fill="currentColor" opacity=".7"/>'
-    + '<circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg>';
-  const rose = (): SVGElement | null => compass.querySelector('svg');
+  // Cada anillo en dos trazos: la mitad de delante, entera, y la de detrás,
+  // tenue, que es lo que hace que se lea como una bola y no como un dibujo.
+  const svgNs = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNs, 'svg');
+  svg.setAttribute('viewBox', '0 0 100 100');
+  svg.setAttribute('aria-hidden', 'true');
+  const rim = document.createElementNS(svgNs, 'circle');
+  rim.setAttribute('cx', '50'); rim.setAttribute('cy', '50'); rim.setAttribute('r', String(RADIUS));
+  rim.setAttribute('fill', 'none'); rim.setAttribute('stroke', 'rgba(255,248,230,.55)'); rim.setAttribute('stroke-width', '1.5');
+  svg.append(rim);
+  const strokes = RINGS.map((ring) => {
+    const back = document.createElementNS(svgNs, 'path');
+    const front = document.createElementNS(svgNs, 'path');
+    for (const [path, opacity, width] of [[back, '0.28', '2'], [front, '1', '3']] as const) {
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', ring.colour);
+      path.setAttribute('stroke-opacity', opacity);
+      path.setAttribute('stroke-width', width);
+      path.setAttribute('stroke-linecap', 'round');
+    }
+    svg.append(back);
+    return { ring, back, front };
+  });
+  for (const stroke of strokes) svg.append(stroke.front);
+  // El norte del valle es -Z (la garganta de arriba del mapa).
+  const north = document.createElementNS(svgNs, 'g');
+  const northDot = document.createElementNS(svgNs, 'circle');
+  northDot.setAttribute('r', '9'); northDot.setAttribute('fill', '#d9544f');
+  const northText = document.createElementNS(svgNs, 'text');
+  northText.textContent = renderUiText('app.compass.north');
+  northText.setAttribute('text-anchor', 'middle'); northText.setAttribute('dominant-baseline', 'central');
+  northText.setAttribute('fill', '#fff'); northText.setAttribute('font-size', '12'); northText.setAttribute('font-weight', '700');
+  north.append(northDot, northText);
+  svg.append(north);
+  compass.append(svg);
+  const RING_STEPS = 48;
+  const draw = (yaw: number, pitch: number): void => {
+    const project = projector(yaw, pitch);
+    for (const { ring, back, front } of strokes) {
+      // Dos vectores perpendiculares al eje del anillo recorren su círculo.
+      const helper: V3 = Math.abs(ring.axis[1]) > 0.9 ? [1, 0, 0] : [0, 1, 0];
+      const e1 = unit3(cross(ring.axis, helper));
+      const e2 = cross(ring.axis, e1);
+      let dFront = '', dBack = '';
+      let wasFront: boolean | null = null;
+      for (let k = 0; k <= RING_STEPS; k += 1) {
+        const t = (k / RING_STEPS) * Math.PI * 2;
+        const p: V3 = [e1[0] * Math.cos(t) + e2[0] * Math.sin(t), e1[1] * Math.cos(t) + e2[1] * Math.sin(t), e1[2] * Math.cos(t) + e2[2] * Math.sin(t)];
+        const at = project(p);
+        const cmd = `${at.x.toFixed(1)} ${at.y.toFixed(1)}`;
+        if (at.front) dFront += `${wasFront === true ? 'L' : 'M'}${cmd}`;
+        else dBack += `${wasFront === false ? 'L' : 'M'}${cmd}`;
+        wasFront = at.front;
+      }
+      front.setAttribute('d', dFront);
+      back.setAttribute('d', dBack);
+    }
+    const n = project([0, 0, -1]);
+    north.setAttribute('transform', `translate(${n.x.toFixed(1)} ${n.y.toFixed(1)})`);
+    north.setAttribute('opacity', n.front ? '1' : '0.35');
+  };
+  let drawn = '';
 
   let raf = 0;
   let turning: { from: number; startMs: number } | null = null;
@@ -105,27 +197,32 @@ export function mountCameraControls(camera: () => CameraApi, surface: () => HTML
     }
     // Sin cámara que girar (el 2D de respaldo), no hay brújula.
     compass.hidden = !api.movesCamera;
-    // La aguja apunta al norte del valle: gira al revés que la vista.
-    const svg = rose();
-    if (svg !== null) svg.style.transform = `rotate(${(camera().heading() * 180) / Math.PI}deg)`;
+    // La bola gira con la vista: sólo se redibuja cuando la vista cambia.
+    const angles = api.viewAngles();
+    const key = `${angles.yaw.toFixed(4)}|${angles.pitch.toFixed(4)}`;
+    if (key !== drawn) { drawn = key; draw(angles.yaw, angles.pitch); }
     raf = requestAnimationFrame(frame);
   };
   raf = requestAnimationFrame(frame);
 
-  // La brújula: arrastrar gira, tocar vuelve al norte.
-  let dragFrom: { x: number; moved: boolean } | null = null;
+  // La bola: arrastrar gira (a los lados) e inclina (arriba y abajo), como
+  // girar una bola del mundo con el dedo; tocar vuelve al norte.
+  let dragFrom: { x: number; y: number; moved: boolean } | null = null;
   compass.addEventListener('pointerdown', (event) => {
     compass.setPointerCapture(event.pointerId);
-    dragFrom = { x: event.clientX, moved: false };
+    dragFrom = { x: event.clientX, y: event.clientY, moved: false };
     turning = null;
+    event.preventDefault();
   });
   compass.addEventListener('pointermove', (event) => {
     if (dragFrom === null) return;
     const dx = event.clientX - dragFrom.x;
-    if (!dragFrom.moved && Math.abs(dx) < DRAG_PX) return;
+    const dy = event.clientY - dragFrom.y;
+    if (!dragFrom.moved && Math.hypot(dx, dy) < DRAG_PX) return;
     dragFrom.moved = true;
     dragFrom.x = event.clientX;
-    if (camera().movesCamera) camera().orbit(-dx * ORBIT_PER_PX, 0);
+    dragFrom.y = event.clientY;
+    if (camera().movesCamera) camera().orbit(-dx * ORBIT_PER_PX, dy * PITCH_PER_PX);
   });
   const release = (): void => {
     if (dragFrom !== null && !dragFrom.moved) faceNorth();

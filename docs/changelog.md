@@ -1,5 +1,16 @@
 # The Valley — Registro de cambios
 
+## v4.80 · 27 sep 2026 · La bola de la vista, como la de Blender
+
+Vera, tras ver la brújula: «no como un botón, sino como un objeto 3D que rota
+sobre sí mismo como la tierra; al moverla como una bola del mundo vas moviendo
+la cámara, como la que tiene Blender». La brújula-botón se sustituye por **una
+bola** abajo a la izquierda, con el horizonte (verde) y los dos meridianos (rojo
+y azul) dibujados en perspectiva y una «N» al norte, que gira en directo con la
+cámara; la mitad de atrás de cada anillo se ve tenue. Arrastrarla a los lados
+gira la vista y arriba y abajo la inclina; tocarla vuelve al norte. El teclado
+y el botón derecho de v4.79 siguen igual.
+
 ## v4.79 · 27 sep 2026 · La brújula, el botón derecho y el teclado
 
 Vera: «es muy incómodo moverse, y con el ratón no me sé todos los controles:

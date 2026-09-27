@@ -85,6 +85,8 @@ interface ValleyBackend {
   orbit(dYaw: number, dPitch: number): void;
   /** Cuánto se ha girado la vista desde la de partida, en radianes; 0 en Canvas. */
   heading(): number;
+  /** Rumbo e inclinación absolutos de la vista; la de partida en Canvas. */
+  viewAngles(): { yaw: number; pitch: number };
   resetView(): void;
   /** U-11 · el vuelo de entrada; el 2D, sin cámara, no hace nada. */
   flyIn(seconds: number): void;
@@ -182,6 +184,7 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     // que girar, y por eso `movesCamera` es `false` y quien llama no lo intenta.
     orbit() { /* idem */ },
     heading() { return 0; },
+    viewAngles() { return { yaw: 0, pitch: Math.PI / 4 }; },
     resetView() { /* idem */ },
     flyIn() { /* idem */ },
     stats() { return null; },
@@ -423,6 +426,7 @@ export function attachBackend(
         pan(dx, dy) { renderer.pan(dx, dy); },
         orbit(dYaw, dPitch) { renderer.orbit(dYaw, dPitch); },
         heading() { return renderer.heading(); },
+        viewAngles() { return renderer.viewAngles(); },
         resetView() { renderer.resetView(); },
         flyIn(seconds) { renderer.flyIn(seconds); },
         stats() { return renderer.stats(); },

@@ -521,9 +521,9 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   hudRight.className = 'valley-hud-right hud-speed-corner';
   cameraControls?.dispose();
   cameraControls = mountCameraControls(() => backend.live, () => backend.live.surface);
-  hudRight.append(cameraControls.compass, bareToggle, hud.speedControls, hud.speedBadge, huntAction);
+  hudRight.append(bareToggle, hud.speedControls, hud.speedBadge, huntAction);
 
-  root.append(canvas, hud.header, hudRight, shell.element);
+  root.append(canvas, hud.header, hudRight, cameraControls.compass, shell.element);
 
   /**
    * **UI-R1 · la pila del mensaje, y el fallo concreto que esta ronda tiene
