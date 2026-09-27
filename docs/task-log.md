@@ -1,5 +1,14 @@
 # Cuaderno de tareas — el rework
 
+## 27 sep 2026 · El modo taller, visible y con cifras (v4.76)
+
+`wood.css`: `.title-sheet:has(.title-continue-row)` encoge viñeta y logotipo
+para que el pie (idioma, «DEV») quepa con «Continue». `ui/dev-hud.ts`: el panel
+de taller (FPS y peor fotograma; llamadas y triángulos; resolución adaptativa),
+arrancado en `boot` si `devPreference()`; la preferencia de taller vive ahora
+ahí (`title.ts` la importa) para no cerrar un ciclo con `app.ts`. Gancho
+nuevo: `window.__valleyRenderStats` en `renderer.ts`.
+
 ## 27 sep 2026 · El ciervo anda de verdad (v4.75)
 
 El GLB del ciervo era anterior a `repair-gait.cjs` (huella de receta `232D…`

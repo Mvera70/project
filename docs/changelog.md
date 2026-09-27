@@ -1,5 +1,16 @@
 # The Valley — Registro de cambios
 
+## v4.76 · 27 sep 2026 · El modo taller vuelve a verse, y trae sus cifras
+
+Vera: «el modo desarrollador ha desaparecido». No había desaparecido: con una
+partida guardada el menú suma «Continue» y su línea, y el pie —idioma y el
+interruptor «DEV»— quedaba por debajo del borde. Con «Continue», el grabado y
+el logotipo ceden sitio y el pie vuelve a caber (medido a 390 × 844 y a
+471 × 884). Y lo que pidió después: con el taller puesto, **un panel de tres
+líneas arriba a la derecha** —fotogramas por segundo y el peor fotograma,
+llamadas de dibujo y triángulos, y la resolución a la que va la adaptativa—
+(`ui/dev-hud.ts`, `window.__valleyRenderStats`).
+
 ## v4.75 · 27 sep 2026 · El ciervo anda de verdad
 
 Vera: «la animación del ciervo al andar está rota: las patas siguen girando

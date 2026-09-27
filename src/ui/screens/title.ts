@@ -24,6 +24,7 @@ import { population } from '@engine/people/demography';
 import type { SaveFile } from '@engine/state';
 import { yearOf } from '@engine/time';
 import { nextUnusedSeed } from '../app';
+import { devPreference, setDevPreference } from '../dev-hud';
 import { retireOverlay } from '../motion';
 import { ORNAMENT_VIEWBOX, YEAR_FLOURISH } from '../redesign/chronicle-ornaments';
 import { currentLocale, loadLocale, setSavedLocale } from '../locale';
@@ -283,16 +284,6 @@ export function parseYear(text: string, fallback = 1): number {
   return Math.min(value, YEAR_MAX);
 }
 
-/** Si el interruptor de taller está puesto. Se recuerda, como el sonido. */
-function devPreference(): boolean {
-  try { return localStorage.getItem(DEV_KEY) === 'on'; } catch { return false; }
-}
-
-function setDevPreference(on: boolean): void {
-  try { localStorage.setItem(DEV_KEY, on ? 'on' : 'off'); } catch { /* modo privado: nada que hacer */ }
-}
-
-const DEV_KEY = 'valley.dev';
 
 /** Un número de valle al azar que no repita ninguno de los ya jugados. */
 function rollSeed(excluded: ReadonlySet<number>): number {

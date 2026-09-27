@@ -51,6 +51,7 @@ import { openEpitaph } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
 import { accentFor, createSoundEngine } from './sound';
 import { openWelcome } from './welcome';
+import { devPreference, startDevHud, type DevHud } from './dev-hud';
 import {
   SILENT,
   clearOffer, dismissHint,
@@ -188,6 +189,9 @@ const WHEEL_STEP = 1.18;
  * (`?sandbox=battle`), que monta una partida de prueba y no puede pisar la
  * que el jugador tiene guardada en el mismo navegador.
  */
+/** El panel de taller vivo, si lo hay (`ui/dev-hud.ts`). */
+let devHud: DevHud | null = null;
+
 export function boot(root: HTMLElement, save?: SaveFile, options: { readonly ephemeral?: boolean } = {}): App {
   let state = save?.state ?? foundGame(freshSeed());
   const archive: ArchivedGame[] = save !== undefined ? [...save.archive] : [];
@@ -200,6 +204,10 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   let lastFraction = 0;
   root.replaceChildren();
   root.className = 'valley-app';
+  // El panel de taller, si el interruptor del menú está puesto. Uno solo: una
+  // partida nueva arranca otro `boot` y el anterior se apaga aquí.
+  devHud?.dispose();
+  devHud = devPreference() ? startDevHud(root) : null;
 
   const canvas = document.createElement('canvas');
   canvas.id = 'valley';

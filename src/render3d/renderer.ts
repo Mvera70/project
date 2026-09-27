@@ -1480,6 +1480,13 @@ export async function createGraphicsRenderer(
   // la densidad; si durante un rato sobra, se recupera. Cambiar la densidad
   // rehace el lienzo, así que se decide como mucho cada `ADAPT.everySeconds`.
   let renderScale = 1;
+  // El panel de taller (`ui/dev-hud.ts`): lo que costó el último dibujo y a
+  // qué resolución va la adaptativa. Ligero: lo lee dos veces por segundo.
+  window.__valleyRenderStats = () => ({
+    calls: renderer.info.render.calls,
+    triangles: renderer.info.render.triangles,
+    scale: renderScale,
+  });
   let frameAverage = 1 / 60;
   let sinceAdapt = 0;
   let easySeconds = 0;
@@ -2452,6 +2459,7 @@ declare global {
     __valleyVisit?: (kind?: HappeningId, dealt?: boolean) => void;
     __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm } | null) => void;
     __valleyBattleStats?: () => BattleStats;
+    __valleyRenderStats?: () => { calls: number; triangles: number; scale: number };
     __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];
   }
 }
