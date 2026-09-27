@@ -1,5 +1,17 @@
 # The Valley — Registro de cambios
 
+## v4.73 · 27 sep 2026 · Río, lago y caídas de agua
+
+Vera señaló que el río se veía como una franja azul y que los arroyos de las
+gargantas parecían trazos blancos sobre la roca. El cauce tiene ahora fondo
+terroso visible, canal más hondo y orillas someras; la corriente usa coordenadas
+continuas para evitar abanicos y patrones por celda. El vado conserva el agua
+entre sus losas, y el tramo exterior comparte el mismo acabado. La orilla del
+lago deja de mostrar la trama de diamantes. Las caídas se ajustan a la roca con
+un cuerpo azul verdoso que llega al río o al lago; la espuma queda al pie y se
+retiran los anillos concéntricos. Revisado con capturas del juego real en
+`artifacts/graphics/water-review/` (semillas 7 y 11, cauce, lago y garganta).
+
 ## v4.72 · 27 sep 2026 · Lo que se quedó en ramas
 
 Vera: «nos dejamos trabajo sin subir en ramas perdidas… revisa al completo».

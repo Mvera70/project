@@ -189,7 +189,7 @@ export class WaterThrows {
   }
 
   /**
-   * La espuma al pie de una cascada: anillos que se abren y gotas que saltan,
+   * La espuma al pie de una cascada: gotas cortas sobre la espuma del material,
    * a ritmo fijo y sin dados (`world/waterfalls.ts`).
    */
   churn(feet: readonly { x: number; y: number; z: number }[], seconds: number): void {
@@ -201,12 +201,13 @@ export class WaterThrows {
       const foot = feet[this.churnCount % feet.length]!;
       const n = this.churnCount;
       const ox = (unit(n * 7_919 + 3) - 0.5) * 0.5, oz = (unit(n * 104_729 + 5) - 0.5) * 0.5;
-      this.ring(foot.x + ox, foot.y + 0.03, foot.z + oz, RING_SPLASH * (0.7 + unit(n * 31 + 1) * 0.6));
+      // Una caída continua no dibuja círculos concéntricos de gotas aisladas.
+      // La espuma la pinta su lámina; aquí sólo salta un poco de agua.
       const angle = unit(n * 15_485_863 + 9) * Math.PI * 2;
       this.live[this.nextDrop] = {
         x: foot.x + ox, y: foot.y + 0.05, z: foot.z + oz,
-        vx: Math.cos(angle) * 0.4, vy: 0.9 + unit(n * 13 + 2) * 0.6, vz: Math.sin(angle) * 0.4,
-        age: 0, size: 0.022, bounces: 1, sliding: false,
+        vx: Math.cos(angle) * 0.28, vy: 0.4 + unit(n * 13 + 2) * 0.25, vz: Math.sin(angle) * 0.28,
+        age: 0, size: 0.018, bounces: 1, sliding: false,
       };
       this.nextDrop = (this.nextDrop + 1) % DROPS;
     }

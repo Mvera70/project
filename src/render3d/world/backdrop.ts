@@ -145,6 +145,7 @@ function outerWater(map: ValleyMap, seed: number, palette: Palette): Mesh | null
   const positions: number[] = [];
   const shores: number[] = [];
   const flows: number[] = [];
+  const courses: number[] = [];
   const indices: number[] = [];
   for (const north of [true, false]) {
     let previous = -1;
@@ -155,14 +156,20 @@ function outerWater(map: ValleyMap, seed: number, palette: Palette): Mesh | null
       const at = positions.length / 3;
       positions.push(
         section.left, GROUND_BIAS - 0.10, z,
+        (section.left + section.right) * 0.5, GROUND_BIAS - 0.10, z,
         section.right, GROUND_BIAS - 0.10, z,
       );
-      // El agua viva, como la de dentro: corre hacia el sur y tiene espuma en
-      // las dos orillas. La cinta sólo tiene dos vértices de ancho, así que la
-      // orilla va a medias o sería toda espuma.
-      shores.push(0.55, 0.55);
-      flows.push(0, 0.6, 0, 0.6);
-      if (previous >= 0) indices.push(previous, at, previous + 1, previous + 1, at, at + 1);
+      // El centro conserva profundidad; las orillas usan el mismo gradiente
+      // que el río del mapa para que la salida no cambie de material.
+      shores.push(1, 0, 1);
+      flows.push(0, 0.6, 0, 0.6, 0, 0.6);
+      courses.push(-1, z, 0, z, 1, z);
+      if (previous >= 0) {
+        for (let lane = 0; lane < 2; lane += 1) {
+          indices.push(previous + lane, at + lane, previous + lane + 1,
+            previous + lane + 1, at + lane, at + lane + 1);
+        }
+      }
       previous = at;
     }
   }
@@ -171,11 +178,12 @@ function outerWater(map: ValleyMap, seed: number, palette: Palette): Mesh | null
   geometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
   geometry.setAttribute('waterShore', new BufferAttribute(new Float32Array(shores), 1));
   geometry.setAttribute('waterFlow', new BufferAttribute(new Float32Array(flows), 2));
+  geometry.setAttribute('waterCourse', new BufferAttribute(new Float32Array(courses), 2));
   geometry.setIndex(new BufferAttribute(new Uint32Array(indices), 1));
   geometry.computeVertexNormals();
   const material = new MeshStandardMaterial({
-    color: palette.water, roughness: 0.18, metalness: 0.1,
-    transparent: true, opacity: 0.86, side: DoubleSide, depthWrite: false,
+    color: palette.water, roughness: 0.42, metalness: 0,
+    transparent: true, opacity: 0.92, side: DoubleSide, depthWrite: false,
   });
   liveWater(material, SHARED_WATER);
   const mesh = new Mesh(geometry, material);

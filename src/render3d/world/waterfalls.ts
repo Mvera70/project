@@ -6,19 +6,19 @@
 // río, y otra al lago si el valle tiene lago con roca detrás.
 //
 // Es una cinta pegada a la roca —el agua que salta de piedra en piedra, no una
-// cortina en el aire— con vetas que corren hacia abajo (la textura se desliza,
-// que es lo único que se anima y no cuesta nada), más ancha abajo que arriba. Al
-// pie, la espuma: anillos y gotas que salen de `effects/water-throws.ts` a
+// cortina en el aire— con vetas procedurales que corren hacia abajo y bordes
+// transparentes, más ancha abajo que arriba. Al
+// pie, la espuma del material y gotas cortas de `effects/water-throws.ts` a
 // ritmo fijo, sin dados.
 
 import {
-  BufferAttribute, BufferGeometry, CanvasTexture, DoubleSide, Group, Mesh, MeshBasicMaterial, RepeatWrapping,
-  type Texture,
+  BufferAttribute, BufferGeometry, DoubleSide, Group, Mesh, MeshStandardMaterial,
 } from 'three';
 import { hash32 } from '@engine/rng';
 import { TERRAIN_CODE, type ValleyMap } from '@engine/state';
 import { GROUND_BIAS } from '../visual-config';
 import { gorgeAt, valleyAxis } from './valley-profile';
+import { groundSurfaceAt } from './ground';
 
 export interface Site {
   readonly kind: 'gorge' | 'lake';
@@ -41,15 +41,12 @@ const GORGE_AT = 7;
 /** Lo deprisa que bajan las vetas, en repeticiones de la textura por segundo. */
 const FLOW = 0.9;
 /** Ancho de la cinta arriba y abajo, en celdas. */
-const WIDTH_TOP = 0.5;
-const WIDTH_FOOT = 1.0;
-/**
- * Lo que se separa de la roca, en celdas. TUNE: con 0,07 la tapaban las caras
- * de la montaña, que sobresalen de la cota interpolada (captura del 26 sep).
- */
-const LIFT = 0.28;
+const WIDTH_TOP = 0.85;
+const WIDTH_FOOT = 1.45;
+/** Separación mínima; la envolvente comprueba también los bordes de la cinta. */
+const LIFT = 0.055;
 /** Muestras a lo largo de la cinta. */
-const SAMPLES = 28;
+const SAMPLES = 56;
 
 const unit = (seed: number, what: string): number => hash32(seed, what) / 4_294_967_296;
 
@@ -88,7 +85,7 @@ export function waterfallSites(map: ValleyMap, seed: number, heightAt: (x: numbe
         // El pie, en la orilla medida a su propia altura del valle: el eje
         // serpentea, y medido arriba el pie quedaba a dos celdas del río.
         const footZ = top.z + (end === 0 ? 0.6 : -0.6);
-        const bottom = { x: valleyAxis(map, footZ) + side * 1.4, z: footZ };
+        const bottom = waterLanding(map, { x: valleyAxis(map, footZ) + side * 1.4, z: footZ });
         if (!inside(map, top) || !inside(map, bottom)) continue;
         const drop = heightAt(top.x, top.z) - heightAt(bottom.x, bottom.z);
         const value = drop < LEAST_DROP ? 0 : score({ top, bottom }, drop);
@@ -106,6 +103,21 @@ function inside(map: ValleyMap, p: { x: number; z: number }): boolean {
   return p.x > 0.5 && p.z > 0.5 && p.x < map.width - 0.5 && p.z < map.height - 0.5;
 }
 
+/** El agua termina dentro del cauce real, no en un desplazamiento del eje. */
+function waterLanding(map: ValleyMap, target: { x: number; z: number }): { x: number; z: number } {
+  let best = target, nearest = Infinity;
+  for (let z = Math.floor(target.z) - 3; z <= Math.floor(target.z) + 3; z += 1) {
+    for (let x = Math.floor(target.x) - 3; x <= Math.floor(target.x) + 3; x += 1) {
+      if (x < 0 || z < 0 || x >= map.width || z >= map.height) continue;
+      const terrain = map.terrain[z * map.width + x];
+      if (terrain !== TERRAIN_CODE.water && terrain !== TERRAIN_CODE.lake) continue;
+      const distance = Math.hypot(x + 0.5 - target.x, z + 0.5 - target.z);
+      if (distance < nearest) { nearest = distance; best = { x: x + 0.5, z: z + 0.5 }; }
+    }
+  }
+  return best;
+}
+
 /** La orilla del lago con la roca más alta detrás, y la cascada que baja de ella. */
 function lakeSite(map: ValleyMap, heightAt: (x: number, z: number) => number): Site | null {
   let best: Site | null = null;
@@ -119,7 +131,7 @@ function lakeSite(map: ValleyMap, heightAt: (x: number, z: number) => number): S
       if (map.terrain[nz * map.width + nx] !== TERRAIN_CODE.mountain) continue;
       const edge = { x: x + 0.5 + dx * 0.5, z: z + 0.5 + dz * 0.5 };
       const top = { x: edge.x + dx * 3, z: edge.z + dz * 3 };
-      const bottom = { x: edge.x - dx * 0.35, z: edge.z - dz * 0.35 };
+      const bottom = waterLanding(map, { x: edge.x - dx * 0.35, z: edge.z - dz * 0.35 });
       if (!inside(map, top)) continue;
       const drop = heightAt(top.x, top.z) - heightAt(bottom.x, bottom.z);
       const value = drop < LEAST_DROP ? 0 : score({ top, bottom }, drop);
@@ -129,38 +141,40 @@ function lakeSite(map: ValleyMap, heightAt: (x: number, z: number) => number): S
   return best;
 }
 
-/** Las vetas del agua que cae: rayas claras de largo y brillo distintos. Sin DOM, nada (pruebas). */
-function streakTexture(): Texture | null {
-  if (typeof document === 'undefined') return null;
-  const canvas = document.createElement('canvas');
-  canvas.width = 32;
-  canvas.height = 128;
-  const context = canvas.getContext('2d');
-  if (context === null) return null;
-  context.clearRect(0, 0, 32, 128);
-  for (let n = 0; n < 26; n += 1) {
-    const x = (hash32(n, 'streak:x') % 32);
-    const y = (hash32(n, 'streak:y') % 128);
-    const long = 18 + (hash32(n, 'streak:l') % 60);
-    const alpha = 0.35 + (hash32(n, 'streak:a') % 60) / 100;
-    context.fillStyle = `rgba(255,255,255,${alpha.toFixed(2)})`;
-    context.fillRect(x, y, 2 + (hash32(n, 'streak:w') % 3), long);
-    context.fillRect(x, y - 128, 2 + (hash32(n, 'streak:w') % 3), long);
-  }
-  const texture = new CanvasTexture(canvas);
-  texture.wrapS = RepeatWrapping;
-  texture.wrapT = RepeatWrapping;
-  return texture;
-}
-
 export function buildWaterfalls(map: ValleyMap, seed: number, heightAt: (x: number, z: number) => number): Waterfalls {
   const group = new Group();
   group.name = 'Valley_Waterfalls';
-  const texture = streakTexture();
-  const material = new MeshBasicMaterial({
-    color: '#dcecf2', transparent: true, opacity: texture === null ? 0.7 : 0.95, depthWrite: false, side: DoubleSide,
-    ...(texture === null ? {} : { map: texture, alphaMap: texture }),
+  const time = { value: 0 };
+  const material = new MeshStandardMaterial({
+    color: '#438d9b', roughness: 0.42, metalness: 0,
+    transparent: true, opacity: 1, depthWrite: false, side: DoubleSide,
   });
+  // Un único material iluminado: la cascada se oscurece al anochecer. La
+  // máscara afina los bordes y corta las vetas; no son rectángulos de textura.
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uFallTime = time;
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nattribute float fallProgress;\nvarying float vFallProgress;\nvarying vec2 vFallUv;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvFallUv = uv;\nvFallProgress = fallProgress;');
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>
+        varying vec2 vFallUv;
+        varying float vFallProgress;
+        uniform float uFallTime;`)
+      .replace('#include <color_fragment>', `#include <color_fragment>
+        float run = vFallUv.y - uFallTime;
+        float thread = sin(vFallUv.x * 13.0 + sin(run * 2.0) * 1.3);
+        float pulse = sin(run * 7.0 + vFallUv.x * 8.0) * 0.5 + 0.5;
+        float rim = min(vFallUv.x, 1.0 - vFallUv.x);
+        float edge = smoothstep(0.0, 0.07, rim);
+        float white = smoothstep(0.2, 0.95, thread) * (0.25 + pulse * 0.65);
+        diffuseColor.rgb *= 0.88 + pulse * 0.12;
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.38, 0.65, 0.68), white * 0.18);
+        float foam = smoothstep(0.8, 0.98, vFallProgress) * (0.2 + pulse * 0.22);
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.8, 0.9, 0.86), foam);
+        diffuseColor.a *= edge * smoothstep(0.0, 0.18, vFallUv.y);`);
+  };
+  material.customProgramCacheKey = () => 'valley-falling-water';
   const feet: { x: number; y: number; z: number }[] = [];
   const geometries: BufferGeometry[] = [];
   for (const site of waterfallSites(map, seed, heightAt)) {
@@ -170,31 +184,65 @@ export function buildWaterfalls(map: ValleyMap, seed: number, heightAt: (x: numb
     const dx = site.bottom.x - site.top.x, dz = site.bottom.z - site.top.z;
     const length = Math.hypot(dx, dz);
     const across = { x: -dz / length, z: dx / length };
-    let lowest = Infinity;
+    // Envolvente desde el pie hacia arriba: no sube al avanzar y nunca se
+    // mete debajo de una piedra. El mínimo acumulado anterior enterraba todos
+    // los tramos posteriores al primer hueco del terreno.
+    const lanes = 7;
+    const path: { x: number; y: number; z: number }[][] = [];
+    const waterLevel = site.kind === 'lake' ? -0.23 : -0.10;
+    for (let i = 0; i <= SAMPLES; i += 1) {
+      const t = i / SAMPLES;
+      const sway = Math.sin(t * Math.PI * 3 + unit(seed, 'fall:sway') * 6) * 0.16 * Math.sin(t * Math.PI);
+      const x = site.top.x + dx * t + across.x * sway;
+      const z = site.top.z + dz * t + across.z * sway;
+      const half = (WIDTH_TOP + (WIDTH_FOOT - WIDTH_TOP) * t) * 0.5
+        * (0.85 + 0.15 * Math.sin(t * Math.PI * 5));
+      const section: { x: number; y: number; z: number }[] = [];
+      for (let lane = 0; lane < lanes; lane += 1) {
+        const offset = (lane / (lanes - 1) * 2 - 1) * half;
+        const px = x + across.x * offset, pz = z + across.z * offset;
+        section.push({ x: px, z: pz, y: Math.max(waterLevel, groundSurfaceAt(map, px, pz) + LIFT) });
+      }
+      path.push(section);
+    }
+    // Redondear los pequeños huecos entre facetas sin bajar ningún vértice
+    // bajo la roca. Más muestras evitan los recortes triangulares del salto.
+    const heights = path.map(section => section.map(point => point.y));
+    for (let i = 1; i < SAMPLES; i += 1) {
+      for (let lane = 0; lane < lanes; lane += 1) {
+        path[i]![lane]!.y = Math.max(path[i]![lane]!.y,
+          (heights[i - 1]![lane]! + 2 * heights[i]![lane]! + heights[i + 1]![lane]!) * 0.25);
+      }
+    }
+    for (let i = SAMPLES - 1; i >= 0; i -= 1) {
+      for (let lane = 0; lane < lanes; lane += 1) {
+        path[i]![lane]!.y = Math.max(path[i]![lane]!.y, path[i + 1]![lane]!.y);
+      }
+    }
     let travelled = 0;
     let previous: { x: number; y: number; z: number } | null = null;
     for (let i = 0; i <= SAMPLES; i += 1) {
-      const t = i / SAMPLES;
-      // Un poco de vaivén: el agua busca la piedra, no la regla.
-      const sway = Math.sin(t * Math.PI * 3 + unit(seed, 'fall:sway') * 6) * 0.12 * (1 - t);
-      const x = site.top.x + dx * t + across.x * sway, z = site.top.z + dz * t + across.z * sway;
-      // Pegada a la roca y nunca subiendo: el agua sólo baja.
-      lowest = Math.min(lowest, heightAt(x, z) + LIFT * (1 - t * 0.7));
-      const y = GROUND_BIAS + lowest;
-      if (previous !== null) travelled += Math.hypot(x - previous.x, y - previous.y, z - previous.z);
-      previous = { x, y, z };
-      const half = (WIDTH_TOP + (WIDTH_FOOT - WIDTH_TOP) * t) / 2;
-      positions.push(x - across.x * half, y, z - across.z * half, x + across.x * half, y, z + across.z * half);
-      uvs.push(0, travelled / 1.2, 1, travelled / 1.2);
-      if (i > 0) {
-        const a = (i - 1) * 2;
-        indices.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
+      const centre = path[i]![Math.floor(lanes / 2)]!;
+      const y = GROUND_BIAS + centre.y;
+      if (previous !== null) travelled += Math.hypot(centre.x - previous.x, y - previous.y, centre.z - previous.z);
+      previous = { x: centre.x, y, z: centre.z };
+      for (let lane = 0; lane < lanes; lane += 1) {
+        const p = path[i]![lane]!;
+        positions.push(p.x, GROUND_BIAS + p.y, p.z);
+        uvs.push(lane / (lanes - 1), travelled / 1.2);
+        if (i > 0 && lane < lanes - 1) {
+          const a = (i - 1) * lanes + lane;
+          indices.push(a, a + lanes, a + 1, a + 1, a + lanes, a + lanes + 1);
+        }
       }
     }
     const geometry = new BufferGeometry();
     geometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
     geometry.setAttribute('uv', new BufferAttribute(new Float32Array(uvs), 2));
+    geometry.setAttribute('fallProgress', new BufferAttribute(
+      Float32Array.from({ length: positions.length / 3 }, (_, index) => Math.floor(index / lanes) / SAMPLES), 1));
     geometry.setIndex(indices);
+    geometry.computeVertexNormals();
     geometries.push(geometry);
     const mesh = new Mesh(geometry, material);
     mesh.name = 'Valley_Waterfall';
@@ -206,13 +254,12 @@ export function buildWaterfalls(map: ValleyMap, seed: number, heightAt: (x: numb
     group,
     feet,
     step(seconds): void {
-      // Las vetas bajan: la textura corre hacia el pie.
-      if (texture !== null) texture.offset.y -= seconds * FLOW;
+      // Las vetas bajan sin mover ni recalcular la geometría.
+      time.value += seconds * FLOW;
     },
     dispose(): void {
       for (const geometry of geometries) geometry.dispose();
       material.dispose();
-      texture?.dispose();
     },
   };
 }
