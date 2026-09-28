@@ -1,0 +1,11 @@
+[
+  {
+    "id": "signpost",
+    "round": "astra-signpost",
+    "glb": "artifacts/graphics/astra/signpost/signpost.glb",
+    "preview": "artifacts/graphics/astra/signpost/three-quarter.png",
+    "recipe": "art/recipes/signpost-candidate/build.py",
+    "source": "Modelo original del cartel del camino de The Valley, realizado por Astra conforme a docs/encargos/cartel-del-camino.md. Fuente reproducible: art/recipes/signpost-candidate/build.py.",
+    "license": "project-original"
+  }
+]
