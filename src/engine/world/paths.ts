@@ -18,6 +18,7 @@ import { smithyWorking } from '../subsistence/building-counts';
 import { TERRAIN_CODE } from '../state';
 import type { GameState, PathEvent, Villager, VillagerId } from '../state';
 import { route } from './astar';
+import { wearValleyRoad } from './valley-road';
 import { plotAccess, solidKind, walkingBlocked, walkingMap } from './spatial';
 import type { ValleyMap } from '../state';
 
@@ -501,6 +502,8 @@ export function accrueTraffic(state: GameState): void {
       active.add(cell);
     }
   }
+  // Y los de fuera, por el camino del valle (`valley-road.ts`).
+  for (const cell of wearValleyRoad(state)) active.add(cell);
 }
 
 /**

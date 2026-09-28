@@ -57,7 +57,7 @@ import {
   approachOf, type Gate, type Raider,
 } from './raiders';
 import type { HappeningId } from '@engine/state';
-import { beastOf, createVisitors, stallOf, stallSiteOf, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
+import { beastOf, createVisitors, stallOf, stallSiteOf, stayForGoods, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
@@ -1692,6 +1692,24 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         if (stallSolids.has(site.id)) continue;
         placeSolid(land, site.solid);
         stallSolids.set(site.id, site.solid);
+        // Y quien estuviera dentro de la huella —los críos jugando donde el
+        // puesto se monta (semilla 41, 28 sep 2026)— sale al hueco libre más
+        // cercano y vuelve a decidir; su sitio de juego ya no existe.
+        for (const dweller of dwellers) {
+          const body = dweller.body;
+          if (fitsCircle(land, body.x, body.z, body.radius)) continue;
+          for (let ring = 1; ring <= 6; ring += 1) {
+            const free = Array.from({ length: 8 }, (_, k) => ({
+              x: body.x + Math.cos((k / 8) * Math.PI * 2) * ring * 0.25,
+              z: body.z + Math.sin((k / 8) * Math.PI * 2) * ring * 0.25,
+            })).find((at) => fitsCircle(land, at.x, at.z, body.radius));
+            if (free !== undefined) { body.x = free.x; body.z = free.z; body.vx = 0; body.vz = 0; break; }
+          }
+          if (dweller.doing !== null && Math.hypot(dweller.doing.place.at.x - site.x, dweller.doing.place.at.z - site.z) < 1.5) {
+            dweller.doing = null;
+            dweller.rethinkAt = steps;
+          }
+        }
       }
       const stallOptions: Place[] = stallsNow.flatMap((site) => {
         const offer = placedOffer(OFFERS['browse']!, site.front, land);
@@ -2676,6 +2694,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       for (const trade of tradeStarts) {
         if (trade.started === true || trade.visitor.phase !== 'staying') continue;
         trade.started = true;
+        if (trade.trips.length > 0) stayForGoods(trade.visitor, phase);
         for (const trip of trade.trips) {
           const dweller = dwellers.find((one) => one.villager === trip.villager);
           if (dweller === undefined || indoors(dweller) || dweller.flight !== null || dweller.scene !== null) continue;

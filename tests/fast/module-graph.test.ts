@@ -202,7 +202,7 @@ describe('grafo de módulos del motor', () => {
     // le avisa de que los árboles se han movido, y la flecha no vuelve.
     expect(importsOf('world/astar.ts')).toEqual(['balance', 'state', 'tiles']);
     expect(importsOf('world/forest.ts')).toEqual(['balance', 'paths', 'state', 'tiles']);
-    const pathDependencies = new Set([
+    const pathDependencies = new Set(['valley-road', 
       'astar',
       'balance',
       'people/demography',
@@ -214,6 +214,9 @@ describe('grafo de módulos del motor', () => {
     ]);
     expect(importsOf('world/paths.ts').every(target => pathDependencies.has(target))).toBe(true);
     expect(importsOf('world/paths.ts')).not.toContain('forest');
+    // El camino del valle (28 sep 2026): del mapa y la semilla, con el A* de los
+    // aldeanos, y nada más. `paths.ts` lo pisa cada semana; nadie más lo conoce.
+    expect(importsOf('world/valley-road.ts')).toEqual(['astar', 'balance', 'rng', 'state']);
     // K-2 · `people/crown`: qué familia va delante en la cola de §7.3 y si la
     // muralla espera a que haya amenaza lo dice ahora la voluntad del rey, no
     // `state.intent` —que M-2 dejó sin quien lo escriba—.

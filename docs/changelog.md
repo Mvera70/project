@@ -1,5 +1,59 @@
 # The Valley — Registro de cambios
 
+## v4.94 · 28 sep 2026 · El camino, en el motor; los visitantes lo siguen; piedras en la calzada
+
+Los tres abiertos que dejó v4.93, pedidos por Vera tal cual: «los mercaderes y
+el buhonero siguen apareciendo en la celda de la aldea más cercana a la
+entrada, no en la boca del camino, y su ruta no lo sigue; marcar este camino
+también en el mapa del motor; para la villa, piedras sueltas por la calzada,
+de cerca».
+
+- **El camino vive en el motor** (`engine/world/valley-road.ts`, nuevo). No es
+  una capa nueva del mapa: es **tráfico**, como todo lo demás (§7.6). Cada
+  semana los de fuera pisan las celdas del camino (`wearValleyRoad`, en
+  `accrueTraffic`, `WORLD.ROAD_TRAFFIC` 16) y el mismo decaimiento y los mismos
+  umbrales que asientan las sendas de la aldea lo asientan a él: pisada, senda,
+  y calzada cuando hay fragua. Al fundar ya está pisado (`seedValleyRoad`,
+  `WORLD.ROAD_FOUNDING` 400): la pareja llegó por algún sitio. Ni un campo
+  nuevo en el esquema, ni una tirada: determinista, misma huella en dos
+  partidas. Con 12 de tráfico semanal sólo un cuarto del camino era senda a
+  los cuatro años; con 16, más del 70 % en las cuatro semillas y nunca llega a
+  calzada sin fragua. El eje del río, la inundación que evita las islas de roca
+  y las bocas se mudan al motor (`valleyAxis`, `valleyReach`, `roadMouths`), y
+  la sierra, el suelo pintado y la vida leen de ahí: un trazado, cinco
+  llamantes. **Y como el A* de los aldeanos descuenta las celdas pisadas, ahora
+  prefieren el camino**: eso mueve la trayectoria de las partidas (la aldea de
+  ocho años de la semilla 7 ya no es la misma), y las pruebas que lo midieron
+  llevan la causa escrita.
+- **Los visitantes entran por la boca y siguen el camino** (`life/visitors.ts`,
+  `roadInto`): el buhonero, el factor, el tratante y el salinero nacen sobre
+  una celda del camino —lo más lejos que se ve, `ENTRY_FAR` de andadura—, van
+  por él hasta tres celdas de la plaza y el resto con el A* de la vida. Salen
+  antes cuanto más rodeo dé el camino, para estar en la plaza a la hora de
+  siempre; y **el que compró espera a que le lleven lo suyo** (`stayForGoods`,
+  0,3 de jornada desde que salen los porteadores, nunca más tarde de 0,7): por
+  el camino se llegaba a 0,36 y con la hora fija de irse el bulto llegaba a la
+  plaza a 0,64 con el buhonero ya de vuelta, y nadie pagaba (semilla 7). Se
+  arreglan dos cosas viejas que el camino destapó: el visitante se quedaba a
+  0,6 celdas de su sitio —justo donde luego se monta su puesto— y al irse
+  arrancaba desde una celda sólida, sin ruta, deslizándose por las paredes
+  hasta la noche (ahora llega al sitio, y sin ruta se pide otra desde el primer
+  hueco libre, cada medio segundo); y los críos que jugaban donde se monta el
+  puesto quedaban dentro de su huella (salen al hueco más cercano). Con eso, el
+  salinero de la semilla 23 —el `it.fails` de v4.84— sale de la plaza cerrada
+  por el camino, y la prueba vuelve a ser una prueba.
+- **Piedras por la calzada de la villa** (`buildRoadStones`, `world/road.ts`):
+  guijarros instanciados con la geometría del peñasco pequeño, 0,6 por celda,
+  sólo en la era de villa y sólo a lo largo del camino; de lejos no se ven, de
+  cerca la calzada ya no es una franja lisa.
+
+Pruebas: `valley-road-engine.test.ts` (dos bocas, un camino pisable por boca
+desde la fundación, senda a los cuatro años, determinista), `visitors-road.test.ts`
+(el buhonero nace en el camino y más del 60 % de su ruta va por él, tres
+semillas), y `life-trade.test.ts` con el `it.fails` de la semilla 23 vuelto
+verde. Frontera: `module-graph.test.ts` conoce `valley-road` (importa sólo
+`astar`, `balance`, `rng`, `state`).
+
 ## v4.93 · 28 sep 2026 · El camino del valle: de los desfiladeros a la plaza, por eras
 
 Vera, con tres capturas: «el camino que entra por ambos desfiladeros no se

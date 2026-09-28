@@ -80,9 +80,13 @@ describe('K-2 · el rey herrero mira a la muralla', () => {
     // ninguno de los dos y **los dos valles caen en la misma mejora a piedra**,
     // que es la vía de escape de §7.3 y no la voluntad de nadie. En el quince
     // el contraste es el que la fila describe: el rey pide estaca, el valle sin
-    // rey no pide nada.
-    const plain = village(41, 15);
-    const forge = crowned(village(41, 15), 'smith');
+    // rey no pide nada. **Y al catorce desde v4.94**: con el camino del valle
+    // pisado desde la fundación los aldeanos lo prefieren y la aldea se hace
+    // un año antes —dieciséis casas al quince, el anillo lleno, y los dos
+    // valles otra vez en la mejora a piedra—; al catorce hay quince casas y el
+    // contraste está intacto (medido del año 10 al 18).
+    const plain = village(41, 14);
+    const forge = crowned(village(41, 14), 'smith');
     for (const state of [plain, forge]) {
       delete state.flags['threatened'];
       state.village.wood = 4_000;

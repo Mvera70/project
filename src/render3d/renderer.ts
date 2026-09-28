@@ -40,7 +40,7 @@ import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
 import { updateMountainVeil } from './effects/mountain-veil';
 import { createGrass, meadowWeight } from './world/grass';
-import { buildSignposts, valleyRoad } from './world/road';
+import { buildRoadStones, buildSignposts, valleyRoad } from './world/road';
 import { createTrampleMap, setTramplers, snowTracks, SNOW_FROM, type TrampleMap, type Trampler } from './effects/trample';
 import { cloudsFor, stepClouds } from './effects/clouds';
 import { createAmbience, type Ambience } from './effects/ambience';
@@ -1109,6 +1109,10 @@ export async function createGraphicsRenderer(
       snowing < 0.5 ? (x, z) => meadowWeight(terrainSeed, x, z) : undefined, road.wear);
     if (signposts !== null) world.remove(signposts);
     signposts = buildSignposts(road.signposts, (x, z) => elevationAt(state.map, x, z));
+    // Y en la villa, piedras sueltas por la calzada, con la forma de un peñasco de Astra.
+    const roadStones = buildRoadStones(road, state.map, terrainSeed, rockGeometry(library.get('crag-2')?.original) ?? null,
+      (x, z) => elevationAt(state.map, x, z), palette.stone);
+    if (roadStones !== null) signposts.add(roadStones);
     world.add(signposts);
     if (trample === null) trample = createTrampleMap(state.map.width, state.map.height);
     snowTracks(ground.mesh.material as Material);

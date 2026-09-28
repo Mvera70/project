@@ -150,9 +150,16 @@ describe('el desgaste del suelo · §7.6', () => {
     const cell = idx(18, 20);
     s.map.terrain[cell] = TERRAIN_CODE.meadow;
     let ticks = 0;
+    // Las pisadas van **antes** del desgaste de la semana, como en el tick
+    // (§4.2: se anda y luego se asienta). No es sólo orden: el motor lleva las
+    // celdas con tráfico en un conjunto que rellena del mapa una sola vez y
+    // que desde entonces alimentan las rutas y el camino del valle (v4.94);
+    // una celda pisada a mano después del primer desgaste no entra nunca en
+    // él, y con el camino siempre pisado el conjunto ya no vuelve a rellenarse
+    // solo (medido: 5.000 semanas sin senda).
     while (s.map.path[cell] !== 2 && ticks < 5000) {
-      accrueTraffic(s); // nadie anda: solo decae
       s.map.traffic[cell] = (s.map.traffic[cell] as number) + walkers;
+      accrueTraffic(s); // nadie anda: solo decae
       upgradePaths(s);
       ticks += 1;
     }

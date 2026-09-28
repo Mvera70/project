@@ -112,8 +112,9 @@ juega.
 | Qué | Qué se ve hoy | Qué haría falta |
 |---|---|---|
 | **El cartel de la aldea** | Un poste y una tablilla de dos cajas, uno por entrada desde la era de aldea (`world/road.ts`) | El modelo de Astra: `docs/encargos/cartel-del-camino.md` (Vera lo pasa) |
-| **Los visitantes por el camino** | El buhonero y los tratantes entran por la celda de la aldea más cercana a la entrada, no por el camino pintado | Que `entryOf` (`life/visitors.ts`) parta de la boca del camino y que su ruta lo siga |
-| **La calzada de la villa** | El nivel 3 del suelo (`cellColour`), el mismo de las sendas gastadas | Piedras o losas sueltas por la calzada de cerca, instanciadas como los peñascos |
+| ~~**Los visitantes por el camino**~~ · hecho en v4.94 | Nacen en el camino y lo siguen hasta tres celdas de la plaza (`roadInto`) | Nada; queda que la mula y la vaca del tratante entren también por él, que hoy siguen al cuerpo |
+| ~~**La calzada de la villa**~~ · hecho en v4.94 | Guijarros instanciados a lo largo del camino en la era de villa (`buildRoadStones`) | Losas de verdad, con juntas, si el arte de superficie llega a la calzada |
+| **El camino que se gasta** | El motor lo pisa cada semana (`wearValleyRoad`) y el suelo lo pinta por nivel | Que se vea el paso: carriladas de carro en la senda, barro en el vado tras la lluvia |
 
 ## La hierba (28 sep 2026)
 

@@ -1863,6 +1863,20 @@ export const WORLD = {
   PATH_T2: 1600,
   PATH_T3: 6000,
   TRAFFIC_DECAY: 0.005, // per tick
+  // TUNE: **el camino del valle** (`world/valley-road.ts`, 28 sep 2026), lo
+  // que pisan cada semana los de fuera en cada celda del camino de los
+  // desfiladeros a la plaza. Con el decaimiento del 0,5 % el tráfico se
+  // estabiliza en ROAD_TRAFFIC / 0,005 = 3.200: por encima de la senda
+  // (1.600) y por debajo de la calzada (6.000), que sigue siendo cosa de la
+  // aldea y su fragua. Desde la pisada de la fundación (400) llega a senda en
+  // unas 110 semanas —dos años y pico, 26 h de reloj a ×1—, que es lo que
+  // tarda un caserío en ser aldea (§16.2). Con 12 el tope era 2.400 y el
+  // redondeo hacia arriba del decaimiento lo dejaba rozando el umbral: a los
+  // cuatro años sólo el 25 % del camino era senda en la semilla 3.
+  ROAD_TRAFFIC: 16,
+  // TUNE: el tráfico con el que nace el camino: justo pisada (PATH_T1). La
+  // pareja fundadora llegó por él.
+  ROAD_FOUNDING: 400,
   STONE_PER_BP: 0.5, // build points converted to stone, with a smithy
   // M-0 · TUNE: hasta dónde cantea la aldea cuando no tiene nada que levantar.
   // Con la fragua en pie y la obra parada, los puntos de la semana se van a la

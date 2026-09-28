@@ -1,5 +1,23 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · El camino en el motor, los visitantes por él, piedras (v4.94)
+
+`engine/world/valley-road.ts` (nuevo: `valleyAxis`, `valleyReach`,
+`roadMouths`, `valleyRoadCells`, `wearValleyRoad`, `seedValleyRoad`),
+`engine/world/paths.ts` (`accrueTraffic` pisa el camino cada semana),
+`engine/found.ts` (`seedValleyRoad` tras la plaza), `balance.ts`
+(`WORLD.ROAD_TRAFFIC` 16, `ROAD_FOUNDING` 400), `world/mountains.ts` y
+`world/road.ts` (leen las bocas del motor; `buildRoadStones`),
+`life/visitors.ts` (`roadInto`, `routeOut`, `stayForGoods`, `ARRIVE_AT_SPOT`),
+`life/village.ts` (desalojo de la huella del puesto; espera por lo comprado).
+Pruebas: `valley-road-engine.test.ts`, `visitors-road.test.ts`,
+`life-trade.test.ts` (la semilla 23 ya no es `it.fails`). **Abierto:** la
+trayectoria de las partidas cambió (los aldeanos prefieren el camino), así
+que cualquier prueba o medida que hable de una aldea hecha por semilla hay que
+remedirla; el cartel sigue siendo de dos cajas hasta que Astra entregue
+(`docs/encargos/cartel-del-camino.md`); y las piedras de la calzada no tienen
+captura de cerca en tablet.
+
 ## 28 sep 2026 · El camino del valle (v4.93)
 
 `world/road.ts` (`valleyRoad`, `buildSignposts`), `world/mountains.ts`
@@ -7,12 +25,8 @@
 `world/ground.ts` (`buildGround(..., road)`, `cellColour(..., road)`),
 `renderer.ts` (camino y carteles en `rebuildGround`). Prueba:
 `valley-road.test.ts`. Encargo: `docs/encargos/cartel-del-camino.md` (Vera lo
-pasa a Astra). **Abierto:** los visitantes (`visitors.ts`) siguen entrando por
-`entryOf` —la celda del suelo de la aldea más cerca de `approachOf`—, no por
-el camino pintado; el paso siguiente es que `entryOf` prefiera la boca del
-camino y que su ruta lo siga (el A* de la vida no descuenta la senda). Y que
-el camino se marque también en `map.path` del motor sería un cambio de motor:
-no se hace sin pedirlo.
+pasa a Astra). Los tres abiertos que dejó —visitantes por el camino, el camino
+en `map.path`, piedras en la calzada— los cerró v4.94 (arriba).
 
 ## 28 sep 2026 · Las sombras por pasos y el tinte del alba (v4.90, v4.91)
 

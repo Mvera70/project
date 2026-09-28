@@ -16,9 +16,10 @@
 
 import { hash32 } from '@engine/rng';
 import type { GameState, HappeningId } from '@engine/state';
+import { valleyRoadCells } from '@engine/world/valley-road';
 import type { Animal } from '@derive/animals';
 import type { Body, Point, Solid, Terrain } from './body';
-import { fitsCircle, integrate, turnTo } from './body';
+import { blockedAt, fitsCircle, integrate, turnTo } from './body';
 import { LIFE_STEP } from './clock';
 import { clearBetween, pathTo } from './navigate';
 import type { Waypoint } from './navigate';
@@ -38,9 +39,9 @@ export interface Visitor {
   readonly centre: Point;
   phase: VisitorPhase;
   route: Waypoint[];
-  /** Hora de llegar y de irse, en fase de jornada: cada uno la suya. */
+  /** Hora de llegar y de irse, en fase de jornada: cada uno la suya. La de irse se retrasa si le están llevando lo comprado (`stayForGoods`). */
   readonly arrive: number;
-  readonly leave: number;
+  leave: number;
   /** Paso a partir del cual el tramo se da por hecho aunque no se haya llegado (E.7). */
   deadline: number;
   /** Lo andado, para la zancada del clip. */
@@ -91,8 +92,27 @@ const VISITS: Readonly<Partial<Record<HappeningId, { days: number; people: numbe
  * (0,6, las tres), antes de la hoguera, para volver con luz.
  */
 const ARRIVE = 0.14;
+/** Lo más pronto que sale quien viene de lejos, en fracción de jornada: con luz. */
+const EARLIEST = 0.07;
+/** Lo que dura la jornada escénica, en segundos (`STEPS_PER_DAY · LIFE_STEP`). */
+const DAY_SECONDS = 120;
 const LEAVE = 0.6;
 const JITTER = 0.05;
+/**
+ * Lo que se queda como mínimo el que compró desde que la aldea sale a llevarle
+ * lo suyo, y lo más tarde que sale de la plaza, para volver con luz. Por el
+ * camino del valle se llega más tarde (semilla 7: a 0,36) y con la hora fija
+ * de irse el bulto llegaba a la plaza a 0,64 con el buhonero ya en el camino:
+ * nadie pagó. Ir y venir de la leñera con la carga son 0,27 de jornada,
+ * medido en tres semillas.
+ */
+const STAY_FOR_GOODS = 0.3;
+const LEAVE_LATEST = 0.7;
+
+/** El vendedor que compró espera a que le lleven lo suyo, hasta donde da la luz. */
+export function stayForGoods(visitor: Visitor, phase: number): void {
+  visitor.leave = Math.min(LEAVE_LATEST, Math.max(visitor.leave, phase + STAY_FOR_GOODS));
+}
 /** Lo que anda un visitante, en celdas por segundo: sin prisa, como un vecino (`body.ts`). */
 const VISITOR_PACE = 1.1;
 const VISITOR_RADIUS = 0.32;
@@ -166,8 +186,15 @@ function unit(seed: number, what: string): number {
   return hash32(seed, `visitor:${what}`) / 0x1_0000_0000;
 }
 
-function deadlineFor(from: Point, to: Point, step: number): number {
-  const far = Math.hypot(to.x - from.x, to.z - from.z);
+function deadlineFor(from: Point, to: Point, step: number, route: readonly Point[] = []): number {
+  // Lo que hay que andar es la ruta, no la recta: por el camino del valle se
+  // da un rodeo, y con la recta el plazo vencía antes de llegar y el buhonero
+  // se plantaba a medio camino (cazado por `life-trade.test.ts`, 28 sep 2026).
+  let along = 0;
+  let last = from;
+  for (const point of route) { along += Math.hypot(point.x - last.x, point.z - last.z); last = point; }
+  along += Math.hypot(to.x - last.x, to.z - last.z);
+  const far = Math.max(along, Math.hypot(to.x - from.x, to.z - from.z));
   return step + Math.round(((far / VISITOR_PACE) * 2) / LIFE_STEP) + DEADLINE_SLACK;
 }
 
@@ -189,7 +216,12 @@ export function createVisitors(
   // fuera, pero siempre lejos de la plaza, para que se le vea venir.
   const shore = reachableFrom(land, heart);
   const road = approachOf(state, land, heart);
-  const entry = entryOf(land, shore, plaza, road);
+  // **Por el camino del valle** (Vera, 28 sep 2026): la entrada es la celda
+  // del camino más lejana de la plaza que sigue siendo suelo de la aldea, y
+  // la ruta va por el camino hasta cerca de la plaza. Si el valle no tiene
+  // camino que llegue, la entrada de siempre.
+  const along = roadInto(state, land, shore, plaza);
+  const entry = along?.entry ?? entryOf(land, shore, plaza, road);
   if (entry === null) return [];
   const visitors: Visitor[] = [];
   for (const { kind, dealt } of visits) {
@@ -217,6 +249,13 @@ export function createVisitors(
       // desde el que la plaza se alcanza andando.
       let from: Point | null = null;
       let route: Waypoint[] | null = null;
+      if (along !== null) {
+        // Por el camino hasta el último tramo, y de ahí al puesto.
+        const start = nearestReachable(land, shore, along.entry, VISITOR_RADIUS);
+        const last = along.road[along.road.length - 1]!;
+        const tail = start === null ? null : pathTo(land, last, spot);
+        if (start !== null && tail !== null) { from = start; route = [...along.road, ...tail]; }
+      }
       for (let tries = 0; tries < ENTRY_TRIES && route === null; tries += 1) {
         const turn = unit(seed, `${index}:turn`) * Math.PI * 2 + tries * 2.4;
         const far = tries === 0 ? 0 : 1 + tries * 0.8;
@@ -227,6 +266,15 @@ export function createVisitors(
         if (from !== null) route = pathTo(land, from, spot);
       }
       if (from === null || route === null) continue;
+      // Quien viene por el camino da un rodeo: sale antes, lo que tarde de más
+      // respecto a la recta, para estar en la plaza a la hora de siempre. Con
+      // la hora fija de salida llegaba a 0,41 de la jornada y las cargas del
+      // trato, que van por hora, ya no lo encontraban (28 sep 2026).
+      let walked = 0;
+      let last: Point = from;
+      for (const point of route) { walked += Math.hypot(point.x - last.x, point.z - last.z); last = point; }
+      const straight = Math.hypot(spot.x - from.x, spot.z - from.z);
+      const early = Math.max(0, (walked - straight) / VISITOR_PACE / DAY_SECONDS);
       visitors.push({
         body: {
           id: -(VISITOR_ID_BASE + index), x: from.x, z: from.z,
@@ -238,7 +286,7 @@ export function createVisitors(
         centre: plaza,
         phase: 'waiting',
         route,
-        arrive: ARRIVE + unit(seed, `${index}:arrive`) * JITTER,
+        arrive: Math.max(EARLIEST, ARRIVE + unit(seed, `${index}:arrive`) * JITTER - early),
         leave: LEAVE + unit(seed, `${index}:leave`) * JITTER,
         deadline: 0,
         travelled: 0,
@@ -265,6 +313,48 @@ export function createVisitors(
  */
 const ENTRY_NEAR = 12;
 const ENTRY_FAR = 26;
+
+/**
+ * El camino del valle como lo pisa un visitante: la entrada (la celda del
+ * camino más lejana de la plaza, dentro de lo que se mira, que sea suelo de la
+ * aldea) y los puntos del camino desde ahí hasta el último que sigue lejos de
+ * la plaza. Se toma la boca más cercana a la entrada de fuera de los asaltos,
+ * que es por donde el valle da al mundo.
+ */
+function roadInto(
+  state: GameState, land: Terrain, shore: Uint8Array, plaza: Point,
+): { entry: Point; road: Waypoint[] } | null {
+  const routes = valleyRoadCells(state.map, state.terrainSeed, state.plaza);
+  let best: { entry: Point; road: Waypoint[] } | null = null;
+  for (const cells of routes) {
+    const points = cells.map((cell) => ({ x: cell % state.map.width + 0.5, z: Math.floor(cell / state.map.width) + 0.5 }));
+    const onShore = (p: Point): boolean => shore[Math.floor(p.z) * land.width + Math.floor(p.x)] === 1;
+    // El final: el último punto del camino que sigue a más de tres celdas de
+    // la plaza (de ahí al puesto va por su cuenta).
+    let stop = -1;
+    for (let i = 0; i < points.length; i += 1) {
+      if (Math.hypot(points[i]!.x - plaza.x, points[i]!.z - plaza.z) <= 3) break;
+      stop = i;
+    }
+    if (stop < 3) continue;
+    // La entrada: hacia atrás desde el final, **lo que se anda por el camino**
+    // —no la recta— hasta `ENTRY_FAR`, y todo suelo de la aldea. Medido por la
+    // recta, en la semilla 23 el camino serpenteaba cincuenta celdas y el
+    // buhonero llegaba a 0,47 de la jornada, sin tiempo para el trato.
+    let start = stop;
+    let walked = 0;
+    for (let i = stop; i > 0; i -= 1) {
+      const step = Math.hypot(points[i]!.x - points[i - 1]!.x, points[i]!.z - points[i - 1]!.z);
+      if (walked + step > ENTRY_FAR || !onShore(points[i - 1]!)) break;
+      walked += step;
+      start = i - 1;
+    }
+    if (stop - start < 3 || Math.hypot(points[start]!.x - plaza.x, points[start]!.z - plaza.z) < ENTRY_NEAR * 0.5) continue;
+    const road = points.slice(start, stop + 1);
+    if (best === null || road.length > best.road.length) best = { entry: points[start]!, road };
+  }
+  return best;
+}
 
 /** Por dónde entra: del suelo de la aldea, lejos de la plaza y lo más cerca posible de la entrada de fuera. */
 function entryOf(land: Terrain, shore: Uint8Array, plaza: Point, road: Point | null): Point | null {
@@ -308,20 +398,25 @@ function moveVisitor(visitor: Visitor, land: Terrain, phase: number, step: numbe
     if (phase >= visitor.leave) { visitor.phase = 'gone'; return; }
     if (phase < visitor.arrive) return;
     visitor.phase = 'coming';
-    visitor.deadline = deadlineFor(body, visitor.spot, step);
+    visitor.deadline = deadlineFor(body, visitor.spot, step, visitor.route);
   }
   if (visitor.phase === 'staying') {
     body.vx = 0;
     body.vz = 0;
     if (phase < visitor.leave) return;
     visitor.phase = 'leaving';
-    visitor.route = pathTo(land, { x: body.x, z: body.z }, visitor.road) ?? [];
-    visitor.deadline = deadlineFor(body, visitor.road, step);
+    visitor.route = routeOut(land, body, visitor.road);
+    visitor.deadline = deadlineFor(body, visitor.road, step, visitor.route);
   }
 
   const goal = visitor.phase === 'coming' ? visitor.spot : visitor.road;
   const gap = Math.hypot(goal.x - body.x, goal.z - body.z);
-  if (gap < 0.6 || step > visitor.deadline) {
+  // Al puesto se llega **al sitio**, no a dos palmos: el que se quedaba a 0,6
+  // se quedaba justo donde luego se monta su puesto, y al irse arrancaba desde
+  // una celda sólida, sin ruta, deslizándose por las paredes hasta la noche
+  // (salinero de la semilla 7, 28 sep 2026). A la salida del valle basta con
+  // estar cerca.
+  if (gap < (visitor.phase === 'coming' ? ARRIVE_AT_SPOT : 0.6) || step > visitor.deadline) {
     body.vx = 0;
     body.vz = 0;
     if (visitor.phase === 'coming') {
@@ -356,7 +451,11 @@ function moveVisitor(visitor: Visitor, land: Terrain, phase: number, step: numbe
   // de vuelta, el último tramo recto hacia la entrada daba contra una esquina y
   // el buhonero se quedó veinte segundos andando contra ella hasta el plazo.
   visitor.stalled = moved < VISITOR_PACE * LIFE_STEP * 0.2 ? visitor.stalled + 1 : 0;
-  if (visitor.stalled >= STALL_STEPS) {
+  // Y sin ruta —la que había se acabó o no se encontró— se vuelve a pedir cada
+  // medio segundo: deslizarse por una pared a un quinto del paso no cuenta
+  // como atasco y no re-rutaba nunca.
+  const routeless = route.length === 0 && gap > 1 && step % STALL_STEPS === 0;
+  if (visitor.stalled >= STALL_STEPS || routeless) {
     visitor.stalled = 0;
     // Y si rehacer la ruta no basta —en el juego de verdad, semilla 11 al año
     // 30, se quedó encajado entre dos troncos del bosque, solapado con uno, y
@@ -372,12 +471,33 @@ function moveVisitor(visitor: Visitor, land: Terrain, phase: number, step: numbe
         if (free !== undefined) { body.x = free.x; body.z = free.z; break; }
       }
     }
-    visitor.route = pathTo(land, { x: body.x, z: body.z }, goal) ?? [];
+    visitor.route = routeOut(land, body, goal);
   }
 }
 
 /** Pasos sin avanzar antes de rehacer la ruta: medio segundo escénico. */
 const STALL_STEPS = Math.round(0.5 / LIFE_STEP);
+/** A qué distancia del sitio del puesto se da por llegado. */
+const ARRIVE_AT_SPOT = 0.25;
+
+/**
+ * La ruta desde donde está el cuerpo; y si desde ahí no hay —la celda la
+ * tapa su propio puesto, o un tronco— desde el primer punto libre de
+ * alrededor, que se pone delante para salir por él.
+ */
+function routeOut(land: Terrain, body: Body, goal: Point): Waypoint[] {
+  const direct = pathTo(land, { x: body.x, z: body.z }, goal);
+  if (direct !== null) return direct;
+  for (let ring = 1; ring <= 4; ring += 1) {
+    for (let k = 0; k < 8; k += 1) {
+      const at = { x: body.x + Math.cos((k / 8) * Math.PI * 2) * ring * 0.3, z: body.z + Math.sin((k / 8) * Math.PI * 2) * ring * 0.3 };
+      if (blockedAt(land, at.x, at.z) || !fitsCircle(land, at.x, at.z, body.radius)) continue;
+      const rest = pathTo(land, at, goal);
+      if (rest !== null) return [at, ...rest];
+    }
+  }
+  return [];
+}
 
 /** Lo que va la mula detrás del ramal, en celdas, y lo que anda como mucho. */
 const MULE_BEHIND = 1.1;

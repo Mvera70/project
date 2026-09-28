@@ -121,7 +121,9 @@ describe('El valle más vivo · el puesto y el trato', () => {
   // (38,5, 58,7) hasta acabar la jornada, `leaving` y no `gone`. No es de la
   // madera: esa semana no hay obra ni acarreo. Es la capa de vida, que no sabe
   // salir de una plaza cerrada; la propiedad se queda intacta hasta arreglarlo.
-  it.fails('semilla 23 · el salinero se va de una plaza que la aldea ha cerrado', () => {
+  // **Y desde el camino del valle (v4.94) sale**: entra y se va por el camino,
+  // que el motor mantiene pisado, y ya no se queda contra el granero.
+  it('semilla 23 · el salinero se va de una plaza que la aldea ha cerrado', () => {
     const market = createVillage(dealing(SALT_BLOCKED, 'salt_visit'), dealing(SALT_BLOCKED, 'salt_visit').tick * TIME.DAYS_PER_WEEK);
     for (let n = 0; n < STEPS_PER_DAY; n += 1) market.step(n / STEPS_PER_DAY);
     expect(market.visitors[0]!.phase).toBe('gone');

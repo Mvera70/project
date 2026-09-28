@@ -11,6 +11,7 @@ import type { BuildingKind, FoundingProfile, GameState } from './state';
 import { generateMap } from './world/mapgen';
 import { placeBuilding } from './world/placement';
 import { choosePlaza } from './world/plaza';
+import { seedValleyRoad } from './world/valley-road';
 
 /** Place completed founding buildings without charging the opening stores. */
 function foundingBuildings(state: GameState, profile: FoundingProfile): void {
@@ -123,6 +124,8 @@ export function foundGame(
   // casa y el campo, porque se pone a su lado; antes del primer tick, porque
   // desde el primero ya nadie puede construir dentro (`world/placement.ts`).
   state.plaza = choosePlaza(state);
+  // Y la senda por la que llegaron, de los desfiladeros a la plaza, ya pisada.
+  seedValleyRoad(state);
   if (inherited !== undefined) {
     if (inherited.ruins.length !== state.map.ruins.length) {
       throw new Error('Inherited ruin mask does not fit the valley.');

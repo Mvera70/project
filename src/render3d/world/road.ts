@@ -22,11 +22,12 @@
 // villa, calzada. Y desde la aldea, un **cartel** en cada entrada, a unas
 // celdas de la plaza, mirando a quien llega. Puro salvo `buildSignposts`.
 
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
-import { route, stepCost } from '@engine/world/astar';
+import { BoxGeometry, type BufferGeometry, Color, Group, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, Quaternion, Vector3 } from 'three';
+import { stepCost } from '@engine/world/astar';
+import { hash32 } from '@engine/rng';
 import type { ValleyMap } from '@engine/state';
+import { roadMouths, valleyRoadCells } from '@engine/world/valley-road';
 import type { Era } from '@derive/era';
-import { gorgeRoadPaths, valleyReach } from './mountains';
 
 /**
  * TUNE visual. El nivel de senda que pinta el camino en cada era (los mismos
@@ -39,8 +40,8 @@ const ROAD_WEAR: Readonly<Record<Era, number>> = { hamlet: 2, village: 3, town: 
 const SIGN_DISTANCE = 10;
 /** Cuánto se aparta el cartel del eje del camino, en celdas. */
 const SIGN_ASIDE = 0.55;
-/** Si la boca de la senda cae en celda cerrada, se busca una abierta hasta aquí. */
-const MOUTH_SEARCH = 4;
+/** TUNE visual. Las piedras sueltas de la calzada de la villa: cuántas por celda, y su tamaño en celdas. */
+const STONES = { PER_CELL: 0.6, SIZE: 0.09, SPREAD: 0.5 } as const;
 
 export interface Signpost { readonly x: number; readonly z: number; readonly yaw: number }
 
@@ -53,39 +54,15 @@ export interface ValleyRoad {
   readonly mouths: readonly { readonly x: number; readonly z: number }[];
 }
 
-/** La celda más cercana que conecta a pie con el corazón del valle (no una isla de roca). */
-function passableNear(map: ValleyMap, x: number, z: number): number | null {
-  const reach = valleyReach(map);
-  const cx = Math.max(0, Math.min(map.width - 1, Math.floor(x)));
-  const cz = Math.max(0, Math.min(map.height - 1, Math.floor(z)));
-  let best: number | null = null;
-  let bestGap = Infinity;
-  for (let dz = -MOUTH_SEARCH; dz <= MOUTH_SEARCH; dz += 1) {
-    for (let dx = -MOUTH_SEARCH; dx <= MOUTH_SEARCH; dx += 1) {
-      const tx = cx + dx, tz = cz + dz;
-      if (tx < 0 || tz < 0 || tx >= map.width || tz >= map.height) continue;
-      const cell = tz * map.width + tx;
-      if (reach[cell] !== 1) continue;
-      const gap = Math.hypot(dx, dz);
-      if (gap < bestGap) { bestGap = gap; best = cell; }
-    }
-  }
-  return best;
-}
-
 export function valleyRoad(
   map: ValleyMap, seed: number, plaza: { readonly x: number; readonly y: number }, era: Era,
 ): ValleyRoad {
   const wear = new Uint8Array(map.width * map.height);
   const level = ROAD_WEAR[era];
   const signposts: Signpost[] = [];
-  const mouths = gorgeRoadPaths(map, seed).map((path) => ({ x: path[0]!.x, z: path[0]!.z }));
-  const goal = passableNear(map, plaza.x, plaza.y);
-  if (goal === null) return { wear, signposts, mouths };
-  for (const mouth of mouths) {
-    const from = passableNear(map, mouth.x, mouth.z);
-    if (from === null) continue;
-    const cells = route(map, from, goal);
+  const mouths = roadMouths(map, seed).map((mouth) => ({ x: mouth.cell % map.width + 0.5, z: Math.floor(mouth.cell / map.width) + 0.5 }));
+  // Las mismas rutas que pisa el motor (`valleyRoadCells`).
+  for (const cells of valleyRoadCells(map, seed, plaza)) {
     // Con hombros: las celdas vecinas, un nivel menos. El suelo promedia el
     // color en cada esquina, y una línea de una celda sola salía a medio
     // contraste y no se leía desde la vista de siempre (captura, 28 sep).
@@ -111,6 +88,54 @@ export function valleyRoad(
     signposts.push({ x: hx + Math.cos(yaw) * SIGN_ASIDE, z: hz - Math.sin(yaw) * SIGN_ASIDE, yaw });
   }
   return { wear, signposts, mouths };
+}
+
+/**
+ * Las piedras sueltas de la calzada (Vera: «para la villa, piedras sueltas por
+ * la calzada, de cerca»): una malla instanciada con la forma de un peñasco de
+ * Astra, pequeño, repartidas por las celdas del eje con el hash de la celda.
+ * Sólo en la villa; una llamada de dibujo.
+ */
+export function buildRoadStones(
+  road: ValleyRoad, map: ValleyMap, seed: number, shape: BufferGeometry | null,
+  ground: (x: number, z: number) => number, colour: string,
+): InstancedMesh | null {
+  if (shape === null) return null;
+  const spots: { x: number; z: number; turn: number; size: number }[] = [];
+  for (let cell = 0; cell < road.wear.length; cell += 1) {
+    if (road.wear[cell] !== 3) continue;
+    const x = cell % map.width, z = Math.floor(cell / map.width);
+    const n = Math.floor(STONES.PER_CELL + unit(seed, `stone:${cell}`));
+    for (let k = 0; k < n; k += 1) {
+      spots.push({
+        x: x + 0.5 + (unit(seed, `sx:${cell}:${k}`) - 0.5) * STONES.SPREAD,
+        z: z + 0.5 + (unit(seed, `sz:${cell}:${k}`) - 0.5) * STONES.SPREAD,
+        turn: unit(seed, `st:${cell}:${k}`) * Math.PI * 2,
+        size: STONES.SIZE * (0.6 + unit(seed, `ss:${cell}:${k}`) * 0.8),
+      });
+    }
+  }
+  if (spots.length === 0) return null;
+  const material = new MeshStandardMaterial({ color: new Color(colour), flatShading: true, roughness: 1, metalness: 0 });
+  const mesh = new InstancedMesh(shape, material, spots.length);
+  mesh.name = 'Valley_Road_Stones';
+  mesh.castShadow = false;
+  mesh.receiveShadow = true;
+  const matrix = new Matrix4(), at = new Vector3(), size = new Vector3(), turn = new Quaternion(), up = new Vector3(0, 1, 0);
+  spots.forEach((spot, i) => {
+    turn.setFromAxisAngle(up, spot.turn);
+    at.set(spot.x, ground(spot.x, spot.z) + spot.size * 0.3, spot.z);
+    size.setScalar(spot.size);
+    matrix.compose(at, turn, size);
+    mesh.setMatrixAt(i, matrix);
+  });
+  mesh.instanceMatrix.needsUpdate = true;
+  mesh.computeBoundingSphere();
+  return mesh;
+}
+
+function unit(seed: number, key: string): number {
+  return hash32(seed, key) / 4_294_967_296;
 }
 
 /**
