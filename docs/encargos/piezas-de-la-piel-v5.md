@@ -10,7 +10,9 @@ mockup (`docs/visual-reference/ui-wood/mockup-cart-2026-09-24.jpg`) y entra
 como PNG.
 
 Estilo de todo: el del mockup —dibujo a color, contornos suaves, luz de arriba
-a la izquierda, sin texto—. PNG con transparencia, a 2× (la medida es en
+a la izquierda, sin texto—. **El arado, los cerdos, la jarra y el hacha del
+mockup son la referencia de estilo, no piezas para reutilizar**: cada elemento
+recibe la suya, generada nueva y en ese estilo (Vera, 28 sep 2026). PNG con transparencia, a 2× (la medida es en
 píxeles CSS; el fichero, el doble).
 
 ## 0 · La regla: cada imagen es de su sitio
@@ -75,8 +77,8 @@ de la cabecera van **a color**, como los troncos y la moneda del mockup.
 
 ## 3 · Las ilustraciones a color
 
-Una por cosa del carro (las cuatro del mockup ya existen a tamaño de captura;
-se regeneran limpias) y una por misión del tablón. Cabecera de tarjeta,
+Una por cosa del carro y una por misión del tablón, todas nuevas; las cuatro
+del mockup sólo marcan el estilo. Cabecera de tarjeta,
 arriba a la derecha, asomando sobre la cinta.
 
 | Fichero | Qué | Medida CSS |
