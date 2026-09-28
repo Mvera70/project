@@ -1,5 +1,30 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · La huella de la presa (v4.83), y la CI rota: pendiente
+
+La señal de caza es la huella de cada especie (`HUNT_TRACKS` en `app.ts`) y se
+apaga con un fundido cuando el bosque tapa a la presa (`forest.hides`, la misma
+oclusión del asalto). Medido en el navegador: semilla 3, la perdiz entre la
+arboleda y la huella apagada; semilla 5, en campo abierto y visible.
+
+**Pendiente, apuntado por Vera: la CI de GitHub no pasa desde el 9 sep 2026**
+(última verde `dc013ec`; de las 200 ejecuciones siguientes, 125 cortadas por
+tiempo y 75 fallidas). Lo medido el 28 sep, sin arreglar nada:
+
+- **`fast` no cabe en sus 10 minutos.** En el runner de GitHub la suite rápida
+  pasó 76 de 201 ficheros en nueve minutos, sin fallos; detrás, en el mismo
+  trabajo, van las jornadas (284 s en local). Falta saber qué ficheros pesan:
+  medirlo con `vitest --reporter=json` **limitado a dos hilos**
+  (`--pool=threads --poolOptions.threads.maxThreads=2`), porque la suite a
+  todos los núcleos pone el ventilador del portátil de Vera a tope. Con esa
+  lista, los pesados se mudan a `tests/journeys/` (regla del 16 sep) y las
+  jornadas van a un trabajo propio con más tiempo.
+- **`browser`: 12 recorridos de `tools/shots/valley.shots.ts` rotos por el
+  rediseño**, no por el juego: dos botones «Valley» donde esperaban uno, dos
+  títulos en el epitafio, y otros diez que buscan piezas de la interfaz
+  anterior (crónica y gente, encrucijada, carro, trato, bienvenida,
+  tormenta, hambre, aviso de sucesos). Hay que llevarlos a la interfaz de hoy.
+
 ## 27 sep 2026 · La caza, señal en el mapa (v4.82)
 
 Fundamento nuevo: skill `.claude/skills/senales-en-el-mapa/` (enlazada desde
