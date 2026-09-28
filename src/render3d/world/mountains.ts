@@ -28,6 +28,7 @@ import {
 } from 'three';
 import { hash32 } from '@engine/rng';
 import { TERRAIN_CODE, type ValleyMap } from '@engine/state';
+import { stepCost } from '@engine/world/astar';
 import type { Palette } from '@derive/palette';
 import { GROUND_BIAS } from '../visual-config';
 import { elevationAt, floodReach, groundColourAt, groundSurfaceAt } from './ground';
@@ -490,6 +491,8 @@ const BRIDGE = { deck: 0.05, over: 0.12, arch: 0.3, rail: 0.14, post: 0.04, timb
 
 /** Hasta dónde entra en el mapa y hasta dónde se aleja por fuera, en celdas. TUNE visual. */
 const ROAD_IN = 14;
+/** Y lo más que entra buscando suelo pisable (`gorgeMouthDepth`). */
+const ROAD_IN_MAX = 34;
 const ROAD_OUT = 42;
 /** Ancho de la senda, y su distancia al eje del río. TUNE visual: el río ocupa dos celdas. */
 const ROAD_WIDTH = 0.6;
@@ -509,18 +512,31 @@ export function gorgeRoadPaths(
   wet?: (x: number, z: number) => boolean,
   axis: (z: number) => number = z => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))),
 ): { x: number; z: number }[][] {
+  // El suelo que pisa la senda dentro del mapa: el prado o el cinturón de
+  // montaña. Va aquí y no como parámetro para que **todos** los que trazan la
+  // senda —la cinta, los pinos, el bosque, el camino del valle— saquen el
+  // mismo trazado; fuera del mapa la sierra sube suave y no hace falta buscar.
+  const floorAt = (x: number, z: number): number => x >= 0 && z >= 0 && x <= map.width && z <= map.height
+    ? Math.max(elevationAt(map, x, z), mountainSurfaceAt(map, x, z)) : Number.NEGATIVE_INFINITY;
   const reach = floodReach(map);
   const water = wet ?? ((x: number, z: number): boolean => {
     const col = Math.floor(x), row = Math.floor(z);
     return riverExtensionAt(map, seed, x, z, 1.4)
       || (col >= 0 && row >= 0 && col < map.width && row < map.height && reach[row * map.width + col]! >= 0);
   });
-  const count = Math.round((ROAD_IN + ROAD_OUT) / ROAD_STEP);
   const paths: { x: number; z: number }[][] = [];
   for (const end of [0, 1] as const) {
-    // Cada entrada saca su senda por una orilla, la que diga el hash.
-    const side = unit(seed, `road:${end}`) > 0.5 ? 1 : -1;
-    const zOf = (t: number): number => (end === 0 ? ROAD_IN - t : map.height - ROAD_IN + t);
+    // Y entra hasta donde el valle se abre (`gorgeMouthDepth`): con catorce
+    // celdas fijas se quedaba dentro del cinturón de montaña, donde el A* del
+    // motor no pisa, y el camino del valle no tenía de dónde salir.
+    const depth = gorgeMouthDepth(map, end);
+    // Cada entrada saca su senda por una orilla: **la que conecta con el
+    // valle** en la boca, y si las dos, la que diga el hash. Con el hash solo,
+    // en la semilla 7 la senda salía por la orilla cerrada y el camino pintado
+    // arrancaba en la otra, sin juntarse.
+    const side = bankSide(map, end === 0 ? depth : map.height - 1 - depth, unit(seed, `road:${end}`) > 0.5 ? 1 : -1);
+    const count = Math.round((depth + ROAD_OUT) / ROAD_STEP);
+    const zOf = (t: number): number => (end === 0 ? depth - t : map.height - depth + t);
     // Primero lo lejos del eje que puede ir sin mojarse, muestra a muestra; y
     // luego suavizado, que con los saltos de una orilla a otra la senda salía
     // en zigzag y trepaba por la pared (captura del 26 sep).
@@ -536,7 +552,20 @@ export function gorgeRoadPaths(
         const x = centre + side * d;
         if (water(x, z) || soggy(map, x, z)) bank = Math.max(bank, d);
       }
-      const dry = bank === -Infinity ? ROAD_MIN : Math.max(ROAD_MIN, bank + ROAD_WIDTH * 0.5 + ROAD_SMOOTH_SLACK);
+      let dry = bank === -Infinity ? ROAD_MIN : Math.max(ROAD_MIN, bank + ROAD_WIDTH * 0.5 + ROAD_SMOOTH_SLACK);
+      // **Y por el fondo del desfiladero**, no pegada al agua: de la orilla
+      // hacia fuera, el sitio más bajo. Pegada a la orilla, donde la garganta
+      // se estrecha la senda pisaba la pared y la plataforma se subía a la
+      // roca: el muro vertical de la captura de Vera (28 sep 2026).
+      {
+        let lowest = Infinity;
+        let best = dry;
+        for (let d = dry; d <= dry + ROAD_FLOOR_SEARCH; d += 0.25) {
+          const floor = floorAt(centre + side * d, z);
+          if (floor < lowest - 0.02) { lowest = floor; best = d; }
+        }
+        dry = best;
+      }
       offsets.push(dry);
     }
     // Suave y sin mojarse: primero cada muestra toma lo más lejos que pida
@@ -561,6 +590,79 @@ export function gorgeRoadPaths(
     paths.push(centre);
   }
   return paths;
+}
+
+const reaches = new WeakMap<ValleyMap, Uint8Array>();
+
+/**
+ * Qué celdas conectan a pie con el corazón del valle: una inundación por las
+ * celdas que el A* del motor pisa, desde el prado del rectángulo central.
+ * Dentro del cinturón de montaña hay roca suelta pisable pero aislada —islas—
+ * y sin esto la boca de la senda y el camino se iban a ellas (medido en las
+ * semillas 7 y 11: ruta de longitud cero). Una vez por mapa.
+ */
+export function valleyReach(map: ValleyMap): Uint8Array {
+  let reach = reaches.get(map);
+  if (reach !== undefined) return reach;
+  reach = new Uint8Array(map.width * map.height);
+  const queue: number[] = [];
+  const x0 = Math.floor(map.width / 4), x1 = Math.ceil(map.width * 3 / 4);
+  const z0 = Math.floor(map.height / 4), z1 = Math.ceil(map.height * 3 / 4);
+  for (let z = z0; z < z1; z += 1) for (let x = x0; x < x1; x += 1) {
+    const cell = z * map.width + x;
+    if (map.terrain[cell] === TERRAIN_CODE.meadow && stepCost(map, cell) !== null) { reach[cell] = 1; queue.push(cell); }
+  }
+  for (let head = 0; head < queue.length; head += 1) {
+    const cell = queue[head]!;
+    const x = cell % map.width, z = Math.floor(cell / map.width);
+    for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+      const nx = x + dx, nz = z + dz;
+      if (nx < 0 || nz < 0 || nx >= map.width || nz >= map.height) continue;
+      const next = nz * map.width + nx;
+      if (reach[next] === 1 || stepCost(map, next) === null) continue;
+      reach[next] = 1;
+      queue.push(next);
+    }
+  }
+  reaches.set(map, reach);
+  return reach;
+}
+
+/** Por qué orilla conecta el valle en una fila: 1 o −1; `fallback` si las dos o ninguna. */
+function bankSide(map: ValleyMap, z: number, fallback: 1 | -1): 1 | -1 {
+  const reach = valleyReach(map);
+  const row = Math.max(0, Math.min(map.height - 1, z));
+  const centre = valleyAxis(map, row);
+  const opens = (side: 1 | -1): boolean => {
+    for (let d = ROAD_MIN; d <= ROAD_MIN + ROAD_FLOOR_SEARCH + 1; d += 1) {
+      const x = Math.floor(centre + side * d);
+      if (x >= 0 && x < map.width && reach[row * map.width + x] === 1) return true;
+    }
+    return false;
+  };
+  const right = opens(1), left = opens(-1);
+  if (right === left) return fallback;
+  return right ? 1 : -1;
+}
+
+/**
+ * Hasta qué fila entra la senda de cada extremo: la primera, desde el borde,
+ * con suelo junto al cauce que conecta con el corazón del valle. Ahí el
+ * desfiladero se abre y empieza el camino pintado (`world/road.ts`). Como
+ * mínimo `ROAD_IN`, como mucho `ROAD_IN_MAX`.
+ */
+export function gorgeMouthDepth(map: ValleyMap, end: 0 | 1): number {
+  const reach = valleyReach(map);
+  for (let depth = ROAD_IN; depth <= ROAD_IN_MAX; depth += 1) {
+    const z = end === 0 ? depth : map.height - 1 - depth;
+    const centre = valleyAxis(map, z);
+    for (let d = -ROAD_SEARCH - ROAD_FLOOR_SEARCH; d <= ROAD_SEARCH + ROAD_FLOOR_SEARCH; d += 1) {
+      const x = Math.floor(centre + d);
+      if (x < 0 || x >= map.width) continue;
+      if (reach[z * map.width + x] === 1) return depth + 1;
+    }
+  }
+  return ROAD_IN_MAX;
 }
 
 /** El decorado deja libre la senda, sus barandas y su propia huella. */
@@ -696,6 +798,12 @@ export function buildGorgeRoads(
       level[i] = level[i]! + lift;
       level[i + 1] = level[i + 1]! + lift;
     }
+    // Y nunca un muro: entre dos muestras la senda sube como mucho
+    // `ROAD_GRADE`, y lo que falte se levanta en rampa hacia los dos lados
+    // (sólo se sube, nunca por debajo de la roca). Un salto de cinco celdas
+    // entre dos muestras se pintaba como una pared de pie (28 sep 2026).
+    for (let i = 0; i < count; i += 1) level[i + 1] = Math.max(level[i + 1]!, level[i]! - ROAD_GRADE);
+    for (let i = count; i > 0; i -= 1) level[i - 1] = Math.max(level[i - 1]!, level[i]! - ROAD_GRADE);
     const edge = (i: number, s: number): number[] => {
       const p = centre[i]!;
       const x = p.x + s * ROAD_WIDTH * 0.5 * (0.5 + 0.5 * fadeAt(i)) * startAt(i);
@@ -766,6 +874,10 @@ export function buildGorgeRoads(
 
 /** El margen que se deja al agua porque el suavizado puede acercar la senda a la orilla. */
 const ROAD_SMOOTH_SLACK = 0.12;
+/** Desde la orilla hacia fuera, hasta dónde se busca el fondo del desfiladero, en celdas. */
+const ROAD_FLOOR_SEARCH = 3;
+/** Lo más que sube la senda entre dos muestras (media celda), en celdas: unos 24°. */
+const ROAD_GRADE = 0.22;
 
 /**
  * Si en ese punto del mapa hay agua; fuera del mapa, nunca (eso lo mira `wet`).

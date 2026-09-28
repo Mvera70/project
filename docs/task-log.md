@@ -1,5 +1,19 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · El camino del valle (v4.93)
+
+`world/road.ts` (`valleyRoad`, `buildSignposts`), `world/mountains.ts`
+(`valleyReach`, `gorgeMouthDepth`, `bankSide`, fondo y rampa en la cinta),
+`world/ground.ts` (`buildGround(..., road)`, `cellColour(..., road)`),
+`renderer.ts` (camino y carteles en `rebuildGround`). Prueba:
+`valley-road.test.ts`. Encargo: `docs/encargos/cartel-del-camino.md` (Vera lo
+pasa a Astra). **Abierto:** los visitantes (`visitors.ts`) siguen entrando por
+`entryOf` —la celda del suelo de la aldea más cerca de `approachOf`—, no por
+el camino pintado; el paso siguiente es que `entryOf` prefiera la boca del
+camino y que su ruta lo siga (el A* de la vida no descuenta la senda). Y que
+el camino se marque también en `map.path` del motor sería un cambio de motor:
+no se hace sin pedirlo.
+
 ## 28 sep 2026 · Las sombras por pasos y el tinte del alba (v4.90, v4.91)
 
 `effects/sun-steps.ts` (puro: `stepSun`, `quantizeReach`) y `renderer.ts`

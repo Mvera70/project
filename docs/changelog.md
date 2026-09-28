@@ -1,5 +1,47 @@
 # The Valley — Registro de cambios
 
+## v4.93 · 28 sep 2026 · El camino del valle: de los desfiladeros a la plaza, por eras
+
+Vera, con tres capturas: «el camino que entra por ambos desfiladeros no se
+pinta correctamente: se corta por las montañas y no se conecta con el pueblo,
+así no pueden ir mercaderes ni el buhonero por un sendero como tal. Al
+principio tierra, luego sendero (alguna señal, cartel anunciando la aldea). El
+camino que construye el pueblo no entra por el desfiladero: llega hasta la
+puerta, y ahí iría el cartel».
+
+Tres causas, tres cambios (`world/road.ts` nuevo, `world/mountains.ts`,
+`world/ground.ts`):
+
+- **El muro vertical** de la boca: la senda del desfiladero iba pegada a la
+  orilla y donde la garganta se estrecha pisaba la pared, y la plataforma se
+  subía a la roca de golpe. Ahora la senda busca **el fondo del desfiladero**
+  (el sitio más bajo de la orilla hacia fuera) y entre dos muestras no sube
+  más de `ROAD_GRADE` (0,22 celdas): lo que falte se levanta en rampa. Prueba:
+  ningún triángulo de la cinta sube más de media celda, tres semillas.
+- **El corte**: la senda entraba catorce celdas fijas y moría dentro del
+  cinturón de montaña, donde el A* del motor no pisa. Ahora entra hasta donde
+  el valle **conecta a pie con su corazón** (`valleyReach`, una inundación por
+  las celdas pisables desde el prado central, que evita las islas de roca
+  suelta del cinturón —medido: en las semillas 7 y 11 la boca caía en una y la
+  ruta salía de longitud cero—) y sale por la orilla que conecta, no por la
+  que dijera el hash.
+- **El camino del valle**: de cada boca a la plaza, con el mismo A* que usan
+  los aldeanos (`route`), **pintado en el suelo** como la senda que gasta la
+  aldea (`cellColour`, nivel máximo entre `map.path` y el camino): sin malla
+  que se corte contra nada, y como el A* prefiere las celdas pisadas, entra en
+  la aldea por sus propias sendas y se une a ellas. Por eras: tierra (el nivel
+  2 de las sendas) en el caserío y senda clara (el 3) desde la aldea; con el
+  nivel 1 en el caserío no se distinguía del prado, y con hombros de un nivel
+  menos a cada lado, que una línea de una celda sola salía a medio contraste
+  por el promedio de las esquinas. Y desde la aldea, **un
+  cartel** en cada entrada, a diez celdas de la plaza, mirando a quien llega:
+  provisional de dos cajas, con el modelo pedido a Astra
+  (`docs/encargos/cartel-del-camino.md`).
+
+La senda del desfiladero y el camino del valle salen del mismo trazado
+(`gorgeRoadPaths`), igual que los pinos, el bosque y los peñascos que lo
+despejan: cuatro llamantes, un trazado.
+
 ## v4.92 · 28 sep 2026 · La sombra se desliza: el sol continuo y la rejilla del mundo
 
 Vera, con las sombras por pasos de un grado (v4.90): «se nota un tic al

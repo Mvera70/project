@@ -107,6 +107,14 @@ hoy y qué haría falta. Un encargo que sólo vive en un comentario del código 
 un encargo que nadie hará — y una mecánica que no se ve no existe para quien
 juega.
 
+## El camino del valle (28 sep 2026)
+
+| Qué | Qué se ve hoy | Qué haría falta |
+|---|---|---|
+| **El cartel de la aldea** | Un poste y una tablilla de dos cajas, uno por entrada desde la era de aldea (`world/road.ts`) | El modelo de Astra: `docs/encargos/cartel-del-camino.md` (Vera lo pasa) |
+| **Los visitantes por el camino** | El buhonero y los tratantes entran por la celda de la aldea más cercana a la entrada, no por el camino pintado | Que `entryOf` (`life/visitors.ts`) parta de la boca del camino y que su ruta lo siga |
+| **La calzada de la villa** | El nivel 3 del suelo (`cellColour`), el mismo de las sendas gastadas | Piedras o losas sueltas por la calzada de cerca, instanciadas como los peñascos |
+
 ## La hierba (28 sep 2026)
 
 | Qué | Qué se ve hoy | Qué haría falta |

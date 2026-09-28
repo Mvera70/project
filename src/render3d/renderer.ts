@@ -40,6 +40,7 @@ import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
 import { updateMountainVeil } from './effects/mountain-veil';
 import { createGrass, meadowWeight } from './world/grass';
+import { buildSignposts, valleyRoad } from './world/road';
 import { createTrampleMap, setTramplers, snowTracks, SNOW_FROM, type TrampleMap, type Trampler } from './effects/trample';
 import { cloudsFor, stepClouds } from './effects/clouds';
 import { createAmbience, type Ambience } from './effects/ambience';
@@ -518,6 +519,7 @@ export async function createGraphicsRenderer(
   // Las pisadas (`effects/trample.ts`): un mapa por valle, que sobrevive a los
   // repintados del suelo; la hierba y el suelo nevado lo leen.
   let trample: TrampleMap | null = null;
+  let signposts: Group | null = null;
   const tramplers: Trampler[] = [];
   /** Hasta qué altura de vista se aparta la hierba en vivo: más lejos no se ve. */
   const TRAMPLE_VIEW = 40;
@@ -1100,8 +1102,14 @@ export async function createGraphicsRenderer(
     // Y bajo las manchas de hierba, el suelo más hondo (`world/grass.ts`); con
     // la nieve encima no, que la hierba está enterrada y el prado es blanco.
     const terrainSeed = state.terrainSeed;
+    // El camino del valle, de las bocas de los desfiladeros a la plaza, pintado
+    // en el suelo al nivel de la era; y los carteles desde la aldea.
+    const road = valleyRoad(state.map, terrainSeed, plazaOf(state), era);
     ground = buildGround(state.map, palette, plazaOf(state), era,
-      snowing < 0.5 ? (x, z) => meadowWeight(terrainSeed, x, z) : undefined);
+      snowing < 0.5 ? (x, z) => meadowWeight(terrainSeed, x, z) : undefined, road.wear);
+    if (signposts !== null) world.remove(signposts);
+    signposts = buildSignposts(road.signposts, (x, z) => elevationAt(state.map, x, z));
+    world.add(signposts);
     if (trample === null) trample = createTrampleMap(state.map.width, state.map.height);
     snowTracks(ground.mesh.material as Material);
     village.season(snowing, palette.accent);

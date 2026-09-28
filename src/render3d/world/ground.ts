@@ -148,7 +148,7 @@ function wobbleAt(map: ValleyMap, x: number, z: number): { x: number; z: number 
  */
 function cornerColour(
   map: ValleyMap, x: number, z: number, palette: Palette, into: Color,
-  plaza?: Plaza, era?: Era,
+  plaza?: Plaza, era?: Era, road?: Uint8Array,
 ): void {
   let r = 0;
   let g = 0;
@@ -161,7 +161,7 @@ function cornerColour(
     // aunque la consulten el suelo y la sierra desde lados distintos.
     const edgeX = Math.max(0, Math.min(map.width - 1, cx));
     const edgeZ = Math.max(0, Math.min(map.height - 1, cz));
-    sample.set(cellColour(map, edgeZ * map.width + edgeX, palette, plaza, era));
+    sample.set(cellColour(map, edgeZ * map.width + edgeX, palette, plaza, era, road));
     r += sample.r * 0.25;
     g += sample.g * 0.25;
     b += sample.b * 0.25;
@@ -188,6 +188,7 @@ export function groundColourAt(
  */
 export function cellColour(
   map: ValleyMap, cell: number, palette: Palette, plaza?: Plaza, era: Era = 'hamlet',
+  road?: Uint8Array,
 ): string {
   // P-2 · **el acabado de la plaza.** Va antes que el camino y antes que el
   // terreno porque es lo que manda: dentro del círculo la Era decide tierra
@@ -202,7 +203,9 @@ export function cellColour(
       return plazaPaving(palette, era, x, z, plaza, gap);
     }
   }
-  const wear = map.path[cell] ?? 0;
+  // El camino del valle (`world/road.ts`) pinta como la senda que gasta la
+  // aldea, al nivel que le da la era: los dos se unen sin costura.
+  const wear = Math.max(map.path[cell] ?? 0, road?.[cell] ?? 0);
   if (wear > 0) {
     // La era no inventa caminos: sólo asienta los que ya dice el mapa. Cada
     // peldaño conserva un tono distinto para que una calzada no aparezca donde
@@ -822,7 +825,7 @@ const MEADOW_SHADE = 0.45;
  */
 export function buildGround(
   map: ValleyMap, palette: Palette, plaza?: Plaza, era: Era = 'hamlet',
-  meadow?: (x: number, z: number) => number,
+  meadow?: (x: number, z: number) => number, road?: Uint8Array,
 ): Ground {
   const cells = map.width * map.height;
   const columns = map.width + 1;
@@ -844,7 +847,7 @@ export function buildGround(
       positions[at] = moved.x;
       positions[at + 1] = GROUND_BIAS + heightAt(map, x, z);
       positions[at + 2] = moved.z;
-      cornerColour(map, x, z, palette, tint, plaza, era);
+      cornerColour(map, x, z, palette, tint, plaza, era, road);
       if (meadow !== undefined) {
         const cell = Math.min(z, map.height - 1) * map.width + Math.min(x, map.width - 1);
         const code = map.terrain[cell];
