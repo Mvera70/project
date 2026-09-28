@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · Las sombras por pasos y el tinte del alba (v4.90, v4.91)
+
+`effects/sun-steps.ts` (puro: `stepSun`, `quantizeReach`) y `renderer.ts`
+(`stabilizeSunShadow` con `shadowStepped`; `window.__valleyShadowStats()`);
+`visual-config.ts` (`SUN_SHADOW.stepDegrees` 1, `reachStep` 4, `radius` 1,5).
+`effects/daylight.ts` (`SKY_DAWN`, `morning`, rebote cálido). Pruebas:
+`sun-steps.test.ts`, `daylight-glow.test.ts`. Herramienta nueva en el catálogo:
+`performance/shadow-flicker.mjs`. **Abierto:** que Vera mire en la tablet si el
+paso de un grado (dos ticks por segundo) se nota como tirón; si sí, subir a 2°
+(uno por segundo) o bajar a 0,5°. Y si el tinte del alba le parece poco o mucho.
+
 ## 28 sep 2026 · Las pisadas (v4.89)
 
 `effects/trample.ts` (el mapa, `setTramplers`, `snowTracks`), `world/grass.ts`

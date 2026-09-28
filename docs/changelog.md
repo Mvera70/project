@@ -1,5 +1,45 @@
 # The Valley — Registro de cambios
 
+## v4.91 · 28 sep 2026 · El alba y el ocaso tiñen el valle
+
+Vera: «la luz tiene que ser realista, rollo amanecer, atardecer y la sombra que
+vaya bien, acorde», y «al atardecer y al amanecer el color del cielo cambie un
+poco, como que se tiña un poco la escena, pero muy suave». El cielo ya se
+encendía de naranja al ponerse el sol (`SKY_EVENING`) y sólo entonces; ahora
+tiene su hermano del alba (`SKY_DAWN`, rosado) durante un rato al salir, y en
+las dos horas el rebote del suelo se calienta un cuarto hacia el sol bajo, para
+que las sombras no sean grises. Como el cielo es también la luz de ambiente y
+la niebla, teñirlo tiñe el valle entero sin tocar nada más. Suave por prueba:
+`daylight-glow.test.ts` exige que el tinte sea mayor que a mediodía y menor de
+un cuarto de distancia del cielo del día. Capturado en la semilla 11 esperando
+la jornada: día, ocaso y alba.
+
+## v4.90 · 28 sep 2026 · Las sombras dejan de temblar: el sol de la sombra va por pasos
+
+Vera: «lleva mucho tiempo un bug en las sombras que en su día corregimos
+subiéndole la resolución, que era un parche… la sombra de un árbol, en vez de
+verse fija en el suelo y moverse poquito a poco con el sol, parpadea y se mueve
+para un lado, para otro». Mirado a fondo: **no era de resolución, era el giro.**
+La cámara de sombra se reorientaba con el sol en cada fotograma —dos grados por
+segundo a ×1— y el mapa se rasterizaba cada dos fotogramas con la rejilla de
+texeles girada un poco: cada borde caía en otros texeles y temblaba. Y el
+alineado del centro «a la rejilla» (S-1) se hacía en esa base que gira, así que
+hacía bailar la sombra media texela a cada lado en vez de fijarla. Subir el
+mapa a 2048 hizo la texela más pequeña; el baile siguió, más fino.
+
+La cura (`effects/sun-steps.ts`, `SUN_SHADOW.stepDegrees`, `reachStep`,
+`radius`): el rumbo del sol que ven las sombras avanza **por pasos de un
+grado** (medio segundo a ×1) y el alcance a escalones de cuatro celdas; entre
+pasos la cámara de sombra es la misma, lo quieto rasteriza igual fotograma a
+fotograma, y el mapa se sigue rehaciendo cada dos para la gente que anda. La
+luz y la sombra son el mismo foco, así que siguen acordes; un grado en el
+sombreado no se ve. **Medido** con `window.__valleyShadowStats()` en 10 s a ×1
+(semilla 11, año 5): 1.338 fotogramas, 669 redibujados y **13 reorientaciones**
+de la cámara de sombra, donde antes eran 1.338. La diferencia de píxeles entre
+fotogramas (`tools/graphics/performance/shadow-flicker.mjs`) apenas se mueve
+(1,3 % → 1,1 %) porque las copas y la hierba se mecen con el viento en cada
+fotograma: no sirve para aislar el temblor, y queda escrito en la herramienta.
+
 ## v4.89 · 28 sep 2026 · Las pisadas: la hierba se aparta, la nieve guarda la huella
 
 Vera: «que se aparte al pisarla, si no es muy costoso; también las pisadas en

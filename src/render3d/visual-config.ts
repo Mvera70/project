@@ -110,6 +110,14 @@ export const GROUND_BIAS = 0.002;
  * TUNE: escena de 72 × 112 celdas con PCF suave. El mapa sube de 1024 a 2048
  * tras la revisión en movimiento de S-1: reduce el flicker global sin eliminarlo.
  * Una comparación rápida de cinco segundos mantuvo la misma cadencia p50/p95/p99.
+ *
+ * **Y el flicker no era de resolución** (28 sep 2026, `effects/sun-steps.ts`):
+ * era la cámara de sombra girando con el sol en cada fotograma. Desde entonces
+ * el sol de las sombras avanza por pasos (`stepDegrees`) y el alcance a
+ * escalones (`reachStep`), y entre pasos la cámara no se mueve. Medido con
+ * `tools/graphics/performance/shadow-flicker.mjs` (fracción de píxeles que
+ * cambian entre fotogramas seguidos sobre el borde del bosque, a ×1): ver el
+ * registro de cambios v4.90.
  */
 export const SUN_SHADOW = {
   mapSize: 2048,
@@ -118,4 +126,10 @@ export const SUN_SHADOW = {
   farMultiplier: 4,
   bias: -0.0002,
   normalBias: 0.02,
+  /** Cada cuántos grados de sol se reorienta la cámara de sombra. A ×1, un grado es medio segundo. */
+  stepDegrees: 1,
+  /** El alcance de la cámara de sombra sube en escalones de tantas celdas. */
+  reachStep: 4,
+  /** Radio del filtro PCF en texeles: suaviza el escalón del borde sin emborronar. */
+  radius: 1.5,
 } as const;

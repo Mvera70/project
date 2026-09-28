@@ -95,6 +95,13 @@ const SUN_LOW = new Color('#FFB870');
 const SUN_NIGHT = new Color('#9FB4D8');
 const SKY_DAY = new Color('#DDE3C4');
 const SKY_EVENING = new Color('#E8C39A');
+/**
+ * El alba, rosada donde el atardecer es naranja (Vera, 28 sep 2026: «al
+ * atardecer y al amanecer el color del cielo cambie un poco, como que se tiña
+ * un poco la escena, pero muy suave»). El cielo es también la luz de ambiente y
+ * la niebla, así que teñirlo tiñe el valle entero sin tocar nada más.
+ */
+const SKY_DAWN = new Color('#E6C4B8');
 const SKY_NIGHT = new Color('#5A6780');
 /** U-13 · el gris al que se va el cielo con nubes. Plomo, no negro: llueve, no anochece. */
 const STORM_GREY = '#5F646B';
@@ -168,10 +175,18 @@ function lightAt(phase: number): Daylight {
   const sunColour = blend(warm, SUN_NIGHT, dark);
 
   // El cielo se enciende de naranja justo antes de que el sol se vaya, y sólo
-  // entonces: un valle naranja a media tarde sería un valle en llamas.
+  // entonces: un valle naranja a media tarde sería un valle en llamas. Y de
+  // rosa un rato después de salir —cuando ya clarea; justo al salir la noche
+  // pesa el 80 % de la mezcla y se come cualquier tinte (lo cazó la prueba)—,
+  // que se apaga en cuanto es de día.
   const evening = between(day, DUSK - 0.10, DUSK + 0.04) * (1 - between(day, NIGHT - 0.04, NIGHT));
+  const morning = between(day, DAWN + 0.02, DAWN + 0.07) * (1 - between(day, MORNING - 0.01, MORNING + 0.04));
   const dusk = new Color(blend(SKY_DAY, SKY_EVENING, evening));
-  const background = blend(dusk, SKY_NIGHT, dark);
+  const glowing = new Color(blend(dusk, SKY_DAWN, morning));
+  const background = blend(glowing, SKY_NIGHT, dark);
+  // Y el rebote del suelo se calienta con el cielo, muy poco: es lo que hace
+  // que las sombras del alba y del ocaso no sean grises.
+  const glow = Math.max(evening, morning);
 
   return {
     sun,
@@ -181,7 +196,7 @@ function lightAt(phase: number): Daylight {
     sunIntensity: 2.6 * light,
     // Luz lunar difusa independiente del cielo visible: mantiene legible el relieve.
     skyColour: blend(new Color(background), new Color('#B7C6DA'), dark * 0.85),
-    groundBounce: blend(BOUNCE_DAY, BOUNCE_NIGHT, dark),
+    groundBounce: blend(new Color(blend(BOUNCE_DAY, SUN_LOW, glow * 0.25)), BOUNCE_NIGHT, dark),
     // Y el cielo recoge lo que el sol suelta, que es lo que deja ver el valle
     // de noche sin que nada proyecte sombra.
     ambientIntensity: 1.5 * (

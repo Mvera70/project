@@ -159,6 +159,17 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
     prioridad al azar**, `count = total · densidad(altura)` es una muestra
     uniforme sin reordenar nada. Así la hierba dobló su densidad de cerca
     costando lo mismo en la vista de siempre.
+18. **El parpadeo de las sombras no era de resolución: era la cámara de sombra
+    girando con el sol en cada fotograma** (v4.90, `effects/sun-steps.ts`). Con
+    el mapa rehecho cada dos fotogramas y la rejilla de texeles girada un poco
+    cada vez, cada borde caía en otros texeles; y alinear el centro a una rejilla
+    que gira no fija nada. Subir el mapa a 2048 hizo la texela más fina y el
+    baile siguió. La cura: el rumbo del sol que ven las sombras avanza **por
+    pasos** (`SUN_SHADOW.stepDegrees`) y entre pasos la cámara es la misma; lo
+    quieto rasteriza igual, y el mapa se sigue rehaciendo para quien anda. Regla:
+    **lo que se alinea a una rejilla necesita que la rejilla no se mueva**. Se
+    mide con `window.__valleyShadowStats()` (reorientaciones por segundo), no
+    con diferencias de píxeles, que el viento contamina.
 
 ## Lo que queda (por lo que pesa)
 

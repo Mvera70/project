@@ -34,6 +34,7 @@ import type {
   GraphicsTarget, GraphicsViewport,
 } from './contracts';
 import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
+import { quantizeReach, stepSun } from './effects/sun-steps';
 import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './world/ground';
 import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
@@ -333,6 +334,7 @@ export async function createGraphicsRenderer(
   sun.shadow.mapSize.set(shadowSize, shadowSize);
   sun.shadow.bias = SUN_SHADOW.bias;
   sun.shadow.normalBias = SUN_SHADOW.normalBias;
+  sun.shadow.radius = SUN_SHADOW.radius;
   const ambient = new HemisphereLight('#FFF6DF', '#776F62', 1.5);
   scene.add(ambient, sun, sun.target);
   const lightPool = new LightPool(POINT_LIGHTS);
@@ -353,8 +355,16 @@ export async function createGraphicsRenderer(
   // mirando la aldea. El volumen sigue a lo visible con margen para los
   // proyectores que quedan justo fuera, y su centro se alinea a la cuadrícula
   // del mapa de sombras. Así pan y zoom no hacen nadar la proyección entre
-  // texels; el rumbo del sol sigue cambiando de manera continua.
+  // texels. **Y el rumbo del sol va por pasos** (28 sep 2026,
+  // `effects/sun-steps.ts`): con la base girando en cada fotograma, alinear el
+  // centro a una rejilla que gira no fijaba nada, y cada rasterización caía en
+  // otros texeles —el parpadeo que Vera llevaba tiempo viendo—. Entre pasos la
+  // cámara de sombra es la misma y lo quieto rasteriza igual.
   const shadowFocus = new Vector3();
+  const shadowStepped = new Vector3(Number.NaN, 0, 0);
+  // Para la sonda: cuántas veces se ha reorientado la cámara de sombra y
+  // cuántas se ha rehecho el mapa (`tools/graphics/performance/shadow-flicker.mjs`).
+  const shadowStats = { moves: 0, redraws: 0, frames: 0 };
   const shadowSnapped = new Vector3();
   const shadowDirection = new Vector3();
   const shadowForward = new Vector3();
@@ -369,6 +379,7 @@ export async function createGraphicsRenderer(
   function scheduleShadows(): void {
     if (!renderer.shadowMap.enabled) return;
     shadowAge += 1;
+    shadowStats.frames += 1;
     // «Moverse» es moverse de verdad: el centro de la cámara de sombra baila
     // una fracción de texel en cada fotograma al girar el sol (se ajusta a la
     // rejilla de una base que gira), y comparar con igualdad lo rehacía
@@ -379,6 +390,7 @@ export async function createGraphicsRenderer(
       || Math.abs(reach - shadowDrawnReach) > reach * 0.01;
     if (!moved && shadowAge < (handheld ? SHADOW_EVERY.handheld : SHADOW_EVERY.desk)) return;
     renderer.shadowMap.needsUpdate = true;
+    shadowStats.redraws += 1;
     shadowAge = 0;
     shadowDrawnAt.copy(sun.target.position);
     shadowDrawnReach = reach;
@@ -397,13 +409,15 @@ export async function createGraphicsRenderer(
         ground.x - shadowFocus.x, ground.z - shadowFocus.z,
       ));
     }
-    const reach = Math.max(1, visibleRadius + SUN_SHADOW.focusMargin);
+    const reach = quantizeReach(Math.max(1, visibleRadius + SUN_SHADOW.focusMargin), SUN_SHADOW.reachStep);
     const texel = (reach * 2) / shadowSize;
 
     // `direction` va del objetivo hacia el sol; la cámara de sombra mira en
-    // sentido contrario. La base rota suavemente con el astro, mientras el
-    // centro sólo puede ocupar coordenadas enteras de texel en esa base.
-    shadowDirection.set(direction.x, Math.max(0.35, direction.y), direction.z).normalize();
+    // sentido contrario. La base sólo gira cuando el sol se ha movido un paso
+    // entero; entre pasos es la misma, y el centro sólo puede ocupar
+    // coordenadas enteras de texel en ella.
+    if (stepSun(shadowStepped, direction, SUN_SHADOW.stepDegrees)) shadowStats.moves += 1;
+    shadowDirection.set(shadowStepped.x, Math.max(0.35, shadowStepped.y), shadowStepped.z).normalize();
     shadowForward.copy(shadowDirection).multiplyScalar(-1);
     shadowRight.crossVectors(shadowForward, worldUp).normalize();
     shadowUp.crossVectors(shadowRight, shadowForward).normalize();
@@ -1480,6 +1494,7 @@ export async function createGraphicsRenderer(
   // Una malla instanciada es una llamada por muchas copias.
   // Las pisadas, para la sonda: cuánta marca hay en un punto (`effects/trample.ts`).
   window.__valleyTrampleAt = (x: number, z: number) => trample?.at(x, z) ?? null;
+  window.__valleyShadowStats = () => ({ ...shadowStats });
   window.__valleySceneReport = () => {
     const rows = new Map<string, { meshes: number; shadow: number; instanced: number; triangles: number }>();
     // Los edificios se desglosan por tipo (`Valley_Buildings/wall`…), que es
@@ -2723,6 +2738,7 @@ declare global {
     __valleyRenderStats?: () => { calls: number; triangles: number; scale: number };
     __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];
     __valleyTrampleAt?: (x: number, z: number) => { grass: number; snow: number } | null;
+    __valleyShadowStats?: () => { moves: number; redraws: number; frames: number };
   }
 }
 
