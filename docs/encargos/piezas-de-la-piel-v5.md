@@ -13,6 +13,35 @@ Estilo de todo: el del mockup —dibujo a color, contornos suaves, luz de arriba
 a la izquierda, sin texto—. PNG con transparencia, a 2× (la medida es en
 píxeles CSS; el fichero, el doble).
 
+## 0 · La regla: cada imagen es de su sitio
+
+Ninguna ilustración es decorativa: **cada una acompaña a lo que pasa en el
+elemento que la usa**, y se genera mirando ese elemento.
+
+- **Carro**: una por cosa que se da (`MEANS_SPEC`, `world/means.ts`): el
+  dibujo es esa cosa (un arado, dos cerdos en su pocilga, un barril…).
+- **Tablón**: una por misión (`MISSION_IDS`, `state.ts`): lo que se va a
+  buscar (setas en cesta, hierbas, la lobera, la veta con pico y cuerda, el
+  fardo del mercado).
+- **Crónica**: la clave de cada línea decide el fichero en
+  `src/ui/redesign/chronicle-art.ts` (`HAPPENING_ART`, `MEANS_ART`, respaldo
+  por `kind`). La versión a color **conserva la escena del grabado sepia que
+  sustituye** (abrir el PNG actual antes de generar) y se revisa leyendo la
+  línea que la usa en `bank.en.ts`. Donde hoy varias claves comparten un
+  grabado por falta de arte, se hace una por clave si la escena es otra:
+
+| Fichero compartido hoy | Claves que lo usan | Qué hacer |
+|---|---|---|
+| `fire.png` | `lightning_fire`, `raid.burnt`, `raid.arrows.burnt` | Una ilustración por clave si la escena es distinta (el factor del señor no es el buhonero; la fiesta del barril no es la cosecha) |
+| `pedlar.png` | `pedlar`, `factor_visit`, `drover_visit`, `salt_visit`, `tinker` | Una ilustración por clave si la escena es distinta (el factor del señor no es el buhonero; la fiesta del barril no es la cosecha) |
+| `harvest.png` | `harvest_feast`, `ale_feast`, `pig_slaughter`, `minstrel` | Una ilustración por clave si la escena es distinta (el factor del señor no es el buhonero; la fiesta del barril no es la cosecha) |
+| `road.png` | `stranger_passes`, `pilgrims`, `wise_woman` | Una ilustración por clave si la escena es distinta (el factor del señor no es el buhonero; la fiesta del barril no es la cosecha) |
+| `means-hand.png` | `refugees`, `means.hand.given` | Una ilustración por clave si la escena es distinta (el factor del señor no es el buhonero; la fiesta del barril no es la cosecha) |
+| `raid-sack.png` | `raid.open`, `raid.beast` | Una ilustración por clave si la escena es distinta (el factor del señor no es el buhonero; la fiesta del barril no es la cosecha) |
+| `raid-held.png` | `raid.held`, `raid.arrows.saved` | Una ilustración por clave si la escena es distinta (el factor del señor no es el buhonero; la fiesta del barril no es la cosecha) |
+| `built-wall.png` | `built.wall`, `built.wall.year` | Una ilustración por clave si la escena es distinta (el factor del señor no es el buhonero; la fiesta del barril no es la cosecha) |
+| `built-watchtower.png` | `built.watchtower`, `built.watchtower.year` | Una ilustración por clave si la escena es distinta (el factor del señor no es el buhonero; la fiesta del barril no es la cosecha) |
+
 ## 1 · Los marcos y controles (nueve partes)
 
 Cada uno se recorta en nueve partes (`border-image`): las esquinas no se
