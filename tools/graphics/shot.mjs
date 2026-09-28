@@ -356,16 +356,31 @@ if (open === 'orders' || open === 'cart') {
   await tab.locator('.valley-cart').waitFor({ timeout: 4000 }).catch(() => {});
 }
 if (open === 'speed') await tab.locator('.valley-speed-badge').click().catch(() => {});
+// Piel v8 · `--open chronicle` pulsa la pestaña de la crónica; `--open label`
+// toca el centro del valle (una casa o alguien) y espera la etiqueta A1.
+if (open === 'chronicle') {
+  await tab.locator('.skin-nav-tab').nth(1).click().catch(() => {});
+  await tab.waitForTimeout(1500);
+}
+if (open === 'label') {
+  const box = await tab.locator('canvas:visible').first().boundingBox();
+  if (box !== null) await tab.mouse.click(box.x + box.width * 0.17, box.y + box.height * 0.2);
+  await tab.locator('.valley-label').waitFor({ timeout: 4000 }).catch(() => {});
+  console.log('etiqueta:', await tab.locator('.valley-label').count());
+}
 // §7.15 · `--open board` mira al tablón de la plaza y **lo toca**, en el punto
 // de la pantalla donde el render lo dibuja: la foto prueba también el toque.
 if (open === 'board') {
   await tab.waitForTimeout(1500);
   const at = await tab.evaluate(() => window.__valleyBoardScreen?.() ?? null);
-  const box = await tab.locator('canvas').first().boundingBox();
+  // El lienzo 3D, el visible: el primero de la página es el 2D, oculto desde
+  // que releva el 3D, y sin caja (así el toque no llegaba nunca).
+  const box = await tab.locator('canvas:visible').first().boundingBox();
   if (at !== null && box !== null) {
     await tab.mouse.click(box.x + at.x, box.y + at.y);
     await tab.locator('.valley-board').waitFor({ timeout: 4000 }).catch(() => {});
   }
+  console.log('velo:', await tab.evaluate(() => { const v = document.querySelector('.valley-board-veil'); const b = document.querySelector('.valley-board'); if (!v || !b) return null; const cs = getComputedStyle(v); return { pad: cs.padding, place: cs.placeItems, pos: cs.position, veil: v.getBoundingClientRect().toJSON(), board: b.getBoundingClientRect().toJSON(), hud: getComputedStyle(document.documentElement).getPropertyValue('--ui-hud-height') }; }));
   console.log('tablón en pantalla:', JSON.stringify(at), 'abierto:', await tab.locator('.valley-board').count(),
     'hoja:', await tab.evaluate(() => document.querySelector('.ui-shell-content')?.hidden === false ? document.querySelector('.ui-shell-content')?.textContent?.slice(0, 80) : 'cerrada'));
 }

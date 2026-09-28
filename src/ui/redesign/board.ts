@@ -23,12 +23,14 @@ import type { UiActions, UiPanel, UiSnapshot } from './contracts';
 const STYLE_ID = 'valley-board-style';
 
 const CSS = `
-.valley-board-veil { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
-  padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px));
+/* Entre la cabecera y la barra, como en la lámina v8: ni tapa las cifras ni la
+   navegación. --ui-hud-height lo publica la cabecera (hud.ts). */
+.valley-board-veil { position: fixed; inset: 0; z-index: 20; display: grid; place-items: start center;
+  padding: calc(var(--ui-hud-height, 104px) + 10px) 12px calc(86px + env(safe-area-inset-bottom, 0px));
   background: rgba(20, 12, 6, .42); animation: valley-board-in .18s ease-out; }
 @keyframes valley-board-in { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .valley-board-veil { animation: none; } }
-.valley-board { position: relative; width: min(100%, 390px); max-height: min(82vh, 640px); overflow-y: auto;
+.valley-board { position: relative; width: min(100%, 390px); max-height: 100%; box-sizing: border-box; overflow-y: auto;
   display: flex; flex-direction: column; gap: 16px; padding: 44px 14px 16px; border-radius: 6px;
   /* la madera de la tabla de arriba: la misma textura, no un degradado */
   background-color: var(--wood-plank); background-image: var(--plank-texture); background-size: var(--plank-size);

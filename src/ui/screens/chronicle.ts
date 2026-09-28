@@ -14,7 +14,6 @@ import type { ArchivedGame, ChronicleEntry, GameState, HappeningRecord, PendingC
 import { yearOf } from '@engine/time';
 import { seasonLabel } from '../redesign/hud';
 import type { App } from '../app';
-import { roman } from '../app';
 import { recogniseGesture, type Point } from '../gestures';
 import { requestSheetClose } from '../motion';
 import { illustrationFor } from '../redesign/chronicle-art';
@@ -392,7 +391,7 @@ function timelineSep(): HTMLElement {
 const ENTRY_VIGNETTE = './ui/art/entry.png';
 
 /** Una entrada normal: hueco de ilustración (o su respaldo) + texto. */
-function timelineRow(text: string, art: string | null, tick: number | null): HTMLElement {
+function timelineRow(text: string, art: string | null, tick: number | null, anno: number): HTMLElement {
   const row = document.createElement('div');
   row.className = 'chronicle-entry';
   const dot = document.createElement('span');
@@ -403,7 +402,9 @@ function timelineRow(text: string, art: string | null, tick: number | null): HTM
   date.className = 'chronicle-entry-date';
   // Una línea sin entrada detrás (el respaldo) no sabe su semana: sin fecha.
   if (tick === null) date.hidden = true;
-  else date.textContent = renderUiText('chronicle.entry_date', { year: yearOf(tick) + 1, season: seasonLabel(tick) });
+  // El mismo año que la cabecera de su bloque, para que la pantalla no se
+  // contradiga; la estación, la de su semana.
+  else date.textContent = renderUiText('chronicle.entry_date', { year: anno, season: seasonLabel(tick) });
   const hole = document.createElement('div');
   hole.className = 'chronicle-entry-art';
   const img = document.createElement('img');
@@ -515,7 +516,9 @@ function yearBlock(source: ChronicleSource, year: number, actions?: UiActions): 
   section.className = 'chronicle-year';
   const head = document.createElement('div');
   head.className = 'chronicle-year-head';
-  const headingText = renderUiText('app.year', { year: roman(year + 1) });
+  // v7 · en cifras (Vera, 28 sep 2026: «nunca romanos»), y el mismo número
+  // que el marcador de arriba y que los textos del motor (`yearOf`).
+  const headingText = renderUiText('app.year', { year });
   // UI-V3b · el capitular ilustrado del prototipo, recortado. Ver el
   // comentario de `.chronicle-capital`: la inicial es siempre una `A`, así
   // que una imagen sirve para cualquier año, y el año lo dice el `<h2>`.
@@ -587,7 +590,7 @@ function yearBlock(source: ChronicleSource, year: number, actions?: UiActions): 
       && (matched.kind === 'crossroad_posed' || matched.kind === 'crossroad_taken' || matched.kind === 'consequence')) {
       append(flatCard(line));
     } else {
-      append(timelineRow(line, matched === null ? null : illustrationFor(matched, happenings), matched === null ? null : matched.tick));
+      append(timelineRow(line, matched === null ? null : illustrationFor(matched, happenings), matched === null ? null : matched.tick, year));
     }
   }
   if (posingThisYear && pending !== null && source.live !== undefined && actions !== undefined) {

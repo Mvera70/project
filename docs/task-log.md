@@ -1,6 +1,16 @@
 # Cuaderno de tareas — el rework
 
-## 29 sep 2026 · La piel v8, al juego — tandas 1 y 2 en local, sin subir
+## 29 sep 2026 · La piel v8, al juego — tandas 1 a 3 subidas y desplegadas
+
+**Capturas y comparación con las láminas (29 sep, noche):** valle, carro,
+tablón, crónica y etiqueta, lado a lado con v8/v4. Arreglado al verlas: los
+iconos a color de la cabecera (una forma corta `background:` borraba la
+imagen), la brújula encima de las hojas, el tablón tapando cabecera y barra
+(ahora entre las dos), el dintel de piedra de las hojas (fuera, Vera), y la
+crónica en cifras con el mismo año que el marcador. **El tablón sí se abre al
+tocarlo**: el fallo era de `shot.mjs`, que tocaba el lienzo 2D oculto. Queda:
+la ficha de coste dentro de la fila de datos del tablón; la crónica a pantalla
+entera como la lámina (pregunta a Vera); la crónica a color; la skill.
 
 Codex entregó v6, v7 y v8 (`art/astra-modelos`, `6e4aea4`) y Vera las dio por
 buenas: cuero con medallones para la barra, placas de madera con brasa para

@@ -77,12 +77,15 @@
    Codex); la cara de la gente sigue siendo la del sprite, que dice el ánimo. */
 :root .valley-vital.skin-plate--chip[data-res]:not([data-res="people"]) .skin-icon { display: none; }
 :root .valley-vital.skin-plate--chip[data-res]:not([data-res="people"])::before {
-  content: ''; width: 20px; height: 20px; flex: 0 0 20px; background: center / contain no-repeat;
+  content: ''; width: 20px; height: 20px; flex: 0 0 20px;
+  /* Sin la forma corta `background:`: borraría la imagen de cada recurso, que
+     va en una regla menos específica que ésta. */
+  background-position: center; background-size: contain; background-repeat: no-repeat;
 }
-:root .valley-vital.skin-plate--chip[data-res="grain"]::before { background-image: var(--res-grain); }
-:root .valley-vital.skin-plate--chip[data-res="wood"]::before { background-image: var(--res-wood); }
-:root .valley-vital.skin-plate--chip[data-res="stone"]::before { background-image: var(--res-stone); }
-:root .valley-vital.skin-plate--chip[data-res="silver"]::before { background-image: var(--res-silver); }
+:root .valley-vital.skin-plate--chip[data-res][data-res="grain"]::before { background-image: var(--res-grain); }
+:root .valley-vital.skin-plate--chip[data-res][data-res="wood"]::before { background-image: var(--res-wood); }
+:root .valley-vital.skin-plate--chip[data-res][data-res="stone"]::before { background-image: var(--res-stone); }
+:root .valley-vital.skin-plate--chip[data-res][data-res="silver"]::before { background-image: var(--res-silver); }
 /* La comida que se acaba sigue avisando (§11.1.1), en un rojo que se lee sobre
    la madera oscura: el `--ui-alarm` de siempre se hunde en ella. */
 :root .valley-vital.skin-plate--chip.thin,
@@ -205,12 +208,15 @@
   background-size: 64px 100%, 100% 100%;
   box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .3), 0 2px 3px rgba(60, 40, 20, .25);
   pointer-events: none;
+  /* v8 · **Fuera el dintel de piedra** (Vera, 29 sep 2026: «hay que quitar la
+     línea de piedra»; sólo madera). La hoja empieza en su pergamino. */
+  display: none;
 }
 #root .ui-shell-content:has(.chronicle-scrim, .people-scrim, .valley-panel, .valley-cart) > .ui-sheet-grip {
   flex-basis: 34px;
   height: 34px;
 }
-#root .ui-sheet-grip::before { background: var(--stone-deep); opacity: .9; }
+#root .ui-sheet-grip::before { background: var(--wood-plank-deep); opacity: .55; }
 /* La bandeja del valle es la misma hoja más baja: mismo papel, misma piedra. */
 :root .ui-shell-message { background-color: var(--sheet); }
 :root .crossroad { position: relative; }
@@ -1023,3 +1029,8 @@ html.bare:has(#root .ui-shell-content:not([hidden])) .valley-hud-right.hud-speed
   :root .title-sheet:has(.title-continue-row) .title-vignette { width: min(34vw, 118px); }
   :root .title-sheet:has(.title-continue-row) .title-logo { width: min(100%, 220px); }
 }
+
+/* v8 · la brújula no se pinta encima de una hoja ni del tablón (z-index 30): con
+   algo abierto se aparta; vuelve al cerrar. */
+html:has(.ui-shell-content:not([hidden])) .valley-compass,
+html:has(.valley-board-veil) .valley-compass { visibility: hidden; }
