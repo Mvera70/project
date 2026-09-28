@@ -73,6 +73,16 @@
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, .55), 0 1px 0 rgba(255, 214, 160, .22);
 }
 :root .valley-vital.skin-plate--chip .skin-icon { color: #E8C36A; }
+/* v6 · los cuatro recursos con su icono a color (`--res-*`, imágenes de
+   Codex); la cara de la gente sigue siendo la del sprite, que dice el ánimo. */
+:root .valley-vital.skin-plate--chip[data-res]:not([data-res="people"]) .skin-icon { display: none; }
+:root .valley-vital.skin-plate--chip[data-res]:not([data-res="people"])::before {
+  content: ''; width: 20px; height: 20px; flex: 0 0 20px; background: center / contain no-repeat;
+}
+:root .valley-vital.skin-plate--chip[data-res="grain"]::before { background-image: var(--res-grain); }
+:root .valley-vital.skin-plate--chip[data-res="wood"]::before { background-image: var(--res-wood); }
+:root .valley-vital.skin-plate--chip[data-res="stone"]::before { background-image: var(--res-stone); }
+:root .valley-vital.skin-plate--chip[data-res="silver"]::before { background-image: var(--res-silver); }
 /* La comida que se acaba sigue avisando (§11.1.1), en un rojo que se lee sobre
    la madera oscura: el `--ui-alarm` de siempre se hunde en ella. */
 :root .valley-vital.skin-plate--chip.thin,
@@ -102,35 +112,36 @@
     coronar, empezar de nuevo—, así que cambia en todas a la vez.
 
     La portada también, desde que tiene diseño (abajo). */
+/** v7 · **Fuera el verde.** Vera, 28 sep 2026: ni el verde lacado del mockup ni
+    el verde azulado la convencieron; la placa de actuar es **madera con canto
+    de latón y brasa ámbar dentro** (`plaque-wood.png`, nueve partes), y la
+    apagada es la misma placa sin luz. La imagen la generó Codex; aquí sólo se
+    estira y se pone el texto encima. */
 :root .skin-button--wood,
 :root .valley-orders-now.hud-say-line {
-  border: 2px solid var(--brass);
-  background: var(--give);
-  color: #F6ECD0;
+  border: 10px solid transparent;
+  border-image: var(--plaque-wood) var(--plaque-slice) fill stretch;
+  border-image-width: var(--plaque-edge);
+  background: none;
+  color: #F9EAC8;
   font-family: var(--skin-font-display);
   font-weight: 700;
-  letter-spacing: .04em;
-  text-shadow: 0 1px 0 var(--give-deep);
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, .22),
-    inset 0 -3px 0 rgba(0, 0, 0, .28),
-    0 3px 0 var(--give-deep),
-    0 6px 12px rgba(31, 63, 39, .25);
+  letter-spacing: .06em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .55);
+  box-shadow: 0 3px 6px rgba(20, 12, 6, .35);
 }
 :root .skin-button--wood:hover,
-:root .valley-orders-now.hud-say-line:hover { background: var(--give-lit); }
+:root .valley-orders-now.hud-say-line:hover { filter: brightness(1.08); }
 :root .skin-button--wood:active,
 :root .valley-orders-now.hud-say-line:active {
   transform: translateY(2px);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .18), 0 1px 0 var(--give-deep);
+  box-shadow: 0 1px 2px rgba(20, 12, 6, .35);
 }
-/** Lo que no se puede dar: madera apagada con el borde a trazos, no un verde
-    medio transparente que parece un fallo de carga. */
+/** Lo que no se puede dar: la misma placa, apagada, con la letra atenuada. */
 :root .skin-button--wood:disabled {
   opacity: 1;
-  border: 2px dashed #9C8360;
-  background: #CDBD9C;
-  color: #6E5A3E;
+  border-image-source: var(--plaque-wood-off);
+  color: #AF9B7B;
   text-shadow: none;
   box-shadow: none;
   cursor: not-allowed;
@@ -229,27 +240,22 @@
   font-size: 0;
   letter-spacing: 0;
 }
+/* v7 · el aro de madera con el aspa tallada (`btn-close.png`): toque de 44,
+   dibujo de 32. Vera pidió el dibujo más pequeño y «menos botón de app». */
 :root .cart-close::after,
 :root .ui-shell-content-close::after,
 :root .chronicle-close::after,
 :root .annals-close::after {
   content: '';
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
-  border-radius: 50%;
-  border: 2px solid var(--brass);
-  background-color: var(--lacquer);
-  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 7l10 10M17 7L7 17' stroke='%23F6ECD0' stroke-width='3' stroke-linecap='round'/></svg>");
-  background-size: 20px 20px;
-  background-position: center;
-  background-repeat: no-repeat;
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .2), inset 0 -3px 0 rgba(0, 0, 0, .3), 0 2px 0 var(--lacquer-deep);
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  background: var(--btn-close) center / 32px 32px no-repeat;
 }
 :root .cart-close:active::after,
 :root .ui-shell-content-close:active::after,
 :root .chronicle-close:active::after,
-:root .annals-close:active::after { transform: translateY(2px); box-shadow: 0 0 0 var(--lacquer-deep); }
+:root .annals-close:active::after { transform: translateY(1px); }
 
 /* ------------------------------------------------------ las tarjetas */
 
@@ -265,6 +271,20 @@
     inset 0 0 0 5px rgba(122, 88, 48, .45),
     0 3px 0 #C9B08A,
     0 6px 12px rgba(60, 40, 20, .18);
+}
+/** v6 · **La tarjeta del carro es pergamino rasgado de imagen**
+    (`frame-parchment.png`, nueve partes, esquinas con filigrana): Vera, 28 sep
+    2026, «el pergamino con los bordes más reales… los nuestros parecen
+    pintados». El filete de tinta de arriba se queda para las fichas y las
+    decisiones; el carro lleva el marco. */
+:root .cart-row.skin-plate--card {
+  border: var(--frame-parchment-edge) solid transparent;
+  border-image: var(--frame-parchment) var(--frame-parchment-slice) fill stretch;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  filter: drop-shadow(0 3px 4px rgba(40, 25, 10, .3));
+  padding: 0 0 4px;
 }
 
 /** La cinta del título: pizarra que sale por el borde izquierdo de la tarjeta
@@ -285,47 +305,63 @@
   align-items: center;
   box-sizing: border-box;
   width: calc(100% - 64px);
-  min-height: 36px;
-  padding: 4px 12px 4px 22px;
-  border-radius: 0 4px 4px 0;
-  background: var(--ribbon);
+  min-height: 40px;
+  padding: 0 12px 0 22px;
+  /* v6 · la cinta de pizarra es una imagen con su doblez (`frame-ribbon.png`) */
+  border: 8px solid transparent;
+  border-image: var(--frame-ribbon) var(--frame-ribbon-slice) fill stretch;
+  border-image-width: var(--frame-ribbon-edge);
+  background: none;
   color: var(--card);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 2px 0 var(--ribbon-deep);
-  font: 400 19px/1.1 var(--skin-font-display);
+  box-shadow: none;
+  font: 400 17px/1.1 var(--skin-font-display);
   letter-spacing: .03em;
   text-transform: uppercase;
 }
+:root .cart-row-head::after { display: none; }
 /** El medallón con el grabado de la cosa: los `means-*.png` que ya ilustran su
     línea de crónica (`public/ui/art/`). Recortado al centro, que es donde está
     el objeto en los diez. */
+/* v7 · la ilustración a color de la cosa, sin medallón, asomando sobre la
+   cinta a 64 × 54 (`public/ui/art/cards/means-*.png`, Codex). */
 :root .cart-art {
   position: absolute;
   z-index: 2;
-  right: 10px;
-  top: -6px;
-  width: 58px;
-  height: 58px;
-  box-sizing: border-box;
-  border-radius: 50%;
-  border: 2px solid var(--wood-plank);
-  object-fit: cover;
-  object-position: 55% 55%;
-  background: var(--card);
-  box-shadow: 0 0 0 3px var(--card), 0 0 0 4px var(--card-edge), 0 3px 6px rgba(60, 40, 20, .25);
+  right: -4px;
+  top: -16px;
+  width: 64px;
+  height: 54px;
+  border: 0;
+  border-radius: 0;
+  object-fit: contain;
+  background: none;
+  box-shadow: none;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .25));
 }
 :root .cart-what { color: var(--skin-ink); font: 400 16px/1.4 var(--skin-font-story); }
 /** El precio en su bandeja hundida, y lo que falta en la tinta del lacre. */
+/* v6 · la ficha del precio es la pastilla hundida de imagen (`chip-cost.png`),
+   y los iconos del precio, los mismos a color de la cabecera. */
 :root .cart-cost {
-  flex: 1 1 auto;
-  min-height: 44px;
+  flex: 0 1 auto;
+  min-height: 34px;
   box-sizing: border-box;
-  padding: 4px 12px;
-  border-radius: 6px;
-  background: var(--card-tray);
-  box-shadow: inset 0 1px 3px rgba(80, 55, 25, .35);
-  flex-wrap: wrap;
-  gap: 4px 14px;
+  padding: 0 6px;
+  border: 8px solid transparent;
+  border-image: var(--chip-cost) var(--chip-cost-slice) fill stretch;
+  border-image-width: var(--chip-cost-edge);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  flex-wrap: nowrap;
+  gap: 2px 10px;
 }
+:root .cart-coin .skin-icon { display: none; }
+:root .cart-coin::before { content: ''; width: 20px; height: 20px; flex: 0 0 20px; background: center / contain no-repeat; }
+:root .cart-coin[data-res="grain"]::before { background-image: var(--res-grain); }
+:root .cart-coin[data-res="wood"]::before { background-image: var(--res-wood); }
+:root .cart-coin[data-res="stone"]::before { background-image: var(--res-stone); }
+:root .cart-coin[data-res="silver"]::before { background-image: var(--res-silver); }
 :root .cart-coin { color: var(--wood-plank-deep); font-weight: 800; }
 :root .cart-coin.cart-coin--want { color: var(--want); }
 :root .cart-coin-have { font-size: 12px; font-weight: 700; }
@@ -381,38 +417,66 @@
     madera «como lo de arriba del todo», y el verde azulado que tenía la
     barra pasó a los botones. La activa es madera al sol, con latón y un
     brillo cálido, que es lo que la regla 4 de la dirección pedía. */
+/** v8 · **La barra es de cuero, y las pestañas medallones de latón.** Vera,
+    28 sep 2026: la barra de madera «es muy pobre; es lo más importante de la
+    navegación y debe resaltar; quitaría la madera, ya la usamos en el resto».
+    El cuero es el tercer material del juego (la tapa del libro de la portada)
+    y no sale en ninguna otra pantalla: por eso se distingue. La correa
+    (`nav-leather.png`, nueve partes) y los medallones (`nav-medal*.png`) son
+    imágenes de Codex; el símbolo de cada pestaña sigue siendo el del sprite,
+    en crema, encima del medallón. La activa se eleva 4 px y se enciende. */
 :root .skin-nav {
-  background-color: var(--wood-plank);
-  background-image: var(--plank-texture);
-  background-size: var(--plank-size);
-  /* El mismo acabado que la tabla de arriba: filete de latón, luz en el canto
-     alto y sombra en el bajo. Sin esto la barra era un tablero plano al lado
-     de una tabla con relieve (Vera: «no tiene la calidad del que hiciste la
-     primera vez»). */
-  border-top: 3px solid var(--brass);
-  box-shadow:
-    inset 0 2px 0 rgba(255, 214, 160, .3),
-    inset 0 -3px 0 rgba(0, 0, 0, .35),
-    inset 0 5px 6px -3px rgba(0, 0, 0, .35),
-    0 -6px 16px rgba(0, 0, 0, .35);
+  min-height: 72px;
+  border-top: 0;
+  border: var(--nav-leather-edge) solid transparent;
+  border-image: var(--nav-leather) var(--nav-leather-slice) fill stretch;
+  background: none;
+  box-shadow: 0 -6px 16px rgba(0, 0, 0, .35);
 }
-:root .skin-nav .skin-nav-tab { color: #F3E3C2; font-family: var(--skin-font-display); font-weight: 700; text-shadow: 0 1px 0 rgba(0, 0, 0, .45); }
-/* Los surcos entre celdas: una ranura oscura con su luz al lado. */
-:root .skin-nav .skin-rule-v { width: 2px; background: rgba(0, 0, 0, .35); box-shadow: 1px 0 0 rgba(255, 214, 160, .18); }
-/** La activa es **una placa de madera rica sobre la barra**, en las dos
-    materias —sobre la madera y sobre la piedra—, como la del primer diseño
-    del lienzo: latón alrededor y brillo de brasa. En gris claro, sobre la
-    piedra, se leía como un botón apagado. */
+:root .skin-nav .skin-nav-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  min-height: 56px;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: #F4E6C5;
+  font-family: var(--skin-font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: .04em;
+  text-shadow: none;
+}
+:root .skin-nav .skin-nav-medal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  margin-top: -14px;
+  background: var(--nav-medal) center / contain no-repeat;
+  transition: transform .15s ease;
+}
+:root .skin-nav .skin-nav-tab .skin-icon { width: 25px; height: 25px; color: #F4E6C5; }
+/* Sin surcos: la correa es una pieza. */
+:root .skin-nav .skin-rule-v { display: none; }
 :root .skin-nav .skin-nav-tab[aria-pressed="true"] {
-  border: 2px solid var(--brass);
-  background-color: #6B3A22;
-  background-image: repeating-linear-gradient(90deg, rgba(0, 0, 0, .10) 0 2px, transparent 2px 19px);
+  border: 0;
+  background: none;
+  box-shadow: none;
   color: #FFF3D6;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 214, 160, .3),
-    inset 0 -3px 0 rgba(0, 0, 0, .35),
-    0 0 16px rgba(242, 160, 60, .45);
 }
+:root .skin-nav .skin-nav-tab[aria-pressed="true"] .skin-nav-medal {
+  background-image: var(--nav-medal-on);
+  transform: translateY(-4px);
+}
+@media (prefers-reduced-motion: reduce) { :root .skin-nav .skin-nav-medal { transition: none; } }
 
 /* ------------------------------------------------------ la carga */
 
@@ -598,40 +662,13 @@ html.bare .ui-hud-header::before { visibility: hidden; }
 :root .cart-row--owned { opacity: .78; }
 :root .cart-row--owned .cart-why { color: var(--wood-plank-deep); font-style: italic; }
 
-/* ------------------------------------------ la edad de piedra: la UI se vuelve piedra */
+/* ------------------------------------------ la edad de piedra, ya no */
 
-/** UI-W · Idea de Vera, 24 sep 2026: «cuando la aldea pase a la edad de
-    piedra, que se cambie la UI por una de piedra». `app.ts` pone
-    `data-material` en `<html>` con `uiMaterialOf` (`derive/era.ts`): la
-    primera obra de piedra, el peldaño de las 61 h. **Todo lo de madera de esta
-    capa sale de cinco tokens**, así que basta con redefinirlos: la tabla de
-    arriba, la barra de abajo, los aros de los mandos, los medallones y la
-    carga pasan a sillería sin una regla más. El pergamino, las cintas, el
-    lacre y el botón de actuar no cambian: son lo que se lee y lo que se toca,
-    y eso no debe moverse de sitio ni de color de un día para otro. */
-:root[data-material="stone"] {
-  --wood-plank: #7D7870;
-  --wood-plank-lit: #9A958B;
-  --wood-plank-deep: #3E3B36;
-  --wood-nail: #2A2825;
-  /* El empedrado de `tools/ui/textures.py`, el mismo del pie de la portada. */
-  --plank-texture: var(--cobble-texture);
-  --plank-size: 192px;
-}
-/* Y el cambio se ve pasar: la tabla y la barra se funden a piedra en un
-   segundo largo en vez de saltar, la semana en que la primera obra se alza. */
-:root .ui-hud-header::before,
-:root .skin-nav,
-:root .valley-vital.skin-plate--chip {
-  transition: background-color 1.4s ease, border-color 1.4s ease;
-}
-@media (prefers-reduced-motion: reduce) {
-  :root .ui-hud-header::before, :root .skin-nav, :root .valley-vital.skin-plate--chip { transition: none; }
-}
-/* En piedra la barra baja un tono respecto a la tabla de arriba: el crema de
-   las pestañas sobre el gris medio de la tabla se leía flojo (medido en la
-   captura de la semilla 7, año 30). */
-:root[data-material="stone"] .skin-nav { background-color: #5E5A53; }
+/** UI-W ponía la carcasa de piedra con la primera obra de piedra
+    (`data-material`, `derive/era.ts`). **Vera lo retiró el 28 sep 2026**:
+    «sólo madera; nada de piedra». `uiMaterialOf` sigue existiendo y `app.ts`
+    sigue marcando `<html data-material>` —es un dato de la era que otras
+    cosas pueden leer—, pero la piel no lo mira. */
 
 /* ------------------------------------------------------------ la portada */
 

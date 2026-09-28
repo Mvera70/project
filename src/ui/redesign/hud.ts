@@ -372,8 +372,12 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   vitals.className = 'valley-vitals hud-chips-row';
   vitals.setAttribute('aria-label', renderUiText('app.vitals'));
 
-  const vital = (iconId: string): VitalCell => {
+  // v8 · `res` nombra el recurso para que la piel ponga su icono a color
+  // (`tokens.css`, `--res-*`); el de la gente sigue siendo la cara del sprite,
+  // que cambia con el ánimo y es información, no adorno.
+  const vital = (iconId: string, res: string): VitalCell => {
     const chip = makeVitalCell(iconId, 'skin-plate skin-plate--chip');
+    chip.cell.dataset['res'] = res;
     vitals.append(chip.cell);
     return chip;
   };
@@ -385,11 +389,11 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   // la gente**: una sola pieza dice cuántos son y cómo están, que es lo que ese
   // chip quiere decir de verdad. Un sexto chip no cabía a 390 px sin romper el
   // mínimo de toque.
-  const people = vital('face-calm');
-  const food = vital('wheat');
-  const wood = vital('logs');
-  const stone = vital('stone');
-  const silver = vital('silver');
+  const people = vital('face-calm', 'people');
+  const food = vital('wheat', 'grain');
+  const wood = vital('logs', 'wood');
+  const stone = vital('stone', 'stone');
+  const silver = vital('silver', 'silver');
 
   // VZ-02 · **la frase de actividad ya no vive aquí.** Era una de las cuatro
   // voces del valle y ahora las cuatro se leen en un solo hueco, el de la

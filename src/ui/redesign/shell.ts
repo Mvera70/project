@@ -426,6 +426,12 @@ export function createShell(actions: UiActions): ShellHandle {
       cells.append(rule);
     }
     const button = tapButton(labels[tabName], NAV_TAB_ICON[tabName], 'skin-nav-tab');
+    // v8 · el icono va sobre un medallón de latón cosido a la correa de cuero
+    // (`wood.css`, la navegación): el dibujo es la imagen, el símbolo el sprite.
+    const medal = document.createElement('span');
+    medal.className = 'skin-nav-medal';
+    const icon = button.querySelector('svg');
+    if (icon !== null) { medal.append(icon); button.prepend(medal); }
     button.setAttribute('aria-pressed', 'false');
     button.addEventListener('click', () => {
       if (tabName === 'valley' && !content.hidden) finishDrag(true);

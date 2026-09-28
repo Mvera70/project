@@ -1,5 +1,19 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · La piel v8, al juego — tandas 1 y 2 en local, sin subir
+
+Codex entregó v6, v7 y v8 (`art/astra-modelos`, `6e4aea4`) y Vera las dio por
+buenas: cuero con medallones para la barra, placas de madera con brasa para
+actuar, «Open the cart» en la bandeja. Plan y estado en
+`docs/ui-redesign/plan-integracion-piel-2026-09-29.md`. Las piezas de imagen
+están ya en `src/ui/redesign/` y `public/ui/art/cards/`; `tokens.css` las
+nombra. Tandas 1 y 2 escritas (correa, medallones, iconos a color, placas,
+cierre, tarjetas rasgadas, fichas, clavos, ilustraciones; fuera la edad de
+piedra de la carcasa): typecheck, lint y 45 pruebas de piel en verde. **Sin
+captura ni build**: Vera pidió no hacer ruido; la primera captura decide si
+se sube. Abierto: tocar el tablón no abre su ventana; la etiqueta A1 y la
+crónica a color (tanda 3); la skill `piel-del-valle` (tanda 4).
+
 ## 28 sep 2026 · Piel v5: el toque de calidad — **encargo, a la espera de las piezas**
 
 La v4 de Codex vale («ha mejorado mucho»). Para la v5 Vera pide pergamino con

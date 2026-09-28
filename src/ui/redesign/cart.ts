@@ -90,6 +90,8 @@ function ensureStyle(): void {
 function coin(stat: string, amount: number): HTMLElement {
   const box = document.createElement('span');
   box.className = 'cart-coin';
+  // v6 · la piel pone el icono a color por el recurso (`wood.css`, `--res-*`).
+  box.dataset['res'] = stat;
   box.dataset.stat = stat;
   box.dataset.amount = String(amount);
   box.innerHTML = `<svg class="skin-icon" aria-hidden="true" focusable="false"><use href="#${COIN[stat] ?? 'silver'}"/></svg>`;
@@ -228,7 +230,9 @@ export function cartPanel(actions: UiActions): UiPanel {
     why.className = 'cart-why';
     why.hidden = true;
 
-    row.append(artOf(`means-${id}.png`), head, what, foot, why);
+    // v6 · la ilustración a color de la cosa (`public/ui/art/cards/`), no el
+    // grabado de su línea de crónica, que sigue en `public/ui/art/`.
+    row.append(artOf(`cards/means-${id}.png`), head, what, foot, why);
     element.append(row);
     rows.set(id, { element: row, cost, give, why });
   }

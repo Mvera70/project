@@ -29,37 +29,41 @@ const CSS = `
 @keyframes valley-board-in { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .valley-board-veil { animation: none; } }
 .valley-board { position: relative; width: min(100%, 390px); max-height: min(82vh, 640px); overflow-y: auto;
-  display: flex; flex-direction: column; gap: 12px; padding: 44px 14px 16px; border-radius: 6px;
-  background:
-    repeating-linear-gradient(180deg, transparent 0 62px, rgba(0,0,0,.32) 62px 64px),
-    repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 3px, transparent 3px 9px),
-    linear-gradient(var(--wood-plank-lit), var(--wood-plank) 40%, #5a371f);
+  display: flex; flex-direction: column; gap: 16px; padding: 44px 14px 16px; border-radius: 6px;
+  /* la madera de la tabla de arriba: la misma textura, no un degradado */
+  background-color: var(--wood-plank); background-image: var(--plank-texture); background-size: var(--plank-size);
   border: 3px solid var(--wood-plank-deep);
   box-shadow: 0 18px 40px rgba(0,0,0,.55), inset 0 0 0 2px rgba(201,162,74,.35); }
 .valley-board-title { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); margin: 0;
   padding: 7px 16px; border-radius: 2px; background: var(--card); color: var(--skin-ink);
   box-shadow: 0 2px 0 var(--wood-plank-deep); white-space: nowrap;
   font: 700 13px/1 var(--skin-font-display); letter-spacing: .18em; text-transform: uppercase; }
-.valley-board-close { position: absolute; right: 8px; top: 6px; width: 40px; height: 40px; border-radius: 50%;
-  border: 2px solid var(--brass); cursor: pointer; font-size: 0; color: transparent;
-  background: radial-gradient(circle at 35% 30%, #a8402f, var(--lacquer) 55%, var(--lacquer-deep)); }
-.valley-board-close::after { content: '×'; display: grid; place-items: center; height: 100%;
-  color: var(--card); font: 700 22px/1 var(--skin-font-voice); }
-.valley-note { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 12px 12px 11px;
-  background: var(--card); color: var(--skin-ink); border-radius: 1px; box-shadow: 0 3px 6px rgba(0,0,0,.4); }
-.valley-note:nth-of-type(odd) { transform: rotate(-.8deg); }
-.valley-note:nth-of-type(even) { transform: rotate(.6deg); }
-.valley-note::before { content: ''; position: absolute; left: 50%; top: -4px; width: 10px; height: 10px;
-  border-radius: 50%; background: var(--wood-nail); }
-.valley-note-name { margin: 0; font: 700 14px/1.2 var(--skin-font-display); letter-spacing: .04em; }
+/* v7 · el aro de madera con el aspa tallada: toque de 44, dibujo de 32 */
+.valley-board-close { position: absolute; right: 6px; top: 4px; width: 44px; height: 44px; border: 0; cursor: pointer;
+  font-size: 0; color: transparent; background: var(--btn-close) center / 32px 32px no-repeat; }
+.valley-board-close:active { transform: translateY(1px); }
+/* v6/v7 · el aviso es la tarjeta de pergamino rasgado (nueve partes), con su
+   clavo y la ilustración de lo que se va a buscar asomando junto al título. */
+.valley-note { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 6px 6px 8px;
+  color: var(--skin-ink); border: var(--frame-parchment-edge) solid transparent;
+  border-image: var(--frame-parchment) var(--frame-parchment-slice) fill stretch;
+  filter: drop-shadow(0 3px 4px rgba(20,12,6,.45)); }
+.valley-note:nth-of-type(odd) { transform: rotate(-.35deg); }
+.valley-note:nth-of-type(even) { transform: rotate(.3deg); }
+.valley-note-nail { position: absolute; left: calc(50% - 10px); top: -38px; width: 20px; height: 20px;
+  background: var(--nail) center / contain no-repeat; }
+.valley-note:nth-of-type(even) .valley-note-nail { background-image: var(--nail-bent); }
+.valley-note-art { position: absolute; right: -3px; top: -20px; width: 56px; height: 48px; object-fit: contain;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+.valley-note-name { margin: 0; min-height: 30px; padding-right: 61px; font: 700 14px/1.2 var(--skin-font-display); letter-spacing: .04em; }
 .valley-note-what { margin: 0; color: var(--skin-ink-faded); font: italic 400 15px/1.35 var(--skin-font-voice); }
 .valley-note-facts { margin: 0; color: var(--skin-ink-soft); font: 600 14px/1.3 var(--skin-font-voice);
   font-variant-numeric: tabular-nums; }
 .valley-note-risk { color: var(--want); }
 .valley-note-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .valley-step { display: flex; align-items: center; gap: 6px; }
-.valley-step button { width: 34px; height: 34px; border-radius: 4px; border: 1px solid var(--wood-plank-deep);
-  background: var(--wood-plank); color: var(--card); font: 700 18px/1 var(--skin-font-voice); cursor: pointer; }
+.valley-step button { width: 40px; height: 40px; padding: 0; color: #3d3020; font: 700 22px/1 var(--skin-font-voice); cursor: pointer;
+  border: 8px solid transparent; border-image: var(--chip-cost) var(--chip-cost-slice) fill stretch; border-image-width: 14px; background: none; }
 .valley-step button[disabled] { opacity: .35; cursor: default; }
 .valley-step output { min-width: 18px; text-align: center; font: 700 16px/1 var(--skin-font-display); }
 .valley-note-send { min-height: var(--ui-tap-min); padding: 0 16px; }
@@ -127,6 +131,15 @@ export function boardPanel(actions: UiActions): UiPanel {
       const note = document.createElement('article');
       note.className = 'valley-note';
       note.dataset['mission'] = mission.id;
+      // v6 · el clavo y la ilustración a color de lo que se va a buscar
+      // (`public/ui/art/cards/mission-*.png`), asomando junto al título.
+      const nail = document.createElement('span');
+      nail.className = 'valley-note-nail';
+      const art = document.createElement('img');
+      art.className = 'valley-note-art';
+      art.alt = '';
+      art.src = `./ui/art/cards/mission-${mission.id.replace('_', '-')}.png`;
+      note.append(nail, art);
       const name = document.createElement('h3');
       name.className = 'valley-note-name';
       name.textContent = renderUiText(`mission.${mission.id}.name`);

@@ -193,6 +193,39 @@
   --lacquer-deep: #5A1D15;
   --want: #8C2F22;                  /* la cifra que falta, en la tinta del lacre */
 
+  /* ---------------------------------- v8 · las piezas de imagen (29 sep 2026) */
+  /* Generadas por Codex con la referencia del mockup del 24 sep y aprobadas
+     por Vera en las láminas v6–v8 (`docs/ui-redesign/propuesta-piel-v7-…`,
+     `propuesta-barra-v8-…`). **Nada de esto se dibuja con CSS**: CSS coloca y
+     estira las nueve partes. Cada PNG está a 2×; el corte (`-slice`) es en
+     píxeles del PNG y el borde (`-edge`) en píxeles CSS. */
+  --frame-parchment: url('./frame-parchment.png');   /* 640×400: la tarjeta rasgada */
+  --frame-parchment-slice: 56;
+  --frame-parchment-edge: 28px;
+  --frame-ribbon: url('./frame-ribbon.png');         /* 600×80: la cinta del título */
+  --frame-ribbon-slice: 28;
+  --frame-ribbon-edge: 14px;
+  --chip-cost: url('./chip-cost.png');               /* 360×88: la ficha del precio */
+  --chip-cost-slice: 28;
+  --chip-cost-edge: 14px;
+  --plaque-wood: url('./plaque-wood.png');           /* 400×92: actuar, con brasa */
+  --plaque-wood-off: url('./plaque-wood-off.png');   /* la misma, apagada */
+  --plaque-slice: 36;
+  --plaque-edge: 18px;
+  --btn-close: url('./btn-close.png');               /* 64×64: aro de madera con aspa */
+  --nail: url('./nail.png');                         /* 32×32 y 48×48: los clavos del tablón */
+  --nail-bent: url('./nail-bent.png');
+  --res-people: url('./res-people.png');             /* 40×40: los recursos a color */
+  --res-grain: url('./res-grain.png');
+  --res-wood: url('./res-wood.png');
+  --res-stone: url('./res-stone.png');
+  --res-silver: url('./res-silver.png');
+  --nav-leather: url('./nav-leather.png');           /* 780×144: la correa de la barra */
+  --nav-leather-slice: 32;
+  --nav-leather-edge: 16px;
+  --nav-medal: url('./nav-medal.png');               /* 112×112: el medallón de cada pestaña */
+  --nav-medal-on: url('./nav-medal-on.png');
+
   /* ------------------------------------------- los `--ui-*` de UI-R1, vivos */
   /* Cinco rondas los usan. Se conservan y **apuntan a los de arriba**, así
      que la piel nueva entra sin tocar `hud.ts`, `orders.ts`, `shell.css` ni
