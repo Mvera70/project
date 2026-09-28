@@ -4,7 +4,8 @@
    **Pequeña y difusa, a propósito** (Vera, 27 sep 2026: «tiene que ser
    pequeñita y difusa; que no sea algo que parpadee para que se dé cuenta, pero
    que no se vea mucho. La gracia es que él se dé cuenta y lo pulse»). Así que:
-   sin plato de madera, sólo el trazo en crema, medio transparente, con un halo
+   sin plato de madera, sólo la huella de la presa en crema (desde el mismo
+   día: «no me gusta el icono; la huella del animal»), medio transparente, con un halo
    blando que lo separa del prado sin gritar, y quieto. El área de toque sí es
    de dedo (36 px), pero invisible. */
 .hunt-sign {
@@ -14,8 +15,11 @@
   color: #fbf4e2; opacity: .62;
   filter: drop-shadow(0 0 3px rgba(40, 30, 18, .55));
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  transition: opacity .6s ease;
 }
+/* La presa entre los árboles: la huella se apaga despacio y no se toca. */
+.hunt-sign--covered { opacity: 0; pointer-events: none; }
 .hunt-sign[hidden] { display: none; }
-.hunt-sign svg { width: 15px; height: 15px; }
+.hunt-sign svg { width: 16px; height: 16px; }
 .hunt-sign:hover, .hunt-sign:focus-visible { opacity: .95; }
 .hunt-sign:focus-visible { outline: 1px solid rgba(251, 244, 226, .7); outline-offset: -8px; border-radius: 50%; }

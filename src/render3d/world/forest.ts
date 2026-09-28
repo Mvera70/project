@@ -89,6 +89,8 @@ export interface Forest {
   readonly revealedCount: number;
   /** Actualiza la oclusión selectiva; una lista vacía restaura el bosque. */
   reveal(camera: Camera, targets: readonly ForestRevealTarget[]): number;
+  /** Si algún árbol tapa ese punto desde la cámara; no atenúa nada. */
+  hides(camera: Camera, target: ForestRevealTarget): boolean;
   /**
    * IA-anim · Inclina el árbol de una celda sobre su base, hacia `(x, z)`, y
    * `angle = 0` lo devuelve a su sitio. Sólo toca las matrices de ese árbol:
@@ -335,6 +337,7 @@ export function buildForest(
     stumpCount: stumpCells.length,
     get revealedCount(): number { return scattered.revealedCount; },
     reveal(camera, targets): number { return scattered.reveal(camera, targets); },
+    hides(camera, target): boolean { return scattered.hides(camera, target) || (conifers?.hides(camera, target) ?? false); },
     sway(cell, x, z, angle): boolean { return scattered.sway(cell, x, z, angle); },
     season(palette): void {
       scattered.season(palette);
@@ -679,6 +682,9 @@ export function scatterCells(
     stumpCount: 0,
     get revealedCount(): number { return revealedCount; },
     reveal,
+    hides(camera: Camera, target: ForestRevealTarget): boolean {
+      return occludable && forestOccluders(occluders, camera, [target]).length > 0;
+    },
     sway,
     season(palette): void {
       for (const material of tinted) tintFoliage(material, palette);

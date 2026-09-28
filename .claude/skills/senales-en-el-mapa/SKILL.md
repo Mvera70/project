@@ -65,8 +65,17 @@ es ver la ocasión a tiempo.
   sobre la proyección en pantalla de la cosa (su posición 3D más una altura).
   **Pequeño y difuso**, que es la gracia (Vera: «pequeñito y difuso, que no
   parpadee para que se dé cuenta, que no se vea mucho; la gracia es que él se
-  dé cuenta y lo pulse»): sin plato ni fondo, sólo el trazo de ~15 px en crema
-  al 60 % con un halo blando, quieto, sin latido ni destello. El área de toque
+  dé cuenta y lo pulse»): sin plato ni fondo, sólo el dibujo de ~16 px en crema
+  al 60 % con un halo blando, quieto, sin latido ni destello. **Y el dibujo es
+  un rastro de la cosa, no un icono genérico** (Vera, mismo día: «no me gusta
+  el icono; la huella del animal … cada uno que tenga la suya»): la caza pinta
+  la huella de cada especie (`HUNT_TRACKS` en `app.ts`). La próxima señal busca
+  su equivalente: lo que la cosa deja en el mundo.
+- **Sólo se ofrece lo que se va a poder ver.** Si la cosa queda tapada (la
+  presa entre los árboles), la señal se apaga con un fundido de medio segundo y
+  no se puede tocar; vuelve cuando la cosa sale a la vista (Vera, 28 sep 2026:
+  «que desaparezca con transición cuando entra en un bosque… porque si no la
+  caza no se ve»). Se pregunta al bosque con `forest.hides(camera, punto)`. El área de toque
   sí es de dedo (36 px), invisible. Referencia: `redesign/hunt-sign.css`. Se esconde si la cosa sale de pantalla, con la
   pantalla despejada no, y con una hoja abierta sí.
 - **El toque**: llama a una sola función del renderer/backend (`startHunt`,

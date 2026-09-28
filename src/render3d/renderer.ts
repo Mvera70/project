@@ -108,6 +108,8 @@ import type { Physics } from './life/physics';
 const HANDHELD = { pixelRatio: 1.5, shadowMapSize: 1024 } as const;
 /** La señal de caza flota esta altura sobre la presa, en celdas. TUNE visual. */
 const HUNT_SIGN_LIFT = 0.9;
+/** Radio de la presa al preguntar si el bosque la tapa: poco, para que el borde del bosque no la esconda. */
+const HUNT_SIGN_COVER = 0.2;
 /** Quién puede salir de caza: adultos, ni niños ni viejos. TUNE. */
 const HUNTER_AGE = { min: 16, max: 60 } as const;
 /**
@@ -2272,7 +2274,7 @@ export async function createGraphicsRenderer(
       return true;
     },
     /** Dónde va la señal de caza en la pantalla, o `null` si no hay ocasión a la vista. */
-    huntSign(): { x: number; y: number; species: HuntSpecies } | null {
+    huntSign(): { x: number; y: number; species: HuntSpecies; hidden: boolean } | null {
       if (huntScene !== null || huntSighting === null || life === null) return null;
       const at = huntSighting.prey !== null
         ? { x: huntSighting.prey.body.x, z: huntSighting.prey.body.z }
@@ -2280,7 +2282,12 @@ export async function createGraphicsRenderer(
       if (at === null) return null;
       const point = new Vector3(at.x, groundFloor(at.x, at.z) + HUNT_SIGN_LIFT, at.z).project(camera);
       if (point.z > 1 || point.x < -1.05 || point.x > 1.05 || point.y < -1.05 || point.y > 1.05) return null;
-      return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, species: huntSighting.species };
+      // Entre los árboles no se ofrece: la caza que empezara ahí no se vería
+      // (Vera, 28 sep 2026). Se mide la presa a media altura, no la señal.
+      const hidden = forest !== null && forest.hides(camera, {
+        x: at.x, y: groundFloor(at.x, at.z) + ACTOR_VISUAL_HEIGHT / 2, z: at.z, radius: HUNT_SIGN_COVER,
+      });
+      return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, species: huntSighting.species, hidden };
     },
     attackHunt(precision?: number): boolean { return huntScene?.attack(precision) ?? false; },
     hunt(): HuntReport | null {

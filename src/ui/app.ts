@@ -487,13 +487,34 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   const huntSign = document.createElement('button');
   huntSign.type = 'button';
   huntSign.className = 'hunt-sign';
-  huntSign.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none"'
-    + ' stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
-    + '<path d="M5 3c9 2 12 8 14 18M5 3c-2 8 2 14 14 18M7 5l12 14"/></svg>';
   huntSign.hidden = true;
+  /**
+   * La huella de la presa, no un icono (Vera, 27 sep 2026: «no me gusta el
+   * icono; la huella del animal, por ejemplo»): el rastro dice qué hay sin
+   * nombrarlo. Cinco dibujos en 24 × 24, rellenos del color de la señal.
+   */
+  const HUNT_TRACKS: Record<HuntOpportunity['species'], string> = {
+    // Ave: tres dedos delante y uno atrás.
+    partridge: '<path d="M12 14V4.5M12 14 6.5 7.5M12 14l5.5-6.5M12 14v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    // Conejo: las dos patas largas delante, las dos cortas una tras otra.
+    rabbit: '<ellipse cx="8.5" cy="7" rx="1.9" ry="4"/><ellipse cx="15.5" cy="6.5" rx="1.9" ry="4"/>'
+      + '<ellipse cx="11" cy="15.5" rx="1.6" ry="2"/><ellipse cx="12.5" cy="20.5" rx="1.6" ry="2"/>',
+    // Ciervo: la pezuña partida, dos gotas alargadas.
+    deer: '<path d="M10.6 3.5c-2.4 3.2-3.4 8.4-2.1 13.4.6 2.2 3.4 2.1 3.5-.3.3-4.8-.2-9.6-1.4-13.1z"/>'
+      + '<path d="M13.4 3.5c2.4 3.2 3.4 8.4 2.1 13.4-.6 2.2-3.4 2.1-3.5-.3-.3-4.8.2-9.6 1.4-13.1z"/>',
+    // Jabalí: pezuña más ancha y corta, con los dos espolones detrás.
+    boar: '<path d="M10.2 5c-2.6 2.6-3.6 6.6-2.5 10.2.6 1.9 3.3 1.8 3.4-.3.2-3.7-.1-7.2-.9-9.9z"/>'
+      + '<path d="M13.8 5c2.6 2.6 3.6 6.6 2.5 10.2-.6 1.9-3.3 1.8-3.4-.3-.2-3.7.1-7.2.9-9.9z"/>'
+      + '<circle cx="6.8" cy="19.4" r="1.3"/><circle cx="17.2" cy="19.4" r="1.3"/>',
+    // Oso: la almohadilla ancha y cinco dedos.
+    bear: '<path d="M5.5 15.5c0-3.2 3-5.2 6.5-5.2s6.5 2 6.5 5.2-2.7 5.5-6.5 5.5-6.5-2.3-6.5-5.5z"/>'
+      + '<circle cx="5.3" cy="9.6" r="1.6"/><circle cx="8.4" cy="6.7" r="1.7"/><circle cx="12" cy="5.8" r="1.8"/>'
+      + '<circle cx="15.6" cy="6.7" r="1.7"/><circle cx="18.7" cy="9.6" r="1.6"/>',
+  };
+  let huntSignSpecies: HuntOpportunity['species'] | null = null;
   huntSign.addEventListener('click', () => {
     const offer = currentHuntOffer;
-    if (offer === null || huntInProgress || state.tick !== offer.tick || backend.live.kind !== 'pilot3d') return;
+    if (offer === null || huntSign.classList.contains('hunt-sign--covered') || huntInProgress || state.tick !== offer.tick || backend.live.kind !== 'pilot3d') return;
     const weapon = offer.weapons[hash32(state.seed, `hunt:weapon:${offer.tick}`) % offer.weapons.length]!;
     if (!backend.live.startHunt(state, offer.species, weapon)) return;
     huntSign.hidden = true;
@@ -510,6 +531,13 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     const box = backend.live.surface.getBoundingClientRect();
     huntSign.style.transform = `translate(${Math.round(box.left + at.x)}px, ${Math.round(box.top + at.y)}px) translate(-50%, -50%)`;
     huntSign.setAttribute('aria-label', renderUiText(`hunt.sign.${at.species}`));
+    // Dentro del bosque se apaga con un fundido y no se puede tocar.
+    huntSign.classList.toggle('hunt-sign--covered', at.hidden);
+    huntSign.tabIndex = at.hidden ? -1 : 0;
+    if (huntSignSpecies !== at.species) {
+      huntSignSpecies = at.species;
+      huntSign.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor">${HUNT_TRACKS[at.species]}</svg>`;
+    }
   };
 
   const hudRight = document.createElement('div');

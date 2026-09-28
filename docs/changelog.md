@@ -1,5 +1,17 @@
 # The Valley — Registro de cambios
 
+## v4.83 · 28 sep 2026 · La huella de la presa, y el bosque la esconde
+
+Vera, sobre la señal de caza: «no me gusta el icono; la huella del animal, por
+ejemplo… cada uno que tenga la suya». La señal es ahora la huella de su especie:
+perdiz (tres dedos), conejo, ciervo (pezuña partida), jabalí (con espolones) y
+oso (almohadilla y cinco dedos), en `HUNT_TRACKS` de `src/ui/app.ts`, igual de
+pequeña y difusa. Y «que desaparezca con transición cuando entra en un bosque…
+porque si no la caza no se ve»: el bosque contesta `hides(camera, punto)` con
+la misma oclusión que ya atenúa árboles en el asalto, y si la presa queda tapada
+la huella se apaga en medio segundo y no se toca. La regla queda en la skill
+`senales-en-el-mapa`: sólo se ofrece lo que se va a poder ver.
+
 ## v4.82 · 27 sep 2026 · La caza, una señal en el mapa
 
 Vera, tras tres versiones de la caza en un día (un botón, una tarjeta, unos

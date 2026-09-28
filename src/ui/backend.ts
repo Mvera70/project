@@ -61,7 +61,7 @@ interface ValleyBackend {
   startHunt(state: Readonly<GameState>, species: HuntSpecies, weapon: HuntWeapon): boolean;
   attackHunt(precision?: number): boolean;
   /** Dónde va la señal de caza en la pantalla, o `null`. */
-  huntSign(): { x: number; y: number; species: HuntSpecies } | null;
+  huntSign(): { x: number; y: number; species: HuntSpecies; hidden: boolean } | null;
   /** Completed hunt report, consumed once by the UI and forwarded to the engine. */
   hunt(): { sourceTick: number; species: HuntSpecies; weapon: HuntWeapon; hits: number; killed: boolean } | null;
   /**
