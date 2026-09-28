@@ -486,7 +486,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   };
   const huntSign = document.createElement('button');
   huntSign.type = 'button';
-  huntSign.className = 'hunt-sign skin-plate skin-plate--round';
+  huntSign.className = 'hunt-sign';
   huntSign.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none"'
     + ' stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
     + '<path d="M5 3c9 2 12 8 14 18M5 3c-2 8 2 14 14 18M7 5l12 14"/></svg>';
@@ -508,7 +508,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     huntSign.hidden = at === null;
     if (at === null) return;
     const box = backend.live.surface.getBoundingClientRect();
-    huntSign.style.transform = `translate(${Math.round(box.left + at.x)}px, ${Math.round(box.top + at.y)}px) translate(-50%, -100%)`;
+    huntSign.style.transform = `translate(${Math.round(box.left + at.x)}px, ${Math.round(box.top + at.y)}px) translate(-50%, -50%)`;
     huntSign.setAttribute('aria-label', renderUiText(`hunt.sign.${at.species}`));
   };
 

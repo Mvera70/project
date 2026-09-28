@@ -1,18 +1,21 @@
-/* La señal de caza (`app.ts`, skill `senales-en-el-mapa`): un redondo pequeño
-   de madera y latón encima de la presa, que la sigue fotograma a fotograma.
-   Se coloca con `transform` desde la esquina de la página; sin transición,
-   porque va pegado a algo que se mueve. Late despacio para que se vea en un
-   valle lleno de cosas sin gritar. */
+/* La señal de caza (`app.ts`, skill `senales-en-el-mapa`): encima de la presa,
+   siguiéndola fotograma a fotograma.
+
+   **Pequeña y difusa, a propósito** (Vera, 27 sep 2026: «tiene que ser
+   pequeñita y difusa; que no sea algo que parpadee para que se dé cuenta, pero
+   que no se vea mucho. La gracia es que él se dé cuenta y lo pulse»). Así que:
+   sin plato de madera, sólo el trazo en crema, medio transparente, con un halo
+   blando que lo separa del prado sin gritar, y quieto. El área de toque sí es
+   de dedo (36 px), pero invisible. */
 .hunt-sign {
   position: fixed; left: 0; top: 0; z-index: 28;
-  width: 34px; height: 34px; min-width: 34px; min-height: 34px; padding: 0;
-  border-radius: 50%; display: grid; place-items: center; cursor: pointer;
-  color: var(--skin-ink, #2b1a0e);
+  width: 36px; height: 36px; padding: 0; border: 0; background: transparent;
+  display: grid; place-items: center; cursor: pointer;
+  color: #fbf4e2; opacity: .62;
+  filter: drop-shadow(0 0 3px rgba(40, 30, 18, .55));
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
 .hunt-sign[hidden] { display: none; }
-.hunt-sign svg { width: 20px; height: 20px; animation: hunt-sign-beat 1.6s ease-in-out infinite; }
-/* Un área de toque de dedo alrededor del redondo pequeño. */
-.hunt-sign::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; }
-@keyframes hunt-sign-beat { 50% { transform: scale(1.12); } }
-@media (prefers-reduced-motion: reduce) { .hunt-sign svg { animation: none; } }
+.hunt-sign svg { width: 15px; height: 15px; }
+.hunt-sign:hover, .hunt-sign:focus-visible { opacity: .95; }
+.hunt-sign:focus-visible { outline: 1px solid rgba(251, 244, 226, .7); outline-offset: -8px; border-radius: 50%; }

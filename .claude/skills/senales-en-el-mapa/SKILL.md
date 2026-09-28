@@ -62,9 +62,12 @@ es ver la ocasión a tiempo.
 ## Cómo se construye una mecánica así
 
 - **El icono**: un elemento de la capa de interfaz posicionado cada fotograma
-  sobre la proyección en pantalla de la cosa (su posición 3D más una altura), con
-  el mismo lenguaje que los redondos del valle (`skin-plate--round`, pequeño,
-  ~34 px) y un pictograma propio. Se esconde si la cosa sale de pantalla, con la
+  sobre la proyección en pantalla de la cosa (su posición 3D más una altura).
+  **Pequeño y difuso**, que es la gracia (Vera: «pequeñito y difuso, que no
+  parpadee para que se dé cuenta, que no se vea mucho; la gracia es que él se
+  dé cuenta y lo pulse»): sin plato ni fondo, sólo el trazo de ~15 px en crema
+  al 60 % con un halo blando, quieto, sin latido ni destello. El área de toque
+  sí es de dedo (36 px), invisible. Referencia: `redesign/hunt-sign.css`. Se esconde si la cosa sale de pantalla, con la
   pantalla despejada no, y con una hoja abierta sí.
 - **El toque**: llama a una sola función del renderer/backend (`startHunt`,
   `startX`…) que elige al aldeano (el adulto libre más cercano), monta la escena
