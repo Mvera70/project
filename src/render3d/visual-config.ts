@@ -126,8 +126,13 @@ export const SUN_SHADOW = {
   farMultiplier: 4,
   bias: -0.0002,
   normalBias: 0.02,
-  /** Cada cuántos grados de sol se reorienta la cámara de sombra. A ×1, un grado es medio segundo. */
-  stepDegrees: 1,
+  /**
+   * Cada cuántos grados de sol se reorienta la cámara de sombra. Con 1 (medio
+   * segundo a ×1) Vera vio «un tic al moverse la sombra», así que 0: gira de
+   * forma continua y la sombra se desliza. Lo que quitaba el temblor no era el
+   * paso, era no ajustar el centro a una rejilla que gira (`stabilizeSunShadow`).
+   */
+  stepDegrees: 0,
   /** El alcance de la cámara de sombra sube en escalones de tantas celdas. */
   reachStep: 4,
   /** Radio del filtro PCF en texeles: suaviza el escalón del borde sin emborronar. */

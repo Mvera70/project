@@ -1,5 +1,18 @@
 # The Valley — Registro de cambios
 
+## v4.92 · 28 sep 2026 · La sombra se desliza: el sol continuo y la rejilla del mundo
+
+Vera, con las sombras por pasos de un grado (v4.90): «se nota un tic al
+moverse la sombra del sol». Así que el sol de la sombra vuelve a girar de forma
+continua (`stepDegrees` 0) y lo que se queda es la otra mitad de la cura, que
+era la que quitaba el temblor: **el centro de la cámara de sombra se alinea a la
+rejilla del mundo, no a la de la luz**. Alinearlo a una rejilla que giraba con el
+sol lo hacía saltar media texela en una dirección al azar en cada fotograma
+—el «para un lado, para otro»—; con la rejilla fija sólo se mueve cuando se
+mueve la vista, y el giro del sol desliza cada borde una fracción de texela
+por fotograma, que con el filtro PCF de 1,5 texelas es un deslizamiento. El
+paso queda como cifra por si hace falta (`SUN_SHADOW.stepDegrees`).
+
 ## v4.91 · 28 sep 2026 · El alba y el ocaso tiñen el valle
 
 Vera: «la luz tiene que ser realista, rollo amanecer, atardecer y la sombra que

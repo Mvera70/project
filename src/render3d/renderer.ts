@@ -355,11 +355,15 @@ export async function createGraphicsRenderer(
   // mirando la aldea. El volumen sigue a lo visible con margen para los
   // proyectores que quedan justo fuera, y su centro se alinea a la cuadrícula
   // del mapa de sombras. Así pan y zoom no hacen nadar la proyección entre
-  // texels. **Y el rumbo del sol va por pasos** (28 sep 2026,
-  // `effects/sun-steps.ts`): con la base girando en cada fotograma, alinear el
-  // centro a una rejilla que gira no fijaba nada, y cada rasterización caía en
-  // otros texeles —el parpadeo que Vera llevaba tiempo viendo—. Entre pasos la
-  // cámara de sombra es la misma y lo quieto rasteriza igual.
+  // texels. **Y el centro se alinea a la rejilla del mundo, no a la de la
+  // luz** (28 sep 2026): alinearlo a una rejilla que gira con el sol lo hacía
+  // saltar media texela en una dirección al azar en cada fotograma —el temblor
+  // «para un lado, para otro» que Vera llevaba tiempo viendo—. Con la rejilla
+  // fija el centro sólo se mueve cuando la vista se mueve, y el giro del sol
+  // desliza cada borde una fracción de texela por fotograma, que con el filtro
+  // es un deslizamiento y no un tic. El rumbo puede ir por pasos
+  // (`SUN_SHADOW.stepDegrees`, `effects/sun-steps.ts`); con un grado Vera vio
+  // el tic, así que va continuo.
   const shadowFocus = new Vector3();
   const shadowStepped = new Vector3(Number.NaN, 0, 0);
   // Para la sonda: cuántas veces se ha reorientado la cámara de sombra y
@@ -367,10 +371,6 @@ export async function createGraphicsRenderer(
   const shadowStats = { moves: 0, redraws: 0, frames: 0 };
   const shadowSnapped = new Vector3();
   const shadowDirection = new Vector3();
-  const shadowForward = new Vector3();
-  const shadowRight = new Vector3();
-  const shadowUp = new Vector3();
-  const worldUp = new Vector3(0, 1, 0);
   // Dónde estaba la cámara de sombra la última vez que se rehízo el mapa.
   const shadowDrawnAt = new Vector3(Number.NaN, 0, 0);
   let shadowDrawnReach = 0;
@@ -413,21 +413,12 @@ export async function createGraphicsRenderer(
     const texel = (reach * 2) / shadowSize;
 
     // `direction` va del objetivo hacia el sol; la cámara de sombra mira en
-    // sentido contrario. La base sólo gira cuando el sol se ha movido un paso
-    // entero; entre pasos es la misma, y el centro sólo puede ocupar
-    // coordenadas enteras de texel en ella.
+    // sentido contrario. El centro sólo puede ocupar coordenadas enteras de
+    // texela en la rejilla del mundo, que no gira con el sol.
     if (stepSun(shadowStepped, direction, SUN_SHADOW.stepDegrees)) shadowStats.moves += 1;
     shadowDirection.set(shadowStepped.x, Math.max(0.35, shadowStepped.y), shadowStepped.z).normalize();
-    shadowForward.copy(shadowDirection).multiplyScalar(-1);
-    shadowRight.crossVectors(shadowForward, worldUp).normalize();
-    shadowUp.crossVectors(shadowRight, shadowForward).normalize();
-    const rightStep = Math.round(shadowFocus.dot(shadowRight) / texel) * texel
-      - shadowFocus.dot(shadowRight);
-    const upStep = Math.round(shadowFocus.dot(shadowUp) / texel) * texel
-      - shadowFocus.dot(shadowUp);
-    shadowSnapped.copy(shadowFocus)
-      .addScaledVector(shadowRight, rightStep)
-      .addScaledVector(shadowUp, upStep);
+    shadowSnapped.set(
+      Math.round(shadowFocus.x / texel) * texel, 0, Math.round(shadowFocus.z / texel) * texel);
 
     const mapRadius = Math.hypot(mapWidth, mapHeight) / 2 + 1;
     sun.target.position.copy(shadowSnapped);

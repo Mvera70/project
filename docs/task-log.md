@@ -7,9 +7,11 @@
 `visual-config.ts` (`SUN_SHADOW.stepDegrees` 1, `reachStep` 4, `radius` 1,5).
 `effects/daylight.ts` (`SKY_DAWN`, `morning`, rebote cálido). Pruebas:
 `sun-steps.test.ts`, `daylight-glow.test.ts`. Herramienta nueva en el catálogo:
-`performance/shadow-flicker.mjs`. **Abierto:** que Vera mire en la tablet si el
-paso de un grado (dos ticks por segundo) se nota como tirón; si sí, subir a 2°
-(uno por segundo) o bajar a 0,5°. Y si el tinte del alba le parece poco o mucho.
+`performance/shadow-flicker.mjs`. Vera vio el tic del paso de un grado, así que
+v4.92: sol continuo (`stepDegrees` 0) y el centro alineado a la rejilla del
+mundo, que es lo que quitaba el temblor. **Abierto:** que Vera confirme en la
+tablet que la sombra se desliza sin temblar; y si el tinte del alba le parece
+poco o mucho.
 
 ## 28 sep 2026 · Las pisadas (v4.89)
 
