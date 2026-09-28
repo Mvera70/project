@@ -116,7 +116,11 @@ describe('V-14 · el valle', () => {
     // Sin índices desde la sierra facetada (26 sep 2026): cada cara lleva su
     // propio color, así que cada tres vértices son un triángulo.
     const triangles = (ridge.geometry.getIndex()?.count ?? position.count) / 3;
-    expect(triangles, `la malla exterior tiene ${triangles} triángulos`).toBeLessThan(16_000);
+    // 16 000 hasta el 28 sep 2026; la sierra lejana pasó de cuadros de seis
+    // celdas a cuatro para que desde arriba no se leyeran bloques (18 268 en
+    // la semilla 7). Sigue siendo una malla y una llamada: esto vigila que no
+    // se vuelva una montaña por celda, no el presupuesto de la tablet.
+    expect(triangles, `la malla exterior tiene ${triangles} triángulos`).toBeLessThan(20_000);
     expect(ridge.geometry.getAttribute('color'), 'el color va por vértice').toBeDefined();
     // Y ningún vértice de dentro del valle se despega del suelo: el suelo de
     // siempre es quien pinta el interior, y dos superficies a distinta altura en

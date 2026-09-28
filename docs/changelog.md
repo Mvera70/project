@@ -1,5 +1,20 @@
 # The Valley — Registro de cambios
 
+## v4.87 · 28 sep 2026 · La sierra vista desde arriba
+
+Vera, con siete capturas desde la vista más alta: «las montañas que tenemos
+ahora han quedado bastante bien; hay una única cosa que me disgusta: desde
+arriba se ven muy raras, una serie de picos muy feos, muy poco naturales». No
+era la forma, era la malla (`world/ridge.ts`): una rejilla recta en la que todos
+los cuadros se partían por la misma diagonal —en las laderas empinadas, filas de
+triángulos largos e iguales, dientes de sierra con la luz facetada— y, lejos del
+valle, cuadros de seis celdas que se leían como bloques. Ahora cada cuadro se
+parte por la diagonal que sigue la ladera (la de menos diferencia de altura),
+los vértices lejos del empalme se apartan un poco de su nudo (con la altura
+recalculada en el punto movido: la montaña es la misma) y la franja lejana va
+de cuatro en cuatro. Comparado con la misma cámara antes y después. De 16 000 a
+un tope de 20 000 triángulos en la prueba de la sierra (18 268): una llamada.
+
 ## v4.86 · 28 sep 2026 · La hierba del valle
 
 Vera: «implementar un césped, hierba, rastrojos… algo parecido a la hierba de

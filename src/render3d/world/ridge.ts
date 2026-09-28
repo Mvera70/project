@@ -55,6 +55,24 @@ const PEAK = 19;
 const STRIDE = 2;
 
 /**
+ * Y lejos del valle. Eran 6, y desde la vista más alta se leían **bloques
+ * rectos** de seis por seis (Vera, 28 sep 2026: «desde arriba las montañas se
+ * ven muy raras, una serie de picos muy feos, muy poco naturales»). Con 4, la
+ * sierra pasa de unos 14 000 a 18 268 triángulos (semilla 7) en la misma llamada
+ * de dibujo; con 3 eran 24 652 y no se veía más limpia.
+ */
+const FAR_STRIDE = 4;
+
+/**
+ * Cuánto se aparta cada vértice de su nudo de la rejilla, en fracción del paso,
+ * lejos del borde del mapa. La altura se recalcula en el punto movido, así que
+ * la montaña es la misma; lo que cambia es que la rejilla deja de leerse.
+ */
+const JITTER = 0.42;
+/** Hasta dónde, desde el borde del mapa, la sierra se queda en su rejilla (el empalme). */
+const JITTER_SEAM = 4;
+
+/**
  * Una textura mineral muy pequeña, creada una sola vez al montar la sierra.
  * El dibujo mezcla grano, vetas horizontales y manchas amplias. Es deliberadamente
  * casi gris para que la estación siga mandando a través del color por vértice.
@@ -266,13 +284,13 @@ export function buildRidge(map: ValleyMap, seed: number, palette: Palette = PALE
   // Tres celdas a cada lado del empalme tienen paso uno; lejos, dos y seis.
   const axis = (size: number): number[] => {
     const values = new Set<number>([0, size, -SKIRT, size + SKIRT]);
-    for (let at = -SKIRT; at <= -12; at += 6) values.add(at);
+    for (let at = -SKIRT; at <= -12; at += FAR_STRIDE) values.add(at);
     for (let at = -12; at <= -3; at += STRIDE) values.add(at);
     for (let at = -3; at <= 3; at += 1) values.add(at);
     for (let at = 3; at <= size - 3; at += STRIDE) values.add(at);
     for (let at = size - 3; at <= size + 3; at += 1) values.add(at);
     for (let at = size + 3; at <= size + 12; at += STRIDE) values.add(at);
-    for (let at = size + 12; at <= size + SKIRT; at += 6) values.add(at);
+    for (let at = size + 12; at <= size + SKIRT; at += FAR_STRIDE) values.add(at);
     return [...values].sort((a, b) => a - b);
   };
   const xs = axis(map.width), zs = axis(map.height);
@@ -284,8 +302,18 @@ export function buildRidge(map: ValleyMap, seed: number, palette: Palette = PALE
 
   for (let row = 0; row < rows; row += 1) {
     for (let col = 0; col < cols; col += 1) {
-      const x = xs[col]!;
-      const z = zs[row]!;
+      // Lejos del empalme el vértice se aparta de su nudo, un poco y siempre
+      // igual para la misma semilla: con la rejilla recta, las laderas
+      // empinadas salían en filas de triángulos iguales.
+      const gx = xs[col]!;
+      const gz = zs[row]!;
+      const away = Math.hypot(Math.max(0, -gx, gx - map.width), Math.max(0, -gz, gz - map.height));
+      const edgeCol = col === 0 || col === cols - 1, edgeRow = row === 0 || row === rows - 1;
+      const spanX = Math.min(xs[Math.min(cols - 1, col + 1)]! - gx || Infinity, gx - xs[Math.max(0, col - 1)]! || Infinity);
+      const spanZ = Math.min(zs[Math.min(rows - 1, row + 1)]! - gz || Infinity, gz - zs[Math.max(0, row - 1)]! || Infinity);
+      const loose = away > JITTER_SEAM ? Math.min(1, (away - JITTER_SEAM) / 4) : 0;
+      const x = edgeCol ? gx : gx + (hash32(seed, `ridge-jx:${col}:${row}`) / 4_294_967_296 - 0.5) * JITTER * spanX * loose;
+      const z = edgeRow ? gz : gz + (hash32(seed, `ridge-jz:${col}:${row}`) / 4_294_967_296 - 0.5) * JITTER * spanZ * loose;
       const y = ridgeAt(map, seed, x, z);
       const pointAt = (row * cols + col) * 3;
       points[pointAt] = x;
@@ -368,7 +396,16 @@ export function buildRidge(map: ValleyMap, seed: number, palette: Palette = PALE
         faces.push(a, c, middle, middle, c, b, b, c, d);
         continue;
       }
-      faces.push(a, c, b, b, c, d);
+      // **La diagonal que sigue la ladera**: la de menos diferencia de altura
+      // entre sus puntas. Partir siempre por la misma dejaba, en las laderas
+      // empinadas, filas de triángulos largos y finos que desde arriba eran
+      // dientes de sierra.
+      const height = (index: number): number => points[index * 3 + 1]!;
+      if (Math.abs(height(a) - height(d)) < Math.abs(height(b) - height(c))) {
+        faces.push(a, c, d, a, d, b);
+      } else {
+        faces.push(a, c, b, b, c, d);
+      }
     }
   }
 

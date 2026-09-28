@@ -1,5 +1,13 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · La sierra vista desde arriba (v4.87)
+
+`world/ridge.ts`: diagonal por ladera, vértices apartados lejos del empalme
+(`JITTER`, `JITTER_SEAM`) y `FAR_STRIDE` 4. Comparado en local con la misma
+cámara (semilla 11, año 1, vista más alta). **Abierto:** la piel de montaña de
+dentro del mapa (`mountains.ts`, `buildMountainSkin`) alterna la diagonal en
+damero; si Vera sigue viendo picos dentro del valle, es ella.
+
 ## 28 sep 2026 · La hierba del valle (v4.86)
 
 `world/grass.ts` (+ `renderer.ts`: `createGrass`, replantar una vez por semana
