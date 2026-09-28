@@ -9,7 +9,7 @@
 // Nadie más define estos tipos: un consumidor que necesite otra ruta reabre
 // §11.2 con el coordinador en vez de añadirla en silencio (UI-R0 §8).
 
-import type { ArchivedGame, GameState, MeansId, VillagerId } from '@engine/state';
+import type { ArchivedGame, GameState, MeansId, MissionId, VillagerId } from '@engine/state';
 import type { InspectTarget } from '../inspect';
 import type { Speed } from '../speed';
 import type { ActorDoing } from '../../render3d/contracts';
@@ -31,7 +31,11 @@ export type SheetRoute =
   // gustan para nada»), y lo que ocupa su sitio es lo que el jugador puede
   // **dar** al valle. Sigue siendo una ruta y no una superposición: se abre
   // desde el valle y se sale por la barra, como las órdenes.
-  | { kind: 'cart' };
+  | { kind: 'cart' }
+  // §7.13 · **el tablón de misiones.** Es la primera ventana que abre un
+  // objeto del valle al tocarlo, y no es una hoja: se monta encima del valle
+  // (`board.ts`), que sigue a la vista detrás.
+  | { kind: 'board' };
 
 /**
  * Lo único que un panel puede pedirle a la aplicación.
@@ -75,6 +79,12 @@ export interface UiActions {
    * repite para pintarse.
    */
   crown(who: VillagerId): void;
+  /**
+   * §7.13 · **Mandar gente del tablón.** El jugador dice cuántos; quiénes, la
+   * aldea (`engine/world/expeditions.ts`). Como `give`, no comprueba nada: lo
+   * decide el motor.
+   */
+  expedition(mission: MissionId, count: number): void;
 }
 
 /**

@@ -34,6 +34,7 @@ import { creditWoodRun } from '@engine/subsistence/wood-run';
 import { hash32 } from '@engine/rng';
 import { createInspectPanel } from './redesign/inspect-panel';
 import { cartPanel } from './redesign/cart';
+import { boardPanel } from './redesign/board';
 import { peoplePanel } from './redesign/people-panel';
 import { createShell } from './redesign/shell';
 import type { SheetRoute, UiActions, UiPanel, UiSnapshot } from './redesign/contracts';
@@ -284,6 +285,7 @@ export function boot(
     // cada navegación es lo que impide que se quede pegada al abrir otra cosa
     // justo después.
     shell.content.replaceChildren();
+    board.element.remove();
     shell.setRoute(route);
     if (route.kind === 'chronicle') {
       // UI-R3/UI-R5 · migrada de verdad a `shell.content`. Hasta UI-R5,
@@ -318,6 +320,10 @@ export function boot(
       // M-2 · `shell.content` ya ha quedado vacía arriba: es seguro montar aquí.
       shell.content.append(cart.element);
       cart.update(snapshot());
+    } else if (route.kind === 'board') {
+      // §7.13 · la ventana del tablón, encima del valle y fuera de la bandeja.
+      shell.element.append(board.element);
+      board.update(snapshot());
     }
   }
   /** Lo que cualquier `UiPanel` necesita para pintarse (`contracts.ts`). */
@@ -352,6 +358,11 @@ export function boot(
     // aldea decide qué hacer con ello. Aquí lo que da es **a alguien**.
     crown(who): void {
       pendingActs.push({ kind: 'crown', who });
+      if (speed !== 0) { runTick(); paint(lastFraction); }
+    },
+    // §7.13 · mandar gente del tablón: la misma cola de actos que un medio.
+    expedition(mission, count): void {
+      pendingActs.push({ kind: 'expedition', mission, count });
       if (speed !== 0) { runTick(); paint(lastFraction); }
     },
     setSpeed(value): void { app.setSpeed(value); },
@@ -404,6 +415,7 @@ export function boot(
   // navegación porque lleva un `target` distinto cada vez (ver `navigate`).
   const hud = createHud(actions, () => currentRoute);
   const cart = cartPanel(actions);
+  const board = boardPanel(actions);
   // UI-R3/UI-R4 · la crónica y la lista de la gente, migradas a
   // `shell.content` (ver el comentario de `navigate`, arriba). Igual que
   // `orders`: se crean una vez y su `element` se monta/desmonta de la
@@ -837,6 +849,7 @@ export function boot(
     // entrar — pero un panel no debe fiarse de que nadie más vaya a tocar el
     // estado mientras está montado.
     if (currentRoute.kind === 'cart') cart.update(snapshot());
+    else if (currentRoute.kind === 'board') board.update(snapshot());
     // UI-R3 · la crónica lee entradas nuevas mientras está abierta —a
     // diferencia de la vieja `openChronicle`, que pintaba una vez y no volvía
     // a mirar el estado—; `chroniclePanel.update` decide sola cuándo de
@@ -1180,6 +1193,8 @@ export function boot(
       // nada»: abrir una ficha del prado con la anterior detrás era lo que
       // hacía que la selección no tuviera salida.
       if (target === null || target.kind === 'terrain') actions.navigate({ kind: 'valley' });
+      // §7.13 · el tablón de la plaza abre su propia ventana, no una ficha.
+      else if (target.kind === 'board') actions.navigate({ kind: 'board' });
       else {
         actions.navigate({ kind: 'inspect', target, from: 'valley' });
         if (gesture === 'hold' && target.kind === 'villager') actions.track(target.id);

@@ -577,6 +577,16 @@ export const FATE = {
     ale_feast: 0,
     pig_slaughter: 1.5,
     rats_in_the_granary: 2,
+    // TUNE: más gente por el camino (28 sep 2026). El forastero pesa 1 y es
+    // el listón de «alguien pasa»; el juglar y el calderero, lo mismo; los
+    // peregrinos piden capilla, así que salen menos solos; la curandera es
+    // rara salvo con peste (`WISE_WOMAN_PLAGUE`), y la familia que huye es la
+    // más rara porque se queda. Medir con `tools/reports/fate-report.ts`.
+    minstrel: 1,
+    pilgrims: 0.8,
+    tinker: 1,
+    wise_woman: 0.5,
+    refugees: 0.4,
   },
   // La fiesta de la cosecha no es suerte: si hay grano y hay gente, la semana
   // después de la siega se celebra. Medido sin esto: una vez cada veinte años,
@@ -627,6 +637,29 @@ export const FATE = {
   // TUNE: un niño perdido y encontrado, y un forastero que pasa.
   CHILD_MORALE: -3,
   STRANGER_MORALE: 1,
+  // TUNE: los que llegan por el camino (28 sep 2026). Escala: una boda da 5 de
+  // ánimo y el forastero 1; el buhonero se lleva 80 de leña por 6 de plata.
+  // El juglar anima menos que una boda y cobra lo que el forastero paga.
+  MINSTREL_MORALE: 3,
+  MINSTREL_SILVER: 2,
+  // Los peregrinos: fe, y la limosna de grano que se llevan.
+  PILGRIM_FAITH: 3,
+  PILGRIM_ALMS: 4,
+  // El calderero afila las hachas: la leña de unos días de tala, por su plata.
+  TINKER_WOOD: 20,
+  TINKER_SILVER: 2,
+  // La curandera: con peste, la acorta estas semanas; sin ella, ánimo. Y con
+  // peste pesa este múltiplo: la llaman.
+  WISE_WOMAN_WEEKS: 2,
+  WISE_WOMAN_MORALE: 2,
+  WISE_WOMAN_PLAGUE: 6,
+  // La familia que huye: dos adultos y una criatura, y la fe de quien acoge.
+  // No llega a una aldea que no tiene grano para un mes de tres bocas.
+  REFUGEE_ADULT_AGE: 27,
+  REFUGEE_CHILD_AGE: 6,
+  REFUGEE_FAITH: 2,
+  REFUGEE_MIN_GRAIN: 30,
+  REFUGEE_MIN_PEOPLE: 6,
   // ---------------------------------------------------------------------------
   // M-1 · **El mundo contesta a lo que hay.** `docs/historico/rework.md` §4b.
   //
@@ -742,6 +775,13 @@ export const OFFER = {
     factor_visit: 48,
     drover_visit: 48,
     salt_visit: 96,
+    // TUNE: los que llegan sin oferta (28 sep 2026): el juglar, como el
+    // buhonero, cada medio año como mucho; la familia que huye, cada dos.
+    minstrel: 24,
+    pilgrims: 36,
+    tinker: 36,
+    wise_woman: 48,
+    refugees: 96,
   },
 } as const;
 
@@ -1582,6 +1622,59 @@ export const FORAGE = {
 } as const;
 
 /** Cacerías observables: encuentros escasos sobre la subsistencia semanal. */
+/**
+ * §7.13 · Las expediciones del tablón de la plaza (28 sep 2026).
+ *
+ * TUNE, todas, y **sin nivelar**: el nivelado es del dueño y va al final. Lo
+ * que fija cada cifra es su escala con lo que ya hay, escrita al lado. Una
+ * persona come 1 de grano a la semana (`FOOD.GRAIN_PER_PERSON`); un ciervo
+ * cazado da 8 (`HUNT.meat`); el arado cuesta 20 de plata y el buhonero paga 6.
+ */
+export const EXPEDITION = {
+  // Adultos que se quedan en casa como poco: nunca se vacía la aldea.
+  MIN_HOME: 2,
+  // Ánimo por cada uno que no vuelve (una muerte de la tabla quita 1,5).
+  GRIEF: -3,
+  // Ni la mejor expedición es segura.
+  MAX_SUCCESS: 0.95,
+  MISSIONS: {
+    // Setas en el bosque: cerca, gratis, casi segura. Cada uno trae la comida
+    // de tres semanas de una persona.
+    mushrooms: {
+      where: 'forest', people: [1, 3], weeks: 1, silver: 0, minPeople: 3,
+      seasons: ['summer', 'autumn'], success: 0.8, perExtra: 0.05, death: 0, cause: 'mishap',
+      reward: { grain: 3 }, perHead: true, roles: ['herbalist', 'woodward'],
+    },
+    // Hierbas del monte bajo: ánimo y fe, y un resbalón de vez en cuando.
+    herbs: {
+      where: 'forest', people: [1, 2], weeks: 1, silver: 0, minPeople: 6,
+      seasons: ['spring', 'summer'], success: 0.7, perExtra: 0.1, death: 0.01, cause: 'mishap',
+      reward: { morale: 4, faith: 2 }, perHead: false, roles: ['herbalist', 'midwife'],
+    },
+    // La lobera de la sierra: lanzas (la plata) y gente. Si sale, carne y
+    // ánimo; los lobos muerden.
+    wolf_den: {
+      where: 'mountain', people: [2, 5], weeks: 2, silver: 5, minPeople: 12,
+      seasons: ['spring', 'summer', 'autumn'], success: 0.45, perExtra: 0.1, death: 0.1, cause: 'violence',
+      reward: { grain: 16, morale: 6 }, perHead: false, roles: ['woodward'],
+    },
+    // La veta alta: cuerdas y picos (la plata), tres semanas en la roca. Si
+    // sale, piedra y mineral que se vende; la montaña se lleva a alguno.
+    high_seam: {
+      where: 'mountain', people: [2, 4], weeks: 3, silver: 8, minPeople: 16,
+      seasons: ['spring', 'summer', 'autumn'], success: 0.5, perExtra: 0.1, death: 0.08, cause: 'mishap',
+      reward: { stone: 40, silver: 12 }, perHead: false, roles: ['smith'],
+    },
+    // El mercado del otro valle: se lleva mercancía (la plata) por el camino y
+    // se vuelve con más, si el camino es bueno.
+    market: {
+      where: 'road', people: [2, 3], weeks: 4, silver: 15, minPeople: 20,
+      seasons: ['spring', 'summer', 'autumn'], success: 0.65, perExtra: 0.1, death: 0.04, cause: 'violence',
+      reward: { silver: 36 }, perHead: false, roles: ['reeve', 'stranger'],
+    },
+  },
+} as const;
+
 export const HUNT = {
   // TUNE: probabilidad semanal sobre cien cuando la especie ya está abierta.
   chance: { partridge: 70, rabbit: 48, deer: 18, boar: 12, bear: 0 },

@@ -1,0 +1,216 @@
+// §7.13 · La ventana del tablón de misiones (28 sep 2026).
+//
+// Vera: «al pulsar sobre el cartel se abrirá un pop up de una pantalla
+// imitando una UI de un cartel de madera. Esta mecánica de tener objetos que al
+// pulsar abren un menú de UI del objeto relacionado será como lo haremos con
+// muchas cosas, así no invadimos la UI hasta que pulsamos».
+//
+// **La madera significa «aquí se decide algo»** (opción B1 de
+// https://claude.ai/artifact/CJ4i9oGim8mQZnJ6s7RPxT): la ventana es un tablón
+// con avisos de pergamino clavados, uno por misión, con cuántos van (− y +) y
+// el botón verde de actuar de toda la piel. Lo que sólo se lee no se viste así.
+//
+// El jugador dice **cuántos**; quiénes, la aldea (`engine/world/expeditions.ts`).
+// El panel no decide si se puede: repite lo que dice el motor (`missionsOpen`)
+// para pintarse, con el motivo escrito cuando no.
+
+import { renderUiText } from '@engine/chronicle/render';
+import { TIME } from '@engine/balance';
+import type { MissionId } from '@engine/state';
+import { missionsOpen, outNow, type MissionOpen } from '@engine/world/expeditions';
+import type { UiActions, UiPanel, UiSnapshot } from './contracts';
+
+const STYLE_ID = 'valley-board-style';
+
+const CSS = `
+.valley-board-veil { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
+  padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px));
+  background: rgba(20, 12, 6, .42); animation: valley-board-in .18s ease-out; }
+@keyframes valley-board-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .valley-board-veil { animation: none; } }
+.valley-board { position: relative; width: min(100%, 390px); max-height: min(82vh, 640px); overflow-y: auto;
+  display: flex; flex-direction: column; gap: 12px; padding: 44px 14px 16px; border-radius: 6px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 62px, rgba(0,0,0,.32) 62px 64px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 3px, transparent 3px 9px),
+    linear-gradient(var(--wood-plank-lit), var(--wood-plank) 40%, #5a371f);
+  border: 3px solid var(--wood-plank-deep);
+  box-shadow: 0 18px 40px rgba(0,0,0,.55), inset 0 0 0 2px rgba(201,162,74,.35); }
+.valley-board-title { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); margin: 0;
+  padding: 7px 16px; border-radius: 2px; background: var(--card); color: var(--skin-ink);
+  box-shadow: 0 2px 0 var(--wood-plank-deep); white-space: nowrap;
+  font: 700 13px/1 var(--skin-font-display); letter-spacing: .18em; text-transform: uppercase; }
+.valley-board-close { position: absolute; right: 8px; top: 6px; width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid var(--brass); cursor: pointer; font-size: 0; color: transparent;
+  background: radial-gradient(circle at 35% 30%, #a8402f, var(--lacquer) 55%, var(--lacquer-deep)); }
+.valley-board-close::after { content: '×'; display: grid; place-items: center; height: 100%;
+  color: var(--card); font: 700 22px/1 var(--skin-font-voice); }
+.valley-note { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 12px 12px 11px;
+  background: var(--card); color: var(--skin-ink); border-radius: 1px; box-shadow: 0 3px 6px rgba(0,0,0,.4); }
+.valley-note:nth-of-type(odd) { transform: rotate(-.8deg); }
+.valley-note:nth-of-type(even) { transform: rotate(.6deg); }
+.valley-note::before { content: ''; position: absolute; left: 50%; top: -4px; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--wood-nail); }
+.valley-note-name { margin: 0; font: 700 14px/1.2 var(--skin-font-display); letter-spacing: .04em; }
+.valley-note-what { margin: 0; color: var(--skin-ink-faded); font: italic 400 15px/1.35 var(--skin-font-voice); }
+.valley-note-facts { margin: 0; color: var(--skin-ink-soft); font: 600 14px/1.3 var(--skin-font-voice);
+  font-variant-numeric: tabular-nums; }
+.valley-note-risk { color: var(--want); }
+.valley-note-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.valley-step { display: flex; align-items: center; gap: 6px; }
+.valley-step button { width: 34px; height: 34px; border-radius: 4px; border: 1px solid var(--wood-plank-deep);
+  background: var(--wood-plank); color: var(--card); font: 700 18px/1 var(--skin-font-voice); cursor: pointer; }
+.valley-step button[disabled] { opacity: .35; cursor: default; }
+.valley-step output { min-width: 18px; text-align: center; font: 700 16px/1 var(--skin-font-display); }
+.valley-note-send { min-height: var(--ui-tap-min); padding: 0 16px; }
+.valley-note-why { margin: 0; color: var(--skin-ink-faded); font: 400 14px/1.35 var(--skin-font-voice); }
+.valley-board-away, .valley-board-empty { margin: 0; color: var(--card); text-align: center;
+  font: italic 400 15px/1.4 var(--skin-font-voice); }
+`;
+
+function ensureStyle(): void {
+  if (document.getElementById(STYLE_ID) !== null) return;
+  const style = document.createElement('style');
+  style.id = STYLE_ID;
+  style.textContent = CSS;
+  document.head.append(style);
+}
+
+/** Cuántos quiere mandar el jugador a cada misión, mientras el tablón está abierto. */
+const wanted = new Map<MissionId, number>();
+
+function riskKey(open: MissionOpen): string {
+  const death = open.spec.death;
+  return death === 0 ? 'board.risk.none' : death < 0.05 ? 'board.risk.low' : 'board.risk.high';
+}
+
+export function boardPanel(actions: UiActions): UiPanel {
+  ensureStyle();
+  const element = document.createElement('div');
+  element.className = 'valley-board-veil';
+  element.setAttribute('role', 'dialog');
+  element.setAttribute('aria-modal', 'true');
+  element.setAttribute('aria-label', renderUiText('board.title'));
+  // Tocar fuera del tablón lo cierra: la ventana es del objeto, no de la
+  // pantalla. Con `pointerdown` y no `click`: el toque que abre el tablón se
+  // reconoce al levantar el dedo, y el `click` de ese mismo toque caía después
+  // sobre el velo recién puesto y lo cerraba al instante (medido con
+  // `shot.mjs --open board`: se abría y no se veía).
+  element.addEventListener('pointerdown', (event) => {
+    if (event.target === element) actions.navigate({ kind: 'valley' });
+  });
+  const board = document.createElement('section');
+  board.className = 'valley-board';
+  element.append(board);
+  let last: UiSnapshot | null = null;
+
+  const paint = (snapshot: UiSnapshot): void => {
+    last = snapshot;
+    const { state } = snapshot;
+    const title = document.createElement('h2');
+    title.className = 'valley-board-title';
+    title.textContent = renderUiText('board.title');
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'valley-board-close';
+    close.textContent = renderUiText('board.close');
+    close.addEventListener('click', () => actions.navigate({ kind: 'valley' }));
+    const nodes: HTMLElement[] = [title, close];
+    const open = missionsOpen(state);
+    if (open.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'valley-board-empty';
+      empty.textContent = renderUiText('board.empty');
+      nodes.push(empty);
+    }
+    for (const mission of open) {
+      const note = document.createElement('article');
+      note.className = 'valley-note';
+      note.dataset['mission'] = mission.id;
+      const name = document.createElement('h3');
+      name.className = 'valley-note-name';
+      name.textContent = renderUiText(`mission.${mission.id}.name`);
+      const what = document.createElement('p');
+      what.className = 'valley-note-what';
+      what.textContent = renderUiText(`mission.${mission.id}.what`);
+      const facts = document.createElement('p');
+      facts.className = 'valley-note-facts';
+      const weeks = renderUiText(mission.spec.weeks === 1 ? 'board.weeks.one' : 'board.weeks.many', { count: mission.spec.weeks });
+      const cost = mission.spec.silver === 0 ? renderUiText('board.free') : renderUiText('board.silver', { silver: mission.spec.silver });
+      const risk = document.createElement('span');
+      risk.className = mission.spec.death >= 0.05 ? 'valley-note-risk' : '';
+      risk.textContent = renderUiText(riskKey(mission));
+      facts.append(`${weeks} · ${cost} · `, risk);
+      note.append(name, what, facts);
+      if (mission.refusal === null) {
+        const low = mission.spec.people[0];
+        const count = Math.max(low, Math.min(mission.most, wanted.get(mission.id) ?? low));
+        const foot = document.createElement('div');
+        foot.className = 'valley-note-foot';
+        const step = document.createElement('div');
+        step.className = 'valley-step';
+        const less = document.createElement('button');
+        less.type = 'button';
+        less.textContent = '−';
+        less.setAttribute('aria-label', renderUiText('board.fewer'));
+        less.disabled = count <= low;
+        const shown = document.createElement('output');
+        shown.textContent = String(count);
+        const more = document.createElement('button');
+        more.type = 'button';
+        more.textContent = '+';
+        more.setAttribute('aria-label', renderUiText('board.more'));
+        more.disabled = count >= mission.most;
+        less.addEventListener('click', () => { wanted.set(mission.id, count - 1); if (last !== null) update(last); });
+        more.addEventListener('click', () => { wanted.set(mission.id, count + 1); if (last !== null) update(last); });
+        step.append(less, shown, more);
+        const send = document.createElement('button');
+        send.type = 'button';
+        send.className = 'skin-button skin-button--wood valley-note-send';
+        send.textContent = renderUiText('board.send');
+        send.addEventListener('click', () => {
+          wanted.delete(mission.id);
+          actions.expedition(mission.id, count);
+        });
+        foot.append(step, send);
+        note.append(foot);
+      } else {
+        const why = document.createElement('p');
+        why.className = 'valley-note-why';
+        why.textContent = renderUiText(`board.why.${mission.refusal}`);
+        note.append(why);
+      }
+      nodes.push(note);
+    }
+    // Quién está fuera y cuándo vuelve.
+    for (const trip of outNow(state)) {
+      const away = document.createElement('p');
+      away.className = 'valley-board-away';
+      const names = trip.who.map((id) => state.people.villagers.find((v) => v.id === id)?.name ?? '').filter((n) => n !== '');
+      const weeks = Math.max(0, trip.dueTick - state.tick);
+      away.textContent = renderUiText('board.away', {
+        place: renderUiText(`mission.${trip.mission}.name`),
+        names: names.length <= 1 ? names[0] ?? '' : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`,
+        days: Math.max(1, weeks * TIME.DAYS_PER_WEEK),
+      });
+      nodes.push(away);
+    }
+    board.replaceChildren(...nodes);
+  };
+
+  /** Sólo se repinta si algo de lo que se enseña ha cambiado. */
+  let key = '';
+  const update = (snapshot: UiSnapshot): void => {
+    const { state } = snapshot;
+    const next = `${state.tick}:${state.expeditions.length}:${Math.floor(state.village.silver)}:${[...wanted].join(',')}`;
+    if (next === key && last !== null) { last = snapshot; return; }
+    key = next;
+    paint(snapshot);
+  };
+
+  return {
+    element,
+    update,
+    dispose(): void { element.remove(); },
+  };
+}

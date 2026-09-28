@@ -43,6 +43,13 @@ const HAPPENING_ART: Readonly<Record<HappeningId, string>> = {
   ale_feast: 'harvest.png',
   pig_slaughter: 'harvest.png',
   rats_in_the_granary: 'lost.png',
+  // Más gente por el camino (28 sep 2026). Provisionales: las suyas están
+  // pedidas en `docs/plan-arte-pendiente.md`.
+  minstrel: 'harvest.png',
+  pilgrims: 'road.png',
+  tinker: 'pedlar.png',
+  wise_woman: 'road.png',
+  refugees: 'means-hand.png',
 };
 
 /** Los medios estables de M-2: una ilustración por cosa entregada al valle. */

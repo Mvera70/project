@@ -25,6 +25,7 @@
 import { TERRAIN_CODE, type Building, type ConstructionWork, type ValleyMap } from '@engine/state';
 import { defenceGates } from '@derive/defence-gates';
 import { bastionAccessOf } from '@derive/bastion-access';
+import { noticeBoardOf } from '@derive/notice-board';
 import { fitsCircle, type Point, type Terrain } from './body';
 
 /**
@@ -112,6 +113,9 @@ export function terrainOf(state: {
   const plaza = state.plaza;
   if (plaza !== undefined && plaza.x >= 0 && plaza.y >= 0 && plaza.x < width && plaza.y < height) {
     blocked[plaza.y * width + plaza.x] = 1;
+    // §7.13 · y el tablón de misiones, en el borde de la plaza.
+    const board = noticeBoardOf({ plaza }).cell;
+    if (board.x >= 0 && board.y >= 0 && board.x < width && board.y < height) blocked[board.y * width + board.x] = 1;
   }
 
   return { width, height, blocked };

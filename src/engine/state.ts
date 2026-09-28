@@ -152,7 +152,8 @@ export type DeathCause =
   | 'cold' // §5.4, a winter with the woodpile empty
   | 'plague' // §5.8
   | 'fire' // §5.9
-  | 'violence'; // §8.4, the `kill` effect of a crossroad
+  | 'violence' // §8.4, the `kill` effect of a crossroad
+  | 'mishap'; // §7.13, a fall on the mountain: an expedition that went wrong
 
 /**
  * What a named villager remembers. design.md §3.4 names the first three and
@@ -491,6 +492,16 @@ export const HAPPENINGS = [
   'factor_visit',
   'drover_visit',
   'salt_visit',
+  // Más gente por el camino (28 sep 2026). Vera, con el camino ya en el motor:
+  // «crear más eventos de gente que llegue a la aldea». Pasan como el
+  // forastero —cambian el estado al llegar, sin oferta que contestar— y suben
+  // por el camino del valle como el buhonero (`life/visitors.ts`, `VISITS`).
+  // La familia que huye no se va: se queda (`arriveToStay`).
+  'minstrel',
+  'pilgrims',
+  'tinker',
+  'wise_woman',
+  'refugees',
 ] as const;
 
 export type HappeningId = (typeof HAPPENINGS)[number];
@@ -576,6 +587,11 @@ export type PlayerAct =
    * Lo dijo el dueño del diseño: «el resultado entra en el motor por la misma
    * puerta por la que entra lo que hace el jugador cada semana».
    */
+  /**
+   * §7.13 · Mandar gente a una misión del tablón de la plaza. El jugador dice
+   * **cuántos**; quiénes lo decide la aldea (`world/expeditions.ts`).
+   */
+  | { kind: 'expedition'; mission: MissionId; count: number }
   | {
     kind: 'battle';
     /** Cuántos del clan quedaron en el suelo. */
@@ -585,6 +601,32 @@ export type PlayerAct =
     /** Si llegaron a entrar. Lo único que decide si la partida acaba. */
     breached: boolean;
   };
+
+/**
+ * §7.13 · Las misiones del tablón, en orden estable: de la más sencilla a la
+ * más arriesgada, que es como las anuncia el tablón a medida que el valle
+ * crece (`EXPEDITION.MISSIONS[id].minPeople`).
+ */
+export const MISSION_IDS = ['mushrooms', 'herbs', 'wolf_den', 'high_seam', 'market'] as const;
+export type MissionId = (typeof MISSION_IDS)[number];
+
+/** Cómo acabó una expedición (`world/expeditions.ts`). */
+export type ExpeditionEnd = 'back' | 'back_mourning' | 'empty' | 'empty_mourning' | 'lost';
+export const EXPEDITION_ENDS: readonly ExpeditionEnd[] = ['back', 'back_mourning', 'empty', 'empty_mourning', 'lost'];
+
+/**
+ * Una expedición: quiénes, desde cuándo y cuándo vuelven. Mientras está fuera
+ * `end` es `null`; la semana en que vuelve se queda con su final y sus muertos,
+ * para que la capa de vida enseñe la vuelta, y la siguiente desaparece.
+ */
+export interface Expedition {
+  mission: MissionId;
+  who: VillagerId[];
+  sentTick: number;
+  dueTick: number;
+  end: ExpeditionEnd | null;
+  dead: VillagerId[];
+}
 
 export interface ActRecord {
   tick: number;
@@ -675,7 +717,10 @@ export type ChronicleKind =
   // el mismo motivo que `road`: un suceso de R-1 le pasa al valle y queda en
   // `state.happenings`, y esto es gente que baja de la ladera de al lado. Una
   // prueba compara las dos listas y contarlo como suceso las descuadra.
-  | 'raid';
+  | 'raid'
+  // §7.13 · las expediciones: salir y volver. Es lo que el valle **hizo**, como
+  // `road` y `means`, no algo que le pasó.
+  | 'expedition';
 
 /**
  * The chronicle stores keys and parameters, never prose. The text is composed
@@ -1066,6 +1111,12 @@ export interface GameState {
   traits: ValleyTrait[];
   /** B1 · El clan del valle vecino. Esquema 11. */
   threat: Threat;
+  /**
+   * §7.13 · Las expediciones en camino. **No sube el esquema**: una partida
+   * guardada sin él carga con la lista vacía (`save.ts`), que es exactamente
+   * lo que tenía, igual que el libro de cuentas de F3a.
+   */
+  expeditions: Expedition[];
   /**
    * La madera de la semana, en camino (esquema 12, 28 sep 2026).
    *

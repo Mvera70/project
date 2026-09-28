@@ -18,6 +18,7 @@ import { hash32 } from '@engine/rng';
 import type { GameState, HappeningId } from '@engine/state';
 import { valleyRoadCells } from '@engine/world/valley-road';
 import type { Animal } from '@derive/animals';
+import { NOTICE_BOARD } from '@derive/notice-board';
 import type { Body, Point, Solid, Terrain } from './body';
 import { blockedAt, fitsCircle, integrate, turnTo } from './body';
 import { LIFE_STEP } from './clock';
@@ -50,6 +51,8 @@ export interface Visitor {
   stalled: number;
   /** Si trae género: el que viene a vender, sí; el de paso, no. */
   readonly pack: boolean;
+  /** Si viene para quedarse (la familia que huye): no se va al acabar el día. */
+  readonly stays: boolean;
   /**
    * El animal que trae, y que va detrás de él por donde ha pisado: la **mula**
    * del que viene a vender, con la carga a lomos (Vera, «mula de buhonero
@@ -75,13 +78,37 @@ export interface Visitor {
  * uno, porque está de paso. A ×1 un día escénico son dos minutos, así que tres
  * días son seis minutos de plaza con alguien nuevo en ella.
  */
-const VISITS: Readonly<Partial<Record<HappeningId, { days: number; people: number; pack: boolean }>>> = {
+const VISITS: Readonly<Partial<Record<HappeningId, { days: number; people: number; pack: boolean; stays?: boolean }>>> = {
   pedlar: { days: 3, people: 1, pack: true },
   factor_visit: { days: 3, people: 2, pack: true },
   drover_visit: { days: 3, people: 2, pack: false },
   salt_visit: { days: 3, people: 1, pack: true },
   stranger_passes: { days: 1, people: 1, pack: false },
+  // Más gente por el camino (28 sep 2026): de paso, un día; el calderero
+  // trae su mula con la piedra de afilar. Y **la familia que huye no se va**:
+  // entra por el camino y se queda en la plaza hasta la noche (`stays`); al
+  // día siguiente ya son vecinos, con su casa (`arrivingToday`).
+  minstrel: { days: 1, people: 1, pack: false },
+  pilgrims: { days: 1, people: 2, pack: false },
+  tinker: { days: 1, people: 1, pack: true },
+  wise_woman: { days: 1, people: 1, pack: false },
+  refugees: { days: 1, people: 3, pack: false, stays: true },
 };
+
+/**
+ * Los vecinos nuevos que hoy todavía son visitantes: la familia que huye, el
+ * día que llega. `village.ts` no les da cuerpo de vecino ese día, porque ya
+ * lo tienen de visitante entrando por el camino.
+ */
+export function arrivingToday(state: GameState, day: number, daysPerWeek: number): ReadonlySet<number> {
+  const out = new Set<number>();
+  if (day - state.tick * daysPerWeek !== 0) return out;
+  for (const happening of state.happenings) {
+    if (happening.tick !== state.tick || VISITS[happening.id]?.stays !== true) continue;
+    for (const id of happening.who) out.add(id);
+  }
+  return out;
+}
 
 /**
  * Cuándo se ponen en camino y cuándo se van, en fase de jornada. TUNE: salen al
@@ -129,7 +156,7 @@ const STALL_RADIUS = 3;
  * fiesta (`effects/festoon.ts`, a 45° + k·90°). Se copian aquí porque la capa
  * de vida no importa del render; si se mueven allí, se mueven aquí.
  */
-const PLAZA_TAKEN = [Math.atan2(1.1, 1.8), ...[1, 3, 5, 7].map((k) => (k * Math.PI) / 4)];
+const PLAZA_TAKEN = [Math.atan2(1.1, 1.8), ...[1, 3, 5, 7].map((k) => (k * Math.PI) / 4), NOTICE_BOARD.ANGLE];
 const TAKEN_GAP = 0.4;
 function stallAngle(wanted: number): number {
   for (let k = 0; k < 16; k += 1) {
@@ -292,6 +319,7 @@ export function createVisitors(
         travelled: 0,
         stalled: 0,
         pack: visit.pack,
+        stays: visit.stays === true,
         beast: n !== 0 ? null
           : visit.pack ? { kind: 'mule', x: from.x, z: from.z, moving: false }
             : kind === 'drover_visit' ? { kind: 'cow', x: from.x, z: from.z, moving: false } : null,
@@ -321,7 +349,7 @@ const ENTRY_FAR = 26;
  * la plaza. Se toma la boca más cercana a la entrada de fuera de los asaltos,
  * que es por donde el valle da al mundo.
  */
-function roadInto(
+export function roadInto(
   state: GameState, land: Terrain, shore: Uint8Array, plaza: Point,
 ): { entry: Point; road: Waypoint[] } | null {
   const routes = valleyRoadCells(state.map, state.terrainSeed, state.plaza);
@@ -403,7 +431,8 @@ function moveVisitor(visitor: Visitor, land: Terrain, phase: number, step: numbe
   if (visitor.phase === 'staying') {
     body.vx = 0;
     body.vz = 0;
-    if (phase < visitor.leave) return;
+    // El que viene a quedarse no vuelve al camino.
+    if (visitor.stays || phase < visitor.leave) return;
     visitor.phase = 'leaving';
     visitor.route = routeOut(land, body, visitor.road);
     visitor.deadline = deadlineFor(body, visitor.road, step, visitor.route);

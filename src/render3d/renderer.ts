@@ -2,6 +2,9 @@ import { visibleBuildings } from '@derive/visible-buildings';
 import { plazaOf } from '@derive/plaza';
 import { eraOf } from '@derive/era';
 import { PlazaFountain } from './world/plaza';
+import { createNoticeBoard } from './world/notice-board';
+import { noticeBoardOf } from '@derive/notice-board';
+import { missionsOpen } from '@engine/world/expeditions';
 // G-06 · The renderer. design.md D.5, D.6.
 //
 // The whole contract, implemented. D.5 forbids publishing an empty method to
@@ -558,6 +561,10 @@ export async function createGraphicsRenderer(
   const hearth = createHearth();
   // Y los banderines y farolillos cuando hay fiesta (`derive/festivity.ts`).
   const festoon = createFestoon();
+  // §7.13 · el tablón de misiones, que abre su ventana al tocarlo.
+  const noticeBoard = createNoticeBoard();
+  /** Cuántas misiones anuncia esta semana: tantos papeles clavados. */
+  let boardNotes = 0;
   // El valle más vivo · la ropa tendida y el huerto de cada casa.
   const yards = createYards();
   // Y el ladrido del perro, que se dibuja porque no hay sonido.
@@ -573,7 +580,7 @@ export async function createGraphicsRenderer(
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, quarry.group, coins.mesh, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, quarry.group, coins.mesh, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group, noticeBoard.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1500,6 +1507,13 @@ export async function createGraphicsRenderer(
   // Una malla instanciada es una llamada por muchas copias.
   // Las pisadas, para la sonda: cuánta marca hay en un punto (`effects/trample.ts`).
   window.__valleyTrampleAt = (x: number, z: number) => trample?.at(x, z) ?? null;
+  // §7.13 · dónde cae el tablón en la pantalla, en píxeles CSS del lienzo, para
+  // que un recorrido lo toque de verdad (`shot.mjs --open board`).
+  window.__valleyBoardScreen = () => {
+    if (!noticeBoard.group.visible) return null;
+    const at = new Vector3(0, 0.85, 0).applyMatrix4(noticeBoard.group.matrixWorld).project(camera);
+    return { x: (at.x + 1) / 2 * viewport.widthCss, y: (1 - at.y) / 2 * viewport.heightCss };
+  };
   window.__valleyShadowStats = () => ({ ...shadowStats });
   window.__valleySceneReport = () => {
     const rows = new Map<string, { meshes: number; shadow: number; instanced: number; triangles: number }>();
@@ -1785,6 +1799,7 @@ export async function createGraphicsRenderer(
       // cambió algo de lo que la mueve (caminos, edificios, campos segados).
       if (shown.tick !== grassTick || change.cleared) {
         grassTick = shown.tick;
+        boardNotes = missionsOpen(shown).filter((m) => m.refusal === null).length;
         grass.plant(shown, groundFloor, plazaOf(shown), roadWear ?? undefined);
         grass.season(appearancePalette ?? paletteFor(live.season, live.seasonWeek),
           snowCover(live.season, live.seasonWeek));
@@ -2064,6 +2079,8 @@ export async function createGraphicsRenderer(
       // D2b · y las flechas, con su altura absoluta: la `y` es del mundo físico.
       arrows.update([...arrowsOf(life), ...(huntScene?.projectiles ?? [])]);
       plaza.show(plazaOf(shown), groundFloor);
+      const board = noticeBoardOf(shown);
+      noticeBoard.place(board.x, groundFloor(board.x, board.z), board.z, board.yaw, boardNotes);
       hearth.place(plazaOf(shown), groundFloor);
       hearth.step(phase, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       cameraRight.setFromMatrixColumn(camera.matrixWorld, 0);
@@ -2334,6 +2351,12 @@ export async function createGraphicsRenderer(
       for (const hit of hits) {
         const id = idOf(hit.object, 'villagerId');
         if (id !== undefined) return { kind: 'villager', id };
+      }
+      // §7.13 · y el tablón de la plaza, que abre su propia ventana.
+      for (const hit of hits) {
+        let node: Object3D | null = hit.object;
+        while (node !== null && node.userData['noticeBoard'] !== true) node = node.parent;
+        if (node !== null) return { kind: 'board' };
       }
       for (const hit of hits) {
         const id = idOf(hit.object, 'buildingId');
@@ -2744,6 +2767,7 @@ declare global {
     __valleyRenderStats?: () => { calls: number; triangles: number; scale: number };
     __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];
     __valleyTrampleAt?: (x: number, z: number) => { grass: number; snow: number } | null;
+    __valleyBoardScreen?: () => { x: number; y: number } | null;
     __valleyShadowStats?: () => { moves: number; redraws: number; frames: number };
   }
 }

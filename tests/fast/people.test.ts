@@ -74,6 +74,7 @@ function stateOf(seed: number): GameState {
     // B1 · el clan vecino: esta aldea de laboratorio no tiene vecinos.
     threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0, arrivedTick: null, lastBand: 0 },
     woodRun: null,
+    expeditions: [],
     ended: null,
   };
 }

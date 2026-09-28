@@ -57,7 +57,8 @@ import {
   approachOf, type Gate, type Raider,
 } from './raiders';
 import type { HappeningId } from '@engine/state';
-import { beastOf, createVisitors, stallOf, stallSiteOf, stayForGoods, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
+import { createTravellers, returningToday, stepTraveller, travelling, type Traveller } from './expeditions';
+import { arrivingToday, beastOf, createVisitors, stallOf, stallSiteOf, stayForGoods, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
@@ -363,6 +364,12 @@ export interface Village {
    * sortea. Tampoco son vecinos, así que van por su lista.
    */
   readonly visitors: readonly Visitor[];
+  /**
+   * §7.13 · Los que salen de expedición, están en el bosque o vuelven hoy
+   * (`expeditions.ts`). Son vecinos de verdad —llevan su `VillagerId`— pero
+   * ese día no viven en casa, así que van por su lista.
+   */
+  readonly travellers: readonly Traveller[];
   /**
    * El valle más vivo · **Los pagos de un trato**: quién paga, a quién y en qué
    * paso de la jornada. El buhonero y el factor pagan a cada vecino que les
@@ -917,7 +924,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const props: Prop[] = [...loose, ...given(state, land, loose.length), ...aftermath];
   const propsById = new Map(props.map((prop) => [prop.id, prop]));
 
-  const alive = state.people.villagers.filter((v) => v.diedTick === null && v.leftTick === null);
+  // Los que llegan hoy para quedarse son todavía visitantes: entran por el
+  // camino (`visitors.ts`, `arrivingToday`) y mañana ya tienen casa.
+  const arriving = arrivingToday(state, day, TIME.DAYS_PER_WEEK);
+  // Y los que vuelven hoy de una expedición: entran andando por donde se
+  // fueron (`expeditions.ts`), y mañana ya están en casa.
+  const returning = returningToday(state, day);
+  const alive = state.people.villagers.filter((v) => v.diedTick === null && v.leftTick === null
+    && !arriving.has(v.id) && !returning.has(v.id));
   alive.forEach((villager, n) => {
     // Se le deja junto a un sitio de la aldea, repartidos.
     const homeBuilding = villager.homeId === null ? undefined
@@ -1160,6 +1174,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // alguien esta semana. Se montan al abrir la jornada y llegan a su hora.
   // Las huellas de los puestos que están montados ahora, para quitarlas al recoger.
   const stallSolids = new Map<number, Solid>();
+  const travellers: Traveller[] = createTravellers(state, land, heart,
+    { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 }, day, seed);
   const visitors: Visitor[] = createVisitors(state, land, heart,
     { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 }, seed,
     options.visits?.map((kind) => ({ kind, dealt: options.dealt === true }))
@@ -1546,6 +1562,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
 
     get raiders(): readonly Raider[] { return raiders; },
     get visitors(): readonly Visitor[] { return visitors; },
+    get travellers(): readonly Traveller[] { return travellers; },
     get payments(): readonly Payment[] { return payments; },
     get dog() {
       return dog === null ? null
@@ -1663,7 +1680,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           && wounded.get(person.villager)?.down !== true);
       }), ...raiders
         .filter((raider) => raider.phase !== 'gone' && raider.phase !== 'down')
-        .map((raider) => raider.body), ...visitors.filter(visiting).map((visitor) => visitor.body)];
+        .map((raider) => raider.body), ...visitors.filter(visiting).map((visitor) => visitor.body),
+        ...travellers.filter(travelling).map((traveller) => traveller.body)];
       const taken = seats();
       // Se va actualizando conforme la gente decide: ver el comentario de abajo.
       around.rebuild(outside());
@@ -2655,6 +2673,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       if (sackScene !== null) props.push(...sackScene.step(raiders, land, seed, steps));
       // Y los del camino, a su hora.
       for (const visitor of visitors) stepVisitor(visitor, land, phase, steps);
+      for (const traveller of travellers) stepTraveller(traveller, land, phase, steps);
       // Al tratante y al salinero, que venden a la aldea, les paga un vecino:
       // el adulto libre más cercano va a él cuando ya está en la plaza, habla
       // un momento y, al terminar, pasan las monedas.

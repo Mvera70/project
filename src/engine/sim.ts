@@ -40,6 +40,7 @@ import { seasonOf, weekOf, yearOf } from './time';
 import { count } from './subsistence/building-counts';
 import { allocateLabour, produce } from './subsistence/labour';
 import { forage } from './subsistence/forage';
+import { returnExpeditions, sendExpedition } from './world/expeditions';
 import { settleHunt } from './world/hunting';
 import { crowsPeck } from './subsistence/crows';
 import { consume, overwinter } from './subsistence/consumption';
@@ -679,6 +680,12 @@ export function tick(
       state.acts.push({ tick: state.tick, act, done: outcome.crowned });
       crown = outcome;
       for (const entry of outcome.entries) say(entry);
+    } else if (act.kind === 'expedition') {
+      // §7.13 · mandar gente del tablón. Se paga y salen esta semana; el
+      // resultado se tira cuando vuelven (paso 1c).
+      const outcome = sendExpedition(state, act.mission, act.count, yearOf(state.tick));
+      state.acts.push({ tick: state.tick, act, done: outcome.sent });
+      if (outcome.entry !== null) say(outcome.entry);
     } else if (act.kind === 'hunt') {
       // La presa sólo paga comida si el encuentro de la semana anterior
       // produjo un impacto real. El parte queda en el guardado para reproducirlo.
@@ -709,6 +716,11 @@ export function tick(
   // Y quien esperaba y no tuvo respuesta, sigue camino.
   const gone = expireOffer(state, seasonOf(state.tick), yearOf(state.tick));
   if (gone !== null) say(gone);
+
+  // ---- 1c · EXPEDITIONS (§7.13) --------------------------------------------
+  // Vuelven los que tocaba, con lo que traigan o sin alguno. Antes de lo
+  // anual y de la comida: quien vuelve esta semana ya come en casa.
+  for (const back of returnExpeditions(state, yearOf(state.tick))) say(back.entry);
 
   // ---- 2 · ANNUAL ----------------------------------------------------------
   // Week 0 and week 0 only: the weather of the year, the plague, the fire, the

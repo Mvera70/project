@@ -34,7 +34,7 @@ import { seasonOf, weekOf } from '../time';
 import { burnBuilding } from './buildings';
 import { herdCapacity, herdDensity } from '../subsistence/herd';
 import { storageCapacity } from '../subsistence/harvest';
-import { aleWindow } from './means';
+import { aleWindow, arriveToStay } from './means';
 import { will } from '../people/crown';
 import { factorWants, postOffer } from './road';
 import { weekWeather } from './sky';
@@ -205,6 +205,30 @@ function weightOf(state: GameState, id: HappeningId, ctx: Context): number {
       return children(state).length > 0 ? w : 0;
     case 'stranger_passes':
       return flagSet(state, 'hostile') ? 0 : w;
+    // ------------------------------------------- más gente por el camino
+    // Nadie sube a un valle hostil, y todos buscan gente: son visitas, y el
+    // mismo `visitable` que las del camino no deja dos a la vez ni repite una
+    // antes de su plazo (`OFFER.AGAIN_WEEKS`).
+    case 'minstrel':
+      // Con buen tiempo y alguien que le escuche.
+      return visitable(state, 'minstrel') && ctx.season !== 'winter' && ctx.sky.wet <= 3 ? w : 0;
+    case 'pilgrims':
+      // Van a un santuario y paran donde hay capilla.
+      return visitable(state, 'pilgrims') && (has(state, 'chapel') || has(state, 'church'))
+        && ctx.season !== 'winter' ? w : 0;
+    case 'tinker':
+      // Donde hay hachas que afilar: un valle que tala, con plata para pagarle.
+      return visitable(state, 'tinker') && state.village.silver >= FATE.TINKER_SILVER
+        && ratioOf(state, 'forestLeft') > 0 ? w : 0;
+    case 'wise_woman':
+      // Rara; con peste, la llaman.
+      return visitable(state, 'wise_woman')
+        ? w * (state.outbreak !== null ? FATE.WISE_WOMAN_PLAGUE : 1) : 0;
+    case 'refugees':
+      // Una familia que huye de un valle quemado. Sólo a una aldea hecha y con
+      // grano para tres bocas más: con hambre, sigue camino.
+      return visitable(state, 'refugees') && ctx.people >= FATE.REFUGEE_MIN_PEOPLE
+        && state.village.grain >= FATE.REFUGEE_MIN_GRAIN && ctx.season !== 'winter' ? w : 0;
     // ----------------------------------------------------------------- M-2
     case 'ale_feast':
       // No se sortea nunca: la fiesta del barril la paga el jugador y la sirve
@@ -489,6 +513,62 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
       params['silver'] = FATE.STRANGER_SILVER;
       visible.push({ k: 'gather', where: 'square', days: 1 });
       weight = 1;
+      break;
+    }
+    case 'minstrel': {
+      // Toca en la plaza y se le echa lo que haya.
+      moraleBy(state, FATE.MINSTREL_MORALE);
+      const paid = Math.min(FATE.MINSTREL_SILVER, Math.max(0, Math.floor(state.village.silver)));
+      state.village.silver -= paid;
+      params['silver'] = paid;
+      visible.push({ k: 'gather', where: 'square', days: 1 });
+      weight = 1;
+      break;
+    }
+    case 'pilgrims': {
+      faithBy(state, FATE.PILGRIM_FAITH);
+      const alms = Math.min(FATE.PILGRIM_ALMS, Math.max(0, Math.floor(state.village.grain)));
+      state.village.grain -= alms;
+      params['grain'] = alms;
+      visible.push({ k: 'gather', where: 'chapel', days: 1 });
+      weight = 1;
+      break;
+    }
+    case 'tinker': {
+      state.village.silver -= FATE.TINKER_SILVER;
+      state.village.wood += FATE.TINKER_WOOD;
+      params['silver'] = FATE.TINKER_SILVER;
+      params['wood'] = FATE.TINKER_WOOD;
+      visible.push({ k: 'gather', where: 'square', days: 1 });
+      weight = 1;
+      break;
+    }
+    case 'wise_woman': {
+      if (state.outbreak !== null) {
+        // Acorta la peste; no resucita a nadie.
+        state.outbreak.endsTick = Math.max(state.tick + 1, state.outbreak.endsTick - FATE.WISE_WOMAN_WEEKS);
+        key = 'fate.wise_woman.plague';
+        weight = 2;
+      } else {
+        moraleBy(state, FATE.WISE_WOMAN_MORALE);
+        weight = 1;
+      }
+      visible.push({ k: 'gather', where: 'square', days: 1 });
+      break;
+    }
+    case 'refugees': {
+      // Dos adultos y una criatura. Los nombres y el carácter salen de un
+      // hash, como el brazo del carro: no mueven el flujo de nombres.
+      const a = arriveToStay(state, 'refugee-a', FATE.REFUGEE_ADULT_AGE, { female: false, character: false });
+      const b = arriveToStay(state, 'refugee-b', FATE.REFUGEE_ADULT_AGE, { female: true, character: false });
+      const child = arriveToStay(state, 'refugee-c', FATE.REFUGEE_CHILD_AGE, { parents: [a, b], character: false });
+      faithBy(state, FATE.REFUGEE_FAITH);
+      const names = [a, b].map((id) => state.people.villagers.find((v) => v.id === id)?.name ?? '');
+      params['a'] = names[0] ?? '';
+      params['b'] = names[1] ?? '';
+      who.push(a, b, child);
+      visible.push({ k: 'gather', where: 'square', days: 2 });
+      weight = 2;
       break;
     }
     default:

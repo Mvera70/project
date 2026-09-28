@@ -8,6 +8,7 @@
 import { isHere, population } from '../people/demography';
 import { remember } from '../people/memories';
 import { adjustOpinion } from '../people/opinions';
+import { makeName } from '../people/names';
 import { ageOf, makeVillager, promoteToNamed } from '../people/villagers';
 import { rollCharacter } from '../people/traits';
 import { int, next, pick } from '../rng';
@@ -273,7 +274,18 @@ export function applyOption(
   // sale en 12 de 12, siempre `feud_inherited.give_b_the_smithy`. Va **antes**
   // de aplicar los efectos: si la opción también da un oficio (`{k:'role'}`),
   // quien lo recibe ya es un personaje y no un anónimo con un puesto.
-  for (const id of Object.values(pending.cast)) promoteToNamed(state, id, null);
+  for (const id of Object.values(pending.cast)) {
+    promoteToNamed(state, id, null);
+    // Y si no cabía otro personaje (`PEOPLE.MAX_NAMED`), `promoteToNamed` no
+    // hace nada y la línea volvía a salir con `{B}`: pasó en la semilla 23 el
+    // 28 sep 2026, con la lista llena. Al menos un nombre, del flujo `names`
+    // como el de la promoción, y sin volverlo personaje.
+    const chosen = state.people.villagers.find((v) => v.id === id);
+    if (chosen !== undefined && chosen.name === '') {
+      chosen.name = makeName(state.rng, chosen.female,
+        new Set(state.people.villagers.filter(isHere).map((v) => v.name)));
+    }
+  }
 
   for (const e of option.effects) applyEffect(state, pending.cast, e, out);
 

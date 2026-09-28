@@ -76,6 +76,7 @@ function village(seed: number): GameState {
     // B1 · el clan vecino: esta aldea de laboratorio no tiene vecinos.
     threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0, arrivedTick: null, lastBand: 0 },
     woodRun: null,
+    expeditions: [],
     ended: null,
   };
 }
@@ -344,6 +345,15 @@ describe('render', () => {
       // B1 · la cabeza que se lleva un asalto.
       animal: 'cow',
       weapon: 'sling',
+      // §7.13 · las expediciones y los que llegan por el camino: quiénes van,
+      // quiénes no vuelven, lo que traen, y la familia que huye.
+      names: 'Aelric and Wulfrun',
+      dead: 'Osric',
+      stone: 40,
+      morale: 4,
+      faith: 2,
+      a: 'Edwin',
+      b: 'Hild',
     };
     const keys = bankKeys();
     let rendered = 0;

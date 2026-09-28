@@ -971,6 +971,149 @@ export const BANK: Record<string, string[]> = {
     'Someone passed along the road in the {season} of year {year}, stopped at the square, paid {silver} silver, and went on.',
     'A traveller in year {year}, gone by morning, and {silver} silver on the table. They talked of it for a week.',
   ],
+  // §7.13 · Las expediciones del tablón (28 sep 2026): la salida y la vuelta
+  // con lo prometido, por misión; las otras vueltas, por sitio. Y más gente
+  // por el camino (28 sep 2026).
+  'fate.minstrel': [
+    'A minstrel played in the square in the {season} of year {year}. The valley paid him {silver} silver.',
+    'In year {year} a fiddler walked in from the gorge. By dark the square was dancing.',
+    'A singer stopped one night in the {season}. Nobody kept the words; everybody kept the tune.',
+  ],
+  'fate.pilgrims': [
+    'Two pilgrims prayed at the chapel in the {season} of year {year}, and left with {grain} grain.',
+    'Pilgrims passed through in year {year}, dusty to the knees. The valley fed them.',
+    'A pair of pilgrims knelt in the chapel in the {season} and asked the valley to pray for them.',
+  ],
+  'fate.tinker': [
+    'A tinker sharpened every axe in the valley in year {year}, for {silver} silver.',
+    'In the {season} a tinker came with his grindstone. The woodpile grew by {wood} that week.',
+    'A tinker stopped for a day, mended two pots and put an edge on the axes.',
+  ],
+  'fate.wise_woman': [
+    'A herb-woman came down the road in the {season} of year {year}, and would take nothing.',
+    'A wise woman passed through in year {year}. The valley slept easier for a week.',
+    'In the {season} an old woman listened to everyone’s aches in the square, and left before dawn.',
+  ],
+  'fate.wise_woman.plague': [
+    'With the fever in the valley, a wise woman came in year {year}. It broke sooner than feared.',
+    'A herb-woman went house to house in the worst of the sickness, in the {season}.',
+    'A wise woman heard of the plague and came. She did not save everyone. She shortened it.',
+  ],
+  'fate.refugees': [
+    '{a} and {b} came up the road in year {year} with a child, from a valley that had burned. They stayed.',
+    'In the {season} a family asked for a corner: {a}, {b} and their little one. They were given one.',
+    'Three strangers at the square in year {year}, {a} and {b} and a child. Their valley was ash.',
+  ],
+  'expedition.mushrooms.sent': [
+    'In the {season} of year {year}, {names} took baskets into the wood after mushrooms.',
+    '{names} went into the trees with baskets in year {year}.',
+    'Mushroom weather, in the {season}. {names} went to the wood.',
+  ],
+  'expedition.mushrooms.back': [
+    '{names} came out of the wood with full baskets: {grain} meals.',
+    'Mushrooms by the basketful in year {year}. {names} brought back {grain} meals.',
+    'The wood was generous. {names} came home with {grain} meals in their baskets.',
+  ],
+  'expedition.herbs.sent': [
+    '{names} went up the low slopes after herbs in the {season} of year {year}.',
+    'In year {year}, {names} set out with a knife and a bag for the herbs above the wood.',
+    'Herb season, in the {season}. {names} went up the hill.',
+  ],
+  'expedition.herbs.back': [
+    '{names} came back smelling of thyme and rue. The valley slept better for weeks.',
+    'Herbs hung drying in every house in year {year}. {names} were thanked for them.',
+    '{names} came down with bags of herbs. Coughs eased and tempers with them.',
+  ],
+  'expedition.wolf_den.sent': [
+    '{names} took spears up the mountain in year {year}, to the wolves’ den.',
+    'In the {season} of year {year}, {count} went up after the wolves: {names}.',
+    'Spears bought for {silver} silver, and {names} went up to the den.',
+  ],
+  'expedition.wolf_den.back': [
+    '{names} came down from the den with hides on their shoulders. Meat for {grain}.',
+    'The den was cleared in year {year}. {names} brought back meat and a story for every fire.',
+    'No wolves on the hill that winter. {names} had seen to it.',
+  ],
+  'expedition.high_seam.sent': [
+    '{names} climbed toward the high seam in year {year}, with rope and picks.',
+    'In the {season} of year {year}, {count} went up the rock after the ore: {names}.',
+    'Rope and picks for {silver} silver, and {names} started up the mountain.',
+  ],
+  'expedition.high_seam.back': [
+    '{names} came down from the seam with {stone} of stone and ore worth {silver} silver.',
+    'The high seam paid in year {year}: {stone} of stone, {silver} silver of ore.',
+    '{names} came back bent under the load. The seam had been worth it.',
+  ],
+  'expedition.market.sent': [
+    '{names} left by the road in year {year} with {silver} silver of goods, for market.',
+    'In the {season} of year {year}, a laden party went down the road: {names}.',
+    'Goods on their backs and the road ahead: {names} went to market.',
+  ],
+  'expedition.market.back': [
+    '{names} came back up the road with {silver} silver and news of the world.',
+    'The market was good in year {year}. {names} returned with {silver} silver.',
+    '{names} were home from market, {silver} silver the richer.',
+  ],
+  'expedition.back_mourning.forest': [
+    '{names} came back from the wood with what they went for, and without {dead}.',
+    'The baskets were full in year {year}. {dead} did not come back out of the trees.',
+    'A good harvest in the wood, and a grave for {dead}.',
+  ],
+  'expedition.back_mourning.mountain': [
+    'They did what they went up the mountain to do. {dead} stayed up there.',
+    'In year {year} the mountain gave what it was asked, and took {dead} for it.',
+    '{names} came down with the prize. {dead} did not come down at all.',
+  ],
+  'expedition.back_mourning.road': [
+    '{names} came back up the road with the silver. {dead} did not come back.',
+    'The trip paid, in year {year}, and cost {dead}.',
+    'Silver in the purse and {dead} buried by the road.',
+  ],
+  'expedition.empty.forest': [
+    '{names} came back from the wood with empty baskets.',
+    'Nothing in the wood that week. {names} were home by dark.',
+    'The wood had nothing to give in year {year}. {names} came back empty.',
+  ],
+  'expedition.empty.mountain': [
+    '{names} came down from the mountain with nothing. Not worth the climb.',
+    'In year {year}, {names} came back from the heights empty-handed, and glad to be back.',
+    'The mountain kept its secrets. {names} came home with nothing.',
+  ],
+  'expedition.empty.road': [
+    '{names} came back up the road with less than they took.',
+    'The road was long and the trade was poor. {names} came home with nothing.',
+    'A bad market in year {year}. {names} were back, and the goods were gone.',
+  ],
+  'expedition.empty_mourning.forest': [
+    '{names} came back from the wood with nothing, and without {dead}.',
+    'An empty basket and an empty place at the table: {dead} stayed in the wood.',
+    'Nothing from the wood in year {year} but the news of {dead}.',
+  ],
+  'expedition.empty_mourning.mountain': [
+    'The mountain gave nothing and took {dead}. {names} came down alone.',
+    'In year {year}, {names} came back from the heights with nothing but grief.',
+    'No ore, and no {dead}. The mountain had its way.',
+  ],
+  'expedition.empty_mourning.road': [
+    '{names} came back up the road with nothing, and without {dead}.',
+    'Robbed on the road in year {year}. {dead} did not come home.',
+    'The road took the goods and {dead} with them.',
+  ],
+  'expedition.lost.forest': [
+    'Nobody came back out of the wood. {dead} were searched for until the snow.',
+    'In year {year} the wood kept {dead}.',
+    'The baskets were found. {dead} never were.',
+  ],
+  'expedition.lost.mountain': [
+    'Nobody came down from the mountain. {dead} are up there still.',
+    'In year {year}, {dead} went up the mountain and it kept them all.',
+    'Smoke was seen on the heights for a day. Then nothing. {dead} were gone.',
+  ],
+  'expedition.lost.road': [
+    '{dead} went down the road and never came back up it.',
+    'In year {year} the road swallowed {dead}. Nobody learned how.',
+    'Word came up the road, too late: {dead} would not be coming home.',
+  ],
 
   // -------------------------------------------------------------------------
   // Buildings raised
@@ -2537,6 +2680,37 @@ export const UI_BANK: Record<string, string> = {
   'cart.nothing': 'Nothing to give yet',
   'cart.some': 'Something to give',
   'cart.give': 'Give',
+  // §7.13 · el tablón de misiones de la plaza y lo que anuncia.
+  'board.title': 'Notices',
+  'board.close': 'Close',
+  'board.empty': 'Nothing is asked of the valley yet.',
+  'board.send': 'Send',
+  'board.fewer': 'One fewer',
+  'board.more': 'One more',
+  'board.weeks.one': 'One week away',
+  'board.weeks.many': 'Away {count} weeks',
+  'board.free': 'Free',
+  'board.silver': 'Costs {silver} silver',
+  'board.risk.none': 'Safe',
+  'board.risk.low': 'A little risk',
+  'board.risk.high': 'Dangerous',
+  'board.why.season': 'Not in this season.',
+  'board.why.silver': 'Not enough silver.',
+  'board.why.hands': 'No hands to spare.',
+  'board.why.away': 'They are out already.',
+  'board.why.small': 'The valley is too small for this yet.',
+  'board.why.ended': 'There is no one left to send.',
+  'board.away': '{place}: {names}, back in {days} days.',
+  'mission.mushrooms.name': 'Mushrooms in the wood',
+  'mission.mushrooms.what': 'Baskets and a morning. The wood is kind after rain.',
+  'mission.herbs.name': 'Herbs on the slopes',
+  'mission.herbs.what': 'Thyme, rue and feverfew from above the trees. Good for sleep and tempers.',
+  'mission.wolf_den.name': 'The wolves’ den',
+  'mission.wolf_den.what': 'Spears up the mountain, to where the wolves come down from. Wolves bite.',
+  'mission.high_seam.name': 'The high seam',
+  'mission.high_seam.what': 'Ore in the rocks above the gorge, for rope and picks. The mountain takes some.',
+  'mission.market.name': 'Market in the next valley',
+  'mission.market.what': 'Goods down the road, silver back. If the road is kind.',
   'cart.plough': 'A plough',
   'cart.plough.what': 'One field worked by half the hands. The rest go where the valley needs them.',
   'cart.pigs': 'A sty and two pigs',

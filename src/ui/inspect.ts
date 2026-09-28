@@ -11,6 +11,8 @@ import { crowdPositions } from '@render/crowd';
 export type InspectTarget =
   | { kind: 'building'; id: number }
   | { kind: 'villager'; id: number }
+  // §7.13 · el tablón de misiones: no abre ficha, abre su ventana (`app.ts`).
+  | { kind: 'board' }
   | { kind: 'terrain'; x: number; y: number };
 export interface PanelModel { title: string; lines: string[] }
 
@@ -97,6 +99,8 @@ export function panelFor(target: InspectTarget, state: GameState): PanelModel {
     const person = state.people.villagers.find((item) => item.id === target.id);
     return person === undefined ? { title: renderUiText('inspect.gone'), lines: [] } : villagerPanel(person, state);
   }
+  // El tablón no tiene ficha: abre su ventana (`app.ts`). Si llega aquí, su nombre.
+  if (target.kind === 'board') return { title: renderUiText('board.title'), lines: [] };
   const code = state.map.terrain[target.y * state.map.width + target.x];
   const names = ['meadow', 'forest', 'water', 'rock', 'marsh', 'cleared'] as const;
   return {

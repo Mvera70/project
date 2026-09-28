@@ -28,7 +28,7 @@ import { hash32 } from '../rng';
 import { withinCap } from './buildings';
 import { placeBuilding } from './placement';
 import { requestBuild } from './works';
-import type { BuildingKind, ChronicleEntry, GameState, MeansId, VillageStats, Villager } from '../state';
+import type { BuildingKind, ChronicleEntry, GameState, MeansId, VillageStats, Villager, VillagerId } from '../state';
 import { herdCapacity } from '../subsistence/herd';
 
 /** Lo que un medio cuesta y lo que deja al darlo. */
@@ -166,12 +166,33 @@ export const MEANS_SPEC: Readonly<Record<MeansId, MeansSpec>> = {
  * del flujo `names` y con eso un forastero habría desplazado la partida entera.
  */
 function settle(state: GameState): void {
-  const female = hash32(state.tick, 'means-hand') % 2 === 0;
+  arriveToStay(state, 'means-hand', MEANS.HAND_AGE);
+}
+
+/**
+ * Alguien de fuera que llega para quedarse: el brazo del carro, o la familia
+ * que huye por el camino (`fate.ts`, `refugees`). Todo sale de `hash32` con la
+ * sal que se le dé, así que no consume ninguna tirada. Devuelve su id.
+ */
+export function arriveToStay(
+  state: GameState, salt: string, ageYears: number,
+  options: {
+    female?: boolean;
+    parents?: [VillagerId | null, VillagerId | null];
+    /**
+     * Si entra en la lista de personajes (`namedIds`, como mucho
+     * `PEOPLE.MAX_NAMED`). La familia que huye no: son tres de golpe, y
+     * llenarían los huecos que las encrucijadas necesitan para sus repartos.
+     */
+    character?: boolean;
+  } = {},
+): VillagerId {
+  const female = options.female ?? hash32(state.tick, salt) % 2 === 0;
   const bank = female ? FEMALE_NAMES : MALE_NAMES;
   const used = new Set(state.people.villagers.map((person) => person.name));
   const free = bank.filter((name) => !used.has(name));
   const pool = free.length > 0 ? free : bank;
-  const name = pool[hash32(state.tick, 'means-hand-name') % pool.length] ?? 'Stranger';
+  const name = pool[hash32(state.tick, `${salt}-name`) % pool.length] ?? 'Stranger';
   const id = state.people.nextId;
   state.people.nextId += 1;
   state.people.villagers.push({
@@ -180,23 +201,24 @@ function settle(state: GameState): void {
     named: true,
     role: null,
     female,
-    bornTick: state.tick - MEANS.HAND_AGE * TIME.WEEKS_PER_YEAR,
+    bornTick: state.tick - ageYears * TIME.WEEKS_PER_YEAR,
     diedTick: null,
     causeOfDeath: null,
     leftTick: null,
     // Los rasgos salen del mismo hash: un forastero tiene carácter, y el mismo
     // en la misma partida, pero no cuesta una tirada.
     traits: [
-      ALL_TRAITS[hash32(state.tick, 'means-hand-a') % ALL_TRAITS.length],
-      ALL_TRAITS[hash32(state.tick, 'means-hand-b') % ALL_TRAITS.length],
+      ALL_TRAITS[hash32(state.tick, `${salt}-a`) % ALL_TRAITS.length],
+      ALL_TRAITS[hash32(state.tick, `${salt}-b`) % ALL_TRAITS.length],
     ].filter((trait, index, all): trait is Villager['traits'][number] =>
       trait !== undefined && all.indexOf(trait) === index),
     homeId: null,
-    parentIds: [null, null],
+    parentIds: options.parents ?? [null, null],
     memories: [],
     opinions: {},
   });
-  if (state.people.namedIds.length < PEOPLE.MAX_NAMED) state.people.namedIds.push(id);
+  if (options.character !== false && state.people.namedIds.length < PEOPLE.MAX_NAMED) state.people.namedIds.push(id);
+  return id;
 }
 
 /** Por qué no se puede dar algo, o `null` si se puede. */

@@ -356,6 +356,19 @@ if (open === 'orders' || open === 'cart') {
   await tab.locator('.valley-cart').waitFor({ timeout: 4000 }).catch(() => {});
 }
 if (open === 'speed') await tab.locator('.valley-speed-badge').click().catch(() => {});
+// §7.13 · `--open board` mira al tablón de la plaza y **lo toca**, en el punto
+// de la pantalla donde el render lo dibuja: la foto prueba también el toque.
+if (open === 'board') {
+  await tab.waitForTimeout(1500);
+  const at = await tab.evaluate(() => window.__valleyBoardScreen?.() ?? null);
+  const box = await tab.locator('canvas').first().boundingBox();
+  if (at !== null && box !== null) {
+    await tab.mouse.click(box.x + at.x, box.y + at.y);
+    await tab.locator('.valley-board').waitFor({ timeout: 4000 }).catch(() => {});
+  }
+  console.log('tablón en pantalla:', JSON.stringify(at), 'abierto:', await tab.locator('.valley-board').count(),
+    'hoja:', await tab.evaluate(() => document.querySelector('.ui-shell-content')?.hidden === false ? document.querySelector('.ui-shell-content')?.textContent?.slice(0, 80) : 'cerrada'));
+}
 if (open) await tab.waitForTimeout(300);
 
 let sceneImage = null;

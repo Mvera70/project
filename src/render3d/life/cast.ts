@@ -10,6 +10,7 @@
 // función que evaluaba una curva del reloj— ya no existe, y con ella se fue la
 // bandera que permitía volver a ella.
 
+import { travelling } from './expeditions';
 import { visiting } from './visitors';
 import { indoors } from './home';
 import { occupationOf } from '../world/models';
@@ -236,6 +237,37 @@ export function castOf(
       occupation: null,
       role: 'stranger',
       visualIdentity: 'neighbor',
+    });
+  }
+
+  // §7.13 · Y los que salen o vuelven de una expedición (`expeditions.ts`):
+  // vecinos de verdad, con su id, así que el render les pone su cara.
+  for (const traveller of life.travellers) {
+    if (!travelling(traveller)) continue;
+    const { body } = traveller;
+    const moving = Math.hypot(body.vx, body.vz) > 0.05;
+    const carrying = traveller.load !== null;
+    const clip = moving ? carrying ? 'carry_walk' : 'walk' : 'idle';
+    const cellX = Math.max(0, Math.min(width - 1, Math.floor(body.x)));
+    const cellZ = Math.max(0, Math.min(life.land.height - 1, Math.floor(body.z)));
+    actors.push({
+      id: traveller.villager,
+      x: body.x,
+      z: body.z,
+      facing: body.facing,
+      activity: moving ? 'walking' : 'resting',
+      clip,
+      load: carrying ? traveller.load : null,
+      poseSeconds: seconds,
+      clipSeconds: clipTime(clip, traveller.travelled, seconds, (traveller.villager % 11) / 11),
+      travelled: traveller.travelled,
+      cell: cellZ * width + cellX,
+      named: named.has(traveller.villager),
+      age: ages.get(traveller.villager) ?? 30,
+      talking: false,
+      arguing: false,
+      occupation: null,
+      role: null,
     });
   }
 

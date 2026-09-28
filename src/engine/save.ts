@@ -7,7 +7,7 @@ import { population } from './people/demography';
 import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import { herdCapacity } from './subsistence/herd';
-import { HAPPENINGS, HERD_KINDS, MEANS_IDS, SCHEMA_VERSION, TERRAIN_CODE, valleyTraits } from './state';
+import { EXPEDITION_ENDS, HAPPENINGS, HERD_KINDS, MEANS_IDS, MISSION_IDS, SCHEMA_VERSION, TERRAIN_CODE, valleyTraits } from './state';
 import { ledgerOf } from './chronicle/ledger';
 import { choosePlaza } from './world/plaza';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
@@ -45,7 +45,7 @@ const TRAITS = new Set([
   'ambitious', 'devout', 'spiteful', 'craven', 'generous', 'stubborn', 'cunning', 'kind',
   'hot_tempered', 'frail', 'hardy', 'greedy', 'loyal', 'proud', 'secretive',
 ]);
-const DEATHS = new Set(['natural', 'old_age', 'hunger', 'cold', 'plague', 'fire', 'violence']);
+const DEATHS = new Set(['natural', 'old_age', 'hunger', 'cold', 'plague', 'fire', 'violence', 'mishap']);
 const MEMORIES = new Set([
   'lost_child', 'was_blamed', 'was_saved', 'was_passed_over', 'went_hungry',
   'lost_home', 'stole', 'unspoken',
@@ -135,7 +135,33 @@ function actRecord(value: unknown): boolean {
   // guardada que nombre un medio que este build no conoce no se puede jugar.
   // K-1 · y la corona, que se da a alguien: el `who` es un id de aldeano.
   if (act['kind'] === 'crown') return tickValue(act['who']);
+  // La caza y el parte de la batalla. **Faltaban desde que existen** y una
+  // partida en la que se hubiera cazado o visto un asalto no cargaba: `loadSave`
+  // la daba por corrupta y el juego empezaba otra (cazado el 28 sep 2026).
+  if (act['kind'] === 'hunt') {
+    return tickValue(act['sourceTick']) && HUNT_SPECIES.has(act['species'] as string)
+      && HUNT_WEAPONS.has(act['weapon'] as string) && tickValue(act['hits']) && typeof act['killed'] === 'boolean';
+  }
+  if (act['kind'] === 'battle') {
+    return tickValue(act['slain']) && tickValue(act['lost']) && typeof act['breached'] === 'boolean';
+  }
+  // §7.13 · mandar gente a una misión.
+  if (act['kind'] === 'expedition') {
+    return (MISSION_IDS as readonly string[]).includes(act['mission'] as string) && tickValue(act['count']);
+  }
   return act['kind'] === 'means' && (MEANS_IDS as readonly string[]).includes(act['means'] as string);
+}
+
+const HUNT_SPECIES = new Set(['partridge', 'rabbit', 'deer', 'boar', 'bear']);
+const HUNT_WEAPONS = new Set(['sling', 'bow', 'spear']);
+
+/** §7.13 · una expedición en camino. */
+function expedition(value: unknown): boolean {
+  return record(value) && (MISSION_IDS as readonly string[]).includes(value['mission'] as string)
+    && Array.isArray(value['who']) && value['who'].every(tickValue)
+    && tickValue(value['sentTick']) && tickValue(value['dueTick'])
+    && (value['end'] === null || (EXPEDITION_ENDS as readonly unknown[]).includes(value['end']))
+    && Array.isArray(value['dead']) && value['dead'].every(tickValue);
 }
 
 function catalogueOption(templateId: unknown, optionId: unknown) {
@@ -365,6 +391,7 @@ function isPlausibleState(value: unknown): value is GameState {
       && tickValue(outbreak['endsTick']) && tickValue(outbreak['deaths'])))
     && nullableTick(s['dwindlingSince']) && tickValue(s['noOneStreak'])
     && woodRun(s['woodRun'])
+    && Array.isArray(s['expeditions']) && s['expeditions'].every(expedition)
     && (modifier === null || (record(modifier) && finite(modifier['factor']) && tickValue(modifier['harvests'])))
     && (ended === null || (record(ended) && tickValue(ended['tick'])
       && ENDS.has(ended['cause'] as string) && (ended['lastId'] === null || tickValue(ended['lastId']))))
@@ -543,6 +570,16 @@ export function deserialize(raw: unknown): SaveFile {
   // jugador puede coronar a quien quiera cuando quiera.
   if ((state as Partial<GameState>).crown === undefined) {
     state = { ...state, version: SCHEMA_VERSION, crown: null } as GameState;
+  }
+  // §7.13 · las expediciones, **sin subir el esquema**: una partida guardada
+  // antes no tenía ninguna en camino, y su flujo de azar sale de la semilla
+  // maestra como todos. Así la partida de la tablet sigue cargando.
+  if ((state as Partial<GameState>).expeditions === undefined || state.rng.expeditions === undefined) {
+    state = {
+      ...state,
+      expeditions: (state as Partial<GameState>).expeditions ?? [],
+      rng: { ...state.rng, expeditions: state.rng.expeditions ?? hash32(state.seed, 'expeditions') },
+    } as GameState;
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');
