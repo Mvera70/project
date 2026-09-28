@@ -22,7 +22,7 @@
 // villa, calzada. Y desde la aldea, un **cartel** en cada entrada, a unas
 // celdas de la plaza, mirando a quien llega. Puro salvo `buildSignposts`.
 
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
+import { Group, type Object3D } from 'three';
 import { route, stepCost } from '@engine/world/astar';
 import type { ValleyMap } from '@engine/state';
 import type { Era } from '@derive/era';
@@ -113,30 +113,22 @@ export function valleyRoad(
   return { wear, signposts, mouths };
 }
 
-/**
- * Los carteles, provisionales: un poste y una tablilla de madera. El modelo de
- * verdad está pedido a Astra (`docs/encargos/cartel-del-camino.md`); cuando
- * llegue se instancia aquí con el mismo `yaw`.
- */
-export function buildSignposts(signs: readonly Signpost[], ground: (x: number, z: number) => number): Group {
+/** Los carteles publicados de Astra, con el origen del GLB en la base del poste. */
+export function buildSignposts(
+  signs: readonly Signpost[], ground: (x: number, z: number) => number,
+  instance: () => Object3D | undefined,
+): Group {
   const group = new Group();
   group.name = 'Valley_Signposts';
-  if (signs.length === 0) return group;
-  const timber = new MeshStandardMaterial({ color: '#6b4a2e', roughness: 0.95, metalness: 0 });
-  const board = new MeshStandardMaterial({ color: '#a8845a', roughness: 0.9, metalness: 0 });
-  const postShape = new BoxGeometry(0.08, 1.1, 0.08);
-  const boardShape = new BoxGeometry(0.56, 0.2, 0.04);
   for (const sign of signs) {
-    const y = ground(sign.x, sign.z);
-    const post = new Mesh(postShape, timber);
-    post.position.set(sign.x, y + 0.55, sign.z);
-    post.castShadow = true;
-    const plank = new Mesh(boardShape, board);
-    plank.position.set(sign.x, y + 0.92, sign.z);
-    // La tablilla cruza el camino: quien viene por él la lee de frente.
-    plank.rotation.y = sign.yaw;
-    plank.castShadow = true;
-    group.add(post, plank);
+    const post = instance();
+    if (post === undefined) continue;
+    post.position.set(sign.x, ground(sign.x, sign.z), sign.z);
+    // La talla del GLB mira a +Z; el camino va de la boca a la plaza,
+    // así que la cara del cartel mira hacia la boca.
+    post.rotation.y = sign.yaw + Math.PI;
+    post.traverse((part) => { part.castShadow = true; });
+    group.add(post);
   }
   return group;
 }

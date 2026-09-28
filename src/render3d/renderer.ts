@@ -207,6 +207,7 @@ export const WANTED = [
   'fountain',
   // La golondrina de Astra (26 sep 2026), para las bandadas del cielo.
   'bird',
+  'signpost',
   // Y el resto de sus modelos (27 sep 2026): los puestos de los que visitan,
   // la cara de la cantera en sus tres estados, los peñascos y el mojón.
   'stall-pedlar', 'stall-factor', 'stall-salter',
@@ -1108,7 +1109,8 @@ export async function createGraphicsRenderer(
     ground = buildGround(state.map, palette, plazaOf(state), era,
       snowing < 0.5 ? (x, z) => meadowWeight(terrainSeed, x, z) : undefined, road.wear);
     if (signposts !== null) world.remove(signposts);
-    signposts = buildSignposts(road.signposts, (x, z) => elevationAt(state.map, x, z));
+    signposts = buildSignposts(road.signposts, (x, z) => elevationAt(state.map, x, z),
+      () => library.instance('signpost'));
     world.add(signposts);
     if (trample === null) trample = createTrampleMap(state.map.width, state.map.height);
     snowTracks(ground.mesh.material as Material);

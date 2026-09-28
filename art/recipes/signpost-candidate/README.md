@@ -42,7 +42,7 @@ El `.blend` contiene exclusivamente el modelo. Las capturas y las medidas
 caja, triángulos, pivote y normal de la talla. Los hashes identifican fuente y GLB.
 `artifacts/` está ignorado por Git: los productos se regeneran desde la fuente.
 
-## Entrada posterior al catálogo
+## Entrada al catálogo
 
 El comando del encargo `npm run art -- all signpost` **todavía no acepta este
 candidato**: `tools/art/index.ts` exige una receta JSON de primitivas y el
@@ -50,8 +50,8 @@ generador `tools/art/blender-build.py`. La flecha excavada y el contorno tallado
 usan malla propia y una operación booleana, siguiendo los candidatos de
 `burnt-house` y `great-oak`.
 
-La vía existente para estos modelos es `tools/art/adopt-models.mjs`; se deja
-`adopt.json` preparado, sin ejecutarlo. Después de aceptar el candidato:
+Se integró por `tools/art/adopt-models.mjs` con `adopt.json` y se publicó en
+`public/assets/valley3d/signpost.glb`. Para repetir la admisión y publicación:
 
 ```powershell
 node tools/art/adopt-models.mjs art/recipes/signpost-candidate/adopt.json
@@ -61,10 +61,10 @@ npx tsx tools/graphics/publish-assets.ts --ids signpost
 Para que funcione literalmente `npm run art -- all signpost`, hace falta una
 ronda del pipeline que admita generadores Python propios y sus recibos de
 construcción. Darlo de alta como si fuera una receta de primitivas no basta.
-No se ha modificado catálogo, código del juego ni `public/`.
+`src/render3d/world/road.ts` instancia el GLB en las dos entradas del camino.
 
 ## Revisión pendiente
 
 Las capturas permiten revisar el candidato aislado y junto a un aldeano.
-Falta la aceptación estética de Vera y la revisión dentro del valle cuando
-se integre. No se han ejecutado pruebas automatizadas ni publicado el modelo.
+Vera aceptó el candidato y pidió integrarlo. No se han ejecutado pruebas
+automatizadas ni se ha revisado aún una captura dentro del valle.

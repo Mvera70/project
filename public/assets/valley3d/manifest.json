@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-27T18:16:30.614Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids deer",
+  "generatedAt": "2026-09-28T13:37:30.476Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids signpost",
   "assets": [
     {
       "id": "axis-marker",
@@ -1548,6 +1548,17 @@
         "kind": "original",
         "source": "Original procedural stag modeled for The Valley on 23 Sep 2026; no external provider.",
         "license": "Project original"
+      }
+    },
+    {
+      "id": "signpost",
+      "file": "signpost.glb",
+      "sha256": "3A4F90CD4A77D2A8F3AA754763F73DBC6E2B68E9F6C7B0BA7F9D7AA95841D637",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelo original del cartel del camino de The Valley, realizado por Astra conforme a docs/encargos/cartel-del-camino.md. Fuente reproducible: art/recipes/signpost-candidate/build.py.",
+        "license": "project-original"
       }
     }
   ]

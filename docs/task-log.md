@@ -1,5 +1,14 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · Cartel del camino de Astra
+
+`signpost` aceptado por Vera: fuente reproducible en
+`art/recipes/signpost-candidate/build.py`, GLB de 300 triángulos publicado en
+`public/assets/valley3d/signpost.glb` y registrado en el catálogo y manifiesto.
+`world/road.ts` coloca una instancia en cada entrada, con la talla mirando a
+quien llega desde la boca del desfiladero. **Pendiente:** captura dentro del
+valle y confirmación visual en dispositivo. No se ejecutaron pruebas en esta ronda.
+
 ## 28 sep 2026 · El camino del valle (v4.93)
 
 `world/road.ts` (`valleyRoad`, `buildSignposts`), `world/mountains.ts`
