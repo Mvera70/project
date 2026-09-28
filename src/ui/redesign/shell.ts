@@ -79,7 +79,12 @@ export function navTabFor(route: SheetRoute): NavTab {
 export function contentRouteFor(route: SheetRoute): 'cart' | 'inspect' | 'chronicle' | 'people' | null {
   // §7.15 · el tablón tampoco monta nada en la bandeja: su ventana va encima
   // del valle (`board.ts`), que es lo que la distingue de una hoja.
-  return route.kind === 'valley' || route.kind === 'board' ? null : route.kind;
+  if (route.kind === 'valley' || route.kind === 'board') return null;
+  // A1 · tocar algo **en el valle** abre la etiqueta de pergamino junto a la
+  // cosa (`label.ts`), no una hoja; desde la lista de la gente sigue abriéndose
+  // la ficha en la bandeja.
+  if (route.kind === 'inspect' && route.from === 'valley') return null;
+  return route.kind;
 }
 
 /**

@@ -35,6 +35,7 @@ import { hash32 } from '@engine/rng';
 import { createInspectPanel } from './redesign/inspect-panel';
 import { cartPanel } from './redesign/cart';
 import { boardPanel } from './redesign/board';
+import { labelPanel, type LabelPanel } from './redesign/label';
 import { peoplePanel } from './redesign/people-panel';
 import { createShell } from './redesign/shell';
 import type { SheetRoute, UiActions, UiPanel, UiSnapshot } from './redesign/contracts';
@@ -256,6 +257,12 @@ export function boot(
   // `dispose()` cancele el seguimiento que ella misma pudiera haber empezado
   // (§2.5: «cerrar la ficha termina el seguimiento iniciado desde ella»).
   let mountedInspect: UiPanel | null = null;
+  /** A1 · la etiqueta de pergamino abierta sobre el valle, si hay una. */
+  let mountedLabel: LabelPanel | null = null;
+  const surfaceBounds = (): { width: number; height: number } => {
+    const box = surface().getBoundingClientRect();
+    return { width: box.width, height: box.height };
+  };
   /**
    * UI-V10 · Salir de la pantalla despejada. Se asigna de verdad más abajo,
    * cuando el botón existe; hasta entonces no hay nada que despejar. La
@@ -286,6 +293,8 @@ export function boot(
     // justo después.
     shell.content.replaceChildren();
     board.element.remove();
+    mountedLabel?.dispose();
+    mountedLabel = null;
     shell.setRoute(route);
     if (route.kind === 'chronicle') {
       // UI-R3/UI-R5 · migrada de verdad a `shell.content`. Hasta UI-R5,
@@ -311,6 +320,14 @@ export function boot(
       // hidden = false`) ya no hace falta.
       shell.content.append(people.element);
       people.update(snapshot());
+    } else if (route.kind === 'inspect' && route.from === 'valley') {
+      // A1 · desde el valle, la etiqueta de pergamino junto a la cosa; el
+      // punto se pone en cada fotograma (abajo, en `paint`).
+      const label = labelPanel(actions, route.target);
+      mountedLabel = label;
+      shell.element.append(label.element);
+      label.update(snapshot());
+      label.place(backend.live.screenOf(route.target), surfaceBounds());
     } else if (route.kind === 'inspect') {
       const inspect = createInspectPanel(actions, route.target, route.from);
       mountedInspect = inspect;
@@ -864,7 +881,10 @@ export function boot(
     // este refresco por fotograma la ficha se habría quedado congelada en el
     // último `panelFor` calculado al entrar, y un seguimiento activo nunca se
     // habría cancelado solo.
-    else if (currentRoute.kind === 'inspect') mountedInspect?.update(snapshot());
+    else if (currentRoute.kind === 'inspect' && mountedLabel !== null) {
+      mountedLabel.update(snapshot());
+      mountedLabel.place(backend.live.screenOf(currentRoute.target), surfaceBounds());
+    } else if (currentRoute.kind === 'inspect') mountedInspect?.update(snapshot());
     // The same kind of observability hook as `data-app-ready` (M-19): the year
     // on screen is rounded to twelve weeks, and a test about the clock needs
     // the week.

@@ -45,7 +45,10 @@ describe('contentRouteFor · qué monta la bandeja de la carcasa (UI-R5)', () =>
   it('órdenes, ficha, crónica y gente piden un panel dentro de `content`', () => {
     const target = { kind: 'terrain', x: 0, y: 0 } as const;
     expect(contentRouteFor({ kind: 'cart' })).toBe('cart');
-    expect(contentRouteFor({ kind: 'inspect', target, from: 'valley' })).toBe('inspect');
+    // A1 (29 sep 2026): desde la lista, la ficha va en la bandeja; desde el
+    // valle, la etiqueta de pergamino va junto a la cosa y la bandeja no se abre.
+    expect(contentRouteFor({ kind: 'inspect', target, from: 'people' })).toBe('inspect');
+    expect(contentRouteFor({ kind: 'inspect', target, from: 'valley' })).toBeNull();
     expect(contentRouteFor({ kind: 'chronicle' })).toBe('chronicle');
     expect(contentRouteFor({ kind: 'people' })).toBe('people');
   });

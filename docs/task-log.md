@@ -7,12 +7,11 @@ buenas: cuero con medallones para la barra, placas de madera con brasa para
 actuar, «Open the cart» en la bandeja. Plan y estado en
 `docs/ui-redesign/plan-integracion-piel-2026-09-29.md`. Las piezas de imagen
 están ya en `src/ui/redesign/` y `public/ui/art/cards/`; `tokens.css` las
-nombra. Tandas 1 y 2 escritas (correa, medallones, iconos a color, placas,
+nombra. Tandas 1, 2 y 3 escritas (correa, medallones, iconos a color, placas,
 cierre, tarjetas rasgadas, fichas, clavos, ilustraciones; fuera la edad de
-piedra de la carcasa): typecheck, lint y 45 pruebas de piel en verde. **Sin
+piedra de la carcasa; la etiqueta A1 junto a la cosa con `screenOf`; la crónica en viñetas con fecha): typecheck, lint y 91 pruebas de interfaz en verde. **Sin
 captura ni build**: Vera pidió no hacer ruido; la primera captura decide si
-se sube. Abierto: tocar el tablón no abre su ventana; la etiqueta A1 y la
-crónica a color (tanda 3); la skill `piel-del-valle` (tanda 4).
+se sube. Abierto: tocar el tablón no abre su ventana (hay que verlo en el navegador); la crónica a color cuando estén las 51; la skill `piel-del-valle` y las capturas (tanda 4).
 
 ## 28 sep 2026 · Piel v5: el toque de calidad — **encargo, a la espera de las piezas**
 

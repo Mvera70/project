@@ -12,6 +12,7 @@ import { makeBundle, type RngBundle } from '@engine/rng';
 import { eraAtYear } from '@derive/era';
 import type { ArchivedGame, ChronicleEntry, GameState, HappeningRecord, PendingCrossroad } from '@engine/state';
 import { yearOf } from '@engine/time';
+import { seasonLabel } from '../redesign/hud';
 import type { App } from '../app';
 import { roman } from '../app';
 import { recogniseGesture, type Point } from '../gestures';
@@ -162,23 +163,28 @@ const STYLE = `
 .chronicle-entry-sep svg { flex: 0 0 auto; display: block; height: 7px; width: auto;
   color: var(--skin-gold); }
 .chronicle-entry-sep svg { display: none; }
-.chronicle-entry { position: relative; display: flex; align-items: flex-start; gap: 16px;
-  padding: 16px 34px 16px 38px; }
+/* v7 · la entrada es una columna: fecha, viñeta apaisada del ancho del papel
+   (130 px, recorte centrado) y el texto debajo. Sin línea de tiempo ni
+   arandela: el prototipo aprobado el 29 sep 2026 las quitó. */
+.chronicle-entry { position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 8px;
+  padding: 13px 16px 18px; }
+.chronicle-entry + .chronicle-entry { border-top: 1px solid rgba(120, 97, 60, .35); }
+.chronicle-entry-date { font: 600 10px/1.3 var(--skin-font-display); letter-spacing: .075em; text-transform: uppercase; color: #78613c; }
+.chronicle-timeline::before { display: none; }
 /* **La cuenta es un anillo, no un punto.** En el prototipo cada entrada se
    marca con una arandela de oro con su centro más oscuro, y un disco plano es
    lo que hacía que la línea de tiempo pareciera una lista con viñetas. El
    papel de dentro tapa el filete que pasa por detrás, que es lo que le da el
    relieve. */
-.chronicle-entry-dot { position: absolute; left: 16px; top: 23px; width: 13px; height: 13px;
-  box-sizing: border-box; border: 2px solid var(--skin-gold); border-radius: 50%;
-  background: var(--skin-gold-deep, #9A7B36); box-shadow: 0 0 0 2px var(--skin-page); }
-.chronicle-entry-art { flex: 0 0 100px; width: 100px; height: 66px; overflow: hidden; }
+.chronicle-entry-dot { display: none; }
+.chronicle-entry-art { width: 100%; height: 130px; overflow: hidden; border-radius: 3px; }
 /* La viñeta va **sobre el papel, sin marco y sin recuadro**, como en el
    prototipo: es un aguado a pluma, no una foto en una tarjeta. Se recorta con
    \`tools/ui/cut-art.py\` en modo \`wash\`, que tira el papel del prototipo y
    guarda el dibujo como alfa — así se compone encima de nuestro pergamino sin
    que se vea un rectángulo de otro tono. */
-.chronicle-entry-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.chronicle-entry-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.chronicle-entry-art--fallback img { object-fit: contain; }
 /* Sin dibujo listado en \`public/ui/art/index.json\` (hoy, siempre): la hoja de
    roble del sprite sobre un óvalo — el respaldo obligatorio del plan §3.2.
    Una entrada nunca se queda sin su hueco. */
@@ -386,11 +392,18 @@ function timelineSep(): HTMLElement {
 const ENTRY_VIGNETTE = './ui/art/entry.png';
 
 /** Una entrada normal: hueco de ilustración (o su respaldo) + texto. */
-function timelineRow(text: string, art: string | null): HTMLElement {
+function timelineRow(text: string, art: string | null, tick: number | null): HTMLElement {
   const row = document.createElement('div');
   row.className = 'chronicle-entry';
   const dot = document.createElement('span');
   dot.className = 'chronicle-entry-dot';
+  // v7 · la fecha en cada entrada, en cifras («Anno 50 · Spring»): Vera, 28
+  // sep 2026, «nunca romanos» para la crónica.
+  const date = document.createElement('span');
+  date.className = 'chronicle-entry-date';
+  // Una línea sin entrada detrás (el respaldo) no sabe su semana: sin fecha.
+  if (tick === null) date.hidden = true;
+  else date.textContent = renderUiText('chronicle.entry_date', { year: yearOf(tick) + 1, season: seasonLabel(tick) });
   const hole = document.createElement('div');
   hole.className = 'chronicle-entry-art';
   const img = document.createElement('img');
@@ -411,7 +424,7 @@ function timelineRow(text: string, art: string | null): HTMLElement {
   const p = document.createElement('p');
   p.className = 'chronicle-entry-text skin-read';
   p.textContent = text;
-  row.append(dot, hole, p);
+  row.append(dot, date, hole, p);
   return row;
 }
 
@@ -574,7 +587,7 @@ function yearBlock(source: ChronicleSource, year: number, actions?: UiActions): 
       && (matched.kind === 'crossroad_posed' || matched.kind === 'crossroad_taken' || matched.kind === 'consequence')) {
       append(flatCard(line));
     } else {
-      append(timelineRow(line, matched === null ? null : illustrationFor(matched, happenings)));
+      append(timelineRow(line, matched === null ? null : illustrationFor(matched, happenings), matched === null ? null : matched.tick));
     }
   }
   if (posingThisYear && pending !== null && source.live !== undefined && actions !== undefined) {

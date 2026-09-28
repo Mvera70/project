@@ -2860,6 +2860,8 @@ export const UI_BANK: Record<string, string> = {
   // un «no hay nada» no le dice a nadie qué hacer.
   'annals.empty': 'Nothing here yet. Every valley that ends is written down, and the ones that came before you were not.',
   'annals.anno': 'ANNO {year} · VALLEY {seed}',
+  // v7 · la fecha de cada entrada de la crónica, en cifras.
+  'chronicle.entry_date': 'Anno {year} · {season}',
   // Las tres cifras grandes de la hoja de cuentas (F3b), en una línea: son las
   // que dejan comparar dos valles de un vistazo.
   // **Sin los años**, y es lo que la captura enseñó: la línea de arriba ya dice

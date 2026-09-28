@@ -43,6 +43,8 @@ interface ValleyBackend {
   paint(state: GameState, tickFraction: number, speed: 0 | 1 | 4 | 16 | 64): void;
   /** What is under a point, in CSS pixels local to the viewport element. */
   pick(state: GameState, xCss: number, yCss: number, tickFraction: number): InspectTarget | null;
+  /** A1 · dónde cae en pantalla la cosa tocada, o `null`. El 2D no lo sabe. */
+  screenOf(target: InspectTarget): { x: number; y: number } | null;
   track(id: number | null): void;
   /** VZ-6 · mirar a un punto del mapa, en celdas. El 2D no tiene cámara. */
   look(x: number, z: number): void;
@@ -171,6 +173,7 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
       );
     },
     track(id) { renderer.track(id); },
+    screenOf() { return null; },
     look() { /* El 2D dibuja el mapa entero: no hay a dónde mirar. */ },
     // El 2D pinta puntos desde el estado, no simula cuerpos: no hay a quién
     // preguntar qué está haciendo, y una frase inventada es peor que ninguna.
@@ -429,6 +432,7 @@ export function attachBackend(
           }));
         },
         pick(_state, xCss, yCss) { return renderer.pick(xCss, yCss); },
+        screenOf(target) { return target.kind === 'terrain' ? null : renderer.screenOf(target); },
         track(id) { renderer.track(id); },
         zoom(factor, atX, atY) { renderer.zoom(factor, atX, atY); },
         pan(dx, dy) { renderer.pan(dx, dy); },

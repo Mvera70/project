@@ -2371,6 +2371,30 @@ export async function createGraphicsRenderer(
       };
     },
 
+    // A1 · el punto de pantalla de la cosa tocada: la cabeza de una persona,
+    // el tejado de un edificio, la tabla del tablón. Del mismo fotograma que
+    // se acaba de pintar, como `doing`.
+    screenOf(target: GraphicsTarget): { x: number; y: number } | null {
+      if (disposed || mapWidth === 0) return null;
+      let at: Vector3 | null = null;
+      if (target.kind === 'villager') {
+        const actor = lastActors.find((one) => one.id === target.id);
+        if (actor !== undefined) at = new Vector3(actor.x, (actor.y ?? groundFloor(actor.x, actor.z)) + 1.25, actor.z);
+      } else if (target.kind === 'building') {
+        const building = lifeState?.buildings.find((one) => one.id === target.id);
+        if (building !== undefined) {
+          const cx = building.x + building.w / 2, cz = building.y + building.h / 2;
+          at = new Vector3(cx, groundFloor(cx, cz) + 1.5, cz);
+        }
+      } else if (target.kind === 'board') {
+        at = new Vector3(0, 1.2, 0).applyMatrix4(noticeBoard.group.matrixWorld);
+      }
+      if (at === null) return null;
+      const point = at.project(camera);
+      if (point.z > 1) return null;
+      return { x: (point.x + 1) / 2 * viewport.widthCss, y: (1 - point.y) / 2 * viewport.heightCss };
+    },
+
     doing(id: number): ActorDoing | null {
       // VZ-6 · del mismo `lastActors` con el que se pintó el último fotograma:
       // lo que la ficha dice es literalmente lo que se está viendo.

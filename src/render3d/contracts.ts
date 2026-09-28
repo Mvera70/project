@@ -223,6 +223,12 @@ export interface GraphicsRenderer {
   resize(viewport: GraphicsViewport): void;
   paint(state: Readonly<GameState>, frame: GraphicsFrame): void;
   pick(localXCss: number, localYCss: number): GraphicsTarget | null;
+  /**
+   * A1 · Dónde cae en la pantalla la cosa que se tocó, en px CSS del lienzo,
+   * o `null` si no está en la escena: la etiqueta de pergamino se coloca ahí
+   * cada fotograma (`ui/redesign/label.ts`).
+   */
+  screenOf(target: GraphicsTarget): { x: number; y: number } | null;
   track(id: number | null): void;
 
   /**
