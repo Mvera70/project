@@ -2,8 +2,9 @@
 
 ## v4.95 · 28 sep 2026 · Más gente por el camino, las expediciones y el tablón de la plaza
 
-**En `main` sin subir** (commit local): falta que tocar el tablón abra su
-ventana, y la suite completa. Ver `docs/task-log.md`.
+**En `main` a medias, a propósito:** se subió para que el agente del diseño
+nuevo de la interfaz lo vea. Falta que tocar el tablón abra su ventana, y la
+suite completa. Ver `docs/task-log.md`.
 
 Vera, con el camino ya en el motor: «crear más eventos de gente que llegue a la
 aldea, te doy libertad de imaginación», y las expediciones: «el jugador podrá

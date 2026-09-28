@@ -2,8 +2,9 @@
 
 ## 28 sep 2026 · Llegadas, expediciones y el tablón (v4.95) — **en vuelo**
 
-Commit local en `main` (`173d1d8` y el de la documentación), **sin subir**:
-Vera pidió parar de noche para no hacer ruido con el ventilador y avisará.
+En `main` y subido (`173d1d8`, `be1886b` y éste) para que el agente del
+diseño nuevo de la interfaz lo vea, **con lo de abajo abierto**. Vera pidió
+parar de noche para no hacer ruido con el ventilador y avisará.
 
 Hecho y con prueba: las cinco llegadas (`fate.ts`, `VISITS`), el motor de las
 expediciones (`world/expeditions.ts`, `state.expeditions` sin subir el esquema,
