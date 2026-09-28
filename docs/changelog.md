@@ -32,6 +32,21 @@ vértices (v4.86), así que `world/grass.ts` deja de gastarlos donde no se ven:
   (0,7; `snowCover` llega a 0,72) apaga el grupo entero, que en pleno invierno
   no cuesta nada. Capturado en las cuatro estaciones (semilla 11, año 5).
 
+**Y en la misma tarde, dos cosas más de Vera al probarlo en la tablet.** «Poner
+lo mismo que haces en los conjuntos pero suelto queda muy mal; el típico césped
+más plano, más puntiagudo, quizás pequeños matojitos, zonas chiquititas»: fuera
+de las manchas ya no hay matas altas (por debajo de un peso de prado de 0,12,
+ninguna) sino un **césped** bajo, ancho y afilado, casi del color del suelo, en
+matojos que reparte un ruido fino de 2,5 celdas; de lejos baja antes que la
+hierba alta (densidad al cuadrado). Y sobre el recorte por altura de vista: «no
+se puede ver muy exagerado; que vayas viendo que se va pintando la hierba va a
+ser muy feo». Así que **ninguna mata aparece de golpe**: cada una lleva su
+puesto en la fila (`grassRank`, un atributo por instancia) y las que están en la
+banda del umbral (`GROW_BAND`, 0,12) se dibujan pequeñas y crecen del suelo con
+el zoom. Medido con dibujo por software en la aldea de referencia: 466 llamadas
+(quince tramos de césped más), 710 mil triángulos y 104 fotogramas en 30 s: el
+césped sale casi gratis, porque de lejos baja antes que la hierba alta.
+
 ## v4.87 · 28 sep 2026 · La sierra vista desde arriba
 
 Vera, con siete capturas desde la vista más alta: «las montañas que tenemos

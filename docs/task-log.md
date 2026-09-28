@@ -6,7 +6,10 @@
 `world/ground.ts` (`buildGround(..., meadow)`), `renderer.ts` (`grass.zoom` cada
 fotograma; el suelo con la mancha si no nieva). Pruebas: `grass.test.ts` (cinco:
 dónde crece, manchas, tramos recortables, menos de lejos, estación y nieve).
-Capturas 430 × 932, semilla 11, año 5, cuatro estaciones. **Abierto:** los
+Capturas 430 × 932, semilla 11, año 5, cuatro estaciones. Después, por Vera
+desde la tablet: el césped bajo fuera de las manchas (`LAWN`, `TALL_FROM`) y
+las matas que crecen del suelo con el zoom en vez de aparecer (`grassRank`,
+`GROW_BAND`). **Abierto:** los
 fotogramas en la tablet de Vera con las manchas densas; la hierba que se aparta
 al pisarla (`encargos-3d.md`); la primera nevada (otoño, semanas 8–11) no está
 capturada, sólo la nieve asentada.

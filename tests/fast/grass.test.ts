@@ -64,6 +64,9 @@ describe('la hierba del valle', () => {
       }
       expect(lushCells, `semilla ${seed}: hay prado`).toBeGreaterThan(50);
       expect(lush / lushCells).toBeGreaterThan(8 * (bare / Math.max(1, bareCells)));
+      // Y fuera de la mancha no hay matas altas sueltas: ahí crece el césped bajo.
+      expect(bareCells).toBe(0);
+      expect(grass.counts.lawn, `semilla ${seed}: hay césped`).toBeGreaterThan(1000);
     }
   });
 
@@ -92,11 +95,13 @@ describe('la hierba del valle', () => {
     grass.plant(state, () => 0, plazaOf(state));
     grass.zoom(13);
     const near = grass.counts.drawn;
-    expect(near).toBe(grass.counts.grass + grass.counts.stubble);
+    expect(near).toBe(grass.counts.grass + grass.counts.lawn + grass.counts.stubble);
     grass.zoom(80);
     const far = grass.counts.drawn;
+    // De lejos, alrededor de un cuarto de las matas altas y menos del césped;
+    // con la banda de crecimiento, que dibuja pequeñas las del umbral.
     expect(far).toBeLessThan(near * 0.3);
-    expect(far).toBeGreaterThan(near * 0.2);
+    expect(far).toBeGreaterThan(near * 0.12);
     expect(densityAt(36)).toBeGreaterThan(densityAt(60));
     // Repartida: el tramo con más matas de lejos sigue siendo el que más tenía de cerca.
     const meshes = tuftMeshes(grass);

@@ -38,8 +38,8 @@
 // replanta sólo cuando cambia algo de eso (`plant` compara una firma).
 
 import {
-  BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Group, InstancedMesh, Matrix4,
-  MeshLambertMaterial, Quaternion, Vector3,
+  BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Group, InstancedBufferAttribute, InstancedMesh,
+  Matrix4, MeshLambertMaterial, Quaternion, Vector3,
 } from 'three';
 import { hash32 } from '@engine/rng';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
@@ -63,10 +63,42 @@ const GRASS = {
    */
   PER_CELL: 28,
   PER_CELL_HANDHELD: 18,
-  SPARSE: 1,
   /** Cuánto se dobla la punta con el viento, en celdas, a fuerza 1. */
   BEND: 0.16,
 } as const;
+
+/**
+ * TUNE visual. El césped de fuera de las manchas. Vera, al ver la mata alta
+ * suelta por el prado: «poner lo mismo que haces en los conjuntos pero suelto
+ * queda muy mal; el típico césped más plano, más puntiagudo, quizás pequeños
+ * matojitos, zonas chiquititas, no hace falta que esté todo cubierto». Así que
+ * fuera de los prados no hay matas altas: hay esto, bajo, ancho y afilado,
+ * casi del color del suelo, en corros pequeños repartidos por un ruido fino.
+ */
+const LAWN = {
+  BLADES: 7,
+  HEIGHT: 0.08,
+  WIDTH: 0.035,
+  SPREAD: 0.3,
+  /** Matas por celda de media; el ruido fino las junta en matojos. */
+  PER_CELL: 2,
+  PER_CELL_HANDHELD: 2,
+  /** Celdas de la rejilla del ruido que hace los matojos. */
+  CLUMP: 2.5,
+  BEND: 0.03,
+} as const;
+
+/**
+ * Cuánto tarda una mata en crecer del suelo cuando el zoom la va trayendo, en
+ * fracción de la densidad. Vera: «no se puede ver muy exagerado; que vayas
+ * viendo que se va pintando la hierba va a ser muy feo». Las matas no aparecen:
+ * las que están junto al umbral de la densidad se dibujan pequeñas y crecen
+ * con el zoom, así que ninguna salta de golpe.
+ */
+const GROW_BAND = 0.12;
+
+/** Peso de prado a partir del cual hay matas altas; por debajo, sólo el césped. */
+const TALL_FROM = 0.12;
 
 /** TUNE visual. El rastrojo de un campo segado: bajo, tieso y color paja. */
 const STUBBLE = {
@@ -127,7 +159,7 @@ export interface Grass {
   /** La altura de la vista, en celdas: de lejos se dibujan menos matas. */
   zoom(viewHeight: number): void;
   /** Cuántas matas hay plantadas de cada, y cuántas se dibujan ahora. */
-  readonly counts: { readonly grass: number; readonly stubble: number; readonly drawn: number };
+  readonly counts: { readonly grass: number; readonly lawn: number; readonly stubble: number; readonly drawn: number };
   dispose(): void;
 }
 
@@ -136,20 +168,20 @@ function unit(seed: number, key: string): number {
 }
 
 /** Ruido de valor suave, de 0 a 1, estable por semilla del terreno. */
-function meadowNoise(seed: number, x: number, z: number): number {
-  const gx = x / MEADOWS.SCALE, gz = z / MEADOWS.SCALE;
+function valueNoise(seed: number, x: number, z: number, scale: number, salt: string): number {
+  const gx = x / scale, gz = z / scale;
   const x0 = Math.floor(gx), z0 = Math.floor(gz);
   const fx = gx - x0, fz = gz - z0;
   const sx = fx * fx * (3 - 2 * fx), sz = fz * fz * (3 - 2 * fz);
-  const at = (i: number, j: number): number => unit(seed, `meadow:${i}:${j}`);
+  const at = (i: number, j: number): number => unit(seed, `${salt}:${i}:${j}`);
   const top = at(x0, z0) + (at(x0 + 1, z0) - at(x0, z0)) * sx;
   const bottom = at(x0, z0 + 1) + (at(x0 + 1, z0 + 1) - at(x0, z0 + 1)) * sx;
   return top + (bottom - top) * sz;
 }
 
-/** Cuánto prado hay en una celda, de 0 (matas sueltas) a 1 (alfombra). El suelo lo lee también. */
+/** Cuánto prado hay en una celda, de 0 (césped bajo) a 1 (alfombra). El suelo lo lee también. */
 export function meadowWeight(seed: number, x: number, z: number): number {
-  const n = meadowNoise(seed, x + 0.5, z + 0.5);
+  const n = valueNoise(seed, x + 0.5, z + 0.5, MEADOWS.SCALE, 'meadow');
   const t = Math.max(0, Math.min(1, (n - MEADOWS.FROM) / (MEADOWS.FULL - MEADOWS.FROM)));
   return t * t * (3 - 2 * t);
 }
@@ -168,7 +200,7 @@ export function densityAt(viewHeight: number): number {
  * hacia el amarillo; el de la mata lo pone la instancia. Todas las normales
  * hacia arriba: la luz la trata como al suelo.
  */
-function tuftGeometry(spec: typeof GRASS | typeof STUBBLE, salt: number): BufferGeometry {
+function tuftGeometry(spec: typeof GRASS | typeof LAWN | typeof STUBBLE, salt: number): BufferGeometry {
   const positions: number[] = [];
   const colours: number[] = [];
   for (let blade = 0; blade < spec.BLADES; blade += 1) {
@@ -196,6 +228,8 @@ function tuftGeometry(spec: typeof GRASS | typeof STUBBLE, salt: number): Buffer
 
 const snowUniform = { value: 0 };
 
+interface Kind { readonly geometry: BufferGeometry; readonly material: MeshLambertMaterial; readonly name: string; readonly grow: { value: number } }
+
 /**
  * El material de una hierba: Lambert con el color de vértice y de instancia,
  * el viento en ondas y la nieve. La onda avanza por el prado (fase por
@@ -203,13 +237,14 @@ const snowUniform = { value: 0 };
  * todas se doblen hacia el mismo lado aunque cada una esté girada. La nieve
  * blanquea desde las puntas —es donde se posa— y entierra la brizna.
  */
-function grassMaterial(height: number, bend: number): MeshLambertMaterial {
+function grassMaterial(height: number, bend: number, grow: { value: number }): MeshLambertMaterial {
   const material = new MeshLambertMaterial({ vertexColors: true, side: DoubleSide });
   const wind = windShaderUniforms();
   material.onBeforeCompile = (shader) => {
     shader.uniforms['uWindTime'] = wind.uWindTime;
     shader.uniforms['uWindStrength'] = wind.uWindStrength;
     shader.uniforms['uGrassSnow'] = snowUniform;
+    shader.uniforms['uGrowEdge'] = grow;
     // Las dos caras con la misma luz: con `DoubleSide`, Three le da la vuelta a
     // la normal en la cara de atrás y media hierba salía negra.
     shader.fragmentShader = shader.fragmentShader.replace('#include <normal_fragment_begin>',
@@ -219,7 +254,9 @@ function grassMaterial(height: number, bend: number): MeshLambertMaterial {
       .replace('#include <common>', `#include <common>
 uniform float uWindTime;
 uniform float uWindStrength;
-uniform float uGrassSnow;`)
+uniform float uGrassSnow;
+uniform float uGrowEdge;
+attribute float grassRank;`)
       .replace('#include <color_vertex>', `#include <color_vertex>
   float snowH = clamp(position.y / ${height.toFixed(3)}, 0.0, 1.0);
   vColor.rgb = mix(vColor.rgb, vec3(0.93, 0.95, 0.98), clamp(uGrassSnow * (0.5 + 0.9 * snowH), 0.0, 1.0));`)
@@ -239,7 +276,9 @@ uniform float uGrassSnow;`)
     * grassH * grassH * ${bend.toFixed(3)};
   transformed.xz += grassWind.xz * grassBend;
   transformed.y -= abs(grassBend) * 0.3 * grassH;
-  transformed.y *= max(0.0, 1.0 - uGrassSnow * ${(1 / BURIED).toFixed(3)});`);
+  transformed.y *= max(0.0, 1.0 - uGrassSnow * ${(1 / BURIED).toFixed(3)});
+  // Las matas junto al umbral del zoom, pequeñas: crecen al acercarse en vez de aparecer.
+  transformed *= 1.0 - smoothstep(uGrowEdge - ${GROW_BAND.toFixed(2)}, uGrowEdge, grassRank);`);
   };
   material.customProgramCacheKey = () => `grass:${height}:${bend}`;
   return material;
@@ -265,11 +304,18 @@ export function createGrass(handheld: boolean): Grass {
   group.name = 'Valley_Grass';
   const perCell = handheld ? GRASS.PER_CELL_HANDHELD : GRASS.PER_CELL;
   const stubblePerCell = handheld ? STUBBLE.PER_CELL_HANDHELD : STUBBLE.PER_CELL;
-  const grassGeometry = tuftGeometry(GRASS, 1);
-  const stubbleGeometry = tuftGeometry(STUBBLE, 2);
-  const grassMat = grassMaterial(GRASS.HEIGHT, GRASS.BEND);
-  const stubbleMat = grassMaterial(STUBBLE.HEIGHT, STUBBLE.BEND);
+  const lawnPerCell = handheld ? LAWN.PER_CELL_HANDHELD : LAWN.PER_CELL;
+  const kind = (spec: typeof GRASS | typeof LAWN | typeof STUBBLE, salt: number, name: string): Kind => {
+    const grow = { value: 1 };
+    return { geometry: tuftGeometry(spec, salt), material: grassMaterial(spec.HEIGHT, spec.BEND, grow), name, grow };
+  };
+  const kinds = {
+    grass: kind(GRASS, 1, 'Valley_Grass_Tufts'),
+    lawn: kind(LAWN, 3, 'Valley_Lawn'),
+    stubble: kind(STUBBLE, 2, 'Valley_Stubble'),
+  } as const;
   let grassChunks: Chunk[] = [];
+  let lawnChunks: Chunk[] = [];
   let stubbleChunks: Chunk[] = [];
   let planted = '';
   let palette: Palette | null = null;
@@ -283,12 +329,17 @@ export function createGrass(handheld: boolean): Grass {
   const tint = new Color();
   const other = new Color();
 
-  function chunk(which: 'grass' | 'stubble', tufts: Tuft[], tile: number, seed: number): Chunk {
+  function chunk(which: keyof typeof kinds, tufts: Tuft[], tile: number, seed: number): Chunk {
     // Ordenadas por su prioridad: las `n` primeras son una muestra uniforme.
     tufts.sort((a, b) => a.order - b.order);
-    const mesh = new InstancedMesh(which === 'grass' ? grassGeometry : stubbleGeometry,
-      which === 'grass' ? grassMat : stubbleMat, tufts.length);
-    mesh.name = `${which === 'grass' ? 'Valley_Grass_Tufts' : 'Valley_Stubble'}_${tile}`;
+    // La geometría se copia por tramo para llevar el rango de cada mata (su
+    // puesto en la fila, de 0 a 1): es lo que el sombreador compara con el
+    // umbral del zoom para hacerla crecer. Veinticuatro vértices: no pesa.
+    const geometry = kinds[which].geometry.clone();
+    geometry.setAttribute('grassRank', new InstancedBufferAttribute(
+      Float32Array.from(tufts, (_, n) => n / Math.max(1, tufts.length - 1)), 1));
+    const mesh = new InstancedMesh(geometry, kinds[which].material, tufts.length);
+    mesh.name = `${kinds[which].name}_${tile}`;
     mesh.castShadow = false;
     mesh.receiveShadow = false;
     tufts.forEach((tuft, n) => {
@@ -308,9 +359,19 @@ export function createGrass(handheld: boolean): Grass {
   }
 
   function applyDensity(): void {
-    for (const { mesh, tufts } of [...grassChunks, ...stubbleChunks]) {
-      mesh.count = Math.max(0, Math.round(tufts.length * density));
-    }
+    // El umbral va un poco por encima de la densidad: las matas de la banda
+    // de crecimiento se dibujan (pequeñas) y a densidad 1 ninguna se encoge.
+    const edge = (d: number): number => d * (1 + GROW_BAND);
+    const apply = (chunks: readonly Chunk[], d: number): void => {
+      for (const { mesh, tufts } of chunks) mesh.count = Math.min(tufts.length, Math.ceil(tufts.length * edge(d)));
+    };
+    kinds.grass.grow.value = edge(density);
+    kinds.stubble.grow.value = edge(density);
+    // El césped es un palmo de alto: de lejos es un píxel, así que baja antes.
+    kinds.lawn.grow.value = edge(density * density);
+    apply(grassChunks, density);
+    apply(stubbleChunks, density);
+    apply(lawnChunks, density * density);
   }
 
   function colour(): void {
@@ -328,6 +389,15 @@ export function createGrass(handheld: boolean): Grass {
       });
       if (mesh.instanceColor !== null) mesh.instanceColor.needsUpdate = true;
     }
+    for (const { mesh, tufts } of lawnChunks) {
+      tufts.forEach((tuft, n) => {
+        // Del color del prado, un poco más hondo y con poca variación: textura,
+        // no matas.
+        tint.set(tuft.pick < 0.5 ? p.meadow : p.meadowAlt).multiplyScalar(0.86 + (tuft.pick * 5 % 1) * 0.1);
+        mesh.setColorAt(n, tint);
+      });
+      if (mesh.instanceColor !== null) mesh.instanceColor.needsUpdate = true;
+    }
     for (const { mesh, tufts } of stubbleChunks) {
       tufts.forEach((tuft, n) => {
         tint.set(p.field).lerp(other.set(p.accent), 0.35 + tuft.pick * 0.25);
@@ -338,8 +408,13 @@ export function createGrass(handheld: boolean): Grass {
   }
 
   function clear(): void {
-    for (const { mesh } of [...grassChunks, ...stubbleChunks]) { group.remove(mesh); mesh.dispose(); }
+    for (const { mesh } of [...grassChunks, ...lawnChunks, ...stubbleChunks]) {
+      group.remove(mesh);
+      mesh.geometry.dispose();
+      mesh.dispose();
+    }
     grassChunks = [];
+    lawnChunks = [];
     stubbleChunks = [];
   }
 
@@ -347,8 +422,8 @@ export function createGrass(handheld: boolean): Grass {
     group,
     get counts() {
       const sum = (chunks: readonly Chunk[]): number => chunks.reduce((n, c) => n + c.tufts.length, 0);
-      const drawn = [...grassChunks, ...stubbleChunks].reduce((n, c) => n + c.mesh.count, 0);
-      return { grass: sum(grassChunks), stubble: sum(stubbleChunks), drawn };
+      const drawn = [...grassChunks, ...lawnChunks, ...stubbleChunks].reduce((n, c) => n + c.mesh.count, 0);
+      return { grass: sum(grassChunks), lawn: sum(lawnChunks), stubble: sum(stubbleChunks), drawn };
     },
     plant(state, ground, plaza): void {
       const key = `${handheld ? 1 : 0}:${signature(state, plaza)}`;
@@ -374,6 +449,7 @@ export function createGrass(handheld: boolean): Grass {
       const seed = state.terrainSeed;
       const tilesX = Math.ceil(width / TILE);
       const grassTiles = new Map<number, Tuft[]>();
+      const lawnTiles = new Map<number, Tuft[]>();
       const stubbleTiles = new Map<number, Tuft[]>();
       const into = (tiles: Map<number, Tuft[]>, tuft: Tuft): void => {
         const tile = Math.floor(tuft.x / TILE) + Math.floor(tuft.z / TILE) * tilesX;
@@ -398,19 +474,35 @@ export function createGrass(handheld: boolean): Grass {
         if (keep <= 0) continue;
         if (Math.hypot(x + 0.5 - plaza.x, z + 0.5 - plaza.y) < plaza.radius + 0.5) continue;
         const lush = meadowWeight(seed, x, z);
-        const tufts = Math.round(GRASS.SPARSE + (perCell - GRASS.SPARSE) * lush);
+        // El césped bajo, en matojos por todo el prado (un ruido fino junta las
+        // matas en unas celdas y vacía otras); las matas altas sólo dentro de
+        // la mancha, y en su borde van entrando de una en una.
+        const clump = valueNoise(seed, x + 0.5, z + 0.5, LAWN.CLUMP, 'lawn');
+        const lawnHere = Math.round(lawnPerCell * 2 * Math.max(0, clump - 0.25) / 0.75);
+        for (let k = 0; k < lawnHere; k += 1) {
+          if (unit(seed, `lk${cell}:${k}`) > keep) continue;
+          const px = x + unit(seed, `lx${cell}:${k}`);
+          const pz = z + unit(seed, `lz${cell}:${k}`);
+          into(lawnTiles, { x: px, y: ground(px, pz), z: pz,
+            shade: scale * (0.7 + unit(seed, `ls${cell}:${k}`) * 0.5) * (keep < 1 ? 0.6 : 1),
+            pick: unit(seed, `lp${cell}:${k}`), order: unit(seed, `lo${cell}:${k}`) });
+        }
+        // Por debajo de `TALL_FROM` ninguna: una o dos matas altas sueltas en
+        // el borde son justo lo que Vera vio quedar mal.
+        const tufts = lush < TALL_FROM ? 0 : Math.round(perCell * lush);
         for (let k = 0; k < tufts; k += 1) {
           if (unit(seed, `gk${cell}:${k}`) > keep) continue;
           const px = x + unit(seed, `gx${cell}:${k}`);
           const pz = z + unit(seed, `gz${cell}:${k}`);
-          // En el prado, más alta; suelta, más baja: la mancha se lee de lejos.
-          const shade = scale * (0.6 + unit(seed, `gs${cell}:${k}`) * 0.35) * (0.8 + 0.45 * lush) * (keep < 1 ? 0.6 : 1);
+          // Más alta hacia el centro de la mancha.
+          const shade = scale * (0.6 + unit(seed, `gs${cell}:${k}`) * 0.35) * (0.85 + 0.4 * lush) * (keep < 1 ? 0.6 : 1);
           into(grassTiles, { x: px, y: ground(px, pz), z: pz, shade, pick: unit(seed, `gp${cell}:${k}`),
             order: unit(seed, `go${cell}:${k}`) });
         }
       }
       clear();
       for (const [tile, tufts] of grassTiles) grassChunks.push(chunk('grass', tufts, tile, seed));
+      for (const [tile, tufts] of lawnTiles) lawnChunks.push(chunk('lawn', tufts, tile, seed));
       for (const [tile, tufts] of stubbleTiles) stubbleChunks.push(chunk('stubble', tufts, tile, seed));
       applyDensity();
       colour();
@@ -432,10 +524,7 @@ export function createGrass(handheld: boolean): Grass {
     },
     dispose(): void {
       clear();
-      grassGeometry.dispose();
-      stubbleGeometry.dispose();
-      grassMat.dispose();
-      stubbleMat.dispose();
+      for (const one of Object.values(kinds)) { one.geometry.dispose(); one.material.dispose(); }
     },
   };
 }
