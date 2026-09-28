@@ -2221,7 +2221,9 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             const sellerId = Number(dweller.doing.place.id.slice('pay:'.length));
             const seller = visitors.find((one) => one.body.id === sellerId);
             const deal = buyers.get(sellerId);
-            if (seller !== undefined && deal !== undefined && !deal.paid) {
+            // Y sólo a quien sigue en su puesto: con él ya de camino, las monedas
+            // «pasaban de mano» a un metro (`life-trade.test.ts`, semilla 7, 28 sep 2026).
+            if (seller !== undefined && deal !== undefined && !deal.paid && seller.phase === 'staying') {
               payments.push({ from: { x: body.x, z: body.z }, to: { x: seller.body.x, z: seller.body.z }, at: steps });
               deal.paid = true;
             }
@@ -2699,6 +2701,9 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           const route = pathTo(land, candidate.body, seatAt(offer, 0), candidate.body.radius);
           if (route === null) continue;
           deal.payer = candidate.villager;
+          // Y quien cobra espera a que llegue el que paga, como el buhonero espera
+          // su leña (`stayForGoods`): sin esto el pago llegaba tarde y nadie pagaba.
+          stayForGoods(visitor, phase);
           candidate.doing = {
             place: { id: `pay:${visitor.body.id}`, at: front, offers: [offer] }, offer, route,
             seat: 0, since: steps, until: steps, there: false,

@@ -31,8 +31,12 @@ function fence(state: GameState): void {
   for (let n = 1; n <= 6; n += 1) put('palisade', 30 + n, 40);
 }
 
+// Lo que quemó **el asalto** esta semana: lo quemado menos lo que quemó un rayo
+// de la misma semana (semilla 7 desde v4.95: cae uno en la semana del asalto y
+// la cuenta salía 4 donde el portón quemó 3).
 const burntThisWeek = (state: GameState): number =>
-  state.buildings.filter((b) => b.lostTick === state.tick && state.flags[`burnt:${b.id}`] !== undefined).length;
+  state.buildings.filter((b) => b.lostTick === state.tick && state.flags[`burnt:${b.id}`] !== undefined).length
+  - state.happenings.filter((h) => h.tick === state.tick && h.id === 'lightning_fire' && h.visible.some((v) => v.k === 'ruin')).length;
 
 describe('E4 · lo que queman al entrar', () => {
   it('una villa tomada arde por el portón, y se cuenta', () => {

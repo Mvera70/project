@@ -129,10 +129,11 @@ describe('las expediciones del tablón · §7.15', () => {
     c.village.silver = 100;
     sendExpedition(c, 'high_seam', 3, 20);
     c.tick += missionSpec('high_seam').weeks;
-    const { expeditions: _mine, ...others } = c.rng;
+    const others = (rng: typeof c.rng): Record<string, number> =>
+      Object.fromEntries(Object.entries(rng).filter(([stream]) => stream !== 'expeditions'));
+    const before = others(c.rng);
     returnExpeditions(c, 20);
-    const { expeditions: _after, ...othersAfter } = c.rng;
-    expect(othersAfter).toEqual(others);
+    expect(others(c.rng)).toEqual(before);
   });
 
   it('cada misión y cada final tienen su frase en la crónica', () => {

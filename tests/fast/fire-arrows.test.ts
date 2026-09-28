@@ -24,6 +24,12 @@ function assaulted(seed: number): GameState {
   for (let n = 1; n <= 6; n += 1) put('palisade', 30 + n, 40);
   state.threat.comingTick = state.tick + 1;
   state.threat.comingBand = Math.ceil(resistance(state) * THREAT.STORM_ODDS) + 1;
+  // **Y sin los sucesos del mundo durante el asalto**: lo que se mide son las
+  // flechas. Desde v4.95 en la semilla 7 cae un rayo esa misma semana y quema
+  // una casa lejos del agua, que la prueba contaba como flecha. Un suceso vacío
+  // apuntado en la semana siguiente hace que el hueco mínimo entre sucesos
+  // (`FATE.MIN_GAP_WEEKS`, dos) cubra las dos semanas de la prueba.
+  state.happenings.push({ tick: state.tick + 1, id: 'stranger_passes', visible: [], who: [] });
   return state;
 }
 
@@ -53,7 +59,10 @@ describe('E4 · flechas incendiarias contra un cerco que aguanta', () => {
       tick(state, CATALOG, undefined, [held(state)]);
       expect(state.ended, `semilla ${seed}: el cerco aguantó`).toBeNull();
       const burnt = state.buildings.filter((b) => b.lostTick === state.tick && state.flags[`burnt:${b.id}`] !== undefined);
-      const saved = state.buildings.filter((b) => b.lostTick === null && state.flags[`doused:${b.id}`] !== undefined);
+      // Salvadas **esta semana**: la marca vale `tick + 1` y no se borra, así que
+      // una casa salvada en un asalto anterior contaba también (semilla 7 desde
+      // v4.95, que trae otro asalto antes: 3 tejados donde sólo prendieron 2).
+      const saved = state.buildings.filter((b) => b.lostTick === null && state.flags[`doused:${b.id}`] === state.tick + 1);
       const hit = burnt.length + saved.length;
       expect(hit, `semilla ${seed}`).toBeGreaterThanOrEqual(THREAT.ARROW_ROOFS);
       expect(hit, `semilla ${seed}`).toBeLessThanOrEqual(THREAT.ARROW_ROOFS_STRONG);

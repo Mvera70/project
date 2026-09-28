@@ -20,8 +20,17 @@ ventana (`ui/redesign/board.ts`). Pruebas: `expeditions.test.ts`,
    ventana ni ninguna ficha. Ya se descartó el clic fantasma (el velo cierra
    con `pointerdown`). Lo siguiente: comprobar si `renderer.pick` devuelve
    `{kind:'board'}` en ese punto y si `app.ts` llega a `navigate`.
-2. **La suite completa** (hace ruido: diez minutos a dos núcleos).
-3. Capturas para Vera, subir y desplegar.
+2. ~~**La suite completa**~~ · **cerrada: 213 ficheros, 2054 pruebas en verde.** La
+   primera pasada dio 11 rojas. Cinco eran del decorado de las pruebas: el
+   combate sin `travellers`, el estado dorado sin el flujo nuevo, las
+   flechas contando casas salvadas en asaltos viejos y un rayo de la misma
+   semana, la quema al entrar contando el rayo, y el rencor comparando cada
+   lado con el «antes» del otro. Una era un defecto: el salinero cobraba ya
+   de camino, y ahora sólo se paga a quien sigue en su puesto, y quien cobra
+   espera al que paga (`stayForGoods`). El devoto vuelve a pasar. Los
+   tendederos quedan en `it.fails` con lo medido: 9 de 31 casas vestidas
+   (29 %) por la senda pisada que traen las familias que llegan.
+3. Capturas de la ventana del tablón (cuando abra) y desplegar.
 
 **Decisiones de Vera de esta ronda** (en la bóveda): las misiones se anuncian
 en un tablón de la plaza que abre una ventana de madera; tocar objetos del

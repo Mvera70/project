@@ -76,6 +76,9 @@ describe('rng · reproducibilidad', () => {
       // tampoco mueve ni uno de los de arriba. Eso es lo que esta prueba
       // guarda: un flujo nuevo no puede desplazar una partida vieja.
       raid: 911719150,
+      // §7.15: y `expeditions`, cómo vuelven los que salen. Detrás de todos y
+      // sin mover ninguno: las partidas viejas siguen dando lo mismo.
+      expeditions: 4132758830,
     });
   });
 

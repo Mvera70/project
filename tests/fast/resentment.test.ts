@@ -130,11 +130,15 @@ describe('la desgracia compartida acerca · §7.9', () => {
       housemates.push(spare);
     }
     const [a, b] = housemates;
+    // Cada uno con su «antes»: las opiniones no son simétricas, y comparar lo
+    // que B piensa de A con lo que A pensaba de B fallaba en cuanto B partía de
+    // más abajo (semilla 7 desde v4.95: B sube de −30 a −21,6 y A partía de −8,6).
     const before = opinionOf(state, a!.id, b!.id);
+    const beforeBack = opinionOf(state, b!.id, a!.id);
 
     scarFire(state, home);
     expect(opinionOf(state, a!.id, b!.id)).toBeGreaterThan(before);
-    expect(opinionOf(state, b!.id, a!.id)).toBeGreaterThan(before);
+    expect(opinionOf(state, b!.id, a!.id)).toBeGreaterThan(beforeBack);
   });
 
   it('a quien no vivía allí no le acerca nada', () => {

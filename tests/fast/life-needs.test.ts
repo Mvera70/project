@@ -414,7 +414,12 @@ describe('IA-3 · aldeanos con hábitos', () => {
   // en la muestra, y con la trayectoria nueva el devoto reza el 3,7 % de sus
   // jornadas contra el 3,0 % del resto (1,2×, no 2×). Se deja `it.fails` con
   // la propiedad intacta, como manda la casa, en vez de bajar el listón.
-  it.fails('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
+  //
+  // **Y verde otra vez con la trayectoria de v4.95 (28 sep 2026)**, por el mismo
+  // motivo por el que se puso roja: la aldea de la muestra es otra (llegan
+  // familias por el camino). La propiedad no se ha movido; si vuelve a caer
+  // con otra trayectoria, vuelve a `it.fails`.
+  it('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
     const { byTrait, anyThirstIgnored } = habitSample();
     expect(anyThirstIgnored, 'una necesidad urgente no se apaga con otra cosa').toBe(false);
 
