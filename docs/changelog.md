@@ -1,5 +1,18 @@
 # The Valley — Registro de cambios
 
+## v4.85 · 28 sep 2026 · El velo de la montaña
+
+Vera: a ras de suelo y con la cámara lejos, «casi siempre nos chocamos con las
+montañas». Se le propuso un túnel difuso sólo donde tapa y lo descartó: «atenuarlo;
+no quiero que sea invisible del todo, ni que desaparezca así, ni que haya un
+túnel». `effects/mountain-veil.ts`: la montaña que queda **por delante del punto
+que se mira** (la sierra, la piel de dentro y los peñascos) se vuelve un velo
+entero con un tramado de puntos que deja un 45 %; la del fondo sigue sólida. Sólo
+con la cámara baja: nada por encima de 26° (la vista de partida es 30,6°), entero
+a 18°, con un fundido de un tercio de segundo. Tramado y no transparencia, para
+no ordenar capas ni romper el agua que se dibuja sobre la sierra: sin llamadas
+de dibujo de más y sin recompilar al moverse. Prueba: `mountain-veil.test.ts`.
+
 ## v4.84 · 28 sep 2026 · La madera, de «+1» a la obra (esquema 12)
 
 El prototipo que pidió Vera: **¿mirar una cadena productiva entera hace el

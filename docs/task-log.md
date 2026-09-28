@@ -1,5 +1,14 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · El velo de la montaña (v4.85)
+
+`effects/mountain-veil.ts` (+ `backdrop.ts` que lo pone en la sierra, la piel y
+los peñascos, y `renderer.ts` que lo pone en hora cada fotograma con el centro de
+la vista y el ángulo). Capturado a 430 × 932 en la semilla 11, año 5: la loma
+de delante se ve como silueta de puntos y el río y la aldea detrás. **Abierto:**
+que Vera lo pruebe en la tablet; si el tramado se nota demasiado al mover la
+cámara, se puede suavizar con ruido azul en vez de Bayer, o subir `KEEP`.
+
 ## 28 sep 2026 · La madera, de «+1» a la obra (v4.84, esquema 12)
 
 Prototipo de Vera: ¿mirar la cadena entera hace el valle más interesante sin

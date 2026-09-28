@@ -18,6 +18,7 @@ import { FLOOD_RISE, elevationAt, floodReach, floodWaterLevelAt, waterCourseAt, 
 import { TERRAIN_CODE } from '@engine/state';
 import { riverExtensionAt, riverSection } from './river-extension';
 import { waterfallCorridorAt, waterfallSites } from './waterfalls';
+import { veilMaterial } from '../effects/mountain-veil';
 
 export interface Backdrop {
   readonly group: Group;
@@ -296,6 +297,12 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
   const clearInside = inside.filter(rock => !waterfallCorridorAt(falls, rock.x, rock.z, rock.size * 1.5));
   const crags = buildCrags([...clearInside, ...outside], palette, rocks?.crags);
   group.add(crags.group);
+  // La montaña que tapa lo que se mira se vuelve un velo con la cámara baja
+  // (`effects/mountain-veil.ts`): la sierra, la piel de dentro y los peñascos.
+  veilMaterial(ridge.material as Material);
+  if (skin !== null) veilMaterial(skin.mesh.material as Material);
+  const cragMaterial = (crags.group.children[0] as Mesh | undefined)?.material;
+  if (cragMaterial !== undefined) veilMaterial(cragMaterial as Material);
   const cairns = buildCairns(map, palette, (x, z) => ridgeAt(map, seed, x, z),
     (x, z) => exteriorWaterAt(map, seed, x, z, 1.8), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))), rocks?.cairn);
   group.add(cairns);

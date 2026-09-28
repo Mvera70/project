@@ -37,6 +37,7 @@ import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
 import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './world/ground';
 import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
+import { updateMountainVeil } from './effects/mountain-veil';
 import { cloudsFor, stepClouds } from './effects/clouds';
 import { createAmbience, type Ambience } from './effects/ambience';
 import { createPuddles, wetnessAt, type Puddles } from './effects/puddles';
@@ -691,6 +692,7 @@ export async function createGraphicsRenderer(
    */
   let huntSighting: { tick: number; species: HuntSpecies; prey: WildPrey | null; targetId: number | null } | null = null;
   let huntSightingTick = -1;
+  const veilFocus = new Vector3();
   // Esquema 12 · lo que el motor ha apuntado de la madera de la semana, visto
   // desde aquí, y los avisos «+1» / «−40» que eso deja sobre la leñera.
   let woodSeen: { tick: number; credited: number; total: number; wood: number; work: number | null } | null = null;
@@ -1747,6 +1749,10 @@ export async function createGraphicsRenderer(
       // ese reloj lleva la velocidad y se para en pausa.
       stepFlight(frame.realDeltaSeconds);
       stepFocus(frame.realDeltaSeconds);
+      // El velo de la montaña: lo que tapa el punto mirado se atenúa cuando la
+      // cámara baja a ras de suelo (Vera, 28 sep 2026).
+      veilFocus.set(view.view.centre.x, groundFloor(view.view.centre.x, view.view.centre.z), view.view.centre.z);
+      updateMountainVeil(camera, veilFocus, view.angles.pitch, frame.realDeltaSeconds);
 
       // La gente se recoloca en cada fotograma porque en cada fotograma se ha
       // movido; la aldea no, porque cambia unas cuantas veces al año.
