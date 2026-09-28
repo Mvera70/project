@@ -4,7 +4,7 @@ import { foundSuccessor } from '@engine/save';
 import { HAPPENINGS, MEANS_IDS, SCHEMA_VERSION, type HappeningId, type MeansId, type SaveFile } from '@engine/state';
 import { archivedGames, crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYearCooperative,
   parseDebugRequest, raidNow, bracedNow, comingNow, warningNow, warningPendingNow, aftermathNow, wallWorkNow,
-  runToCrossroad, runToSky, stateAt, walkwayNow } from './ui/debug';
+  runToCrossroad, runToSky, runToWoodChain, stateAt, walkwayNow, WOOD_DEMO_START } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
@@ -82,6 +82,12 @@ if (root) {
     // dos, o nubes). En invierno hay que pedir `snow`: no truena.
     const sky = query.get('weather');
     if (sky === 'storm' || sky === 'snow' || sky === 'wet') runToSky(state, sky);
+    // Esquema 12 · `&demo=wood` adelanta hasta una semana con entregas de
+    // madera cuya siguiente abre una obra, y la abre a media semana: la cadena
+    // entera —«+1» en la leñera, la obra que se abre y su madera saliendo hacia
+    // la parcela— cabe en diez minutos a ×1.
+    const woodDemo = query.get('demo') === 'wood';
+    if (woodDemo) runToWoodChain(state);
     // VZ-6 · `&crossroad=1` sigue jugando hasta que haya una decisión sin
     // contestar. Sin esto no se puede fotografiar ni el documento sellado ni
     // el sello del ornamento: el valle que estas rutas abren viene ya jugado
@@ -150,7 +156,7 @@ if (root) {
       state,
       decisions: [...state.history],
       archive: [],
-    });
+    }, woodDemo ? { startFraction: WOOD_DEMO_START } : {});
   } else {
     mountDebug(root, request);
   }

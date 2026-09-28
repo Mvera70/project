@@ -72,6 +72,9 @@ function weeklyRoster(
   return today;
 }
 
+/** TUNE (esquema 12): cuántos haces salen de la leñera hacia la obra que se abre. */
+const WOOD_FETCH_TRIPS = 3;
+
 export function dayPlans(
   state: GameState,
   places: readonly Place[],
@@ -177,6 +180,26 @@ export function dayPlans(
     { prefix: 'works:' as const, offer: 'work' },
     { prefix: 'field:' as const, offer: fieldOffer },
   ]).map(quota => ({ ...quota, count: roster.get(quota.prefix) ?? 0 }));
+  // Esquema 12 · la jornada en que la obra se abre, los primeros albañiles
+  // empiezan sacando su madera de la leñera (`fetch-wood`) y la llevan a la
+  // parcela; después levantan como cualquier otro. Sólo el primer día de la
+  // semana, que es cuando el motor la pagó: los demás días la madera ya está
+  // allí. Salen de la cuota de la obra, así que no se inventa trabajo.
+  const works = quotas.find(quota => quota.prefix === 'works:');
+  const firstDay = day === state.tick * TIME.DAYS_PER_WEEK;
+  const fetchAt = firstDay ? places.find(p => p.offers.some(o => o.id === 'fetch-wood')) : undefined;
+  if (works !== undefined && fetchAt !== undefined) {
+    let trips = Math.min(works.count, WOOD_FETCH_TRIPS);
+    while (trips > 0 && idle.size > 0 && available(fetchAt, 'fetch-wood')) {
+      const pick = [...idle].sort(([a, from], [b, to]) => gap(from, fetchAt.at) - gap(to, fetchAt.at) || a - b)[0]!;
+      const job = choose(pick[1], [fetchAt], 'fetch-wood');
+      if (job === null) break;
+      plans.set(pick[0], { ...plans.get(pick[0])!, job });
+      idle.delete(pick[0]);
+      works.count -= 1;
+      trips -= 1;
+    }
+  }
   // Primero los tajos escasos, por proximidad, y luego los campos repartidos.
   // El orden de ids no debe enviar al recién llegado al bosque del otro extremo.
   for (const quota of quotas) {

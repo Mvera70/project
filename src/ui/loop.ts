@@ -34,10 +34,13 @@ export function startLoop(
   // todo va a un cuarto —cuerpos, animaciones, hora—, porque todo cuelga del
   // tick y su fracción. El juego no lo toca: vale 1.
   scale: () => number = () => 1,
+  // Esquema 12 · dónde de la semana empieza el bucle. El juego abre al empezar
+  // la semana; la demo de la madera (`&demo=wood`) abre a media semana.
+  startFraction = 0,
 ): Loop {
   let frameId = 0;
   let previous: number | null = null;
-  let remainder = 0;
+  let remainder = Math.max(0, Math.min(0.999, startFraction)) * TIME.REAL_MS_PER_TICK;
   let stopped = false;
 
   const visibility = (): void => { previous = null; };

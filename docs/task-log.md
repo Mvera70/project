@@ -1,5 +1,36 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · La madera, de «+1» a la obra (v4.84, esquema 12)
+
+Prototipo de Vera: ¿mirar la cadena entera hace el valle más interesante sin
+pedir nada? **Motor**: `subsistence/wood-run.ts` —`planWoodRun` en el paso 5
+(`produce`), `creditWoodRun` desde `app.ts` antes de pintar, `closeWoodRun` en
+el paso 1a nuevo— y `state.woodRun` (esquema 12, **sin migración**: una partida
+del 11 no carga). Horas en `WOOD_RUN` (0,30–0,58 de la jornada de sol, medidas
+contra la vida). **Vida**: `village.ts` (`setWoodClock`, `dueWoodDelivery`, el
+porteador espera en la leñera y suelta a su hora; `fetch-wood`/`deliver-wood`
+para la obra que se abre, `day.ts` y `offers.ts`). **Pantalla**: `woodGains()`
+en el renderer y `redesign/wood-gains.ts`. **Demo**: `?debug=1&live=1&seed=11&year=3&demo=wood`
+(`runToWoodChain` en `debug.ts`, arranca a 0,45 de la semana con `startFraction`).
+
+Medido: 35 de 38 entregas llegan con porteador; 12 semillas × 20 años sin
+cambio de fondo (40,6 → 39,2 personas, ninguna aldea más acabada). Grabación
+tablet 10 min a ×1, semilla 11, antes y después: **antes** la leña se queda en
+163 toda la semana, hay hasta cuatro descargas por jornada que no mueven nada y
+salta a 109 al cerrar; **después** sube 157 → 162 de uno en uno con seis «+1»,
+cada uno con su porteador en el mismo segundo, y al cerrar la semana se abre la
+casa (−60) y uno o dos albañiles le llevan la madera. Vídeo comparado: se le
+pasó a Vera (no está en el repo: `artifacts/` no se versiona).
+
+**Abierto:** que Vera lo mire diez minutos sin tocar y conteste las dos
+preguntas por separado —¿pudo seguir adónde fue la madera?, ¿le apeteció seguir
+mirando?—; si entiende la cadena y sigue aburrido, la ronda siguiente va a
+decisiones y consecuencias cercanas. Después, la piedra y el grano igual
+(`plan-meta.md` I2). Y dos defectos de la vida destapados por la trayectoria
+nueva en la semilla 23: el fuego apagado (arreglado, `sittingOpen`) y el
+salinero que no sale de una plaza cerrada por un granero (`it.fails` en
+`life-trade.test.ts`).
+
 ## 28 sep 2026 · La huella de la presa (v4.83), y la CI rota: pendiente
 
 La señal de caza es la huella de cada especie (`HUNT_TRACKS` en `app.ts`) y se

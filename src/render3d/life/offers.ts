@@ -159,6 +159,13 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   carry: { id: 'carry', reach: 0.75, seats: 1, gives: { duty: 0.2, boredom: 0.15 }, seconds: [5, 12] },
   /** Descargar la madera en la leñera. Sólo la rutina del talador la asigna. */
   deliver: { id: 'deliver', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 4], routineOnly: true },
+  /**
+   * Esquema 12 · sacar un haz de la leñera para la obra que se acaba de abrir.
+   * Sólo lo asigna la jornada en que la obra pagó su madera (`day.ts`).
+   */
+  'fetch-wood': { id: 'fetch-wood', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 3], routineOnly: true },
+  /** Esquema 12 · y dejarlo en la parcela, que es adonde fue esa madera. */
+  'deliver-wood': { id: 'deliver-wood', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 3], routineOnly: true },
   /** Asentar una carga de piedra en la obra que la consume. */
   'deliver-stone': { id: 'deliver-stone', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 4], routineOnly: true },
   /** Guardar una carga de la cosecha; sólo la asigna la rutina de la semana 35. */
@@ -536,6 +543,21 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
       if (stoneWork(state) !== null) {
         const delivery = placedOffer({ ...OFFERS['deliver-stone']!, seats: Math.min(building, 2) }, at, land);
         if (delivery !== null) offers.push(delivery);
+      }
+      // Esquema 12 · la obra recién abierta pagó su madera esta semana: que se
+      // vea salir de la leñera y llegar aquí. La plaza de sacarla va en la
+      // leñera, que se crea si ese día nadie tala.
+      const store = work.startedTick === state.tick ? woodStoreCells(state)[0] : undefined;
+      if (store !== undefined) {
+        const storeAt = { x: store % state.map.width + 0.5, z: Math.floor(store / state.map.width) + 0.5 };
+        const fetch = placedOffer({ ...OFFERS['fetch-wood']!, seats: Math.min(building, 2) }, storeAt, land);
+        const drop = placedOffer({ ...OFFERS['deliver-wood']!, seats: Math.min(building, 2) }, at, land);
+        if (fetch !== null && drop !== null) {
+          offers.push(drop);
+          const yard = places.findIndex(place => place.id === `wood-store:${store}`);
+          if (yard >= 0) places[yard] = { ...places[yard]!, offers: [...places[yard]!.offers, fetch] };
+          else places.push({ id: `wood-store:${store}`, at: storeAt, offers: [fetch] });
+        }
       }
       if (offers.length > 0) places.push({ id: `works:${work.id}`, at, offers });
     }

@@ -11,7 +11,7 @@
 import { skyAt, type SkyKind } from '../../derive/weather';
 import type { Garrison } from '@derive/garrison';
 import { homeRoutine, indoors, isNight, stepHome, type HomeRoutine } from './home';
-import { shelterUnder } from './decide';
+import { shelterUnder, sittingOpen } from './decide';
 import { statureAt } from '../world/models';
 import { scatterTransform } from '../world/forest';
 import { VILLAGER_CLIPS } from '../clips';
@@ -100,6 +100,19 @@ const GIVE_UP = 600;
 const CATCH_RANGE = 2;
 
 /** Una persona, entera: cuerpo, cabeza y lo que está haciendo. */
+/** Esquema 12 · segundos escénicos de una semana: los de la jornada por siete. */
+const WEEK_SECONDS = TIME.REAL_MS_PER_TICK / 1000;
+/** TUNE: el porteador cargado anda a este tanto de su paso (la estimación de la ida). */
+const WOOD_CARRY_PACE = 0.8;
+/** TUNE: con cuántos segundos escénicos de margen sale, para llegar antes que su hora. */
+const WOOD_ARRIVE_EARLY = 6;
+/** TUNE: lo más que espera en la leñera, en pasos (40 s escénicos). */
+const WOOD_WAIT_LIMIT = Math.round(40 / LIFE_STEP);
+/** Cada cuántos pasos mira el leñador si le toca una entrega (medio segundo). */
+const WOOD_CHECK_STEPS = Math.round(0.5 / LIFE_STEP);
+/** Lo más lejos que se mira una entrega, en fracción de semana: dos minutos escénicos. */
+const WOOD_MAX_LEAD = 120 / WEEK_SECONDS;
+
 export interface Dweller {
   /** E0 · Porte efímero de la plata que hace volver al clan. */
   payoff?: PayoffTrip;
@@ -183,6 +196,12 @@ export interface Dweller {
    * preguntar `?? null` en cada uso, que es lo que hacía la primera versión.
    */
   holding: number | null;
+  /**
+   * Esquema 12 · qué entrega de la semana lleva este haz (índice de
+   * `state.woodRun.at`). Con ella el porteador no descarga antes de su hora:
+   * espera en la leñera y suelta el haz cuando el motor apunta la unidad.
+   */
+  woodDelivery?: number;
   /** V-09: a quién apunta mientras espera para tirar lo que lleva. Id de
    *  cuerpo. */
   aimAt: number | null;
@@ -214,7 +233,9 @@ export interface Dweller {
    * `undefined` es un adulto, y también lo que sigue siendo cualquier bestia.
    */
   readonly ageGroup?: 'child' | 'elder' | undefined;
-  readonly dayPlan?: DayPlan;
+  // Esquema 12 · no es de sólo lectura: el albañil que lleva la madera a la
+  // obra recién abierta pasa a tener la obra por jornada (`deliver-wood`).
+  dayPlan?: DayPlan;
   readonly leisure?: readonly Place[];
   /**
    * IA-3: la puerta de su propia casa, si tiene una en pie. Sólo se usa para
@@ -257,12 +278,20 @@ export interface Village {
   readonly raidTick: number | null;
   /** Un paso de vida para todos. */
   step(phase?: number): void;
+  /**
+   * Esquema 12 · pone la vida en hora con las entregas de madera: las horas de
+   * la semana (`state.woodRun.at`) y la fracción de semana de este paso. Sin
+   * llamarla, los leñadores cargan tras cada tanda como antes.
+   */
+  setWoodClock(at: readonly number[], weekFraction: number): void;
   /** Cuántos pasos lleva la jornada. */
   readonly steps: number;
   /** Pases de pelota dados en la jornada, V-09: lo que sale de jugar. */
   readonly passes: number;
   /** Haces llevados del árbol a la leñera durante esta jornada. */
   readonly timberDeliveries: number;
+  /** Esquema 12 · haces llevados de la leñera a la obra recién abierta. */
+  readonly buildDeliveries: number;
   /** Cargas llevadas del pedregal a una obra de piedra durante esta jornada. */
   readonly stoneDeliveries: number;
   /** Cargas llevadas del campo al almacén durante la semana real de cosecha. */
@@ -1357,7 +1386,13 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // delante por gusto (`finishHolding`, más abajo).
   let passes = 0;
   let timberDeliveries = 0;
+  // Esquema 12 · las horas de las entregas de la semana y dónde va el reloj.
+  let woodAt: readonly number[] = [];
+  let woodNow = 0;
+  const woodClaimed = new Set<number>();
   let stoneDeliveries = 0;
+  // Esquema 12 · haces llevados de la leñera a la obra que se abre.
+  let buildDeliveries = 0;
   let harvestDeliveries = 0;
   let preparationDeliveries = 0;
   // V-09b: el registro de cada pase, para poder medir una cadena — `passes`
@@ -1417,6 +1452,27 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     return shelterUnder(best, body, land, router, seed, body.id, steps, dweller?.traits ?? []);
   }
 
+  /**
+   * Esquema 12 · la entrega que este porteador debe llevar ahora, o `null` si
+   * todavía no toca y le queda otra tanda de hachazos. Toca cuando lo que falta
+   * para su hora es lo que tarda en llegar a la leñera cargado, con margen: así
+   * llega un poco antes, espera con el haz y lo suelta a su hora, que es cuando
+   * el motor la apunta y salta el «+1».
+   */
+  function dueWoodDelivery(body: Body, route: readonly Point[]): number | null {
+    let length = 0;
+    for (let i = 1; i < route.length; i += 1) {
+      length += Math.hypot(route[i]!.x - route[i - 1]!.x, route[i]!.z - route[i - 1]!.z);
+    }
+    const lead = (length / (body.pace * WOOD_CARRY_PACE) + WOOD_ARRIVE_EARLY) / WEEK_SECONDS;
+    for (let index = 0; index < woodAt.length; index += 1) {
+      const at = woodAt[index]!;
+      if (at <= woodNow || woodClaimed.has(index)) continue;
+      return at - woodNow <= lead ? index : null;
+    }
+    return null;
+  }
+
   function woodDelivery(body: Body): Intent | null {
     const store = mine.find((place) => place.id.startsWith('wood-store:'));
     const offer = store?.offers.find((item) => item.id === 'deliver');
@@ -1458,7 +1514,12 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     get steps(): number { return steps; },
     get passes(): number { return passes; },
     get timberDeliveries(): number { return timberDeliveries; },
+    setWoodClock(at: readonly number[], weekFraction: number): void {
+      woodAt = at;
+      woodNow = weekFraction;
+    },
     get stoneDeliveries(): number { return stoneDeliveries; },
+    get buildDeliveries(): number { return buildDeliveries; },
     get harvestDeliveries(): number { return harvestDeliveries; },
     get preparation() {
       return { active: preparing, porters: preparationTrips, deliveries: preparationDeliveries };
@@ -2034,7 +2095,41 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // abandona ahora **se da la vuelta y va a otro sitio**, que es lo que
         // debe pasar — antes se quedaba clavado mirando a la plaza fallida.
         // Aquí queda sólo el final normal de una ocupación cumplida.
+        // Esquema 12 · **si una entrega está al caer, el leñador deja el hacha
+        // y sale con el haz**, sin esperar a acabar la tanda: medido en cuatro
+        // semillas, la tanda dura lo bastante para que la hora pasara con todos
+        // talando y el «+1» saliera sin nadie delante. Cada medio segundo, que
+        // la ruta a la leñera es un A* y no se pide en cada paso.
+        if (woodAt.length > 0 && steps % WOOD_CHECK_STEPS === body.id % WOOD_CHECK_STEPS
+          && dweller.doing !== null && dweller.doing.there && dweller.holding === null
+          && dweller.doing.place.id.startsWith('felling:')
+          && dweller.dayPlan?.job?.place.startsWith('felling:') === true
+          && woodAt.some((at, index) => at > woodNow && at - woodNow <= WOOD_MAX_LEAD && !woodClaimed.has(index))) {
+          const planned = woodDelivery(body);
+          const due = planned === null ? null : dueWoodDelivery(body, planned.route);
+          if (planned !== null && due !== null) {
+            woodClaimed.add(due);
+            dweller.woodDelivery = due;
+            dweller.holding = -1 - body.id;
+            const before = dweller.doing;
+            dweller.doing = planned;
+            moveSeat(taken, before, dweller.doing);
+            prog.at = steps + PROGRESS_CHECK;
+            prog.gap = Number.POSITIVE_INFINITY;
+            prog.stalls = 0;
+            dweller.rethinkAt = steps + GIVE_UP;
+            continue;
+          }
+        }
         if (dweller.doing !== null && dweller.doing.there && steps >= dweller.doing.until) {
+          // Esquema 12 · el haz se suelta a su hora, no antes: quien llega
+          // pronto espera en la leñera con la carga. Con un tope, por si el
+          // reloj salta (una carga, el letargo) y la hora ya no va a llegar.
+          const waitFor = dweller.woodDelivery === undefined ? undefined : woodAt[dweller.woodDelivery];
+          if (dweller.doing.offer.id === 'deliver' && waitFor !== undefined && woodNow < waitFor
+            && steps - dweller.doing.until < WOOD_WAIT_LIMIT) {
+            continue;
+          }
           // E0a · La ida exterior acaba al coger una carga visible; la vuelta
           // usa otra ruta real hasta el almacén. No hay inventario aquí: el
           // coste y la protección ya los resolvió el motor al elegir `brace`.
@@ -2123,15 +2218,56 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             }
             if (dweller.holding !== null) continue;
           }
+          // Esquema 12 · el albañil que ha sacado madera de la leñera la lleva
+          // a la obra con el haz a cuestas, y desde allí sigue su jornada en
+          // ella: la madera que la obra pagó llega a la parcela a la vista.
+          if (dweller.doing.offer.id === 'fetch-wood') {
+            const works = mine.find(place => place.id.startsWith('works:'));
+            const offer = works?.offers.find(item => item.id === 'deliver-wood');
+            const seat = offer === undefined ? 0 : (dweller.dayPlan?.job?.seat ?? 0) % Math.max(1, offer.seats);
+            const spot = offer === undefined ? null : seatAt(offer, seat);
+            const route = spot === null ? null : pathTo(land, body, spot, body.radius);
+            if (works !== undefined && offer !== undefined && route !== null) {
+              const durationSteps = Math.round(1.5 / LIFE_STEP);
+              dweller.holding = -3_000_000 - body.id;
+              dweller.doing = {
+                place: works, offer, seat, route: [...route], since: steps,
+                until: steps + durationSteps, durationSteps, there: false,
+              };
+              dweller.rethinkAt = steps + GIVE_UP;
+              continue;
+            }
+          }
+          if (dweller.doing.offer.id === 'deliver-wood' && dweller.holding !== null && dweller.holding <= -3_000_000
+            && dweller.holding > -4_000_000) {
+            buildDeliveries += 1;
+            // Y se queda a levantar: su jornada pasa a ser la de la obra.
+            const works = dweller.doing.place;
+            if (dweller.dayPlan !== undefined && works.offers.some(item => item.id === 'work')) {
+              dweller.dayPlan = { ...dweller.dayPlan, job: { place: works.id, offer: 'work' } };
+            }
+          }
           // Una tanda de hachazos toma un haz visible. La descarga se intenta
           // justo debajo: si los dos puestos están ocupados, el porteador
           // espera lejos de la puerta conservando la carga, y vuelve a probar.
           const felling = dweller.doing.place.id.startsWith('felling:')
             && dweller.dayPlan?.job?.place.startsWith('felling:') === true;
-          if (felling) dweller.holding = -1 - body.id;
+          // Esquema 12 · con la semana planificada, el haz sale cuando le toca
+          // a una entrega y no tras cada tanda: el que no tiene entrega sigue
+          // talando. Sin plan (el camino viejo, las pruebas), como siempre.
+          let planned: Intent | null | undefined;
+          if (felling && woodAt.length > 0) {
+            planned = woodDelivery(body);
+            const due = planned === null ? null : dueWoodDelivery(body, planned.route);
+            if (due !== null) {
+              woodClaimed.add(due);
+              dweller.woodDelivery = due;
+              dweller.holding = -1 - body.id;
+            }
+          } else if (felling) dweller.holding = -1 - body.id;
           if (dweller.holding === -1 - body.id && dweller.doing.offer.id !== 'deliver') {
             const before = dweller.doing;
-            const delivery = woodDelivery(body);
+            const delivery = planned !== undefined && planned !== null ? planned : woodDelivery(body);
             dweller.doing = delivery ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits, body.pace);
             // La transición manual no pasa por `decide()`: debe liberar el
             // tajo y ocupar exactamente la descarga o la espera que acaba de
@@ -2172,6 +2308,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           }
           if (dweller.doing.offer.id === 'deliver' && dweller.holding !== null && dweller.holding < 0) {
             timberDeliveries += 1;
+            delete dweller.woodDelivery;
             // IA-piles · La carga se guarda: entra en el leñero y no se deja al
             // lado. Hasta el 24 sep quedaban hasta tres haces sueltos junto a la
             // descarga toda la jornada, y Vera los vio como material olvidado.
@@ -2233,6 +2370,13 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         if (dweller.doing !== null && !dweller.doing.there) {
           const spot = seatAt(dweller.doing.offer, dweller.doing.seat);
           if (!elevatedPosts.has(dweller.doing.place.id)
+            && Math.hypot(spot.x - body.x, spot.z - body.z) <= dweller.doing.offer.reach * 0.6
+            && !sittingOpen(dweller.doing.offer, phase)) {
+            // Llega tarde al corro o al fuego: ya se han levantado. Se vuelve
+            // a pensar qué hacer en vez de sentarse solo.
+            dweller.doing = null;
+            dweller.rethinkAt = steps;
+          } else if (!elevatedPosts.has(dweller.doing.place.id)
             && Math.hypot(spot.x - body.x, spot.z - body.z) <= dweller.doing.offer.reach * 0.6) {
             dweller.doing.there = true;
             dweller.doing.until = steps + (dweller.doing.durationSteps ?? Math.round(dweller.doing.offer.seconds[0] * 30));

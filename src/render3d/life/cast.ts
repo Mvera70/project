@@ -149,7 +149,9 @@ export function castOf(
       facing: combat?.facing ?? body.facing,
       activity: activityOf(dweller, moving),
       clip,
-      load: dweller.holding !== null && dweller.holding <= -2_000_000 ? 'grain'
+      // Esquema 12 · el haz que va de la leñera a la obra es leña, no grano.
+      load: dweller.holding !== null && dweller.holding <= -3_000_000 && dweller.holding > -4_000_000 ? 'bundle'
+        : dweller.holding !== null && dweller.holding <= -2_000_000 ? 'grain'
         : dweller.holding !== null && dweller.holding <= -1_000_000 ? 'stone'
         : dweller.holding !== null && dweller.holding < 0 ? 'bundle' : null,
       poseSeconds: seconds,

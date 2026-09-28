@@ -843,7 +843,9 @@ export type MigrationEvent =
  * es cuando lo habrá— no se ha validado todavía. Después de ese hito, esto ya
  * no sería aceptable.
  */
-export const SCHEMA_VERSION = 11; // B1: el clan vecino (10 era K-1: la corona)
+// 12: la madera llega de una en una (`woodRun`). Sin migración, por decisión
+// del dueño del diseño (28 sep 2026): una partida del esquema 11 no carga.
+export const SCHEMA_VERSION = 12; // 11 era B1: el clan vecino
 // F3a no sube el esquema: `ArchivedGame.ledger` es opcional y lo que falta se
 // recuenta de la crónica, así que una partida vieja carga sin migración.
 
@@ -1064,7 +1066,39 @@ export interface GameState {
   traits: ValleyTrait[];
   /** B1 · El clan del valle vecino. Esquema 11. */
   threat: Threat;
+  /**
+   * La madera de la semana, en camino (esquema 12, 28 sep 2026).
+   *
+   * Lo que cortan los leñadores ya no cae entero en la leñera al cerrar el
+   * tick: entra **de una en una**, a su hora de la semana, y la última fracción
+   * al cerrarla (`subsistence/wood-run.ts`). Vive en el estado para que guardar
+   * a media semana, cargar o recuperar el letargo no acredite dos veces nada.
+   */
+  woodRun: WoodRun | null;
   ended: EndState | null;
+}
+
+/**
+ * El plan de entregas de madera de una semana. Plano y serializable.
+ *
+ * `at` son los momentos de cada unidad entera, en fracción de la semana que
+ * empieza en `tick` (la misma fracción que el bucle lleva y que el reloj de la
+ * cabecera convierte en hora); ordenados de menor a mayor. `credited` cuenta
+ * las que ya están en la leñera, que son siempre las primeras. `rest` es la
+ * fracción de unidad que no llega a entrega y se liquida al cerrar la semana.
+ *
+ * `base` es la leñera tal como la dejó el tick, apuntada en la primera entrega:
+ * la leñera a media semana es siempre `base + credited` y al cerrar
+ * `base + (at.length + rest)`, **una sola suma**. Sumar de uno en uno daba otro
+ * último decimal que sumar de golpe (la coma flotante no es asociativa), y
+ * mirar la semana a treinta fotogramas no puede dar otra partida que no mirarla.
+ */
+export interface WoodRun {
+  tick: number;
+  at: number[];
+  credited: number;
+  rest: number;
+  base: number | null;
 }
 
 /**

@@ -29,6 +29,8 @@ import type { ArchivedGame, Decision, GameState, PlayerAct, SaveFile } from '@en
 import { huntOpportunity, type HuntOpportunity } from '@engine/world/hunting';
 import { createHud } from './redesign/hud';
 import './redesign/hunt-sign.css';
+import { mountWoodGains } from './redesign/wood-gains';
+import { creditWoodRun } from '@engine/subsistence/wood-run';
 import { hash32 } from '@engine/rng';
 import { createInspectPanel } from './redesign/inspect-panel';
 import { cartPanel } from './redesign/cart';
@@ -195,7 +197,10 @@ let cameraControls: CameraControls | null = null;
 /** El panel de taller vivo, si lo hay (`ui/dev-hud.ts`). */
 let devHud: DevHud | null = null;
 
-export function boot(root: HTMLElement, save?: SaveFile, options: { readonly ephemeral?: boolean } = {}): App {
+export function boot(
+  root: HTMLElement, save?: SaveFile,
+  options: { readonly ephemeral?: boolean; readonly startFraction?: number } = {},
+): App {
   let state = save?.state ?? foundGame(freshSeed());
   const archive: ArchivedGame[] = save !== undefined ? [...save.archive] : [];
   let speed: Speed = 1;
@@ -484,6 +489,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     if (huntPreviousSpeed !== null) app.setSpeed(huntPreviousSpeed);
     huntPreviousSpeed = null;
   };
+  const woodGains = mountWoodGains();
   const huntSign = document.createElement('button');
   huntSign.type = 'button';
   huntSign.className = 'hunt-sign';
@@ -550,7 +556,7 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   cameraControls = mountCameraControls(() => backend.live, () => backend.live.surface);
   hudRight.append(bareToggle, hud.speedControls, hud.speedBadge);
 
-  root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, shell.element);
+  root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, woodGains.element, shell.element);
 
   /**
    * **UI-R1 · la pila del mensaje, y el fallo concreto que esta ronda tiene
@@ -770,6 +776,10 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
   let spokenOffer: number | null = null;
   const paint = (fraction: number): void => {
     lastFraction = fraction;
+    // Esquema 12 · la madera de la semana entra a su hora: las entregas cuya
+    // hora ya ha pasado en el reloj de la semana van a la leñera ahora, antes
+    // de pintar, y la cabecera y el «+1» las enseñan en este mismo fotograma.
+    creditWoodRun(state, fraction);
     if (huntOpportunityTick !== state.tick) {
       huntOpportunityTick = state.tick;
       currentHuntOffer = huntOpportunity(state);
@@ -918,6 +928,10 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     if (trackedId !== null) renderer.track(trackedId);
     renderer.paint(state, fraction);
     placeHuntSign();
+    woodGains.paint(
+      currentRoute.kind === 'valley' && backend.live.kind === 'pilot3d' ? backend.live.woodGains() : [],
+      backend.live.kind === 'pilot3d' ? backend.live.surface.getBoundingClientRect() : null,
+    );
     // El resultado físico llega en un fotograma, no al cabo de otra semana
     // de reloj real. Se entrega al motor justo después de pintar el impacto.
     if (huntInProgress) {
@@ -1470,8 +1484,13 @@ export function boot(root: HTMLElement, save?: SaveFile, options: { readonly eph
     }
     if (state.tick % TIME.SAVE_EVERY_TICKS === 0) persist();
   };
+  // Esquema 12 · la fracción de arranque sólo vale la primera vez: volver de
+  // una pestaña oculta sigue donde el letargo deje la semana.
+  let loopStarted = false;
   const beginLoop = (): void => {
-    loop = startLoop(() => speed, () => { if (!ticksHeld) runTick(); }, paint, () => timeScale);
+    loop = startLoop(() => speed, () => { if (!ticksHeld) runTick(); }, paint, () => timeScale,
+      loopStarted ? 0 : options.startFraction ?? 0);
+    loopStarted = true;
   };
 
   /**

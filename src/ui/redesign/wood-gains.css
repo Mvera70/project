@@ -1,0 +1,15 @@
+/* El «+1» de la leñera (`wood-gains.ts`, esquema 12). Pequeño y en crema, como
+   la señal de caza, con el icono de la leña de la cabecera; sin plato, con un
+   halo blando para leerse sobre el prado. La salida hacia una obra («−40») va
+   un punto más cálida para que no se confunda con una entrada. */
+.wood-gains { position: fixed; inset: 0; pointer-events: none; z-index: 27; }
+.wood-gain {
+  position: absolute; left: 0; top: 0;
+  display: inline-flex; align-items: center; gap: 3px;
+  color: #fbf4e2; font: 700 13px/1 var(--skin-font-body, system-ui, sans-serif);
+  font-variant-numeric: tabular-nums;
+  filter: drop-shadow(0 0 3px rgba(40, 30, 18, .7));
+  will-change: transform, opacity;
+}
+.wood-gain .skin-icon { width: 14px; height: 14px; }
+.wood-gain--out { color: #f1c79a; }

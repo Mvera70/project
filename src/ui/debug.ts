@@ -8,6 +8,7 @@ import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { archiveGame } from '@engine/save';
 import { MEANS_SPEC, giveMeans } from '@engine/world/means';
+import { woodCostOf } from '@engine/world/works';
 import { crownCandidates } from '@engine/people/crown';
 import { crownKing } from '@engine/world/crown';
 import { postOffer } from '@engine/world/road';
@@ -39,6 +40,35 @@ export function parseDebugRequest(search: string): DebugRequest | null {
     throw new Error('Invalid debug route: seed and year must be integers and season must be valid.');
   }
   return { seed, year, season };
+}
+
+/**
+ * Esquema 12 · la demo de la cadena de la madera (28 sep 2026): dónde empieza.
+ *
+ * El prototipo de Vera se juzga mirando diez minutos a ×1 sin tocar nada, y en
+ * diez minutos tiene que caber la cadena entera: entregas que suben la leñera
+ * y, al cerrar la semana, una obra que se abre, paga su madera y la ve salir
+ * hacia la parcela. Así que se busca, semana a semana y con la política
+ * prudente de siempre, **una semana con al menos `minDeliveries` entregas
+ * después de `WOOD_DEMO_START` cuya semana siguiente abra una obra que pague
+ * madera**. Determinista: la misma semilla da la misma semana.
+ */
+export const WOOD_DEMO_START = 0.45;
+
+export function runToWoodChain(state: GameState, limitWeeks = 480, minDeliveries = 3): number {
+  for (let week = 0; week < limitWeeks && state.ended === null; week += 1) {
+    const late = (state.woodRun?.at ?? []).filter((at) => at >= WOOD_DEMO_START).length;
+    if (late >= minDeliveries) {
+      const next = structuredClone(state);
+      run(next, 1, 'prudent', CATALOG);
+      const work = next.works.find((one) => one.startedTick === next.tick);
+      const paid = work !== undefined && woodCostOf(next, work.kind) > 0
+        && work.stoneDone === 0;
+      if (paid) return week;
+    }
+    run(state, 1, 'prudent', CATALOG);
+  }
+  return limitWeeks;
 }
 
 export function stateAt(request: DebugRequest): GameState {

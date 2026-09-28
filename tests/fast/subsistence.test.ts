@@ -107,6 +107,7 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
     // B1 · el clan vecino: esta aldea de laboratorio no tiene vecinos.
     threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0, arrivedTick: null, lastBand: 0 },
+    woodRun: null,
     ended: null,
   };
 }
@@ -222,14 +223,16 @@ describe('mano de obra · §5.2', () => {
 });
 
 describe('producción · §5.2, §5.4', () => {
-  it('la madera entra en el granero y los puntos de obra no tocan el estado', () => {
+  it('la madera sale en camino (esquema 12) y los puntos de obra no tocan el estado', () => {
     const s = founded(7);
     const before = structuredClone(s);
     const a = allocateLabour(s);
     const out = produce(s, a);
 
     expect(out.wood).toBeCloseTo(a.cutters * LABOUR.WOOD_PER_CUTTER, 9);
-    expect(s.village.wood).toBeCloseTo(before.village.wood + out.wood, 9);
+    // No entra de golpe: queda planificada en entregas que suman lo cortado.
+    expect(s.village.wood).toBe(before.village.wood);
+    expect(s.woodRun!.at.length + s.woodRun!.rest).toBeCloseTo(out.wood, 9);
     expect(out.buildPoints).toBeCloseTo(a.builders * LABOUR.BP_PER_BUILDER, 9);
 
     // Nada más ha cambiado: los puntos de obra viajan de vuelta, no al estado.

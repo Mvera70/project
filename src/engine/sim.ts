@@ -68,6 +68,7 @@ import { holderOf, ratioOf } from './crossroads/conditions';
 import { selectCrossroad } from './crossroads/select';
 import { applyOption } from './crossroads/resolve';
 import { fireSeeds } from './crossroads/seeds';
+import { closeWoodRun } from './subsistence/wood-run';
 import type {
   AppliedEffects,
   Catalogue,
@@ -634,6 +635,13 @@ export function tick(
 
   // ---- 1 · ADVANCE ---------------------------------------------------------
   state.tick += 1;
+
+  // ---- 1a · CLOSE (esquema 12) ---------------------------------------------
+  // La semana que acaba entrega lo que le quedara en camino: las unidades cuya
+  // hora no llegó a pintarse y la fracción que no hacía una entera. Aquí y no
+  // en el paso 5 para que todo lo de esta semana —la obra, el invierno, el
+  // catálogo— vea la madera de la anterior entera, como la veía antes.
+  closeWoodRun(state);
 
   // ---- 1b · ACTS (M-0) ------------------------------------------------------
   // Lo que el jugador hizo esta semana sin que nadie le preguntara: contestar a

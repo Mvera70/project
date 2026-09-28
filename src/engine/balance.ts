@@ -202,6 +202,33 @@ export const FOOD = {
   STARVE_CHILD_UNDER: 5,
 } as const;
 
+/**
+ * La madera de la semana, entregada de una en una (esquema 12, 28 sep 2026).
+ *
+ * Vera pidió probar si mirar una cadena entera —tala, carga, leñera, obra—
+ * hace el valle más interesante sin pedir nada al jugador, y que **los
+ * sistemas vayan con el reloj lo más posible**. Así que cada unidad tiene su
+ * hora, y la hora es de día: la jornada de sol se lee con el mismo origen que
+ * la cabecera (`TIME.DAY_START_PHASE`, `derive/clock.ts`).
+ */
+export const WOOD_RUN = {
+  // TUNE: la ventana de las entregas, en fase de jornada de sol (0 medianoche),
+  // **medida donde hay leñadores y dándoles tiempo de llegar**. Con cuatro
+  // semillas, dos edades (años 3 y 8) y dos jornadas cada una hay gente talando
+  // de la fase 0,10 a la 0,65 (el grueso de 0,25 a 0,45, nadie desde 0,70), y
+  // el porteador sale un quinto de jornada antes de su hora. Medido con tres
+  // jornadas por aldea (`life-wood-run.test.ts` mide lo mismo), entregas que
+  // llegan con alguien delante: 0,22-0,60 → 31 de 39 (fallaban las del alba);
+  // 0,34-0,74 → 24 de 38 (fallaban las de la tarde, con el bosque vacío);
+  // **0,30-0,58 → 35 de 38**, y de las tres, una es de un día sin leñadores.
+  // Dentro de la luz de `effects/day-phases.ts`, que comprueba la prueba.
+  FIRST_PHASE: 0.3,
+  LAST_PHASE: 0.58,
+  // TUNE: cuánto se aparta cada entrega de su hueco regular, en fracción del
+  // hueco. 0,6 reparte sin dejar dos entregas pegadas ni un día hueco.
+  JITTER: 0.6,
+} as const;
+
 export const LABOUR = {
   WOOD_PER_CUTTER: 3.0, // per week
   // TUNE: **cuánto levanta un albañil en una semana, y cuántas manos tiene

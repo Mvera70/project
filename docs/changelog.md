@@ -1,5 +1,41 @@
 # The Valley — Registro de cambios
 
+## v4.84 · 28 sep 2026 · La madera, de «+1» a la obra (esquema 12)
+
+El prototipo que pidió Vera: **¿mirar una cadena productiva entera hace el
+valle más interesante sin pedir nada al jugador?** Y con una condición suya
+dicha a media ronda: «los sistemas deberían estar sincronizados en tiempo del
+reloj lo máximo posible».
+
+- **Motor.** El paso 5 ya no suma la madera de golpe: la planifica en entregas
+  de una unidad con su hora en la semana (`subsistence/wood-run.ts`,
+  `state.woodRun`). `creditWoodRun` las mete en la leñera cuando llega su hora
+  según la fracción que lleva el bucle; el paso **1a** nuevo (`closeWoodRun`)
+  liquida el resto al cerrar la semana. Horas con `hash32`, sin azar. La leñera
+  a media semana es `base + acreditadas`, una sola suma: sumar de uno en uno
+  daba otro último decimal que sumar de golpe, y eso rompía la igualdad entre
+  mirar la semana y no mirarla (cazado por la prueba de fotogramas).
+- **Las horas, medidas contra la vida.** Hay gente talando de la fase 0,10 a la
+  0,65 y el porteador sale un quinto de jornada antes. Entregas con alguien
+  delante: 0,22–0,60 → 31 de 39; 0,34–0,74 → 24 de 38; **0,30–0,58 → 35 de 38**.
+- **Vida.** El leñador sale con el haz cuando le toca una entrega (deja el hacha
+  si hace falta), espera en la leñera si llega pronto y lo suelta a su hora. La
+  obra que se abre manda hasta tres albañiles a llevar su madera de la leñera a
+  la parcela la primera jornada.
+- **Pantalla.** «+1» sobre la leñera cuando el motor apunta la unidad (y «−N»
+  cuando una obra la paga), con el icono de la leña y la cabecera subiendo a la
+  vez; a velocidades altas se juntan.
+- **Balance.** La madera de una semana llega como tarde a la siguiente. Doce
+  semillas × veinte años: 40,6 → 39,2 personas, 292 → 308 de leña, 39,3 → 39,8
+  edificios, ninguna aldea más acabada.
+- **Esquema 12, sin migración** (decisión del dueño): una partida del 11 no
+  carga. Demo reproducible: `?debug=1&live=1&seed=11&year=3&demo=wood`, que
+  busca una semana con entregas cuya siguiente abre una obra y la abre a 0,45.
+- **Dos defectos de la vida que destapó la trayectoria nueva** (semilla 23):
+  quien llegaba tarde al fuego se sentaba con la hoguera apagada (arreglado,
+  `sittingOpen`), y el salinero no sabe salir de una plaza que un granero
+  cierra: queda en `it.fails` con lo medido, no es de la madera.
+
 ## v4.83 · 28 sep 2026 · La huella de la presa, y el bosque la esconde
 
 Vera, sobre la señal de caza: «no me gusta el icono; la huella del animal, por

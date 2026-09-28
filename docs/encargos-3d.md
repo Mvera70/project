@@ -107,6 +107,19 @@ hoy y qué haría falta. Un encargo que sólo vive en un comentario del código 
 un encargo que nadie hará — y una mecánica que no se ve no existe para quien
 juega.
 
+## La madera a la vista (28 sep 2026, esquema 12)
+
+La madera entra en la leñera de una en una, a su hora, con un porteador que la
+trae y un «+1» encima (`docs/design.md` §5.4). Lo que el motor ya sabe y la
+pantalla todavía no enseña del todo:
+
+| Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
+|---|---|---|---|
+| **La madera en la parcela** | La obra paga toda su madera al abrirse | Hasta tres albañiles llevan un haz de la leñera a la parcela la primera jornada, y el haz desaparece al llegar | Un montón de tablones en la parcela que baja a medida que la obra sube (`bpDone / bpCost`), reutilizando `log-pile` a escala |
+| **La leñera que sube de uno en uno** | Cada entrega suma una unidad | El montón de `steading.ts` cambia por tramos de 60 (`floor(wood/60)`), así que casi ninguna entrega lo mueve | Un tronco más en el montón por entrega, o un escalón más fino, sin rehacer el grupo entero |
+| **La entrega sin leñadores** | Entra igual, a su hora | El «+1» sale sin nadie delante los días en que el reparto no pone a nadie en el bosque (3 de 38 entregas medidas) | Que el reparto de la jornada (`life/day.ts`) ponga un leñador los días con entregas |
+| **La piedra y el grano** | Siguen entrando por semanas enteras | La piedra se acarrea sin «+1»; el grano sube de golpe | Lo mismo que la madera: entregas con hora, porteador y aviso. Pedido por el dueño del diseño el 28 sep 2026, para después de probar la madera |
+
 ## El roble del valle (24 sep 2026)
 
 **G-42:** `great-oak.glb` sustituye las primitivas cuando está publicado. Toma

@@ -117,7 +117,11 @@ describe('grafo de módulos del motor', () => {
       'people/crown',
       'people/demography',
       'state',
+      // Esquema 12 · la madera de la semana sale en entregas, no a la leñera.
+      'wood-run',
     ]);
+    // Y las entregas son una hoja de la subsistencia: horas con `hash32`, sin azar.
+    expect(importsOf('subsistence/wood-run.ts')).toEqual(['balance', 'rng', 'state']);
     expect(importsOf('subsistence/consumption.ts')).toEqual([
       'balance',
       'herd',

@@ -75,6 +75,18 @@ function uint32(value: unknown): value is number {
   return tickValue(value) && (value as number) <= 0xffff_ffff;
 }
 
+/** Esquema 12 · el plan de la madera de la semana: horas ordenadas en [0, 1]. */
+function woodRun(value: unknown): boolean {
+  if (value === null) return true;
+  if (!record(value) || !tickValue(value['tick']) || !tickValue(value['credited'])) return false;
+  const at = value['at'];
+  const rest = value['rest'];
+  return Array.isArray(at) && at.every((t, i) => finite(t) && t >= 0 && t <= 1 && (i === 0 || t >= (at[i - 1] as number)))
+    && (value['credited'] as number) <= at.length
+    && finite(rest) && rest >= 0 && rest < 1
+    && (value['base'] === null || finite(value['base']));
+}
+
 function nullableTick(value: unknown): boolean {
   return value === null || tickValue(value);
 }
@@ -352,6 +364,7 @@ function isPlausibleState(value: unknown): value is GameState {
     && (outbreak === null || (record(outbreak) && tickValue(outbreak['startedTick'])
       && tickValue(outbreak['endsTick']) && tickValue(outbreak['deaths'])))
     && nullableTick(s['dwindlingSince']) && tickValue(s['noOneStreak'])
+    && woodRun(s['woodRun'])
     && (modifier === null || (record(modifier) && finite(modifier['factor']) && tickValue(modifier['harvests'])))
     && (ended === null || (record(ended) && tickValue(ended['tick'])
       && ENDS.has(ended['cause'] as string) && (ended['lastId'] === null || tickValue(ended['lastId']))))

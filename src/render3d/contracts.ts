@@ -258,6 +258,8 @@ export interface GraphicsRenderer {
   attackHunt(precision?: number): boolean;
   /** Dónde va la señal de caza en la pantalla (`senales-en-el-mapa`), o `null`. */
   huntSign(): { x: number; y: number; species: HuntSpecies; hidden: boolean } | null;
+  /** Esquema 12 · los «+1» y «−N» de la leñera, proyectados; `age` va de 0 a 1. */
+  woodGains(): readonly { id: number; count: number; x: number; y: number; age: number }[];
   /** Parte de la cacería, entregado una sola vez al motor. */
   hunt(): { sourceTick: number;
     species: HuntSpecies;

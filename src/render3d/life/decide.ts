@@ -173,6 +173,17 @@ function ageLeanOf(group: 'child' | 'elder' | undefined, offer: string): number 
  * cualquier alternativa sin hora que dé lo mismo; fuera sigue siendo viable,
  * porque nunca es cero.
  */
+/**
+ * Si la comida en corro o el fuego siguen abiertos a esta hora. Se eligen con
+ * la ventana abierta (`hourFactor`), pero quien viene de lejos puede llegar
+ * cuando ya ha cerrado: medido en la semilla 23 a los veinte años, un vecino se
+ * sentaba al fuego apagado (fase 0,738, la ventana acaba en 0,72).
+ */
+export function sittingOpen(offer: Offer, dayPhase: number): boolean {
+  if ((offer.id !== 'meal' && offer.id !== 'hearth') || offer.hours === undefined) return true;
+  return hourFactor(offer, dayPhase) >= 1.4;
+}
+
 function hourFactor(offer: Offer, dayPhase: number): number {
   if (offer.hours === undefined) return 1;
 

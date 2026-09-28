@@ -26,7 +26,8 @@ import type { Palette } from '@derive/palette';
 import { moodsFor } from '@derive/moods';
 import { createValleyCamera, BASE_YAW } from './camera';
 import { TERRAIN_CODE, type GameState, type HappeningId, type VillagerId } from '@engine/state';
-import { BUILDINGS } from '@engine/balance';
+import { BUILDINGS, TIME } from '@engine/balance';
+import { woodCostOf } from '@engine/world/works';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
   Actor, ActorDoing, BattleReport, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats,
@@ -74,7 +75,7 @@ import { floodOf } from '../derive/flood';
 import { SHARED_WATER } from './world/water-surface';
 import { createQuarryFace, quarryStage } from './world/quarry-face';
 import { rockGeometry } from './world/mountains';
-import { stoneWork } from './life/resource-sites';
+import { stoneWork, woodStoreCells } from './life/resource-sites';
 import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
@@ -110,6 +111,15 @@ const HANDHELD = { pixelRatio: 1.5, shadowMapSize: 1024 } as const;
 const HUNT_SIGN_LIFT = 0.9;
 /** Radio de la presa al preguntar si el bosque la tapa: poco, para que el borde del bosque no la esconda. */
 const HUNT_SIGN_COVER = 0.2;
+/** Esquema 12 · segundos escénicos de una semana (siete jornadas de sol). */
+const WEEK_SECONDS = TIME.REAL_MS_PER_TICK / 1000;
+/** Lo que vive un «+1» sobre la leñera, en segundos de reloj real. */
+const WOOD_GAIN_LIFE = 2.6;
+/** Dos entradas más juntas que esto se cuentan en el mismo aviso (×16, ×64). */
+const WOOD_GAIN_MERGE = 0.7;
+/** Altura del aviso sobre el suelo de la leñera, en celdas. */
+const WOOD_GAIN_LIFT = 1.1;
+const NO_WOOD: readonly number[] = [];
 /** Quién puede salir de caza: adultos, ni niños ni viejos. TUNE. */
 const HUNTER_AGE = { min: 16, max: 60 } as const;
 /**
@@ -681,6 +691,11 @@ export async function createGraphicsRenderer(
    */
   let huntSighting: { tick: number; species: HuntSpecies; prey: WildPrey | null; targetId: number | null } | null = null;
   let huntSightingTick = -1;
+  // Esquema 12 · lo que el motor ha apuntado de la madera de la semana, visto
+  // desde aquí, y los avisos «+1» / «−40» que eso deja sobre la leñera.
+  let woodSeen: { tick: number; credited: number; total: number; wood: number; work: number | null } | null = null;
+  let woodGains: { id: number; count: number; x: number; z: number; age: number }[] = [];
+  let woodGainId = 0;
   /** Quién caza ahora, para seguirlo y devolverlo a su día al acabar. */
   let huntHunter: Dweller | null = null;
   let huntReport: HuntReport | null = null;
@@ -719,6 +734,58 @@ export async function createGraphicsRenderer(
    * la altura de un cuerpo. Así cubre la partida de la semilla 7 cuando aún
    * está a unas cuatro celdas, sin transparentar su ruta entera por el bosque.
    */
+  /**
+   * Esquema 12 · lo que entra y sale de la leñera, para el aviso sobre ella.
+   *
+   * Sólo cuenta lo que el motor ya apuntó (`woodRun.credited`), así que el
+   * «+1» sale cuando la unidad está en la leñera y el contador de la cabecera
+   * ya la enseña. Al cerrar la semana, lo que no llegó a pintarse (×64, una
+   * pestaña oculta) sale de una vez. Y la obra que se abre esa semana saca su
+   * madera: «−40» en el mismo sitio.
+   */
+  function noteWood(state: Readonly<GameState>, frame: GraphicsFrame): void {
+    for (const gain of woodGains) gain.age += frame.realDeltaSeconds;
+    woodGains = woodGains.filter(gain => gain.age < WOOD_GAIN_LIFE);
+    const run = state.woodRun;
+    const work = state.works[0];
+    const fresh = work !== undefined && work.startedTick === state.tick ? work.id : null;
+    const now = { tick: state.tick, credited: run?.tick === state.tick ? run.credited : 0,
+      total: run?.tick === state.tick ? run.at.length : 0, wood: state.village.wood, work: fresh };
+    const seen = woodSeen;
+    woodSeen = now;
+    if (seen === null || frame.discontinuity || now.tick < seen.tick || now.tick > seen.tick + 1) return;
+    const store = woodStoreCells(state)[0];
+    if (store === undefined) return;
+    const width = state.map.width;
+    const x = store % width + 0.5;
+    const z = Math.floor(store / width) + 0.5;
+    const shout = (count: number): void => {
+      const last = woodGains[woodGains.length - 1];
+      if (last !== undefined && Math.sign(last.count) === Math.sign(count) && last.age < WOOD_GAIN_MERGE) {
+        last.count += count;
+        last.age = 0;
+        return;
+      }
+      woodGainId += 1;
+      woodGains.push({ id: woodGainId, count, x, z, age: 0 });
+    };
+    if (now.tick === seen.tick) {
+      if (now.credited > seen.credited) shout(now.credited - seen.credited);
+      return;
+    }
+    // Semana nueva: lo que quedaba en camino entró al cerrarla.
+    const closed = seen.total - seen.credited;
+    if (closed > 0) shout(closed);
+    if (fresh !== null && fresh !== seen.work) {
+      const cost = woodCostOf(state as GameState, work!.kind);
+      // Una obra regalada por una encrucijada no paga: sólo se enseña la salida
+      // si la leñera ha bajado de verdad lo que cuesta. Con una unidad de
+      // holgura, porque al cerrar la semana entra también la fracción que no
+      // hacía entrega: en la demo, 162 → 103 por una casa de 60.
+      if (cost > 0 && seen.wood + closed - now.wood >= cost - 1) shout(-Math.round(cost));
+    }
+  }
+
   function revealAssault(): number {
     if (forest === null || life === null) return 0;
     if (huntScene !== null) {
@@ -1578,6 +1645,7 @@ export async function createGraphicsRenderer(
       const phase = heldPhase ?? options.previewPhase ?? dayPhase(frame.presentationSeconds);
       paintedPhase = phase;
       const today = dayNumber(frame.presentationSeconds);
+      noteWood(state, frame);
       // Un fotograma discontinuo —partida nueva, carga, letargo— trae un estado
       // que no es la continuacion del anterior, asi que la jornada guardada no
       // vale: se estrena una. `presentation-clock` ya distingue los tres casos.
@@ -1836,6 +1904,11 @@ export async function createGraphicsRenderer(
           if (nightOutcomes.length > 64) nightOutcomes.shift();
         }
         steppedPhase = stepPhase;
+        // Esquema 12 · la vida con la hora de la semana en la que cae este
+        // paso, la misma que el bucle pasa al motor para apuntar entregas.
+        const run = state.woodRun;
+        life.setWoodClock(run !== null && run.tick === state.tick ? run.at : NO_WOOD,
+          frame.tickFraction - (lifeCarry - LIFE_STEP) / WEEK_SECONDS);
         life.step(stepPhase);
         if (huntScene !== null) {
           huntScene.step(life.wildlife);
@@ -2272,6 +2345,17 @@ export async function createGraphicsRenderer(
       // De cerca, para ver la pieza, sin alejar a quien ya está más cerca.
       view.zoom(Math.min(1, 13 / view.view.height), viewport.widthCss / 2, viewport.heightCss / 2);
       return true;
+    },
+    /** Esquema 12 · los avisos de la leñera en la pantalla: cuánto, dónde y cuánto llevan. */
+    woodGains(): readonly { id: number; count: number; x: number; y: number; age: number }[] {
+      const shown: { id: number; count: number; x: number; y: number; age: number }[] = [];
+      for (const gain of woodGains) {
+        const point = new Vector3(gain.x, groundFloor(gain.x, gain.z) + WOOD_GAIN_LIFT, gain.z).project(camera);
+        if (point.z > 1 || Math.abs(point.x) > 1.05 || Math.abs(point.y) > 1.05) continue;
+        shown.push({ id: gain.id, count: gain.count, age: gain.age / WOOD_GAIN_LIFE,
+          x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2 });
+      }
+      return shown;
     },
     /** Dónde va la señal de caza en la pantalla, o `null` si no hay ocasión a la vista. */
     huntSign(): { x: number; y: number; species: HuntSpecies; hidden: boolean } | null {

@@ -35,6 +35,7 @@ import type { Allocation, GameState } from '../state';
 import { count, smithyWorking } from './building-counts';
 import { foragingUrgency, hasRiver } from './forage';
 import { wardensWanted } from './crows';
+import { planWoodRun } from './wood-run';
 
 function clamp(value: number, low: number, high: number): number {
   return Number.isFinite(value) ? Math.max(low, Math.min(high, value)) : low;
@@ -185,7 +186,10 @@ export function allocateLabour(state: GameState): Allocation {
 /**
  * Step 6. The week's wood and build points. §5.2, §5.4.
  *
- * The wood goes into the village store, which is what §5.4 says. The build
+ * **La madera no entra en la leñera aquí** (esquema 12): se planifica en
+ * entregas de una unidad a lo largo de la semana que empieza
+ * (`wood-run.ts`), y llega a la leñera cuando llega su hora o, como tarde, al
+ * cerrar la semana en el paso 1a del tick siguiente. The build
  * points do NOT: they are handed back so that M-10 can pass them to M-14's
  * `advanceWorks`. Parking them in the state would add a field that only exists
  * between two steps of the same tick, and would have to be saved and migrated.
@@ -201,7 +205,7 @@ export function produce(
 ): { wood: number; buildPoints: number } {
   const cut = a.cutters * LABOUR.WOOD_PER_CUTTER;
   const wood = Math.max(0, Math.min(cut, woodCap));
-  state.village.wood += wood;
+  state.woodRun = planWoodRun(state, wood);
 
   const active = (flag: string): boolean => {
     const until = state.flags[flag];

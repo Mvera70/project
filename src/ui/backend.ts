@@ -62,6 +62,8 @@ interface ValleyBackend {
   attackHunt(precision?: number): boolean;
   /** Dónde va la señal de caza en la pantalla, o `null`. */
   huntSign(): { x: number; y: number; species: HuntSpecies; hidden: boolean } | null;
+  /** Esquema 12 · los «+1» y «−N» de la leñera, proyectados; `age` va de 0 a 1. */
+  woodGains(): readonly { id: number; count: number; x: number; y: number; age: number }[];
   /** Completed hunt report, consumed once by the UI and forwarded to the engine. */
   hunt(): { sourceTick: number; species: HuntSpecies; weapon: HuntWeapon; hits: number; killed: boolean } | null;
   /**
@@ -178,6 +180,7 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     startHunt() { return false; },
     attackHunt() { return false; },
     huntSign() { return null; },
+    woodGains() { return []; },
     hunt() { return null; },
     siege() { return null; },
     ending() { return null; },
@@ -408,6 +411,7 @@ export function attachBackend(
         startHunt(state, species, weapon) { return renderer.startHunt(state, species, weapon); },
         attackHunt(precision) { return renderer.attackHunt(precision); },
         huntSign() { return renderer.huntSign(); },
+        woodGains() { return renderer.woodGains(); },
         hunt() { return renderer.hunt(); },
         siege() { return renderer.siege(); },
         ending() { return renderer.ending(); },

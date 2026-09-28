@@ -597,6 +597,8 @@ de las partidas guardadas.
 ```
 tick(state, decision?) :
    1.  ADVANCE      tick += 1; recalcular reloj
+  1a.  CLOSE        cerrar la madera de la semana anterior: entra lo que quedaba
+                    en camino (§5.4, esquema 12)
    2.  ANNUAL       si week == 0:  tirar clima del año, comprobar peste,
                     comprobar incendio, migración de primavera, envejecer a todos
   2b.  FATE         rollFate(state): una tirada del flujo `fate` contra la tabla
@@ -627,6 +629,10 @@ Notas obligatorias:
   el granero antes del invierno.
 - Los pasos 12 y 13 se ejecutan sobre listas fotografiadas al empezar el paso.
   Un recién nacido no puede morir en el mismo tick en el que nace.
+- El paso **1a** (esquema 12, v4.84) cierra el plan de entregas de madera de
+  la semana que acaba (§5.4): lo que no se apuntó a su hora entra aquí, antes
+  que nada del mundo, para que la obra, el invierno y el catálogo de esta semana
+  vean la madera de la anterior entera. No consume ninguna tirada.
 - El paso **2b** (R-1, v3.75) va después del bloque anual y antes de la
   decisión a propósito: un suceso es del mundo, no del jugador, y lo que el
   jugador decide esa semana se decide **con el suceso ya encima** (una casa
@@ -792,6 +798,40 @@ Producción: `cutters · WOOD_PER_CUTTER`, limitada por el bosque disponible (§
 Consumo: construcción, y calefacción en invierno a `WINTER_WOOD` por persona y
 semana. Si la leña se agota en invierno, se marca `cold` y la mortalidad se
 multiplica por 1.4 esa semana.
+
+**Entrega, leñera y obra (esquema 12, v4.84, 28 sep 2026).** La madera que el
+paso 5 corta **no entra en la leñera de golpe**. Se reparte en un plan de la
+semana que empieza (`state.woodRun`, `subsistence/wood-run.ts`): una entrega por
+unidad entera, cada una con su hora en fracción de semana, y la fracción que no
+hace una unidad aparte. Tres reglas:
+
+1. **Las horas son de día y donde hay leñadores.** Se reparten por el tiempo de
+   trabajo de las siete jornadas de sol (`WOOD_RUN.FIRST_PHASE`–`LAST_PHASE`,
+   medidas contra la capa de vida), con el mismo origen que el reloj de la
+   cabecera (`TIME.DAY_START_PHASE`), y se apartan de su hueco con `hash32`: no
+   consumen azar ni desplazan ninguna tirada.
+2. **Cada entrega entra una sola vez.** `creditWoodRun(state, fracción)` mete en
+   la leñera las que ya han llegado según la fracción de semana que lleva el
+   bucle, antes de pintar; `closeWoodRun` (paso 1a) liquida el resto y la
+   fracción. Lo acreditado vive en el estado, así que guardar a media semana,
+   cargar, recuperar el letargo (que sólo da semanas enteras) o pintar a
+   cualquier tasa de fotogramas termina la semana en la misma leñera, byte a
+   byte: la leñera a media semana es `base + acreditadas`, una sola suma.
+3. **La obra paga al abrirse, como siempre** (paso 6, §7.3), con la leñera que
+   haya. Lo único que cambia de balance es que la madera de una semana llega a
+   la leñera la semana siguiente a más tardar: medido en doce semillas y veinte
+   años, 40,6 → 39,2 personas, 292 → 308 de leña, 39,3 → 39,8 edificios y
+   ninguna aldea más acabada.
+
+La pantalla lo cuenta entero sin pedir nada al jugador: el leñador sale con el
+haz para llegar a la leñera a la hora de su entrega y lo suelta cuando el motor
+la apunta; encima de la leñera sale un «+1» y la cifra de la cabecera sube a la
+vez; la semana que se abre una obra sale un «−N» y, esa primera jornada, hasta
+tres albañiles llevan haces de la leñera a la parcela antes de ponerse a
+levantar (`life/day.ts`, `life/village.ts`, `redesign/wood-gains.ts`). A
+velocidades altas los avisos seguidos se juntan en uno («+6»), pero el motor
+cuenta cada unidad. **La piedra y el grano irán después por el mismo camino**
+(pedido por el dueño del diseño el mismo día).
 
 **Cuestión abierta — el tope de la madera.** El grano tiene capacidad y merma;
 la madera no tiene ni una cosa ni la otra, así que una aldea sin obras acumula
@@ -4632,7 +4672,13 @@ convierte una puesta al día parcial en una partida actual. El último lote es u
 límite de persistencia propio: solicita una instantánea con la hora actual antes
 de mostrar el parte y arrancar el bucle ordinario.
 
-**Esquema actual: 2 (v2.67).** El esquema 1 se migra de forma aditiva: su única
+**Esquema actual: 12 (v4.84, la madera en entregas, §5.4).** Y es el primero que
+**no migra**, por decisión del dueño del diseño (28 sep 2026): una partida del
+esquema 11 no carga, y el menú funda una nueva. Las partidas de demostración no
+se guardan: se regeneran desde la semilla (`?debug=1&live=1&…`, `&demo=wood`).
+Lo que sigue es la historia de las migraciones que sí se hicieron.
+
+**Esquema 2 (v2.67).** El esquema 1 se migra de forma aditiva: su única
 `seed` pasa también a `terrainSeed`; `peakPeople` toma el mayor valor de
 `params.people` conservado en la crónica o la población presente. No se atribuye
 al guardado antiguo una precisión que nunca almacenó.

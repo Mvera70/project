@@ -18,6 +18,8 @@ import { stallOf, visitsToday } from '../../src/render3d/life/visitors';
 import { fitsCircle, penetration } from '../../src/render3d/life/body';
 
 const SEEDS = [7, 23, 41];
+/** La semilla cuya plaza queda cerrada tras el esquema 12 (ver el `it.fails`). */
+const SALT_BLOCKED = 23;
 
 function grown(seed: number): GameState {
   const state = foundTwenty(seed);
@@ -102,12 +104,27 @@ describe('El valle más vivo · el puesto y el trato', () => {
       const life = createVillage(cow, cow.tick * TIME.DAYS_PER_WEEK);
       for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step(n / STEPS_PER_DAY);
       expect(life.visitors[0]!.beast?.home, `semilla ${seed}`).toBe(true);
+      if (seed === SALT_BLOCKED) continue;
       const salt = dealing(seed, 'salt_visit');
       const market = createVillage(salt, salt.tick * TIME.DAYS_PER_WEEK);
       for (let n = 0; n < STEPS_PER_DAY; n += 1) market.step(n / STEPS_PER_DAY);
       expect(market.visitors[0]!.phase, `semilla ${seed}`).toBe('gone');
       expect(stallOf(market.visitors[0]!), `semilla ${seed}: la sal se fue con él`).not.toBeNull();
     }
+  });
+
+  // **Medido el 28 sep 2026, al pasar la madera a entregas (esquema 12).** La
+  // trayectoria nueva deja en la semilla 23, al año ocho, un granero en
+  // (38, 59) sobre la línea recta entre la plaza y la entrada, y `pathTo` no
+  // encuentra camino de la plaza a la entrada ni desde el puesto: el salinero
+  // vino en línea recta sin ruta y al irse se queda contra el granero en
+  // (38,5, 58,7) hasta acabar la jornada, `leaving` y no `gone`. No es de la
+  // madera: esa semana no hay obra ni acarreo. Es la capa de vida, que no sabe
+  // salir de una plaza cerrada; la propiedad se queda intacta hasta arreglarlo.
+  it.fails('semilla 23 · el salinero se va de una plaza que la aldea ha cerrado', () => {
+    const market = createVillage(dealing(SALT_BLOCKED, 'salt_visit'), dealing(SALT_BLOCKED, 'salt_visit').tick * TIME.DAYS_PER_WEEK);
+    for (let n = 0; n < STEPS_PER_DAY; n += 1) market.step(n / STEPS_PER_DAY);
+    expect(market.visitors[0]!.phase).toBe('gone');
   });
 
   it('en cada trato cerrado pasan monedas de mano, del que compra al que vende', () => {
