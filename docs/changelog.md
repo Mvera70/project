@@ -1,5 +1,44 @@
 # The Valley — Registro de cambios
 
+## v4.95 · 28 sep 2026 · Más gente por el camino, las expediciones y el tablón de la plaza
+
+**En `main` sin subir** (commit local): falta que tocar el tablón abra su
+ventana, y la suite completa. Ver `docs/task-log.md`.
+
+Vera, con el camino ya en el motor: «crear más eventos de gente que llegue a la
+aldea, te doy libertad de imaginación», y las expediciones: «el jugador podrá
+decidir si mandar a uno o a X adultos a cumplir algún objetivo […] un juego de
+doble filo, puedes ganar o perder». Y, preguntada por cómo se elige cuántos:
+«habrá un cartel en la plaza; al pulsarlo se abrirá una ventana que imita un
+cartel de madera; así no invadimos la UI hasta que pulsamos».
+
+- **Cinco llegadas nuevas** (`HAPPENINGS`, `fate.ts`, §7.10): juglar,
+  peregrinos, calderero, curandera y la familia que huye y se queda. Suben por
+  el camino; la familia pasa el día en la plaza y al siguiente vive en la
+  aldea. Medido en seis semillas a treinta años: todas salen (18, 13, 17, 12 y
+  6 por valle).
+- **Las expediciones** (§7.15, `world/expeditions.ts`): cinco misiones, de las
+  setas al mercado del otro valle. El jugador dice cuántos, la aldea quiénes
+  (nunca el líder, siempre dos adultos en casa). Los que se van llevan
+  `leftTick` mientras dura. Al volver, una tirada en su propio flujo
+  (`expeditions`) decide entre cinco finales, y en las pruebas salen los cinco.
+  **Sin subir el esquema**: una partida vieja carga con la lista vacía.
+- **Se ven** (`life/expeditions.ts`): salen andando de casa; en el bosque se
+  les ve recoger; a la montaña y al mercado se van por el camino; al volver
+  entran andando hasta su puerta.
+- **El tablón de la plaza** (`derive/notice-board.ts`, `world/notice-board.ts`,
+  `ui/redesign/board.ts`): provisional de cajas, con un aviso por misión; su
+  ventana imita madera (opción B1 de las maquetas). El modelo está pedido a
+  Astra (`docs/encargos/visitantes-y-expediciones.md`).
+- **Arreglado: una partida con una caza o un asalto no cargaba.** `actRecord`
+  (`save.ts`) no conocía `hunt` ni `battle`; `loadSave` la daba por corrupta y
+  el juego empezaba otra.
+- **Arreglado: una encrucijada podía escribir `{B}`** cuando la lista de
+  personajes estaba llena (`MAX_NAMED` 8): `promoteToNamed` no hacía nada y el
+  elegido seguía sin nombre. Ahora recibe uno sin volverse personaje
+  (`resolve.ts`). Lo destapó la familia que huye en la semilla 23; por eso la
+  familia llega con nombre pero sin ocupar hueco (`arriveToStay`, `character`).
+
 ## v4.94 · 28 sep 2026 · El camino, en el motor; los visitantes lo siguen; piedras en la calzada
 
 Los tres abiertos que dejó v4.93, pedidos por Vera tal cual: «los mercaderes y

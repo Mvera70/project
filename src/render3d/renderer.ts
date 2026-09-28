@@ -561,7 +561,7 @@ export async function createGraphicsRenderer(
   const hearth = createHearth();
   // Y los banderines y farolillos cuando hay fiesta (`derive/festivity.ts`).
   const festoon = createFestoon();
-  // §7.13 · el tablón de misiones, que abre su ventana al tocarlo.
+  // §7.15 · el tablón de misiones, que abre su ventana al tocarlo.
   const noticeBoard = createNoticeBoard();
   /** Cuántas misiones anuncia esta semana: tantos papeles clavados. */
   let boardNotes = 0;
@@ -1507,7 +1507,7 @@ export async function createGraphicsRenderer(
   // Una malla instanciada es una llamada por muchas copias.
   // Las pisadas, para la sonda: cuánta marca hay en un punto (`effects/trample.ts`).
   window.__valleyTrampleAt = (x: number, z: number) => trample?.at(x, z) ?? null;
-  // §7.13 · dónde cae el tablón en la pantalla, en píxeles CSS del lienzo, para
+  // §7.15 · dónde cae el tablón en la pantalla, en píxeles CSS del lienzo, para
   // que un recorrido lo toque de verdad (`shot.mjs --open board`).
   window.__valleyBoardScreen = () => {
     if (!noticeBoard.group.visible) return null;
@@ -2352,7 +2352,7 @@ export async function createGraphicsRenderer(
         const id = idOf(hit.object, 'villagerId');
         if (id !== undefined) return { kind: 'villager', id };
       }
-      // §7.13 · y el tablón de la plaza, que abre su propia ventana.
+      // §7.15 · y el tablón de la plaza, que abre su propia ventana.
       for (const hit of hits) {
         let node: Object3D | null = hit.object;
         while (node !== null && node.userData['noticeBoard'] !== true) node = node.parent;

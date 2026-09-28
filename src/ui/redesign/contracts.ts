@@ -32,7 +32,7 @@ export type SheetRoute =
   // **dar** al valle. Sigue siendo una ruta y no una superposición: se abre
   // desde el valle y se sale por la barra, como las órdenes.
   | { kind: 'cart' }
-  // §7.13 · **el tablón de misiones.** Es la primera ventana que abre un
+  // §7.15 · **el tablón de misiones.** Es la primera ventana que abre un
   // objeto del valle al tocarlo, y no es una hoja: se monta encima del valle
   // (`board.ts`), que sigue a la vista detrás.
   | { kind: 'board' };
@@ -80,7 +80,7 @@ export interface UiActions {
    */
   crown(who: VillagerId): void;
   /**
-   * §7.13 · **Mandar gente del tablón.** El jugador dice cuántos; quiénes, la
+   * §7.15 · **Mandar gente del tablón.** El jugador dice cuántos; quiénes, la
    * aldea (`engine/world/expeditions.ts`). Como `give`, no comprueba nada: lo
    * decide el motor.
    */

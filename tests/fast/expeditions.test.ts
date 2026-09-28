@@ -1,4 +1,4 @@
-// §7.13 · Las expediciones del tablón (28 sep 2026). Lo que el dueño del
+// §7.15 · Las expediciones del tablón (28 sep 2026). Lo que el dueño del
 // diseño pidió, como propiedades: el jugador dice cuántos y la aldea quiénes;
 // nunca se vacía la aldea ni se va quien manda; los que se van no están; y es
 // un juego de doble filo — con muchas salidas salen todos los finales.
@@ -39,7 +39,7 @@ function adultsHere(state: GameState): number {
     && ageOf(v, state.tick) >= LIFE.ADULT[0] && ageOf(v, state.tick) <= LIFE.ADULT[1]).length;
 }
 
-describe('las expediciones del tablón · §7.13', () => {
+describe('las expediciones del tablón · §7.15', () => {
   it('el tablón crece con el valle: la pareja no anuncia nada, una aldea hecha anuncia las sencillas', () => {
     expect(missionsOpen(foundGame(7))).toHaveLength(0);
     for (const seed of SEEDS) {

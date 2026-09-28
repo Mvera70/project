@@ -356,7 +356,7 @@ if (open === 'orders' || open === 'cart') {
   await tab.locator('.valley-cart').waitFor({ timeout: 4000 }).catch(() => {});
 }
 if (open === 'speed') await tab.locator('.valley-speed-badge').click().catch(() => {});
-// §7.13 · `--open board` mira al tablón de la plaza y **lo toca**, en el punto
+// §7.15 · `--open board` mira al tablón de la plaza y **lo toca**, en el punto
 // de la pantalla donde el render lo dibuja: la foto prueba también el toque.
 if (open === 'board') {
   await tab.waitForTimeout(1500);

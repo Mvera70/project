@@ -1,4 +1,4 @@
-// §7.13 · El tablón de misiones de la plaza, provisional (28 sep 2026).
+// §7.15 · El tablón de misiones de la plaza, provisional (28 sep 2026).
 //
 // Dos postes, una tabla, un tejadillo y tres papeles clavados, hechos de
 // cajas: se lee como tablón de avisos desde la vista de juego y se puede tocar

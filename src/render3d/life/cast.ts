@@ -240,7 +240,7 @@ export function castOf(
     });
   }
 
-  // §7.13 · Y los que salen o vuelven de una expedición (`expeditions.ts`):
+  // §7.15 · Y los que salen o vuelven de una expedición (`expeditions.ts`):
   // vecinos de verdad, con su id, así que el render les pone su cara.
   for (const traveller of life.travellers) {
     if (!travelling(traveller)) continue;

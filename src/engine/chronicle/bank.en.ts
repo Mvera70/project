@@ -971,7 +971,7 @@ export const BANK: Record<string, string[]> = {
     'Someone passed along the road in the {season} of year {year}, stopped at the square, paid {silver} silver, and went on.',
     'A traveller in year {year}, gone by morning, and {silver} silver on the table. They talked of it for a week.',
   ],
-  // §7.13 · Las expediciones del tablón (28 sep 2026): la salida y la vuelta
+  // §7.15 · Las expediciones del tablón (28 sep 2026): la salida y la vuelta
   // con lo prometido, por misión; las otras vueltas, por sitio. Y más gente
   // por el camino (28 sep 2026).
   'fate.minstrel': [
@@ -2680,7 +2680,7 @@ export const UI_BANK: Record<string, string> = {
   'cart.nothing': 'Nothing to give yet',
   'cart.some': 'Something to give',
   'cart.give': 'Give',
-  // §7.13 · el tablón de misiones de la plaza y lo que anuncia.
+  // §7.15 · el tablón de misiones de la plaza y lo que anuncia.
   'board.title': 'Notices',
   'board.close': 'Close',
   'board.empty': 'Nothing is asked of the valley yet.',

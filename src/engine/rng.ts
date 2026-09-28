@@ -27,7 +27,7 @@ export type RngStream =
   | 'minds'
   | 'fate' // R-1: los sucesos del valle (§7.10)
   | 'raid' // B1: el clan del valle vecino (§1b)
-  | 'expeditions'; // §7.13: cómo vuelven los que salen
+  | 'expeditions'; // §7.15: cómo vuelven los que salen
 
 /**
  * The 32-bit state of every stream. Part of GameState, so it is flat and
@@ -56,7 +56,7 @@ export const RNG_STREAMS: readonly RngStream[] = [
   'minds',
   // B1 · el clan del valle vecino: cuánto junta y cuándo baja (§1b).
   'raid',
-  // §7.13 · las expediciones. Su propio flujo: mandar gente no mueve ninguna
+  // §7.15 · las expediciones. Su propio flujo: mandar gente no mueve ninguna
   // otra tirada del mundo.
   'expeditions',
 ] as const;

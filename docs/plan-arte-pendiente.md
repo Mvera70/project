@@ -387,3 +387,20 @@ integran por `public/ui/art/index.json` y `src/ui/redesign/chronicle-art.ts`.
 | `raid-burnt.png` | `raid.burnt` | La calle del portón ardiendo después de que entraran: dos o tres casas con el tejado en llamas, humo negro subiendo en columna y el portón roto al fondo. Sin figuras en primer plano. Mientras no llegue, la línea usa `fire.png`. |
 | `raid-arrows-burnt.png` | `raid.arrows.burnt` | Flechas encendidas cayendo por encima de la muralla sobre los tejados de paja de detrás; una casa ardiendo junto al muro. Mientras no llegue, `fire.png`. |
 | `raid-arrows-saved.png` | `raid.arrows.saved` | Una fila de aldeanos pasándose cubos desde el pozo hasta un tejado que humea; la muralla entera al fondo. Mientras no llegue, `raid-held.png`. |
+
+## Llegadas y expediciones (v4.95, 28 sep 2026) — **pedidas por la regla de la crónica**
+
+Líneas nuevas de crónica que hoy caen en un grabado prestado
+(`chronicle-art.ts`). Fichero propuesto, claves y qué tiene que enseñar:
+
+| Fichero | Clave | Qué enseña |
+|---|---|---|
+| `minstrel.png` | `fate.minstrel` | Un juglar tocando el violín junto a la hoguera de la plaza, la gente alrededor |
+| `pilgrims.png` | `fate.pilgrims` | Dos peregrinos con sombrero y bordón arrodillados en la puerta de la capilla |
+| `tinker.png` | `fate.tinker` | El calderero afilando un hacha en su piedra, ollas colgando de la mula |
+| `wise-woman.png` | `fate.wise_woman`, `fate.wise_woman.plague` | Una anciana con una cesta de hierbas ante una puerta, una mano en la frente de un niño |
+| `refugees.png` | `fate.refugees` | Un hombre, una mujer y una criatura con hatillos entrando por el camino, la aldea mirándolos |
+| `expedition-forest.png` | `expedition.mushrooms.*`, `expedition.herbs.*`, `expedition.*.forest` | Dos aldeanos con cestas entre los troncos, agachados sobre las setas |
+| `expedition-mountain.png` | `expedition.wolf_den.*`, `expedition.high_seam.*`, `expedition.*.mountain` | Una fila de tres subiendo una ladera de roca con cuerda, picos y lanzas |
+| `expedition-road.png` | `expedition.market.*`, `expedition.*.road` | Dos con fardos a la espalda bajando el camino del desfiladero |
+| `expedition-lost.png` | `expedition.lost.*` | Una cesta volcada en el suelo del bosque, sin nadie |

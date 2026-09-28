@@ -1,4 +1,4 @@
-// §7.13 · Las expediciones, a la vista (28 sep 2026). Vera: «algunas se
+// §7.15 · Las expediciones, a la vista (28 sep 2026). Vera: «algunas se
 // podrían ver físicamente en el mapa, y en otras veremos a los elegidos irse
 // por el camino». Propiedades: el día que salen, cada uno sale andando desde
 // su casa y se pierde de vista; al bosque se les ve recoger los días
@@ -33,7 +33,7 @@ function send(state: GameState, mission: MissionId, count: number): void {
   tick(state, CATALOG, undefined, [{ kind: 'expedition', mission, count }]);
 }
 
-describe('las expediciones, a la vista · §7.13', () => {
+describe('las expediciones, a la vista · §7.15', () => {
   it('el día que salen, cada uno sale de su casa andando y se pierde de vista', () => {
     for (const seed of SEEDS) {
       for (const mission of ['mushrooms', 'market'] as const) {

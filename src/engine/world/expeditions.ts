@@ -1,4 +1,4 @@
-// Las expediciones (28 sep 2026). design.md §7.13.
+// Las expediciones (28 sep 2026). design.md §7.15.
 //
 // Lo pidió el dueño del diseño con estas palabras: «el jugador podrá decidir si
 // mandar a uno o a X trabajadores adultos a cumplir algún objetivo. Las

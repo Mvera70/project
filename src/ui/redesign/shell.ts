@@ -77,7 +77,7 @@ export function navTabFor(route: SheetRoute): NavTab {
  * la única ruta que no monta nada: es el valle mismo, sin bandeja encima.
  */
 export function contentRouteFor(route: SheetRoute): 'cart' | 'inspect' | 'chronicle' | 'people' | null {
-  // §7.13 · el tablón tampoco monta nada en la bandeja: su ventana va encima
+  // §7.15 · el tablón tampoco monta nada en la bandeja: su ventana va encima
   // del valle (`board.ts`), que es lo que la distingue de una hoja.
   return route.kind === 'valley' || route.kind === 'board' ? null : route.kind;
 }

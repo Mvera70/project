@@ -1,4 +1,4 @@
-// Las expediciones, a la vista (§7.13, 28 sep 2026).
+// Las expediciones, a la vista (§7.15, 28 sep 2026).
 //
 // El motor dice quién se fue, adónde y cómo volvió (`@engine/world/expeditions`);
 // esto lo enseña, sin decidir nada. Vera: «algunas se podrían ver físicamente

@@ -1623,7 +1623,7 @@ export const FORAGE = {
 
 /** Cacerías observables: encuentros escasos sobre la subsistencia semanal. */
 /**
- * §7.13 · Las expediciones del tablón de la plaza (28 sep 2026).
+ * §7.15 · Las expediciones del tablón de la plaza (28 sep 2026).
  *
  * TUNE, todas, y **sin nivelar**: el nivelado es del dueño y va al final. Lo
  * que fija cada cifra es su escala con lo que ya hay, escrita al lado. Una

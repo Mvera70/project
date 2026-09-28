@@ -1,4 +1,4 @@
-// §7.13 · La ventana del tablón de misiones (28 sep 2026).
+// §7.15 · La ventana del tablón de misiones (28 sep 2026).
 //
 // Vera: «al pulsar sobre el cartel se abrirá un pop up de una pantalla
 // imitando una UI de un cartel de madera. Esta mecánica de tener objetos que al

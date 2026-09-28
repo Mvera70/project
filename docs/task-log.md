@@ -1,5 +1,35 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · Llegadas, expediciones y el tablón (v4.95) — **en vuelo**
+
+Commit local en `main` (`173d1d8` y el de la documentación), **sin subir**:
+Vera pidió parar de noche para no hacer ruido con el ventilador y avisará.
+
+Hecho y con prueba: las cinco llegadas (`fate.ts`, `VISITS`), el motor de las
+expediciones (`world/expeditions.ts`, `state.expeditions` sin subir el esquema,
+flujo `expeditions`, paso 1c), la capa de vida (`life/expeditions.ts`), el
+tablón en la plaza (`derive/notice-board.ts`, `world/notice-board.ts`) y su
+ventana (`ui/redesign/board.ts`). Pruebas: `expeditions.test.ts`,
+`life-expeditions.test.ts`, y `fate`, `save`, `chronicle` en verde.
+
+**Abierto, en este orden:**
+
+1. **Tocar el tablón no abre la ventana.** `shot.mjs --open board` toca el
+   punto donde el render lo dibuja (`__valleyBoardScreen`) y no aparece ni la
+   ventana ni ninguna ficha. Ya se descartó el clic fantasma (el velo cierra
+   con `pointerdown`). Lo siguiente: comprobar si `renderer.pick` devuelve
+   `{kind:'board'}` en ese punto y si `app.ts` llega a `navigate`.
+2. **La suite completa** (hace ruido: diez minutos a dos núcleos).
+3. Capturas para Vera, subir y desplegar.
+
+**Decisiones de Vera de esta ronda** (en la bóveda): las misiones se anuncian
+en un tablón de la plaza que abre una ventana de madera; tocar objetos del
+valle para abrir su interfaz es el patrón; lo informativo que hoy sale en una
+hoja pasará a una ventana genérica con estilo distinto de lo que se usa
+(maquetas: https://claude.ai/artifact/CJ4i9oGim8mQZnJ6s7RPxT); y **viene un
+lavado de cara completo de la interfaz**, así que no se pule nada de UI hasta
+entonces. Los modelos nuevos se piden a Astra en la misma ronda.
+
 ## 28 sep 2026 · El camino en el motor, los visitantes por él, piedras (v4.94)
 
 `engine/world/valley-road.ts` (nuevo: `valleyAxis`, `valleyReach`,

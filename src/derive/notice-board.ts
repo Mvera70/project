@@ -1,4 +1,4 @@
-// §7.13 · El tablón de misiones de la plaza (28 sep 2026).
+// §7.15 · El tablón de misiones de la plaza (28 sep 2026).
 //
 // Vera: «habrá un cartel en la plaza del pueblo donde se anuncian las
 // misiones; al pulsarlo se abrirá una ventana que imita un cartel de madera».

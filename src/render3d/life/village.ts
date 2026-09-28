@@ -365,7 +365,7 @@ export interface Village {
    */
   readonly visitors: readonly Visitor[];
   /**
-   * §7.13 · Los que salen de expedición, están en el bosque o vuelven hoy
+   * §7.15 · Los que salen de expedición, están en el bosque o vuelven hoy
    * (`expeditions.ts`). Son vecinos de verdad —llevan su `VillagerId`— pero
    * ese día no viven en casa, así que van por su lista.
    */

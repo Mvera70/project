@@ -2358,6 +2358,99 @@ flujo que no sea `fate`; una clave sin sus tres variantes en el banco; dos
 semillas con el mismo reparto; o una partida de treinta años sin un solo
 rencor. Las siete tienen prueba en `tests/fast/fate.test.ts`.
 
+**Más gente por el camino (v4.95, 28 sep 2026).** Con el camino ya en el
+motor, el dueño del diseño pidió «más eventos de gente que llegue a la
+aldea». Son cinco sucesos más, que pasan como el forastero (cambian el estado
+al llegar, sin oferta) y suben por el camino como el buhonero
+(`life/visitors.ts`, `VISITS`): el **juglar** (ánimo, cobra un poco de plata),
+los **peregrinos** (fe, piden grano; sólo donde hay capilla), el **calderero**
+(afila las hachas: leña por plata), la **curandera** (ánimo, o acorta la peste
+si la hay, y entonces pesa seis veces más) y la **familia que huye** de un
+valle quemado: dos adultos y una criatura **que se quedan**
+(`arriveToStay`, `world/means.ts`), con nombre pero sin ocupar hueco de
+personaje. Entran andando y pasan el día en la plaza; al día siguiente viven
+en la aldea. Comparten `visitable` con las visitas de M-0 (una a la vez, cada
+una con su plazo, `OFFER.AGAIN_WEEKS`). Medido en seis semillas a treinta
+años: 18 juglares, 17 caldereros, 13 peregrinos, 12 curanderas y 6 familias
+por valle.
+
+### 7.15 Las expediciones y el tablón de la plaza (v4.95, 28 sep 2026)
+
+Lo pidió el dueño del diseño: «el jugador podrá decidir si mandar a uno o a X
+trabajadores adultos a cumplir algún objetivo. Las primeras simples, como ir
+al bosque a recolectar setas, y luego complicándose, como ir a la montaña.
+[…] Las más avanzadas costarán dinero, y la gente puede volver con vida o no,
+o no haber conseguido el objetivo, o sí lograrlo y volver con la recompensa:
+un juego de doble filo».
+
+**El jugador dice cuántos; la aldea dice quiénes.** Es el verbo del carro
+(§7.12) aplicado a una misión. La aldea prefiere a quien sirve —el herbolario
+al bosque, el herrero a la veta— y, entre iguales, a los adultos más jóvenes;
+**nunca manda a quien la dirige** y **siempre deja dos adultos en casa**
+(`EXPEDITION.MIN_HOME`). Entra por `PlayerAct` (`{kind:'expedition', mission,
+count}`, paso 1b) y sin tirada.
+
+**Las cinco misiones**, de la más sencilla a la más arriesgada, que es como
+las anuncia el tablón a medida que el valle crece (`EXPEDITION.MISSIONS`,
+todas TUNE y sin nivelar):
+
+| Misión | Dónde | Quiénes | Semanas | Plata | Desde | Si sale | Riesgo por cabeza |
+|---|---|---|---|---|---|---|---|
+| Setas | bosque | 1–3 | 1 | 0 | 3 personas | 3 de grano por cabeza | 0 |
+| Hierbas | bosque | 1–2 | 1 | 0 | 6 | ánimo 4, fe 2 | 1 % |
+| La lobera | montaña | 2–5 | 2 | 5 | 12 | grano 16, ánimo 6 | 10 % |
+| La veta alta | montaña | 2–4 | 3 | 8 | 16 | piedra 40, plata 12 | 8 % |
+| El mercado | camino | 2–3 | 4 | 15 | 20 | plata 36 | 4 % |
+
+**Los que se van, se van de verdad.** Llevan `leftTick` puesto mientras dura,
+que es la palabra de §5.7 para «no está en el valle»: no trabajan, no comen del
+granero, no cuentan para el cerco, y la vida no les da cuerpo en casa. Al
+volver se les quita. Lo que distingue una expedición de una partida para
+siempre es que su id está en `state.expeditions`.
+
+**El resultado se tira al volver** (paso 1c, antes de lo anual), en su propio
+flujo `expeditions`: una tirada de éxito (la de la misión más `perExtra` por
+cada uno por encima del mínimo, hasta `MAX_SUCCESS` 0,95) y una por cabeza.
+Cinco finales, y en las pruebas salen los cinco: `back` (con lo prometido),
+`back_mourning` (con lo prometido y sin alguno), `empty`, `empty_mourning` y
+`lost` (no vuelve nadie). Cada muerto quita 3 de ánimo (`GRIEF`) y sale de la
+lista de personajes. La semana de la vuelta la expedición se queda en el
+estado con su final y sus muertos, para que la vida enseñe quién entra; a la
+siguiente desaparece.
+
+**No sube el esquema.** Una partida guardada sin `expeditions` carga con la
+lista vacía y el flujo sembrado de la maestra (`save.ts`), como el libro de
+cuentas de F3a: la partida de la tablet sigue cargando.
+
+**Se ve.** El día que salen, cada uno sale andando **desde su casa**: al
+bosque, o por el camino del valle hasta la boca del desfiladero, donde se
+pierde de vista. Mientras dura una del bosque, cada día salen de lo hondo,
+recogen por la linde y a la tarde vuelven a meterse. El día que vuelven, los
+que vuelven entran andando por donde se fueron hasta su puerta, con el fardo
+si traen algo, y ese día no tienen cuerpo de vecino (`life/expeditions.ts`).
+Son las mismas personas: el actor lleva su `VillagerId`.
+
+**El tablón de la plaza** (`derive/notice-board.ts`) está en el borde de la
+plaza, frente a la hoguera, con un aviso clavado por misión que se puede
+mandar; la gente lo rodea (su celda está cerrada) y los puestos no se ponen
+encima. **Tocarlo abre su ventana**, que imita un tablón de madera
+(`ui/redesign/board.ts`): un aviso por misión con cuántos van, lo que cuesta,
+cuánto se tarda y el riesgo, y quién está fuera y cuándo vuelve. Es el primer
+objeto del valle que abre su propia interfaz, que es el patrón que el dueño
+quiere para más cosas: «así no invadimos la UI hasta que pulsamos».
+
+**Qué falsaría esto:** que la pareja fundadora viera misiones; que saliera el
+líder o que quedaran menos de dos adultos; que alguien fuera estuviera en el
+valle; que en muchas salidas no aparecieran los cinco finales; que volver
+tocara otro flujo; o que una partida con gente fuera no se pudiera guardar y
+cargar. Las seis tienen prueba en `tests/fast/expeditions.test.ts`, y lo que
+se ve, en `tests/fast/life-expeditions.test.ts`.
+
+**Y un defecto que salió al hacerlo:** el guardado no conocía los actos
+`hunt` ni `battle` (`actRecord`), así que **una partida en la que se había
+cazado o visto un asalto no cargaba** —`loadSave` la daba por corrupta y el
+juego empezaba otra—. Arreglado, con prueba.
+
 ---
 
 ## 8. Sistema D — Encrucijadas

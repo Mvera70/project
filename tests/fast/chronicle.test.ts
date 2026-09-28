@@ -345,7 +345,7 @@ describe('render', () => {
       // B1 · la cabeza que se lleva un asalto.
       animal: 'cow',
       weapon: 'sling',
-      // §7.13 · las expediciones y los que llegan por el camino: quiénes van,
+      // §7.15 · las expediciones y los que llegan por el camino: quiénes van,
       // quiénes no vuelven, lo que traen, y la familia que huye.
       names: 'Aelric and Wulfrun',
       dead: 'Osric',

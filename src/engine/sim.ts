@@ -681,7 +681,7 @@ export function tick(
       crown = outcome;
       for (const entry of outcome.entries) say(entry);
     } else if (act.kind === 'expedition') {
-      // §7.13 · mandar gente del tablón. Se paga y salen esta semana; el
+      // §7.15 · mandar gente del tablón. Se paga y salen esta semana; el
       // resultado se tira cuando vuelven (paso 1c).
       const outcome = sendExpedition(state, act.mission, act.count, yearOf(state.tick));
       state.acts.push({ tick: state.tick, act, done: outcome.sent });
@@ -717,7 +717,7 @@ export function tick(
   const gone = expireOffer(state, seasonOf(state.tick), yearOf(state.tick));
   if (gone !== null) say(gone);
 
-  // ---- 1c · EXPEDITIONS (§7.13) --------------------------------------------
+  // ---- 1c · EXPEDITIONS (§7.15) --------------------------------------------
   // Vuelven los que tocaba, con lo que traigan o sin alguno. Antes de lo
   // anual y de la comida: quien vuelve esta semana ya come en casa.
   for (const back of returnExpeditions(state, yearOf(state.tick))) say(back.entry);

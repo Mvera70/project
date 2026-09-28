@@ -164,7 +164,7 @@ export interface RagdollPose {
 export type GraphicsTarget =
   | { kind: 'building'; id: number }
   | { kind: 'villager'; id: number }
-  // §7.13 · el tablón de misiones de la plaza.
+  // §7.15 · el tablón de misiones de la plaza.
   | { kind: 'board' }
   | { kind: 'terrain'; x: number; y: number };
 

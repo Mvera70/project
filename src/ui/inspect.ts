@@ -11,7 +11,7 @@ import { crowdPositions } from '@render/crowd';
 export type InspectTarget =
   | { kind: 'building'; id: number }
   | { kind: 'villager'; id: number }
-  // §7.13 · el tablón de misiones: no abre ficha, abre su ventana (`app.ts`).
+  // §7.15 · el tablón de misiones: no abre ficha, abre su ventana (`app.ts`).
   | { kind: 'board' }
   | { kind: 'terrain'; x: number; y: number };
 export interface PanelModel { title: string; lines: string[] }

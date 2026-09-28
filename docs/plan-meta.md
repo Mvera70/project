@@ -174,6 +174,16 @@ minutos a ×1 sin tocar nada, antes y después.
 | I1 · La madera, de «+1» a la obra · **hecha el 28 sep 2026** (v4.84, esquema 12) | La madera de la semana entra de una en una a su hora de día (`subsistence/wood-run.ts`), el porteador la trae y la suelta cuando el motor la apunta, sale un «+1» sobre la leñera y la cabecera sube a la vez; la obra que se abre saca «−N» y sus albañiles llevan la madera a la parcela. **Medido**: 35 de 38 entregas llegan con porteador delante (cuatro semillas, dos edades, tres jornadas); doce semillas × veinte años, 40,6 → 39,2 personas y ninguna aldea más acabada. Demo: `?debug=1&live=1&seed=11&year=3&demo=wood`. Grabaciones antes/después en `artifacts/graphics/wood-chain/` | Hecho | Media | — | — |
 | I2 · La piedra y el grano, igual | El mismo plan de entregas para la piedra de la cantera y el grano de la cosecha | P2 | Media | — | que el dueño juzgue I1 |
 
+### J · Salir del valle (28 sep 2026)
+
+Lo que el jugador manda fuera: gente, con su riesgo. Pedido por el dueño con el
+camino ya en el motor.
+
+| Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
+|---|---|---|---|---|---|
+| J1 · Llegadas y expediciones · **en vuelo** (v4.95) | Cinco llegadas por el camino; cinco misiones con cinco finales; el tablón de la plaza y su ventana. Motor, vida y pruebas hechos; falta que el toque abra la ventana y la suite (`task-log.md`) | P1 | Media | — | — |
+| J2 · Las misiones que tocan el asedio | Espiar al clan vecino (retrasa o adelanta el aviso), ir a pedir ayuda a otro valle | P2 | Media | Sol | J1 y B1 |
+
 ### H · Deuda medida (el cuaderno)
 
 Lo que `docs/task-log.md` §4 lleva anotado con su medida y **no bloquea la

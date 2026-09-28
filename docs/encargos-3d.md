@@ -116,6 +116,17 @@ juega.
 | ~~**La calzada de la villa**~~ · hecho en v4.94 | Guijarros instanciados a lo largo del camino en la era de villa (`buildRoadStones`) | Losas de verdad, con juntas, si el arte de superficie llega a la calzada |
 | **El camino que se gasta** | El motor lo pisa cada semana (`wearValleyRoad`) y el suelo lo pinta por nivel | Que se vea el paso: carriladas de carro en la senda, barro en el vado tras la lluvia |
 
+## Llegadas y expediciones (v4.95, 28 sep 2026)
+
+| Qué | Qué se ve hoy | Qué haría falta |
+|---|---|---|
+| **El tablón de misiones** | Cajas: dos postes, tabla, tejadillo y hasta tres papeles | El modelo `notice-board` de Astra (`docs/encargos/visitantes-y-expediciones.md`) |
+| **Quién es cada visitante** | El juglar, los peregrinos, el calderero y la curandera son el forastero de siempre | Sus accesorios (violín, sombrero y bordón, piedra de afilar, cesta) sobre el aldeano |
+| **Lo que llevan los expedicionarios** | El fardo genérico a la vuelta, y nada a la ida | Cesta de setas, cuerda y pico, fardo de mercado, pieles |
+| **La montaña** | Los de la lobera y la veta se van por el camino del desfiladero y no se les ve más | Que se les viera subir por la ladera, lejos, antes de perderse |
+| **Recoger en el bosque** | Andan de parada en parada por la linde y se quedan quietos | Un gesto de agacharse y recoger (`sort` o uno nuevo) |
+| **La familia que huye** | Tres forasteros en la plaza todo el día | El hatillo a la espalda, y que alguien de la aldea salga a recibirlos |
+
 ## La hierba (28 sep 2026)
 
 | Qué | Qué se ve hoy | Qué haría falta |

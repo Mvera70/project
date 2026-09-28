@@ -153,7 +153,7 @@ export type DeathCause =
   | 'plague' // §5.8
   | 'fire' // §5.9
   | 'violence' // §8.4, the `kill` effect of a crossroad
-  | 'mishap'; // §7.13, a fall on the mountain: an expedition that went wrong
+  | 'mishap'; // §7.15, a fall on the mountain: an expedition that went wrong
 
 /**
  * What a named villager remembers. design.md §3.4 names the first three and
@@ -588,7 +588,7 @@ export type PlayerAct =
    * puerta por la que entra lo que hace el jugador cada semana».
    */
   /**
-   * §7.13 · Mandar gente a una misión del tablón de la plaza. El jugador dice
+   * §7.15 · Mandar gente a una misión del tablón de la plaza. El jugador dice
    * **cuántos**; quiénes lo decide la aldea (`world/expeditions.ts`).
    */
   | { kind: 'expedition'; mission: MissionId; count: number }
@@ -603,7 +603,7 @@ export type PlayerAct =
   };
 
 /**
- * §7.13 · Las misiones del tablón, en orden estable: de la más sencilla a la
+ * §7.15 · Las misiones del tablón, en orden estable: de la más sencilla a la
  * más arriesgada, que es como las anuncia el tablón a medida que el valle
  * crece (`EXPEDITION.MISSIONS[id].minPeople`).
  */
@@ -718,7 +718,7 @@ export type ChronicleKind =
   // `state.happenings`, y esto es gente que baja de la ladera de al lado. Una
   // prueba compara las dos listas y contarlo como suceso las descuadra.
   | 'raid'
-  // §7.13 · las expediciones: salir y volver. Es lo que el valle **hizo**, como
+  // §7.15 · las expediciones: salir y volver. Es lo que el valle **hizo**, como
   // `road` y `means`, no algo que le pasó.
   | 'expedition';
 
@@ -1112,7 +1112,7 @@ export interface GameState {
   /** B1 · El clan del valle vecino. Esquema 11. */
   threat: Threat;
   /**
-   * §7.13 · Las expediciones en camino. **No sube el esquema**: una partida
+   * §7.15 · Las expediciones en camino. **No sube el esquema**: una partida
    * guardada sin él carga con la lista vacía (`save.ts`), que es exactamente
    * lo que tenía, igual que el libro de cuentas de F3a.
    */

@@ -321,7 +321,7 @@ export function boot(
       shell.content.append(cart.element);
       cart.update(snapshot());
     } else if (route.kind === 'board') {
-      // §7.13 · la ventana del tablón, encima del valle y fuera de la bandeja.
+      // §7.15 · la ventana del tablón, encima del valle y fuera de la bandeja.
       shell.element.append(board.element);
       board.update(snapshot());
     }
@@ -360,7 +360,7 @@ export function boot(
       pendingActs.push({ kind: 'crown', who });
       if (speed !== 0) { runTick(); paint(lastFraction); }
     },
-    // §7.13 · mandar gente del tablón: la misma cola de actos que un medio.
+    // §7.15 · mandar gente del tablón: la misma cola de actos que un medio.
     expedition(mission, count): void {
       pendingActs.push({ kind: 'expedition', mission, count });
       if (speed !== 0) { runTick(); paint(lastFraction); }
@@ -1193,7 +1193,7 @@ export function boot(
       // nada»: abrir una ficha del prado con la anterior detrás era lo que
       // hacía que la selección no tuviera salida.
       if (target === null || target.kind === 'terrain') actions.navigate({ kind: 'valley' });
-      // §7.13 · el tablón de la plaza abre su propia ventana, no una ficha.
+      // §7.15 · el tablón de la plaza abre su propia ventana, no una ficha.
       else if (target.kind === 'board') actions.navigate({ kind: 'board' });
       else {
         actions.navigate({ kind: 'inspect', target, from: 'valley' });

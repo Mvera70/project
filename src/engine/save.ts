@@ -145,7 +145,7 @@ function actRecord(value: unknown): boolean {
   if (act['kind'] === 'battle') {
     return tickValue(act['slain']) && tickValue(act['lost']) && typeof act['breached'] === 'boolean';
   }
-  // §7.13 · mandar gente a una misión.
+  // §7.15 · mandar gente a una misión.
   if (act['kind'] === 'expedition') {
     return (MISSION_IDS as readonly string[]).includes(act['mission'] as string) && tickValue(act['count']);
   }
@@ -155,7 +155,7 @@ function actRecord(value: unknown): boolean {
 const HUNT_SPECIES = new Set(['partridge', 'rabbit', 'deer', 'boar', 'bear']);
 const HUNT_WEAPONS = new Set(['sling', 'bow', 'spear']);
 
-/** §7.13 · una expedición en camino. */
+/** §7.15 · una expedición en camino. */
 function expedition(value: unknown): boolean {
   return record(value) && (MISSION_IDS as readonly string[]).includes(value['mission'] as string)
     && Array.isArray(value['who']) && value['who'].every(tickValue)
@@ -571,7 +571,7 @@ export function deserialize(raw: unknown): SaveFile {
   if ((state as Partial<GameState>).crown === undefined) {
     state = { ...state, version: SCHEMA_VERSION, crown: null } as GameState;
   }
-  // §7.13 · las expediciones, **sin subir el esquema**: una partida guardada
+  // §7.15 · las expediciones, **sin subir el esquema**: una partida guardada
   // antes no tenía ninguna en camino, y su flujo de azar sale de la semilla
   // maestra como todos. Así la partida de la tablet sigue cargando.
   if ((state as Partial<GameState>).expeditions === undefined || state.rng.expeditions === undefined) {
