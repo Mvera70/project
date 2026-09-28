@@ -1,0 +1,29 @@
+[
+  {
+    "id": "btn-close",
+    "prompt": "Generate a NEW small medieval wooden ring for a close control, cream X carved INTO weathered oak, restrained shallow chisel marks, slightly irregular artisanal ring. Less polished and less like a modern app button than the second reference. First image is palette and painted style reference ONLY. Soft painted outline, upper-left lighting, subtle thin aged brass rim, no glossy plastic, no glowing outer halo. A quiet functional medieval wooden fitting. Only the cream carved X, no text. Front view, full object isolated on real transparency. Intended drawing32x32 CSS, deliver square high resolution for export64x64. Keep the X legible at small size.",
+    "size": [
+      64,
+      64
+    ],
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-d190f115-1196-4cac-a88c-e9dc56b415ab.png"
+  },
+  {
+    "id": "plaque-wood",
+    "prompt": "EDIT TARGET first attached green plaque; second mockup is colour/material reference. Regenerate this action plate in warm dark OAK WOOD with aged brass rim, cream lettering will be added later so leave ENTIRE CENTRE EMPTY. REMOVE ALL GREEN. Preserve horizontal clipped-corner silhouette and bevel but simplify leaf-like end ornaments. ACTIVE state: subtle warm ember-amber illumination INSIDE the recessed wood surface and along its inner rim, echoing the active valley tab in second reference. No actual flames, no outer glow, no text, no symbols. Painted medieval game UI, soft contours, top-left light. NINE-SLICE asset final400x92 pixels (200x46 CSS), fixed borders36pixels (18CSS). All corner/end carving contained within36pixel left/right end areas when scaled to400x92. Wide plain low-detail centre safe to stretch. Straight stretchable edges, actual transparent surroundings, front view entire silhouette.",
+    "size": [
+      400,
+      92
+    ],
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-748b99c7-4e38-4d23-b276-61fa82f8a76c.png"
+  },
+  {
+    "id": "plaque-wood-off",
+    "size": [
+      400,
+      92
+    ],
+    "prompt": "EDIT this exact wooden action plaque into its disabled state. Preserve EVERY contour, proportions, wooden grain, carving, brass border, dimensions and transparency. Only extinguish all warm amber internal ember illumination; wood stays natural brown and brass stays aged matte brass with ordinary upper-left light, slightly less bright overall. No green or grey tint. No text. It is the same physical object with its internal light turned off. Blank stretchable centre; nine-slice corners identical to source. Transparent background.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-7c795a8e-eb49-47f3-88bb-872ebced75c4.png"
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "nav-leather",
+    "size": [
+      780,
+      144
+    ],
+    "alphaCrop": [
+      3,
+      176,
+      2058,
+      544
+    ],
+    "sha256": "1071dee8c132cdbdf218d01e947fed6a482327b9717275429ddc370a2d23c1ed"
+  },
+  {
+    "id": "nav-medal",
+    "size": [
+      112,
+      112
+    ],
+    "alphaCrop": [
+      82,
+      61,
+      1172,
+      1146
+    ],
+    "sha256": "a7a935172057cb15f5e2276e966d009dc279d8d44725984e0467f9b9ddde5f38"
+  },
+  {
+    "id": "nav-medal-on",
+    "size": [
+      112,
+      112
+    ],
+    "alphaCrop": [
+      80,
+      58,
+      1174,
+      1149
+    ],
+    "sha256": "56e42bd246b0074f122a89a4dfd7ad25aaec35007ef4e778d1c55d7d5c0fb695"
+  },
+  {
+    "id": "nav-iron",
+    "size": [
+      780,
+      144
+    ],
+    "alphaCrop": [
+      19,
+      202,
+      2054,
+      545
+    ],
+    "sha256": "bee7a710c14293d878fa3ebdb37ca8748e361604c9eedc9ce04920c9bb50e78e"
+  }
+]

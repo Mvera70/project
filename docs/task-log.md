@@ -1,5 +1,33 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · V8: barra de cuero y medallones
+
+Terminada la propuesta local iniciada el 28: correa de cuero y medallones de
+latón, iconos del sprite, Cinzel 10 px, activo elevado 4 px. Cuatro PNG nuevos
+con alfa a 2×, incluido soporte alternativo de hierro. Ocho capturas de las
+cuatro pantallas y cuatro adicionales de hierro, comparación y hoja de piezas.
+Doce vistas verificadas, sin fallos de carga o disposición. Skill compartida
+actualizada; sin cambios de componentes, motor ni banco. Documento y enlaces:
+`ui-redesign/propuesta-barra-v8-2026-09-28.md`. Pendiente de revisión de Vera.
+
+
+## 28 sep 2026 · V7: escala de la piel y acciones de madera
+
+Pasada documental sobre V6 (`6fac8ec`): carro 64×54, misiones 56×48,
+viñetas de crónica 130/120 px con texto debajo y fechas ANNO, coste 34,
+acciones y selectores 40, cierre 32 dentro de toque 44. Generadas solo tres
+piezas: aspa tallada y placas de madera activa/apagada. Se mantienen el
+arco solar de cinco cuentas y los recursos a color.
+
+Ocho capturas en dos tamaños, tira continua de siete crónicas y hoja de
+piezas en `ui-redesign/laminas-v7-2026-09-28/`. Verificaciones de disposición
+sin fallos. Los siete sepia de `public/ui/art/` se restauran; colores guardados
+en `laminas-v6-2026-09-28/colour/`. No sustituir más hasta las 51 a color.
+Skill compartida actualizada. Propuesta y enlaces:
+`ui-redesign/propuesta-piel-v7-2026-09-28.md`. Pendiente de revisión de Vera;
+sin integración de componentes, cambios de motor ni banco.
+
+
 ## 28 sep 2026 · V6: piezas generadas para revisar la piel
 
 Encargo V5 de `2d9eb5a`: 8 marcos/controles, 5 recursos, 10 miniaturas del

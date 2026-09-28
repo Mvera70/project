@@ -9,7 +9,7 @@ const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const data=p=>'../../../'+p.replaceAll('\\','/');
 const esc=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const manifest=JSON.parse(fs.readFileSync(path.join(dir,'manifest.generated.json'),'utf8'));
-const art=id=>data(({ui:'src/ui/redesign/',art:'public/ui/art/cards/',chronicle:'public/ui/art/'}[manifest.find(a=>a.id===id).group])+id+'.png');
+const art=id=>data(({ui:'src/ui/redesign/',art:'public/ui/art/cards/',chronicle:'docs/ui-redesign/laminas-v6-2026-09-28/colour/'}[manifest.find(a=>a.id===id).group])+id+'.png');
 const icon=(id,alt='')=>'<img class="resource" src="'+art('res-'+id)+'" alt="'+alt+'">';
 const snapshot=path.join(dir,'bank.snapshot.json');
 let bank;

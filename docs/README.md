@@ -46,6 +46,8 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `plan-meta.md` | **El plan hacia la meta** (§1b), con prioridad, dificultad y agente |
 | `encargos-3d.md` | **Todo lo que el juego no enseña todavía**: mallas, animaciones y mecánicas sin representación, apuntado en la misma ronda en que se descubre |
 | `interfaz/` | **La interfaz, versión a versión**: una carpeta por fecha con todas las pantallas y estados del juego (skill `press-kit`), para comparar qué cambió |
+| `ui-redesign/propuesta-barra-v8-2026-09-28.md` | **V8 para revisión**: [barra de cuero y medallones](ui-redesign/laminas-v8-2026-09-28/index.html), cuatro pantallas en dos tamaños y [alternativa de hierro](ui-redesign/laminas-v8-2026-09-28/comparison.html). Solo maquetas |
+| `ui-redesign/propuesta-piel-v7-2026-09-28.md` | **V7 para revisión**: escala reducida, [láminas móviles](ui-redesign/laminas-v7-2026-09-28/index.html), [siete viñetas seguidas](ui-redesign/laminas-v7-2026-09-28/cronica-siete-390.png) y acciones de madera. Originales sepia restaurados; colores guardados en docs |
 | `ui-redesign/propuesta-piel-v6-2026-09-28.md` | **V6 para revisión**: 35 piezas generadas, [carro, tablón y crónica](ui-redesign/laminas-v6-2026-09-28/index.html), [muestrario](ui-redesign/laminas-v6-2026-09-28/pieces.html) y siete escenas a color. Pendiente de aprobación e integración funcional |
 | `ui-redesign/propuesta-piel-v4-2026-09-28.md` | **Cuarta pasada para revisión** sobre v3: [HTML comparativo](ui-redesign/laminas-v4-2026-09-28/index.html), menos madera repetida y piezas del juego conservadas. Solo mockups; v2 queda rechazada |
 | `plan-arte-pendiente.md` | La cola del arte: cada crónica nueva trae aquí su imagen pedida |

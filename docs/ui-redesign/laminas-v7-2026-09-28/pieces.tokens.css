@@ -1,0 +1,26 @@
+/* V7 · piezas generadas; consumo en las láminas, pendiente de integrar componentes. */
+:root {
+  --frame-parchment: url('./frame-parchment.png');
+  --frame-parchment-slice: 56;
+  --frame-parchment-edge: 28px;
+  --frame-ribbon: url('./frame-ribbon.png');
+  --frame-ribbon-slice: 28;
+  --frame-ribbon-edge: 14px;
+  --chip-cost: url('./chip-cost.png');
+  --chip-cost-slice: 28;
+  --chip-cost-edge: 14px;
+  --plaque-wood: url('./plaque-wood.png');
+  --plaque-wood-slice: 36;
+  --plaque-wood-edge: 18px;
+  --plaque-wood-off: url('./plaque-wood-off.png');
+  --plaque-wood-off-slice: 36;
+  --plaque-wood-off-edge: 18px;
+  --btn-close: url('./btn-close.png');
+  --nail: url('./nail.png');
+  --nail-bent: url('./nail-bent.png');
+  --res-people: url('./res-people.png');
+  --res-grain: url('./res-grain.png');
+  --res-wood: url('./res-wood.png');
+  --res-stone: url('./res-stone.png');
+  --res-silver: url('./res-silver.png');
+}

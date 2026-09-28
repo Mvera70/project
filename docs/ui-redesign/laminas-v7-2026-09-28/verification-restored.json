@@ -1,0 +1,44 @@
+[
+  {
+    "id": "harvest",
+    "colourSha256": "1b3994e9788e41d62317c818ccddabb44e409649838b47112f3d486181c7767e",
+    "originalSha256": "1e1a2ff645ef7c4c8ea4ddd5f2af7502702b122e551585faad10a8839a281fab",
+    "publicMatchesOriginal": true
+  },
+  {
+    "id": "birth",
+    "colourSha256": "cd4c616531233cc847afb81449e4cf7c3218d6ec6bceb79cdde37772f099a9bf",
+    "originalSha256": "cbda88960911b47e4b33fcb5089d11a7ac525e8f781d963d92ec1390c2d93058",
+    "publicMatchesOriginal": true
+  },
+  {
+    "id": "death",
+    "colourSha256": "43539003b7c6fc8053db18cf0771679f9b21c9151ecb39d34d518fad92b320c6",
+    "originalSha256": "0a96784bf6915e0961affac5cdcc557704039db6cf3edb7642dc82c94216cd08",
+    "publicMatchesOriginal": true
+  },
+  {
+    "id": "built",
+    "colourSha256": "c2a6576bfe9f81d2f138a9c34cec9188c4036a05a1879fa377230f6299bfb7d3",
+    "originalSha256": "3e3de4f0a279efc78d02a03ce3bc2b4812a37a17ae7de486d7600d753ae411bd",
+    "publicMatchesOriginal": true
+  },
+  {
+    "id": "pedlar",
+    "colourSha256": "45390585cc45278ef810ba0c838fde078289aed261281f92fb8f731313d88a1c",
+    "originalSha256": "737795fb016efe81bf1006abd42554d9ab30eec54326a25a114e4ed847f7224d",
+    "publicMatchesOriginal": true
+  },
+  {
+    "id": "wedding",
+    "colourSha256": "488444a642098ae58533c75dae000553d68bfc7f744075b88551cd03652136a0",
+    "originalSha256": "be35e739289a2c57698e12b9f8fe14d724c18f3d54678d5a9a5a88016308624b",
+    "publicMatchesOriginal": true
+  },
+  {
+    "id": "fire",
+    "colourSha256": "c581303a3f3992159bb0309d4a88c94dbdcb404b51cd9f9edd5297449e494306",
+    "originalSha256": "1126bd052c3bc4c740033c052a6629cd04d7821deff15e016bf391a009012e0f",
+    "publicMatchesOriginal": true
+  }
+]

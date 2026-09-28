@@ -1,0 +1,52 @@
+/* Solo composición documental V7. Las nuevas piezas se guardan con las láminas. */
+.date svg { display:block;width:90px;height:29px;flex:0 0 90px;overflow:visible; }
+.arc-track { opacity:.75;stroke-linecap:round; }
+.arc-bead { opacity:.35; }
+.board-close { width:44px;height:44px;background-size:32px 32px; }
+.cart-card .card-heading { min-height:44px;margin-bottom:8px; }
+.cart-card .card-heading h3 { padding-right:53px;min-height:40px; }
+.cart-card .object-art { width:64px;height:54px;right:-4px;top:-16px; }
+.note .card-heading { min-height:46px;margin-bottom:8px; }
+.note .card-heading h4 { padding-right:61px; }
+.note .object-art { width:56px;height:48px;right:-3px;top:-5px; }
+.nail,.nail.bent { width:20px;height:20px;left:calc(50% - 10px);top:-38px; }
+.notes { padding-top:13px;gap:16px; }
+.cost-chip { height:34px;border-width:8px;border-image-width:14px;font-size:17px; }
+.paint-action { height:40px;min-height:40px;border:10px solid transparent;border-image:var(--plaque-wood) 36 fill stretch;border-image-width:18px;color:#f9eac8; }
+.paint-action:disabled { border-image-source:var(--plaque-wood-off);color:#af9b7b; }
+.step button { width:40px;height:40px;border-width:8px;border-image-width:14px;font-size:22px; }
+.facts-row { flex-wrap:nowrap;white-space:nowrap;gap:5px;font-size:14px;margin-bottom:10px; }
+.facts-row .cost-chip { flex:0 0 auto;min-width:0;padding:0 2px;font-size:15px;gap:3px; }
+.facts-row .cost-chip .resource { width:20px;height:20px; }
+.facts-row .risk { color:#743d2a; }
+.chronicle-sheet { padding:10px 16px; }
+.chronicle-sheet header h2 { font-size:18px; }
+.chronicle-line { padding:13px 0 18px; }
+.entry-date { font:600 10px/1.3 var(--display);letter-spacing:.075em;color:#78613c;margin:0 0 8px; }
+.chronicle-line img { width:100%;max-width:none;height:130px;object-fit:cover;object-position:center;margin:0 0 10px; }
+.chronicle-line p { margin:0 2px;font:19px/1.32 var(--read); }
+.chronicle-line:first-of-type p::first-letter { font:inherit;color:inherit; }
+.chronicle-grid img { height:130px;object-fit:cover;object-position:center; }
+.open-cart { position:absolute;bottom:146px;left:50%;transform:translateX(-50%);z-index:5; }
+.open-cart .paint-action { width:200px;white-space:nowrap; }
+.action-samples { display:flex;gap:16px;align-items:center;flex-wrap:wrap; }
+.action-samples .paint-action { min-width:100px; }
+.action-samples .paint-action:nth-child(3) { width:200px; }
+.modal-open .nav { pointer-events:auto; }
+/* Tira de lectura: viewport móvil, contenido desplegado para fotografiarlo entero. */
+body.reading-strip { overflow:auto;height:auto; }
+.reading-strip #prototype,.reading-strip .screen { height:auto;min-height:844px;overflow:visible; }
+.reading-strip .screen { padding-top:116px;padding-bottom:68px; }
+.reading-strip .chronicle-sheet { position:relative;inset:auto;overflow:visible; }
+.reading-strip .nav { position:absolute;bottom:0; }
+@media(max-width:350px){
+ .date svg{width:90px;flex-basis:90px}
+ .cart-card .card-heading{min-height:44px}
+ .cart-card .card-heading h3{padding-right:53px}
+ .note .card-heading{min-height:46px}
+ .facts-row{gap:4px;font-size:12.5px}
+ .facts-row .cost-chip{font-size:14px}
+ .chronicle-sheet{padding:10px 14px}
+ .chronicle-line img{height:120px}
+ .chronicle-line p{font-size:18px}
+}

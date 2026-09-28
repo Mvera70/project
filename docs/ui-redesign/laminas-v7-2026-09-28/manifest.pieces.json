@@ -1,0 +1,525 @@
+[
+  {
+    "id": "frame-parchment",
+    "group": "ui",
+    "size": [
+      640,
+      400
+    ],
+    "css": [
+      320,
+      200
+    ],
+    "slice": 56,
+    "source": "C:/Users/mvera/.codex/generated_images/01a0e8ec-50b2-7a60-b0d1-2963999a83a4/exec-74b3c09b-0da0-4412-9d02-b592420e1e61.png",
+    "prompt": "Aged parchment 8:5 card, torn edges, corner filigree, plain centre, transparent; style reference mockup-cart-2026-09-24.jpg."
+  },
+  {
+    "id": "frame-ribbon",
+    "group": "ui",
+    "size": [
+      600,
+      80
+    ],
+    "css": [
+      300,
+      40
+    ],
+    "slice": 28,
+    "desc": "Dark slate-blue title ribbon, very wide 7.5:1 aspect ratio, slightly worn soft edges, small folded right end within the rightmost 9% of width. Flat empty centre, straight horizontal edges, suitable for nine-slice UI stretching. Thin item with minimal transparent padding, no parchment.",
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow. Dark slate-blue title ribbon, very wide 7.5:1 aspect ratio, slightly worn soft edges, small folded right end within the rightmost 9% of width. Flat empty centre, straight horizontal edges, suitable for nine-slice UI stretching. Thin item with minimal transparent padding, no parchment. Intended export 600x80 pixels.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-1364adb4-997e-4bf0-bfb6-9acc286e4022.png"
+  },
+  {
+    "id": "chip-cost",
+    "group": "ui",
+    "size": [
+      360,
+      88
+    ],
+    "css": [
+      180,
+      34
+    ],
+    "slice": 28,
+    "desc": "A wide 4.1:1 sunken beige parchment pill for resource costs, rounded corners, soft inner shadow, completely empty plain centre, subtle border. All bevel within 8% of width. Orthographic front view, no symbols.",
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow. A wide 4.1:1 sunken beige parchment pill for resource costs, rounded corners, soft inner shadow, completely empty plain centre, subtle border. All bevel within 8% of width. Orthographic front view, no symbols. Intended export 360x88 pixels.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-157c1df9-900a-4e4c-9aa0-0b1b7c801319.png"
+  },
+  {
+    "id": "plaque-wood",
+    "group": "ui",
+    "size": [
+      400,
+      92
+    ],
+    "css": [
+      200,
+      46
+    ],
+    "slice": 36,
+    "desc": "Wide 4.35:1 lacquered forest-green wooden action plaque, elegant brass bevelled rim, shallow lower step. Clipped curved corners. Flat empty centre, no letters. All shaped end details confined to left/right 9% bands, middle perfectly plain for nine-slice scaling. Match the restrained green plaque in reference.",
+    "prompt": "EDIT TARGET first attached green plaque; second mockup is colour/material reference. Regenerate this action plate in warm dark OAK WOOD with aged brass rim, cream lettering will be added later so leave ENTIRE CENTRE EMPTY. REMOVE ALL GREEN. Preserve horizontal clipped-corner silhouette and bevel but simplify leaf-like end ornaments. ACTIVE state: subtle warm ember-amber illumination INSIDE the recessed wood surface and along its inner rim, echoing the active valley tab in second reference. No actual flames, no outer glow, no text, no symbols. Painted medieval game UI, soft contours, top-left light. NINE-SLICE asset final400x92 pixels (200x46 CSS), fixed borders36pixels (18CSS). All corner/end carving contained within36pixel left/right end areas when scaled to400x92. Wide plain low-detail centre safe to stretch. Straight stretchable edges, actual transparent surroundings, front view entire silhouette.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-748b99c7-4e38-4d23-b276-61fa82f8a76c.png"
+  },
+  {
+    "id": "plaque-wood-off",
+    "group": "ui",
+    "size": [
+      400,
+      92
+    ],
+    "css": [
+      200,
+      46
+    ],
+    "slice": 36,
+    "prompt": "EDIT this exact wooden action plaque into its disabled state. Preserve EVERY contour, proportions, wooden grain, carving, brass border, dimensions and transparency. Only extinguish all warm amber internal ember illumination; wood stays natural brown and brass stays aged matte brass with ordinary upper-left light, slightly less bright overall. No green or grey tint. No text. It is the same physical object with its internal light turned off. Blank stretchable centre; nine-slice corners identical to source. Transparent background.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-7c795a8e-eb49-47f3-88bb-872ebced75c4.png"
+  },
+  {
+    "id": "btn-close",
+    "group": "ui",
+    "size": [
+      64,
+      64
+    ],
+    "css": [
+      32,
+      32
+    ],
+    "prompt": "Generate a NEW small medieval wooden ring for a close control, cream X carved INTO weathered oak, restrained shallow chisel marks, slightly irregular artisanal ring. Less polished and less like a modern app button than the second reference. First image is palette and painted style reference ONLY. Soft painted outline, upper-left lighting, subtle thin aged brass rim, no glossy plastic, no glowing outer halo. A quiet functional medieval wooden fitting. Only the cream carved X, no text. Front view, full object isolated on real transparency. Intended drawing32x32 CSS, deliver square high resolution for export64x64. Keep the X legible at small size.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-d190f115-1196-4cac-a88c-e9dc56b415ab.png"
+  },
+  {
+    "id": "nail",
+    "size": [
+      32,
+      32
+    ],
+    "css": [
+      20,
+      20
+    ],
+    "desc": "ONE small forged iron nail head front-on, slightly irregular hammered domed dark iron circle, top-left highlight and very short soft lower-right shadow. No screw slot, no wooden disk, no brass, no visible long shank. Readable at16px.",
+    "group": "ui",
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow. ONE small forged iron nail head front-on, slightly irregular hammered domed dark iron circle, top-left highlight and very short soft lower-right shadow. No screw slot, no wooden disk, no brass, no visible long shank. Readable at16px.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-7c477554-a17a-4100-8b60-d1739f736a09.png"
+  },
+  {
+    "id": "nail-bent",
+    "size": [
+      48,
+      48
+    ],
+    "css": [
+      20,
+      20
+    ],
+    "desc": "ONE worn forged iron nail, head slightly tilted with a very short bent shank visible toward lower-right, hammered dark grey metal, top-left highlight and short soft shadow. Not a screw, no brass, no wood. Readable at24px.",
+    "group": "ui",
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow. ONE worn forged iron nail, head slightly tilted with a very short bent shank visible toward lower-right, hammered dark grey metal, top-left highlight and short soft shadow. Not a screw, no brass, no wood. Readable at24px.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-80d15048-b8d4-4cf5-ab50-8d8ad16f9a0b.png"
+  },
+  {
+    "id": "res-people",
+    "group": "ui",
+    "css": [
+      20,
+      20
+    ],
+    "size": [
+      40,
+      40
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow. A round smiling ochre face resource icon, simple readable painted relief, front view, friendly two eyes and curved smile, no other symbols. Resource icon displayed20x20 CSS, export40x40, strong simplified silhouette, no tiny details. Square canvas.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-def77806-8119-4a3b-9573-deefbcf586ac.png"
+  },
+  {
+    "id": "res-grain",
+    "group": "ui",
+    "css": [
+      20,
+      20
+    ],
+    "size": [
+      40,
+      40
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow. ONE golden ear of wheat, diagonal upright, compact simple silhouette, a few plump grains, no bundle or ribbon. Resource icon displayed20x20 CSS, export40x40, strong simplified silhouette, no tiny details. Square canvas.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-836ec9a4-252d-4862-879c-160e27900b87.png"
+  },
+  {
+    "id": "res-wood",
+    "group": "ui",
+    "css": [
+      20,
+      20
+    ],
+    "size": [
+      40,
+      40
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow. Exactly THREE stacked short brown logs, ends visible, compact triangular stack, pale cut ends and dark bark, three-quarter view. Resource icon displayed20x20 CSS, export40x40, strong simplified silhouette, no tiny details. Square canvas.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-31311df9-f5c2-4f9c-bb1d-4dea0ff1138a.png"
+  },
+  {
+    "id": "res-stone",
+    "group": "ui",
+    "css": [
+      20,
+      20
+    ],
+    "size": [
+      40,
+      40
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow. ONE squat grey dressed stone block, front and top visible, softened chipped edges, compact readable silhouette. Resource icon displayed20x20 CSS, export40x40, simplified painterly detail. Square canvas.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-60732604-a6de-47e2-a141-c2ce5bb8ff2f.png"
+  },
+  {
+    "id": "res-silver",
+    "group": "ui",
+    "css": [
+      20,
+      20
+    ],
+    "size": [
+      40,
+      40
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow. ONE silver coin, round minted rim, a simple small central embossed star, cool grey silver metal, slightly tilted front view. Not gold, no letters or numerals, compact clean silhouette. Resource icon displayed20x20 CSS, export40x40, simplified painterly detail. Square canvas.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-a5d5da9e-0799-41d0-b223-d247fbee675b.png"
+  },
+  {
+    "id": "means-plough",
+    "group": "art",
+    "css": [
+      64,
+      54
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A medieval wooden plough with iron ploughshare, two long handles, sturdy oak beam. Compact three-quarter view, newly designed object. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for96x80 CSS, export192x160. Keep entire object with breathing room. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-79861540-2e08-408b-bea1-a5ce4f60a131.png"
+  },
+  {
+    "id": "means-pigs",
+    "group": "art",
+    "css": [
+      64,
+      54
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "prompt": "Revise this two-pig illustration into a GROUNDED MEDIEVAL farm vignette. Exactly two domestic medieval pigs, leaner natural bodies, longer snouts, small natural dark eyes, coarse visible bristles, one dusky brown-grey pig and one muted pale pink pig with muddy patches. Neutral animal expressions: NO smiles, NO eyebrows, NO oversized eyes, NO cute baby proportions. Rough-hewn timber trough with mash, short rustic fence fragment. Keep isolated composition, transparency, soft painted warm colours and top-left lighting. Storybook historical illustration for adults, not photoreal, not a cute farming phone game. 3/4 view, no text. Meant for96x80 CSS.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-1d473ba9-af89-4125-abd2-c402924ed519.png",
+    "rejectedSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-b0d0cbd4-c987-4b12-b14a-7bc96102542f.png",
+    "revision": "Vera: menos infantil, Edad Media"
+  },
+  {
+    "id": "means-ale",
+    "group": "art",
+    "css": [
+      64,
+      54
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A small medieval oak beer barrel with iron hoops and one modest foaming wooden tankard beside it. Barrel is main subject, a gift for a village feast. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for96x80 CSS, export192x160. Keep entire object with breathing room. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-43b61f73-3686-4eaa-94aa-2d12d5399b2b.png"
+  },
+  {
+    "id": "means-axe",
+    "group": "art",
+    "css": [
+      64,
+      54
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A good single woodcutting axe, polished iron cutting head with curved wooden handle, angled three-quarter view. A tool, not a weapon scene. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for96x80 CSS, export192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-b908ac4e-c621-46de-9092-bb1eb2eb8384.png"
+  },
+  {
+    "id": "means-relic",
+    "group": "art",
+    "css": [
+      64,
+      54
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A small medieval gilt reliquary casket with a simple cross on its lid, aged brass and red lining, closed and portable. Not a huge church. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for96x80 CSS, export192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-552f9c96-f8e5-42fc-8d5a-667c67dbd406.png"
+  },
+  {
+    "id": "means-hand",
+    "group": "art",
+    "css": [
+      64,
+      54
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A traveller's cloth bindle tied to a short walking stick, worn leather pouch alongside, representing a new villager settling. No literal hand, no person, no scenery. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for96x80 CSS, export192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-f85b69d9-5a34-4e10-aa6f-63c039a12249.png"
+  },
+  {
+    "id": "means-arms",
+    "group": "art",
+    "size": [
+      192,
+      160
+    ],
+    "css": [
+      64,
+      54
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A compact tied bundle of three medieval spears with simple forged iron points, leather binding, weapons for a village smithy. No shields or figures. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for 96x80 CSS, export 192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-f4c604ef-26a4-4d3c-a523-6768234dc38c.png"
+  },
+  {
+    "id": "means-bows",
+    "group": "art",
+    "size": [
+      192,
+      160
+    ],
+    "css": [
+      64,
+      54
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A medieval wooden longbow with taut string and a small leather quiver containing arrows, no person. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for 96x80 CSS, export 192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-58bcdf98-7831-44e1-8995-6d5411c4a8e8.png"
+  },
+  {
+    "id": "means-tower",
+    "group": "art",
+    "size": [
+      192,
+      160
+    ],
+    "css": [
+      64,
+      54
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A small timber watchtower, four sturdy posts, elevated lookout platform, simple roof and ladder, three-quarter view, isolated building vignette. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for 96x80 CSS, export 192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-c647ef2f-dffe-4592-aa4d-9a6ac5b23799.png"
+  },
+  {
+    "id": "means-gate",
+    "group": "art",
+    "size": [
+      192,
+      160
+    ],
+    "css": [
+      64,
+      54
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A sturdy closed medieval double wooden gate with dark iron hinges and a minimal timber support frame, three-quarter view, no wall or landscape. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for 96x80 CSS, export 192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-99bd9f55-7f9a-416c-9843-60911148f1b1.png"
+  },
+  {
+    "id": "mission-mushrooms",
+    "group": "art",
+    "size": [
+      192,
+      160
+    ],
+    "css": [
+      56,
+      48
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A wicker gathering basket filled with edible brown and cream woodland mushrooms, a few mushrooms beside it, no landscape. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for 96x80 CSS, export 192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-bfb89f39-5f61-46a8-b17c-6a20a88bcce1.png"
+  },
+  {
+    "id": "mission-herbs",
+    "group": "art",
+    "size": [
+      192,
+      160
+    ],
+    "css": [
+      56,
+      48
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A compact tied bunch of medicinal green herbs with sage leaves and tiny pale flowers, roots and string visible, no container. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for 96x80 CSS, export 192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-5197199b-942c-48a4-a54c-7c443cc537b1.png"
+  },
+  {
+    "id": "mission-wolf-den",
+    "group": "art",
+    "size": [
+      192,
+      160
+    ],
+    "css": [
+      56,
+      48
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. An old non-gory wolf skull resting on a small dark mossy rock, representing a wolf-den expedition. No blood, no living wolf, no background. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for 96x80 CSS, export 192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-5f111f13-b791-4a9a-9eb5-461c149e0824.png"
+  },
+  {
+    "id": "mission-high-seam",
+    "group": "art",
+    "size": [
+      192,
+      160
+    ],
+    "css": [
+      56,
+      48
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A mining pickaxe beside a coil of rope and a small chunk of grey ore, clear three-quarter view, equipment for the high rocky seam. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for 96x80 CSS, export 192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-0c068513-5ac5-4ffb-bf1f-3f73aeaeb5a4.png"
+  },
+  {
+    "id": "mission-market",
+    "group": "art",
+    "size": [
+      192,
+      160
+    ],
+    "css": [
+      56,
+      48
+    ],
+    "prompt": "Style reference only: attached medieval game mockup. Painted colour art, warm colours, soft outlines, light upper left. Create ONE isolated new asset. No reuse of reference objects, no text or labels, real transparent background, complete object fully visible, no large cast shadow.  Grounded medieval storybook, restrained and believable proportions, NOT cute mobile-game mascots, no toy-like shapes, no anthropomorphic smiles or big glossy eyes. Small painted illustration, medieval warm colours, soft outline, 3/4 view. A compact travelling merchant's bundle of cloth and goods tied with rope, one rolled fabric and small sack, no person, no cart, no background. Transparent cutout, no floor rectangle, no text, no card or UI frame. Designed for 96x80 CSS, export 192x160. Keep entire object visible. New drawing, not a crop or copy of the reference.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-a267692b-a3b4-4aa0-9763-8b08b6b6ce69.png"
+  },
+  {
+    "id": "harvest",
+    "group": "chronicle",
+    "size": [
+      640,
+      512
+    ],
+    "css": [
+      320,
+      256
+    ],
+    "key": "harvest.good",
+    "line": "A good autumn. 120 bushels for 35 mouths.",
+    "original": "D:/DESARROLLO/PROYECTOS/VALLEY/project/public/ui/art/harvest.png",
+    "prompt": "EDIT TARGET is the first attached sepia illustration. STYLE reference only is second attached medieval game mockup. Repaint the first image as painted COLOUR storybook illustration, warm but restrained natural palette, soft outlines, light from upper left, grounded medieval era. Preserve the original composition, all figures, poses, objects, framing and landscape, not modernize or make cute. Man with sickle harvesting at left, woman tying sheaf centre-right, crop cart at right, riverside village and church behind. Keep exact placement, adult natural proportions, golden wheat and muted linen clothing. Scene accompanies the game line: \"A good autumn. 120 bushels for 35 mouths.\" (do NOT paint any text). No text, no frame or card, no sepia paper texture. Full 5:4 scene composed to 640x512 pixels, painted environment retained; only very outer edge subtly fades to transparency, don't remove scene background.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-70dd8058-436d-4517-963a-c489a2e6ff50.png"
+  },
+  {
+    "id": "birth",
+    "group": "chronicle",
+    "size": [
+      640,
+      512
+    ],
+    "css": [
+      320,
+      256
+    ],
+    "key": "birth.named.daughter",
+    "line": "Edith had a daughter in the spring of year 50.",
+    "original": "D:/DESARROLLO/PROYECTOS/VALLEY/project/public/ui/art/birth.png",
+    "prompt": "EDIT TARGET is the first attached sepia illustration. STYLE reference only is second attached medieval game mockup. Repaint the first image as painted COLOUR storybook illustration, warm but restrained natural palette, soft outlines, light from upper left, grounded medieval era. Preserve the original composition, all figures, poses, objects, framing and landscape, not modernize or make cute. Mother seated on bed cradling swaddled newborn left/centre; father leans gently from centre behind, rustic interior and open doorway right looking to distant village. Keep exact positions and gestures. Natural adult proportions, modest medieval linen and wool. Scene accompanies the game line: \"Edith had a daughter in the spring of year 50.\" (do NOT paint any text). No text, no frame or card, no sepia paper texture. Full 5:4 scene composed to 640x512 pixels, painted environment retained; only very outer edge subtly fades to transparency, don't remove scene background.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-18430c46-2c8a-4a19-9a87-a21e280590cd.png"
+  },
+  {
+    "id": "death",
+    "group": "chronicle",
+    "size": [
+      640,
+      512
+    ],
+    "css": [
+      320,
+      256
+    ],
+    "key": "death.old_age.named",
+    "line": "Thomas died in the autumn of year 50, 72 winters old.",
+    "original": "D:/DESARROLLO/PROYECTOS/VALLEY/project/public/ui/art/death.png",
+    "prompt": "EDIT TARGET is the first attached sepia illustration. STYLE reference only is second attached medieval game mockup. Repaint the first image as painted COLOUR storybook illustration, warm but restrained natural palette, soft outlines, light from upper left, grounded medieval era. Preserve the original composition, all figures, poses, objects, framing and landscape, not modernize or make cute. Elder lying peacefully in bed at left, adult son seated centre holding his hand, adult woman seated right; same sparse medieval room and village through open doorway right. Quiet restrained sorrow, no gore, no cheerful expressions. Scene accompanies the game line: \"Thomas died in the autumn of year 50, 72 winters old.\" (do NOT paint any text). No text, no frame or card, no sepia paper texture. Full 5:4 scene composed to 640x512 pixels, painted environment retained; only very outer edge subtly fades to transparency, don't remove scene background.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-29438dbd-9810-4c3d-8565-8b39f456e75e.png"
+  },
+  {
+    "id": "built",
+    "group": "chronicle",
+    "size": [
+      640,
+      512
+    ],
+    "css": [
+      320,
+      256
+    ],
+    "key": "built.house",
+    "line": "They raised a house in the spring of year 50.",
+    "original": "D:/DESARROLLO/PROYECTOS/VALLEY/project/public/ui/art/built.png",
+    "prompt": "EDIT TARGET is first attached sepia illustration. STYLE reference only is second medieval game mockup. Repaint first image in COLOUR storybook style, warm restrained natural palette, soft outlines, top-left light, grounded medieval era. Preserve original composition, all figures, poses, objects, framing and landscape. No cartoon mascots. Three adult medieval carpenters building a timber house: man raising vertical post left, worker sawing beam at trestle foreground centre, man carrying planks at right rear. Preserve all composition including village across river and piles of wood. Accompanies game line: \"They raised a house in the spring of year 50.\" (do NOT render any text). No text, no frame, no sepia paper. Full 5:4 scene composed to 640x512 pixels, painted environment retained, only outermost edge subtly fades to transparency.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-b1475c66-d140-4d75-9859-b2db960a3f5e.png"
+  },
+  {
+    "id": "pedlar",
+    "group": "chronicle",
+    "size": [
+      640,
+      512
+    ],
+    "css": [
+      320,
+      256
+    ],
+    "key": "fate.pedlar",
+    "line": "A pedlar came up the road in spring wanting timber: 20 wood for 8 silver.",
+    "original": "D:/DESARROLLO/PROYECTOS/VALLEY/project/public/ui/art/pedlar.png",
+    "prompt": "EDIT TARGET is first attached sepia illustration. STYLE reference only is second medieval game mockup. Repaint first image in COLOUR storybook style, warm restrained natural palette, soft outlines, top-left light, grounded medieval era. Preserve original composition, all figures, poses, objects, framing and landscape. No cartoon mascots. Travelling pedlar with brimmed medieval hat, backpack, basket at left addressing adult village couple centre-right beside river; distant village and church right, tree left. Keep poses, gestures and exact scene; muted linen, ochre, moss green, russet. Accompanies game line: \"A pedlar came up the road in spring wanting timber: 20 wood for 8 silver.\" (do NOT render any text). No text, no frame, no sepia paper. Full 5:4 scene composed to 640x512 pixels, painted environment retained, only outermost edge subtly fades to transparency.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-343f899f-be75-4405-9f66-d55974597a1e.png"
+  },
+  {
+    "id": "wedding",
+    "group": "chronicle",
+    "size": [
+      640,
+      512
+    ],
+    "css": [
+      320,
+      256
+    ],
+    "key": "fate.wedding",
+    "line": "There was a wedding in the spring of year 50. The whole valley came.",
+    "original": "D:/DESARROLLO/PROYECTOS/VALLEY/project/public/ui/art/wedding.png",
+    "prompt": "EDIT TARGET is first attached sepia illustration. STYLE reference only is second medieval game mockup. Repaint first image in COLOUR storybook style, warm restrained natural palette, soft outlines, top-left light, grounded medieval era. Preserve original composition, all figures, poses, objects, framing and landscape. No cartoon mascots. Medieval adult couple holding hands centre foreground, officiant with leafy branch directly behind, two witnesses at right rear, river village and church in background. Modest wool and linen garments, natural adult proportions and expressions, restrained warm joy. Keep composition exactly. Accompanies game line: \"There was a wedding in the spring of year 50. The whole valley came.\" (do NOT render any text). No text, no frame, no sepia paper. Full 5:4 scene composed to 640x512 pixels, painted environment retained, only outermost edge subtly fades to transparency.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-c9396f4a-466f-4419-8e7d-9ef34c329f65.png"
+  },
+  {
+    "id": "fire",
+    "group": "chronicle",
+    "size": [
+      640,
+      512
+    ],
+    "css": [
+      320,
+      256
+    ],
+    "key": "fate.lightning_fire",
+    "line": "Lightning struck the house in the summer of year 50. It burned to the ground.",
+    "original": "D:/DESARROLLO/PROYECTOS/VALLEY/project/public/ui/art/fire.png",
+    "prompt": "EDIT TARGET first attached sepia illustration; second attached mockup is STYLE reference only. Repaint sepia scene in COLOUR, grounded medieval storybook, warm restrained palette, soft outlines, light upper left. Preserve exact composition: woman left carrying wooden water bucket, man ahead centre carrying bucket towards damaged smoking timber and thatch building at right, river and distant medieval village behind, tree upper left. This is response to an accidental fire after lightning, no attackers, no weapons. Modest linen and wool, natural adult proportions, serious expressions. Keep existing building extent, smoke and camera framing; subtle embers at damaged eaves allowed, no huge newly invented blaze or lightning bolt. Game line it accompanies: \"Lightning struck the house in the summer of year 50. It burned to the ground.\" (do not draw text). No writing, no frame, no sepia paper. Full 5:4 scene640x512 with painted landscape intact, only outermost edge gently transparent.",
+    "source": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-aada4735-2ec5-4c74-a20d-a0d919336a4c.png"
+  }
+]

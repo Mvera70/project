@@ -1,0 +1,890 @@
+[
+  {
+    "scene": "cart",
+    "width": 390,
+    "height": 844,
+    "bodyWidth": 390,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44,
+        "close": true
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 40,
+        "close": false
+      }
+    ],
+    "art": [
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 163,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 163,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 163,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 163,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 163,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 163,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 163,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 163,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 163,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 163,
+        "height": 34
+      }
+    ],
+    "overflowingText": [],
+    "artOverlapsDescription": [],
+    "beads": 5,
+    "date": "ANNO 50 · SPRING",
+    "actionImages": [
+      "url(\"file:///D:/DESARROLLO/PROYECTOS/VALLEY/project/docs/ui-redesign/laminas-v7-2026-09-28/assets/plaque-wood.png\")"
+    ]
+  },
+  {
+    "scene": "board",
+    "width": 390,
+    "height": 844,
+    "bodyWidth": 390,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44,
+        "close": true
+      },
+      {
+        "label": "One fewer",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "One more",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Send",
+        "width": 88,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "One fewer",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "One more",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Send",
+        "width": 88,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Send",
+        "width": 88,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Send",
+        "width": 88,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "One fewer",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "One more",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Send",
+        "width": 88,
+        "height": 40,
+        "close": false
+      }
+    ],
+    "art": [
+      {
+        "kind": "nail",
+        "width": 20,
+        "height": 20
+      },
+      {
+        "kind": "object-art",
+        "width": 56,
+        "height": 48
+      },
+      {
+        "kind": "cost-chip free",
+        "width": 46,
+        "height": 34
+      },
+      {
+        "kind": "nail bent",
+        "width": 20,
+        "height": 20
+      },
+      {
+        "kind": "object-art",
+        "width": 56,
+        "height": 48
+      },
+      {
+        "kind": "cost-chip",
+        "width": 52,
+        "height": 34
+      },
+      {
+        "kind": "nail",
+        "width": 20,
+        "height": 20
+      },
+      {
+        "kind": "object-art",
+        "width": 56,
+        "height": 48
+      },
+      {
+        "kind": "cost-chip",
+        "width": 59,
+        "height": 34
+      },
+      {
+        "kind": "nail bent",
+        "width": 20,
+        "height": 20
+      },
+      {
+        "kind": "object-art",
+        "width": 56,
+        "height": 48
+      },
+      {
+        "kind": "cost-chip free",
+        "width": 46,
+        "height": 34
+      },
+      {
+        "kind": "nail",
+        "width": 20,
+        "height": 20
+      },
+      {
+        "kind": "object-art",
+        "width": 56,
+        "height": 48
+      },
+      {
+        "kind": "cost-chip",
+        "width": 52,
+        "height": 34
+      }
+    ],
+    "overflowingText": [],
+    "artOverlapsDescription": [],
+    "beads": 5,
+    "date": "ANNO 50 · SUMMER",
+    "actionImages": [
+      "url(\"file:///D:/DESARROLLO/PROYECTOS/VALLEY/project/docs/ui-redesign/laminas-v7-2026-09-28/assets/plaque-wood.png\")",
+      "url(\"file:///D:/DESARROLLO/PROYECTOS/VALLEY/project/docs/ui-redesign/laminas-v7-2026-09-28/assets/plaque-wood-off.png\")"
+    ]
+  },
+  {
+    "scene": "chronicle",
+    "width": 390,
+    "height": 844,
+    "bodyWidth": 390,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44,
+        "close": true
+      }
+    ],
+    "art": [
+      {
+        "kind": "vignette",
+        "width": 358,
+        "height": 130
+      },
+      {
+        "kind": "vignette",
+        "width": 358,
+        "height": 130
+      },
+      {
+        "kind": "vignette",
+        "width": 358,
+        "height": 130
+      },
+      {
+        "kind": "vignette",
+        "width": 358,
+        "height": 130
+      },
+      {
+        "kind": "vignette",
+        "width": 358,
+        "height": 130
+      },
+      {
+        "kind": "vignette",
+        "width": 358,
+        "height": 130
+      },
+      {
+        "kind": "vignette",
+        "width": 358,
+        "height": 130
+      }
+    ],
+    "overflowingText": [],
+    "artOverlapsDescription": [],
+    "beads": 5,
+    "date": "ANNO 50 · SPRING",
+    "actionImages": []
+  },
+  {
+    "scene": "valley",
+    "width": 390,
+    "height": 844,
+    "bodyWidth": 390,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Open the cart",
+        "width": 200,
+        "height": 40,
+        "close": false
+      }
+    ],
+    "art": [],
+    "overflowingText": [],
+    "artOverlapsDescription": [],
+    "beads": 5,
+    "date": "ANNO 50 · SPRING",
+    "actionImages": [
+      "url(\"file:///D:/DESARROLLO/PROYECTOS/VALLEY/project/docs/ui-redesign/laminas-v7-2026-09-28/assets/plaque-wood.png\")"
+    ]
+  },
+  {
+    "scene": "cart",
+    "width": 320,
+    "height": 568,
+    "bodyWidth": 320,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44,
+        "close": true
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 40,
+        "close": false
+      }
+    ],
+    "art": [
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 130,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 130,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 130,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 130,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 130,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 130,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 130,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 130,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 130,
+        "height": 34
+      },
+      {
+        "kind": "object-art",
+        "width": 64,
+        "height": 54
+      },
+      {
+        "kind": "cost-chip",
+        "width": 130,
+        "height": 34
+      }
+    ],
+    "overflowingText": [],
+    "artOverlapsDescription": [],
+    "beads": 5,
+    "date": "ANNO 50 · SPRING",
+    "actionImages": [
+      "url(\"file:///D:/DESARROLLO/PROYECTOS/VALLEY/project/docs/ui-redesign/laminas-v7-2026-09-28/assets/plaque-wood.png\")"
+    ]
+  },
+  {
+    "scene": "board",
+    "width": 320,
+    "height": 568,
+    "bodyWidth": 320,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44,
+        "close": true
+      },
+      {
+        "label": "One fewer",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "One more",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Send",
+        "width": 78,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "One fewer",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "One more",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Send",
+        "width": 78,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Send",
+        "width": 78,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Send",
+        "width": 78,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "One fewer",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "One more",
+        "width": 40,
+        "height": 40,
+        "close": false
+      },
+      {
+        "label": "Send",
+        "width": 78,
+        "height": 40,
+        "close": false
+      }
+    ],
+    "art": [
+      {
+        "kind": "nail",
+        "width": 20,
+        "height": 20
+      },
+      {
+        "kind": "object-art",
+        "width": 56,
+        "height": 48
+      },
+      {
+        "kind": "cost-chip free",
+        "width": 44,
+        "height": 34
+      },
+      {
+        "kind": "nail bent",
+        "width": 20,
+        "height": 20
+      },
+      {
+        "kind": "object-art",
+        "width": 56,
+        "height": 48
+      },
+      {
+        "kind": "cost-chip",
+        "width": 51,
+        "height": 34
+      },
+      {
+        "kind": "nail",
+        "width": 20,
+        "height": 20
+      },
+      {
+        "kind": "object-art",
+        "width": 56,
+        "height": 48
+      },
+      {
+        "kind": "cost-chip",
+        "width": 58,
+        "height": 34
+      },
+      {
+        "kind": "nail bent",
+        "width": 20,
+        "height": 20
+      },
+      {
+        "kind": "object-art",
+        "width": 56,
+        "height": 48
+      },
+      {
+        "kind": "cost-chip free",
+        "width": 44,
+        "height": 34
+      },
+      {
+        "kind": "nail",
+        "width": 20,
+        "height": 20
+      },
+      {
+        "kind": "object-art",
+        "width": 56,
+        "height": 48
+      },
+      {
+        "kind": "cost-chip",
+        "width": 51,
+        "height": 34
+      }
+    ],
+    "overflowingText": [],
+    "artOverlapsDescription": [],
+    "beads": 5,
+    "date": "ANNO 50 · SUMMER",
+    "actionImages": [
+      "url(\"file:///D:/DESARROLLO/PROYECTOS/VALLEY/project/docs/ui-redesign/laminas-v7-2026-09-28/assets/plaque-wood.png\")",
+      "url(\"file:///D:/DESARROLLO/PROYECTOS/VALLEY/project/docs/ui-redesign/laminas-v7-2026-09-28/assets/plaque-wood-off.png\")"
+    ]
+  },
+  {
+    "scene": "chronicle",
+    "width": 320,
+    "height": 568,
+    "bodyWidth": 320,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44,
+        "close": true
+      }
+    ],
+    "art": [
+      {
+        "kind": "vignette",
+        "width": 292,
+        "height": 120
+      },
+      {
+        "kind": "vignette",
+        "width": 292,
+        "height": 120
+      },
+      {
+        "kind": "vignette",
+        "width": 292,
+        "height": 120
+      },
+      {
+        "kind": "vignette",
+        "width": 292,
+        "height": 120
+      },
+      {
+        "kind": "vignette",
+        "width": 292,
+        "height": 120
+      },
+      {
+        "kind": "vignette",
+        "width": 292,
+        "height": 120
+      },
+      {
+        "kind": "vignette",
+        "width": 292,
+        "height": 120
+      }
+    ],
+    "overflowingText": [],
+    "artOverlapsDescription": [],
+    "beads": 5,
+    "date": "ANNO 50 · SPRING",
+    "actionImages": []
+  },
+  {
+    "scene": "valley",
+    "width": 320,
+    "height": 568,
+    "bodyWidth": 320,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Open the cart",
+        "width": 200,
+        "height": 40,
+        "close": false
+      }
+    ],
+    "art": [],
+    "overflowingText": [],
+    "artOverlapsDescription": [],
+    "beads": 5,
+    "date": "ANNO 50 · SPRING",
+    "actionImages": [
+      "url(\"file:///D:/DESARROLLO/PROYECTOS/VALLEY/project/docs/ui-redesign/laminas-v7-2026-09-28/assets/plaque-wood.png\")"
+    ]
+  },
+  {
+    "continuousChronicle": {
+      "entries": 7,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "height": 1875
+    }
+  },
+  {
+    "interactions": {
+      "countCapped": true,
+      "actionDimmed": true,
+      "closedToValley": true,
+      "openedCart": true
+    }
+  },
+  {
+    "pieces": {
+      "count": 28,
+      "chronicleCount": 7,
+      "brokenImages": 0
+    }
+  },
+  {
+    "errors": []
+  }
+]

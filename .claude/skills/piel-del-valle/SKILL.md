@@ -5,6 +5,56 @@ description: El estándar visual de la interfaz de The Valley: qué papel, qué 
 
 # La piel del valle: un estándar, no un catálogo de excepciones
 
+## Propuesta V8 · navegación con material propio · 29 sep 2026
+
+Encargo de Vera: la barra de madera resulta pobre y no distingue la navegación.
+En las maquetas V8 usar correa de cuero mate marrón rojizo profundo, de 72 px,
+con costura clara a 6 px de los bordes. PNG 780×144, nueve partes con corte
+32 PNG / borde 16 CSS. Tres medallones de latón viejo de 56×56 (PNG 112×112),
+centrados por tercios; activo elevado 4 px, con relieve y brasa ámbar interior.
+Los símbolos mountains/book/people vienen del sprite aprobado, en crema;
+nunca pintarlos en el PNG. Nombre debajo en Cinzel crema de 10 px. Toque
+mínimo 44 px, sin reducir medallón o letra en 320 px de ancho.
+
+Presentar cuatro pantallas en 390×844 y 320×568, incluido valle de día y
+tablón abierto. Hierro forjado con remaches es una alternativa aparte para
+comparar; no está elegido. Propuesta y evidencia en
+`docs/ui-redesign/propuesta-barra-v8-2026-09-28.md`. Conservar el resto de V7.
+No integrar componentes hasta revisión. La generación adicional de estas
+cuatro piezas está autorizada por este encargo V8.
+
+## Pasada V7 · escala y conservación · 28 sep 2026
+
+Estas instrucciones de Vera prevalecen sobre las recetas V6 de abajo para las
+maquetas V7. Referencia: `docs/ui-redesign/propuesta-piel-v7-2026-09-28.md`.
+
+- Conservar el estilo pintado medieval y las ilustraciones V6. Solo regenerar
+  el cierre y las dos placas de madera encargadas; no producir piezas extra.
+- Crónica: ancho de columna completo, alto 120–140 px, recorte centrado del
+  PNG 640×512 con `object-fit:cover`; texto debajo. Fecha `ANNO 50 · SPRING`,
+  nunca romanos. Entregar viewport 390×844 y tira continua con las siete
+  entradas sin empequeñecerlas para encajarlas artificialmente.
+- Carro: dibujo 64×54 asomando sobre la cinta; coste 34 de alto; GIVE 40.
+  Tablón: dibujo 56×48; −/+ 40; clavo 20 centrado sobre el borde superior;
+  duración, coste y riesgo en una fila, incluido Free dentro de su ficha.
+- Cierre: toque 44 y dibujo 32, aro de madera con aspa crema tallada.
+- GIVE, SEND y Open the cart usan placa de madera con latón y letra crema,
+  brillo interior ámbar en activo; misma placa sin brillo y letra atenuada en
+  apagado. PNG 400×92, corte 36 px, borde visual 18 CSS. No usar verde.
+- Recuperar el arco solar existente con sus cinco cuentas; conservar los
+  cinco recursos a color. Copiar su geometría aprobada, no inventar otro sol.
+- Mantener los siete colores en `docs/ui-redesign/laminas-v6-2026-09-28/colour/`.
+  Los originales sepia de `public/ui/art/` quedan restaurados; no sustituirlos
+  hasta disponer de las 51 a color. Revisar las claves compartidas antes de
+  integrar, porque una imagen nueva no puede representar escenas distintas.
+- Mantener resolución de las piezas reutilizadas aunque cambie su medida CSS.
+  CSS coloca y estira; no dibuja arte. Entregar carro, tablón y crónica en
+  390×844 y 320×568, más hoja de piezas con tamaños de uso explícitos.
+- Antes de capturar o desplazar una entrada, esperar `document.fonts.ready`
+  y la decodificación de todas las imágenes. Verificar también tarjetas que
+  quedan fuera del primer viewport. La propuesta no modifica componentes,
+  motor ni banco de textos.
+
 ## Regla V5 de producción de arte · 28 sep 2026
 
 ### Aplicación V6: ilustración ligada al contenido

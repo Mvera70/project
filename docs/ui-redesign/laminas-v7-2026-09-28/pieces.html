@@ -1,0 +1,319 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V7 · Muestrario a tamaño real</title><style>
+@font-face { font-family: 'Cinzel'; src: url('../../../src/ui/redesign/fonts/cinzel.woff2') format('woff2'); font-weight: 400 700; }
+@font-face { font-family: 'EB Garamond'; src: url('../../../src/ui/redesign/fonts/garamond.woff2') format('woff2'); }
+:root {
+  --wood: url('../../../docs/ui-redesign/laminas-v3-2026-09-28/muestra-madera.png'); --woodband: url('../../../docs/ui-redesign/laminas-v3-2026-09-28/muestra-madera.png'); --parch: url('../../../src/ui/redesign/parchment.png');
+  --brass: #C9A24A; --brass-deep: #8A6A2A; --cream: #F1E6CE; --ink: #2A2118; --ink-mute: #6B5A45;
+  --give: #29464E; --give-deep: #16262C; --lacquer: #8C2F22; --lacquer-deep: #5A1D15; --sun: #E8C36A;
+  --display: 'Cinzel', serif; --read: 'EB Garamond', Georgia, serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 390px; height: 844px; overflow: hidden; background: #000; }
+.screen { position: relative; width: 390px; height: 844px; overflow: hidden; background: #6f8a3c url('../../../docs/interfaz/2026-09-27/ui/010-valle-despejado.jpg') center / cover no-repeat; font-family: var(--read); }
+/* ---------- la tabla: una sola pieza de madera con canto de latón ---------- */
+.plank { background: var(--wood) center / 390px auto; box-shadow: inset 0 0 0 2px rgba(0,0,0,.35), inset 0 0 0 3px rgba(201,162,74,.55), 0 6px 14px rgba(0,0,0,.45); }
+.hud { position: absolute; left: 10px; right: 10px; top: 10px; border-radius: 10px; padding: 8px 10px 9px; display: grid; gap: 7px; }
+.hud-row { display: flex; align-items: center; gap: 10px; }
+.date { flex: 1; display: flex; align-items: center; justify-content: space-between; height: 34px; padding: 0 12px; border-radius: 6px;
+  background: linear-gradient(#F6ECD6, #E9DCC0); box-shadow: inset 0 1px 0 #fff8, inset 0 -2px 3px rgba(0,0,0,.18), 0 1px 0 rgba(0,0,0,.4);
+  color: var(--ink); font: 700 13.5px/1 var(--display); letter-spacing: .06em; }
+.date svg { width: 90px; height: 29px; }
+.arc-track { fill: none; stroke: #8A6A2A; stroke-width: 1; } .arc-bead { fill: #8A6A2A; opacity: .4; } .arc-sun line { stroke: var(--sun); stroke-width: 1.4; stroke-linecap: round; } .arc-disc { fill: var(--sun); }
+.vitals { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.vital { height: 34px; border-radius: 7px; display: flex; align-items: center; justify-content: center; gap: 5px;
+  background: rgba(30,16,8,.72); box-shadow: inset 0 2px 4px rgba(0,0,0,.65), 0 1px 0 rgba(255,214,160,.22);
+  color: var(--cream); font: 700 16px/1 var(--display); font-variant-numeric: tabular-nums; }
+.vital svg { width: 17px; height: 17px; color: var(--sun); }
+.skin-icon { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+/* ---------- la barra: la misma tabla, abajo ---------- */
+.nav { position: absolute; left: 0; right: 0; bottom: 0; height: 66px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px 8px 8px; border-radius: 0; box-shadow: inset 0 3px 0 rgba(201,162,74,.5), inset 0 5px 0 rgba(0,0,0,.35), 0 -6px 14px rgba(0,0,0,.35); }
+.tab { display: grid; place-items: center; gap: 2px; border-radius: 7px; color: #E9DCC0; opacity: .8; font: 700 10.5px/1 var(--display); letter-spacing: .12em; }
+.tab svg { width: 22px; height: 22px; }
+.tab.on { opacity: 1; color: var(--cream); background: linear-gradient(rgba(255,205,120,.28), rgba(120,60,20,.25)); box-shadow: inset 0 0 0 2px var(--brass), inset 0 0 12px rgba(255,190,90,.35), 0 2px 0 rgba(0,0,0,.4); text-shadow: 0 0 6px rgba(255,190,90,.6); }
+/* ---------- brújula y mandos ---------- */
+.compass { position: absolute; left: 12px; bottom: 82px; width: 76px; height: 76px; background: url('../../../docs/ui-redesign/laminas-v3-2026-09-28/01-valle.png') center / cover; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,.4); }
+.ctrls { position: absolute; right: 12px; bottom: 84px; display: flex; gap: 8px; }
+.rbtn { width: 46px; height: 46px; border-radius: 50%; background: var(--woodband) center / 120px auto; display: grid; place-items: center; color: var(--cream);
+  box-shadow: inset 0 0 0 2px var(--brass), inset 0 0 0 3px rgba(0,0,0,.4), 0 3px 6px rgba(0,0,0,.45); font: 700 14px/1 var(--display); }
+.rbtn svg { width: 20px; height: 20px; }
+/* ---------- A1: la etiqueta de pergamino, junto a la cosa ---------- */
+.tag { position: absolute; left: 22px; top: 330px; width: 300px; padding: 12px 14px 11px; background: #F3EAD6 var(--parch) center / 256px; background-blend-mode: multiply;
+  border-radius: 3px; color: var(--ink); box-shadow: 0 8px 18px rgba(0,0,0,.4), inset 0 0 0 1px rgba(107,74,46,.35); }
+.tag::after { content: ''; position: absolute; left: 150px; bottom: -8px; width: 16px; height: 16px; background: #EFE4CB; transform: rotate(45deg); box-shadow: 2px 2px 3px rgba(0,0,0,.2); }
+.tag h3 { margin: 0 0 4px; font: 700 15px/1.2 var(--display); letter-spacing: .04em; }
+.tag p { margin: 0; font-size: 16px; line-height: 1.3; color: var(--ink-mute); }
+.tag .kv { margin-top: 8px; display: flex; justify-content: space-between; font-size: 15px; }
+.tag .kv b { color: var(--give); font-weight: 600; }
+.tag-mark { position: absolute; left: 160px; top: 447px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #F3EAD6; box-shadow: 0 0 0 3px rgba(201,162,74,.7); }
+/* ---------- B1: el tablón de madera ---------- */
+.veil { position: absolute; inset: 0; background: rgba(20,12,6,.42); }
+.board { position: absolute; left: 14px; right: 14px; top: 120px; bottom: 90px; border-radius: 10px; padding: 46px 12px 12px; display: grid; gap: 10px; align-content: start; overflow: hidden; }
+.board-title { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); padding: 7px 18px; border-radius: 2px; background: #F3EAD6 var(--parch) center / 256px; background-blend-mode: multiply; color: var(--ink);
+  font: 700 13px/1 var(--display); letter-spacing: .2em; box-shadow: 0 2px 0 rgba(0,0,0,.5); }
+.board-close { position: absolute; right: 10px; top: 8px; width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #A8402F, var(--lacquer) 55%, var(--lacquer-deep)); border: 2px solid var(--brass); display: grid; place-items: center; color: var(--cream); font: 700 22px/1 var(--read); }
+.note { position: relative; padding: 11px 12px 10px; background: #F3EAD6 var(--parch) center / 256px; background-blend-mode: multiply; color: var(--ink); border-radius: 2px; box-shadow: 0 3px 6px rgba(0,0,0,.45); display: grid; gap: 6px; }
+.note:nth-child(odd) { transform: rotate(-.8deg); } .note:nth-child(even) { transform: rotate(.6deg); }
+.note::before { content: ''; position: absolute; left: 50%; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: #2B1A0E; box-shadow: 0 1px 0 rgba(255,255,255,.3); }
+.note h4 { margin: 0; font: 700 13.5px/1.2 var(--display); letter-spacing: .04em; }
+.note p { margin: 0; font-size: 15px; line-height: 1.3; color: var(--ink-mute); font-style: italic; }
+.note .facts { font-size: 14px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.note .risk { color: var(--lacquer); }
+.foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.step { display: flex; align-items: center; gap: 5px; }
+.step i { width: 32px; height: 32px; border-radius: 5px; background: var(--woodband) center / 100px auto; box-shadow: inset 0 0 0 1px rgba(0,0,0,.5), 0 2px 0 rgba(0,0,0,.35); color: var(--cream); font: 700 18px/32px var(--read); text-align: center; font-style: normal; }
+.step em { min-width: 16px; text-align: center; font: 700 16px/1 var(--display); font-style: normal; }
+.send { padding: 9px 16px; border-radius: 6px; background: linear-gradient(#33565F, var(--give) 55%, var(--give-deep)); color: var(--cream); box-shadow: inset 0 0 0 2px var(--brass), 0 3px 0 var(--give-deep); font: 700 12px/1 var(--display); letter-spacing: .14em; }
+.away { color: var(--cream); text-align: center; font-size: 14.5px; font-style: italic; text-shadow: 0 1px 0 rgba(0,0,0,.6); }
+.why { font-size: 14px; color: var(--ink-mute); }
+
+/* Sólo maqueta documental. Materiales de imagen heredados de v3. */
+html,body { width:100%;height:auto;min-height:100%;overflow:auto;background:#211b15; }
+body { color:#eee1c6; }
+.standalone { margin:0;overflow:hidden; }
+.screen { width:100%;max-width:390px;height:100dvh;min-height:568px;max-height:844px; }
+button { font:inherit;cursor:pointer;border:0; }
+button:focus-visible,a:focus-visible { outline:3px solid #f4d280;outline-offset:3px; }
+.hud { left:10px;right:10px;top:10px;border-radius:9px;padding:8px 9px 10px;gap:6px; }
+.plank { box-shadow:inset 0 0 0 1px #2b180c,inset 0 0 0 3px #aa8650,inset 0 0 0 4px #3e2816,0 4px 9px #1f16095e; }
+.date { background:#efe2c4 var(--parch) center / 256px; background-blend-mode:multiply; border-radius:3px;height:35px;padding:0 9px;font-size:12.5px;letter-spacing:.01em;box-shadow:inset 0 0 0 1px #f7eddbb3,0 2px 2px #20110880; }
+.date span { white-space:nowrap; }
+.date svg { flex:0 0 87px;width:87px;overflow:visible; }
+.arc-track { stroke:#967744; }
+.arc-disc { fill:#d9a938; }
+.arc-sun line { stroke:#d9a938; }
+.vitals { gap:5px; }
+.vital { height:35px;border-radius:4px;background:#23160ec9;box-shadow:inset 0 2px 4px #180c08b0,0 1px 0 #cea66b5c;font-size:17px;gap:5px; }
+.vital svg { width:18px;height:18px;flex-shrink:0; }
+.nav { height:68px;padding:7px 10px 9px;gap:7px;box-shadow:inset 0 2px #ad8a51,inset 0 4px #2a170e,0 -3px 9px #23160f4d; }
+.tab { border-radius:4px;opacity:1;color:#e7d3ae;font-size:10px;letter-spacing:.055em;gap:3px;padding:3px 0; }
+.tab.on { position:relative;background:#e7b45920;box-shadow:inset 0 0 0 1px #ba9757,inset 0 0 0 3px #2a170e80,0 2px 2px #20140f90;text-shadow:0 1px 2px #1d1309; }
+.tab.on::after { content:'';position:absolute;bottom:1px;left:calc(50% - 2px);width:4px;height:4px;background:#edc36d;transform:rotate(45deg); }
+.compass { background-size:390px 844px;background-position:-12px -686px;bottom:83px;box-shadow:0 4px 9px #20170e66; }
+.rbtn { box-shadow:inset 0 0 0 1px #25180e,inset 0 0 0 3px #b99858,inset 0 0 0 4px #352514,0 3px 5px #2516087a; }
+.ctrls { bottom:86px; }
+.tag { left:24px;top:174px;width:302px;padding:14px 16px 13px;border-radius:2px;box-shadow:0 5px 12px #22180e61,inset 0 0 0 1px #ad9263,inset 0 0 0 5px #f5ebd080,inset 0 0 0 6px #ad92634a; }
+.tag h3 { font-size:16px;letter-spacing:.015em;margin-bottom:6px; }
+.tag p { font-size:17px;line-height:1.22;color:#604b34; }
+.tag dl { display:grid;grid-template-columns:1fr auto;margin:10px 0 0;padding-top:7px;border-top:1px solid #bba175;gap:14px; }
+.tag dl div { display:flex;flex-direction:column;gap:1px; }
+.tag dt { font:600 9px/1.4 var(--display);letter-spacing:.06em;color:#715b3d; }
+.tag dd { margin:0;font-size:16px;line-height:1.25;color:#2a2118; }
+.tag::after { left:228px;background:#efe4cb;bottom:-7px;width:14px;height:14px; }
+.tag-mark { left:256px;top:342px;width:8px;height:8px;border:1px solid #fff1cb;background:#70532c;box-shadow:0 0 0 2px #c9a24a99; }
+.veil { background:#160f084d;z-index:4; }
+.board { z-index:5;left:13px;right:13px;top:117px;bottom:88px;padding:57px 13px 0;display:flex;flex-direction:column;gap:0;border-radius:7px; }
+.board-title { top:15px;padding:9px 18px;font-size:14px;letter-spacing:.13em; }
+.board-close { right:9px;top:8px;width:44px;height:44px;box-shadow:inset 0 0 0 2px #ad5c4380,0 2px 3px #2b130b80;border-color:#b79452; }
+.notes { overflow:auto;min-height:0;flex:1;padding:6px 3px 7px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:#b79a65 #38271b; }
+.note { padding:12px 12px 11px;gap:6px;flex-shrink:0;box-shadow:0 2px 3px #20130880,inset 0 0 0 1px #ab936a55; }
+.note:nth-child(odd) { transform:rotate(-.35deg); }
+.note:nth-child(even) { transform:rotate(.3deg); }
+.note h4 { font-size:13px;line-height:1.28;letter-spacing:.01em; }
+.note p { font-size:16px;line-height:1.12;color:#655137; }
+.note .facts { font-size:15px;line-height:1.15; }
+.note::before { width:8px;height:8px;left:46%;background:#372417;box-shadow:inset 1px 1px #8e6b4480,0 1px 2px #28180f99; }
+.foot { margin-top:1px; }
+.step { gap:7px; }
+.step button { width:44px;height:44px;padding:0;border-radius:4px;background:var(--woodband) center / 150px auto;box-shadow:inset 0 0 0 1px #2e1b0f,inset 0 0 0 2px #b29a7350,0 2px #291a10; color:var(--cream);font:600 23px/1 var(--read); }
+.step em { min-width:22px;font-size:17px; }
+.send { min-width:86px;min-height:44px;padding:9px 12px;border-radius:5px;font-size:12px;letter-spacing:.07em;box-shadow:inset 0 0 0 1px #e4c277,inset 0 0 0 3px #a88645,0 3px #172c31; }
+.send:disabled { background:var(--woodband) center / 150px auto;color:#e4d4b4;box-shadow:inset 0 0 0 1px #856847;cursor:default; }
+.unavailable .why { font-size:15px;color:#783d2f; }
+.away { flex-shrink:0;text-align:left;margin:2px -2px 0;padding:10px 5px 13px;border-top:1px solid #b4955c8c;display:grid;grid-template-columns:1fr auto;gap:3px 8px;font-size:15px;line-height:1.15;font-style:normal; }
+.away span:first-child { grid-column:1/-1;font:600 9px/1.3 var(--display);letter-spacing:.06em;color:#dbc79d; }
+.away strong { font-weight:500; }
+.away span:last-child { font-style:italic; }
+.modal-open .ctrls,.modal-open .compass,.modal-open .nav { pointer-events:none; }
+@media(max-width:350px){.date{font-size:10px;padding:0 6px}.date svg{flex-basis:70px;width:70px}.vital{font-size:15px;gap:3px}.vital svg{width:15px}.tag{left:14px;width:calc(100% - 28px)}.tag::after{left:72%}.tag-mark{left:75%}.note h4{font-size:12px}.note p{font-size:15px}.step{gap:4px}.send{min-width:77px}.board{padding-left:9px;padding-right:9px}.ctrls{gap:6px}}
+/* Corrección de Vera: reservar la veta para soportes, sin repetirla en cada control. */
+.rbtn { background:#eee0bf var(--parch) center / 256px;background-blend-mode:multiply;color:#3d3428;border:4px solid #68492d;box-shadow:0 0 0 1px #bda065,inset 0 0 0 1px #b29768,0 3px 6px #20180d70; }
+.tab { background:#241e17bf; }
+.tab.on { background:#b9843740; }
+.step button { background:#e5d4af;color:#3d3020;box-shadow:inset 0 0 0 1px #8b714b,inset 0 1px #fff0cf,0 2px #675037; }
+.send:disabled { background:#d6c5a6;color:#74624a;box-shadow:inset 0 0 0 1px #a99573; }
+.away { margin:4px 0 10px;padding:8px 10px;border:1px solid #a99573;border-radius:2px;background:#eee1c6 var(--parch) center / 256px;background-blend-mode:multiply;color:#3d3020;text-shadow:none; }
+.away span:first-child { color:#766043; }
+/* Página de revisión, fuera del juego. */
+#gallery { max-width:1050px;margin:auto;padding:64px 28px 40px;font-family:var(--read); }
+.intro { max-width:720px;margin-bottom:52px; }
+.eyebrow { color:#b99c66;letter-spacing:.15em;font:12px var(--display); }
+h1 { font:400 clamp(27px,4vw,43px)/1.2 var(--display);letter-spacing:-.02em;margin:24px 0; }
+.intro p,.comparison>p { font-size:20px;color:#cbbda5;line-height:1.4; }
+.scope { max-width:660px; }
+.switch { display:flex;gap:10px;flex-wrap:wrap;margin-top:24px; }
+.switch button { padding:12px 17px;background:#3a2c20;color:#e9dac1;border:1px solid #84683f;border-radius:4px;font:16px var(--read); }
+.switch button[aria-pressed=true] { background:#e6d4af;color:#302419; }
+.comparison { margin:0 0 65px;padding-top:20px;border-top:1px solid #76604566; }
+.comparison h2 { font:400 24px var(--display);margin:18px 0 9px; }
+.pair { display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start; }
+figure { margin:10px 0 0;max-width:100%; }
+figure[hidden] { display:none; }
+figcaption { color:#bda57c;font:12px var(--display);margin-bottom:12px; }
+figure img,iframe { display:block;border:1px solid #907444;border-radius:9px;max-width:100%;box-shadow:0 12px 32px #0005; }
+figure img { height:auto; }
+figure a { display:inline-block;margin-top:12px;color:#dfc48d;font-size:17px; }
+footer { color:#b7a88f;font-size:17px;line-height:1.5;max-width:760px; }
+@media(max-width:450px){#gallery{padding:28px 12px}iframe{width:calc(100vw - 24px)}h1{font-size:27px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+
+/* V7 · piezas generadas; consumo en las láminas, pendiente de integrar componentes. */
+:root {
+  --frame-parchment: url('../../../src/ui/redesign/frame-parchment.png');
+  --frame-parchment-slice: 56;
+  --frame-parchment-edge: 28px;
+  --frame-ribbon: url('../../../src/ui/redesign/frame-ribbon.png');
+  --frame-ribbon-slice: 28;
+  --frame-ribbon-edge: 14px;
+  --chip-cost: url('../../../src/ui/redesign/chip-cost.png');
+  --chip-cost-slice: 28;
+  --chip-cost-edge: 14px;
+  --plaque-wood: url('assets/plaque-wood.png');
+  --plaque-wood-slice: 36;
+  --plaque-wood-edge: 18px;
+  --plaque-wood-off: url('assets/plaque-wood-off.png');
+  --plaque-wood-off-slice: 36;
+  --plaque-wood-off-edge: 18px;
+  --btn-close: url('assets/btn-close.png');
+  --nail: url('../../../src/ui/redesign/nail.png');
+  --nail-bent: url('../../../src/ui/redesign/nail-bent.png');
+  --res-people: url('../../../src/ui/redesign/res-people.png');
+  --res-grain: url('../../../src/ui/redesign/res-grain.png');
+  --res-wood: url('../../../src/ui/redesign/res-wood.png');
+  --res-stone: url('../../../src/ui/redesign/res-stone.png');
+  --res-silver: url('../../../src/ui/redesign/res-silver.png');
+}
+
+/* Prototipo V6. El arte nuevo procede exclusivamente de PNG. */
+.screen { max-height:none;min-height:0; }
+.resource { width:20px;height:20px;object-fit:contain;flex:none;vertical-align:middle; }
+.board { top:116px;bottom:82px;padding:58px 10px 0; }
+.board-close { border:0;border-radius:0;background:var(--btn-close) center/44px 44px no-repeat;box-shadow:none;color:transparent;z-index:8; }
+.board-title { font-size:15px;letter-spacing:.08em; }
+.notes { padding:9px 2px 12px;gap:13px;scrollbar-width:thin; }
+.paint-card { position:relative;background:none;box-shadow:none;border:28px solid transparent;border-image:var(--frame-parchment) 56 fill stretch;border-radius:0;padding:0;color:var(--ink);flex-shrink:0; }
+.note.paint-card { display:block;margin:0; }
+.note::before { content:none; }
+.note:nth-child(odd),.note:nth-child(even) { transform:none; }
+.nail { position:absolute;width:16px;height:16px;left:calc(50% - 8px);top:-27px;z-index:3; }
+.nail.bent { width:24px;height:24px;top:-30px; }
+.card-heading { position:relative;min-height:55px;display:flex;align-items:center;margin:-10px -12px 4px; }
+.card-heading h3,.card-heading h4 { position:relative;width:100%;margin:0;padding:4px 86px 5px 7px;min-height:40px;border:14px solid transparent;border-image:var(--frame-ribbon) 28 fill stretch;border-image-width:14px;background:none;color:#f7eed7;font:600 13px/1.23 var(--display);letter-spacing:0; }
+.card-heading h4 { border:0;color:var(--ink);padding:0 87px 0 0;min-height:0; }
+.object-art { position:absolute;right:-7px;top:-20px;width:96px;height:80px;object-fit:contain;pointer-events:none; }
+.note .object-art { top:-11px;right:-3px; }
+.note .card-heading { min-height:67px;margin-bottom:8px; }
+.paint-card p { margin:2px -6px 10px;font:17px/1.2 var(--read);color:#594832; }
+.note p { font-style:italic; }
+.facts-row { display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 -6px 7px;font:15px/1.2 var(--read); }
+.risk { color:#783d2f; }
+.cost-chip { display:flex;align-items:center;justify-content:center;gap:9px;height:44px;min-width:100px;border:14px solid transparent;border-image:var(--chip-cost) 28 fill stretch;padding:0 1px;box-sizing:border-box;color:#392b1d;font:600 19px/1 var(--read);white-space:nowrap; }
+.cost-chip span { display:flex;align-items:center;gap:4px; }
+.foot { margin:2px -7px -7px;gap:8px; }
+.paint-action { border:18px solid transparent;border-image:var(--plaque-green) 36 fill stretch;background:none;box-shadow:none;border-radius:0;min-width:88px;min-height:46px;padding:0 3px;color:#f8edcf;font:600 12px/1 var(--display);letter-spacing:.06em; }
+.paint-action:disabled { border-image-source:var(--plaque-green-off);background:none;box-shadow:none;color:#eee5d1;cursor:default; }
+.paint-action:active:not(:disabled) { transform:translateY(1px); }
+.why { font-size:15px;line-height:1.2;color:#743d2a; }
+.step { gap:5px; }
+.step button { width:44px;height:44px;border:14px solid transparent;border-image:var(--chip-cost) 28 fill stretch;background:none;box-shadow:none;border-radius:0;color:#38291c;padding:0; }
+.step em { min-width:15px; }
+.away { font-size:14px;display:block;line-height:1.22;margin-top:3px; }
+.cart-sheet { position:absolute;inset:116px 0 68px;z-index:5;background:var(--cream) var(--parch) center/256px;color:var(--ink);display:flex;flex-direction:column;padding:0 12px; }
+.cart-header { flex:none;min-height:61px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 3px 9px; }
+.cart-header h2 { max-width:240px;font:600 13px/1.3 var(--display);margin:0; }
+.cart-header .board-close { position:static;flex:none; }
+.cart-list { min-height:0;overflow:auto;display:flex;flex-direction:column;gap:17px;padding:15px 0 15px;scrollbar-width:thin; }
+.cart-sheet,.chronicle-sheet { background-blend-mode:multiply; }
+.cart-card .card-heading { margin:-9px -23px 6px; }
+.cart-card .card-heading h3 { padding-left:4px;padding-right:85px; }
+.cart-card p { margin-top:3px; }
+.cart-card .cost-chip { width:163px;min-width:0;gap:9px; }
+.cart-card .foot { gap:7px; }
+.cart-card .paint-action { min-width:92px; }
+.modal-open .ctrls,.modal-open .compass { visibility:hidden; }
+.chronicle-sheet { position:absolute;inset:116px 0 68px;padding:10px 20px;z-index:5;overflow:auto;background:var(--cream) var(--parch) center/256px;color:var(--ink); }
+.chronicle-sheet header { display:flex;align-items:center;justify-content:space-between;gap:8px; }
+.chronicle-sheet header h2 { margin:5px 0;font:500 22px var(--display); }
+.chronicle-sheet header .board-close { position:static;flex:none; }
+.chronicle-line { padding:15px 0 20px;border-bottom:1px solid #b49d70; }
+.chronicle-line img { display:block;width:100%;max-width:320px;height:auto;margin:0 auto 10px; }
+.chronicle-line p { margin:8px 2px 0;font:20px/1.35 var(--read); }
+.chronicle-line:first-of-type p::first-letter { font:400 36px/1 var(--display);color:#874432; }
+.standalone #prototype { width:100%;height:100dvh; }
+.review-shell { background:#ece6d8;color:#372e24;padding:44px 32px;max-width:1160px;margin:auto;font:18px/1.4 var(--read); }
+.review-shell h1 { font-size:31px; }
+.review-shell h2 { font:400 22px var(--display);margin-top:32px; }
+.review-shell a { color:#264e54; }
+.review-shell .pair { gap:22px; }
+.review-shell figcaption { color:#5e4b32; }
+.review-shell iframe { background:#d9c9aa;border:1px solid #907b58;box-shadow:none; }
+.review-shell .lead { max-width:750px; }
+.review-nav { display:flex;gap:18px;flex-wrap:wrap;margin:20px 0 30px; }
+.piece-grid { display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start; }
+.piece { padding:12px;background:#ddd3bf;border:1px solid #c2b59c;box-sizing:content-box; }
+.piece figcaption { font:12px/1.4 monospace;margin:0 0 9px; }
+.piece img { display:block;max-width:none;box-shadow:none;border:0;border-radius:0; }
+.piece .piece-stage { background:#ebe5d9;display:flex;align-items:center;justify-content:center;min-width:110px;min-height:50px; }
+.chronicle-grid { display:grid;grid-template-columns:repeat(3,320px);gap:24px 18px; }
+.chronicle-grid figure { width:320px; }
+.chronicle-grid img { width:320px;height:256px;border:0;border-radius:0;box-shadow:none; }
+.chronicle-grid p { font-size:18px;margin:8px 0; }
+.slice-tests { display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap; }
+.slice-tests .paint-card { display:flex;align-items:center;justify-content:center; }
+.original-compare { display:flex;gap:12px;flex-wrap:wrap; }
+.original-compare img { width:320px;height:256px; }
+@media(max-width:350px){.cart-sheet{padding:0 7px}.board{left:7px;right:7px;padding-left:7px;padding-right:7px}.board-title{font-size:13px;padding-left:10px;padding-right:10px}.card-heading h3,.card-heading h4{font-size:11.5px}.cart-card .card-heading h3{padding-right:77px}.paint-card p{font-size:16px}.cart-card .cost-chip{width:130px;gap:5px;font-size:17px}.cart-card .paint-action{min-width:79px}.cart-card .foot{margin-left:-12px;margin-right:-12px}.facts-row{gap:5px;font-size:14px}.cost-chip{min-width:88px}.paint-action{min-width:78px}.chronicle-sheet{padding:10px 14px}.chronicle-line p{font-size:18px}.vital{gap:3px;font-size:14px}.resource{width:20px;height:20px}.card-heading{min-height:63px}}
+@media(max-width:800px){.review-shell{padding:25px 14px}.chronicle-grid{grid-template-columns:repeat(auto-fit,minmax(280px,320px))}}
+
+/* Solo composición documental V7. Las nuevas piezas se guardan con las láminas. */
+.date svg { display:block;width:90px;height:29px;flex:0 0 90px;overflow:visible; }
+.arc-track { opacity:.75;stroke-linecap:round; }
+.arc-bead { opacity:.35; }
+.board-close { width:44px;height:44px;background-size:32px 32px; }
+.cart-card .card-heading { min-height:44px;margin-bottom:8px; }
+.cart-card .card-heading h3 { padding-right:53px;min-height:40px; }
+.cart-card .object-art { width:64px;height:54px;right:-4px;top:-16px; }
+.note .card-heading { min-height:46px;margin-bottom:8px; }
+.note .card-heading h4 { padding-right:61px; }
+.note .object-art { width:56px;height:48px;right:-3px;top:-5px; }
+.nail,.nail.bent { width:20px;height:20px;left:calc(50% - 10px);top:-38px; }
+.notes { padding-top:13px;gap:16px; }
+.cost-chip { height:34px;border-width:8px;border-image-width:14px;font-size:17px; }
+.paint-action { height:40px;min-height:40px;border:10px solid transparent;border-image:var(--plaque-wood) 36 fill stretch;border-image-width:18px;color:#f9eac8; }
+.paint-action:disabled { border-image-source:var(--plaque-wood-off);color:#af9b7b; }
+.step button { width:40px;height:40px;border-width:8px;border-image-width:14px;font-size:22px; }
+.facts-row { flex-wrap:nowrap;white-space:nowrap;gap:5px;font-size:14px;margin-bottom:10px; }
+.facts-row .cost-chip { flex:0 0 auto;min-width:0;padding:0 2px;font-size:15px;gap:3px; }
+.facts-row .cost-chip .resource { width:20px;height:20px; }
+.facts-row .risk { color:#743d2a; }
+.chronicle-sheet { padding:10px 16px; }
+.chronicle-sheet header h2 { font-size:18px; }
+.chronicle-line { padding:13px 0 18px; }
+.entry-date { font:600 10px/1.3 var(--display);letter-spacing:.075em;color:#78613c;margin:0 0 8px; }
+.chronicle-line img { width:100%;max-width:none;height:130px;object-fit:cover;object-position:center;margin:0 0 10px; }
+.chronicle-line p { margin:0 2px;font:19px/1.32 var(--read); }
+.chronicle-line:first-of-type p::first-letter { font:inherit;color:inherit; }
+.chronicle-grid img { height:130px;object-fit:cover;object-position:center; }
+.open-cart { position:absolute;bottom:146px;left:50%;transform:translateX(-50%);z-index:5; }
+.open-cart .paint-action { width:200px;white-space:nowrap; }
+.action-samples { display:flex;gap:16px;align-items:center;flex-wrap:wrap; }
+.action-samples .paint-action { min-width:100px; }
+.action-samples .paint-action:nth-child(3) { width:200px; }
+.modal-open .nav { pointer-events:auto; }
+/* Tira de lectura: viewport móvil, contenido desplegado para fotografiarlo entero. */
+body.reading-strip { overflow:auto;height:auto; }
+.reading-strip #prototype,.reading-strip .screen { height:auto;min-height:844px;overflow:visible; }
+.reading-strip .screen { padding-top:116px;padding-bottom:68px; }
+.reading-strip .chronicle-sheet { position:relative;inset:auto;overflow:visible; }
+.reading-strip .nav { position:absolute;bottom:0; }
+@media(max-width:350px){
+ .date svg{width:90px;flex-basis:90px}
+ .cart-card .card-heading{min-height:44px}
+ .cart-card .card-heading h3{padding-right:53px}
+ .note .card-heading{min-height:46px}
+ .facts-row{gap:4px;font-size:12.5px}
+ .facts-row .cost-chip{font-size:14px}
+ .chronicle-sheet{padding:10px 14px}
+ .chronicle-line img{height:120px}
+ .chronicle-line p{font-size:18px}
+}
+</style></head><body><main class="review-shell"><p>THE VALLEY · V7</p><h1>Piezas a tamaño de uso</h1><p>Zoom del navegador al 100 %. Las tres piezas nuevas están a 2× de su diseño nominal; las demás conservan su resolución V6. Aquí se muestran a su medida CSS de uso. El fondo gris permite ver el recorte.</p><a href="index.html">Volver a las láminas</a><h2>Marcos y controles</h2><div class="piece-grid"><figure class="piece"><figcaption>frame-parchment<br>320 × 200 CSS · PNG 640 × 400</figcaption><div class="piece-stage"><img src="../../../src/ui/redesign/frame-parchment.png" width="320" height="200" alt="frame-parchment"></div></figure><figure class="piece"><figcaption>frame-ribbon<br>300 × 40 CSS · PNG 600 × 80</figcaption><div class="piece-stage"><img src="../../../src/ui/redesign/frame-ribbon.png" width="300" height="40" alt="frame-ribbon"></div></figure><figure class="piece"><figcaption>chip-cost<br>180 × 34 CSS · PNG 360 × 88</figcaption><div class="piece-stage"><img src="../../../src/ui/redesign/chip-cost.png" width="180" height="34" alt="chip-cost"></div></figure><figure class="piece"><figcaption>plaque-wood<br>200 × 46 CSS · PNG 400 × 92</figcaption><div class="piece-stage"><img src="assets/plaque-wood.png" width="200" height="46" alt="plaque-wood"></div></figure><figure class="piece"><figcaption>plaque-wood-off<br>200 × 46 CSS · PNG 400 × 92</figcaption><div class="piece-stage"><img src="assets/plaque-wood-off.png" width="200" height="46" alt="plaque-wood-off"></div></figure><figure class="piece"><figcaption>btn-close<br>32 × 32 CSS · PNG 64 × 64</figcaption><div class="piece-stage"><img src="assets/btn-close.png" width="32" height="32" alt="btn-close"></div></figure><figure class="piece"><figcaption>nail<br>20 × 20 CSS · PNG 32 × 32</figcaption><div class="piece-stage"><img src="../../../src/ui/redesign/nail.png" width="20" height="20" alt="nail"></div></figure><figure class="piece"><figcaption>nail-bent<br>20 × 20 CSS · PNG 48 × 48</figcaption><div class="piece-stage"><img src="../../../src/ui/redesign/nail-bent.png" width="20" height="20" alt="nail-bent"></div></figure></div><h2>Recursos · 20 × 20</h2><div class="piece-grid"><figure class="piece"><figcaption>res-people<br>20 × 20 CSS · PNG 40 × 40</figcaption><div class="piece-stage"><img src="../../../src/ui/redesign/res-people.png" width="20" height="20" alt="res-people"></div></figure><figure class="piece"><figcaption>res-grain<br>20 × 20 CSS · PNG 40 × 40</figcaption><div class="piece-stage"><img src="../../../src/ui/redesign/res-grain.png" width="20" height="20" alt="res-grain"></div></figure><figure class="piece"><figcaption>res-wood<br>20 × 20 CSS · PNG 40 × 40</figcaption><div class="piece-stage"><img src="../../../src/ui/redesign/res-wood.png" width="20" height="20" alt="res-wood"></div></figure><figure class="piece"><figcaption>res-stone<br>20 × 20 CSS · PNG 40 × 40</figcaption><div class="piece-stage"><img src="../../../src/ui/redesign/res-stone.png" width="20" height="20" alt="res-stone"></div></figure><figure class="piece"><figcaption>res-silver<br>20 × 20 CSS · PNG 40 × 40</figcaption><div class="piece-stage"><img src="../../../src/ui/redesign/res-silver.png" width="20" height="20" alt="res-silver"></div></figure></div><h2>Carro 64 × 54 · misiones 56 × 48</h2><div class="piece-grid"><figure class="piece"><figcaption>means-plough<br>64 × 54 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/means-plough.png" width="64" height="54" alt="means-plough"></div></figure><figure class="piece"><figcaption>means-pigs<br>64 × 54 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/means-pigs.png" width="64" height="54" alt="means-pigs"></div></figure><figure class="piece"><figcaption>means-ale<br>64 × 54 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/means-ale.png" width="64" height="54" alt="means-ale"></div></figure><figure class="piece"><figcaption>means-axe<br>64 × 54 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/means-axe.png" width="64" height="54" alt="means-axe"></div></figure><figure class="piece"><figcaption>means-relic<br>64 × 54 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/means-relic.png" width="64" height="54" alt="means-relic"></div></figure><figure class="piece"><figcaption>means-hand<br>64 × 54 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/means-hand.png" width="64" height="54" alt="means-hand"></div></figure><figure class="piece"><figcaption>means-arms<br>64 × 54 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/means-arms.png" width="64" height="54" alt="means-arms"></div></figure><figure class="piece"><figcaption>means-bows<br>64 × 54 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/means-bows.png" width="64" height="54" alt="means-bows"></div></figure><figure class="piece"><figcaption>means-tower<br>64 × 54 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/means-tower.png" width="64" height="54" alt="means-tower"></div></figure><figure class="piece"><figcaption>means-gate<br>64 × 54 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/means-gate.png" width="64" height="54" alt="means-gate"></div></figure><figure class="piece"><figcaption>mission-mushrooms<br>56 × 48 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/mission-mushrooms.png" width="56" height="48" alt="mission-mushrooms"></div></figure><figure class="piece"><figcaption>mission-herbs<br>56 × 48 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/mission-herbs.png" width="56" height="48" alt="mission-herbs"></div></figure><figure class="piece"><figcaption>mission-wolf-den<br>56 × 48 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/mission-wolf-den.png" width="56" height="48" alt="mission-wolf-den"></div></figure><figure class="piece"><figcaption>mission-high-seam<br>56 × 48 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/mission-high-seam.png" width="56" height="48" alt="mission-high-seam"></div></figure><figure class="piece"><figcaption>mission-market<br>56 × 48 CSS · PNG 192 × 160</figcaption><div class="piece-stage"><img src="../../../public/ui/art/cards/mission-market.png" width="56" height="48" alt="mission-market"></div></figure></div><h2>Acciones · texto vivo, placa de 40 px</h2><div class="action-samples"><button class="paint-action">Give</button><button class="paint-action">Send</button><button class="paint-action">Open the cart</button><button class="paint-action" disabled>Give</button></div><h2>Nueve partes · esquinas fijas</h2><div class="slice-tests"><div class="paint-card" style="width:280px;height:150px">280 × 150</div><div class="paint-card" style="width:440px;height:210px">440 × 210</div></div><h2>Crónica · recorte centrado a 320 × 130 CSS</h2><div class="chronicle-grid"><figure><figcaption>birth · birth.named.daughter</figcaption><img src="../../../docs/ui-redesign/laminas-v6-2026-09-28/colour/birth.png" alt=""><p>Edith had a daughter in the spring of year 50.</p></figure><figure><figcaption>built · built.house</figcaption><img src="../../../docs/ui-redesign/laminas-v6-2026-09-28/colour/built.png" alt=""><p>They raised a house in the spring of year 50.</p></figure><figure><figcaption>pedlar · fate.pedlar</figcaption><img src="../../../docs/ui-redesign/laminas-v6-2026-09-28/colour/pedlar.png" alt=""><p>A pedlar came up the road in spring wanting timber: 20 wood for 8 silver.</p></figure><figure><figcaption>wedding · fate.wedding</figcaption><img src="../../../docs/ui-redesign/laminas-v6-2026-09-28/colour/wedding.png" alt=""><p>There was a wedding in the spring of year 50. The whole valley came.</p></figure><figure><figcaption>fire · fate.lightning_fire</figcaption><img src="../../../docs/ui-redesign/laminas-v6-2026-09-28/colour/fire.png" alt=""><p>Lightning struck the house in the summer of year 50. It burned to the ground.</p></figure><figure><figcaption>harvest · harvest.good</figcaption><img src="../../../docs/ui-redesign/laminas-v6-2026-09-28/colour/harvest.png" alt=""><p>A good autumn. 120 bushels for 35 mouths.</p></figure><figure><figcaption>death · death.old_age.named</figcaption><img src="../../../docs/ui-redesign/laminas-v6-2026-09-28/colour/death.png" alt=""><p>Thomas died in the autumn of year 50, 72 winters old.</p></figure></div></main></body></html>

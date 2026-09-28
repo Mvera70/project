@@ -1,0 +1,44 @@
+[
+  {
+    "id": "btn-close",
+    "size": [
+      64,
+      64
+    ],
+    "alphaCrop": [
+      186,
+      179,
+      1066,
+      1058
+    ],
+    "sha256": "916892af7e02d8d541370dbd36a8b1ee4ba6a9da74ebd03a25295111d8f38fd6"
+  },
+  {
+    "id": "plaque-wood",
+    "size": [
+      400,
+      92
+    ],
+    "alphaCrop": [
+      40,
+      180,
+      1958,
+      576
+    ],
+    "sha256": "d82e4a3de05fc0c90804fa2ddc686a4527d0a600fdadc795f74061eec5f556ce"
+  },
+  {
+    "id": "plaque-wood-off",
+    "size": [
+      400,
+      92
+    ],
+    "alphaCrop": [
+      40,
+      178,
+      1958,
+      577
+    ],
+    "sha256": "93dc789bbcc7af861df2754df249330e25b1c8ddf61066935b09a846a5c2a491"
+  }
+]

@@ -1,0 +1,20 @@
+/* V8 documental. Cuero y latón proceden de PNG, símbolos del sprite existente. */
+:root { --nav-leather:url('assets/nav-leather.png');--nav-iron:url('assets/nav-iron.png');--nav-medal:url('assets/nav-medal.png');--nav-medal-on:url('assets/nav-medal-on.png'); }
+.nav.plank { height:72px;left:0;right:0;bottom:0;padding:0;gap:0;display:grid;grid-template-columns:repeat(3,1fr);background:none;box-shadow:none;border:0;border-radius:0;isolation:isolate;overflow:visible;z-index:20; }
+.nav.plank::before { content:'';position:absolute;inset:0;z-index:-1;border:16px solid transparent;border-image:var(--nav-leather) 32 fill stretch;pointer-events:none; }
+.iron .nav.plank::before { border-image-source:var(--nav-iron); }
+.nav .tab,.nav .tab.on { position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;width:100%;height:72px;min-height:44px;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;opacity:1;color:#f4e6c5;cursor:pointer;text-shadow:none; }
+.nav .tab::before,.nav .tab::after { content:none; }
+.nav-medal { display:flex;align-items:center;justify-content:center;width:56px;height:56px;flex:0 0 56px;margin-top:-6px;background:var(--nav-medal) center/contain no-repeat; }
+.nav .tab.on .nav-medal { background-image:var(--nav-medal-on);transform:translateY(-4px); }
+.nav .tab .skin-icon { display:block;width:25px;height:25px;color:#f4e6c5;flex:none;margin:0; }
+.nav-label { display:block;font:500 10px/12px var(--display);letter-spacing:.04em;color:#f4e6c5;white-space:nowrap; }
+.nav .tab:focus-visible { outline:2px solid #f4e6c5;outline-offset:-3px; }
+.cart-sheet,.chronicle-sheet { bottom:72px; }
+.board { bottom:86px; }
+.reading-strip .screen { padding-bottom:72px; }
+.review-shell .material-row { display:flex;gap:22px;flex-wrap:wrap; }
+.review-shell .material-row figure { margin:0; }
+.review-shell .material-row iframe { display:block;border:0; }
+.nav-piece-stage { background:#ded3bc;padding:18px 0; }
+.nav-piece-stage img { display:block;max-width:none; }

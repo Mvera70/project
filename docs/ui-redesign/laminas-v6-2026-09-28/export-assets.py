@@ -13,7 +13,7 @@ prior_ids = {a['id'] for a in json.loads(prior_path.read_text())} if prior_path.
 report = []
 for asset in manifest:
     source = Path(asset['source'])
-    target_dir = ROOT / ({'ui':'src/ui/redesign', 'art':'public/ui/art/cards', 'chronicle':'public/ui/art'}[asset['group']])
+    target_dir = ROOT / ({'ui':'src/ui/redesign', 'art':'public/ui/art/cards', 'chronicle':'docs/ui-redesign/laminas-v6-2026-09-28/colour'}[asset['group']])
     target = target_dir / (asset['id'] + '.png')
     backup = HERE / 'originals' / target.relative_to(ROOT)
     if target.exists() and not backup.exists() and asset['id'] not in prior_ids:

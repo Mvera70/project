@@ -1,5 +1,12 @@
 # Piel V6 · piezas generadas y revisión visual
 
+> Actualización V7: las siete crónicas a color se conservan en
+> `laminas-v6-2026-09-28/colour/`; los sepia originales están restaurados en
+> `public/ui/art/`. Los HTML y el exportador V6 ya usan la ubicación documental.
+> Las medidas y el verde de esta ronda quedan como referencia histórica:
+> [V7](propuesta-piel-v7-2026-09-28.md) ajusta la escala y usa acciones de madera.
+
+
 28 septiembre 2026. **Propuesta para revisión de Vera; no aprobada ni publicada.**
 
 Base del encargo: `origin/main`, commit `2d9eb5a`, documentos

@@ -238,3 +238,20 @@ busque: `tools/diag-ia4-temp.ts` (desde `src/render3d/life/beasts.ts`),
 de Blender de `historico/graphics-rounds/`): el script de prueba de la sesión de
 Blender del 15 sep, con rutas fijas a otra carpeta, que aquellos encargos
 pedían no subir nunca y acabó versionado; se retiró el 27 sep.
+
+## Maquetas de piel V7 · documentación
+
+| Herramienta | Uso desde la raíz |
+|---|---|
+| `docs/ui-redesign/laminas-v7-2026-09-28/build.mjs` | `node <ruta>`: compone carro, tablón, crónica y muestrario con PNG existentes; sin juego |
+| `docs/ui-redesign/laminas-v7-2026-09-28/capture.mjs` | `node <ruta>`: ocho capturas móviles, siete entradas continuas y hoja de piezas; Edge sin ventana |
+| `docs/ui-redesign/laminas-v7-2026-09-28/export-assets.py` | Python con Pillow: normaliza las tres generaciones V7; necesita los maestros locales del manifiesto |
+| `docs/ui-redesign/laminas-v7-2026-09-28/prepare-v6.mjs` | `node <ruta>`: conserva siete colores V6 en docs y restaura sepia desde copias; verifica hashes |
+
+## Maquetas de navegación V8 · documentación
+
+| Herramienta | Uso desde la raíz |
+|---|---|
+| `docs/ui-redesign/laminas-v8-2026-09-28/build.mjs` | `node <ruta>`: monta la barra sobre V7 y crea comparación y muestrario |
+| `docs/ui-redesign/laminas-v8-2026-09-28/capture.mjs` | `node <ruta>`: doce capturas, comparación de materiales y medidas de navegación; Edge sin ventana |
+| `docs/ui-redesign/laminas-v8-2026-09-28/export-assets.py` | Python con Pillow: exporta los cuatro PNG con alfa a 2× desde los maestros del manifiesto |
