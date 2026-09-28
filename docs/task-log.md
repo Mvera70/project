@@ -31,6 +31,18 @@ nueva en la semilla 23: el fuego apagado (arreglado, `sittingOpen`) y el
 salinero que no sale de una plaza cerrada por un granero (`it.fails` en
 `life-trade.test.ts`).
 
+**Deuda que Vera aceptó para poder mirarlo (28 sep 2026): las jornadas no están
+verdes.** Con dos procesos no terminaron en 28 minutos, y de las que corrieron
+fallan 20 —una ya declarada (los avisos, 17,4 al año)—. Casi todas miden una
+aldea concreta de una semilla concreta, y la madera una semana más tarde les
+cambia la historia: ids de edificios (`buildingId 58` por `20`), «semilla 36 hay
+guarnición», «cayeron los doce» (10), «semilla 11 no hay cabaña», la villa de
+E3b, los arcos de D2/D3b (3 de 4). **Una puede ser un defecto de verdad y va
+primero**: «las obras dentro del tick · nada se pisa ni cae al agua», semilla 0,
+`wall#284 en 31,42`. Cada una se revisa y, si es sólo la semilla, se escribe la
+causa junto al listón (`docs/historico/rework.md` §2.7). Registro de la tanda:
+fuera del repo, en el scratchpad de la sesión.
+
 ## 28 sep 2026 · La huella de la presa (v4.83), y la CI rota: pendiente
 
 La señal de caza es la huella de cada especie (`HUNT_TRACKS` en `app.ts`) y se
