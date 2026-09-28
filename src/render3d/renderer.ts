@@ -38,6 +38,7 @@ import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './wo
 import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
 import { updateMountainVeil } from './effects/mountain-veil';
+import { createGrass } from './world/grass';
 import { cloudsFor, stepClouds } from './effects/clouds';
 import { createAmbience, type Ambience } from './effects/ambience';
 import { createPuddles, wetnessAt, type Puddles } from './effects/puddles';
@@ -502,6 +503,12 @@ export async function createGraphicsRenderer(
   // cuelgan de ello: un almiar toca un campo y la leña toca una casa.
   const steading = new Steading();
   world.add(steading.group);
+  // La hierba (28 sep 2026): dos mallas instanciadas para todo el valle, con
+  // menos matas en táctil. Se replanta cuando cambia la semana y se recolorea
+  // con la estación (`world/grass.ts`).
+  const grass = createGrass(handheld);
+  world.add(grass.group);
+  let grassTick = -1;
   // **V-15b · la malla la decide `modelFor`, y si no existe se cae al aldeano
   // base.** La regla entera —manda la edad, luego el oficio, luego lo que se
   // está haciendo— vive en `world/models.ts`; aquí sólo queda pedirla y el
@@ -960,6 +967,7 @@ export async function createGraphicsRenderer(
     appearancePalette = blendedPalette;
     appearanceSnow = snowFrom + (snowTarget - snowFrom) * eased;
     forest?.season(blendedPalette);
+    grass.season(blendedPalette, appearanceSnow);
     backdrop?.season(blendedPalette, appearanceSnow);
     greatOak?.season(blendedPalette);
     village.season(appearanceSnow, blendedPalette.accent);
@@ -1737,6 +1745,14 @@ export async function createGraphicsRenderer(
       for (const id of change.works.removed) works.remove(id);
       for (const work of [...change.works.added, ...change.works.changed]) works.add(work);
       plan = next;
+      // La hierba se replanta como mucho una vez por semana: su firma dice si
+      // cambió algo de lo que la mueve (caminos, edificios, campos segados).
+      if (shown.tick !== grassTick || change.cleared) {
+        grassTick = shown.tick;
+        grass.plant(shown, groundFloor, plazaOf(shown));
+        grass.season(appearancePalette ?? paletteFor(live.season, live.seasonWeek),
+          snowCover(live.season, live.seasonWeek));
+      }
       // El encuadre sigue a lo construido, asi que se rehace cuando el pueblo
       // cambia de forma y no en cada fotograma.
       if (!isQuiet(change) && !disturbed) frameCamera();
@@ -2578,6 +2594,7 @@ export async function createGraphicsRenderer(
       village.dispose();
       works.dispose();
       steading.dispose();
+      grass.dispose();
       if (ground !== null) {
         world.remove(ground.mesh);
         ground.dispose();

@@ -92,6 +92,14 @@ export function stepWind(seconds: number): void {
   uniforms.uWindStrength.value = current + (target - current) * Math.min(1, seconds * 0.5);
 }
 
+/**
+ * Los dos uniformes del viento, para los materiales que se mecen a su manera
+ * (la hierba, `world/grass.ts`): así soplan con el mismo viento que el bosque.
+ */
+export function windShaderUniforms(): { readonly uWindTime: { value: number }; readonly uWindStrength: { value: number } } {
+  return uniforms;
+}
+
 /** Para las pruebas y la traza: cuánto sopla ahora. */
 export function windStrength(): number {
   return uniforms.uWindStrength.value;

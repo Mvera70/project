@@ -139,6 +139,16 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
 15. **El humo va instanciado** (`Smoke` en `tells.ts`), con la opacidad de cada
     bocanada en un atributo por instancia (`onBeforeCompile`). Las bocanadas siguen
     en el grupo como marcadores sin malla, porque la lógica y las pruebas las leen ahí.
+16. **La hierba (28 sep 2026, `world/grass.ts`): dos llamadas para todo el valle**
+    —una malla instanciada de matas y otra de rastrojo—, sin sombras, Lambert y el
+    viento en el vértice. Aldea de referencia: 467 → 463 llamadas, 536 → 643 mil
+    triángulos, y con dibujo por software 179 → 119 fotogramas en 30 s. **Ese
+    tercio menos es de vértices, no de píxeles**: con las mismas matas diminutas
+    (casi sin píxeles) salen 118. SwiftShader procesa los vértices en la CPU; una
+    GPU de móvil no. **Lección: antes de recortar algo por los fotogramas de
+    SwiftShader, separar vértices de píxeles con la prueba de las piezas
+    diminutas**, porque recortar vértices por una medida de software puede costar
+    lo que se ve sin ganar nada en el aparato. En táctil, menos matas igualmente.
 
 ## Lo que queda (por lo que pesa)
 

@@ -1,5 +1,14 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · La hierba del valle (v4.86)
+
+`world/grass.ts` (+ `renderer.ts`: `createGrass`, replantar una vez por semana
+con firma, recolorear en `stepAppearance`; `effects/wind.ts`:
+`windShaderUniforms`). Prueba: `tests/fast/grass.test.ts`. Capturas en 430 × 932,
+semilla 11, año 5. **Abierto:** que Vera lo mire en la tablet (fotogramas de
+verdad); el rastrojo no se ha visto aún en captura (sale en otoño e invierno, en
+los campos segados); la hierba no se aplasta al pisarla (`encargos-3d.md`).
+
 ## 28 sep 2026 · El velo de la montaña (v4.85)
 
 `effects/mountain-veil.ts` (+ `backdrop.ts` que lo pone en la sierra, la piel y

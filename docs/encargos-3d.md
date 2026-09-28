@@ -107,6 +107,13 @@ hoy y qué haría falta. Un encargo que sólo vive en un comentario del código 
 un encargo que nadie hará — y una mecánica que no se ve no existe para quien
 juega.
 
+## La hierba (28 sep 2026)
+
+| Qué | Qué se ve hoy | Qué haría falta |
+|---|---|---|
+| **La hierba que se pisa** | La gente y los animales la atraviesan; sólo la senda con mucho paso la gasta (del motor, `map.path`) | Que se aparte al paso, como en Zelda: la posición de los cuerpos cercanos en un uniforme y la brizna doblándose en el vértice |
+| **El prado bajo la hierba** | El suelo es el mismo verde dentro y fuera de las manchas | Un verde algo más hondo bajo las manchas de prado, para que de lejos se lean aun sin briznas |
+
 ## La madera a la vista (28 sep 2026, esquema 12)
 
 La madera entra en la leñera de una en una, a su hora, con un porteador que la

@@ -1,5 +1,23 @@
 # The Valley — Registro de cambios
 
+## v4.86 · 28 sep 2026 · La hierba del valle
+
+Vera: «implementar un césped, hierba, rastrojos… algo parecido a la hierba de
+Zelda Breath of the Wild. No se puede implementar nada que mate el rendimiento»;
+y, al ver la primera versión, con una captura de Zelda: «en Zelda es como un
+felpudo, cubre todo el suelo… que se noten zonas de prado, si no se puede
+aplicar a todo por el coste». `world/grass.ts`: matas de ocho briznas (un
+triángulo cada una) que oscurecen hacia la raíz y amarillean en la punta, verdes
+distintos por mata y el viento del bosque pasando en ondas por el prado.
+**Manchas de prado** densas (ruido suave del terreno, cerca de un tercio del
+prado) y matas sueltas fuera; nada en caminos, agua, roca, plaza, casas ni
+obras, y poca en la senda pisada. **Rastrojo** bajo y color paja en los campos
+segados. La nieve la esconde. Dos llamadas de dibujo en total. Medido en la
+aldea de referencia: +107 mil triángulos, llamadas iguales; el coste que marca
+el dibujo por software es de vértices y no de píxeles (lección 16 de la skill
+`performance`). Primera versión: briznas negras, porque `DoubleSide` le da la
+vuelta a la normal en la cara de atrás; arreglado en el sombreador.
+
 ## v4.85 · 28 sep 2026 · El velo de la montaña
 
 Vera: a ras de suelo y con la cámara lejos, «casi siempre nos chocamos con las
