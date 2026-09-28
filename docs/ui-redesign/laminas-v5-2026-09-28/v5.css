@@ -1,0 +1,35 @@
+/* v5 · piezas reales del mockup de Gemini (24 sep): marco de pergamino
+   rasgado, ficha de coste, placa verde, aro de cerrar e ilustraciones. Todo
+   imagen; CSS sólo coloca. */
+:root { --frame: url('@@frame@@'); --chip: url('@@chip@@'); --plaque: url('@@plaque@@'); --close: url('@@close@@'); }
+/* la hoja del carro: pergamino de imagen, bajo la cabecera, hasta la barra */
+.sheet { position: absolute; left: 0; right: 0; top: 118px; bottom: 66px; z-index: 5; padding: 14px 14px 0;
+  background: #ece0c4 var(--parch) center / 256px; background-blend-mode: multiply; overflow: hidden;
+  box-shadow: inset 0 6px 10px rgba(60,40,20,.25); }
+.sheet-head { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin: 0 0 12px; color: #3d3020; font: 700 12px/1 var(--display); letter-spacing: .12em; }
+.close-ring { width: 44px; height: 44px; background: var(--close) center / contain no-repeat; }
+.cards { display: grid; gap: 14px; }
+/* la tarjeta: los bordes rasgados son la imagen; el centro, pergamino */
+.card { position: relative; padding: 0 14px 12px; color: var(--ink);
+  background: #f1e6cf var(--parch) center / 256px; background-blend-mode: multiply;
+  box-shadow: 0 3px 5px rgba(40,25,10,.35), inset 0 0 0 1px #ad9263, inset 0 0 0 5px #f5ebd080, inset 0 0 0 6px #ad92634a; }
+.card-ribbon { margin: 0 -14px 10px; padding: 8px 14px 8px 14px; background: linear-gradient(#3b4f5a, #2a3b44); color: #efe4cc;
+  font: 700 14.5px/1.15 var(--display); letter-spacing: .04em; box-shadow: 0 2px 0 rgba(0,0,0,.25); width: calc(100% + 28px); }
+.card-ill { position: absolute; right: 4px; top: -14px; width: 92px; height: auto; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+.card p { margin: 0 0 10px; padding-right: 64px; font-size: 16px; line-height: 1.28; color: #3d3020; }
+.card-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.chip { display: inline-flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #2c2216;
+  border: 14px solid transparent; border-image: var(--chip) 14 16 14 16 stretch; background: #e5d9bf; background-clip: padding-box;
+  font: 700 17px/1 var(--display); font-variant-numeric: tabular-nums; }
+.chip span { display: inline-flex; align-items: center; gap: 4px; }
+.chip svg { width: 18px; height: 18px; color: #4a3a2a; }
+.plaque { height: 46px; min-width: 120px; display: grid; place-items: center; color: var(--cream); border-radius: 5px;
+  background: linear-gradient(#33565F, var(--give) 55%, var(--give-deep)); box-shadow: inset 0 0 0 1px #e4c277, inset 0 0 0 3px #a88645, 0 3px #172c31;
+  font: 700 12.5px/1 var(--display); letter-spacing: .12em; }
+/* el tablón v5: avisos con el mismo marco rasgado; el clavo sigue siendo el
+   punto de la v4 hasta que llegue el de imagen (encargo) */
+.note.v5 { border: 22px solid transparent; border-image: var(--frame) 44 46 42 46 round; background: #f1e6cf var(--parch) center / 256px; background-blend-mode: multiply; background-clip: padding-box; box-shadow: none; filter: drop-shadow(0 3px 4px rgba(40,25,10,.4)); padding: 0 0 8px; }
+.note.v5::before { top: -26px; }
+.note.v5 .send { border: 18px solid transparent; border-image: var(--plaque) 18 22 18 22 stretch; background: linear-gradient(#3f8a4c, #2b6a3a 55%, #235a30); background-clip: padding-box; color: #f4ecd3; min-height: 46px; box-shadow: none; text-shadow: 0 1px 0 rgba(0,0,0,.5); }
+.note.v5 .facts .chip { height: 34px; border-width: 12px; font-size: 14px; gap: 8px; padding: 0 8px; }
+.board.v5 .board-close { background: var(--close) center / contain no-repeat; border: 0; box-shadow: none; color: transparent; }

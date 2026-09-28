@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · Piel v5: el toque de calidad — **encargo, a la espera de las piezas**
+
+La v4 de Codex vale («ha mejorado mucho»). Para la v5 Vera pide pergamino con
+bordes reales, clavos reales, ilustraciones a color, fichas de coste con
+iconos a color y el aro de cerrar del mockup de Gemini. Regla suya del mismo
+día: los diseños complicados se piden, no se imitan. Todo va en
+`docs/encargos/piezas-de-la-piel-v5.md` para el generador de Codex;
+`docs/ui-redesign/propuesta-piel-v5-2026-09-28.md` y su lámina del carro
+enseñan la intención con recortes reales. **Sin código de UI hasta tener las
+piezas.** Sigue abierto de antes: tocar el tablón no abre su ventana.
+
 ## 28 sep 2026 · Piel v3: sólo madera, y las piezas del juego — **propuesta, a revisar**
 
 Vera rechazó la propuesta v2 de Codex (su rama `art/astra-modelos`): parece
