@@ -59,7 +59,9 @@ El hierro ofrece un contraste más frío y una presencia más severa.
 
 Generados mediante **ImageGen integrado**; exportación mecánica con Pillow
 para recortar margen alfa y ajustar tamaño, sin dibujar materiales por código.
-Los PNG definitivos están en `laminas-v8-2026-09-28/assets/`.
+Los maestros también se incluyen en la carpeta `masters/`: Claude Code puede
+repetir el proceso sin depender de una ruta local privada de Codex. Los PNG
+definitivos están en `laminas-v8-2026-09-28/assets/`.
 
 | Fichero | PNG a 2× | Medida CSS | Tratamiento |
 |---|---:|---:|---|
@@ -74,6 +76,8 @@ esquinas a 320 y 390 px. Los prompts y las rutas de los maestros se guardan
 en [manifest.generated.json](laminas-v8-2026-09-28/manifest.generated.json);
 [verification-assets.json](laminas-v8-2026-09-28/verification-assets.json)
 registra dimensiones, recortes y SHA-256. El exportador comprueba alfa.
+La skill `piel-del-valle` conserva los pasos de generación, edición, exportación
+y revisión visual para las siguientes piezas.
 
 ## Alcance y comprobaciones
 
@@ -104,8 +108,8 @@ node docs/ui-redesign/laminas-v8-2026-09-28/capture.mjs
 El montaje parte del HTML local de V7; sus referencias se mantienen, incluidos
 los PNG V6. La comparación usa las capturas producidas, para evitar vistas
 incrustadas sin pintar en la captura larga del navegador. No requiere volver
-a generar imágenes. El exportador necesita Pillow y los maestros locales
-del manifiesto solo si se desea repetir la normalización.
+a generar imágenes. El exportador necesita Pillow; los maestros se versionan
+junto a la entrega y las rutas del manifiesto son relativas.
 
 Entrega en la rama `art/astra-modelos`; pendiente de elección del material y
 aprobación visual de Vera. Incluye V7, de la que depende, y los siete colores

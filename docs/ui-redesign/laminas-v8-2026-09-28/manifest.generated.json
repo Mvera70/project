@@ -11,7 +11,7 @@
     ],
     "slice": 32,
     "prompt": "Use case: ui-mockup. Generate ONE isolated navigation strap asset for a medieval painted game interface. Long horizontal dark MATTE LEATHER strap, deep reddish oxblood brown, distinctly leather NOT wood. Straight frontal view, soft painted contours, upper-left lighting. Fine pale flax stitching along upper and lower edges, each seam exactly 1/12 of total strap height inset from its edge (6 CSS px on72px high). Plain quiet smooth leather centre with subtle pores, no folds crossing centre. Entire strap silhouette, almost square softly worn corners, no buckles, no studs, no metal, no medals, NO TEXT or icons. Transparent background outside strap. Nine-slice design: final PNG780x144 (390x72CSS), borders32PNGpixels/16CSS; corners contained in end areas, straight horizontal edges with regular stitches. Aspect ratio65:12, strap fills canvas with only tiny transparent margin. Reference attached ONLY for painted game style, not materials or objects; do not copy its UI.",
-    "source": "C:/Users/mvera/.codex/generated_images/01a0e8ec-50b2-7a60-b0d1-2963999a83a4/exec-0a7473ad-8761-44f3-afc0-88bad256d259.png"
+    "source": "masters/nav-leather-source.png"
   },
   {
     "id": "nav-medal",
@@ -24,7 +24,7 @@
       56
     ],
     "prompt": "Use case: ui-mockup. ONE circular old brass navigation medallion, EMPTY FACE for a game sprite overlaid later. Front orthographic view perfectly circular. A broad aged brass beveled rim, softly worn upper-left highlights and dark patina. Central recessed blank dark bronze face, matte and plain, cream icon will be placed here in code; do NOT draw any emblem, glyph, icon, text, pattern or monogram. Four subtle pairs of pale flax stitches at compass points attach the medallion through tiny holes, visible threads only, no leather backing rectangle. Medieval painted colour illustration, soft outline, upper-left light, restrained patina, no plastic or high gloss. Inactive neutral state, no amber glow. Isolated full silhouette on real transparent background. Intended56x56CSS export112x112PNG. References only for soft painted style and aged brass tone; not target to copy.",
-    "source": "C:/Users/mvera/.codex/generated_images/01a0e8ec-50b2-7a60-b0d1-2963999a83a4/exec-77243ac2-bb81-4d24-9054-d53736ae46c7.png"
+    "source": "masters/nav-medal-source.png"
   },
   {
     "id": "nav-medal-on",
@@ -37,7 +37,7 @@
       56
     ],
     "prompt": "Precise-object-edit. EDIT TARGET first image: produce the ACTIVE version of this exact empty brass medallion. Preserve circle size, silhouette, bevel, four pairs of cream stitches, holes, brass patina and upper-left light. Make central blank bronze face gently raised embossed convex and light it from WITHIN with a controlled ember amber glow, matching warm inner illumination of second reference action plaque. Amber ring inside bevel, central dark warm face still allows a cream icon to be read. No flames, no neon, no exterior halo, no extra ornament. NO icon or text: centre must remain blank. Same front view, exact geometry and real transparent surrounding. Intended PNG112x112, shown56x56CSS. Second image is glow/material reference only.",
-    "source": "C:/Users/mvera/.codex/generated_images/01a0e8ec-50b2-7a60-b0d1-2963999a83a4/exec-34416f7d-ba10-4d32-85c7-6de4130813ac.png"
+    "source": "masters/nav-medal-on-source.png"
   },
   {
     "id": "nav-iron",
@@ -51,6 +51,6 @@
     ],
     "slice": 32,
     "prompt": "Use case: ui-mockup. NEW isolated horizontal WROUGHT IRON navigation band for medieval painted game interface, comparison alternative to a leather strap. Exact front orthographic view, wide65:12 aspect ratio, intended780x144PNG/390x72CSS. Dark charcoal blue-black hand-forged iron, matte hammered surface, restrained cool highlights top-left, softly bevelled top and bottom. Small domed iron rivets at the four corners only, contained within16CSSpx corner regions. Blank quiet centre for overlaying brass medallions and labels later, no medals attached in this image. Nine-slice32PNG border, straight edges, clean silhouette fully visible, actual alpha surrounding with tiny margin. Painted soft outline style matching supplied reference, not photoreal or plastic. NO TEXT, NO icons, no leather, no stitches, no wood, no gold border. Give it weight without ornate scrollwork.",
-    "source": "C:/Users/mvera/.codex/generated_images/01a0e8ec-50b2-7a60-b0d1-2963999a83a4/exec-4f855f37-56da-4e29-a8e6-0673de4cdee9.png"
+    "source": "masters/nav-iron-source.png"
   }
 ]

@@ -23,6 +23,35 @@ comparar; no está elegido. Propuesta y evidencia en
 No integrar componentes hasta revisión. La generación adicional de estas
 cuatro piezas está autorizada por este encargo V8.
 
+### Flujo de generación V8, portable a Claude Code
+
+1. Generar con ImageGen integrado, una llamada por pieza. Para un segundo
+   estado que debe compartir la forma exacta, editar el primer maestro como
+   imagen de referencia y pedir que conserve geometría y cambie solo luz o
+   relieve. Adjuntar referencias de estilo/material, indicando qué no se copia.
+2. Para PNG superpuestos, pedir alfa transparente real. Dejar vacía la cara de
+   cada control cuando el icono o el texto vaya a venir de la UI/sprite. En
+   paneles de nueve partes, concentrar los adornos en las esquinas fijas y
+   mantener plano el centro estirable.
+3. Copiar cada imagen maestra a la carpeta versionada `masters/`. El manifiesto
+   guarda id, prompt completo, medida final, corte y ruta relativa al maestro;
+   nunca dejar como única fuente una ruta privada de Codex.
+4. Normalizar sin redibujar: medir alfa visible, recortar, añadir margen y
+   escalar LANCZOS al lienzo de salida exacto. Guardar PNG en `assets/` y
+   registrar recorte, dimensiones y SHA-256. Confirmar alfa y validar las nueve
+   partes estiradas.
+5. Montar la pieza en la UI con sus sprites/textos existentes; capturarla al
+   tamaño real y revisar la imagen, además de medir el layout. Para opciones de
+   material, cambiar solo la banda, mantener iguales los medallones y estados,
+   y comparar capturas equivalentes. Documentar la recomendación sin elegir en
+   nombre de Vera.
+
+El V8 de ejemplo reproducible es `docs/ui-redesign/laminas-v8-2026-09-28/`:
+prompts más maestros en `manifest.generated.json` y `masters/`; el exportador
+usa rutas relativas y crea los cuatro PNG finales sin acceso a la carpeta del
+generador. Los símbolos de navegación se añaden con el sprite aprobado, no se
+generan como arte duplicado.
+
 ## Pasada V7 · escala y conservación · 28 sep 2026
 
 Estas instrucciones de Vera prevalecen sobre las recetas V6 de abajo para las
@@ -206,8 +235,10 @@ mías del lienzo las descartó («muy, muy malas») y generó ella la referencia
   escudo de latón (`docs/visual-reference/ui-wood/title-logo-en-2026-09-24.jpg`).
   Antes probamos tallado (no se veía), plata con CSS («un título de
   PowerPoint») y hierro pintado por script (sin el acabado de un logotipo de
-  juego). **Los generadores de imágenes no dan transparencia: pintan el
-  tablero de cuadros dentro del JPG.** `tools/ui/cut-logo.py` lo quita: relleno
+  juego). **Aquel generador de títulos no daba transparencia y pintaba el
+  tablero de cuadros dentro del JPG.** Esta limitación pertenece a ese recurso
+  histórico; no describe ImageGen integrado, que sí exporta alfa transparente
+  cuando se solicita. `tools/ui/cut-logo.py` lo quita: relleno
   desde el borde con el contorno oscuro de muro, y los bolsillos encerrados
   por su firma de dos grises. Hay un logotipo por lengua (`TITLE_LOGO` en
   `title.ts`); **el español falta** y mientras tanto sale el inglés.
