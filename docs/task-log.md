@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · Piel v3: sólo madera, y las piezas del juego — **propuesta, a revisar**
+
+Vera rechazó la propuesta v2 de Codex (su rama `art/astra-modelos`): parece
+de móvil y pierde el sol, la brújula, los contadores con icono y los iconos de
+las pestañas. La v3 está en `docs/ui-redesign/propuesta-piel-v3-2026-09-28.md`
+con tres láminas (`laminas-v3-2026-09-28/`, fuente `lamina.src.html`) hechas
+con el sprite, el arco del sol y las fuentes del juego sobre la captura del
+27 sep, y la madera recortada del mockup de Gemini. Decisiones de Vera: sólo
+madera (sale la piedra), texturas de imagen y no CSS. Encargo de las tres
+losetas en `docs/encargos/texturas-de-la-piel.md`. **Sin cambios de código de
+UI todavía**: Vera revisa las láminas y elige; después se implementa (primero
+`wood.css`, `board.ts` y la etiqueta A1 genérica).
+
 ## 28 sep 2026 · Llegadas, expediciones y el tablón (v4.95) — **en vuelo**
 
 En `main` y subido (`173d1d8`, `be1886b` y éste) para que el agente del
