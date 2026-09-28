@@ -17,7 +17,7 @@ import {
   Color, DirectionalLight, Fog, Group, HemisphereLight, PCFShadowMap,
   ACESFilmicToneMapping,
   Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type BufferAttribute, type MeshStandardMaterial, type Object3D,
-  type Mesh,
+  type Mesh, type Material,
 } from 'three';
 import { ford } from '@engine/sim';
 import { clockOf } from '@engine/time';
@@ -39,6 +39,7 @@ import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
 import { updateMountainVeil } from './effects/mountain-veil';
 import { createGrass, meadowWeight } from './world/grass';
+import { createTrampleMap, setTramplers, snowTracks, SNOW_FROM, type TrampleMap, type Trampler } from './effects/trample';
 import { cloudsFor, stepClouds } from './effects/clouds';
 import { createAmbience, type Ambience } from './effects/ambience';
 import { createPuddles, wetnessAt, type Puddles } from './effects/puddles';
@@ -509,6 +510,12 @@ export async function createGraphicsRenderer(
   const grass = createGrass(handheld);
   world.add(grass.group);
   let grassTick = -1;
+  // Las pisadas (`effects/trample.ts`): un mapa por valle, que sobrevive a los
+  // repintados del suelo; la hierba y el suelo nevado lo leen.
+  let trample: TrampleMap | null = null;
+  const tramplers: Trampler[] = [];
+  /** Hasta qué altura de vista se aparta la hierba en vivo: más lejos no se ve. */
+  const TRAMPLE_VIEW = 40;
   // **V-15b · la malla la decide `modelFor`, y si no existe se cae al aldeano
   // base.** La regla entera —manda la edad, luego el oficio, luego lo que se
   // está haciendo— vive en `world/models.ts`; aquí sólo queda pedirla y el
@@ -1090,6 +1097,8 @@ export async function createGraphicsRenderer(
     const terrainSeed = state.terrainSeed;
     ground = buildGround(state.map, palette, plazaOf(state), era,
       snowing < 0.5 ? (x, z) => meadowWeight(terrainSeed, x, z) : undefined);
+    if (trample === null) trample = createTrampleMap(state.map.width, state.map.height);
+    snowTracks(ground.mesh.material as Material);
     village.season(snowing, palette.accent);
     world.add(ground.mesh);
 
@@ -1469,6 +1478,8 @@ export async function createGraphicsRenderer(
   // dibujo. Recorre la escena y cuenta, por grupo con nombre colgado del
   // mundo, las mallas visibles, las que proyectan sombra y sus triángulos.
   // Una malla instanciada es una llamada por muchas copias.
+  // Las pisadas, para la sonda: cuánta marca hay en un punto (`effects/trample.ts`).
+  window.__valleyTrampleAt = (x: number, z: number) => trample?.at(x, z) ?? null;
   window.__valleySceneReport = () => {
     const rows = new Map<string, { meshes: number; shadow: number; instanced: number; triangles: number }>();
     // Los edificios se desglosan por tipo (`Valley_Buildings/wall`…), que es
@@ -2060,6 +2071,34 @@ export async function createGraphicsRenderer(
       festoon.place(plazaOf(shown), groundFloor);
       festoon.step(forceFestoon || festivityOf(shown) !== null, phase, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       cast.show(lastActors, life.physics?.ragdolls ?? []);
+      // Las pisadas: quien anda deja marca en el mapa (la hierba se aplasta y
+      // la nieve guarda la huella), y los cuerpos más cercanos a la vista
+      // apartan la hierba en vivo.
+      if (trample !== null) {
+        const snowOn = appearanceSnow >= SNOW_FROM;
+        const scenicDt = frame.speed === 0 ? 0 : frame.deltaSeconds;
+        const bodies: (Trampler & { moving: boolean })[] = [];
+        for (const actor of lastActors) {
+          bodies.push({ x: actor.x, z: actor.z, radius: 0.42, moving: actor.clip === 'walk' || actor.clip === 'carry_walk' });
+        }
+        for (const animal of life.wildlife) bodies.push({ x: animal.x, z: animal.y, radius: 0.6, moving: true });
+        for (const beast of life.beasts) {
+          const body = beast.dweller.body;
+          bodies.push({ x: body.x, z: body.z, radius: beast.kind === 'cow' ? 0.55 : 0.3,
+            moving: Math.hypot(body.vx, body.vz) > 0.05 });
+        }
+        if (scenicDt > 0) {
+          for (const body of bodies) if (body.moving) trample.stamp(body.x, body.z, body.radius * 0.7, 0.12, snowOn);
+        }
+        trample.step(scenicDt, frame.realDeltaSeconds, paintedSky === 'snow', appearanceSnow);
+        tramplers.length = 0;
+        if (view.view.height < TRAMPLE_VIEW) {
+          const centre = view.view.centre;
+          bodies.sort((a, b) => Math.hypot(a.x - centre.x, a.z - centre.z) - Math.hypot(b.x - centre.x, b.z - centre.z));
+          for (const body of bodies) tramplers.push(body);
+        }
+        setTramplers(tramplers);
+      }
       // Quien cruza el vado o anda por la orilla salpica a cada paso.
       for (const actor of lastActors) {
         if (actor.clip !== 'walk' && actor.clip !== 'carry_walk') continue;
@@ -2601,6 +2640,7 @@ export async function createGraphicsRenderer(
       works.dispose();
       steading.dispose();
       grass.dispose();
+      trample?.dispose();
       if (ground !== null) {
         world.remove(ground.mesh);
         ground.dispose();
@@ -2682,6 +2722,7 @@ declare global {
     __valleyBattleStats?: () => BattleStats;
     __valleyRenderStats?: () => { calls: number; triangles: number; scale: number };
     __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];
+    __valleyTrampleAt?: (x: number, z: number) => { grass: number; snow: number } | null;
   }
 }
 

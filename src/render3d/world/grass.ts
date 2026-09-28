@@ -47,6 +47,7 @@ import { cropOf, fieldMoment } from '@engine/world/crops';
 import type { Palette } from '@derive/palette';
 import type { PlazaPatch } from '@derive/plaza';
 import { windShaderUniforms } from '../effects/wind';
+import { MAX_TRAMPLERS, trampleUniforms } from '../effects/trample';
 
 /** TUNE visual. Una mata de hierba: cuántas briznas y cómo es cada una, en celdas. */
 const GRASS = {
@@ -70,21 +71,24 @@ const GRASS = {
 /**
  * TUNE visual. El césped de fuera de las manchas. Vera, al ver la mata alta
  * suelta por el prado: «poner lo mismo que haces en los conjuntos pero suelto
- * queda muy mal; el típico césped más plano, más puntiagudo, quizás pequeños
- * matojitos, zonas chiquititas, no hace falta que esté todo cubierto». Así que
- * fuera de los prados no hay matas altas: hay esto, bajo, ancho y afilado,
- * casi del color del suelo, en corros pequeños repartidos por un ruido fino.
+ * queda muy mal». La primera versión era una mata plana en estrella y tampoco:
+ * «me refería a hacerla pequeñita, muy chiquitita, como cuando cortas el césped
+ * muy corto y algunas puntas se quedan para arriba; hay alguna zona que es
+ * muerta, otra que no; bajita, con poca densidad en algunos sitios». Así que
+ * briznas cortas y casi verticales, pocas por mata, en rodales vivos con calvas
+ * entre medias (un ruido de tres celdas, con el 40 % del prado sin nada).
  */
 const LAWN = {
-  BLADES: 7,
-  HEIGHT: 0.08,
-  WIDTH: 0.035,
-  SPREAD: 0.3,
-  /** Matas por celda de media; el ruido fino las junta en matojos. */
-  PER_CELL: 2,
+  BLADES: 4,
+  HEIGHT: 0.075,
+  WIDTH: 0.028,
+  SPREAD: 0.09,
+  /** Matas por celda dentro de un rodal vivo. */
+  PER_CELL: 3,
   PER_CELL_HANDHELD: 2,
-  /** Celdas de la rejilla del ruido que hace los matojos. */
-  CLUMP: 2.5,
+  /** Celdas de la rejilla del ruido que hace los rodales, y desde qué valor hay césped. */
+  CLUMP: 3,
+  ALIVE_FROM: 0.4,
   BEND: 0.03,
 } as const;
 
@@ -96,6 +100,13 @@ const LAWN = {
  * con el zoom, así que ninguna salta de golpe.
  */
 const GROW_BAND = 0.12;
+
+/**
+ * TUNE visual. Cómo se aparta la hierba al pisarla (`effects/trample.ts`): lo
+ * que se abre la punta, en celdas, con un cuerpo encima; lo que se agacha; y
+ * lo que queda aplastada después según el mapa de pisadas.
+ */
+const TRAMPLE = { PUSH: 0.32, DUCK: 0.55, FLAT: 0.7, SPLAY: 0.6 } as const;
 
 /** Peso de prado a partir del cual hay matas altas; por debajo, sólo el césped. */
 const TALL_FROM = 0.12;
@@ -240,11 +251,16 @@ interface Kind { readonly geometry: BufferGeometry; readonly material: MeshLambe
 function grassMaterial(height: number, bend: number, grow: { value: number }): MeshLambertMaterial {
   const material = new MeshLambertMaterial({ vertexColors: true, side: DoubleSide });
   const wind = windShaderUniforms();
+  const trample = trampleUniforms();
   material.onBeforeCompile = (shader) => {
     shader.uniforms['uWindTime'] = wind.uWindTime;
     shader.uniforms['uWindStrength'] = wind.uWindStrength;
     shader.uniforms['uGrassSnow'] = snowUniform;
     shader.uniforms['uGrowEdge'] = grow;
+    shader.uniforms['uTrample'] = trample.uTrample;
+    shader.uniforms['uTrampleSize'] = trample.uTrampleSize;
+    shader.uniforms['uTramplers'] = trample.uTramplers;
+    shader.uniforms['uTramplerCount'] = trample.uTramplerCount;
     // Las dos caras con la misma luz: con `DoubleSide`, Three le da la vuelta a
     // la normal en la cara de atrás y media hierba salía negra.
     shader.fragmentShader = shader.fragmentShader.replace('#include <normal_fragment_begin>',
@@ -256,6 +272,10 @@ uniform float uWindTime;
 uniform float uWindStrength;
 uniform float uGrassSnow;
 uniform float uGrowEdge;
+uniform sampler2D uTrample;
+uniform vec2 uTrampleSize;
+uniform vec4 uTramplers[${MAX_TRAMPLERS}];
+uniform int uTramplerCount;
 attribute float grassRank;`)
       .replace('#include <color_vertex>', `#include <color_vertex>
   float snowH = clamp(position.y / ${height.toFixed(3)}, 0.0, 1.0);
@@ -276,6 +296,28 @@ attribute float grassRank;`)
     * grassH * grassH * ${bend.toFixed(3)};
   transformed.xz += grassWind.xz * grassBend;
   transformed.y -= abs(grassBend) * 0.3 * grassH;
+  // Quien pasa la aparta: las briznas se abren lejos del cuerpo y se agachan.
+  vec2 trampleAway = vec2(0.0);
+  float trampleUnder = 0.0;
+  for (int i = 0; i < ${MAX_TRAMPLERS}; i++) {
+    if (i >= uTramplerCount) break;
+    vec2 gap = grassOrigin.xz - uTramplers[i].xy;
+    float dist = length(gap);
+    float under = 1.0 - smoothstep(0.0, uTramplers[i].z, dist);
+    trampleAway += gap / max(dist, 0.05) * under;
+    trampleUnder = max(trampleUnder, under);
+  }
+  // Y lo pisado hace poco sigue aplastado un rato (el mapa de pisadas).
+  float trod = texture2D(uTrample, grassOrigin.xz / uTrampleSize).r;
+  trampleUnder = max(trampleUnder, trod * ${TRAMPLE.FLAT.toFixed(2)});
+#ifdef USE_INSTANCING
+  vec3 trampleLocal = transpose(mat3(instanceMatrix)) * vec3(trampleAway.x, 0.0, trampleAway.y);
+#else
+  vec3 trampleLocal = vec3(trampleAway.x, 0.0, trampleAway.y);
+#endif
+  transformed.xz += trampleLocal.xz * grassH * grassH * ${TRAMPLE.PUSH.toFixed(2)};
+  transformed.xz *= 1.0 + trod * grassH * ${TRAMPLE.SPLAY.toFixed(2)};
+  transformed.y *= 1.0 - trampleUnder * grassH * ${TRAMPLE.DUCK.toFixed(2)};
   transformed.y *= max(0.0, 1.0 - uGrassSnow * ${(1 / BURIED).toFixed(3)});
   // Las matas junto al umbral del zoom, pequeñas: crecen al acercarse en vez de aparecer.
   transformed *= 1.0 - smoothstep(uGrowEdge - ${GROW_BAND.toFixed(2)}, uGrowEdge, grassRank);`);
@@ -393,7 +435,9 @@ export function createGrass(handheld: boolean): Grass {
       tufts.forEach((tuft, n) => {
         // Del color del prado, un poco más hondo y con poca variación: textura,
         // no matas.
-        tint.set(tuft.pick < 0.5 ? p.meadow : p.meadowAlt).multiplyScalar(0.86 + (tuft.pick * 5 % 1) * 0.1);
+        // Del verde del prado, un punto más claro en las puntas (lo pone el
+        // vértice) y con poca variación entre matas.
+        tint.set(tuft.pick < 0.5 ? p.meadow : p.meadowAlt).multiplyScalar(0.94 + (tuft.pick * 5 % 1) * 0.1);
         mesh.setColorAt(n, tint);
       });
       if (mesh.instanceColor !== null) mesh.instanceColor.needsUpdate = true;
@@ -478,7 +522,7 @@ export function createGrass(handheld: boolean): Grass {
         // matas en unas celdas y vacía otras); las matas altas sólo dentro de
         // la mancha, y en su borde van entrando de una en una.
         const clump = valueNoise(seed, x + 0.5, z + 0.5, LAWN.CLUMP, 'lawn');
-        const lawnHere = Math.round(lawnPerCell * 2 * Math.max(0, clump - 0.25) / 0.75);
+        const lawnHere = Math.round(lawnPerCell * Math.max(0, clump - LAWN.ALIVE_FROM) / (1 - LAWN.ALIVE_FROM) * 1.6);
         for (let k = 0; k < lawnHere; k += 1) {
           if (unit(seed, `lk${cell}:${k}`) > keep) continue;
           const px = x + unit(seed, `lx${cell}:${k}`);

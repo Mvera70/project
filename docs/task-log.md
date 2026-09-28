@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · Las pisadas (v4.89)
+
+`effects/trample.ts` (el mapa, `setTramplers`, `snowTracks`), `world/grass.ts`
+(`TRAMPLE`: apartarse en vivo y aplastado por el mapa), `renderer.ts` (marca
+por cuerpo que anda; los doce más cercanos a la vista; huellas en el suelo tras
+`buildGround`). Prueba: `trample.test.ts`. El césped de fuera de las manchas,
+rehecho como césped corto de puntas arriba con calvas (`LAWN`). Gancho de sonda:
+`window.__valleyTrampleAt(x, z)`. **Abierto:** la primera nevada de otoño sigue
+sin captura; las huellas son manchas redondas, no pies (a esta escala no se
+distinguen, pero de muy cerca se podría orientar la marca); y en la plaza,
+donde todo el mundo pisa, la huella se vuelve una mancha uniforme sobre la
+tierra pisada del motor (`map.path`), que ya es oscura.
+
 ## 28 sep 2026 · La hierba, el doble de densa y más barata (v4.88)
 
 `world/grass.ts` (tramos, `zoom`/`densityAt`, nieve en el sombreador),

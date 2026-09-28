@@ -1,5 +1,44 @@
 # The Valley — Registro de cambios
 
+## v4.89 · 28 sep 2026 · Las pisadas: la hierba se aparta, la nieve guarda la huella
+
+Vera: «que se aparte al pisarla, si no es muy costoso; también las pisadas en
+la nieve; y cuando haya nevadas gordas, que se deje un rastro directamente en la
+nieve, que haya zonas que se acumule bastante». Las tres cuelgan de una pieza
+barata, `effects/trample.ts`: **un mapa de pisadas**, una textura de dos
+canales a cuatro texeles por celda (258 KB) en la que cada cuerpo que anda
+—gente, fauna, ganado— deja marca, escrita en la CPU y subida como mucho cuatro
+veces por segundo.
+
+- **La hierba se aparta** (`world/grass.ts`): los doce cuerpos más cercanos al
+  centro de la vista van como uniformes al sombreador y las briznas se abren
+  lejos de ellos y se agachan (como en Breath of the Wild); y lo pisado hace
+  poco sigue aplastado y abierto según el mapa, y se yergue en veinte segundos.
+  Sólo con la vista por debajo de 40 celdas: más lejos no se ve.
+- **Las huellas en la nieve** (`snowTracks`, inyectado en el suelo como las
+  sombras de las nubes): con la nieve por encima de 0,3 de cobertura, la nieve
+  pisada sale gris azulada. Sin nevar, la huella se queda; **nevando, se va
+  tapando en minuto y medio** (la nevada gorda borra el rastro); y el deshielo
+  se la lleva.
+- **Los ventisqueros**: un ruido de dos octavas hace zonas donde la nieve es
+  honda —más blancas y más frías—, que crecen con la cobertura, y en ellas la
+  huella se ve más honda.
+
+Presentación pura: no toca el estado, no tira dados, se pierde al cerrar.
+Medido con dibujo por software en la aldea de referencia: 453 llamadas, 709 mil
+triángulos y 94 fotogramas en 30 s (104 sin las pisadas): el 10 % es el bucle
+de doce cuerpos por vértice de hierba, coste de vértices que en una GPU es poco.
+**Y un defecto cazado midiendo**: el desvanecimiento se restaba por fotograma
+redondeado a entero, y a sesenta fotogramas por segundo redondeaba a cero —la
+marca se quedaba en 1 para siempre—; ahora la fracción se acumula.
+
+**El césped, otra vez, por Vera:** la mata plana en estrella tampoco: «me
+refería a hacerla pequeñita, muy chiquitita, como cuando cortas el césped muy
+corto y algunas puntas se quedan para arriba; hay alguna zona que es muerta,
+otra que no; bajita, con poca densidad en algunos sitios». Cuatro briznas cortas
+casi verticales por mata, tres matas por celda en rodales vivos, y calvas en el
+40 % del prado (`LAWN.ALIVE_FROM`).
+
 ## v4.88 · 28 sep 2026 · La hierba, el doble de densa y más barata
 
 Vera: «mejorar aún más la hierba; se debe optimizar para poder poner zonas más
