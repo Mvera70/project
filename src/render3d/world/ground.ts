@@ -811,10 +811,25 @@ export function groundAppearanceKey(ground: number, era: Era): string {
   return `${ground}:${era}`;
 }
 
-export function buildGround(map: ValleyMap, palette: Palette, plaza?: Plaza, era: Era = 'hamlet'): Ground {
+const MEADOW_SHADE = 0.45;
+
+/**
+ * `meadow` (28 sep 2026, la hierba): cuánto prado hay en cada esquina, de 0 a
+ * 1. Bajo las manchas de hierba el suelo va un verde más hondo, como la tierra
+ * a la sombra de la hierba en Breath of the Wild: así la mancha se lee de lejos
+ * aunque se dibujen pocas matas, y de cerca los huecos entre briznas no son
+ * prado claro. Sin él, el suelo de siempre (las pruebas y la nieve).
+ */
+export function buildGround(
+  map: ValleyMap, palette: Palette, plaza?: Plaza, era: Era = 'hamlet',
+  meadow?: (x: number, z: number) => number,
+): Ground {
   const cells = map.width * map.height;
   const columns = map.width + 1;
   const vertices = columns * (map.height + 1);
+  // TUNE visual: el verde de debajo de la hierba, el del prado hondo un 22 % más
+  // oscuro, y hasta un 45 % de mezcla en el centro de la mancha.
+  const deepMeadow = new Color(palette.meadowAlt).multiplyScalar(0.78);
   const positions = new Float32Array(vertices * 3);
   const colours = new Float32Array(vertices * 3);
   const indices = new Uint32Array(cells * 6);
@@ -830,6 +845,13 @@ export function buildGround(map: ValleyMap, palette: Palette, plaza?: Plaza, era
       positions[at + 1] = GROUND_BIAS + heightAt(map, x, z);
       positions[at + 2] = moved.z;
       cornerColour(map, x, z, palette, tint, plaza, era);
+      if (meadow !== undefined) {
+        const cell = Math.min(z, map.height - 1) * map.width + Math.min(x, map.width - 1);
+        const code = map.terrain[cell];
+        if (code === TERRAIN_CODE.meadow || code === TERRAIN_CODE.cleared) {
+          tint.lerp(deepMeadow, MEADOW_SHADE * meadow(x, z));
+        }
+      }
       const shade = 1 + mottleAt(x, z) + patchAt(x, z);
       colours[at] = tint.r * shade;
       colours[at + 1] = tint.g * shade;

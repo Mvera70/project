@@ -112,7 +112,8 @@ juega.
 | Qué | Qué se ve hoy | Qué haría falta |
 |---|---|---|
 | **La hierba que se pisa** | La gente y los animales la atraviesan; sólo la senda con mucho paso la gasta (del motor, `map.path`) | Que se aparte al paso, como en Zelda: la posición de los cuerpos cercanos en un uniforme y la brizna doblándose en el vértice |
-| **El prado bajo la hierba** | El suelo es el mismo verde dentro y fuera de las manchas | Un verde algo más hondo bajo las manchas de prado, para que de lejos se lean aun sin briznas |
+| ~~**El prado bajo la hierba**~~ · **hecho en v4.88** | El suelo va un verde más hondo bajo las manchas (`buildGround`, `meadow`) | — |
+| **La primera nevada** | La hierba blanquea desde las puntas y se entierra con `snowCover`; sólo está capturada la nieve asentada | Una captura de las semanas 8–11 de otoño, cuando cuaja la primera nieve, para ver si el blanco de las puntas convence |
 
 ## La madera a la vista (28 sep 2026, esquema 12)
 

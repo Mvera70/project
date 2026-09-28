@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · La hierba, el doble de densa y más barata (v4.88)
+
+`world/grass.ts` (tramos, `zoom`/`densityAt`, nieve en el sombreador),
+`world/ground.ts` (`buildGround(..., meadow)`), `renderer.ts` (`grass.zoom` cada
+fotograma; el suelo con la mancha si no nieva). Pruebas: `grass.test.ts` (cinco:
+dónde crece, manchas, tramos recortables, menos de lejos, estación y nieve).
+Capturas 430 × 932, semilla 11, año 5, cuatro estaciones. **Abierto:** los
+fotogramas en la tablet de Vera con las manchas densas; la hierba que se aparta
+al pisarla (`encargos-3d.md`); la primera nevada (otoño, semanas 8–11) no está
+capturada, sólo la nieve asentada.
+
 ## 28 sep 2026 · La sierra vista desde arriba (v4.87)
 
 `world/ridge.ts`: diagonal por ladera, vértices apartados lejos del empalme

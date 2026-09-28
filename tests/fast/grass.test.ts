@@ -1,7 +1,8 @@
 // La hierba del valle (28 sep 2026): propiedades de dónde crece y cuánto
 // cuesta, en varias semillas. No congela cifras de colocación: comprueba lo que
-// Vera pidió (manchas de prado densas, matas sueltas fuera) y lo que manda el
-// presupuesto (dos llamadas de dibujo, sin sombras).
+// Vera pidió (manchas de prado densas, matas sueltas fuera; que siga la
+// estación y la nieve la cubra) y lo que manda el presupuesto (por tramos con
+// recorte de cámara, menos matas de lejos, sin sombras).
 
 import { describe, expect, it } from 'vitest';
 import { Matrix4, Vector3, type InstancedMesh } from 'three';
@@ -10,11 +11,14 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { run } from '@engine/sim';
 import { TERRAIN_CODE } from '@engine/state';
 import { plazaOf } from '@derive/plaza';
-import { PALETTES } from '@derive/palette';
+import { PALETTES, SNOW_DEEP } from '@derive/palette';
 import { foundTwenty } from '../helpers/founding';
-import { createGrass, meadowWeight } from '../../src/render3d/world/grass';
+import { createGrass, densityAt, meadowWeight } from '../../src/render3d/world/grass';
 
 const SEEDS = [3, 7, 11];
+
+const tuftMeshes = (grass: ReturnType<typeof createGrass>): InstancedMesh[] =>
+  grass.group.children.filter((c) => c.name.startsWith('Valley_Grass_Tufts')) as InstancedMesh[];
 
 function positions(mesh: InstancedMesh): Vector3[] {
   const m = new Matrix4();
@@ -29,11 +33,10 @@ describe('la hierba del valle', () => {
       const grass = createGrass(false);
       const plaza = plazaOf(state);
       grass.plant(state, () => 0, plaza);
-      const mesh = grass.group.children.find((c) => c.name === 'Valley_Grass_Tufts') as InstancedMesh;
-      expect(mesh.count, `semilla ${seed}`).toBeGreaterThan(1000);
+      expect(grass.counts.grass, `semilla ${seed}`).toBeGreaterThan(1000);
       const { width } = state.map;
       const standing = state.buildings.filter((b) => b.lostTick === null);
-      for (const at of positions(mesh)) {
+      for (const mesh of tuftMeshes(grass)) for (const at of positions(mesh)) {
         const x = Math.floor(at.x), z = Math.floor(at.z), cell = z * width + x;
         expect(state.map.terrain[cell]).not.toBe(TERRAIN_CODE.water);
         expect(state.map.path[cell] ?? 0).toBeLessThan(2);
@@ -49,9 +52,8 @@ describe('la hierba del valle', () => {
       const state = foundTwenty(seed);
       const grass = createGrass(false);
       grass.plant(state, () => 0, plazaOf(state));
-      const mesh = grass.group.children.find((c) => c.name === 'Valley_Grass_Tufts') as InstancedMesh;
       const perCell = new Map<number, number>();
-      for (const at of positions(mesh)) {
+      for (const mesh of tuftMeshes(grass)) for (const at of positions(mesh)) {
         const cell = Math.floor(at.z) * state.map.width + Math.floor(at.x);
         perCell.set(cell, (perCell.get(cell) ?? 0) + 1);
       }
@@ -61,20 +63,63 @@ describe('la hierba del valle', () => {
         if (w > 0.9) { lush += count; lushCells += 1; } else if (w < 0.1) { bare += count; bareCells += 1; }
       }
       expect(lushCells, `semilla ${seed}: hay prado`).toBeGreaterThan(50);
-      expect(lush / lushCells).toBeGreaterThan(4 * (bare / Math.max(1, bareCells)));
+      expect(lush / lushCells).toBeGreaterThan(8 * (bare / Math.max(1, bareCells)));
     }
   });
 
-  it('cuesta dos llamadas como mucho, sin sombras, y la nieve la esconde', () => {
+  it('va por tramos que la cámara puede recortar, sin sombras, y cada tramo es una malla', () => {
     const state = foundTwenty(7);
     const grass = createGrass(true);
     grass.plant(state, () => 0, plazaOf(state));
-    expect(grass.group.children.length).toBeLessThanOrEqual(2);
-    for (const mesh of grass.group.children) {
+    const meshes = tuftMeshes(grass);
+    expect(meshes.length).toBeGreaterThan(3);
+    expect(meshes.length).toBeLessThanOrEqual(15);
+    for (const mesh of grass.group.children as InstancedMesh[]) {
       expect(mesh.castShadow).toBe(false);
       expect(mesh.receiveShadow).toBe(false);
+      expect(mesh.frustumCulled).toBe(true);
+      expect(mesh.boundingSphere).not.toBeNull();
+      // La esfera abarca todas las matas del tramo, no sólo las que se dibujan.
+      for (const at of positions(mesh)) {
+        expect(mesh.boundingSphere!.distanceToPoint(at)).toBeLessThanOrEqual(0.5);
+      }
     }
-    grass.season(PALETTES.winter, 1);
+  });
+
+  it('de lejos dibuja menos matas que de cerca, y las que dibuja son una muestra repartida', () => {
+    const state = foundTwenty(11);
+    const grass = createGrass(false);
+    grass.plant(state, () => 0, plazaOf(state));
+    grass.zoom(13);
+    const near = grass.counts.drawn;
+    expect(near).toBe(grass.counts.grass + grass.counts.stubble);
+    grass.zoom(80);
+    const far = grass.counts.drawn;
+    expect(far).toBeLessThan(near * 0.3);
+    expect(far).toBeGreaterThan(near * 0.2);
+    expect(densityAt(36)).toBeGreaterThan(densityAt(60));
+    // Repartida: el tramo con más matas de lejos sigue siendo el que más tenía de cerca.
+    const meshes = tuftMeshes(grass);
+    const fullest = meshes.reduce((best, m) => m.instanceMatrix.count > best.instanceMatrix.count ? m : best, meshes[0]!);
+    expect(Math.max(...meshes.map((m) => m.count))).toBe(fullest.count);
+  });
+
+  it('sigue la estación en el color y la nieve la cubre', () => {
+    const state = foundTwenty(7);
+    const grass = createGrass(true);
+    grass.plant(state, () => 0, plazaOf(state));
+    const mesh = tuftMeshes(grass)[0]!;
+    const sample = (): [number, number, number] => [mesh.instanceColor!.getX(0), mesh.instanceColor!.getY(0), mesh.instanceColor!.getZ(0)];
+    grass.season(PALETTES.spring, 0);
+    const spring = sample();
+    grass.season(PALETTES.autumn, 0);
+    const autumn = sample();
+    // El otoño es paja: más rojo y menos verde que la primavera.
+    expect(autumn[0]).toBeGreaterThan(spring[0]);
+    expect(autumn[1] / autumn[0]).toBeLessThan(spring[1] / spring[0]);
+    expect(grass.group.visible).toBe(true);
+    // Con la nieve asentada del invierno, enterrada: ni se dibuja.
+    grass.season(PALETTES.winter, SNOW_DEEP);
     expect(grass.group.visible).toBe(false);
     grass.season(PALETTES.spring, 0);
     expect(grass.group.visible).toBe(true);

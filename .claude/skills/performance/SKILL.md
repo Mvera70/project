@@ -149,6 +149,16 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
     SwiftShader, separar vértices de píxeles con la prueba de las piezas
     diminutas**, porque recortar vértices por una medida de software puede costar
     lo que se ve sin ganar nada en el aparato. En táctil, menos matas igualmente.
+17. **Lo instanciado que cubre el mapa entero va por tramos, y con muestra por
+    altura de vista** (v4.88, `world/grass.ts`). Una sola `InstancedMesh` para
+    todo el valle no se puede recortar: la cámara siempre la ve. En tramos de 24
+    celdas, cada uno con `computeBoundingSphere()` **antes** de bajar `count`,
+    la cámara se salta los que no ve (+14 llamadas como mucho, que es menos de
+    lo que ahorra). Y como la cámara es ortográfica, la «distancia» es la altura
+    de la vista (`view.height`): con las instancias **ordenadas por una
+    prioridad al azar**, `count = total · densidad(altura)` es una muestra
+    uniforme sin reordenar nada. Así la hierba dobló su densidad de cerca
+    costando lo mismo en la vista de siempre.
 
 ## Lo que queda (por lo que pesa)
 

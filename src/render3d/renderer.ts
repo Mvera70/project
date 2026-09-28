@@ -38,7 +38,7 @@ import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './wo
 import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
 import { updateMountainVeil } from './effects/mountain-veil';
-import { createGrass } from './world/grass';
+import { createGrass, meadowWeight } from './world/grass';
 import { cloudsFor, stepClouds } from './effects/clouds';
 import { createAmbience, type Ambience } from './effects/ambience';
 import { createPuddles, wetnessAt, type Puddles } from './effects/puddles';
@@ -1080,12 +1080,16 @@ export async function createGraphicsRenderer(
     treeFalls.season(palette);
     // P-2 · con su plaza empedrada. El radio viene de `derive/plaza.ts`, que es
     // quien traduce la constante del motor a esta capa.
-    ground = buildGround(state.map, palette, plazaOf(state), era);
     // La nieve en los tejados sale de la misma paleta que la del suelo: cuando
     // §10.3 pone el prado blanco es que ha nevado, y la nieve no elige donde
     // cuajar. TUNE: 0,72 y no 1, que un tejado del color exacto del prado
     // nevado deja de leerse como tejado.
     const snowing = snowCover(clock.season, clock.seasonWeek);
+    // Y bajo las manchas de hierba, el suelo más hondo (`world/grass.ts`); con
+    // la nieve encima no, que la hierba está enterrada y el prado es blanco.
+    const terrainSeed = state.terrainSeed;
+    ground = buildGround(state.map, palette, plazaOf(state), era,
+      snowing < 0.5 ? (x, z) => meadowWeight(terrainSeed, x, z) : undefined);
     village.season(snowing, palette.accent);
     world.add(ground.mesh);
 
@@ -1769,6 +1773,8 @@ export async function createGraphicsRenderer(
       // cámara baja a ras de suelo (Vera, 28 sep 2026).
       veilFocus.set(view.view.centre.x, groundFloor(view.view.centre.x, view.view.centre.z), view.view.centre.z);
       updateMountainVeil(camera, veilFocus, view.angles.pitch, frame.realDeltaSeconds);
+      // La hierba dibuja menos matas cuanto más alta la vista (`world/grass.ts`).
+      grass.zoom(view.view.height);
 
       // La gente se recoloca en cada fotograma porque en cada fotograma se ha
       // movido; la aldea no, porque cambia unas cuantas veces al año.

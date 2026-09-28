@@ -1,5 +1,37 @@
 # The Valley — Registro de cambios
 
+## v4.88 · 28 sep 2026 · La hierba, el doble de densa y más barata
+
+Vera: «mejorar aún más la hierba; se debe optimizar para poder poner zonas más
+densas, recuerda que nuestro referente es la hierba de Zelda Breath of the
+Wild», y «tiene que cambiar de color en otoño y en verano, y en invierno
+cubrirse por nieve cuando empieza a nevar». Lo que cuesta la hierba son
+vértices (v4.86), así que `world/grass.ts` deja de gastarlos donde no se ven:
+
+- **Por tramos** de 24 celdas (3 × 5 en el mapa grande), cada uno una malla
+  instanciada con su esfera, así que la cámara recorta los que no ve. De cerca,
+  que es cuando la hierba se mira, se dibujan uno o dos de quince.
+- **Menos matas cuanto más alta la vista** (`zoom`, `densityAt`): dentro de
+  cada tramo las matas van ordenadas por una prioridad al azar, y dibujar las
+  `n` primeras es dibujar una muestra uniforme. Todas hasta 18 celdas de vista,
+  el 22 % desde 52; a la vista de una aldea recién fundada (36), el 57 %.
+- Con eso las manchas de prado van a **28 matas por celda** (18 en táctil) en
+  vez de 14. Medido con dibujo por software en la aldea de referencia: 14/celda
+  eran 642 mil triángulos y 119 fotogramas en 30 s; 28/celda con la primera
+  curva (dibujando el 80 % en la vista por defecto), 711 mil y 95; con la curva
+  final (18/52/0,22), 700 mil y 99: el doble de matas de cerca por un 17 % de
+  fotogramas de software, que es coste de vértices y en la tablet cuesta menos.
+  Llamadas: 463 → 451, porque los tramos fuera de la vista no se envían.
+- **El suelo bajo las manchas va un verde más hondo** (`buildGround`, `meadow`):
+  como la tierra a la sombra de la hierba en Zelda, la mancha se lee de lejos
+  aunque se dibujen pocas matas y de cerca los huecos no son prado claro. Con
+  nieve no (el prado es blanco).
+- **La estación y la nieve.** El color sale de la paleta —verde, amarillo en
+  verano, paja en otoño— y la nieve la cubre en el sombreador: blanquea desde
+  las puntas, que es donde se posa, entierra la brizna y con la nieve asentada
+  (0,7; `snowCover` llega a 0,72) apaga el grupo entero, que en pleno invierno
+  no cuesta nada. Capturado en las cuatro estaciones (semilla 11, año 5).
+
 ## v4.87 · 28 sep 2026 · La sierra vista desde arriba
 
 Vera, con siete capturas desde la vista más alta: «las montañas que tenemos
