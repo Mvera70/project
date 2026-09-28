@@ -1034,3 +1034,8 @@ html.bare:has(#root .ui-shell-content:not([hidden])) .valley-hud-right.hud-speed
    algo abierto se aparta; vuelve al cerrar. */
 html:has(.ui-shell-content:not([hidden])) .valley-compass,
 html:has(.valley-board-veil) .valley-compass { visibility: hidden; }
+
+/* v8 · **La crónica, entera**: de la cabecera a la barra, como la lámina v8.
+   Vera, 29 sep 2026: «entera, como en la demo». La gente, la ficha y el carro
+   siguen naciendo al 44 % (`skin.css`). */
+#root .ui-shell-content:has(.chronicle-scrim) { top: calc(var(--ui-hud-height, 96px) + 8px); }

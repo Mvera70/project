@@ -62,6 +62,12 @@ const CSS = `
 .valley-note-facts { margin: 0; color: var(--skin-ink-soft); font: 600 14px/1.3 var(--skin-font-voice);
   font-variant-numeric: tabular-nums; }
 .valley-note-risk { color: var(--want); }
+.valley-note-facts { display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; gap: 5px; }
+.valley-cost-chip { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 4px; box-sizing: border-box;
+  border: 8px solid transparent; border-image: var(--chip-cost) var(--chip-cost-slice) fill stretch; border-image-width: 14px;
+  color: var(--skin-ink); font: 700 15px/1 var(--skin-font-display); }
+.valley-cost-chip:not(.free)::before { content: ''; width: 18px; height: 18px; flex: 0 0 18px;
+  background-image: var(--res-silver); background-position: center; background-size: contain; background-repeat: no-repeat; }
 .valley-note-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .valley-step { display: flex; align-items: center; gap: 6px; }
 .valley-step button { width: 40px; height: 40px; padding: 0; color: #3d3020; font: 700 22px/1 var(--skin-font-voice); cursor: pointer;
@@ -151,11 +157,16 @@ export function boardPanel(actions: UiActions): UiPanel {
       const facts = document.createElement('p');
       facts.className = 'valley-note-facts';
       const weeks = renderUiText(mission.spec.weeks === 1 ? 'board.weeks.one' : 'board.weeks.many', { count: mission.spec.weeks });
-      const cost = mission.spec.silver === 0 ? renderUiText('board.free') : renderUiText('board.silver', { silver: mission.spec.silver });
+      // v7 · el coste en su ficha (pastilla de imagen, moneda a color), como la
+      // lámina: «Free» también va en la suya.
+      const cost = document.createElement('span');
+      cost.className = mission.spec.silver === 0 ? 'valley-cost-chip free' : 'valley-cost-chip';
+      cost.textContent = mission.spec.silver === 0 ? renderUiText('board.free') : String(mission.spec.silver);
+      cost.setAttribute('aria-label', mission.spec.silver === 0 ? renderUiText('board.free') : renderUiText('board.silver', { silver: mission.spec.silver }));
       const risk = document.createElement('span');
       risk.className = mission.spec.death >= 0.05 ? 'valley-note-risk' : '';
       risk.textContent = renderUiText(riskKey(mission));
-      facts.append(`${weeks} · ${cost} · `, risk);
+      facts.append(`${weeks} · `, cost, ' · ', risk);
       note.append(name, what, facts);
       if (mission.refusal === null) {
         const low = mission.spec.people[0];
