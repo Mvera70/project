@@ -1,5 +1,54 @@
 # Cuaderno de tareas — el rework
 
+## 28 sep 2026 · V6: piezas generadas para revisar la piel
+
+Encargo V5 de `2d9eb5a`: 8 marcos/controles, 5 recursos, 10 miniaturas del
+carro, 5 misiones y 7 crónicas a color con la composición del sepia. Cerdos
+regenerados por indicación de Vera: menos infantiles, proporciones naturales
+y tono medieval. Las miniaturas van en `public/ui/art/cards/` para conservar
+las escenas de crónica que usaban sus nombres. Nuevos tokens de imagen,
+sin cambios de componentes, motor ni textos. Los siete PNG de crónica se
+sustituyen localmente, con copia de originales.
+
+Láminas estáticas 390×844 y 320×568, muestrario de 35 piezas y comparación
+sepia/color en `ui-redesign/laminas-v6-2026-09-28/`. Alfa y medidas exactas;
+revisión visual y comprobación de texto, carga y controles de 44 px. Skill
+`piel-del-valle` actualizada con lo aprendido. Documento:
+`ui-redesign/propuesta-piel-v6-2026-09-28.md`. **Pendiente de revisión de Vera**;
+no se continúa con otras 44 crónicas ni claves compartidas hasta esa revisión.
+
+## 28 sep 2026 · Cuarta pasada documental sobre la piel v3
+
+`docs/ui-redesign/propuesta-piel-v4-2026-09-28.md` y HTML autónomo comparativo
+en `docs/ui-redesign/laminas-v4-2026-09-28/index.html`. Base: v3 de main,
+`9ac5871`. Se conservan sol, brújula, iconos, tipografías, A1 y B1. Vera señaló
+exceso de madera de fondo: v4 concentra la veta en marcos y soportes, aclara
+mandos y reduce repetición. Tres láminas más una vista estrecha; solo revisión
+del HTML. No hay cambios en `src/` ni implementación en el juego.
+
+## 28 sep 2026 · Propuesta detallada de la nueva piel
+
+En `docs/ui-redesign/propuesta-piel-v2-2026-09-28.md`: una dirección visual
+con variantes A/B de cabecera y tira inferior; cinco láminas montadas sobre la
+captura archivada, sin arrancar el juego; bocetos A1/B1 de Vera conservados en
+`docs/ui-redesign/referencias-ventanas-2026-09-28/`. A1 queda como papel
+contextual para leer, B1 como madera con avisos para decidir. La propuesta
+registra el defecto comunicado de v4.95 (toque del tablón no abre la ruta) y
+define su comprobación en la fase de integración. **Pendiente:** Vera elige el
+acabado de cabecera/tira y revisa A1/B1; después se implementa y valida en
+el juego. No hubo cambios de código de UI ni procesos pesados en esta ronda.
+
+## 28 sep 2026 · Nuevo rediseño de interfaz, plan preparado
+
+Vera considera que la UI actual se queda corta. Instaladas en Codex
+`redesign-existing-projects`, `frontend-design` y `game-ui-ux`, y copiadas a
+`.claude/skills/` para Claude Code en este proyecto; plan vigente en
+`docs/ui-redesign/plan-rediseño-ui-2026-09-28.md`. La primera ronda audita la
+versión archivada del 27 sep y presenta una nueva piel con variantes de
+cabecera y navegación antes de extender cambios al código. **Decisión expresa:**
+sale el fondo de piedra de la botonera inferior. Sin cambios de UI ni capturas
+nuevas en esta ronda; Vera pidió evitar procesos que carguen la máquina.
+
 ## 28 sep 2026 · Cartel del camino de Astra
 
 `signpost` aceptado por Vera: fuente reproducible en

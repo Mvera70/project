@@ -1,0 +1,877 @@
+[
+  {
+    "id": "frame-parchment",
+    "path": "src/ui/redesign/frame-parchment.png",
+    "sourceSize": [
+      1586,
+      992
+    ],
+    "alphaCrop": [
+      38,
+      56,
+      1554,
+      936
+    ],
+    "size": [
+      640,
+      400
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 311774,
+    "sha256": "2263cf34873a6eb57fc750fc634487df183c33f2c0acbfe091cc0c1817663ede",
+    "original": null
+  },
+  {
+    "id": "frame-ribbon",
+    "path": "src/ui/redesign/frame-ribbon.png",
+    "sourceSize": [
+      2172,
+      724
+    ],
+    "alphaCrop": [
+      10,
+      263,
+      2163,
+      466
+    ],
+    "size": [
+      600,
+      80
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 60815,
+    "sha256": "5d45639ba248c9d7b9575072f9c7c249c419f87b342b6dbbaa10bb09fb001a8b",
+    "original": null
+  },
+  {
+    "id": "chip-cost",
+    "path": "src/ui/redesign/chip-cost.png",
+    "sourceSize": [
+      2109,
+      746
+    ],
+    "alphaCrop": [
+      19,
+      130,
+      2092,
+      599
+    ],
+    "size": [
+      360,
+      88
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 44457,
+    "sha256": "d65e38deb2ab157eb2024a0e8228f25e306ce4b9d63011ee9ca5d36f3cc1ccc8",
+    "original": null
+  },
+  {
+    "id": "plaque-green",
+    "path": "src/ui/redesign/plaque-green.png",
+    "sourceSize": [
+      2164,
+      726
+    ],
+    "alphaCrop": [
+      65,
+      144,
+      2099,
+      561
+    ],
+    "size": [
+      400,
+      92
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 54711,
+    "sha256": "430a51df7b73d54b5b3f646bbe938d06a1edc3c2d7d25680931628d1cc695c0c",
+    "original": null
+  },
+  {
+    "id": "plaque-green-off",
+    "path": "src/ui/redesign/plaque-green-off.png",
+    "sourceSize": [
+      2164,
+      726
+    ],
+    "alphaCrop": [
+      64,
+      141,
+      2098,
+      563
+    ],
+    "size": [
+      400,
+      92
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 55514,
+    "sha256": "937fb1998eac11bf9268670a639029197f723f3f938dcd6f7b1be5b0d661265f",
+    "original": null
+  },
+  {
+    "id": "btn-close",
+    "path": "src/ui/redesign/btn-close.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "alphaCrop": [
+      84,
+      84,
+      1170,
+      1166
+    ],
+    "size": [
+      88,
+      88
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 16098,
+    "sha256": "69c53250e38a37227f55215277bc040125f5863a6b6753e6de57e3493abd0ceb",
+    "original": null
+  },
+  {
+    "id": "nail",
+    "path": "src/ui/redesign/nail.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "alphaCrop": [
+      343,
+      337,
+      915,
+      899
+    ],
+    "size": [
+      32,
+      32
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 2413,
+    "sha256": "77fa7ddeb46857f2c15ce4459c617852b9bcdef9bc71862e7db76acc7dc61944",
+    "original": null
+  },
+  {
+    "id": "nail-bent",
+    "path": "src/ui/redesign/nail-bent.png",
+    "sourceSize": [
+      1303,
+      1207
+    ],
+    "alphaCrop": [
+      214,
+      170,
+      1067,
+      1032
+    ],
+    "size": [
+      48,
+      48
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 4337,
+    "sha256": "3f33f95a470d222be0ed238f0e2c291b473d3fb6e75583fe6ee7e619c7a84456",
+    "original": null
+  },
+  {
+    "id": "res-people",
+    "path": "src/ui/redesign/res-people.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "alphaCrop": [
+      103,
+      103,
+      1148,
+      1144
+    ],
+    "size": [
+      40,
+      40
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 3851,
+    "sha256": "ea43e3c7e90476805fe30d05adfbc084fca6159682db911984af7cfa9eff290d",
+    "original": null
+  },
+  {
+    "id": "res-grain",
+    "path": "src/ui/redesign/res-grain.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "alphaCrop": [
+      238,
+      47,
+      1126,
+      1223
+    ],
+    "size": [
+      40,
+      40
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 2343,
+    "sha256": "bfbd8ba9b96802772dbcf41aac3f8d416845b9724bec01780ab667eba1615006",
+    "original": null
+  },
+  {
+    "id": "res-wood",
+    "path": "src/ui/redesign/res-wood.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "alphaCrop": [
+      109,
+      256,
+      1168,
+      1098
+    ],
+    "size": [
+      40,
+      40
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 3043,
+    "sha256": "6179641151d03dbca767e242db7d5b89127adc4b41501e7c1849a4482fc766da",
+    "original": null
+  },
+  {
+    "id": "res-stone",
+    "path": "src/ui/redesign/res-stone.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "alphaCrop": [
+      126,
+      233,
+      1132,
+      1068
+    ],
+    "size": [
+      40,
+      40
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 3161,
+    "sha256": "3c4e0e74afd1a5a68eae36c2ec11f84a81246ca8dd6f24e0996099610bd27905",
+    "original": null
+  },
+  {
+    "id": "res-silver",
+    "path": "src/ui/redesign/res-silver.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "alphaCrop": [
+      269,
+      264,
+      984,
+      981
+    ],
+    "size": [
+      40,
+      40
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 4197,
+    "sha256": "a6e4955c91b16365015e5e6f588b58f57723efa43ec007ba77854c27cafa7f77",
+    "original": null
+  },
+  {
+    "id": "means-plough",
+    "path": "public/ui/art/cards/means-plough.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      116,
+      90,
+      1347,
+      1020
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 27453,
+    "sha256": "79ea76f87506351b497027f45e10c61b9d58daed1fb6247d4e4af5022eec36a9",
+    "original": "public/ui/art/means-plough.png"
+  },
+  {
+    "id": "means-pigs",
+    "path": "public/ui/art/cards/means-pigs.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      15,
+      137,
+      1346,
+      1081
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 44818,
+    "sha256": "dde9707ab335950100d7f76f68cac1c5ed34758c8d4f60d1138bee9cac546141",
+    "original": "public/ui/art/means-pigs.png"
+  },
+  {
+    "id": "means-ale",
+    "path": "public/ui/art/cards/means-ale.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      161,
+      98,
+      1242,
+      1052
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 56006,
+    "sha256": "2deaa269e926788fbdb8d9e32294e7624b5493d80fdaa290970917d443e5b639",
+    "original": "public/ui/art/means-ale.png"
+  },
+  {
+    "id": "means-axe",
+    "path": "public/ui/art/cards/means-axe.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      96,
+      11,
+      1279,
+      1140
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 22098,
+    "sha256": "81c74b8681a53f1ae072017b1bbac59c3aed35b069eb32362fbdbae30a269644",
+    "original": "public/ui/art/means-axe.png"
+  },
+  {
+    "id": "means-relic",
+    "path": "public/ui/art/cards/means-relic.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      196,
+      115,
+      1208,
+      1054
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 52894,
+    "sha256": "3c723d14f4d83a276b2c01e4a990e1caa975b8484ea174a1b7f9d1fa2f41fdde",
+    "original": "public/ui/art/means-relic.png"
+  },
+  {
+    "id": "means-hand",
+    "path": "public/ui/art/cards/means-hand.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      140,
+      27,
+      1289,
+      1115
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 34398,
+    "sha256": "877e71fdde73309d103f9bcea4dc09adb68ebfaf0f65e7f6a99a6eb44d9619e5",
+    "original": "public/ui/art/means-hand.png"
+  },
+  {
+    "id": "means-arms",
+    "path": "public/ui/art/cards/means-arms.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      33,
+      24,
+      1365,
+      1124
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 24502,
+    "sha256": "bbe704f369591833a8e2a7667e8c5fb56cb7e9b7916d75ed59bf58874b1b4cfa",
+    "original": "public/ui/art/means-arms.png"
+  },
+  {
+    "id": "means-bows",
+    "path": "public/ui/art/cards/means-bows.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      455,
+      5,
+      1057,
+      1112
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 20377,
+    "sha256": "8d36e86bbfc6be817823e5cb9a794f5bb4c536d91b924208ee33234b24d50a20",
+    "original": "public/ui/art/means-bows.png"
+  },
+  {
+    "id": "means-tower",
+    "path": "public/ui/art/cards/means-tower.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      377,
+      52,
+      1065,
+      1091
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 34984,
+    "sha256": "f3a726932879d46251f7ef5665dacac09368b5202f079c3a0bd13bfce62b86cf",
+    "original": "public/ui/art/means-tower.png"
+  },
+  {
+    "id": "means-gate",
+    "path": "public/ui/art/cards/means-gate.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      54,
+      79,
+      1311,
+      1095
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 53064,
+    "sha256": "91357a42b630ad936beea5d4e189f8a578e343d1813e3ac386925fab1c63025c",
+    "original": "public/ui/art/means-gate.png"
+  },
+  {
+    "id": "mission-mushrooms",
+    "path": "public/ui/art/cards/mission-mushrooms.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      152,
+      48,
+      1277,
+      1056
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 57297,
+    "sha256": "530ae6702c35734504aab8383e089063d583e5fa926d527e98003b29f96b2b5f",
+    "original": null
+  },
+  {
+    "id": "mission-herbs",
+    "path": "public/ui/art/cards/mission-herbs.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      82,
+      31,
+      1348,
+      1112
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 47809,
+    "sha256": "e4a116e8f6c4d0a86cba908c2b72f893c79be501a19ed6cbdb019ebc23321d02",
+    "original": null
+  },
+  {
+    "id": "mission-wolf-den",
+    "path": "public/ui/art/cards/mission-wolf-den.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      72,
+      67,
+      1313,
+      1088
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 60000,
+    "sha256": "165b1dba095f7a7d702eba42f0b57e31a98313a278264814686274385725dd22",
+    "original": null
+  },
+  {
+    "id": "mission-high-seam",
+    "path": "public/ui/art/cards/mission-high-seam.png",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "alphaCrop": [
+      126,
+      94,
+      1330,
+      1039
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 45291,
+    "sha256": "de8d3759dbcbd99998d33323a368e2aff07fd0c90f751808f63d6e5c84305863",
+    "original": null
+  },
+  {
+    "id": "mission-market",
+    "path": "public/ui/art/cards/mission-market.png",
+    "sourceSize": [
+      1375,
+      1144
+    ],
+    "alphaCrop": [
+      151,
+      119,
+      1235,
+      1033
+    ],
+    "size": [
+      192,
+      160
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "bytes": 62671,
+    "sha256": "8fb2c12c981ede47eb041c55c995f11dba982e51960b6f8702f0837aff6ed3d3",
+    "original": null
+  },
+  {
+    "id": "harvest",
+    "path": "public/ui/art/harvest.png",
+    "sourceSize": [
+      1402,
+      1122
+    ],
+    "alphaCrop": [
+      0,
+      0,
+      1402,
+      1122
+    ],
+    "size": [
+      640,
+      512
+    ],
+    "alphaRange": [
+      0,
+      252
+    ],
+    "bytes": 857395,
+    "sha256": "1b3994e9788e41d62317c818ccddabb44e409649838b47112f3d486181c7767e",
+    "original": "docs/ui-redesign/laminas-v6-2026-09-28/originals/public/ui/art/harvest.png"
+  },
+  {
+    "id": "birth",
+    "path": "public/ui/art/birth.png",
+    "sourceSize": [
+      1402,
+      1122
+    ],
+    "alphaCrop": [
+      0,
+      0,
+      1402,
+      1122
+    ],
+    "size": [
+      640,
+      512
+    ],
+    "alphaRange": [
+      6,
+      251
+    ],
+    "bytes": 740656,
+    "sha256": "cd4c616531233cc847afb81449e4cf7c3218d6ec6bceb79cdde37772f099a9bf",
+    "original": "docs/ui-redesign/laminas-v6-2026-09-28/originals/public/ui/art/birth.png"
+  },
+  {
+    "id": "death",
+    "path": "public/ui/art/death.png",
+    "sourceSize": [
+      1402,
+      1122
+    ],
+    "alphaCrop": [
+      0,
+      0,
+      1402,
+      1122
+    ],
+    "size": [
+      640,
+      512
+    ],
+    "alphaRange": [
+      0,
+      252
+    ],
+    "bytes": 741418,
+    "sha256": "43539003b7c6fc8053db18cf0771679f9b21c9151ecb39d34d518fad92b320c6",
+    "original": "docs/ui-redesign/laminas-v6-2026-09-28/originals/public/ui/art/death.png"
+  },
+  {
+    "id": "built",
+    "path": "public/ui/art/built.png",
+    "sourceSize": [
+      1402,
+      1122
+    ],
+    "alphaCrop": [
+      3,
+      0,
+      1399,
+      1117
+    ],
+    "size": [
+      640,
+      512
+    ],
+    "alphaRange": [
+      0,
+      253
+    ],
+    "bytes": 804661,
+    "sha256": "c2a6576bfe9f81d2f138a9c34cec9188c4036a05a1879fa377230f6299bfb7d3",
+    "original": "docs/ui-redesign/laminas-v6-2026-09-28/originals/public/ui/art/built.png"
+  },
+  {
+    "id": "pedlar",
+    "path": "public/ui/art/pedlar.png",
+    "sourceSize": [
+      1402,
+      1122
+    ],
+    "alphaCrop": [
+      2,
+      1,
+      1402,
+      1112
+    ],
+    "size": [
+      640,
+      512
+    ],
+    "alphaRange": [
+      0,
+      253
+    ],
+    "bytes": 791735,
+    "sha256": "45390585cc45278ef810ba0c838fde078289aed261281f92fb8f731313d88a1c",
+    "original": "docs/ui-redesign/laminas-v6-2026-09-28/originals/public/ui/art/pedlar.png"
+  },
+  {
+    "id": "wedding",
+    "path": "public/ui/art/wedding.png",
+    "sourceSize": [
+      1402,
+      1122
+    ],
+    "alphaCrop": [
+      7,
+      8,
+      1394,
+      1109
+    ],
+    "size": [
+      640,
+      512
+    ],
+    "alphaRange": [
+      0,
+      253
+    ],
+    "bytes": 794819,
+    "sha256": "488444a642098ae58533c75dae000553d68bfc7f744075b88551cd03652136a0",
+    "original": "docs/ui-redesign/laminas-v6-2026-09-28/originals/public/ui/art/wedding.png"
+  },
+  {
+    "id": "fire",
+    "path": "public/ui/art/fire.png",
+    "sourceSize": [
+      1402,
+      1122
+    ],
+    "alphaCrop": [
+      0,
+      0,
+      1402,
+      1122
+    ],
+    "size": [
+      640,
+      512
+    ],
+    "alphaRange": [
+      0,
+      253
+    ],
+    "bytes": 852493,
+    "sha256": "c581303a3f3992159bb0309d4a88c94dbdcb404b51cd9f9edd5297449e494306",
+    "original": "docs/ui-redesign/laminas-v6-2026-09-28/originals/public/ui/art/fire.png"
+  }
+]

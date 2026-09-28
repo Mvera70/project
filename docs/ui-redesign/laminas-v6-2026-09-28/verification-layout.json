@@ -1,0 +1,374 @@
+[
+  {
+    "scene": "cart",
+    "width": 390,
+    "height": 844,
+    "bodyWidth": 390,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 92,
+        "height": 48
+      }
+    ],
+    "overflowingText": [],
+    "scrollable": [
+      {
+        "element": "cart-list",
+        "scrollHeight": 2181,
+        "clientHeight": 599
+      }
+    ],
+    "fonts": true,
+    "artOverlapsDescription": []
+  },
+  {
+    "scene": "board",
+    "width": 390,
+    "height": 844,
+    "bodyWidth": 390,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "One fewer",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "One more",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "Send",
+        "width": 88,
+        "height": 48
+      },
+      {
+        "label": "One fewer",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "One more",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "Send",
+        "width": 88,
+        "height": 48
+      },
+      {
+        "label": "Send",
+        "width": 88,
+        "height": 48
+      },
+      {
+        "label": "Send",
+        "width": 88,
+        "height": 48
+      },
+      {
+        "label": "One fewer",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "One more",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "Send",
+        "width": 88,
+        "height": 48
+      }
+    ],
+    "overflowingText": [],
+    "scrollable": [
+      {
+        "element": "notes",
+        "scrollHeight": 1465,
+        "clientHeight": 540
+      }
+    ],
+    "fonts": true,
+    "artOverlapsDescription": []
+  },
+  {
+    "scene": "chronicle",
+    "width": 390,
+    "height": 844,
+    "bodyWidth": 390,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44
+      }
+    ],
+    "overflowingText": [],
+    "scrollable": [
+      {
+        "element": "chronicle-sheet",
+        "scrollHeight": 2511,
+        "clientHeight": 660
+      }
+    ],
+    "fonts": true,
+    "artOverlapsDescription": []
+  },
+  {
+    "scene": "cart",
+    "width": 320,
+    "height": 568,
+    "bodyWidth": 320,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 48
+      },
+      {
+        "label": "Give",
+        "width": 79,
+        "height": 48
+      }
+    ],
+    "overflowingText": [],
+    "scrollable": [
+      {
+        "element": "cart-list",
+        "scrollHeight": 2275,
+        "clientHeight": 323
+      }
+    ],
+    "fonts": true,
+    "artOverlapsDescription": []
+  },
+  {
+    "scene": "board",
+    "width": 320,
+    "height": 568,
+    "bodyWidth": 320,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "One fewer",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "One more",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "Send",
+        "width": 78,
+        "height": 48
+      },
+      {
+        "label": "One fewer",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "One more",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "Send",
+        "width": 78,
+        "height": 48
+      },
+      {
+        "label": "Send",
+        "width": 78,
+        "height": 48
+      },
+      {
+        "label": "Send",
+        "width": 78,
+        "height": 48
+      },
+      {
+        "label": "One fewer",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "One more",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "label": "Send",
+        "width": 78,
+        "height": 48
+      }
+    ],
+    "overflowingText": [],
+    "scrollable": [
+      {
+        "element": "notes",
+        "scrollHeight": 1464,
+        "clientHeight": 264
+      }
+    ],
+    "fonts": true,
+    "artOverlapsDescription": []
+  },
+  {
+    "scene": "chronicle",
+    "width": 320,
+    "height": 568,
+    "bodyWidth": 320,
+    "brokenImages": 0,
+    "buttons": [
+      {
+        "label": "Close",
+        "width": 44,
+        "height": 44
+      }
+    ],
+    "overflowingText": [],
+    "scrollable": [
+      {
+        "element": "chronicle-sheet",
+        "scrollHeight": 2373,
+        "clientHeight": 384
+      }
+    ],
+    "fonts": true,
+    "artOverlapsDescription": []
+  },
+  {
+    "interactions": {
+      "countAfterPlus": "3",
+      "cappedAtMissionMaximum": true,
+      "actionDimmed": true,
+      "closedToValley": true
+    }
+  },
+  {
+    "pieces": {
+      "brokenImages": 0,
+      "count": 28,
+      "chronicleCount": 7
+    }
+  },
+  {
+    "errors": []
+  }
+]

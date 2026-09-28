@@ -46,6 +46,8 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `plan-meta.md` | **El plan hacia la meta** (§1b), con prioridad, dificultad y agente |
 | `encargos-3d.md` | **Todo lo que el juego no enseña todavía**: mallas, animaciones y mecánicas sin representación, apuntado en la misma ronda en que se descubre |
 | `interfaz/` | **La interfaz, versión a versión**: una carpeta por fecha con todas las pantallas y estados del juego (skill `press-kit`), para comparar qué cambió |
+| `ui-redesign/propuesta-piel-v6-2026-09-28.md` | **V6 para revisión**: 35 piezas generadas, [carro, tablón y crónica](ui-redesign/laminas-v6-2026-09-28/index.html), [muestrario](ui-redesign/laminas-v6-2026-09-28/pieces.html) y siete escenas a color. Pendiente de aprobación e integración funcional |
+| `ui-redesign/propuesta-piel-v4-2026-09-28.md` | **Cuarta pasada para revisión** sobre v3: [HTML comparativo](ui-redesign/laminas-v4-2026-09-28/index.html), menos madera repetida y piezas del juego conservadas. Solo mockups; v2 queda rechazada |
 | `plan-arte-pendiente.md` | La cola del arte: cada crónica nueva trae aquí su imagen pedida |
 | `plan-audio.md` | **Inventario maestro de audio**: ambiente, interfaz, economía, hitos, fases y asedio. En curso |
 | `agents.md` | Cómo se delega y se audita |
@@ -112,7 +114,7 @@ una decisión vieja, nunca para saber qué hacer ahora — para eso está
 
 | Carpeta | Qué hay | Por qué no se movió |
 |---|---|---|
-| `ui-redesign/` | El rediseño de interfaz: plan, piel, rondas, prototipos y capturas | **Está vivo**: sus PNG y sus planes los citan `src/ui/`, treinta pruebas y las skills `piel-del-valle` y `calcar-iconos` |
+| `ui-redesign/` | El rediseño de interfaz: [plan vigente del 28 sep](ui-redesign/plan-rediseño-ui-2026-09-28.md), piel, rondas, prototipos y capturas | **Está vivo**: sus PNG y sus planes los citan `src/ui/`, treinta pruebas y las skills `piel-del-valle` y `calcar-iconos` |
 | `observations/` | Las observaciones del valle en marcha (OBS-01, OBS-02) | Evidencia reciente, en su propia carpeta desde el principio |
 | `visual-reference/` | La referencia visual del dueño del diseño | Material aprobado, con su propio README y su verificador |
 | `art-direction-mobile-2026-09/` | Capturas fuente, láminas generadas y workflow reproducible para la piel móvil | Material de trabajo vigente de «Diorama vivo + libro de crónica» |

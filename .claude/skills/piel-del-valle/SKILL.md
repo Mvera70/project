@@ -5,6 +5,63 @@ description: El estándar visual de la interfaz de The Valley: qué papel, qué 
 
 # La piel del valle: un estándar, no un catálogo de excepciones
 
+## Regla V5 de producción de arte · 28 sep 2026
+
+### Aplicación V6: ilustración ligada al contenido
+
+**Corrección de Vera durante V6:** los cerdos deben ser menos infantiles;
+es la Edad Media. Animales con proporciones naturales, ojos pequeños,
+expresión neutra y materiales rústicos. Evitar sonrisas humanas, cejas,
+ojos grandes brillantes y aspecto de mascota de juego infantil. Mantener
+color y contornos suaves sin perder ese tono medieval.
+
+Leer `docs/encargos/piezas-de-la-piel-v5.md` §0 y la propuesta V5 antes de
+producir piezas. `mockup-cart-2026-09-24.jpg` es referencia de estilo
+(color, contornos suaves, luz superior izquierda), nunca un banco de objetos
+para copiar: cada medio del carro y cada misión recibe imagen nueva.
+Relacionar cada pieza con `MEANS_SPEC`, `MISSION_IDS` o la clave de crónica.
+Para crónica abrir el sepia actual, leer la línea de `bank.en.ts` y conservar
+composición al pasar a color. Si un fichero cubre escenas distintas, preparar
+una imagen por clave; no propagar la nueva imagen a todas por comodidad.
+Primera tanda de crónica: harvest, birth, death, built, pedlar, wedding y
+fire; presentarla montada antes de continuar con las otras 44 y las claves
+compartidas. Guardar originales, prompts, medidas, alfa y correspondencias.
+
+Marcos: centro vacío, esquinas dentro de la región fija y borde de imagen
+con el factor 2× correcto. Inspeccionar la pieza a tamaño de uso y estirada:
+el generador no garantiza por sí solo medidas exactas ni nueve partes
+correctas. Exportar controles/iconos/objetos a 2× de su tamaño CSS; crónica
+de esta tanda a los 640×512 pedidos. CSS compone y estira imágenes, sin
+dibujar filigranas, clavos, materiales o arte sustitutorio. Texto vivo encima.
+
+Entrega de referencia: `docs/ui-redesign/propuesta-piel-v6-2026-09-28.md`.
+Las miniaturas del carro/misiones viven en `public/ui/art/cards/`: nombres
+como `means-pigs.png` ya identifican escenas grandes en la crónica. No
+sustituir una escena por una miniatura al preparar el catálogo. Guardar
+copias antes de reemplazar las siete escenas solicitadas.
+
+El alfa casi invisible puede ocupar todo el lienzo del generador: medir la
+silueta antes de exportar, conservar un margen y el alfa original dentro de
+él, y revisar el resultado a tamaño CSS. Validar nueve partes con el PNG
+normalizado, no con su maestro. En el tablón, reservar la altura completa de
+la ilustración antes de empezar la descripción; medir solo el título no
+detecta el solapamiento del dibujo. Capturas de V6 a 390×844 y 320×568.
+
+Para esta revisión V6 mandan el cierre PNG pedido y la reducción de piedra
+y madera repetida de V4/V5 sobre las recetas históricas de abajo. El resto
+de pantallas conserva sus reglas hasta que se apruebe su cambio.
+
+Vera descarta el clavo dibujado a mano: en V5 se usan piezas reales recortadas
+del mockup. Todo dibujo nuevo —clavos, ilustraciones, losetas u otras piezas—
+se encarga al generador de imágenes de Codex. No sustituirlo por dibujo manual,
+SVG inventado o textura CSS. Los iconos existentes aprobados se conservan;
+composición, texto vivo, foco y disposición siguen siendo trabajo de interfaz.
+La V5 que prepara Vera será la referencia de extracción; no dar por aprobado
+el acabado de V4. Un recorte literal y una reconstrucción generativa son
+entregas distintas y deben identificarse. Flujo en
+`docs/ui-redesign/produccion-piezas-v5.md`. Esta regla prevalece sobre las
+recetas antiguas de generación procedural de arte que figuren más abajo.
+
 Esta skill existe por una frase del dueño del diseño, el 17 sep 2026, probando la
 demo en su tablet:
 

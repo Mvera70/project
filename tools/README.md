@@ -16,6 +16,8 @@ terminada.
 | Medir motor y balance | [`reports/`](#reports--medir-el-motor-sin-tocarlo) |
 | Revisar interfaz o PWA | [`shots/`](#shots--la-interfaz-fotografiada), [`pwa/`](#pwa--instalable-y-sin-conexión) y [`ui/`](#ui--la-piel-y-los-iconos) |
 | Reproducir una ronda cerrada | [`history/`](history/README.md) |
+| Regenerar los mockups documentales v4 | [`generate.mjs`](../docs/ui-redesign/laminas-v4-2026-09-28/generate.mjs) compone el HTML; [`capture.mjs`](../docs/ui-redesign/laminas-v4-2026-09-28/capture.mjs) captura la página estática con Edge. [Alcance e instrucciones](../docs/ui-redesign/propuesta-piel-v4-2026-09-28.md). No ejecutan el juego |
+| Exportar piezas y revisar V6 | [`export-assets.py`](../docs/ui-redesign/laminas-v6-2026-09-28/export-assets.py) normaliza PNG de ImageGen; [`build.mjs`](../docs/ui-redesign/laminas-v6-2026-09-28/build.mjs) genera HTML y muestrario; [`capture.mjs`](../docs/ui-redesign/laminas-v6-2026-09-28/capture.mjs) captura con Edge. [Alcance](../docs/ui-redesign/propuesta-piel-v6-2026-09-28.md). Solo prototipo estático |
 
 | Carpeta | Qué hay dentro |
 |---|---|
