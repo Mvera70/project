@@ -45,7 +45,10 @@ de cerca».
 - **Piedras por la calzada de la villa** (`buildRoadStones`, `world/road.ts`):
   guijarros instanciados con la geometría del peñasco pequeño, 0,6 por celda,
   sólo en la era de villa y sólo a lo largo del camino; de lejos no se ven, de
-  cerca la calzada ya no es una franja lisa.
+  cerca la calzada ya no es una franja lisa (de 9 a 14 cm tras la primera
+  captura: a 9 no se leían). Y **la hierba no crece sobre el camino pintado**:
+  `grass.plant` recibe el desgaste del suelo además del del motor, que los
+  hombros del camino son sólo pintura y salían con matas encima.
 
 Pruebas: `valley-road-engine.test.ts` (dos bocas, un camino pisable por boca
 desde la fundación, senda a los cuatro años, determinista), `visitors-road.test.ts`

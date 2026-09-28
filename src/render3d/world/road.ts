@@ -41,7 +41,7 @@ const SIGN_DISTANCE = 10;
 /** Cuánto se aparta el cartel del eje del camino, en celdas. */
 const SIGN_ASIDE = 0.55;
 /** TUNE visual. Las piedras sueltas de la calzada de la villa: cuántas por celda, y su tamaño en celdas. */
-const STONES = { PER_CELL: 0.6, SIZE: 0.09, SPREAD: 0.5 } as const;
+const STONES = { PER_CELL: 0.6, SIZE: 0.14, SPREAD: 0.5 } as const;
 
 export interface Signpost { readonly x: number; readonly z: number; readonly yaw: number }
 

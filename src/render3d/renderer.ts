@@ -520,6 +520,8 @@ export async function createGraphicsRenderer(
   // repintados del suelo; la hierba y el suelo nevado lo leen.
   let trample: TrampleMap | null = null;
   let signposts: Group | null = null;
+  /** El desgaste pintado del camino del valle, para que la hierba no crezca sobre él. */
+  let roadWear: Uint8Array | null = null;
   const tramplers: Trampler[] = [];
   /** Hasta qué altura de vista se aparta la hierba en vivo: más lejos no se ve. */
   const TRAMPLE_VIEW = 40;
@@ -1105,6 +1107,7 @@ export async function createGraphicsRenderer(
     // El camino del valle, de las bocas de los desfiladeros a la plaza, pintado
     // en el suelo al nivel de la era; y los carteles desde la aldea.
     const road = valleyRoad(state.map, terrainSeed, plazaOf(state), era);
+    roadWear = road.wear;
     ground = buildGround(state.map, palette, plazaOf(state), era,
       snowing < 0.5 ? (x, z) => meadowWeight(terrainSeed, x, z) : undefined, road.wear);
     if (signposts !== null) world.remove(signposts);
@@ -1782,7 +1785,7 @@ export async function createGraphicsRenderer(
       // cambió algo de lo que la mueve (caminos, edificios, campos segados).
       if (shown.tick !== grassTick || change.cleared) {
         grassTick = shown.tick;
-        grass.plant(shown, groundFloor, plazaOf(shown));
+        grass.plant(shown, groundFloor, plazaOf(shown), roadWear ?? undefined);
         grass.season(appearancePalette ?? paletteFor(live.season, live.seasonWeek),
           snowCover(live.season, live.seasonWeek));
       }

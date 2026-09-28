@@ -163,8 +163,13 @@ interface Chunk { readonly mesh: InstancedMesh; readonly tufts: readonly Tuft[] 
 
 export interface Grass {
   readonly group: Group;
-  /** Planta la hierba para este estado. No hace nada si nada de lo que la mueve ha cambiado. */
-  plant(state: GameState, ground: (x: number, z: number) => number, plaza: PlazaPatch): void;
+  /**
+   * Planta la hierba para este estado. No hace nada si nada de lo que la mueve
+   * ha cambiado. `wear` es el desgaste que pinta el suelo además del del motor
+   * —el camino del valle y sus hombros (`world/road.ts`)—: donde el suelo se
+   * pinta pisado, la hierba no crece.
+   */
+  plant(state: GameState, ground: (x: number, z: number) => number, plaza: PlazaPatch, wear?: Uint8Array): void;
   /** La estación: el color de la hierba y cuánto la tapa la nieve (0 a 1). */
   season(palette: Palette, snow: number): void;
   /** La altura de la vista, en celdas: de lejos se dibujan menos matas. */
@@ -327,10 +332,10 @@ attribute float grassRank;`)
 }
 
 /** La firma de lo que mueve la hierba: si no cambia, no se replanta. */
-function signature(state: GameState, plaza: PlazaPatch): string {
+function signature(state: GameState, plaza: PlazaPatch, wear: Uint8Array | undefined): string {
   let path = 0, terrain = 0;
   for (let i = 0; i < state.map.path.length; i += 1) {
-    path = (path * 31 + state.map.path[i]!) | 0;
+    path = (path * 31 + Math.max(state.map.path[i]!, wear?.[i] ?? 0)) | 0;
     terrain = (terrain * 31 + state.map.terrain[i]!) | 0;
   }
   const buildings = state.buildings.map((b) => {
@@ -469,8 +474,8 @@ export function createGrass(handheld: boolean): Grass {
       const drawn = [...grassChunks, ...lawnChunks, ...stubbleChunks].reduce((n, c) => n + c.mesh.count, 0);
       return { grass: sum(grassChunks), lawn: sum(lawnChunks), stubble: sum(stubbleChunks), drawn };
     },
-    plant(state, ground, plaza): void {
-      const key = `${handheld ? 1 : 0}:${signature(state, plaza)}`;
+    plant(state, ground, plaza, wear): void {
+      const key = `${handheld ? 1 : 0}:${signature(state, plaza, wear)}`;
       if (key === planted) return;
       planted = key;
       const { width, height } = state.map;
@@ -514,7 +519,7 @@ export function createGrass(handheld: boolean): Grass {
         if (blocked[cell] === 1) continue;
         const scale = TERRAIN_SCALE[state.map.terrain[cell]!];
         if (scale === undefined) continue;
-        const keep = PATH_KEEP[Math.min(3, state.map.path[cell] ?? 0)] ?? 0;
+        const keep = PATH_KEEP[Math.min(3, Math.max(state.map.path[cell] ?? 0, wear?.[cell] ?? 0))] ?? 0;
         if (keep <= 0) continue;
         if (Math.hypot(x + 0.5 - plaza.x, z + 0.5 - plaza.y) < plaza.radius + 0.5) continue;
         const lush = meadowWeight(seed, x, z);
