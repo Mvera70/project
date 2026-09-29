@@ -380,11 +380,27 @@ qué se ve a 390×844 y qué observación la refutaría.
 | mule · idle/walk | banco AN-0; buhonero en partida (IA-5) | — | **conservado** (3,2 Hz) | — |
 | golondrina | plano general 11/21 (cielo) | bate y planea | **conservado** (la fila de AN-0 estaba mal) | — |
 
-### 5.3 Coste (pendiente: cadena 4)
+### 5.3 Coste
 
-Se rellena con `AN-4/perf/`: `gl-probe` villa 7/60 y aldea 11/21 (llamadas,
-triángulos, programas) contra `AN-0/perf/`, y `animation-cost.ts` antes
-(worktree en `d82bd84`) y después, dos pasadas cada uno.
+**Llamadas de dibujo y triángulos** (`gl-probe`, SwiftShader, reloj vivo,
+`artifacts/graphics/AN-4/perf/` contra `AN-0/perf/`). No son FPS de ningún
+aparato y el JS medido dentro del `requestAnimationFrame` de SwiftShader no
+es comparable (el rasterizador dibuja dentro del callback); lo que se compara
+es lo que la escena pide a la GPU:
+
+| Escena | Antes (AN-0) | Después (AN-4) | Lectura |
+|---|---|---|---|
+| Aldea 11/21 | 441 llamadas · 695 243 tris · 43 programas | 446 llamadas · 706 440 tris · 43 programas | igual (+1 % de llamadas, +1,6 % de triángulos: lo que varía entre dos ventanas de reloj vivo) |
+| Villa 7/60 | 503 · 826 018 · 42 | 474 · 778 714 · 64 | menos llamadas y triángulos en la ventana medida; **los programas no son comparables**: cuentan las variantes de sombreado compiladas hasta ese momento, y con el reloj vivo dependen de lo que entró en cuadro (lluvia, noche, fuego), no de la animación, que no añade materiales |
+
+Ningún cambio de esta ronda añade mallas, huesos, materiales ni clips al GLB
+(los clips fabricados se generan sobre el `idle`, como antes; `throw` es uno
+más de la misma familia; las chispas comparten la malla y el material de las
+astillas).
+
+**JS de posar reparto y fauna por fotograma** (`tools/reports/animation-cost.ts`,
+Node, sin dibujar; antes en un worktree de `d82bd84`, después en la rama;
+dos pasadas cada uno, seguidas): pendiente de la cadena 4, se rellena abajo.
 
 ### 5.4 Pendiente en dispositivo real
 
