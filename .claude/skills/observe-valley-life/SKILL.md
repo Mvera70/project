@@ -98,3 +98,27 @@ persistente permanece fijo. Con `--live` avanzan el bucle de la aplicación y el
 comprueba varias noches y ticks, y distingue el total de residentes en cada amanecer
 porque puede haber bajas o cambios de vivienda. A ×64 y 2 fps se miden ciclos, no la
 calidad de las zancadas: para eso conserva las tomas lentas de 15 fps.
+
+## Lo que la ronda AN añadió (29 sep 2026)
+
+- `--viewport 390x844` (o `320x568`) mira el valle al tamaño de un móvil;
+  `--look X,Z` encuadra una coordenada sin seguir a nadie; `--follow ID
+  --zoom 0.18` a 15 fps durante 4–8 s es la toma de detalle de un cuerpo.
+- **Antes y después del mismo estado:** misma semilla, año, lead, actor,
+  cámara y zoom; el «antes» con `--page <empaquetado-anterior>/valley.html`
+  (se construye con el GLB viejo copiado a `public/assets/valley3d/` y se
+  restaura después). Las trazas casan fotograma a fotograma (mismo
+  `engineTick`, mismas posiciones).
+- **Saltos y ritmo se miden sobre `trace.json`** (posiciones por fotograma,
+  pasos exactos): `film.mjs` rueda en tiempo real y bajo SwiftShader tarda
+  8 s por fotograma, así que su informe cuenta el reloj como saltos.
+- `--hunt` toca la señal de caza al acabar el lead y rueda la escena (el
+  juego sigue al cazador); si no hay señal, se para y lo dice: la
+  oportunidad la ofrece el motor (`huntOpportunity`), no el observatorio.
+- `--beast` sólo actúa junto a `--aftermath`; la visita del oso se provoca
+  con `--happening bear_in_the_wood`. `fps` tiene que dividir a 30.
+- `export VALLEY_CHROMIUM=/opt/pw-browsers/chromium` cuando Playwright pide
+  un Chromium que no está; un solo Chromium a la vez, encadenados con un
+  script y un `grep` de su marca de fin.
+- Las comparaciones a escala nativa (GIF «antes | después» a 1:1 y tira):
+  `python3 artifacts/graphics/AN-4/compare/build-compare.py`.
