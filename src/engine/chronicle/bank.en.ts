@@ -2617,6 +2617,7 @@ export const UI_BANK: Record<string, string> = {
   'app.bare.off': 'Show the panels again',
   'app.compass': 'View globe: drag to turn and tilt the view, tap to face north',
   'app.compass.north': 'N',
+  'app.compass.south': 'S',
   'app.compass.help': 'Drag: move · Right-drag: turn and tilt · Wheel: zoom\nKeys: WASD or arrows move · Q/E turn · R/F tilt · +/− zoom · N north\nOn this globe: drag to turn and tilt, click to face north',
   'app.speed.controls': 'Simulation speed',
   'app.speed.pause': 'Pause',

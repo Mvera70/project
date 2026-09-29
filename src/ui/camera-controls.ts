@@ -18,6 +18,7 @@
 // Es interfaz pura: sólo llama a lo que la cámara ya tenía (`pan`, `orbit`,
 // `zoom`) y lee hacia dónde mira (`heading`). No toca el motor.
 
+import ringMetal from './redesign/ring-metal.png';
 import { renderUiText } from '@engine/chronicle/render';
 
 export interface CameraApi {
@@ -40,12 +41,20 @@ const ORBIT_PER_PX = (0.8 * Math.PI) / 180;
 const PITCH_PER_PX = (0.5 * Math.PI) / 180;
 /** El radio de la bola dentro de su caja de 100 × 100: casi hasta el borde del fondo. */
 const RADIUS = 44;
-/** Los anillos: el horizonte, el meridiano norte-sur y el este-oeste. */
+/**
+ * Los anillos: el horizonte, el meridiano norte-sur y el este-oeste.
+ *
+ * v9 · **De latón, como la esfera armilar de Codex** (Vera, 29 sep 2026: «el
+ * último diseño que hizo Codex, pero que funcione como antes, la bola que
+ * gira»). El trazo lleva la textura de metal de `ring-metal.png` (ImageGen) y
+ * un canto oscuro debajo; lo que gira y cómo gira no cambia.
+ */
 const RINGS = [
-  { axis: [0, 1, 0], colour: '#7fb069' },
-  { axis: [1, 0, 0], colour: '#d9544f' },
-  { axis: [0, 0, 1], colour: '#4f86d9' },
+  { axis: [0, 1, 0] },
+  { axis: [1, 0, 0] },
+  { axis: [0, 0, 1] },
 ] as const;
+const RING_EDGE = '#362b1d';
 
 type V3 = readonly [number, number, number];
 const dot = (a: V3, b: V3): number => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -98,39 +107,60 @@ export function mountCameraControls(camera: () => CameraApi, surface: () => HTML
   const svg = document.createElementNS(svgNs, 'svg');
   svg.setAttribute('viewBox', '0 0 100 100');
   svg.setAttribute('aria-hidden', 'true');
-  const rim = document.createElementNS(svgNs, 'circle');
-  rim.setAttribute('cx', '50'); rim.setAttribute('cy', '50'); rim.setAttribute('r', String(RADIUS));
-  rim.setAttribute('fill', 'none'); rim.setAttribute('stroke', 'rgba(255,248,230,.55)'); rim.setAttribute('stroke-width', '1.5');
-  svg.append(rim);
+  // El latón, como patrón de la imagen: el trazo lo pinta la textura.
+  const defs = document.createElementNS(svgNs, 'defs');
+  const pattern = document.createElementNS(svgNs, 'pattern');
+  pattern.setAttribute('id', 'valley-compass-brass');
+  pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+  pattern.setAttribute('width', '64'); pattern.setAttribute('height', '64');
+  const metal = document.createElementNS(svgNs, 'image');
+  metal.setAttribute('href', ringMetal);
+  metal.setAttribute('width', '64'); metal.setAttribute('height', '64');
+  pattern.append(metal);
+  defs.append(pattern);
+  svg.append(defs);
+  const brass = 'url(#valley-compass-brass)';
+  // Cada anillo: la mitad de detrás tenue, y la de delante con su canto oscuro
+  // debajo, que es lo que la hace leerse como una esfera hueca de metal.
   const strokes = RINGS.map((ring) => {
     const back = document.createElementNS(svgNs, 'path');
+    const edge = document.createElementNS(svgNs, 'path');
     const front = document.createElementNS(svgNs, 'path');
-    for (const [path, opacity, width] of [[back, '0.28', '2'], [front, '1', '3']] as const) {
+    for (const [path, stroke, opacity, width] of [
+      [back, brass, '0.65', '2.5'], [edge, RING_EDGE, '1', '5'], [front, brass, '1', '3.5'],
+    ] as const) {
       path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', ring.colour);
+      path.setAttribute('stroke', stroke);
       path.setAttribute('stroke-opacity', opacity);
       path.setAttribute('stroke-width', width);
       path.setAttribute('stroke-linecap', 'round');
     }
     svg.append(back);
-    return { ring, back, front };
+    return { ring, back, edge, front };
   });
-  for (const stroke of strokes) svg.append(stroke.front);
-  // El norte del valle es -Z (la garganta de arriba del mapa).
-  const north = document.createElementNS(svgNs, 'g');
-  const northDot = document.createElementNS(svgNs, 'circle');
-  northDot.setAttribute('r', '9'); northDot.setAttribute('fill', '#d9544f');
-  const northText = document.createElementNS(svgNs, 'text');
-  northText.textContent = renderUiText('app.compass.north');
-  northText.setAttribute('text-anchor', 'middle'); northText.setAttribute('dominant-baseline', 'central');
-  northText.setAttribute('fill', '#fff'); northText.setAttribute('font-size', '12'); northText.setAttribute('font-weight', '700');
-  north.append(northDot, northText);
-  svg.append(north);
+  for (const stroke of strokes) svg.append(stroke.edge, stroke.front);
+  // El norte del valle es -Z (la garganta de arriba del mapa), y el sur +Z.
+  const marker = (label: string, colour: string): SVGGElement => {
+    const g = document.createElementNS(svgNs, 'g');
+    const dot = document.createElementNS(svgNs, 'circle');
+    dot.setAttribute('r', '8.5'); dot.setAttribute('fill', colour);
+    dot.setAttribute('stroke', brass); dot.setAttribute('stroke-width', '1.6');
+    const text = document.createElementNS(svgNs, 'text');
+    text.textContent = label;
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'central');
+    text.setAttribute('fill', '#f7e8c9'); text.setAttribute('font-size', '11'); text.setAttribute('font-weight', '700');
+    text.setAttribute('font-family', 'Cinzel, Georgia, serif');
+    g.append(dot, text);
+    svg.append(g);
+    return g;
+  };
+  const north = marker(renderUiText('app.compass.north'), '#724534');
+  const south = marker(renderUiText('app.compass.south'), '#31464b');
   compass.append(svg);
   const RING_STEPS = 48;
   const draw = (yaw: number, pitch: number): void => {
     const project = projector(yaw, pitch);
-    for (const { ring, back, front } of strokes) {
+    for (const { ring, back, edge, front } of strokes) {
       // Dos vectores perpendiculares al eje del anillo recorren su círculo.
       const helper: V3 = Math.abs(ring.axis[1]) > 0.9 ? [1, 0, 0] : [0, 1, 0];
       const e1 = unit3(cross(ring.axis, helper));
@@ -147,11 +177,14 @@ export function mountCameraControls(camera: () => CameraApi, surface: () => HTML
         wasFront = at.front;
       }
       front.setAttribute('d', dFront);
+      edge.setAttribute('d', dFront);
       back.setAttribute('d', dBack);
     }
-    const n = project([0, 0, -1]);
-    north.setAttribute('transform', `translate(${n.x.toFixed(1)} ${n.y.toFixed(1)})`);
-    north.setAttribute('opacity', n.front ? '1' : '0.35');
+    for (const [g, p] of [[north, [0, 0, -1]], [south, [0, 0, 1]]] as const) {
+      const at = project(p);
+      g.setAttribute('transform', `translate(${at.x.toFixed(1)} ${at.y.toFixed(1)})`);
+      g.setAttribute('opacity', at.front ? '1' : '0.45');
+    }
   };
   let drawn = '';
 

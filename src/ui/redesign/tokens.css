@@ -226,6 +226,21 @@
   --nav-medal: url('./nav-medal.png');               /* 112×112: el medallón de cada pestaña */
   --nav-medal-on: url('./nav-medal-on.png');
 
+  /* v9 · las texturas que quedaban antiguas, rehechas por Codex con ImageGen
+     (`docs/ui-redesign/propuesta-texturas-v9-2026-09-29.md`). Vera, 29 sep
+     2026: «la calidad con respecto a las antiguas es brutal». Cortes en px del
+     PNG (2×), bordes en px CSS, como las de arriba. */
+  --wood-header: url('./wood-header.png');           /* 748×184: la tabla de la cabecera */
+  --wood-board: url('./wood-board.png');             /* 512×512: loseta del tablón */
+  --parchment-sheet: url('./parchment-sheet.png');   /* 1024×1024: loseta de las hojas y la bandeja */
+  --plate-date: url('./plate-date.png');             /* 716×68: la placa de la fecha y el sol */
+  --well-vital: url('./well-vital.png');             /* 136×68: el hueco de cada cifra */
+  --strip-status: url('./strip-status.png');         /* 716×80: la tira de la frase de estado */
+  --button-parchment: url('./button-parchment.png'); /* 400×80: el botón secundario */
+  --button-parchment-off: url('./button-parchment-off.png');
+  --paper-document: url('./paper-document.png');     /* 1024×1024: loseta de los documentos */
+  --control-ivory: url('./control-ivory.png');       /* 128×96: los mandos del valle, marfil (elegido por Vera) */
+
   /* ------------------------------------------- los `--ui-*` de UI-R1, vivos */
   /* Cinco rondas los usan. Se conservan y **apuntan a los de arriba**, así
      que la piel nueva entra sin tocar `hud.ts`, `orders.ts`, `shell.css` ni

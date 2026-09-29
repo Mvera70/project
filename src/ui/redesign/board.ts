@@ -33,7 +33,7 @@ const CSS = `
 .valley-board { position: relative; width: min(100%, 390px); max-height: 100%; box-sizing: border-box; overflow-y: auto;
   display: flex; flex-direction: column; gap: 16px; padding: 44px 14px 16px; border-radius: 6px;
   /* la madera de la tabla de arriba: la misma textura, no un degradado */
-  background-color: var(--wood-plank); background-image: var(--plank-texture); background-size: var(--plank-size);
+  background-color: #4a2f1c; background-image: var(--wood-board); background-size: 256px 256px;
   border: 3px solid var(--wood-plank-deep);
   box-shadow: 0 18px 40px rgba(0,0,0,.55), inset 0 0 0 2px rgba(201,162,74,.35); }
 .valley-board-title { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); margin: 0;

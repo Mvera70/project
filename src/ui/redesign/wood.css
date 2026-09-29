@@ -1039,3 +1039,78 @@ html:has(.valley-board-veil) .valley-compass { visibility: hidden; }
    Vera, 29 sep 2026: «entera, como en la demo». La gente, la ficha y el carro
    siguen naciendo al 44 % (`skin.css`). */
 #root .ui-shell-content:has(.chronicle-scrim) { top: calc(var(--ui-hud-height, 96px) + 8px); }
+
+
+/* ================================================================ v9 · texturas
+
+   Las piezas de Codex (ImageGen) sustituyen a las texturas antiguas y a lo que
+   quedaba dibujado con CSS. Van al final para ganar a todo lo de arriba. CSS
+   sólo coloca y estira; el material lo pone la imagen. */
+
+/* La tabla de la cabecera: nueve partes, esquinas con sus clavos. */
+:root .ui-hud-header::before {
+  border: 12px solid transparent;
+  border-image: var(--wood-header) 48 fill stretch;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  filter: drop-shadow(0 4px 5px rgba(27, 16, 11, .55));
+}
+/* La placa de la fecha, marfil encastrado. */
+:root .hud-plate-date.skin-plate {
+  border: 10px solid transparent;
+  border-image: var(--plate-date) 20 28 fill stretch;
+  border-image-width: 10px 14px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+/* Cada cifra en su hueco tallado. */
+:root .valley-vital.skin-plate--chip {
+  /* Sin el atajo `border`: con `!important` reinicia también la imagen del
+     borde y la gana. El filete izquierdo de `skin.css` lleva `!important`. */
+  border-style: solid;
+  border-color: transparent;
+  border-width: 10px;
+  border-left-width: 10px !important;
+  border-image: var(--well-vital) 20 fill stretch;
+  border-image-width: 10px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+}
+/* Los mandos del valle (vista, pausa, velocidad, caza), en marfil: la opción
+   A que eligió Vera en la revisión v9. La velocidad elegida, en tinta verde. */
+:root .hud-round-btn,
+:root .valley-speeds.hud-speeds {
+  border: 10px solid transparent;
+  border-image: var(--control-ivory) 20 fill stretch;
+  border-image-width: 10px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: #3e3428;
+}
+:root .valley-speeds.hud-speeds button[aria-pressed="true"] { background: none; box-shadow: none; color: #1f4f59; }
+:root .hud-round-btn:active { transform: translateY(1px); box-shadow: none; }
+/* El fondo de las hojas (crónica, gente, ficha, carro) y de la bandeja del
+   valle: pergamino de imagen, loseta sin costura. Vera marcó la bandeja en la
+   tablet: el pergamino antiguo «no vale». */
+#root .ui-shell-content:has(.chronicle-scrim, .people-scrim, .valley-panel, .valley-cart),
+:root .ui-shell-message {
+  background-color: #f1e4c8;
+  background-image: var(--parchment-sheet);
+  background-size: 512px 512px;
+  background-repeat: repeat;
+}
+/* El botón secundario: placa de pergamino con canto de roble. */
+:root .skin-button--parchment {
+  border: 10px solid transparent;
+  border-image: var(--button-parchment) 24 fill stretch;
+  border-image-width: 12px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+:root .skin-button--parchment:disabled { border-image-source: var(--button-parchment-off); }

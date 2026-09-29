@@ -15,6 +15,7 @@ export const UI_BANK_ES: Record<string, string> = {
   'hunt.sign.bear': 'El oso: ir de caza',
   'app.compass': 'Bola de la vista: arrastra para girar e inclinar, toca para mirar al norte',
   'app.compass.north': 'N',
+  'app.compass.south': 'S',
   'app.compass.help': 'Arrastrar: mover · Botón derecho: girar e inclinar · Rueda: acercar\nTeclas: WASD o flechas mueven · Q/E giran · R/F inclinan · +/− acercan · N norte\nEn esta bola: arrastra para girar e inclinar, clic para mirar al norte',
   // M-0 · las existencias nuevas, la cara del ánimo y la oferta del camino.
   'app.vitals.stone': '{count} de piedra',
