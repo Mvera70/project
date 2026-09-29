@@ -213,7 +213,8 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
     en cero pasos y la fecha quieta. Se ve en el reparto del fotograma (`paint`
     enorme, `lifeMs` 0) y en el perfil de CPU (`createVillage`). Con el umbral a
     30 s se recupera a 18–78 ms. **Mientras no se arregle, la villa no sirve
-    para medir el dibujo**: mide el bucle.
+    para medir el dibujo**: mide el bucle. La nota entera, con cómo
+    reproducirlo: `docs/medidas/bucle-villa-2026-09-29.md`.
 
 ## Lo que queda (por lo que pesa)
 

@@ -344,6 +344,9 @@ misma máquina.
 
 ### Un hallazgo que no es de esta ronda: la villa se queda en bucle (y la tablet a 0 fps)
 
+> Apuntado aparte, con la evidencia entera y cómo reproducirlo:
+> `docs/medidas/bucle-villa-2026-09-29.md` (GV-4 en `plan-meta.md`).
+
 Midiendo el reparto del fotograma, la villa 7/60 dio **3,7–3,9 s por `paint`**
 con el dibujo en 10 ms y la vida en cero pasos, **antes y después** de esta
 ronda, con los ganchos de toma y sin ellos. El perfil de CPU (el juego sin

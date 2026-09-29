@@ -73,6 +73,7 @@ Las herramientas que las produjeron están en `tools/reports/`.
 | `medidas/letalidad-por-decision-2026-09-19.md` | **Qué decisiones acumulan la caída (G4)**, por contrafactual: lo que mata es no prepararse para el asedio, y es lo que elige la política prudente |
 | `medidas/banco-de-balance-2026-09-19.md` | **El banco remedido (G2)**: 11 rojas de 37 y 31 minutos, no 19 y 45; las cuatro rojas con su causa; y que el catálogo no tenía contenido muerto, lo tenía el banco que lo medía |
 | `medidas/rendimiento-piel-v9-2026-09-29.md` | **¿La piel v9 hunde el rendimiento?** No por fotograma; `?debug=1` no sirve para medir el 3D; la adaptativa medía un delta recortado. Lo que falta: el reparto del fotograma leído en la tablet |
+| `medidas/bucle-villa-2026-09-29.md` | **El bucle de la villa** (29 sep): un fotograma de más de un segundo se toma por una ausencia, la vida se rehace y vuelve a pasar del segundo; la villa 7/60 se queda en 3,8 s por fotograma y la vida parada. Causa probable de la tablet a 0 fps. Apuntado, sin arreglar (GV-4) |
 | `medidas/p1a-rendimiento-seed11-year21-2026-09-22.md` | P-1a: renderer y app real en semilla 11/año 21; comparación controlada de día/noche/lluvia, datos crudos y límites |
 | `medidas/auditoria-cosas-a-medias-2026-09-24.md` | **Lo que la aldea dejaba a medias** (24 sep), pedido por el dueño tras probar la demo: material tirado, herrería vacía, granero sin nadie, gente reunida sin hacer nada. Sólo observación, con `observe-life.mjs` |
 

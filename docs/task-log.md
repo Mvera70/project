@@ -38,8 +38,10 @@ de vida; en la villa eso (`createVillage`, rutas de A* del común y la orilla)
 tarda más de un segundo, y el fotograma siguiente vuelve a ser «ausencia».
 Medido: 3,8 s por `paint`, la vida en cero pasos y la fecha quieta, antes y
 después de GV; con el umbral a 30 s el mismo `main` se recupera a 18–78 ms.
-Arreglo propuesto en el encargo («Un hallazgo que no es de esta ronda»): que el
-hueco descuente el trabajo del propio fotograma, y abaratar `createVillage`.
+**Apuntado en `docs/medidas/bucle-villa-2026-09-29.md`** (Vera: «apunta lo
+del bucle de la villa»), con la evidencia, cómo reproducirlo y el arreglo que se
+propone —que el hueco descuente el trabajo del propio fotograma, y abaratar
+`createVillage`—; la fila es GV-4 en `plan-meta.md`.
 
 ## 29 sep 2026 · AN-4b y AN-4c: las tomas que faltaban, y el oso que no nacía
 
