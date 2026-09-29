@@ -72,3 +72,15 @@ tres tramos, las pectorales reman) y el reposo.
 - `python3 build-models.py -- fish`. `merge_parts()` junta las piezas que
   comparten articulación y material: de 37 mallas a 19, y hay hasta cuatro
   peces a la vez.
+
+## El cerdo (29 sep 2026) — candidato, **sin publicar**
+
+El de G-23 era una caja con dos losas por orejas que salían de lado como alas.
+`pig()` en `build-models.py` lo hace facetado, sobre la estructura del jabalí
+de Vera: barril redondo, patas cortas, hocico de disco, orejas grandes caídas
+hacia delante y rabo rizado. Mismo tamaño que el de G-23 (0,55 celdas); marcha
+de `rigid-clips.mjs … pig`.
+
+- [pig.glb](pig.glb) · [perfil](pig-profile.png) · [tres cuartos](pig-three-quarter.png) ·
+  [andando](pig-walk.png)
+- `python3 build-models.py -- pig`

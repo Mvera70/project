@@ -448,6 +448,35 @@ def fish():
             ell('Spot_'+str(s)+'_'+str(j),(x,s*ry*.93,z),(.0045,.0015,.0040),m,body,6,4)
     merge_parts(); save('fish')
 
+def pig():
+    # 29 sep 2026. El cerdo de G-23 era una caja con dos losas por orejas que
+    # salían de lado como alas. Facetado como el jabalí de Vera, que es su
+    # pariente: barril redondo, patas cortas, hocico de disco, orejas caídas
+    # hacia delante y rabo rizado. Mismo tamaño que el de G-23.
+    reset(); mat('skin','B8766A'); mat('skinDark','8F5048'); mat('hoof','4A3A33')
+    body=empty('body',(0,0,.14),ROOT)
+    loft('Barrel',[(-.200,.165,.055,.060),(-.160,.170,.095,.090),(-.080,.172,.115,.105),(.020,.172,.118,.108),
+                   (.110,.170,.110,.102),(.170,.168,.085,.085),(.205,.165,.045,.055)],'skin',body,12)
+    neck=empty('neck',(-.17,0,.18),body); head=empty('head',(-.21,0,.18),neck)
+    loft('Head',[(-.170,.180,.086,.086),(-.215,.172,.081,.077),(-.258,.160,.065,.061),(-.290,.152,.053,.051)],'skin',head,12)
+    ell('Jowl',(-.220,0,.140),(.090,.140,.062),'skin',head,10,5)
+    ell('Snout_Disc',(-.298,0,.152),(.022,.100,.086),'skinDark',head,10,6)
+    for s in (-1,1):
+        ell('Nostril_'+str(s),(-.309,s*.017,.152),(.007,.013,.018),'nose',head,6,4)
+        eye('Eye_'+str(s),-.248,s*.058,.198,.013,head)
+        # Orejas grandes y caídas hacia delante, sobre los ojos: son lo que
+        # dice cerdo desde arriba.
+        earP=empty('ear'+str(s),(-.195,s*.050,.245),head)
+        leaf('Ear_'+str(s),(-.195,s*.050,.245),(-.272,s*.092,.212),.086,.014,'skin',earP)
+        leaf('Ear_Inner_'+str(s),(-.202,s*.052,.238),(-.258,s*.082,.214),.046,.005,'skinDark',earP)
+    for pre,x in [('fore',-.115),('hind',.130)]:
+        for s,l in [(-1,'L'),(1,'R')]:
+            y=s*.060; hip=(x,y,.130); knee=(x+(.004 if pre=='fore' else -.012),y,.070); ankle=(x+(-.004 if pre=='fore' else .006),y,.022); toe=(ankle[0]-.008,y,.011)
+            limb(pre+l,hip,knee,ankle,toe,.042,'skin',body,'hoof')
+    tail=empty('tail',(.205,0,.200),body)
+    tube('Curly_Tail',[(.203,0,.200),(.222,0,.212),(.234,.008,.230),(.228,.018,.244),(.216,.014,.240),(.214,.004,.228)],[.008,.007,.006,.005,.004,.002],'skin',tail,7)
+    merge_parts(); save('pig')
+
 def mule():
     reset(); mat('coat','978772'); mat('coatTop','514B40'); mat('light','C9C1A5'); mat('earInner','706658'); mat('pack','B19A6C'); mat('cloth','A28F63')
     body=empty('body',(0,0,.24),ROOT)
@@ -603,6 +632,6 @@ def hoe():
 # `-- bear` construye sólo esos; sin nombres, todos (el oso, en su v4).
 ONLY=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 BUILDS=[('wolf',lambda: canine('wolf')),('dog',lambda: canine('dog')),('boar',boar),('bear',bear),('bear_v3',bear_v3),('mule',mule),
-        ('partridge',partridge),('fish',fish),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
+        ('partridge',partridge),('fish',fish),('pig',pig),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
 for name,build in BUILDS:
     if (not ONLY and name!='bear_v3') or name in ONLY: build()

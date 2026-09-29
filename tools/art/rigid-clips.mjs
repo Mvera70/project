@@ -103,7 +103,7 @@ function clip(name, seconds, spec) {
 const wave = (t, cycles = 1, offset = 0) => Math.sin((t * cycles + offset) * Math.PI * 2);
 // Cuánto abre las patas cada una al andar, en radianes. TUNE: lo que se lee a
 // la distancia de juego sin que el animal parezca que patina ni que salta.
-const QUADS = { wolf: 0.45, dog: 0.5, mule: 0.38, bear: 0.3, boar: 0.4 };
+const QUADS = { wolf: 0.45, dog: 0.5, mule: 0.38, bear: 0.3, boar: 0.4, pig: 0.4 };
 const motion = [];
 // El `rear` del oso es su amenaza, lo que el juego llama `attack`. El `takeoff`
 // de la perdiz se conserva con su nombre: es un despegue de una vez, y el juego
