@@ -13,7 +13,7 @@
 //
 //   node tools/graphics/performance/gl-probe.mjs <valley.html> --seed 7 --year 60 \
 //     [--seconds 40] [--viewport 390x844] [--touch] [--dpr 3] [--quality medium] \
-//     [--sky clear] [--phase 0.45] [--scale 1]
+//     [--sky clear] [--phase 0.45] [--scale 1] [--query "aa=fxaa"] [--report]
 //
 // La ruta `?debug=1` monta además el valle en Canvas 2D y lo pinta debajo del
 // 3D en cada fotograma (`docs/medidas/rendimiento-piel-v9-2026-09-29.md`):
@@ -89,8 +89,9 @@ await tab.addInitScript(() => {
 const page = 'file:///' + resolve(file).split(String.fromCharCode(92)).join('/');
 if (titled) {
   // El camino de `shot.mjs`: el menú de inicio, el número del valle y el año
-  // detrás del interruptor de taller (U-10b).
-  await tab.goto(page);
+  // detrás del interruptor de taller (U-10b). `--query "aa=fxaa"` añade eso a
+  // la dirección, para las opciones de taller que se leen de ella (GV-3).
+  await tab.goto(page + (flag('query', '') === '' ? '' : '?' + flag('query', '')));
   await tab.locator('.title-scrim').waitFor({ timeout: 5000 }).catch(() => {});
   await tab.locator('#valley-seed').fill(flag('seed', '7')).catch(() => {});
   const toggle = tab.locator('.title-dev');
@@ -122,4 +123,13 @@ const r = await tab.evaluate(() => {
     ...(drawn === undefined ? {} : { level: drawn.level, scale: drawn.scale }) };
 });
 console.log(JSON.stringify({ ...r, seconds: Math.round((Date.now() - t0) / 1000) }));
+// `--report`: y de dónde salen, con el reparto de `scene-report.mjs` sobre el
+// mismo valle abierto por el mismo camino.
+if (argv.includes('--report')) {
+  const rows = await tab.evaluate(() => window.__valleySceneReport?.() ?? []);
+  let meshes = 0, shadow = 0;
+  for (const row of rows) { meshes += row.meshes; shadow += row.shadow; }
+  for (const row of rows.slice(0, 14)) console.log(row.group.padEnd(28), String(row.meshes).padStart(5), 'sombra', String(row.shadow).padStart(5), 'inst', String(row.instanced).padStart(3), 'tris', row.triangles);
+  console.log('TOTAL mallas', meshes, 'sombra', shadow);
+}
 await browser.close();

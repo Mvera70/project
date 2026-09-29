@@ -205,7 +205,11 @@ const holdSky = opt('sky', '');
 const holdPhase = opt('phase', '');
 const holdScale = opt('scale', '');
 const pauseEarly = args.includes('--pause');
-const holding = holdSky !== '' || holdPhase !== '' || holdScale !== '' || pauseEarly;
+//   --eval "<js>"   corre esto en la página con el valle puesto, tras fijar
+//                   luz y escala: para comparar variantes de un gancho de
+//                   taller en la misma toma (p. ej. `__valleyContactShade`)
+const evalScript = opt('eval', '');
+const holding = holdSky !== '' || holdPhase !== '' || holdScale !== '' || pauseEarly || evalScript !== '';
 let gateOverrideHits = 0;
 if (gateOverride !== '') {
   const candidate = readFileSync(gateOverride);
@@ -250,6 +254,7 @@ if (open !== 'title' && holding) {
     if (scale !== '') window.__valleyHoldScale?.(Number(scale));
     if (pause) window.__valleySpeed?.(0);
   }, { sky: holdSky, phase: holdPhase, scale: holdScale, pause: pauseEarly });
+  if (evalScript !== '') await tab.evaluate(evalScript);
 }
 //   --settle S   segundos que se espera tras fundar antes de hacer nada (8 por defecto;
 //                0.5 para ver el vuelo de entrada de U-11 fotograma a fotograma)
@@ -470,7 +475,7 @@ if (sequence > 0) {
       const phase = document.documentElement.dataset.sunPhase ?? '-';
       return `${time} ${date} · fase ${phase}`;
     }));
-    await tab.screenshot({ path: `${stem}-${String(n + 1).padStart(2, '0')}.png` });
+    await tab.screenshot({ path: `${stem}-${String(n + 1).padStart(2, '0')}.png`, timeout: 180_000 });
     const open = await tab.evaluate(() => document.documentElement.classList.contains('crossroad-open'));
     if (open) await swipeDown();
     await tab.waitForTimeout(every * 1000);
@@ -491,7 +496,9 @@ if (sceneOnly) {
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, shot);
 } else {
-  shot = await tab.screenshot({ path: out });
+  // GV-0 · la villa del año 60 tarda unos cuatro segundos por fotograma en un
+  // dibujo por software a 3×, y la espera por omisión (30 s) no bastaba.
+  shot = await tab.screenshot({ path: out, timeout: 180_000 });
 }
 
 // Y a qué estación corresponde lo que se acaba de fotografiar, que es la mitad
