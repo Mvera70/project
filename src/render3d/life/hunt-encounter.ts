@@ -34,6 +34,7 @@ import { LIFE_STEP } from './clock';
 import type { Contact, ContactShape, ContactWorld } from './physics';
 import { createWildPrey, escapeFrom, stepWildPrey, wildPreyPosition, type WildKind, type WildPrey } from './wild-prey';
 import { PREY_BODY, preyShape } from './hunt-bodies';
+import { WARNING_SECONDS } from './bear';
 import {
   aimHuntShot, launchHuntShot, RELEASE, SHOT_RADIUS, SHOT_SPEED, stepHuntShot, THRUST, thrustContact, thrustFor, tipReach,
   tipYaw, worldOf, type HuntShot,
@@ -377,8 +378,9 @@ export function createHuntEncounter(
   };
   const altitudeOf = (): number => wild?.altitude ?? externalTarget?.altitude ?? 0;
   const facingOf = (): number => wild?.body.facing ?? deerRun?.facing ?? externalTarget?.facing ?? 0;
+  // Alzado lo que dura su `attack`, el mismo que su aviso en la visita.
   const risen = (): boolean => species === 'bear' && bearAction === 'attack'
-    && stepNumber - lastBearSwipe < Math.round(3 / LIFE_STEP);
+    && stepNumber - lastBearSwipe < Math.round(WARNING_SECONDS / LIFE_STEP);
   const shapeAt = (point: Point): ContactShape =>
     preyShape(species, targetId, point.x, point.z, ground(point.x, point.z), facingOf(), altitudeOf(), risen());
 

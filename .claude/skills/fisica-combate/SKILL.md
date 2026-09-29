@@ -87,6 +87,27 @@ deciden.
   al bit con sondas, la arquería con bitácora que da lo mismo), no umbrales de
   una batalla.
 
+## 3b · Cuando llega un modelo nuevo de animal
+
+Los modelos de los animales van a cambiar (Vera, 29 sep 2026: «el oso, por
+ejemplo, cambia»). Lo que decide la caza no guarda medidas sueltas: guarda la
+caja de cada modelo (`PREY_MODEL` en `life/hunt-bodies.ts`, copia de
+`art/catalog.json`) y saca de ella el tronco con proporciones (`TORSO`); la
+pieza caída sube lo que el render mide sobre el modelo. Al llegar uno nuevo:
+
+1. `npx vitest run tests/fast/hunt-bodies.test.ts`: si falla, el mensaje trae
+   la caja nueva; se copia en `PREY_MODEL`. Si el oso trae otro `attack`, la
+   misma prueba pide cambiar `WARNING_SECONDS` (`life/bear.ts`).
+2. Si la forma del animal cambia mucho (un oso más largo de cuello, un ciervo
+   sin cornamenta), revisar `TORSO`: la cápsula tiene que ser el tronco y caber
+   en la caja (lo vigila la prueba).
+3. `npx tsx tools/reports/hunt-report.ts` y
+   `npx tsx tools/reports/bear-visit-report.ts`: el reparto de finales y la
+   visita, comparados con `artifacts/physics/AN-5/`. Si cambian, la cifra va a
+   Vera.
+4. La cabeza del modelo tiene que seguir en -X (`effects/animal-motion.ts`):
+   si no, el render lo gira mal y el pecho y la grupa se cambian.
+
 ## 4 · Trampas que ya costaron una tarde
 
 - **`castShape` de Rapier 0.20**: el punto tocado en coordenadas del mundo es

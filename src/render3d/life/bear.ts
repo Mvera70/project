@@ -27,10 +27,15 @@ const TOO_CLOSE = 1.6;
 const WARNINGS = 3;
 /** Lo que tarda en volver a avisar a quien sigue ahí, después de un aviso. TUNE: 2 s. */
 const CALM_STEPS = Math.round(2 / LIFE_STEP);
-// AN-3a · El aviso dura lo que el clip `attack` del oso de Vera (3 s, en el
-// catálogo): se alza en el primer segundo y medio y amenaza el resto. Con 1,55 s
-// se cortaba a media subida y se iba andando.
-const WARNING_STEPS = Math.round(3 / LIFE_STEP);
+/**
+ * AN-3a · El aviso dura lo que el clip `attack` del oso de Vera (3 s, en el
+ * catálogo): se alza en el primer segundo y medio y amenaza el resto. Con 1,55 s
+ * se cortaba a media subida y se iba andando. **El oso va a cambiar de modelo**
+ * (Vera, 29 sep 2026): `hunt-bodies.test.ts` compara esto con el `attack` del
+ * catálogo y falla si el clip nuevo dura otra cosa.
+ */
+export const WARNING_SECONDS = 3;
+const WARNING_STEPS = Math.round(WARNING_SECONDS / LIFE_STEP);
 /**
  * AN-4c · La boca de la guarida, en celdas por delante de su centro.
  *

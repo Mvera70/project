@@ -13,31 +13,67 @@ import type { ContactShape } from './physics';
 import { WALLED } from './terrain';
 
 /**
- * El tronco de cada presa, en celdas: una cápsula a lo largo del cuerpo. Sale
- * de las cajas del catálogo (`art/catalog.json`, `bounds`): el radio es la
- * mitad del ancho del modelo, y el largo y la altura del centro, los del
- * tronco sin cabeza, patas, orejas ni cornamenta —lo que no para una flecha—.
- * `tests/fast/hunt-bodies.test.ts` vigila que cada cápsula quepa en su caja.
+ * La caja de cada modelo publicado, en celdas: largo (X, de hocico a cola),
+ * alto (Y) y ancho (Z), **copiada de `art/catalog.json` (`bounds.size`)**.
  *
- * TUNE, medido el 29 sep 2026 sobre las cajas:
- *   perdiz 0,31 × 0,20 × 0,16 · conejo 0,31 × 0,28 × 0,14 · ciervo
- *   0,78 × 0,85 × 0,28 · jabalí 0,71 × 0,42 × 0,24 · oso 1,16 × 0,75 × 0,54.
- * El oso alzado (`attack`, el aviso y el zarpazo) se mide de pie.
+ * **Los modelos de los animales van a cambiar** (Vera, 29 sep 2026: «se van a
+ * subir nuevos modelos en 3D de los animales; el oso, por ejemplo, cambia»).
+ * Por eso lo que decide la caza no guarda medidas sueltas: guarda la caja y
+ * saca de ella el tronco con las proporciones de `TORSO`. Cuando llegue un
+ * modelo nuevo, `tests/fast/hunt-bodies.test.ts` falla con la caja nueva
+ * escrita en el mensaje; se copia aquí y se vuelven a pasar
+ * `tools/reports/hunt-report.ts` y `tools/reports/bear-visit-report.ts`.
  */
-export const PREY_BODY: Readonly<Record<HuntSpecies, {
-  readonly radius: number; readonly halfLength: number; readonly centre: number;
-  /** Medio ancho del modelo: lo que sube la pieza caída al tumbarse de costado (`animal-motion.ts`). */
-  readonly flank: number;
-}>> = {
-  partridge: { radius: 0.075, halfLength: 0.03, centre: 0.1, flank: 0.078 },
-  rabbit: { radius: 0.065, halfLength: 0.05, centre: 0.09, flank: 0.072 },
-  deer: { radius: 0.13, halfLength: 0.12, centre: 0.5, flank: 0.14 },
-  boar: { radius: 0.12, halfLength: 0.16, centre: 0.25, flank: 0.12 },
-  bear: { radius: 0.25, halfLength: 0.2, centre: 0.42, flank: 0.268 },
+export const PREY_MODEL: Readonly<Record<HuntSpecies, { readonly length: number; readonly height: number; readonly width: number }>> = {
+  partridge: { length: 0.313, height: 0.204, width: 0.156 },
+  rabbit: { length: 0.313, height: 0.285, width: 0.144 },
+  deer: { length: 0.776, height: 0.853, width: 0.28 },
+  boar: { length: 0.713, height: 0.42, width: 0.24 },
+  bear: { length: 1.16, height: 0.75, width: 0.537 },
 };
 
-/** El oso de pie: tronco vertical, del vientre a los hombros. */
-export const BEAR_RISEN = { radius: 0.24, halfLength: 0.24, centre: 0.62 } as const;
+/**
+ * Qué parte de la caja es tronco —lo que para una flecha—, sin cabeza, patas,
+ * orejas ni cornamenta: el ancho del tronco, su largo de extremo a extremo y la
+ * altura de su eje, como fracción del ancho, el largo y el alto del modelo.
+ * TUNE, medido el 29 sep 2026 sobre los modelos de entonces: el conejo tiene
+ * las orejas (su eje va a un tercio del alto) y el ciervo la cornamenta; el
+ * jabalí es tronco casi entero.
+ */
+const TORSO: Readonly<Record<HuntSpecies, { readonly width: number; readonly length: number; readonly axis: number }>> = {
+  partridge: { width: 0.96, length: 0.67, axis: 0.49 },
+  rabbit: { width: 0.9, length: 0.735, axis: 0.316 },
+  deer: { width: 0.93, length: 0.644, axis: 0.586 },
+  boar: { width: 1, length: 0.785, axis: 0.595 },
+  bear: { width: 0.93, length: 0.776, axis: 0.56 },
+};
+
+type TorsoShape = { readonly radius: number; readonly halfLength: number; readonly centre: number; readonly flank: number };
+
+/**
+ * El tronco de cada presa, en celdas: una cápsula a lo largo del cuerpo, sacada
+ * de su caja (`PREY_MODEL`) con sus proporciones (`TORSO`), y lo que sube al
+ * tumbarse de costado —medio ancho, como la sube `effects/animal-motion.ts`—.
+ * `tests/fast/hunt-bodies.test.ts` vigila que cada cápsula quepa en su modelo.
+ */
+export const PREY_BODY: Readonly<Record<HuntSpecies, TorsoShape>> = Object.fromEntries(
+  (Object.keys(PREY_MODEL) as HuntSpecies[]).map((species) => {
+    const model = PREY_MODEL[species], torso = TORSO[species];
+    const radius = torso.width * model.width / 2;
+    return [species, { radius, halfLength: Math.max(0, torso.length * model.length / 2 - radius),
+      centre: torso.axis * model.height, flank: model.width / 2 }];
+  })) as Record<HuntSpecies, TorsoShape>;
+
+/**
+ * El oso de pie (`attack`: el aviso y el zarpazo): el tronco vertical, del
+ * vientre a los hombros, sacado del largo del modelo tumbado —de pie, lo que
+ * era largo es alto—. TUNE: el eje a 0,53 del largo y medio tramo de 0,21.
+ */
+export const BEAR_RISEN = {
+  radius: 0.9 * PREY_MODEL.bear.width / 2,
+  halfLength: 0.207 * PREY_MODEL.bear.length,
+  centre: 0.534 * PREY_MODEL.bear.length,
+} as const;
 
 /** La cápsula de una presa en este instante: donde pisa, hacia dónde mira y si está alzada. */
 export function preyShape(species: HuntSpecies, id: number, x: number, z: number, feet: number,

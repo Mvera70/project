@@ -4,12 +4,13 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { BEAR_RISEN, PREY_BODY, STANDING_HEIGHT, standingOf } from '../../src/render3d/life/hunt-bodies';
+import { BEAR_RISEN, PREY_BODY, PREY_MODEL, STANDING_HEIGHT, standingOf } from '../../src/render3d/life/hunt-bodies';
+import { WARNING_SECONDS } from '../../src/render3d/life/bear';
 import { TERRAIN_CODE } from '../../src/engine/state';
 import { foundTwenty } from '../helpers/founding';
 
 const catalog = JSON.parse(readFileSync('art/catalog.json', 'utf8')) as {
-  assets: { id: string; bounds?: { size: [number, number, number] } }[];
+  assets: { id: string; bounds?: { size: [number, number, number] }; motion?: { name: string; seconds: number }[] }[];
 };
 const size = (id: string): [number, number, number] => {
   const found = catalog.assets.find(asset => asset.id === id)?.bounds?.size;
@@ -18,6 +19,25 @@ const size = (id: string): [number, number, number] => {
 };
 
 describe('AN-5b · los cuerpos de la caza', () => {
+  // Los modelos de los animales van a cambiar (Vera, 29 sep 2026: «el oso,
+  // por ejemplo, cambia»). Si esta falla, el mensaje trae la caja nueva: se
+  // copia en `PREY_MODEL` (`hunt-bodies.ts`) y se vuelven a pasar
+  // `hunt-report.ts` y `bear-visit-report.ts`, que dicen cuánto cambia la caza.
+  it.each(Object.keys(PREY_MODEL) as (keyof typeof PREY_MODEL)[])('la caja de %s es la del modelo publicado', (species) => {
+    const [length, height, width] = size(species);
+    const nueva = `{ length: ${length.toFixed(3)}, height: ${height.toFixed(3)}, width: ${width.toFixed(3)} }`;
+    const model = PREY_MODEL[species];
+    const same = Math.abs(model.length - length) < 2e-3 && Math.abs(model.height - height) < 2e-3
+      && Math.abs(model.width - width) < 2e-3;
+    expect(same, `el modelo de ${species} ha cambiado: su caja es ahora ${nueva}`).toBe(true);
+  });
+
+  it('el aviso del oso dura lo que su clip `attack` del catálogo', () => {
+    const attack = catalog.assets.find(asset => asset.id === 'bear')?.motion?.find(clip => clip.name === 'attack');
+    expect(attack, 'el oso publicado trae `attack`').toBeDefined();
+    expect(WARNING_SECONDS, `el clip nuevo dura ${attack?.seconds} s`).toBeCloseTo(attack!.seconds, 2);
+  });
+
   it.each(Object.keys(PREY_BODY) as (keyof typeof PREY_BODY)[])('la cápsula de %s cabe en su modelo y no es un punto', (species) => {
     const body = PREY_BODY[species];
     const [length, height, width] = size(species);
