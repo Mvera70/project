@@ -407,7 +407,7 @@ que tensen; (4) el **lanzamiento** (`throw`) no se puede grabar: la pelota
 suelta la retiró el dueño del diseño el 15 sep («eran el descarte de
 físicas»; `createVillage` no recibe `props: true` en el juego). Eso no es una
 ruta que falte sino una decisión: `throw` queda como límite dicho, y sólo se
-enseña si hay un trasto de verdad en la mano (`holding >= 0`, no una carga).
+enseña si hay un trasto de verdad en la mano (`holding >= 0`, no una carga). **Vera decidió conservarlo (29 sep 2026)**: no se retira, espera a que vuelvan los trastos.
 
 **Módulos fuera de la lista, y por qué.** `src/main.ts` y `src/ui/debug.ts`:
 un parámetro de la ruta de depuración, `&hunted=perdiz,conejo…`, que da por

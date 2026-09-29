@@ -177,7 +177,8 @@ sin la autorización de Vera.
   `--id N [--animal]`; escala las coordenadas al PNG, que la resolución
   adaptativa puede bajar (273×590 en una villa con asalto).
 - La pelota suelta **no existe en la partida** desde el 15 sep (decisión del
-  dueño: `createVillage` sin `props: true`), así que `throw` no sale nunca.
+  dueño: `createVillage` sin `props: true`), así que `throw` no sale nunca;
+  Vera decidió conservarlo (29 sep 2026): no se retira ni se «arregla».
 - `fps` del observatorio tiene que dividir a 30. Un solo Chromium a la vez.
 - La hoja de gestos pone el clip a `action.time = t` sobre el GLB a secas:
   un salto de 0,12 m son 7 px en la hoja; la propiedad lo guarda mejor.
