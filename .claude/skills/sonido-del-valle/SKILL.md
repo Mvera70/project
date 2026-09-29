@@ -235,6 +235,34 @@ el reproductor de hoy **no sabe hacerlo todavía**: no tiene bucles, ni capas co
 su ganancia, ni fundidos, ni posición. Construirlo es la fase 0 de
 `docs/plan-audio-mundo.md`.
 
+**Un bucle no puede latir al dar la vuelta, y eso no se puede oír desde aquí**,
+así que se resuelve por construcción y no escuchando:
+
+- la **costura se pliega en la fábrica** (`seamless` en `sounds.py`: se genera
+  una cola de más y se cruza sobre la cabeza — para una textura de ruido eso es
+  exacto, no una aproximación);
+- toda modulación lenta es **periódica en el bucle** (`wobble` usa un número
+  entero de vueltas), o la costura vuelve por otro lado;
+- **nada de fundidos en los bordes**: el `master()` normal apaga el final, y en
+  un bucle eso es un latido cada vez;
+- el **relleno del codificador** se recorta con `loopEnd`, y por eso la
+  duración de cada bucle viaja con su fichero (`LOOP_FILES` en `sound.ts`);
+- cada capa arranca **por un punto distinto** del bucle, o dos partidas con el
+  mismo cielo suenan sincronizadas.
+
+Y tres números más, medidos el 29 sep 2026 al hacer la fase 1:
+
+- **un lecho pesa.** Once bucles a la calidad de un toque daban 1,5 MB. Son
+  ruido a 35 dB por debajo: con el bitrate bajo (`compression_level` 0,85)
+  bajan a 486 KB y no se nota;
+- **un lecho con filo cansa.** La lluvia y la cascada salieron con un 10–13 %
+  de energía por encima de 4 kHz; en un sonido de un disparo no importa, en uno
+  que suena minutos es fatiga. Se bajaron los topes de banda a 3200–3300 Hz;
+- **un retumbar vive donde el móvil no llega.** El trueno lejano tenía el 34 %
+  en la banda del teléfono. Los tres se subieron hasta el 76–88 %,
+  **conservando el orden** (lejos más oscuro que cerca), que es lo que de
+  verdad se oye como distancia.
+
 Lo que hay que tener en la cabeza antes de tocar el ambiente:
 
 - **A ×64 una jornada dura 1,9 segundos.** El cielo puede cambiar, una puerta

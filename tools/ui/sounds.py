@@ -210,7 +210,8 @@ class Voice:
 # El nivel de cada familia, en dBFS de RMS **en la banda del teléfono** (350 Hz a
 # 6 kHz): dos sonidos igual de fuertes con auriculares pueden sonar uno el doble
 # que el otro en un iPhone, y el iPhone es donde se juega.
-LEVEL = {'tick': -24.0, 'nav': -21.0, 'confirm': -19.0, 'call': -18.0, 'stinger': -18.0}
+LEVEL = {'tick': -24.0, 'nav': -21.0, 'confirm': -19.0, 'call': -18.0, 'stinger': -18.0,
+         'thunder': -17.0, 'thunder_far': -23.0}
 PEAK_CEILING = 0.9
 
 
@@ -441,10 +442,270 @@ def _(v: Voice):
 
 
 # La variante que suena en el juego.
-CHOSEN: dict[str, str] = {cue: 'a' for cue in RECIPES}
+# ---- el cielo: el rayo y sus tres distancias ---------------------------------------
+# El destello dura 0,46 s y el trueno llega después, **por la distancia real**
+# del rayo al centro de la vista (§10.7 y `plan-audio-mundo.md`, decisión 8):
+# cerca es un chasquido con cuerpo, lejos es sólo un retumbar largo. Tres
+# ficheros y no uno con volumen, porque lo que cambia con la distancia no es el
+# volumen: es que el aire se come los agudos y estira la cola.
+#
+# **Y los tres van más altos de lo que un trueno de verdad es.** Un retumbar
+# vive por debajo de 350 Hz, que es justo donde un altavoz de móvil no llega:
+# medido, el lejano se quedaba con el 34 % de su energía en la banda del
+# teléfono y allí habría sido inaudible. Subidos, conservan el orden —lejos
+# más oscuro que cerca— y se oyen en un iPhone; con auriculares se pierde algo
+# del peso, y es el precio de que exista en el aparato donde se juega.
+
+def _rumble(v: Voice, d: float, lo: float, hi: float, tau: float, level: float,
+            roll: float = 0.35) -> np.ndarray:
+    """El retumbar: ruido grave que rueda, con su propia respiración."""
+    n = int(d * SR)
+    x = bp(v.noise(n), lo, hi, order=3)
+    t = np.arange(n) / SR
+    body = np.exp(-t / tau) * (1 + roll * np.sin(2 * np.pi * 0.9 * t + v.rng.uniform(0, 6.28)))
+    x = x * body
+    a = int(SR * 0.004)
+    x[:a] *= np.linspace(0, 1, a)
+    return unit(x, level)
+
+
+@recipe('weather_lightning_crack')
+def _(v: Voice):
+    # El latigazo: el aire que se rompe. Corto y sin cola; la cola es el trueno.
+    x = place((0, v.contact(0.05, 900, 3400, 0.008, 0.2, 1.0)),
+              (0, _rumble(v, 0.22, 200, 1400, 0.045, 0.7)), dur=0.3)
+    return 'thunder', 0.3, x
+
+
+@recipe('weather_thunder_near')
+def _(v: Voice):
+    # Encima: el chasquido y detrás el desplome, con un segundo golpe de eco.
+    x = place((0, v.contact(0.06, 700, 3000, 0.01, 0.3, 0.85)),
+              (0, _rumble(v, 1.6, 280, 1500, 0.32, 1.0)),
+              (0.45, _rumble(v, 1.2, 240, 900, 0.3, 0.45)), dur=1.9)
+    return 'thunder', 1.9, v.room(x, 0.3, 0.14)
+
+
+@recipe('weather_thunder_mid')
+def _(v: Voice):
+    # A media distancia: ya no hay latigazo, hay un desplome que rueda.
+    x = place((0, _rumble(v, 2.4, 260, 1000, 0.55, 1.0, roll=0.5)),
+              (0.6, _rumble(v, 1.8, 230, 780, 0.5, 0.5)), dur=2.6)
+    return 'thunder', 2.6, v.room(x, 0.35, 0.16)
+
+
+@recipe('weather_thunder_far')
+def _(v: Voice):
+    # Lejos: sólo lo grave llega, y llega estirado. Es el más largo y el más bajo.
+    x = place((0, _rumble(v, 3.2, 230, 720, 0.9, 1.0, roll=0.6)),
+              (0.9, _rumble(v, 2.2, 210, 600, 0.8, 0.5)), dur=3.4)
+    return 'thunder_far', 3.4, v.room(x, 0.4, 0.18)
+
+
+# ===========================================================================
+# LOS LECHOS DE AMBIENTE (fase 1 · `docs/plan-audio-mundo.md`)
+#
+# Un ambiente no es un sonido de un disparo: es un **bucle** que va a estar
+# sonando minutos. Tres cosas lo separan de todo lo de arriba:
+#
+#   · **No puede oírse la costura.** Se genera con una cola de más y se pliega
+#     sobre la cabeza con un cruce (`seamless`): para una textura de ruido eso
+#     es matemáticamente perfecto, no una aproximación.
+#   · **No lleva fundido en los bordes.** Un `master()` normal apaga el final,
+#     y eso en un bucle es un latido cada vez que da la vuelta.
+#   · **Va mucho más bajo.** Un lecho que se nota es un lecho incómodo, que es
+#     exactamente lo que Vera cortó el 24 sep. Los niveles de `LOOP_LEVEL`
+#     están entre 14 y 21 dB por debajo de un toque de la interfaz.
+#
+# Duran entre 8 y 14 segundos. Menos se reconoce; más pesa sin ganar nada,
+# porque la modulación lenta ya hace que dos vueltas no suenen igual.
+# ===========================================================================
+
+LOOP_LEVEL = {
+    'bed': -38.0,      # viento en calma, nieve: lo que casi no se oye
+    'weather': -33.0,  # lluvia, tormenta: presente pero detrás de todo
+    'water': -35.0,    # río y cascada: constantes, así que discretos
+    'fire': -31.0,     # el fuego es un suceso y se acerca la cámara
+}
+
+LOOP_RECIPES: dict[str, Callable[[Voice], tuple[str, float, np.ndarray]]] = {}
+
+
+def loop(cue: str):
+    def register(fn):
+        LOOP_RECIPES[cue] = fn
+        return fn
+    return register
+
+
+def seamless(x: np.ndarray, seconds: float, cross: float = 1.0) -> np.ndarray:
+    """Pliega la cola sobre la cabeza: el bucle da la vuelta sin costura."""
+    n = int(seconds * SR)
+    c = int(cross * SR)
+    assert len(x) >= n + c, 'la receta tiene que generar la cola de más'
+    out = np.array(x[:n], dtype=float)
+    fade = np.linspace(0, 1, c)
+    out[:c] = out[:c] * fade + x[n:n + c] * (1 - fade)
+    return out
+
+
+def wobble(v: Voice, seconds: float, hz: float, depth: float, floor: float = 0.0) -> np.ndarray:
+    """Una modulación lenta **periódica en el bucle**: si no lo fuera, la costura se oiría."""
+    t = np.arange(int(seconds * SR)) / SR
+    cycles = max(1, round(hz * seconds))          # un número entero de vueltas
+    out = np.zeros_like(t)
+    for harmonic, weight in ((1, 1.0), (2, 0.45), (3, 0.25)):
+        out += weight * np.sin(2 * np.pi * cycles * harmonic * t / seconds + v.rng.uniform(0, 6.28))
+    out = out / (np.abs(out).max() + 1e-9)
+    return floor + (1 - floor) * (0.5 + 0.5 * out) * depth + (1 - depth)
+
+
+def bed_noise(v: Voice, seconds: float, lo: float, hi: float, order: int = 2) -> np.ndarray:
+    return bp(v.noise(int(seconds * SR)), lo, hi, order)
+
+
+@loop('amb_wind_calm')
+def _(v: Voice):
+    # Brisa: ruido grave y ancho que respira despacio. Nada de silbido.
+    d = 12.0
+    x = bed_noise(v, d + 1.5, 300, 1300) * wobble(v, d + 1.5, 0.11, 0.55, 0.3)
+    x += bed_noise(v, d + 1.5, 900, 2400) * wobble(v, d + 1.5, 0.17, 0.8, 0.05) * 0.25
+    return 'bed', d, x
+
+
+@loop('amb_wind_gust')
+def _(v: Voice):
+    # Racha: la misma brisa con el cuerpo más alto y la respiración más marcada.
+    d = 12.0
+    x = bed_noise(v, d + 1.5, 260, 1500) * wobble(v, d + 1.5, 0.25, 0.85, 0.15)
+    x += bed_noise(v, d + 1.5, 1200, 3200) * wobble(v, d + 1.5, 0.33, 0.9, 0.0) * 0.4
+    return 'weather', d, x
+
+
+@loop('amb_wind_winter')
+def _(v: Voice):
+    # Aire frío: limpio, hueco, sin hojas que muevan. Más estrecho y más grave.
+    d = 12.0
+    x = bed_noise(v, d + 1.5, 300, 1100, order=3) * wobble(v, d + 1.5, 0.08, 0.5, 0.35)
+    return 'bed', d, x
+
+
+@loop('amb_rain_light')
+def _(v: Voice):
+    # Lluvia fina: un siseo continuo y gotas sueltas sobre hierba y tejado.
+    d = 10.0
+    hiss = bed_noise(v, d + 1.5, 700, 3200) * wobble(v, d + 1.5, 0.2, 0.25, 0.75)
+    return 'weather', d, hiss + drops(v, d + 1.5, per_second=26, level=0.5, hi=3200)
+
+
+@loop('amb_rain_heavy')
+def _(v: Voice):
+    # Lluvia fuerte: el siseo gana cuerpo, las gotas se funden en una lámina.
+    d = 10.0
+    hiss = bed_noise(v, d + 1.5, 400, 3300) * wobble(v, d + 1.5, 0.3, 0.3, 0.7)
+    return 'weather', d, hiss * 1.4 + drops(v, d + 1.5, per_second=90, level=0.35, hi=3200)
+
+
+@loop('amb_storm_bed')
+def _(v: Voice):
+    # Tormenta **sin truenos**: lluvia pesada, viento grave y un retumbar lejano.
+    d = 12.0
+    hiss = bed_noise(v, d + 1.5, 350, 3300) * wobble(v, d + 1.5, 0.35, 0.4, 0.6)
+    gale = bed_noise(v, d + 1.5, 200, 1400) * wobble(v, d + 1.5, 0.22, 0.9, 0.1) * 0.9
+    rumble = lp(v.noise(int((d + 1.5) * SR)), 260, order=3) * wobble(v, d + 1.5, 0.09, 1.0) * 0.5
+    return 'weather', d, hiss * 1.3 + gale + rumble + drops(v, d + 1.5, per_second=70, level=0.3, hi=3200)
+
+
+@loop('amb_snow_hush')
+def _(v: Voice):
+    # Nieve: el aire amortiguado, que es **casi** silencio. Sin gotas.
+    d = 12.0
+    x = bed_noise(v, d + 1.5, 320, 900, order=3) * wobble(v, d + 1.5, 0.07, 0.4, 0.5)
+    return 'bed', d, x * 0.8
+
+
+@loop('amb_river')
+def _(v: Voice):
+    # Corriente tranquila: agua sobre piedra, con burbujeo suelto.
+    d = 12.0
+    flow = bed_noise(v, d + 1.5, 350, 2600) * wobble(v, d + 1.5, 0.28, 0.2, 0.8)
+    body = bed_noise(v, d + 1.5, 200, 900) * wobble(v, d + 1.5, 0.15, 0.3, 0.7) * 0.6
+    return 'water', d, flow + body + drops(v, d + 1.5, per_second=7, level=0.22, lo=600, hi=2600)
+
+
+@loop('amb_waterfall')
+def _(v: Voice):
+    # Salto de agua: más ancho, más grave y sin pausas. Es lo que no calla.
+    d = 10.0
+    fall = bed_noise(v, d + 1.5, 320, 3200) * wobble(v, d + 1.5, 0.4, 0.12, 0.88)
+    pool = lp(v.noise(int((d + 1.5) * SR)), 420, order=3) * wobble(v, d + 1.5, 0.2, 0.25, 0.75)
+    return 'water', d, fall * 1.2 + pool * 0.8
+
+
+@loop('amb_fire_flame')
+def _(v: Voice):
+    # Llama viva: un rugido bajo y chasquidos que saltan.
+    d = 8.0
+    roar = bed_noise(v, d + 1.5, 300, 1500) * wobble(v, d + 1.5, 0.5, 0.45, 0.5)
+    return 'fire', d, roar + crackles(v, d + 1.5, per_second=11, level=0.85)
+
+
+@loop('amb_fire_embers')
+def _(v: Voice):
+    # Brasas: sin rugido, sólo el chasquido de vez en cuando y un siseo tenue.
+    d = 10.0
+    bedding = bed_noise(v, d + 1.5, 340, 1200) * wobble(v, d + 1.5, 0.25, 0.3, 0.6) * 0.35
+    return 'fire', d, bedding + crackles(v, d + 1.5, per_second=3.2, level=0.55)
+
+
+def drops(v: Voice, seconds: float, per_second: float, level: float,
+          lo: float = 900, hi: float = 4200) -> np.ndarray:
+    """Gotas sueltas: impactos cortos repartidos al azar sobre el lecho."""
+    n = int(seconds * SR)
+    out = np.zeros(n)
+    count = int(per_second * seconds)
+    for _ in range(count):
+        at = int(v.rng.uniform(0, n - 400))
+        length = int(v.rng.uniform(0.004, 0.02) * SR)
+        tone = v.rng.uniform(lo, hi)
+        grain = bp(v.noise(length), tone * 0.7, tone * 1.4) * np.exp(-np.arange(length) / (length * 0.25))
+        out[at:at + length] += grain * v.rng.uniform(0.3, 1.0)
+    return unit(out, level)
+
+
+def crackles(v: Voice, seconds: float, per_second: float, level: float) -> np.ndarray:
+    """Chasquidos de fuego: pops secos, irregulares, con algún estallido mayor."""
+    n = int(seconds * SR)
+    out = np.zeros(n)
+    for _ in range(int(per_second * seconds)):
+        at = int(v.rng.uniform(0, n - 1200))
+        big = v.rng.uniform() < 0.18
+        length = int(v.rng.uniform(0.003, 0.012 if not big else 0.03) * SR)
+        pop = bp(v.noise(length), 400 if big else 900, 3000 if big else 4500)
+        pop = pop * np.exp(-np.arange(length) / (length * (0.3 if big else 0.18)))
+        out[at:at + length] += pop * (v.rng.uniform(0.7, 1.0) if big else v.rng.uniform(0.15, 0.6))
+    return unit(out, level)
+
+
+def render_loop(cue: str, variant: str) -> np.ndarray:
+    """Un lecho: sin costura, sin fundidos en los bordes y nivelado en la banda del teléfono."""
+    family, seconds, raw = LOOP_RECIPES[cue](Voice(cue, variant))
+    x = seamless(raw, seconds)
+    x = hp(x, 110)
+    x = lp(x, 4800)
+    gain = 10 ** (LOOP_LEVEL[family] / 20) / (band_rms(x) + 1e-12)
+    gain = min(gain, PEAK_CEILING / (np.abs(x).max() + 1e-12))
+    x = x * gain
+    assert np.isfinite(x).all(), f'{cue}/{variant} no es finito'
+    return x
+
+
+CHOSEN: dict[str, str] = {cue: 'a' for cue in list(RECIPES) + list(LOOP_RECIPES)}
 
 
 def render(cue: str, variant: str) -> np.ndarray:
+    if cue in LOOP_RECIPES:
+        return render_loop(cue, variant)
     family, dur, x = RECIPES[cue](Voice(cue, variant))
     y = master(x, family, dur)
     assert np.isfinite(y).all(), f'{cue}/{variant} no es finito'
@@ -456,11 +717,11 @@ def write_wav(path: str, x: np.ndarray) -> None:
     sf.write(path, x.astype(np.float32), SR, subtype='PCM_16')
 
 
-def write_mp3(path: str, x: np.ndarray) -> None:
+def write_mp3(path: str, x: np.ndarray, quality: float = 0.0) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     # `compression_level` 0 es la mejor calidad de LAME: a este tamaño de
     # fichero la diferencia es de un par de kilobytes.
-    sf.write(path, x.astype(np.float32), SR, format='MP3', compression_level=0.0)
+    sf.write(path, x.astype(np.float32), SR, format='MP3', compression_level=quality)
 
 
 def stamp() -> int:
@@ -496,10 +757,12 @@ def main() -> None:
     if args.stamp:
         print(f'{stamp()} huellas cambiadas en src/ui/sound.ts')
         return
-    cues = args.only or list(RECIPES)
+    cues = args.only or list(RECIPES) + list(LOOP_RECIPES)
     for cue in cues:
         x = render(cue, CHOSEN[cue])
-        write_mp3(os.path.join(OUT_GAME, f'{cue}.mp3'), x)
+        # Un lecho es ruido que suena a -35 dB durante minutos: el detalle fino
+        # que paga un bitrate alto no se oye, y sí se nota en lo que pesa.
+        write_mp3(os.path.join(OUT_GAME, f'{cue}.mp3'), x, 0.85 if cue in LOOP_RECIPES else 0.0)
         print(f"{cue:<26} {CHOSEN[cue]}  {len(x) / SR:.2f} s  pico {20 * np.log10(np.abs(x).max() + 1e-12):.1f} dBFS")
         if args.audition:
             for variant in VARIANTS:

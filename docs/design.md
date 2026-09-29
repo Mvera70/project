@@ -4196,6 +4196,52 @@ de `window.__valleySound`), que sonara algo en un letargo o a cada tick, que
 en silencio sonara algo, o que el primer toque de una sesión se quedara sin
 sonido más de `SOUND.LATE_PLAY_MS`.
 
+### 11.11 El fondo del mundo (29 sep 2026)
+
+**El valle suena.** Fase 1 de `docs/plan-audio-mundo.md`, pedida por Vera:
+«los sonidos de ambiente de la vida, de la naturaleza». Lo que hay es un
+**lecho de capas en bucle** cuya mezcla se decide en `src/ui/ambience.ts`, que
+es **puro**: entra cómo está el valle y sale cuánto suena cada capa. Ni un
+`AudioContext`, ni una tirada, ni un reloj — así se prueba entero sin
+navegador, que es lo único que sirve cuando quien lo escribe no puede oírlo.
+
+| Capa | Cuándo suena |
+|---|---|
+| Brisa · Racha | Siempre. La fuerza la da el cielo, con **la misma tabla que mece las hojas** (`SOUND.WIND_BY_SKY`) |
+| Aire frío | En invierno, en lugar de la brisa: no hay hojas que mover, y ése es justo el sonido que falta |
+| Lluvia fina · Lluvia fuerte · Tormenta · Nevada | Por el cielo del día. La tormenta trae su viento grave dentro, así que la lluvia fuerte se retira a media voz |
+| Río | Casi siempre: el pueblo se funda a tres o seis celdas del río (`mapgen.ts`). Sube con la riada |
+| Cascada | Si el valle tiene y se está cerca |
+| Casa ardiendo · Brasas | Por la marca `burnt:<id>` del motor y el día en que va el fuego |
+
+**Cuatro compuertas.** El mundo calla del todo **en pausa** —un valle quieto
+que sigue sonando es un valle roto—, **en un letargo** (§9.2) y **con la
+pestaña escondida**. Y a **×16 y ×64** no calla pero adelgaza: quedan los
+lechos al 35 %, y el fuego se va. Una jornada dura 120 s a ×1 y 1,9 s a ×64,
+así que el cielo cambia más deprisa de lo que una capa puede cruzarse; es lo
+mismo que el renderer hace con la luz (`daylight.ts`, `LIGHT_STEADY`) y por el
+mismo motivo: a esa velocidad, lo fiel parpadea.
+
+**Las fuentes están en un sitio.** El río, la cascada y el fuego se atenúan por
+dos cosas: la distancia al centro de la vista y **el zoom**, que es lo que de
+verdad dice si estás dentro del valle o mirándolo desde arriba
+(`nearness`). No hay panorámica estéreo todavía.
+
+**Y el trueno llega por la distancia, no por una tirada.** Hasta hoy el retardo
+era `Math.random` entre 0,4 y 2,2 s. Ahora el renderer deja dónde cayó el rayo
+(`data-bolt-at`) y `thunderFor` mide contra dónde se mira: **tres truenos y no
+uno con el volumen bajado**, porque lo que cambia con la distancia no es el
+volumen sino que el aire se come los agudos y estira la cola. Encima chasquea
+casi a la vez y lleva su latigazo delante; al otro lado del valle tarda dos
+segundos y llega hecho un retumbar. El reloj del retardo es de pared y no se
+escala con la velocidad: es del aire, no de la simulación, igual que el
+destello (§10.7).
+
+**Qué falsaría esto:** que el cielo y el sonido discrepen; que algo suene en
+pausa, en un letargo o con el sonido apagado; que un rayo lejano suene antes o
+más brillante que uno cerca; que el río no cambie al acercar la cámara; o que
+se oiga el latido del bucle al dar la vuelta.
+
 ### 11.7 Accesibilidad
 
 - Ningún dato depende solo del color: la estación se refuerza con el marco del

@@ -124,12 +124,78 @@ await step('encrucijada · elegir una opción (el sello)', 'ui_crossroad_decide'
   await tab.locator('.crossroad-options button').first().click();
 });
 
+// ---------------------------------------------------------------------------
+// **El fondo del mundo** (fase 1). Aquí no se mira qué empezó a sonar sino qué
+// capas están pedidas: el ambiente no se dispara, se mantiene. La mezcla viva
+// la publica el reproductor en `window.__valleySound.mix`.
+// ---------------------------------------------------------------------------
+const mix = async () => tab.evaluate(() => ({ ...(window.__valleySound?.mix ?? {}) }));
+const ambience = [];
+async function bed(name, check, act) {
+  await act();
+  // Un cruce entero tarda 1/`AMBIENCE_EASE` = 2,5 s: con menos espera se mide
+  // una capa a medio entrar y parece que falta.
+  await tab.waitForTimeout(3200);
+  const now = await mix();
+  const layers = Object.entries(now).filter(([, gain]) => gain > 0.01)
+    .map(([layer, gain]) => `${layer.replace('amb_', '')} ${gain.toFixed(2)}`);
+  let ok = true;
+  let why = '';
+  try { check(now); } catch (error) { ok = false; why = String(error.message ?? error); }
+  ambience.push({ name, layers, ok, why });
+  console.log(`${ok ? '✓' : '✗'} ${name.padEnd(42)} ${layers.join(' · ') || '—'}${why ? `  ← ${why}` : ''}`);
+}
+const has = (now, layer) => {
+  if (!(now[layer] > 0.01)) throw new Error(`falta ${layer}`);
+};
+const lacks = (now, layer) => {
+  if (now[layer] > 0.01) throw new Error(`sobra ${layer}`);
+};
+
+await tab.goto(`${base}?debug=1&live=1&seed=7&year=6&season=summer`);
+await tab.waitForFunction(() => document.documentElement.dataset.appReady === 'true', null, { timeout: 90_000 });
+await tab.mouse.click(4, 300);
+await bed('cielo claro · sólo viento y río', (now) => {
+  has(now, 'amb_wind_calm');
+  lacks(now, 'amb_rain_light');
+  lacks(now, 'amb_storm_bed');
+}, async () => { await tab.evaluate(() => window.__valleyHoldSky?.('clear')); });
+
+await bed('lluvia · entra el lecho de lluvia', (now) => has(now, 'amb_rain_light'),
+  async () => { await tab.evaluate(() => window.__valleyHoldSky?.('rain')); });
+
+await bed('tormenta · lecho de tormenta y racha', (now) => {
+  has(now, 'amb_storm_bed');
+  has(now, 'amb_wind_gust');
+}, async () => { await tab.evaluate(() => window.__valleyHoldSky?.('storm')); });
+
+await bed('nieve · el aire amortiguado', (now) => has(now, 'amb_snow_hush'),
+  async () => { await tab.evaluate(() => window.__valleyHoldSky?.('snow')); });
+
+await bed('en pausa el mundo calla del todo', (now) => {
+  if (Object.values(now).some((gain) => gain > 0.01)) throw new Error('algo sigue sonando');
+}, async () => { await tab.evaluate(() => window.__valleySpeed?.(0)); });
+
+await bed('y al seguir, vuelve', (now) => has(now, 'amb_wind_calm'), async () => {
+  await tab.evaluate(() => { window.__valleyHoldSky?.('clear'); window.__valleySpeed?.(1); });
+});
+
+// Y que la capa de verdad está sonando en el grafo de audio, no sólo pedida.
+const running = await tab.evaluate(() => {
+  const ctx = window.__valleySound;
+  return { armed: ctx !== undefined, layers: Object.keys(ctx?.mix ?? {}).length };
+});
+
 const preference = await tab.evaluate(() => localStorage.getItem('valley.sound'));
 const failed = steps.filter((s) => !s.ok);
-const report = { base, preference, steps, errors, failed: failed.length };
+const ambienceFailed = ambience.filter((row) => !row.ok);
+const report = { base, preference, steps, ambience, running, errors,
+  failed: failed.length + ambienceFailed.length };
 writeFileSync(`${OUT}/report.json`, JSON.stringify(report, null, 2));
-console.log(`\n${steps.length - failed.length}/${steps.length} pasos · preferencia guardada: ${preference}`);
+console.log(`\n${steps.length - failed.length}/${steps.length} toques · `
+  + `${ambience.length - ambienceFailed.length}/${ambience.length} ambiente · `
+  + `preferencia guardada: ${preference}`);
 if (errors.length > 0) console.log(`errores de página:\n  ${errors.join('\n  ')}`);
 await browser.close();
 await server.close();
-process.exit(failed.length > 0 ? 1 : 0);
+process.exit(report.failed > 0 ? 1 : 0);

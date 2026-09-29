@@ -2758,4 +2758,51 @@ export const SOUND = {
   // `ui_speed_change`: «designed to be pitch-shifted slightly for the four
   // speed settings»). A playback rate, so pitch and length move together.
   SPEED_RATES: { 1: 1, 4: 1.122, 16: 1.26, 64: 1.414 },
+
+  // ---- el ambiente del mundo (fase 1, 29 sep 2026) ----
+
+  // TUNE: cuánto tarda una capa de ambiente en llegar a su volumen nuevo, en
+  // ganancia por segundo. Un cambio de cielo no puede ser un corte, y tampoco
+  // una nube de dos minutos: a 0,4 una capa entra o sale en dos segulos y
+  // medio, que es lo que tarda la lluvia en verse del todo en pantalla.
+  AMBIENCE_EASE: 0.4,
+  // TUNE: a partir de qué velocidad el mundo es un avance rápido. Una jornada
+  // dura 120 s a ×1 y 7,5 s a ×16: por ahí el cielo ya cambia más deprisa de
+  // lo que una capa puede cruzar, así que sólo quedan los lechos y apagados.
+  AMBIENCE_FAST_SPEED: 16,
+  // TUNE: cuánto se apaga el ambiente en ese avance rápido. No cero, porque el
+  // valle mudo a ×64 parece roto; no uno, porque parpadearía.
+  AMBIENCE_FAST_GAIN: 0.35,
+  // TUNE: a cuántas celdas de la cámara una fuente deja de oírse. Medio mapa
+  // (el corazón mide 36 × 56) para el río y el fuego: más allá, lo que se ve
+  // es un valle entero y ninguna fuente manda.
+  AMBIENCE_REACH_CELLS: 30,
+  // TUNE: la altura de vista (en celdas visibles) a la que una fuente suena de
+  // cerca y a la que ya es paisaje. Con 8 la cámara está encima de una casa y
+  // con 92 se ve el valle entero (`camera.ts`); 26 es la altura de reposo.
+  AMBIENCE_NEAR_HEIGHT: 14,
+  AMBIENCE_FAR_HEIGHT: 60,
+  // TUNE: la velocidad del sonido **del valle**, en celdas por segundo, para
+  // que el trueno llegue después del rayo por la distancia real y no por una
+  // tirada (§10.7). No son los 114 celdas/s del aire de verdad: con ésos el
+  // rayo más lejano del corazón sonaría a 0,6 s y el retardo no se sentiría.
+  // El corazón mide 36 × 56 celdas (`tiles.ts`), o sea 66,6 de esquina a
+  // esquina; con 31 ese rayo tarda 2,15 s, justo por debajo de los 2,2 s que
+  // era el tope del retardo aleatorio que esto sustituye, y uno a diez celdas
+  // ronda el tercio de segundo. Es una licencia, y es la que hace que una
+  // tormenta se sienta lejos o encima.
+  THUNDER_CELLS_PER_SECOND: 31,
+  // TUNE: a cuántas celdas deja de oírse el latigazo y el trueno pasa a ser un
+  // retumbar (cerca → medio) y luego sólo cola (medio → lejos). Un tercio y
+  // dos tercios del alcance del corazón del valle.
+  THUNDER_NEAR_CELLS: 22,
+  THUNDER_MID_CELLS: 44,
+
+  // TUNE: la fuerza del viento por cielo, de 0 a 1. **Vive aquí y no en el
+  // renderer porque la leen dos capas**: el meneo de las hojas
+  // (`render3d/effects/wind.ts`) y el lecho de viento (`ui/ambience.ts`), y
+  // dos tablas iguales en dos sitios es la segunda verdad que mañana se queda
+  // atrás. Con 0 el bosque se ve de piedra; con 1 a cielo claro parece
+  // tormenta siempre.
+  WIND_BY_SKY: { clear: 0.3, overcast: 0.45, rain: 0.6, storm: 1, snow: 0.25 },
 } as const;

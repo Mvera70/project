@@ -14,7 +14,7 @@ import './redesign/shell.css';
 // UI-W · la piel de madera, piedra y pergamino del mockup del 24 sep. Va la
 // última: es la capa que viste encima de las otras tres.
 import './redesign/wood.css';
-import { SKY, TIME } from '@engine/balance';
+import { BURNING, SKY, SOUND, TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import { burnBuilding } from '@engine/world/buildings';
@@ -39,6 +39,7 @@ import { labelPanel, type LabelPanel } from './redesign/label';
 import { peoplePanel } from './redesign/people-panel';
 import { createShell } from './redesign/shell';
 import type { SheetRoute, UiActions, UiPanel, UiSnapshot } from './redesign/contracts';
+import type { GraphicsStats } from '../render3d/contracts';
 import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom, type BackendHandle } from './backend';
 import { persistSave } from './idb';
@@ -55,6 +56,9 @@ import { closeCrossroad, isDeferred, openCrossroad, openDeferred } from './scree
 import { openEpitaph } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
 import { accentFor, playerAnswer, routeCue, sound, speedCue } from './sound';
+import { cellsBetween, mixFor, riverCellsFrom, thunderFor, type WorldSound } from './ambience';
+import { valleyAxis } from '@engine/world/valley-road';
+import { floodOf } from '@derive/flood';
 import { openWelcome } from './welcome';
 import { devPreference, startDevHud, type DevHud } from './dev-hud';
 import { mountCameraControls, type CameraControls } from './camera-controls';
@@ -876,15 +880,34 @@ export function boot(
       // qué—, así que lo que hace es contar los rayos; aquí se mira cuánto ha
       // subido la cuenta y se truena. Con retardo, porque el sonido va más
       // despacio que la luz y ese retardo es lo que hace que una tormenta se
-      // sienta lejos o encima. Cuánto exactamente lo decide `Math.random`, y
-      // es legítimo porque es decorado del navegador,
+      // sienta lejos o encima.
+      //
+      // **Y desde el 29 sep 2026, por la distancia y no por una tirada.** El
+      // renderer deja dónde cayó (`data-bolt-at`) y aquí se mide contra dónde
+      // se está mirando: un rayo encima chasquea casi a la vez, y uno al otro
+      // lado del valle tarda dos segundos y llega hecho un retumbar
+      // (`ambience.ts`, `thunderFor`). Sigue siendo decorado del navegador y
       // no una tirada de la partida (§4.3).
       if (stats.bolts > lastBolts) {
         lastBolts = stats.bolts;
-        const [near, far] = SKY.THUNDER_DELAY;
-        const delay = (near + Math.random() * (far - near)) * 1000;
-        window.setTimeout(() => sound.accent('thunder', Date.now()), delay);
+        const where = document.documentElement.dataset.boltAt?.split(',').map(Number);
+        const cells = where !== undefined && where.length === 2 && where.every(Number.isFinite)
+          ? cellsBetween({ x: where[0]!, z: where[1]! }, stats.viewCentre)
+          // Sin sitio, se trata como un rayo a media distancia: el aviso
+          // importa más que la precisión.
+          : SKY.THUNDER_DELAY[1] * SOUND.THUNDER_CELLS_PER_SECOND / 2;
+        const { cue, delaySeconds } = thunderFor(cells);
+        // El latigazo va con el destello y el trueno después: es lo que hace
+        // que se lean como una misma cosa lejos o encima.
+        if (cue === 'weather_thunder_near') sound.accent('weather_lightning_crack', Date.now());
+        window.setTimeout(() => sound.accent(cue, Date.now()), delaySeconds * 1000);
       }
+      // **El fondo del mundo** (fase 1): lo que suena se decide en
+      // `ambience.ts`, que es puro; aquí sólo se recoge cómo está el valle.
+      const nowMs = Date.now();
+      const dtSeconds = lastAmbienceMs === null ? 0 : (nowMs - lastAmbienceMs) / 1000;
+      lastAmbienceMs = nowMs;
+      sound.ambience(mixFor(worldSound(stats)), dtSeconds);
     }
     // UI-R2 · hora, fecha, tira, tendencias, actividad y resumen de órdenes:
     // todo lo que antes eran quince líneas sueltas por fotograma es ahora una
@@ -1127,6 +1150,53 @@ export function boot(
   const onValley = (event: Event): boolean => event.target instanceof HTMLCanvasElement;
   /** El lienzo que hay delante ahora mismo, para medir contra su caja. */
   const surface = (): HTMLCanvasElement => backend.live.surface;
+
+  /** El reloj de pared del último cruce de ambiente: los fundidos van en segundos reales. */
+  let lastAmbienceMs: number | null = null;
+
+  /**
+   * Cómo está el valle, para el fondo. Todo sale de sitios que ya existían —el
+   * estado del motor y lo que el renderer publica por fotograma—: **ni un
+   * gancho nuevo y ni una tirada**, que es lo que §4.3 exige de cualquier cosa
+   * que viva en esta capa.
+   *
+   * Lo que **no** sabe todavía, y por eso va a `null`: dónde caen las cascadas
+   * (hace falta la altura del terreno, que sólo tiene el renderer). Queda
+   * apuntado en `plan-audio-mundo.md`.
+   */
+  const worldSound = (stats: GraphicsStats): WorldSound => {
+    const view = stats.viewCentre;
+    // Las casas que arden: la marca del motor (`burnt:<id>`) con su sitio, que
+    // los edificios ya llevan. En qué día va el fuego lo publica el propio
+    // renderer (`data-fire-days`), así que la llama y las brasas se separan
+    // sin preguntarle nada nuevo. Con más de un incendio a la vez —raro— el
+    // día es el del primero y la distancia la del más cercano.
+    let nearest: number | null = null;
+    for (const building of state.buildings) {
+      if (building.lostTick === null) continue;
+      const until = state.flags[`burnt:${building.id}`];
+      if (until === undefined || until <= state.tick) continue;
+      const cells = cellsBetween(
+        { x: building.x + building.w / 2, z: building.y + building.h / 2 }, view,
+      );
+      if (nearest === null || cells < nearest) nearest = cells;
+    }
+    const days = Number(document.documentElement.dataset.fireDays ?? '');
+    const flaming = !Number.isFinite(days) || days < BURNING.FLAME_DAYS;
+    return {
+      sky: stats.sky,
+      season: seasonOf(state.tick),
+      speed,
+      catchingUp,
+      hidden: document.hidden,
+      flood: floodOf(state),
+      riverCells: riverCellsFrom(view, (z) => valleyAxis(state.map, z), state.map.height),
+      waterfallCells: null,
+      flameCells: flaming ? nearest : null,
+      emberCells: flaming ? null : nearest,
+      viewHeight: stats.viewHeight,
+    };
+  };
 
   root.addEventListener('pointerdown', (event) => {
     // El audio se arma con el primer toque de la página (`installSound`, en

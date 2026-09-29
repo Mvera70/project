@@ -255,3 +255,5 @@ que quedan apuntadas aquí, con lo que su sonido esperaría:
 | **Charcos que salpican** | La lluvia cae sobre los charcos sin marca | Gotas |
 | **Flecha que se clava en madera o piedra** | La flecha se para y se queda 8 s; no sabe en qué | Impacto por material |
 | **Coop, pocilga, mercado** | No existen como edificios (los animales van libres, el mercado son puestos de visita) | — |
+| **Dónde caen las cascadas** | Existen (hasta tres: dos gargantas y una al lago) y **el sonido no sabe dónde están**: `waterfallSites` necesita la altura del terreno, que sólo tiene el renderer. El lecho `amb_waterfall` está fabricado y hoy nunca suena | La cascada, por proximidad |
+| **En qué día va cada fuego** | `data-fire-days` publica el del **primero**, así que con dos incendios a la vez el sonido usa el día de uno y la distancia de otro. Raro, pero escrito | Llama contra brasas, por incendio |

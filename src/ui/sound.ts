@@ -34,6 +34,8 @@
 
 import { SOUND } from '@engine/balance';
 import type { TickReport } from '@engine/sim';
+import type { AmbienceLayer, Mix } from './ambience';
+import { AMBIENCE_LAYERS } from './ambience';
 import type { Milestone } from './milestones';
 
 /** Cada momento que suena. Los nombres son los de `docs/plan-audio.md` §4. */
@@ -61,9 +63,12 @@ export type Cue =
   | 'stinger_milestone_major'
   | 'stinger_decade'
   | 'stinger_century'
-  // El trueno lo dispara el cielo (U-13) y no es de la interfaz: sigue sin
-  // fichero hasta que haya uno bueno, y mientras tanto no suena nada.
-  | 'thunder';
+  // El cielo (U-13, §10.7). No son de la interfaz: los dispara la tormenta, y
+  // cuál de los tres truenos suena lo decide la distancia (`ambience.ts`).
+  | 'weather_lightning_crack'
+  | 'weather_thunder_near'
+  | 'weather_thunder_mid'
+  | 'weather_thunder_far';
 
 /**
  * Qué fichero suena en cada momento, relativo a la página
@@ -97,6 +102,10 @@ export const CUE_FILES: Readonly<Partial<Record<Cue, string>>> = {
   stinger_milestone_major: 'stinger_milestone_major.mp3?v=e1d5fe69',
   stinger_decade: 'stinger_decade.mp3?v=acf9fb5d',
   stinger_century: 'stinger_century.mp3?v=396e17e2',
+  weather_lightning_crack: 'weather_lightning_crack.mp3?v=35d201b9',
+  weather_thunder_near: 'weather_thunder_near.mp3?v=9f478873',
+  weather_thunder_mid: 'weather_thunder_mid.mp3?v=017d246e',
+  weather_thunder_far: 'weather_thunder_far.mp3?v=2d10980b',
 };
 
 /**
@@ -187,9 +196,36 @@ function storeSoundPreference(on: boolean): void {
   try { localStorage.setItem(STORAGE_KEY, on ? 'on' : 'off'); } catch { /* modo privado: no se puede guardar */ }
 }
 
+/**
+ * **Los lechos de ambiente**, que no son cues: son bucles que van a estar
+ * sonando minutos y cuyo volumen se cruza en vez de encenderse.
+ *
+ * El fichero lleva su huella, como los demás. Y lleva además **su duración
+ * exacta en segundos**, que es lo que evita el único fallo que un bucle en MP3
+ * puede tener y nadie que programa esto podría oír: el codificador añade unas
+ * milésimas de silencio al final, y un silencio de tres milésimas cada doce
+ * segundos es un latido. Con `loopEnd` puesto a esta duración, ese relleno no
+ * se reproduce nunca. Lo escribe `tools/ui/sounds.py`.
+ */
+export const LOOP_FILES: Readonly<Record<AmbienceLayer, { file: string; seconds: number }>> = {
+  amb_wind_calm: { file: 'amb_wind_calm.mp3', seconds: 12 },
+  amb_wind_gust: { file: 'amb_wind_gust.mp3', seconds: 12 },
+  amb_wind_winter: { file: 'amb_wind_winter.mp3', seconds: 12 },
+  amb_rain_light: { file: 'amb_rain_light.mp3', seconds: 10 },
+  amb_rain_heavy: { file: 'amb_rain_heavy.mp3', seconds: 10 },
+  amb_storm_bed: { file: 'amb_storm_bed.mp3', seconds: 12 },
+  amb_snow_hush: { file: 'amb_snow_hush.mp3', seconds: 12 },
+  amb_river: { file: 'amb_river.mp3', seconds: 12 },
+  amb_waterfall: { file: 'amb_waterfall.mp3', seconds: 10 },
+  amb_fire_flame: { file: 'amb_fire_flame.mp3', seconds: 8 },
+  amb_fire_embers: { file: 'amb_fire_embers.mp3', seconds: 10 },
+};
+
 /** Lo que se ha oído, para que una herramienta de fuera lo compruebe. */
 export interface SoundLog {
   readonly played: { cue: Cue; atMs: number; rate: number }[];
+  /** La mezcla de ambiente que se está pidiendo, para verla desde fuera. */
+  mix?: Mix;
 }
 
 declare global {
@@ -212,6 +248,11 @@ export interface SoundEngine {
   accent(cue: Cue, nowMs: number): void;
   /** La respuesta a un toque del jugador. `rate` sube o baja el tono. */
   tap(cue: Cue, nowMs: number, rate?: number): void;
+  /**
+   * El fondo del mundo: cada capa a su volumen, cruzando desde el que tenía.
+   * Se llama en cada pintado con la mezcla entera; lo que no venga, se apaga.
+   */
+  ambience(mix: Mix, dtSeconds: number): void;
 }
 
 export function createSoundEngine(): SoundEngine {
@@ -220,8 +261,10 @@ export function createSoundEngine(): SoundEngine {
   let master: GainNode | null = null;
   let lastAccentMs: number | null = null;
   const lastTapMs: Partial<Record<Cue, number>> = {};
-  const bytes = new Map<Cue, Promise<ArrayBuffer | null>>();
-  const buffers = new Map<Cue, Promise<AudioBuffer | null>>();
+  const bytes = new Map<string, Promise<ArrayBuffer | null>>();
+  const buffers = new Map<string, Promise<AudioBuffer | null>>();
+  /** Una capa viva: su bucle, su ganancia y a qué volumen va. */
+  const loops = new Map<AmbienceLayer, { gain: GainNode; at: number; want: number }>();
 
   const isEnabled = (): boolean => {
     if (enabled === null) enabled = soundPreference();
@@ -231,7 +274,13 @@ export function createSoundEngine(): SoundEngine {
   /** Pide los ficheros. No necesita el `AudioContext`, así que va antes del toque. */
   const prefetch = (): void => {
     if (typeof fetch !== 'function') return;
-    for (const [cue, file] of Object.entries(CUE_FILES) as [Cue, string][]) {
+    const all: [string, string][] = [
+      ...(Object.entries(CUE_FILES) as [Cue, string][]),
+      // Los lechos van detrás a propósito: pesan diez veces más que un toque y
+      // lo primero que tiene que estar listo es el botón que se va a pulsar.
+      ...AMBIENCE_LAYERS.map((layer) => [layer, LOOP_FILES[layer].file] as [string, string]),
+    ];
+    for (const [cue, file] of all) {
       if (bytes.has(cue)) continue;
       bytes.set(cue, fetch(`./audio/${file}`)
         .then((response) => (response.ok ? response.arrayBuffer() : null))
@@ -239,7 +288,7 @@ export function createSoundEngine(): SoundEngine {
     }
   };
 
-  const decoded = (cue: Cue): Promise<AudioBuffer | null> => {
+  const decoded = (cue: string): Promise<AudioBuffer | null> => {
     const known = buffers.get(cue);
     if (known !== undefined) return known;
     prefetch();
@@ -306,6 +355,53 @@ export function createSoundEngine(): SoundEngine {
       silence.buffer = ctx.createBuffer(1, 1, 22_050);
       silence.connect(ctx.destination);
       silence.start();
+    },
+    ambience(mix: Mix, dtSeconds: number): void {
+      if (typeof window !== 'undefined') {
+        const log = window.__valleySound ?? { played: [] };
+        log.mix = mix;
+        window.__valleySound = log;
+      }
+      if (ctx === null || master === null) return;
+      const context = ctx;
+      const out = master;
+      // Un paso de cruce por fotograma, y **acotado**: si la pestaña estuvo
+      // escondida medio minuto, `dtSeconds` llega enorme y sin el tope una
+      // capa entraría de golpe, que es justo el corte que esto evita.
+      const step = Math.min(dtSeconds, 0.25) * SOUND.AMBIENCE_EASE;
+      for (const layer of AMBIENCE_LAYERS) {
+        const want = isEnabled() ? (mix[layer] ?? 0) : 0;
+        const live = loops.get(layer);
+        if (live === undefined) {
+          if (want <= 0) continue;
+          // Nace en silencio y sube sola: así una capa nueva nunca entra de golpe.
+          const gain = context.createGain();
+          gain.gain.value = 0;
+          gain.connect(out);
+          loops.set(layer, { gain, at: 0, want });
+          const { seconds } = LOOP_FILES[layer];
+          void decoded(layer).then((buffer) => {
+            const started = loops.get(layer);
+            if (buffer === null || started === undefined || started.gain !== gain) return;
+            const source = context.createBufferSource();
+            source.buffer = buffer;
+            source.loop = true;
+            source.loopStart = 0;
+            // El relleno que el codificador añade al final no se reproduce:
+            // por eso la duración viaja con el fichero (`LOOP_FILES`).
+            source.loopEnd = Math.min(seconds, buffer.duration);
+            source.connect(gain);
+            // Cada capa empieza por un sitio distinto del bucle: dos partidas
+            // con el mismo cielo no suenan sincronizadas.
+            source.start(0, Math.random() * source.loopEnd);
+          });
+          continue;
+        }
+        live.want = want;
+        const delta = live.want - live.at;
+        live.at += Math.sign(delta) * Math.min(Math.abs(delta), step);
+        live.gain.gain.setTargetAtTime(live.at, context.currentTime, 0.02);
+      }
     },
     accent(cue: Cue, nowMs: number): void {
       if (CUE_FILES[cue] === undefined || !accentAllowed(nowMs, lastAccentMs)) return;

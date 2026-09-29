@@ -1,5 +1,37 @@
 # The Valley — Registro de cambios
 
+## v5.01 · 29 sep 2026 · El valle suena: el motor de ambiente y la naturaleza
+
+Vera: «cuando el plan esté listo, ejecutarlo y esperar mi aprobación». Fases 0
+y 1 de `plan-audio-mundo.md`, hechas y **a la espera de que las escuche**.
+
+- **Fase 0 · el motor** (`src/ui/ambience.ts`, nuevo, y las capas en
+  `sound.ts`). La mezcla la decide una función **pura** —entra cómo está el
+  valle, sale cuánto suena cada capa—, y el reproductor sólo cruza ganancias.
+  Cuatro compuertas: pausa, letargo, pestaña escondida y avance rápido. La
+  cámara es el oyente: distancia **y zoom**, que es lo que dice si estás
+  dentro del valle o mirándolo desde arriba.
+- **Fase 1 · la naturaleza**: once lechos en bucle y cuatro sonidos de cielo.
+  Un bucle no puede latir al dar la vuelta y eso no se puede oír desde aquí,
+  así que va resuelto por construcción: la costura se pliega en la fábrica
+  (`seamless`) y el relleno que el codificador añade se recorta con `loopEnd`,
+  que viaja con cada fichero.
+- **El trueno llega por la distancia y no por `Math.random`** (§11.11). Tres
+  truenos y no uno con el volumen bajado, porque lo que cambia con la
+  distancia no es el volumen: el aire se come los agudos y estira la cola.
+- **La tabla del viento se muda a `SOUND`**: el meneo de las hojas y el lecho
+  de viento leen la misma, porque el bosque y el sonido tienen que estar de
+  acuerdo sobre si hace viento. Y `GraphicsStats.sky` deja de ser `string`
+  para ser `SkyKind`: con una cadena, un cielo mal escrito habría sido
+  silencio en vez de un fallo de compilación.
+- Lo que midiendo salió a corregir: los lechos pesaban 1,5 MB (ahora 486 KB,
+  bajando el bitrate de lo que es ruido); la lluvia y la cascada tenían un
+  10–13 % de energía por encima de 4 kHz, que en un lecho de minutos es
+  fatiga; y cuatro capas caían por debajo de la banda del móvil.
+- 53 pruebas de sonido y el recorrido del navegador con 6 escenas de ambiente.
+  **Pendiente:** la cascada está fabricada y no suena, porque nadie le dice
+  dónde está (`encargos-3d.md`).
+
 ## v5.00 · 29 sep 2026 · El plan del sonido, detallado; el botón suena; y una skill que lo registra
 
 Vera: «detalla el plan… todo esto tiene que registrar una skill de cómo se

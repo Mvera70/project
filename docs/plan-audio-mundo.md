@@ -465,6 +465,20 @@ las espadas (no hay) y el sonido de sangre (decisión 7).
 
 ## 9 · Lo que ya quedó hecho de este plan
 
+- **Fase 0 · el motor de ambiente, hecho** (29 sep 2026). Capas en bucle con
+  su ganancia, cruces, las cuatro compuertas, la cámara como oyente y la
+  mezcla decidida por una función **pura** (`src/ui/ambience.ts`). El bucle no
+  late al dar la vuelta: la costura se pliega en la fabricación y el relleno
+  del MP3 se recorta con `loopEnd`, que viaja con cada fichero.
+- **Fase 1 · la naturaleza, hecha y a la espera de que Vera la escuche**: once
+  lechos (brisa, racha, aire frío, lluvia fina y fuerte, tormenta, nevada,
+  río, cascada, llama y brasas) y cuatro del cielo (el latigazo y los tres
+  truenos). 486 KB de lechos y 82 del cielo; todos entre el 93 y el 100 % de
+  su energía en la banda del teléfono, salvo los truenos (76–88 %), que son
+  graves por naturaleza. **El trueno llega por la distancia** y no por una
+  tirada. Comprobado con clics reales: 21 toques y 6 escenas de ambiente.
+  **Pendiente:** la cascada no suena todavía porque nadie le dice dónde está
+  (`encargos-3d.md`).
 - **El botón corriente suena** (29 sep 2026): `ui_button_press` y
   `ui_button_release`, el sello de cera que Vera eligió («Eligo el K»). Lo
   llevan todos los botones **menos los que ya tienen voz propia**, listados en

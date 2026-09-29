@@ -11,6 +11,22 @@ elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
 botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
 los momentos de §11.10.
 
+## 29 sep 2026 · El valle suena (v5.01) — **a la espera de que Vera lo escuche**
+
+Fases 0 y 1 de `plan-audio-mundo.md` ejecutadas. El motor de ambiente
+(`src/ui/ambience.ts`, puro; las capas en `sound.ts`) y quince sonidos: once
+lechos de naturaleza y cuatro de cielo. El trueno por distancia real. Página
+de escucha publicada con las ocho escenas que el juego produce de verdad.
+
+**Abierto:**
+- **Que Vera escuche y apruebe** las capas. Retocar una no toca a las demás.
+- **La cascada no suena**: está fabricada y nadie le dice dónde está. Necesita
+  que el renderer publique los pies de las cascadas (`encargos-3d.md`).
+- Las **nueve decisiones** de `plan-audio-mundo.md` §6 siguen abiertas; las
+  fases 2 a 5 dependen sobre todo de la primera (voces y animales).
+- Con dos incendios a la vez, el día del fuego es el del primero y la
+  distancia la del más cercano. Escrito en `encargos-3d.md`.
+
 ## 29 sep 2026 · El plan del sonido y su skill (v5.00)
 
 **La skill `sonido-del-valle`** registra cómo se hace un sonido en este

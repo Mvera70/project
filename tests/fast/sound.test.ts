@@ -11,14 +11,18 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
-import { SOUND, TIME } from '@engine/balance';
+import { SKY, SOUND, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { tick } from '@engine/sim';
 import { milestonesAt } from '@ui/milestones';
 import {
-  accentAllowed, accentFor, createSoundEngine, CUE_FILES, milestoneCue, playerAnswer, routeCue,
-  soundPreference, speedCue, tapAllowed, type Cue,
+  accentAllowed, accentFor, createSoundEngine, CUE_FILES, LOOP_FILES, milestoneCue, playerAnswer,
+  routeCue, soundPreference, speedCue, tapAllowed, type Cue,
 } from '@ui/sound';
+import { AMBIENCE_LAYERS, mixFor, thunderFor, windStrengthOf, type Mix, type WorldSound } from '@ui/ambience';
+import type { SkyKind } from '@derive/weather';
+
+const SKIES: readonly SkyKind[] = ['clear', 'overcast', 'rain', 'storm', 'snow'];
 
 const SEEDS = [7, 42, 108, 999, 2024];
 const WORK = { kind: 'work_done', weight: 2 } as const;
@@ -221,10 +225,10 @@ describe('los ficheros · lo que se registra, existe', () => {
   const registered = (Object.entries(CUE_FILES) as [Cue, string][])
     .map(([cue, url]) => [cue, url.split('?')[0]!, url] as const);
 
-  it('todo momento de la interfaz tiene fichero; sólo el trueno sigue esperando el suyo', () => {
-    const silent = (['thunder'] as Cue[]);
+  it('todo momento tiene su fichero, y desde la fase 1 no queda ninguno mudo', () => {
     const every: Cue[] = [
       'ui_button_press', 'ui_button_release',
+      'weather_lightning_crack', 'weather_thunder_near', 'weather_thunder_mid', 'weather_thunder_far',
       'ui_title_begin', 'ui_title_continue', 'ui_panel_open', 'ui_panel_close', 'ui_tab_change',
       'ui_person_select', 'ui_pause', 'ui_resume', 'ui_speed_change', 'ui_action_success',
       'ui_action_refused', 'ui_offer_arrives', 'ui_offer_accept', 'ui_offer_decline',
@@ -232,7 +236,6 @@ describe('los ficheros · lo que se registra, existe', () => {
       'stinger_milestone_major', 'stinger_decade', 'stinger_century',
     ];
     for (const cue of every) expect(CUE_FILES[cue], cue).toBeDefined();
-    for (const cue of silent) expect(CUE_FILES[cue]).toBeUndefined();
   });
 
   it('cada fichero registrado está en public/audio y no está vacío', () => {
@@ -270,7 +273,171 @@ describe('el reproductor, sin navegador', () => {
     expect(() => {
       engine.tap('ui_panel_open', 0);
       engine.accent('stinger_decade', 0);
-      engine.accent('thunder', SOUND.ACCENT_MIN_GAP_MS);
+      engine.accent('weather_thunder_far', SOUND.ACCENT_MIN_GAP_MS);
     }).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// El fondo del mundo (fase 1, 29 sep 2026). Lo que se guarda aquí es **cuánto
+// suena cada capa**, que es puro y por tanto lo único de todo el sonido que se
+// puede comprobar sin oírlo. Cómo suena cada lecho se escucha.
+// ---------------------------------------------------------------------------
+
+const CALM: WorldSound = {
+  sky: 'clear', season: 'spring', speed: 1, catchingUp: false, hidden: false,
+  flood: 0, riverCells: 6, waterfallCells: null, flameCells: null, emberCells: null,
+  viewHeight: 26,
+};
+const total = (mix: Mix): number => Object.values(mix).reduce((sum, gain) => sum + gain, 0);
+
+describe('el fondo del mundo · las compuertas lo callan entero', () => {
+  it('en pausa no suena nada: un valle quieto que sigue sonando es un valle roto', () => {
+    expect(mixFor({ ...CALM, speed: 0 })).toEqual({});
+  });
+
+  it('en un letargo no suena nada, por lo mismo que calla la voz (§9.2)', () => {
+    expect(mixFor({ ...CALM, catchingUp: true })).toEqual({});
+  });
+
+  it('con la pestaña escondida no suena nada', () => {
+    expect(mixFor({ ...CALM, hidden: true })).toEqual({});
+  });
+
+  it('y jugando sí suena: el valle nunca está mudo, siempre hay viento', () => {
+    const mix = mixFor(CALM);
+    expect(total(mix)).toBeGreaterThan(0);
+    expect(mix.amb_wind_calm ?? 0).toBeGreaterThan(0);
+  });
+});
+
+describe('el fondo del mundo · a ×16 y ×64 el mundo es un avance rápido', () => {
+  it('el ambiente se apaga, pero no del todo: un valle mudo a ×64 parece roto', () => {
+    const slow = total(mixFor({ ...CALM, sky: 'rain' }));
+    for (const speed of [16, 64]) {
+      const fast = total(mixFor({ ...CALM, sky: 'rain', speed }));
+      expect(fast).toBeGreaterThan(0);
+      expect(fast).toBeLessThan(slow);
+    }
+  });
+
+  it('y el fuego se calla del todo: arde tres jornadas, que a ×64 son seis segundos', () => {
+    const near = { ...CALM, flameCells: 3 };
+    expect(mixFor(near).amb_fire_flame ?? 0).toBeGreaterThan(0);
+    expect(mixFor({ ...near, speed: 64 }).amb_fire_flame).toBeUndefined();
+  });
+});
+
+describe('el fondo del mundo · el cielo manda sobre el viento y sobre la lluvia', () => {
+  it('cada cielo suena distinto de los demás', () => {
+    const heard = new Set(SKIES.map((sky) => JSON.stringify(mixFor({ ...CALM, sky }))));
+    expect(heard.size).toBe(SKIES.length);
+  });
+
+  it('cuanto peor el cielo, más viento: la misma tabla que mece las hojas', () => {
+    const gust = (sky: SkyKind): number => mixFor({ ...CALM, sky }).amb_wind_gust ?? 0;
+    expect(gust('storm')).toBeGreaterThan(gust('rain'));
+    expect(gust('rain')).toBeGreaterThan(gust('clear'));
+    expect(windStrengthOf('storm')).toBe(SOUND.WIND_BY_SKY.storm);
+  });
+
+  it('sólo llueve cuando llueve, y sólo nieva cuando nieva', () => {
+    expect(mixFor({ ...CALM, sky: 'rain' }).amb_rain_light ?? 0).toBeGreaterThan(0);
+    expect(mixFor({ ...CALM, sky: 'clear' }).amb_rain_light).toBeUndefined();
+    expect(mixFor({ ...CALM, sky: 'snow' }).amb_snow_hush ?? 0).toBeGreaterThan(0);
+    expect(mixFor({ ...CALM, sky: 'storm' }).amb_snow_hush).toBeUndefined();
+  });
+
+  it('en invierno el viento es el aire frío, y no la brisa entre hojas que no hay', () => {
+    const winter = mixFor({ ...CALM, season: 'winter' });
+    expect(winter.amb_wind_winter ?? 0).toBeGreaterThan(0);
+    expect(winter.amb_wind_calm).toBeUndefined();
+  });
+});
+
+describe('el fondo del mundo · el agua está en un sitio', () => {
+  it('el río se oye al acercar la cámara y se va al alejarla', () => {
+    const close = mixFor({ ...CALM, viewHeight: 10 }).amb_river ?? 0;
+    const far = mixFor({ ...CALM, viewHeight: 80 }).amb_river ?? 0;
+    expect(close).toBeGreaterThan(far);
+  });
+
+  it('y se oye menos cuanto más lejos queda del centro de la vista', () => {
+    const gains = [2, 10, 20, 40].map((riverCells) => mixFor({ ...CALM, riverCells }).amb_river ?? 0);
+    for (let i = 1; i < gains.length; i += 1) expect(gains[i]!).toBeLessThan(gains[i - 1]!);
+    expect(gains.at(-1)).toBe(0);
+  });
+
+  it('una riada sube el río: es el mismo cauce, con más agua', () => {
+    expect(mixFor({ ...CALM, flood: 1 }).amb_river ?? 0)
+      .toBeGreaterThan(mixFor(CALM).amb_river ?? 0);
+  });
+
+  it('un valle sin cascada no suena a cascada', () => {
+    expect(mixFor(CALM).amb_waterfall).toBeUndefined();
+    expect(mixFor({ ...CALM, waterfallCells: 4 }).amb_waterfall ?? 0).toBeGreaterThan(0);
+  });
+});
+
+describe('el fondo del mundo · la llama y las brasas no son lo mismo', () => {
+  it('cada estado del fuego suena el suyo, nunca los dos', () => {
+    const flame = mixFor({ ...CALM, flameCells: 4 });
+    const ember = mixFor({ ...CALM, emberCells: 4 });
+    expect(flame.amb_fire_flame ?? 0).toBeGreaterThan(0);
+    expect(flame.amb_fire_embers).toBeUndefined();
+    expect(ember.amb_fire_embers ?? 0).toBeGreaterThan(0);
+    expect(ember.amb_fire_flame).toBeUndefined();
+  });
+
+  it('sin fuego no hay fuego', () => {
+    expect(mixFor(CALM).amb_fire_flame).toBeUndefined();
+  });
+});
+
+describe('el trueno llega por la distancia, no por una tirada', () => {
+  it('más lejos, más tarde, y siempre', () => {
+    const delays = [0, 10, 30, 60].map((cells) => thunderFor(cells).delaySeconds);
+    for (let i = 1; i < delays.length; i += 1) expect(delays[i]!).toBeGreaterThan(delays[i - 1]!);
+  });
+
+  it('y más lejos, más sordo: tres truenos y no uno con el volumen bajado', () => {
+    expect(thunderFor(2).cue).toBe('weather_thunder_near');
+    expect(thunderFor(SOUND.THUNDER_NEAR_CELLS + 1).cue).toBe('weather_thunder_mid');
+    expect(thunderFor(SOUND.THUNDER_MID_CELLS + 1).cue).toBe('weather_thunder_far');
+  });
+
+  it('el rayo más lejano del corazón del valle no tarda más que el retardo que sustituye', () => {
+    // El corazón mide 36 × 56 celdas (`tiles.ts`), o sea 66 de esquina a
+    // esquina; `SKY.THUNDER_DELAY[1]` era el tope del retardo aleatorio viejo.
+    expect(thunderFor(Math.hypot(36, 56)).delaySeconds).toBeLessThanOrEqual(SKY.THUNDER_DELAY[1]);
+  });
+});
+
+describe('los lechos · lo que se registra, existe y no se nota que da la vuelta', () => {
+  const AUDIO = resolve(__dirname, '../../public/audio');
+
+  it('cada capa tiene su fichero, con su huella', () => {
+    for (const layer of AMBIENCE_LAYERS) {
+      const { file } = LOOP_FILES[layer];
+      const path = resolve(AUDIO, file.split('?')[0]!);
+      expect(existsSync(path), layer).toBe(true);
+    }
+  });
+
+  it('y su duración declarada, que es lo que impide el latido del relleno del MP3', () => {
+    for (const layer of AMBIENCE_LAYERS) {
+      // Un bucle corto se reconoce; uno largo pesa sin ganar nada.
+      expect(LOOP_FILES[layer].seconds, layer).toBeGreaterThanOrEqual(8);
+      expect(LOOP_FILES[layer].seconds, layer).toBeLessThanOrEqual(20);
+    }
+  });
+
+  it('todo el mundo cabe en un presupuesto de móvil: menos de 900 KB', () => {
+    // Medido el 29 sep 2026: 486 KB de lechos y 82 de cielo. El presupuesto es
+    // casi el doble, para que quepan las capas de la fase 2 sin rehacer esto.
+    const files = [...AMBIENCE_LAYERS.map((l) => LOOP_FILES[l].file),
+      ...Object.values(CUE_FILES)];
+    const total = files.reduce((sum, file) => sum + statSync(resolve(AUDIO, file.split('?')[0]!)).size, 0);
+    expect(total).toBeLessThan(900_000);
   });
 });
