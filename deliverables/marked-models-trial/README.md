@@ -56,3 +56,17 @@ el v3, mismos nodos y la misma pose erguida.
   construye el oso; sin nombres, todos.
 - Publicado con `rigid-clips.mjs bear-v4.glb <salida> bear`,
   `adopt-models.mjs` y `publish-assets.ts --ids bear`.
+
+## El pez (29 sep 2026) — candidato, **sin publicar**
+
+El de G-23 era una cápsula con rombos pegados y se leía como un submarino.
+`fish()` en `build-models.py` hace una trucha facetada: huso que se afina hacia
+la cola, caudal ahorquillada, dorsal alta que asoma del agua, lomo oscuro (lo
+que se ve desde arriba), costado dorado con pintas y vientre claro. Mismo
+tamaño que el de G-23 (0,19 celdas) y los nodos `body`, `head`, `tail`,
+`tailTip` y `fin±1`; `rigid-clips.mjs … fish` le da el nado (la cola ondula en
+tres tramos, las pectorales reman) y el reposo.
+
+- [fish.glb](fish.glb) · [perfil](fish-profile.png) · [tres cuartos](fish-three-quarter.png) ·
+  [nadando bajo el agua](fish-swim.png)
+- `python3 build-models.py -- fish`

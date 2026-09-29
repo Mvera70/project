@@ -385,6 +385,55 @@ def bear():
     for i,p in enumerate(fronts): tracks.append((p,'rotation_euler',[(0,0,0),((-.18 if i==0 else .18),-.40,0),((-.23 if i==0 else .23),-.65,0),(0,0,0)]))
     clip('rear',tracks,[1,25,48,72]); save('bear-v4')
 
+def slab(n,pts,off,m,parent=None):
+    # Una aleta: el contorno y su grosor, como un prisma fino.
+    off=Vector(off); vs=[tuple(Vector(p)+off) for p in pts]+[tuple(Vector(p)-off) for p in pts]; k=len(pts)
+    fs=[tuple(range(k-1,-1,-1)),tuple(range(k,2*k))]+[(i,(i+1)%k,(i+1)%k+k,i+k) for i in range(k)]
+    return mesh(n,vs,fs,m,parent)
+
+def fish():
+    # 29 sep 2026. El pez de G-23 era una cápsula con rombos pegados: se leía
+    # como un submarino. Una trucha facetada, como los animales de Vera: huso
+    # que se afina hacia la cola, aleta caudal ahorquillada, dorsal que asoma
+    # del agua (el juego lo pone a −0,14 y la lámina está a −0,10), lomo oscuro
+    # —es lo que se ve desde arriba—, costado dorado con pintas y vientre claro.
+    # Mismo tamaño que el de G-23 y los nodos que `rigid-clips.mjs` hace nadar.
+    reset(); mat('back','3B412E'); mat('flank','8C8158'); mat('belly','D3C9A6'); mat('fin','5B563C')
+    mat('spot','2A2620'); mat('red','9A4430')
+    body=empty('body',(0,0,0),ROOT)
+    head=empty('head',(-.035,0,0),body)
+    tail=empty('tail',(.040,0,0),body)
+    tip=empty('tailTip',(.080,0,0),tail)
+    # (x, centro, semiancho, semialto): el huso, en tres tramos que se solapan
+    # para que la cola se doble sin abrir costura.
+    front=[(-.075,-.002,.004,.005),(-.069,0,.010,.013),(-.057,.001,.015,.020),(-.037,.002,.018,.025),(-.012,.002,.019,.027),(.014,.001,.018,.025),(.038,0,.015,.021),(.046,0,.014,.019)]
+    mid=[(.034,0,.0155,.0215),(.050,0,.0125,.017),(.066,0,.0090,.012),(.086,0,.0060,.0080)]
+    end=[(.078,0,.0068,.0090),(.092,0,.0048,.0062),(.100,0,.0040,.0055)]
+    for name,sections,node in [('Front',front,body),('Mid',mid,tail),('End',end,tip)]:
+        loft(name+'_Flank',sections,'flank',node,10)
+        # El lomo y el vientre asoman un diez por ciento del costado: a ras se
+        # pelean con él y salen a rayas.
+        loft(name+'_Back',[(x,z+rz*.30,ry*.87,rz*.80) for x,z,ry,rz in sections],'back',node,10)
+        loft(name+'_Belly',[(x,z-rz*.34,ry*.88,rz*.72) for x,z,ry,rz in sections],'belly',node,10)
+    # Caudal ahorquillada, en el plano vertical.
+    slab('Caudal_Fin',[(.095,0,.005),(.118,0,.031),(.110,0,.001),(.118,0,-.029),(.095,0,-.005)],(0,.0012,0),'fin',tip)
+    # Dorsal alta y redondeada: es lo que asoma del agua.
+    slab('Dorsal_Fin',[(-.016,0,.022),(-.006,0,.056),(.006,0,.064),(.016,0,.050),(.022,0,.024)],(0,.0012,0),'fin',body)
+    slab('Adipose_Fin',[(.050,0,.015),(.057,0,.023),(.063,0,.012)],(0,.0010,0),'fin',tail)
+    slab('Anal_Fin',[(.040,0,-.016),(.049,0,-.030),(.058,0,-.028),(.060,0,-.011)],(0,.0010,0),'fin',tail)
+    for s in (-1,1):
+        f=empty('fin'+str(s),(-.035,s*.016,-.012),body)
+        slab('Pectoral_'+str(s),[(-.037,s*.015,-.012),(-.020,s*.036,-.016),(-.013,s*.032,-.016),(-.022,s*.014,-.012)],(0,0,.0010),'fin',f)
+        slab('Pelvic_'+str(s),[(.004,s*.009,-.021),(.020,s*.022,-.026),(.024,s*.018,-.025),(.014,s*.007,-.021)],(0,0,.0010),'fin',body)
+        eye('Eye_'+str(s),-.060,s*.0138,.006,.0065,head)
+        tube('Mouth_'+str(s),[(-.074,s*.003,-.004),(-.066,s*.009,-.007),(-.058,s*.012,-.006)],[.0012,.0010,.0008],'spot',head,6)
+        # Pintas en el costado: casi no se ven a la distancia de juego, pero
+        # de cerca dicen trucha y no cualquier pez.
+        for j,(x,z,m) in enumerate([(-.030,.010,'spot'),(-.014,.014,'spot'),(.000,.006,'red'),(.012,.013,'spot'),(.024,.004,'spot'),(-.004,-.002,'spot'),(.030,.011,'red')]):
+            ry=next(a[2]+(b[2]-a[2])*(x-a[0])/(b[0]-a[0]) for a,b in zip(front,front[1:]) if a[0]<=x<=b[0])
+            ell('Spot_'+str(s)+'_'+str(j),(x,s*ry*.93,z),(.0045,.0015,.0040),m,body,6,4)
+    save('fish')
+
 def mule():
     reset(); mat('coat','978772'); mat('coatTop','514B40'); mat('light','C9C1A5'); mat('earInner','706658'); mat('pack','B19A6C'); mat('cloth','A28F63')
     body=empty('body',(0,0,.24),ROOT)
@@ -540,6 +589,6 @@ def hoe():
 # `-- bear` construye sólo esos; sin nombres, todos (el oso, en su v4).
 ONLY=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 BUILDS=[('wolf',lambda: canine('wolf')),('dog',lambda: canine('dog')),('boar',boar),('bear',bear),('bear_v3',bear_v3),('mule',mule),
-        ('partridge',partridge),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
+        ('partridge',partridge),('fish',fish),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
 for name,build in BUILDS:
     if (not ONLY and name!='bear_v3') or name in ONLY: build()

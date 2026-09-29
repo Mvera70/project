@@ -234,12 +234,42 @@ function bird() {
   if (takeoff !== undefined) motion.push({ name: 'takeoff', seconds: durationOf(takeoff), loop: false, strideLength: null });
 }
 
+// El pez nada: la cola ondula en tres tramos, cada uno con retraso sobre el
+// anterior y más amplitud que él, y las pectorales reman. En glTF la vertical es
+// Y, así que la cola gira en torno a Y. La zancada es lo que avanza por ciclo.
+function fish() {
+  const Xaxis = [1, 0, 0];
+  const swimSeconds = 1;
+  clip('walk', swimSeconds, {
+    rotate: {
+      body: [[Y, (t) => 0.05 * wave(t)]],
+      tail: [[Y, (t) => 0.28 * wave(t, 1, -0.15)]],
+      tailTip: [[Y, (t) => 0.42 * wave(t, 1, -0.3)]],
+      'fin-1': [[Xaxis, (t) => 0.35 * wave(t, 2)]],
+      fin1: [[Xaxis, (t) => -0.35 * wave(t, 2)]],
+    },
+  });
+  motion.push({ name: 'walk', seconds: swimSeconds, loop: true, strideLength: 0.1 });
+  // Quieto contra la corriente: la cola apenas, las aletas despacio.
+  const idleSeconds = 4;
+  clip('idle', idleSeconds, {
+    rotate: {
+      tail: [[Y, (t) => 0.08 * wave(t, 2)]],
+      tailTip: [[Y, (t) => 0.14 * wave(t, 2, -0.15)]],
+      'fin-1': [[Xaxis, (t) => 0.25 * wave(t, 3)]],
+      fin1: [[Xaxis, (t) => -0.25 * wave(t, 3)]],
+    },
+  });
+  motion.push({ name: 'idle', seconds: idleSeconds, loop: true, strideLength: null });
+}
+
 function durationOf(animation) {
   return Math.max(...animation.samplers.map((sampler) => gltf.accessors[sampler.input].max?.[0] ?? 0));
 }
 
 if (QUADS[species] !== undefined) quadruped(QUADS[species]);
 else if (species === 'partridge') bird();
+else if (species === 'fish') fish();
 else throw new Error(`Especie sin clips: ${species}`);
 
 // --- escribir --------------------------------------------------------------

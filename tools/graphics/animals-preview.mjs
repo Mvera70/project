@@ -10,8 +10,11 @@ const assets='public/assets/valley3d/',all=JSON.parse(readFileSync(assets+'manif
 // Cualquier especie de `AnimalKind` que tenga GLB publicado; G-23 empezó con siete.
 const KINDS=['hen','pig','cow','crow','wolf','fish','partridge','rabbit','deer','boar','bear','dog','fox','duck','mule'];
 if(!KINDS.includes(id)||!all.assets.some(a=>a.id===id))throw Error(`Id inválido: usa ${KINDS.join(', ')}`);
-const manifest={...all,assets:all.assets.filter(a=>a.id===id)};
-const bytes=Object.fromEntries(manifest.assets.map(a=>[a.id,readFileSync(assets+a.file).toString('base64')]));
+// `--glb <candidato.glb> --motion '<json>'`: un GLB sin publicar en lugar del publicado.
+const opt=(n)=>process.argv.includes('--'+n)?process.argv[process.argv.indexOf('--'+n)+1]:null;
+const glb=opt('glb'),motion=opt('motion');
+const manifest={...all,assets:all.assets.filter(a=>a.id===id).map(a=>glb===null?a:{...a,motion:motion===null?a.motion:JSON.parse(motion)})};
+const bytes=Object.fromEntries(manifest.assets.map(a=>[a.id,readFileSync(glb??assets+a.file).toString('base64')]));
 const result=await build({entryPoints:['tools/graphics/animals-preview.ts'],bundle:true,write:false,format:'esm',define:{PREVIEW_BYTES:JSON.stringify(bytes),PREVIEW_MANIFEST:JSON.stringify(manifest),PREVIEW_ID:JSON.stringify(id)}});
 writeFileSync(dir+'/'+id+'-preview.html',`<!doctype html><meta charset="utf-8"><script type="module">${result.outputFiles[0].text}</script>`);
 const browser=await chromium.launch(withBrowser({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']}));

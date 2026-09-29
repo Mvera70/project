@@ -18,8 +18,9 @@ el hocico suavizado, esqueleto por script, **publicado** (v4.97, 0,56 celdas,
 columna, pardo oscuro; la joroba grande le pareció horrible a Vera y queda
 suave (`BEAR_HUMP` 0,35; 0,15 casi plano); mismo tamaño, nodos y pose erguida que el v3.
 **Publicado** (v4.98), el «normal»: se probaron también patas de delante más
-cortas y con pelo colgando. **Siguiente, uno a uno como pidió Vera:** el pez;
-después el cerdo. El oso no se puede fotografiar dentro de la partida sin
+cortas y con pelo colgando. **Siguiente, uno a uno como pidió Vera:** el pez,
+**candidato sin publicar** (una trucha facetada, `fish()` y
+`rigid-clips.mjs … fish`), a la espera de su visto bueno; después el cerdo. El oso no se puede fotografiar dentro de la partida sin
 cazar antes la cadena entera: no hay `?hunt=`.
 
 ## 29 sep 2026 · Rendimiento en la tablet, «Graphics» y lo que quedaba de la v9
