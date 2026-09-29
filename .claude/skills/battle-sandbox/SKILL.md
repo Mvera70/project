@@ -10,6 +10,9 @@ métricas en directo … yo mismo quiero ver y probar cómo se reproduce el comb
 corregirlo: físicas, animaciones, gore». **En el futuro se le irán integrando más
 cosas del combate para probarlas**: esta skill es cómo hacerlo sin romper lo que hay.
 
+**Si lo que tocas es qué decide la física** (Rapier, contactos, la sombra de
+F-0, el acierto de la flecha), lee antes la skill `fisica-combate`.
+
 ## Qué es, en una frase
 
 `?sandbox=battle` abre **el combate del juego, no una copia**: la villa amurallada de
@@ -34,6 +37,7 @@ Parámetros (todos opcionales, con tope):
 | `arm` | `bow` | `bow` · `spear` | Arma de torres y muralla. **El portón se sujeta siempre con lanza** (regla de `postsOf`) |
 | `raiders` | 12 | 1–80 | Asaltantes. **Sin el tope de `BAND_SHOWN` (12)** del juego |
 | `seed`, `year` | 7, 60 | — | La villa. Tiene que tener cerco cerrado con portón; la 7/60 lo tiene |
+| `shadow` | — | 0,05–0,5 | **F-0, la flecha que toca, en sombra** (29 sep 2026): una cápsula de Rapier de ese radio por asaltante en pie, en un mundo de consulta aparte que no toca la batalla. El panel añade la fila «Sondas F-0» (sondas vivas, ms por paso de las sondas y de Rapier, y en cuántos aciertos coincidiría el contacto) y «Copiar métricas» el bloque `probes`. Radios medidos: 0,12 el tronco, 0,17 con los brazos (`DRAWN_BODY` en `archery.ts`) |
 
 El asalto es siempre **asalto** (van a por el portón), no saqueo.
 
@@ -81,13 +85,30 @@ iguales acaban distinto. Para comparar, se repite varias veces y se miran medias
 | Ganchos del renderer | `src/render3d/renderer.ts` | `window.__valleyBattle(choice \| null)` fija la batalla y rehace la jornada; `window.__valleyBattleStats()` devuelve `BattleStats` (ligero, sin posiciones de pantalla) |
 | Ganchos de la app | `src/ui/app.ts` | `__valleySpeed(0\|1\|4)`, `__valleyTimeScale(0.05–1)`, `__valleyLook(x, y)`, `__valleyHoldTicks(on)` |
 | Física | `src/render3d/life/physics.ts` | `stats.stepMs` y `stats.stepMsAverage` (media móvil 0,95) alrededor de `world.step()` |
-| Sin navegador | `tools/reports/battle-report.ts` | La misma batalla paso a paso con Rapier, impresa |
+| Sin navegador | `tools/reports/battle-report.ts` | La misma batalla paso a paso con Rapier, impresa; con `--shadow r1,r2 --seeds a,b [--relief]`, la tabla de acuerdo de F-0 contra la misma batalla sin sombra |
+| Sombra F-0 | `physics.ts` · `probes`, `sweep`; `archery.ts` · `archeryShadow`; opción `shadow` de `createVillage` | Cápsulas en un mundo de consulta aparte y la bitácora de a quién habría dado cada flecha. **No decide nada**: `tests/fast/physics-probes.test.ts` guarda que el vuelo y el resultado son los mismos |
 | Pruebas | `tests/fast/battle-sandbox.test.ts` | Dirección y topes, `garrisonAs`, la jornada con más cuerpos que el juego sin tocar el motor, y `battleOutcome` |
 
 De dónde sale cada cifra: la defensa es `life.defence` (`village.ts`, el mismo parte que
 lee el motor por B4); las fases, `life.raiders[].phase`; la física, `life.physics.stats`
 (`null` **hasta que llegan**: Rapier se crea la primera vez que hay asaltantes cerca);
 el dibujo, `renderer.info.render`.
+
+## Medir en el aparato (lo que F-1 necesita)
+
+La batalla de referencia es la villa 7/60 con diez en el cerco y veinticuatro
+asaltantes. En el iPhone y en el iPad, **primero la línea de base**:
+`?sandbox=battle&defenders=10&raiders=24`, esperar al pico de la pelea y «Copiar
+métricas»; **después con sondas**: lo mismo con `&shadow=0.12`. Lo que decide F-1 es
+lo que añaden las sondas (`probes.probeMs`) como fracción del fotograma de la línea de
+base en ese aparato (`docs/diagnostico-fisica-combate-2026-09-29.md` §2 y §3). En el
+portátil de este contenedor: Rapier ~0,3 ms por paso y las sondas ~0,08 ms.
+
+**En el Chromium sin GPU del contenedor el banco no avanza** (29 sep 2026): el panel
+se pinta —con la fila «Sondas F-0»— pero la página va a 0 fps, la vida no da ni un
+paso en veinte minutos y `__valleyAdvance` no tiene fotograma del que partir. Aquí se
+mide con `battle-report.ts`; el banco, en un navegador de verdad
+(`artifacts/physics/F-0/banco/`).
 
 ## Comprobar un cambio del combate
 

@@ -1502,11 +1502,11 @@
       "artifactRound": "G-17",
       "status": "study",
       "recipe": "art/recipes/villager/villager.json",
-      "generator": "tools/art/blender-build.py",
+      "generator": "tools/art/blender-build.py · tools/art/bake-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-17T17-47-23-892Z-55152",
-        "directory": "artifacts/graphics/G-17/approved/3e77c2fa1e634969"
+        "runId": "AN-1-bake-2026-09-29",
+        "directory": "artifacts/graphics/AN-1/approved/cbc336551f462700"
       },
       "bounds": {
         "min": [
@@ -1525,7 +1525,7 @@
           0.153333
         ]
       },
-      "recipeSha256": "08045680EC2EF4FE2B63B326AB80B0BCC1FAF0D8DF167753F53A4783489E7608",
+      "recipeSha256": "C950C2A2DE0380F05C1112B5F951785EA3D06F885E19981C458966B23EAD66F7",
       "materials": [
         "skin",
         "cloth",
@@ -1549,7 +1549,7 @@
           "name": "walk",
           "seconds": 1.3333333333333333,
           "loop": true,
-          "strideLength": 0.317
+          "strideLength": 0.423
         },
         {
           "name": "work_hoe",
@@ -1561,7 +1561,7 @@
           "name": "carry_walk",
           "seconds": 1.3333333333333333,
           "loop": true,
-          "strideLength": 0.26
+          "strideLength": 0.339
         }
       ],
       "connectors": [
@@ -1575,18 +1575,11 @@
         "triangles": 1044
       },
       "hashes": {
-        "villager.blend": "7982EB8D909A735F9A085CDCB0C2B164187C6A060119F1EBDBA9D09554B84EB9",
-        "villager.glb": "3E77C2FA1E6349696B828DAA2AB2FE01848531274FA0B2D31435B0D09BA02D33",
-        "villager-blender.png": "1D6F43FE1343ED4A171DB12C42BE873A1EE90E04891FC05DAF113FD9CC9D68C6",
-        "capture-1.png": "15DE9D6C2536E1E1DA8BECAF6ACCCF47D003136F8800A5D42802245DF8758D4F",
-        "capture-1-gray.png": "ABA47B81E2ED800470B510B5278A6C293399EDD671529E2E12D5F9DCE8BE0D76",
-        "capture.json": "5F5FAC2DD48BA1B632D657BC92D94C8A3B3B1A250A05EE9820A11346D6974C63",
-        "build.json": "8688642F73163F47E236E123C5A612A8B0976A7DF1D1EC227792310BCE7FEE7F",
-        "validation.json": "6B5897F8D03861C93174B4A720D234266168B403DB92CD2C0C211EC72C4E031A"
+        "villager.glb": "CBC336551F462700A5BA04E94B76504718EE42A6A4B90864EEBBECA6A6EF6D66"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager: rediseño low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md.",
+        "source": "Original villager: rediseño low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md. AN-1 (29 sep 2026): walk y carry_walk reescritos por art/recipes/villager/plant-gait.mjs y horneados en el GLB de G-17 con tools/art/bake-clips.mjs (sin Blender en la ronda); geometría, rig e idle/work_hoe intactos.",
         "license": "Project original"
       }
     },

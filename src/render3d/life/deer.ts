@@ -158,5 +158,6 @@ export function stepDeer(
 
 export function deerPositions(deer: readonly Deer[]): Animal[] {
   return deer.map(animal => ({ id: animal.body.id, kind: 'deer', x: animal.body.x, y: animal.body.z,
+    facing: animal.body.facing,
     action: Math.hypot(animal.body.vx, animal.body.vz) > 0.01 ? 'walk' : undefined }));
 }

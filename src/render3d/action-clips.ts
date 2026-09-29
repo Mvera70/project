@@ -13,7 +13,7 @@ import { STRIKE_AT, VILLAGER_CLIPS, type ClipName } from './clips';
  * Lo vigila `tests/fast/graphics-clock.test.ts`.
  */
 export const ACTION_CLIPS: readonly ClipName[] = [
-  'sit', 'talk', 'pray', 'hammer', 'chop', 'mine', 'sow', 'spread', 'douse', 'play', 'drink', 'sort', 'shelter',
+  'sit', 'talk', 'pray', 'hammer', 'chop', 'mine', 'sow', 'spread', 'douse', 'play', 'throw', 'drink', 'sort', 'shelter',
   'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall', 'flee',
 ];
 
@@ -67,15 +67,39 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
       // Carrera de silueta grande: piernas y brazos opuestos, torso echado
       // hacia delante y dos apoyos idénticos por ciclo. Se fabrica aparte de
       // `walk`: a la distancia de juego acelerar el paseo no se lee como huir.
-      turn('thigh.L', x, t => 0.85 * wave(t));
-      turn('shin.L', x, t => 0.65 + 0.45 * Math.max(0, -wave(t)));
-      turn('thigh.R', x, t => -0.85 * wave(t));
-      turn('shin.R', x, t => 0.65 + 0.45 * Math.max(0, wave(t)));
-      turn('upperarm.L', x, t => -0.8 * wave(t));
-      turn('forearm.L', x, () => -1.05);
-      turn('upperarm.R', x, t => 0.8 * wave(t));
-      turn('forearm.R', x, () => -1.05);
-      turn('spine', x, t => 0.2 + 0.04 * Math.abs(wave(t)));
+      // AN-3 · La huida va a 1,6–2,6 celdas/s (5–8 m/s, un esprint) y con la
+      // zancada de 0,44 daba 3,7–5,8 ciclos por segundo, casi el paso de andar
+      // con las piernas más abiertas. Zancada de 0,7 (2,1 m por ciclo),
+      // piernas a ±46°, la de atrás casi recta y la de delante con la rodilla
+      // alta: 2,3–3,7 Hz. Y la cadera sigue a la pierna que apoya: con las
+      // piernas abiertas la pierna es más corta en vertical, y sin bajar la
+      // cadera los pies flotaban (la versión de E1 iba diez centímetros por
+      // encima del suelo en cada apoyo); baja hasta 0,10 m y sube 0,03 m en
+      // el cruce, que es el vuelo. Medido con el rig: muslo y canilla 0,38 m.
+      const thigh = (side: 1 | -1, t: number): number => 0.8 * side * wave(t);
+      const bend = (side: 1 | -1, t: number): number => 0.3 + 0.8 * Math.max(0, -side * wave(t));
+      turn('thigh.L', x, t => thigh(1, t)); turn('shin.L', x, t => bend(1, t));
+      turn('thigh.R', x, t => thigh(-1, t)); turn('shin.R', x, t => bend(-1, t));
+      turn('upperarm.L', x, t => -1.0 * wave(t));
+      turn('forearm.L', x, () => -1.1);
+      turn('upperarm.R', x, t => 1.0 * wave(t));
+      turn('forearm.R', x, () => -1.1);
+      turn('spine', x, t => 0.26 + 0.04 * Math.abs(wave(t)));
+      const root = idle.tracks.find(track => track.name === 'hips.position');
+      if (root !== undefined) {
+        const LEG = 0.38, extent = (side: 1 | -1, t: number): number => {
+          const a = thigh(side, t), b = bend(side, t);
+          return LEG * Math.cos(a) + LEG * Math.cos(a - b);
+        };
+        const at = Array.from(root.values.slice(0, 3)), times: number[] = [], values: number[] = [];
+        for (let n = 0; n <= 24; n++) {
+          const t = n / 24; times.push(t * duration);
+          const drop = Math.max(-0.1, Math.max(extent(1, t), extent(-1, t)) - 2 * LEG);
+          values.push(at[0]!, at[1]! + drop + 0.03 * (1 - Math.abs(wave(t))), at[2]!);
+        }
+        clip.tracks = clip.tracks.filter(track => track.name !== root.name);
+        clip.tracks.push(new VectorKeyframeTrack(root.name, times, values));
+      }
     } else if (name === 'bow_draw' || name === 'bow_loose') {
       // Tensado sostenible: extremos idénticos, respiración leve. La suelta
       // empieza con la mano ya separándose de la mejilla, sin anticipación
@@ -90,12 +114,19 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
       turn('hand.R', z, t => name === 'bow_draw' ? 0 : 0.35 * (1 - t));
       turn('spine', z, t => name === 'bow_draw' ? 0.025 * wave(t) : -0.1 * Math.sin(Math.PI * t));
     } else if (name === 'gate_strike') {
-      // El contacto es t=0; después se retiran ambos brazos y el torso.
+      // El contacto es t=0, como el daño. AN-3 · Los golpes van a paso fijo
+      // (`raiders.ts`, `BLOW_STEPS`: uno por segundo), así que el clip dura
+      // el segundo entero y trae el golpe siguiente: retirada del contacto
+      // (0–0,3), carga con los dos brazos por encima de la cabeza y el
+      // tronco atrás (0,3–0,85), y espera cargado hasta que el hecho
+      // siguiente vuelve a ponerlo en t=0. Antes se retiraba y se quedaba
+      // con los brazos caídos: un asaltante que golpea sin levantar el arma.
       for (const side of ['L', 'R']) {
-        turn(`upperarm.${side}`, x, t => -1.45 + 0.8 * t);
-        turn(`forearm.${side}`, x, t => -0.1 - 0.7 * t);
+        turn(`upperarm.${side}`, x, keyed([[0, -1.45, 'smooth'], [0.3, -0.75, 'smooth'], [0.85, -2.45, 'smooth'], [1, -2.45, 'hold']]));
+        turn(`forearm.${side}`, x, keyed([[0, -0.1, 'smooth'], [0.3, -0.8, 'smooth'], [0.85, -1.25, 'smooth'], [1, -1.25, 'hold']]));
       }
-      turn('spine', x, t => 0.3 * (1 - t));
+      turn('spine', x, keyed([[0, 0.3, 'smooth'], [0.3, 0.05, 'smooth'], [0.85, -0.18, 'smooth'], [1, -0.18, 'hold']]));
+      turn('head', x, keyed([[0, 0.1, 'smooth'], [0.3, 0, 'smooth'], [0.85, -0.15, 'smooth'], [1, -0.15, 'hold']]));
     } else if (name === 'spear_thrust') {
       // Contacto en cero, como el daño real. Recuperación sin mover el cuerpo
       // físico: un nuevo golpe puede interrumpir los 0,9 s del encargo.
@@ -139,23 +170,46 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
         clip.tracks.push(new VectorKeyframeTrack(root.name, times, values));
       }
     } else if (name === 'sit') {
+      // AN-2 · Se sentaba en el aire a la altura de un banco que no existe (no
+      // hay banco ni tronco en el valle: `encargos-3d.md`). Sin asiento se
+      // sienta en el suelo: la cadera baja a 0,25 m, las rodillas se alzan,
+      // los pies quedan a ras y las manos descansan sobre las rodillas; el
+      // tronco se mece apenas. Números medidos sobre el rig (pies a ±2 cm).
       for (const side of ['L', 'R']) {
-        turn(`thigh.${side}`, x, () => -1.35); turn(`shin.${side}`, x, () => 0.5);
-        turn(`upperarm.${side}`, x, () => -0.35); turn(`forearm.${side}`, x, () => -0.8);
+        turn(`thigh.${side}`, x, () => -1.9); turn(`shin.${side}`, x, () => 1.35); turn(`foot.${side}`, x, () => 0.4);
+        turn(`upperarm.${side}`, x, () => -0.6); turn(`forearm.${side}`, x, () => -0.7);
       }
+      turn('spine', x, t => 0.12 + 0.03 * wave(t));
+      turn('head', x, () => 0.05);
       const root = idle.tracks.find(track => track.name === 'hips.position');
       if (root !== undefined) {
         clip.tracks = clip.tracks.filter(track => track.name !== root.name);
-        const at = Array.from(root.values.slice(0, 3)); at[1] = at[1]! - 0.55;
+        const at = Array.from(root.values.slice(0, 3)); at[1] = at[1]! - 0.61;
         clip.tracks.push(new VectorKeyframeTrack(root.name, [0, duration], [...at, ...at]));
       }
     } else if (name === 'talk') {
-      turn('forearm.R', x, t => -0.7 - 0.25 * wave(t));
-      turn('upperarm.R', z, t => 0.12 + 0.08 * wave(t));
-      turn('head', x, t => 0.06 * wave(t));
+      // AN-2 · A veinte píxeles sólo se leía la burbuja. La mano derecha sube y
+      // abre delante del pecho dos veces por ciclo, la izquierda contesta a
+      // contratiempo con un gesto más corto, y la cabeza asiente y se vuelve:
+      // dos que hablan se distinguen de dos que esperan.
+      const beat = (t: number): number => Math.max(0, Math.sin(t * Math.PI * 4));
+      const reply = (t: number): number => Math.max(0, -wave(t));
+      turn('upperarm.R', x, t => -0.35 - 0.5 * beat(t));
+      turn('upperarm.R', z, t => 0.25 + 0.25 * beat(t));
+      turn('forearm.R', x, t => -1.1 - 0.5 * beat(t));
+      turn('upperarm.L', x, t => -0.15 - 0.35 * reply(t));
+      turn('forearm.L', x, t => -0.8 - 0.45 * reply(t));
+      turn('head', x, t => 0.05 + 0.1 * Math.sin(t * Math.PI * 6));
+      turn('head', y, t => 0.14 * wave(t));
+      turn('spine', x, () => 0.05);
     } else if (name === 'pray') {
-      for (const side of ['L', 'R']) { turn(`upperarm.${side}`, x, () => -0.55); turn(`forearm.${side}`, x, () => -1.1); }
-      turn('head', x, () => 0.2);
+      // AN-2 · Manos juntas y cabeza gacha, quietas cinco segundos, era
+      // alguien parado. Una inclinación lenta por ciclo: se dobla desde la
+      // cintura, las manos suben al mentón y la cabeza baja con el tronco.
+      const bow = (t: number): number => 0.5 - 0.5 * Math.cos(t * Math.PI * 2);
+      for (const side of ['L', 'R']) { turn(`upperarm.${side}`, x, t => -0.55 - 0.3 * bow(t)); turn(`forearm.${side}`, x, () => -1.1); }
+      turn('spine', x, t => 0.06 + 0.45 * bow(t));
+      turn('head', x, t => 0.2 + 0.12 * bow(t));
     } else if (name === 'mine' || name === 'chop') {
       // IA-anim · Pico y hacha: tres poses —preparado, arriba, golpe— con la
       // subida lenta, la bajada acelerada hasta el impacto y un rebote. El
@@ -228,15 +282,36 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
         turn('spine', y, pose(0, 0.15, -0.2));
       }
     } else if (name === 'hammer') {
-      turn('upperarm.R', x, t => -0.5 - 0.65 * (1 + wave(t)));
-      turn('forearm.R', x, t => -0.6 - 0.35 * (1 - wave(t)));
-      turn('spine', x, t => 0.08 + 0.08 * wave(t));
+      // AN-2b · Era un seno del brazo sin instante de golpe. Las tres poses
+      // del hacha a una mano y en corto: carga sobre el hombro, golpe
+      // acelerado hasta `STRIKE_AT` y rebote, con la izquierda sujetando la
+      // pieza delante y el tronco acompañando. El render suelta chispas o
+      // astillas en el golpe (`world/cast.ts`).
+      const at = STRIKE_AT.hammer;
+      const pose = (ready: number, up: number, hit: number) => keyed([
+        [0, ready, 'smooth'], [at - 0.15, up, 'smooth'], [at, hit, 'strike'],
+        [at + 0.05, hit + (up - hit) * 0.12, 'smooth'], [at + 0.1, hit, 'smooth'],
+        [at + 0.35, ready, 'smooth'], [1, ready, 'smooth'],
+      ]);
+      turn('upperarm.R', x, pose(-0.9, -2.1, -0.5));
+      turn('forearm.R', x, pose(-0.9, -1.5, -0.3));
+      turn('upperarm.L', x, () => -0.6); turn('forearm.L', x, () => -0.95);
+      turn('spine', x, pose(0.1, -0.05, 0.3));
+      turn('head', x, pose(0.15, 0.05, 0.3));
     } else if (name === 'sort') {
+      // AN-2 · Ordenar era un vaivén de manos delante del pecho. Ahora es
+      // coger y poner: se dobla a por algo a la altura de la cintura, lo
+      // levanta al pecho y lo deja a su derecha girando el tronco, y vuelve.
+      // Tres tiempos que a veinte píxeles se leen como alguien que mueve cosas.
+      const cycle = keyed([[0, 0, 'smooth'], [0.3, 1, 'smooth'], [0.5, 0, 'smooth'], [0.75, -1, 'smooth'], [1, 0, 'smooth']]);
+      const bend = (t: number): number => Math.max(0, cycle(t)), place = (t: number): number => Math.max(0, -cycle(t));
+      turn('spine', x, t => 0.12 + 0.75 * bend(t));
+      turn('spine', y, t => -0.55 * place(t));
       for (const side of ['L', 'R']) {
-        turn(`upperarm.${side}`, x, t => -0.55 - 0.25 * wave(t));
-        turn(`forearm.${side}`, x, t => -0.8 + 0.2 * wave(t));
+        turn(`upperarm.${side}`, x, t => -0.35 - 0.2 * bend(t) - 0.55 * place(t));
+        turn(`forearm.${side}`, x, t => -1.15 + 0.75 * bend(t) + 0.6 * place(t));
       }
-      turn('spine', x, t => 0.1 + 0.08 * wave(t));
+      turn('head', x, t => 0.15 + 0.25 * bend(t) - 0.1 * place(t));
     } else if (name === 'shelter') {
       // Bajo el alero: los brazos cruzados contra el pecho, los hombros
       // encogidos, la cabeza gacha y un tiritón corto de vez en cuando.
@@ -250,11 +325,60 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
       turn('spine', x, t => 0.14 + shiver(t) * 0.5);
       turn('head', x, () => 0.28);
     } else if (name === 'drink') {
-      turn('upperarm.R', x, () => -0.8); turn('forearm.R', x, t => -1.4 + 0.12 * wave(t));
-      turn('head', x, t => -0.1 - 0.05 * wave(t));
+      // AN-2 · La taza subía a la boca y se quedaba: a veinte píxeles no se
+      // veía beber. Tres tiempos: la taza sube desde la cintura, la cabeza se
+      // echa atrás con la taza en la boca, y todo baja.
+      const lift = keyed([[0, 0, 'smooth'], [0.3, 1, 'smooth'], [0.62, 1, 'hold'], [0.9, 0, 'smooth'], [1, 0, 'smooth']]);
+      const sip = keyed([[0, 0, 'smooth'], [0.3, 0, 'smooth'], [0.45, 1, 'smooth'], [0.6, 1, 'hold'], [0.75, 0, 'smooth'], [1, 0, 'smooth']]);
+      turn('upperarm.R', x, t => -0.25 - 0.65 * lift(t));
+      turn('upperarm.R', z, t => -0.45 * lift(t));
+      turn('forearm.R', x, t => -0.7 - 1.2 * lift(t));
+      turn('head', x, t => -0.35 * sip(t));
+      turn('spine', x, t => -0.06 * sip(t));
+    } else if (name === 'play') {
+      // AN-2a · Jugar sin pelota, que es lo que un niño hace la mayor parte
+      // de su día de juego (`day.ts`): brinca —dos saltos por ciclo, la
+      // rodilla que sube alterna— y bracea abierto, con el tronco que se
+      // vuelve. Era un balanceo de brazos abiertos que a veinte píxeles no se
+      // distinguía de estar de pie.
+      const hop = (t: number): number => Math.max(0, Math.sin(t * Math.PI * 4));
+      const side = (t: number): number => Math.sin(t * Math.PI * 2);
+      turn('upperarm.L', z, t => -0.45 - 0.5 * hop(t)); turn('upperarm.R', z, t => 0.45 + 0.5 * hop(t));
+      turn('upperarm.L', x, t => -0.3 * hop(t)); turn('upperarm.R', x, t => -0.3 * hop(t));
+      turn('forearm.L', x, () => -0.5); turn('forearm.R', x, () => -0.5);
+      turn('thigh.L', x, t => -1.25 * Math.max(0, side(t)) * hop(t)); turn('shin.L', x, t => 1.35 * Math.max(0, side(t)) * hop(t));
+      turn('thigh.R', x, t => -1.25 * Math.max(0, -side(t)) * hop(t)); turn('shin.R', x, t => 1.35 * Math.max(0, -side(t)) * hop(t));
+      turn('spine', y, t => 0.3 * side(t));
+      turn('spine', x, t => -0.05 * hop(t));
+      turn('head', x, t => -0.12 * hop(t));
+      const root = idle.tracks.find(track => track.name === 'hips.position');
+      if (root !== undefined) {
+        const at = Array.from(root.values.slice(0, 3)), times: number[] = [], values: number[] = [];
+        for (let n = 0; n <= 48; n++) {
+          const t = n / 48; times.push(t * duration);
+          // El salto: la cadera sube 0,12 m en lo alto de cada brinco.
+          values.push(at[0]!, at[1]! + 0.12 * hop(t), at[2]!);
+        }
+        clip.tracks = clip.tracks.filter(track => track.name !== root.name);
+        clip.tracks.push(new VectorKeyframeTrack(root.name, times, values));
+      }
     } else {
-      turn('upperarm.L', z, t => -0.2 - 0.15 * wave(t)); turn('upperarm.R', z, t => 0.2 + 0.15 * wave(t));
-      turn('spine', z, t => 0.08 * wave(t));
+      // AN-2a · `throw`: lanzar la pelota, de una vez y fechado por el hecho
+      // que viene (`life/cast.ts`). Pose 0: la pelota sujeta con las dos
+      // manos delante. Carga atrás y arriba hasta 0,6, giro del tronco y
+      // barrido del brazo hasta la suelta al final del clip, que es el paso en
+      // que `fling` pone la pelota en el aire; lo que sigue —el brazo que baja—
+      // lo pone el fundido a `idle` de `world/cast.ts`.
+      const wind = keyed([[0, 0, 'smooth'], [0.6, 1, 'smooth'], [0.97, -1, 'strike'], [1, -1, 'smooth']]);
+      const back = (t: number): number => Math.max(0, wind(t)), fore = (t: number): number => Math.max(0, -wind(t));
+      turn('upperarm.R', x, t => -0.75 - 1.85 * back(t) - 1.25 * fore(t));
+      turn('upperarm.R', z, t => 0.15 + 0.35 * back(t));
+      turn('forearm.R', x, t => -1.2 - 0.5 * back(t) + 1.0 * fore(t));
+      turn('upperarm.L', x, t => -0.75 - 0.35 * back(t) + 0.3 * fore(t));
+      turn('forearm.L', x, t => -1.2 + 0.7 * back(t) + 0.9 * fore(t));
+      turn('spine', y, t => 0.4 * back(t) - 0.35 * fore(t));
+      turn('spine', x, t => -0.12 * back(t) + 0.28 * fore(t));
+      turn('head', x, t => -0.1 * back(t) + 0.1 * fore(t));
     }
     flush();
     return clip;

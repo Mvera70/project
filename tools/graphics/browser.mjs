@@ -3,10 +3,11 @@
 // (Windows) y fuera de ese portátil reventaba antes de abrir la página: en el
 // contenedor de la nube `model-sheet` y el banco de fauna no arrancaban.
 //
-// Orden: el Playwright de Windows (el más reciente), Chrome o Edge instalados,
-// el navegador exacto que pide Playwright y, si falta —no hay red para
-// bajarlo—, cualquier Chromium de `PLAYWRIGHT_BROWSERS_PATH`. `undefined` deja
-// que Playwright decida, que es lo que hacían antes al no encontrar nada.
+// Orden: `VALLEY_CHROMIUM` si está puesta (AN-0), el Playwright de Windows
+// (el más reciente), Chrome o Edge instalados, el navegador exacto que pide
+// Playwright y, si falta —no hay red para bajarlo—, cualquier Chromium de
+// `PLAYWRIGHT_BROWSERS_PATH`. `undefined` deja que Playwright decida, que es lo
+// que hacían antes al no encontrar nada.
 import { existsSync, readdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
@@ -22,6 +23,8 @@ const newestFirst = (root) => {
 };
 
 export function browserExe() {
+  // AN-0 · `VALLEY_CHROMIUM=/ruta/a/chrome` manda sobre todo lo demás.
+  if (process.env.VALLEY_CHROMIUM) return process.env.VALLEY_CHROMIUM;
   const windows = join(homedir(), 'AppData', 'Local', 'ms-playwright');
   for (const dir of newestFirst(windows)) {
     const exe = join(windows, dir, 'chrome-win64', 'chrome.exe');

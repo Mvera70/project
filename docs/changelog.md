@@ -1,6 +1,6 @@
 # The Valley — Registro de cambios
 
-## v5.05 · 29 sep 2026 · El ciervo, y ya no queda ningún animal de cajas
+## v5.10 · 29 sep 2026 · El ciervo, y ya no queda ningún animal de cajas
 
 El último de la receta G-23. `deer()` en
 `deliverables/marked-models-trial/build-models.py`, sobre la estructura de la
@@ -17,7 +17,7 @@ cuerpo un poco agachado al andar (la pata en reposo va casi estirada y el
 casco no llegaría adelante). Es lo que hacía `plant-gait.cjs` con el modelo
 de cajas. 94 pruebas en verde.
 
-## v5.04 · 29 sep 2026 · El pato, y el pico de la gallina
+## v5.09 · 29 sep 2026 · El pato, y el pico de la gallina
 
 - **El pato** (`duck()` en `deliverables/marked-models-trial/build-models.py`):
   el ánade real de siempre, facetado, con casco de barca a la altura de agua
@@ -27,7 +27,7 @@ de cajas. 94 pruebas en verde.
   dejaba de perfil en punta de flecha; ahora es un cono corto que nace de la
   cara. Queda de cajas sólo el ciervo.
 
-## v5.03 · 29 sep 2026 · El cuervo
+## v5.08 · 29 sep 2026 · El cuervo
 
 El de G-23 era de cajas. Ahora es facetado (`crow()` en
 `deliverables/marked-models-trial/build-models.py`), sobre la estructura de la
@@ -37,7 +37,7 @@ Vera vio que de perfil el primero salía en punta de flecha —el rombo de las
 plumas— y se rehízo. Paso y picoteo, sin vuelo como hasta ahora. La gallina
 lleva el pico de rombo, más pequeño; queda anotado.
 
-## v5.02 · 29 sep 2026 · La gallina, y el corral en un solo estilo
+## v5.07 · 29 sep 2026 · La gallina, y el corral en un solo estilo
 
 Vera: «mucho mejor». La última de cajas del corral, facetada sobre la
 estructura de la perdiz de Vera (`hen()` en
@@ -47,7 +47,7 @@ cola alzada, cresta y barbillas rojas, pico y patas amarillos. Mismo tamaño;
 Con ella, el corral y todos los animales grandes van en el mismo estilo. Quedan
 de cajas el cuervo, el pato y el ciervo.
 
-## v5.01 · 29 sep 2026 · La vaca
+## v5.06 · 29 sep 2026 · La vaca
 
 La de G-23 era de cajas y con el cerdo facetado el corral quedaba en dos
 estilos. Ahora es facetada sobre la estructura de la mula de Vera (`cow()` en
@@ -57,7 +57,7 @@ cuernos, pelo rojizo con la cara y el vientre blancos. Vera la quiso más gorda:
 de la barriga nueva; sacarla por debajo se probó y Vera prefirió seguir.
 Mismo largo que la de G-23; marcha de `rigid-clips.mjs … cow`.
 
-## v5.00 · 29 sep 2026 · El cerdo
+## v5.05 · 29 sep 2026 · El cerdo
 
 Vera: «me gusta». El de G-23 era una caja con dos losas por orejas que salían
 de lado como alas. Ahora es facetado, sobre la estructura del jabalí de Vera
@@ -67,7 +67,7 @@ delante y rabo rizado. Mismo tamaño; marcha de `rigid-clips.mjs … pig`.
 Con él, en el corral conviven los dos estilos: la vaca y la gallina siguen
 siendo de cajas, y son las siguientes.
 
-## v4.99 · 29 sep 2026 · La trucha
+## v5.04 · 29 sep 2026 · La trucha
 
 Vera: «mucho mejor». El pez de G-23 era una cápsula con rombos pegados y se
 leía como un submarino. Ahora es una trucha facetada (`fish()` en
@@ -79,7 +79,7 @@ se ve desde arriba—, costado dorado con pintas y vientre claro. Mismo tamaño.
 pectorales. 19 mallas, juntadas por articulación y material (`merge_parts`),
 porque hay hasta cuatro peces a la vez.
 
-## v4.98 · 29 sep 2026 · El oso nuevo
+## v5.03 · 29 sep 2026 · El oso nuevo
 
 Vera: «el oso no termina de convencerme». El v3 se leía como un perro grande
 o un capibara: lomo de barril, patas que se afinaban hasta 6 cm y acababan en
@@ -98,7 +98,7 @@ color arena. El v4 (`bear()` en `deliverables/marked-models-trial/build-models.p
 Se probaron también las patas de delante más cortas y con pelo colgando
 (`BEAR_FORE_DROP`, `BEAR_FORE_FUR`); Vera se quedó con el normal.
 
-## v4.97 · 29 sep 2026 · El zorro de Vera, publicado, y las herramientas de modelos fuera de Windows
+## v5.02 · 29 sep 2026 · El zorro de Vera, publicado, y las herramientas de modelos fuera de Windows
 
 Vera: «el zorro tiene una versión por ahí que ya se hizo que no sé por qué no
 se ha llegado a subir […] termina lo que quede pendiente del zorro».
@@ -116,6 +116,249 @@ se ha llegado a subir […] termina lo que quede pendiente del zorro».
   `model-sheet --ids … --sides` enseña un modelo por cuatro lados, el banco de
   fauna abre las quince especies (`--out` para no pisar G-23) y
   `shot.mjs --look-animal <especie>` encuadra un animal vivo.
+## v5.01 · 29 sep 2026 · AN-4b y AN-4c: las tomas que faltaban, y el oso que no nacía
+
+Vera pidió cerrar las tomas en partida que el observatorio no había podido dar
+—la visita del oso, la caza (el despegue de la perdiz, la carga del jabalí, la
+huida del conejo) y el asalto de la villa— y conservar `throw`. Las rodaron
+dos agentes con órdenes cerradas; la matriz (`docs/medidas/animacion-matriz-2026-09-29.md`)
+lleva cada fila con su toma.
+
+- **Vistas en partida**: el asalto de la villa 7/60 con arqueros (tensado y
+  suelta cada 2,1 s, lanza, impacto y caída); la huida y la caída del conejo
+  (7/22); el despegue de la perdiz de entre la hierba y su vuelo (11/24, con la
+  cámara en la presa: con la cámara en el cazador no salía en cuadro); la carga
+  del jabalí a galope (7/24, a 30 fps, un paso por fotograma).
+- **El observatorio** (`observe-life.mjs`): `--hunted`, `--hunt` con el gancho
+  `__valleyHunt` y el motivo si no empieza, 240 s de carga, la traza `hunt`, y
+  **la caza se graba desde el paso en que arranca**: se adelantaba un segundo,
+  y la carga del jabalí con su desenlace cabía entera dentro.
+  `trace-strip.py` saca la tira de un actor siguiendo la traza.
+- **AN-4c · el oso no nacía nunca en partida** (`life/bear.ts`): su guarida
+  tenía que ser una celda de bosque libre para un cuerpo de 0,52, y el juego
+  pone un tronco en cada celda de bosque (`solidTerrain`). Con la biblioteca
+  real, 0 guaridas en 7/30, 11/21 y 23/30 (22 sobre el terreno a secas, que es
+  lo que usaba la prueba). Rodado el arreglo, **el oso nacía en el centro del
+  modelo de su cueva y la roca lo tapaba**: ahora nace en la boca que dice la
+  receta publicada (0,55 por delante, mirando al claro) y se retira hacia
+  dentro. **AN-4d, pedido de Vera**: la cueva está **al pie de la montaña**,
+  con la roca detrás y el claro hacia el valle (hay sitio en los siete valles
+  probados, a 12–26 celdas del corazón); la prueba monta troncos donde el juego
+  planta cada árbol y comprueba la roca y la ladera detrás y la boca al
+  valle. Por el camino, dos tropiezos medidos: una mota suelta de montaña no
+  es montaña (se exigen tres celdas de roca y 0,5 de subida a la espalda del
+  modelo), y el oso no tiene que caber en el centro de la cueva sino en su
+  boca (exigirlo dejaba fuera todo pie de ladera). En cinco valles, cueva
+  contra ladera (+0,52 a +0,80) y el oso sale a hozar; en partida (7/30) sale,
+  se alza y se mete.
+- **Límites que las tomas han sacado**, apuntados en `encargos-3d.md`: la honda
+  usa los gestos del arco; en la caza, la estocada que decide no se dibuja, los
+  gestos no van fechados por el tiro y la presa espantada desaparece en el sitio
+  (brief AN-5a, propuesto); y la lanza llega a través de una empalizada (sólo
+  distancia; decisión del dueño).
+- **Vera conserva `throw`** para cuando vuelvan los trastos sueltos.
+
+## v5.00 · 29 sep 2026 · ¿Decide la física las batallas? F-0, la flecha que toca, en sombra
+
+Vera, al cerrar la animación: «me preocupa que tener Rapier para flechas y
+ragdolls dé apariencia de física mientras el resultado siga dependiendo de
+distancias y temporizadores». La respuesta está en
+`docs/diagnostico-fisica-combate-2026-09-29.md`, conciliada con la nota de
+Astra (`ideas-fisica-y-app-nativa-2026-09-29.md`, `24ef5e1`), y **no cambia
+ningún resultado del combate**.
+
+- **El diagnóstico**: Rapier decide el vuelo de la flecha, si la para una
+  almena y cómo caen los muertos; el acierto es un cilindro de 0,45 × 0,7
+  medido desde y=0, el cuerpo a cuerpo y el portón son distancia y reloj, y
+  la flecha que acierta sigue volando. **Rapier sólo ve a los muertos**: los
+  ragdolls son colisionadores y los vivos no.
+- **F-0, en sombra** (`physics.ts` `probes`/`sweep`, `archery.ts`
+  `archeryShadow` y `DRAWN_BODY`, opción `shadow` de la jornada): una cápsula
+  de Rapier del tamaño del aldeano que se pinta (0,65 de alto, medido sobre el
+  GLB) por asaltante, **en un mundo de consulta aparte**, y a quién habría dado
+  cada flecha. En el mismo mundo, aun con los grupos de colisión a cero, la
+  semilla 42 cambiaba en uno o dos aciertos: añadir colisionadores reordena
+  Rapier por dentro.
+- **Medido** (`battle-report.ts --shadow --seeds --relief`, veinte batallas):
+  las 56 pasadas con sondas acaban igual que sin ellas; con el cuerpo que se
+  pinta cambiaría **el 31–40 % de las bajas por flecha** (5–7 % es el ruido
+  del método), siempre a menos: flechas que se clavan a medio metro o más de
+  los pies y flechas que pasan a más de un metro del pecho —el cilindro gordo
+  tapa un apuntado que no cuenta con el aire—; 81 de 100 contactos en cabeza y
+  hombros; la flecha que acierta sigue **7 m** tras el cuerpo; las sondas,
+  0,05–0,09 ms por paso aquí. **Merece la pena seguir, con una decisión del
+  dueño delante**: con el apuntado de hoy, el contacto deja la muralla un
+  tercio menos letal (F-1 y sus tres salidas, en el diagnóstico §3).
+- **El aparato**: `?sandbox=battle&shadow=0.12` enciende las sondas en el
+  banco, con la fila «Sondas F-0» y el bloque `probes` en «Copiar métricas»:
+  la línea de base sin y con sondas en el iPhone y el iPad es F-0b, de Vera.
+- **La nota de Astra, leída con lupa** (§5): de acuerdo con ampliar Rapier sin
+  llevar la aldea entera a la física, con Capacitor como contenedor y con no
+  migrar antes de una prueba; en contra de esperar al aparato para saber si el
+  contacto cambia algo (se midió aquí), del controlador de personajes ahora
+  (dos autoridades del movimiento) y de los colisionadores de armas sin su
+  trayectoria como dato; y dos cosas que no decía: la partida vive en
+  IndexedDB del origen y no se exporta (un contenedor es otro origen), y el
+  motor podría viajar tal cual a un port —`node --jitless`: veinte años en
+  25,8 s contra 5,8 s con JIT, la crónica idéntica byte a byte—, con la
+  recuperación de ausencias largas como límite.
+- Pruebas: `tests/fast/physics-probes.test.ts` (la cápsula a la altura justa
+  y con pies, el muro que tapa, una flecha que vuela igual al bit con sondas,
+  la arquería con bitácora que da lo mismo) y el caso `&shadow=` del banco.
+- **Skill `fisica-combate`** (`.claude/skills/fisica-combate/SKILL.md`): el
+  método de esta línea en una página —qué decide qué, primero en sombra,
+  comparar con distribuciones, el cuerpo que se pinta como cuerpo que decide,
+  el coste en el aparato— y las trampas que ya costaron una tarde.
+  Apuntado en `encargos-3d.md`: la flecha que no se para y la caída sin el
+  impulso del golpe.
+
+## v4.99 · 29 sep 2026 · Animación integral, AN-3 y AN-4: el golpe que carga el siguiente, el esprint que pisa, y la matriz cerrada con su coste
+
+Tercera fase del `/goal` de animación (AN-0 y AN-1 en v4.97, AN-2 en v4.98).
+Los seis gestos fechados de E1 se revisaron sobre sus hojas y sobre el código
+que los fecha (`melee.ts`, `archery.ts`, `raiders.ts`, sin tocar): tensado,
+suelta, estocada, impacto y caída se conservan, con el contacto en t=0 y el
+daño intactos. Tres cosas no se leían y se cambian del lado de la pantalla:
+
+- **El golpe al portón carga el siguiente** (`action-clips.ts`, `clips.ts`):
+  los golpes van a paso fijo (`BLOW_STEPS`, uno por segundo) y el clip
+  duraba 0,6 s —contacto, retirada y los brazos caídos hasta el golpe
+  siguiente: un asaltante que golpea sin levantar el arma—. Ahora dura el
+  segundo entero: contacto en cero, retirada y carga con los dos brazos por
+  encima de la cabeza, sostenida hasta que el hecho siguiente lo devuelve al
+  contacto (`combat-clips.test.ts`).
+- **La huida es un esprint que pisa**: a 1,6–2,6 celdas/s (5–8 m/s) la
+  zancada de 0,44 daba 3,7–5,8 ciclos por segundo, casi el paso de andar con
+  las piernas abiertas, y los pies flotaban diez centímetros en cada apoyo
+  porque la cadera no seguía a la pierna. Zancada 0,7 (2,3–3,7 Hz), piernas a
+  ±46°, la de atrás casi recta y la de delante con la rodilla alta, y la
+  cadera que baja hasta 0,10 m con la pierna que apoya y sube en el cruce.
+- **El aviso del oso dura lo que su clip** (brief AN-3a, `life/bear.ts`):
+  1,55 s cortaban a media subida un `attack` de 3 s; ahora se alza entero y
+  amenaza antes de irse.
+- **Medido y visto** en `artifacts/graphics/AN-3/`: hojas de `gate_strike`,
+  `flee`, `play` y `throw`; el asalto en partida en la semilla 11
+  (`observe-life --raid 12 --assault`: la huida de 43 vecinos a 2,4 ciclos
+  por segundo, y el portón con los golpes en los fotogramas 41 y 51 y la
+  carga sobre la cabeza entre ambos); el parte del banco de batallas sin
+  cambio en sus cifras. **Lo que no se pudo filmar**: la visita del oso
+  (`--beast` sólo actúa con `--aftermath` y `--happening bear_in_the_wood`
+  no la provocó) y la caza (`--hunt`, nuevo en el observatorio, exige una
+  señal tocable que no llegó a verse en tres valles con oferta) y el asalto
+  de la villa de sesenta personas con muralla (tiempo de carga agotado): quedan
+  `preview-only` o «sin toma» con su ruta pendiente en `docs/encargos-3d.md`.
+  Matriz §2.6.
+- **AN-4, la aceptación**: la matriz cierra fila a fila (§5) con la
+  evidencia del después, qué se ve a 390×844, el veredicto (mejorado,
+  conservado, límite, `preview-only`) y **la observación que lo refutaría**,
+  como pide el encargo original de Astra (`docs/encargos/animacion-integral-goal.md`,
+  que llegó a media tanda y se concilió con el plan). Comparaciones
+  antes/después **del mismo instante** (trazas alineadas) a escala nativa:
+  GIF «antes | después» a 1:1 y tira por par, en dos semillas y dos edades,
+  la plaza de la aldea y la de la villa (`artifacts/graphics/AN-4/compare/`,
+  construidas por un agente con instrucciones cerradas y el script
+  reproducible); la aldea a 320×568. Coste: llamadas y triángulos iguales en
+  la aldea (446/706 k contra 441/695 k), y `tools/reports/animation-cost.ts`
+  (nuevo: JS de posar reparto y fauna sin navegador) 4,0–4,2 ms antes y
+  4,2–4,7 ms después por fotograma con 100 personas y 40 animales, dentro del
+  ruido de una máquina cargada. Índice de todas las tomas en
+  `docs/medidas/animacion-tomas-2026-09-29.md`. **iPhone/iPad: pendiente.**
+- **Skill `animacion`** (`.claude/skills/animacion/SKILL.md`): el método de la
+  ronda en una página para quien toque un clip, y `observe-valley-life` y
+  `performance` con lo que la ronda añadió.
+
+## v4.98 · 29 sep 2026 · Animación integral, AN-2: la vida y los oficios se leen a veinte píxeles
+
+Segunda fase del `/goal` de animación (AN-0 y AN-1 en v4.97). Lo que decidía
+si un gesto cotidiano existía para quien mira desde el móvil era la silueta,
+y siete de ellos no la tenían: `talk` movía un antebrazo, `pray` y `sit`
+estaban quietos, `hammer` era un seno sin golpe, `sort` un vaivén, `drink`
+una taza que subía y se quedaba, y `play` un balanceo mientras la pelota
+salía de la nada.
+
+- **Los gestos, con tres tiempos** (`action-clips.ts`): hablar (la mano al
+  pecho dos veces por ciclo, la otra contesta, la cabeza asiente y se
+  vuelve), rezar (una inclinación por ciclo desde la cintura), ordenar (coger
+  a la cintura, levantar, dejar a un lado girando), beber (la taza sube, la
+  cabeza atrás 23°, baja), sentarse **en el suelo** (cadera a 0,25 m,
+  rodillas alzadas, pies a ras; no hay banco en el valle y se encarga),
+  martillar con carga sobre el hombro y golpe en `STRIKE_AT.hammer`. Cada uno
+  con su propiedad de silueta en `work-gestures.test.ts`, medida sobre el
+  `Cast` real.
+- **La pelota sale de la mano** (brief AN-2a), y son dos clips: `play` sin
+  pelota **brinca** —es el día de juego de un niño (`day.ts`), casi siempre
+  sin trasto; y la pelota suelta va apagada desde el 15 sep por decisión del
+  dueño, así que hoy nadie lanza— y `throw`
+  con pelota es un gesto de una vez (1 s) **fechado por el hecho que viene**:
+  `life/cast.ts` (`throwSeconds`) lo hace correr hacia su final desde
+  `doing.until`, que es el paso en que `fling` pone la pelota en el aire, así
+  que la suelta del clip cae en la suelta real; antes de la ventana, la pelota
+  sujeta con las dos manos. `tests/fast/life-play-throw.test.ts`.
+- **Chispas y astillas del martillo** (brief AN-2b): `Cast.strike` suelta
+  `spark` (clase nueva de `work-chips.ts`, clara y de un tercio de segundo)
+  si el actor es el herrero y `wood` en la obra, desde la mano, en el golpe.
+- **La parada del aldeano** (AN-1c, `world/cast.ts`): el clip de marcha que
+  se apaga sigue su ciclo mientras se funde, así que el pie que iba en el
+  aire adelanta y baja en vez de quedarse colgado (`cast-stops.test.ts`).
+- **Medido y visto**: hojas de gesto en `artifacts/graphics/AN-2/gestures/`
+  y tomas en partida en `artifacts/graphics/AN-2/after/` (plano general de
+  la semilla 11 a 390×844, el herrero, un niño sentado, un niño lanzando en
+  la semilla 7); matriz §2.5. La golondrina ya planeaba (la fila de AN-0
+  estaba mal); `bark` y `play` del perro se conservan con el fundido de AN-1b;
+  `sow` y `douse` siguen con verificación en partida pendiente (AN-4).
+- **Encargos**: un banco o un tronco, la pelota colgada de la mano, un
+  martillo publicado (`docs/encargos-3d.md`).
+
+## v4.97 · 29 sep 2026 · Animación integral para móvil, AN-0 y AN-1: la zancada del aldeano y el rumbo de los animales
+
+Vera pidió con `/goal` «mejorar de forma visible todas las animaciones de
+aldeanos y animales; el juego se evalúa principalmente en móvil», en cinco
+fases (AN-0 a AN-4: fila AN de `docs/plan-meta.md`; plan y briefs en
+`docs/plan-animacion-integral-movil-2026-09-29.md`, reconstruido del encargo
+porque el fichero que citaba no existía en ninguna rama).
+
+- **AN-0, el inventario y la línea de base** (`d82bd84`): 24 clips humanos
+  (4 del GLB, 20 fabricados), 15 especies, los tres gestos del perro y la
+  golondrina, verificados en código y catálogo; una matriz por clip y especie
+  (`docs/medidas/animacion-matriz-2026-09-29.md`) con origen, situación en
+  partida, evidencia, defecto, gravedad, coste y decisión; tomas a 390×844
+  con semilla, año, actor, cámara y zoom guardados; y
+  `tools/reports/gait-report.ts`, que mide cadencia, apoyo y plantado de cada
+  clip de marcha sobre el GLB publicado, sin navegador. Lo que dijo: los
+  clips están bien plantados y lo que falla es el **ritmo** —el aldeano a
+  3,3–5,2 ciclos de pierna por segundo («hormigas»), el niño a 6–9, la
+  gallina y el zorro a 7, la perdiz a 23— y dos carreras (`charge` del
+  jabalí, `flee` del conejo) iban por reloj y patinaban de lleno.
+- **AN-1a, la zancada del aldeano** (`c8834ff`): sin Blender en la máquina,
+  `tools/art/bake-clips.mjs` hornea las pistas de una receta directamente en
+  el GLB (`--check` reproduce el exportado de Blender a 0,03° en las claves) y
+  `art/recipes/villager/plant-gait.mjs` reescribe `walk` y `carry_walk` con
+  las piernas por cinemática inversa y el pie plantado. Medido sobre el
+  publicado: zancada 0,423 y 0,339 (eran 0,317 y 0,260), pie apoyado a
+  0,97–1,03× de lo que avanza el cuerpo (era 0,79–0,90×), cadencia 2,5–3,9 Hz
+  (era 3,3–5,2). Catálogo y manifiesto llevan el hash nuevo y la procedencia;
+  `graphics-clock` sigue vigilando que `clips.ts` diga lo mismo.
+- **AN-1b, los animales** (`c7755bf`): `Animal` gana `facing` y lo emiten
+  ganado, perro, zorro, patos, ciervo, oso, conejos, presas y lobo: la cara es
+  la que la vida decidió, con su histéresis, y no una derivada del
+  desplazamiento de píxeles entre fotogramas, que oscilaba contra una valla y
+  hacía ladrar al perro hacia donde iba y no hacia el forastero. `charge` y
+  `flee` van por suelo recorrido con la zancada del catálogo; los gestos
+  entran y salen con fundido (0,08 s) y caer se tumba en 0,14 s, no de golpe;
+  el zorro se acerca al gallinero a 0,6 celdas/s (7,3 → 4,6 ciclos por
+  segundo). Cinco propiedades nuevas sobre el controlador real.
+- **AN-1c, la parada:** el clip de marcha que se apaga sigue su ciclo mientras
+  se funde, así que el pie que iba en el aire adelanta y baja en vez de
+  quedarse colgado y derretirse hacia el reposo (`world/cast.ts`,
+  `tests/fast/cast-stops.test.ts`). Y el segundo par antes/después, en la
+  villa de la semilla 7 (año 60, niño 242 y adulto 208; el 114 quedó bajo la
+  copa del bosque), y la traza de las seis tomas de seguimiento: 0 saltos en
+  30 240 muestras.
+- **Lo que AN-1 deja dicho y no toca** (matriz §2.4): la gallina a 7,3 Hz (no
+  se lee a 6 px; `PACE.hen` es un TUNE de una línea), el niño a 4,5–7,1 Hz
+  (más pasos por la misma distancia), un trote humano de 1,8–2,8 Hz como
+  decisión de Vera, y `walk` de la perdiz y `attack` de lobo y jabalí como
+  `preview-only` porque nadie los emite (`docs/encargos-3d.md`).
 
 ## v4.96 · 29 sep 2026 · La piel v9 en el juego, la crónica a color, y «Graphics» en la portada
 

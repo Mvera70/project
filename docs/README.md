@@ -46,6 +46,10 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `plan-meta.md` | **El plan hacia la meta** (§1b), con prioridad, dificultad y agente |
 | `encargos-3d.md` | **Todo lo que el juego no enseña todavía**: mallas, animaciones y mecánicas sin representación, apuntado en la misma ronda en que se descubre |
 | `interfaz/` | **La interfaz, versión a versión**: una carpeta por fecha con todas las pantallas y estados del juego (skill `press-kit`), para comparar qué cambió |
+| `plan-animacion-integral-movil-2026-09-29.md` | **La ronda AN de animación** (29 sep): fases AN-0 a AN-4, brief y ficheros permitidos por fase, y los briefs de las correcciones que salieron (AN-1a zancada, AN-1b rumbo, AN-2a pelota, AN-2b martillo, AN-3a oso); al final, el encargo original de Astra tal cual |
+| `ideas-fisica-y-app-nativa-2026-09-29.md` | **Combate físico y aplicación móvil** (Astra, 29 sep): las tres vías tras AN-4 —ampliar Rapier, empaquetar con Capacitor, otro motor sólo con causa— y el estudio de portabilidad a Switch; pendiente de decisión. Su lectura crítica, en el diagnóstico de abajo §5 |
+| `diagnostico-fisica-combate-2026-09-29.md` | **¿Decide la física las batallas?** (29 sep): qué decide hoy Rapier (el vuelo de la flecha, si la para una almena, cómo caen los muertos) y qué es distancia y reloj (acierto, cuerpo a cuerpo, portón); los límites para avanzar sin cambiar de motor y qué medir en el móvil; **F-0 hecho y medido** («la flecha que toca», en sombra: el contacto cambiaría el 31–40 % de las bajas por flecha) con su veredicto y la propuesta F-1; qué cuidar de la animación; y la nota de Astra leída con lupa |
+| `plan-atlas-movil-2026-09-29.md` | **Atlas Agent Teams aplicado a The Valley** (Astra, 29 sep): veredicto sobre Atlas y las líneas que vienen después de la animación (interfaz, legibilidad, descubrimiento web, seguridad) |
 | `plan-arte-pendiente.md` | La cola del arte: cada crónica nueva trae aquí su imagen pedida |
 | `plan-audio.md` | **Inventario maestro de audio**: ambiente, interfaz, economía, hitos, fases y asedio. En curso |
 | `agents.md` | Cómo se delega y se audita |
@@ -58,6 +62,8 @@ Las herramientas que las produjeron están en `tools/reports/`.
 
 | Documento | Qué mide |
 |---|---|
+| `medidas/animacion-matriz-2026-09-29.md` | **La matriz de animación (AN-0 a AN-4)**: 24 clips humanos, 15 especies y la golondrina, con origen, situación en partida, evidencia, defecto, gravedad, coste y decisión; línea de base y «después» de cada fase (cadencia, apoyo, plantado, rumbo, mezclas, gestos, combate) y los veredictos de AN-4 |
+| `medidas/animacion-tomas-2026-09-29.md` | **El índice de las tomas de la ronda AN**: cada toma del observatorio con semilla, año, lead, fps, viewport, cámara y escenario, y las hojas de gestos |
 | `medidas/findings-drama.md` | Los dos sistemas del motor que no se disparaban nunca (13 sep). **La medida sigue valiendo**; el plan de arreglarla, no |
 | `medidas/rey-medida.md` | Qué llegó y qué no de la fase del rey (K-6) |
 | `medidas/spatial-engine.md` | Cierre real, accesos y trazado en cuatro semillas; límites y reproducción |
@@ -80,6 +86,7 @@ adarve.
 | Documento | Qué pide |
 |---|---|
 | `encargos/encargo-astra-modelos.md` | **Los modelos 3D para Astra**, con el prompt listo para pegar. Entregados la sala del líder, los puestos, la cantera, las rocas y la golondrina; **quedan el roble y la casa quemada**, a la espera de que Vera decida |
+| `encargos/animacion-integral-goal.md` | **El encargo de la ronda AN de animación, de Astra** (29 sep): el bloque `/goal` completo, tal como se recibió |
 | `encargos/opciones-graficas-v10.md` | **La pantalla «Graphics» para Codex**: lámina de revisión, un estado «elegido» del botón de pergamino si hace falta, y un grabado de cabecera |
 | `encargos/respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos, con decisiones que el dueño dejó sin contestar |
 

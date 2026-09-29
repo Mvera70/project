@@ -4,6 +4,7 @@
 //   node tools/graphics/gesture-sheet.mjs mine --model villager-mason
 //   node tools/graphics/gesture-sheet.mjs chop --frames 10 --out artifacts/graphics/IA-anim/gestures
 //   node tools/graphics/gesture-sheet.mjs sow --views front,three   (vistas: side, front, three)
+//   node tools/graphics/gesture-sheet.mjs walk --model villager --glb candidato.glb   (un GLB sin publicar)
 //
 // Doce fotogramas repartidos por un ciclo, de lado y en tres cuartos, más la
 // posición de la mano y de la cabeza de la herramienta en cada uno: el golpe
@@ -28,7 +29,9 @@ const assets = 'public/assets/valley3d/';
 const all = JSON.parse(readFileSync(assets + 'manifest.json', 'utf8'));
 const manifest = { ...all, assets: all.assets.filter(a => a.id === model) };
 if (manifest.assets.length === 0) throw new Error(`Modelo no publicado: ${model}`);
-const bytes = Object.fromEntries(manifest.assets.map(a => [a.id, readFileSync(assets + a.file).toString('base64')]));
+// AN-1 · `--glb ruta.glb` mira un candidato sin publicarlo.
+const glbOverride = opt('glb', '');
+const bytes = Object.fromEntries(manifest.assets.map(a => [a.id, readFileSync(glbOverride !== '' ? glbOverride : assets + a.file).toString('base64')]));
 const result = await build({ entryPoints: ['tools/graphics/gesture-sheet.ts'], bundle: true, write: false, format: 'esm',
   alias: { '@engine': './src/engine', '@derive': './src/derive' },
   define: { PREVIEW_BYTES: JSON.stringify(bytes), PREVIEW_MANIFEST: JSON.stringify(manifest), PREVIEW_ID: JSON.stringify(model) } });
