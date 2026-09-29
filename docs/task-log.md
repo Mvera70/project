@@ -14,12 +14,17 @@ la carga entera con su desenlace).
 
 **AN-4c (`6337c46`):** la visita del oso **no nacía nunca en partida** —con los
 troncos que `solidTerrain` mete en cada celda de bosque no cabía en ninguna
-guarida— y la prueba no lo veía porque usaba el terreno a secas. La guarida
-puede ser ya la linde; la prueba monta los troncos. Y al rodarlo salió la
-segunda mitad: nacía en el centro del modelo de la cueva y la roca lo tapaba;
-ahora nace en la boca que marca la receta y **se ve en partida** (11/21:
-se alza 3 s delante de la cueva y se mete dentro). 7/30 agota la carga del
-observatorio (240 s) con el empaquetado nuevo, dos veces; 11/21 carga bien.
+guarida— y la prueba no lo veía porque usaba el terreno a secas. Al rodarlo
+salió la segunda mitad: nacía en el centro del modelo de la cueva y la roca lo
+tapaba; ahora nace en la boca que marca la receta. **AN-4d, pedido de Vera
+(«la cueva del oso debe salir en la montaña»):** la cueva va al pie de la
+montaña, contra una ladera que sube (tres celdas de roca y +0,5 a la espalda
+del modelo; el oso cabe en la boca, no en el centro de la roca). Cinco valles
+medidos con el terreno real: +0,52 a +0,80 detrás, el vecino más cercano a
+8–12 celdas de la boca, y el oso sale a hozar. En partida (7/30): sale, se
+alza y se mete (`AN-4b/bear-seed7-y30-montana-ancha`).
+7/30 agota la carga del observatorio (240 s) con el empaquetado nuevo, dos
+veces; 11/21 y 23/30 cargan bien.
 
 **Abierto, decisión de Vera:** la visita del oso dura 3 s (el leñador está en
 la guarida); la lanza de la caza atraviesa empalizadas. **Propuesto sin
@@ -33,6 +38,12 @@ compartida con Chromium. Rojas: la de tiempo de `catchUp` (8,2 s bajo carga;
 la de siempre, también en `d82bd84`) y `life-bear` en la pasada completa, que
 corrió justo en los segundos en que se retiró el arreglo a propósito para ver
 fallar su prueba —el mensaje es el del fallo sin arreglo—; a solas, 4 de 4.
+Jornadas de combate y fauna: asalto, bestias, arquería y guarnición en verde;
+`threat` no terminó dentro de los 50 min del tope; **`life-wildlife` tiene
+tres rojas que ya estaban en `d82bd84`** (comprobado en un árbol aparte): la
+prueba quiere la lista de fauna vacía en una semana sin lobo y la lista trae
+ciervos, perro y patos desde el valle más vivo. No son de esta ronda y no
+están entre las dos rojas declaradas: quedan anotadas aquí.
 
 ## 29 sep 2026 · ¿Decide la física las batallas? F-0, la flecha que toca, en sombra
 

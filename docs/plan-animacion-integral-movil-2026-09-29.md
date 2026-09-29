@@ -471,12 +471,63 @@ al centro, dentro. La prueba lo guarda y la toma lo enseña
 (`AN-4b/bear-seed11-y21-an4c/strip-bear-wide.png`: se alza delante de la cueva
 en los fotogramas 1–30 y entra del 31 al 36).
 
-**Lo que no decide este brief, y es del dueño.** La guarida se elige junto al
+**Superado en parte por AN-4d** (abajo): la cueva ya no está en la linde sino
+al pie de la montaña, que es lo que pidió Vera.
+
+**Lo que no decidía este brief, y era del dueño.** La guarida se elegía junto al
 árbol que se tala, y ahí está el leñador (a 0,2–1,3 celdas en los tres valles):
 el oso avisa en el primer paso de la jornada y a los 3 s se ha ido, sin llegar
 a hozar en el claro. Para que se le vea salir, hozar y retirarse al ver gente
 habría que alejar la guarida del tajo —un cambio de cómo es la visita, no de
 cómo se anima—.
+
+### AN-4d · La cueva del oso en la montaña (pedido de Vera, 29 sep 2026)
+
+**Pedido.** Vera, al ver la toma de AN-4c: «la cueva del oso debe salir en la
+montaña». AN-4c la había dejado en la linde del bosque, junto al tajo: una
+cueva de roca en un prado, al lado de un huerto. El modelo se hizo para la
+montaña (`art/recipes/bear-den`: «hundir la base en la montaña», la boca al
+frente).
+
+**Vía** (`life/bear.ts`, `createBear`). La cueva es una celda transitable al
+pie de la montaña (`TERRAIN_CODE.mountain` en alguna de sus ocho vecinas, y
+no a los dos lados); el claro, a 1,5–5 celdas **delante** —hacia el valle, a
+menos de 60° del frente— y con suelo libre **desde la boca**, que es donde
+tiene que caber el oso; y a la espalda del modelo (la contraria al claro),
+**tres celdas de roca seguidas y una ladera que sube al menos 0,5 celdas a
+dos celdas** (`DEN_ROCK`, `DEN_RISE`, con la cota que pinta el juego, que la
+jornada ya recibe como `ground`). Entre las que cumplen, la del claro más
+cerca del bosque que se tala; si un valle no tuviera ninguna, la mejor sin
+ladera antes que ninguna visita. El oso nace en la boca (AN-4c), vuelve a
+ella al retirarse y el último medio metro hasta el centro lo hace en línea
+recta, porque la roca del modelo no está en la máscara de la vida. La caza del
+oso usa la misma cueva y vuelve a la boca (`renderer.ts`, `beginHunt`).
+
+**Dos tropiezos, medidos y corregidos por el camino.** (1) Con una sola celda
+de montaña al lado bastaba una mota suelta: la primera versión puso la cueva
+de 23/30 con pradera detrás (la ladera subía 0,01). En el borde de la montaña
+el suelo sube poco casi en todas partes —mediana 0,05–0,2 a dos celdas—
+porque la roca crece con la hondura (`risesOf`). (2) Exigir que el oso cupiera
+en el **centro** de la cueva dejaba fuera todo pie de ladera de verdad: una
+celda pegada de lado a la montaña no admite un círculo de 0,52 (hay 0,5 hasta
+la roca), así que sólo pasaban las que la tocan por una esquina —las motas—.
+En 23/30, de 201 pies con ladera, 194 caían por eso.
+
+**Medido** con el terreno real y la cota del juego: en 23/30, 11/21, 7/30,
+3/25 y 5/40 la cueva queda contra una ladera que sube de +0,52 a +0,80 a dos
+celdas, con el vecino más cercano a 8–12 celdas de la boca: el oso sale y
+hoza; en tres valles avisa cuando alguien se acerca y se mete, en dos vuelve
+a su hora. **En partida** (7/30, `observe-life --seed 7 --year 30 --hunted
+partridge,rabbit,deer,boar --happening bear_in_the_wood --lead 0 --zoom 0.5
+--look 13.5,66.5`, 6 fps): la cueva al pie de la ladera de roca con pinos; el
+oso sale por la boca, se alza con las garras fuera cuando alguien se acerca
+(fotogramas 6–23), baja, da media vuelta y se mete (24–33)
+(`AN-4b/bear-seed7-y30-montana-ancha/strip-bear-visita.png`).
+
+**Prueba.** `life-bear.test.ts`: con troncos en cada celda de bosque y la cota
+del juego, la cueva toca la montaña, a su espalda hay tres celdas de roca y la
+ladera sube al menos 0,5, la boca mira al valle y el oso nace en ella mirando
+al claro.
 
 ### AN-5a · La caza enseña el golpe que la decide (brief propuesto, no ejecutado)
 

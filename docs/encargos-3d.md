@@ -109,14 +109,15 @@ con su malla (`world/arrows.ts`). Haría falta un gesto propio —el volteo sobr
 la cabeza y la suelta, fechado por el tiro como `bow_loose`— y elegirlo en
 `hunt-encounter.ts` según el arma.
 
-**La visita del oso** (AN-4c, 29 sep 2026): **no se veía nunca en partida**
-—con los troncos del juego no cabía en ninguna guarida de bosque, y cuando
-cupo nacía dentro de la roca de su cueva—; desde AN-4c nace en la linde, en la
-boca de la cueva, y se ve alzarse y meterse dentro (toma de 11/21). Lo que
-queda es de diseño: la guarida está junto al
-árbol que se tala, con el leñador al lado, así que la visita es un aviso de
-3 s al empezar la jornada y el oso se va sin hozar en el claro. Alejar la
-guarida del tajo es decisión del dueño.
+**La visita del oso** (AN-4c y AN-4d, 29 sep 2026): **no se veía nunca en
+partida** —con los troncos del juego no cabía en ninguna guarida de bosque, y
+cuando cupo nacía dentro de la roca de su cueva—. Desde AN-4c nace en la boca
+de la cueva, y desde AN-4d (pedido de Vera) la cueva está **al pie de la
+montaña**, contra una ladera que sube, con la boca hacia el valle, y se ve
+entera: sale, hoza, se alza si alguien se acerca y se mete (7/30). Lo que
+queda de este encargo es de arte: el modelo es sólo la entrada exterior
+(«nadie entra en una sala interior», 23 sep), y al meterse el oso desaparece
+tras el hueco oscuro.
 
 **La caza no enseña el golpe que la decide** (visto en partida en AN-4b, 29
 sep 2026, jabalí de 7/24 con lanza, `AN-4b/hunt-boar-seed7-y24-desde-el-inicio`).

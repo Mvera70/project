@@ -1656,10 +1656,10 @@ export async function createGraphicsRenderer(
     const sighting = huntSighting?.species === species && huntSighting.tick === state.tick ? huntSighting : null;
     const liveBear = species === 'bear' && life.bearDen === null
       ? createBear(state as GameState, life.land,
-        (() => { const core = valleyCore(state as GameState); return { x: core.x, z: core.y }; })())
+        (() => { const core = valleyCore(state as GameState); return { x: core.x, z: core.y }; })(), groundFloor)
       : null;
     const den = life.bearDen ?? (liveBear === null ? null : {
-      x: liveBear.den.x, z: liveBear.den.z,
+      x: liveBear.den.x, z: liveBear.den.z, mouthX: liveBear.mouth.x, mouthZ: liveBear.mouth.z,
       clearingX: liveBear.clearing.x, clearingZ: liveBear.clearing.z,
       facing: Math.atan2(liveBear.clearing.x - liveBear.den.x,
         liveBear.clearing.z - liveBear.den.z),
@@ -1678,7 +1678,9 @@ export async function createGraphicsRenderer(
     if (hunter === null) return 'no-hunter';
     const scene = createHuntEncounter(state, life.land, species, weapon,
       groundFloor, wildlife, state.seed ^ state.tick,
-      den === null ? null : { x: den.x, z: den.z }, true,
+      // El oso de la caza vuelve a la boca de su cueva (AN-4c): el centro está
+      // dentro de la roca y no se llega andando.
+      den === null ? null : { x: den.mouthX, z: den.mouthZ }, true,
       { hunter: hunter.body, prey: sighting?.prey ?? null });
     if (scene === null) return 'no-scene';
     if (species === 'bear' && den !== null && denVisual === null) {

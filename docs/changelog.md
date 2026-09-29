@@ -22,14 +22,19 @@ lleva cada fila con su toma.
   tenía que ser una celda de bosque libre para un cuerpo de 0,52, y el juego
   pone un tronco en cada celda de bosque (`solidTerrain`). Con la biblioteca
   real, 0 guaridas en 7/30, 11/21 y 23/30 (22 sobre el terreno a secas, que es
-  lo que usaba la prueba). Ahora la guarida puede ser la linde; la prueba monta
-  troncos donde el juego planta cada árbol y falla sin el arreglo. Rodado
-  eso, **el oso nacía en el centro del modelo de su cueva y la roca lo
-  tapaba**: ahora nace en la boca que dice la receta publicada (0,55 por
-  delante, mirando al claro) y se retira hacia dentro. En partida (11/21): se
-  alza delante de la cueva 3 s y entra. **Queda para Vera**: la guarida está junto al árbol que se tala y
-  el leñador a su lado, así que la visita es un aviso de 3 s al empezar la
-  jornada, sin hozar en el claro.
+  lo que usaba la prueba). Rodado el arreglo, **el oso nacía en el centro del
+  modelo de su cueva y la roca lo tapaba**: ahora nace en la boca que dice la
+  receta publicada (0,55 por delante, mirando al claro) y se retira hacia
+  dentro. **AN-4d, pedido de Vera**: la cueva está **al pie de la montaña**,
+  con la roca detrás y el claro hacia el valle (hay sitio en los siete valles
+  probados, a 12–26 celdas del corazón); la prueba monta troncos donde el juego
+  planta cada árbol y comprueba la roca y la ladera detrás y la boca al
+  valle. Por el camino, dos tropiezos medidos: una mota suelta de montaña no
+  es montaña (se exigen tres celdas de roca y 0,5 de subida a la espalda del
+  modelo), y el oso no tiene que caber en el centro de la cueva sino en su
+  boca (exigirlo dejaba fuera todo pie de ladera). En cinco valles, cueva
+  contra ladera (+0,52 a +0,80) y el oso sale a hozar; en partida (7/30) sale,
+  se alza y se mete.
 - **Límites que las tomas han sacado**, apuntados en `encargos-3d.md`: la honda
   usa los gestos del arco; en la caza, la estocada que decide no se dibuja, los
   gestos no van fechados por el tiro y la presa espantada desaparece en el sitio

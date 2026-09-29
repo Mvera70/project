@@ -350,6 +350,8 @@ export interface Village {
   readonly wildlife: readonly Animal[];
   /** Entrada exterior de la guarida; no existe interior navegable. */
   readonly bearDen: { readonly x: number; readonly z: number;
+    /** AN-4c · La boca de la cueva: donde el oso nace y por donde se mete. */
+    readonly mouthX: number; readonly mouthZ: number;
     readonly clearingX: number; readonly clearingZ: number; readonly facing: number } | null;
   /**
    * D3 · La partida del valle vecino, si hoy hay una (§1b, fase 4).
@@ -857,7 +859,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const deer = createDeer(state, land, seed, heart);
   // El valle más vivo · conejos en la linde, al alba y al atardecer.
   const rabbits = createRabbits(state, land, seed, heart);
-  const bear = createBear(state, land, heart);
+  const bear = createBear(state, land, heart, options.ground);
   // IA-5 · El lobo del corral (§7.10, `wolves_at_the_coop`): si el motor lo
   // soltó esta semana (`wolfRaidToday`, `staging.ts`), hay visita esta
   // jornada, guionizada en `wildlife.ts`. El corral es el ancla de la primera
@@ -1616,7 +1618,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     },
     get bearDen() {
       if (bear === null) return null;
-      return { x: bear.den.x, z: bear.den.z,
+      return { x: bear.den.x, z: bear.den.z, mouthX: bear.mouth.x, mouthZ: bear.mouth.z,
         clearingX: bear.clearing.x, clearingZ: bear.clearing.z,
         facing: Math.atan2(bear.clearing.x - bear.den.x,
           bear.clearing.z - bear.den.z) };

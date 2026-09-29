@@ -135,9 +135,11 @@ calidad de las zancadas: para eso conserva las tomas lentas de 15 fps.
   propia shell).
 - **Rueda el empaquetado de `artifacts/graphics/G-10/game`**: tras tocar
   código, `npx tsx tools/graphics/bundle-game.ts` primero.
-- La visita del oso dura 3 s desde el paso 0 (AN-4c): `--lead 0` y `--look`
-  en la guarida (`bearDen` en la traza). Si un actor que el motor pidió no
-  sale, mira la traza desde el paso 0: puede no haber nacido en el juego
-  (el oso no nacía con los troncos de `solidTerrain` hasta AN-4c).
+- La visita del oso empieza en el paso 0 con el oso en la boca de su cueva,
+  al pie de la montaña (AN-4c/AN-4d): `--lead 0` y `--look` en la cueva
+  (el oso de `wild` en el fotograma 0), con `--zoom 0.5` para que se lea la
+  ladera. Si un actor que el motor pidió no sale, mira la traza desde el
+  paso 0: puede no haber nacido en el juego (el oso no nacía con los troncos
+  de `solidTerrain` hasta AN-4c).
 - Las comparaciones a escala nativa (GIF «antes | después» a 1:1 y tira):
   `python3 artifacts/graphics/AN-4/compare/build-compare.py`.

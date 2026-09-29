@@ -179,8 +179,10 @@ sin la autorización de Vera.
   terreno a secas. Si una toma no encuentra a un actor, mira `bearDen` (o lo
   que toque) en la traza desde el paso 0 antes de culpar a la semilla, y
   prueba con la biblioteca real (`loadAssets` + `solidTerrain`).
-- El oso avisa en el paso 0 y se va en el 90 (el leñador está junto a la
-  guarida): se rueda con `--lead 0` y `--look` en la guarida. La presa de una
+- La cueva del oso está al pie de la montaña (AN-4d, pedido de Vera) y el oso
+  sale por la boca en el paso 0: se rueda con `--lead 0` y `--look` en la
+  cueva (la posición del oso en el fotograma 0 de la traza, `wild`, es la
+  boca). La presa de una
   caza puede quedar fuera de cuadro (la cámara va al cazador): `--look` en la
   presa. **La honda usa los gestos del arco** (`hunt-encounter.ts`): límite
   anotado en `encargos-3d.md`.
