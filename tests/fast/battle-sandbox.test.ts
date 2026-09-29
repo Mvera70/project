@@ -38,6 +38,21 @@ describe('el banco de batallas', () => {
     expect(battleSetupFrom(url.slice(url.indexOf('?')))).toEqual(setup);
   });
 
+  it('F-0 · con `&shadow=` pide las sondas en sombra, con tope, y la jornada lleva su bitácora', () => {
+    const setup = battleSetupFrom('?sandbox=battle&shadow=0.12');
+    expect(setup.shadow).toBe(0.12);
+    expect(battleSetupFrom('?sandbox=battle&shadow=3').shadow).toBe(0.5);
+    expect(battleSetupFrom('?sandbox=battle&shadow=no').shadow).toBeUndefined();
+    const url = battleUrl(setup, '/project/');
+    expect(battleSetupFrom(url.slice(url.indexOf('?')))).toEqual(setup);
+    // Sin pedirla no hay bitácora: el juego no la pone nunca.
+    const state = walled(7);
+    const garrison = garrisonAs(state, 6, 'bow');
+    expect(createVillage(state, 0, { battle: { raiders: 12, garrison } }).shadow).toBeNull();
+    expect(createVillage(walled(7), 0, { battle: { raiders: 12, garrison }, shadow: { radius: 0.12, height: 0.65 } }).shadow)
+      .not.toBeNull();
+  });
+
   it('sube las manos que se piden, con su arma, y el portón sigue con lanza', () => {
     const state = walled(7);
     const game = garrisonOf(state);

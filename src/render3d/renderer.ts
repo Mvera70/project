@@ -89,6 +89,7 @@ import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
 import type { PhysicsSnapshot } from './life/physics';
+import { DRAWN_BODY, type ArcheryShadow } from './life/archery';
 import { garrisonAs, type Arm } from '@derive/garrison';
 import { createHuntEncounter, type HuntEncounter, type HuntReport } from './life/hunt-encounter';
 import { createWildPrey, stepWildPrey, wildPreyPosition, type WildKind, type WildPrey } from './life/wild-prey';
@@ -1574,7 +1575,7 @@ export async function createGraphicsRenderer(
   // cuántos asaltantes y qué guarnición, y se rehace la jornada con ellos. Es
   // la capa de vida la que los pone —`garrisonAs`, sin el tope de §12—; el
   // motor sigue sin saber nada. `null` vuelve a lo que diga el motor.
-  let battleChoice: { raiders: number; hands: number; arm: Arm } | null = null;
+  let battleChoice: { raiders: number; hands: number; arm: Arm; shadow?: number } | null = null;
   window.__valleyBattle = (choice) => { battleChoice = choice; life = null; };
   // Y lo que el banco enseña en directo, en una llamada ligera: sin posiciones
   // en pantalla, que es lo caro de `__valleyLife`.
@@ -1590,6 +1591,7 @@ export async function createGraphicsRenderer(
       phases,
       defence: life?.defence ?? null,
       physics: life?.physics?.stats ?? null,
+      shadow: shadowTally(life?.shadow ?? null),
       drawCalls: info.render.calls,
       triangles: info.render.triangles,
       actors: cast.count,
@@ -1987,6 +1989,8 @@ export async function createGraphicsRenderer(
           ...(battleChoice === null ? {} : { battle: {
             raiders: battleChoice.raiders, garrison: garrisonAs(shown, battleChoice.hands, battleChoice.arm),
           } }),
+          // F-0 · la flecha que toca, en sombra: sólo el banco la pide.
+          ...(battleChoice?.shadow === undefined ? {} : { shadow: { radius: battleChoice.shadow, height: DRAWN_BODY.height } }),
         });
         if (denVisual !== null) world.remove(denVisual);
         denVisual = null;
@@ -2873,7 +2877,7 @@ declare global {
     __valleyHoldSky?: (kind: SkyKind | null) => void;
     __valleyHoldFlood?: (level: number | null) => void;
     __valleyVisit?: (kind?: HappeningId, dealt?: boolean) => void;
-    __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm } | null) => void;
+    __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm; shadow?: number } | null) => void;
     __valleyBattleStats?: () => BattleStats;
     __valleyRenderStats?: () => {
       calls: number; triangles: number; scale: number; level: string; targetFps: number;
@@ -3016,6 +3020,20 @@ function wadingCell(map: GameState['map'], x: number, z: number): boolean {
   return t === TERRAIN_CODE.ford || t === TERRAIN_CODE.water;
 }
 
+/** F-0 · La cuenta de la bitácora en sombra, para el banco (`?sandbox=battle&shadow=`). */
+export interface ShadowTally { readonly arrows: number; readonly cylinder: number; readonly rapier: number; readonly same: number }
+
+function shadowTally(shadow: ArcheryShadow | null): ShadowTally | null {
+  if (shadow === null) return null;
+  const done = shadow.arrows.filter((arrow) => arrow.done);
+  return {
+    arrows: done.length,
+    cylinder: done.filter((arrow) => arrow.cylinder !== null).length,
+    rapier: done.filter((arrow) => arrow.rapier !== null).length,
+    same: done.filter((arrow) => arrow.cylinder !== null && arrow.rapier?.id === arrow.cylinder.id).length,
+  };
+}
+
 /** Lo que el banco de batallas lee en directo (`window.__valleyBattleStats`). */
 export interface BattleStats {
   readonly garrison: number;
@@ -3024,6 +3042,8 @@ export interface BattleStats {
   readonly phases: Readonly<Record<string, number>>;
   readonly defence: LifeVillage['defence'] | null;
   readonly physics: PhysicsSnapshot['stats'] | null;
+  /** F-0 · con `&shadow=`: flechas acabadas, aciertos de cada juez y en cuántas coinciden. */
+  readonly shadow: ShadowTally | null;
   readonly drawCalls: number;
   readonly triangles: number;
   readonly actors: number;

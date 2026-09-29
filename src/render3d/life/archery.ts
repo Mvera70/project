@@ -23,6 +23,7 @@
 // nada (D5). Un saqueador alcanzado se para; no hay sangre porque cómo se ve
 // eso es decisión del dueño (E4).
 
+import type { PhysicalVector } from '../contracts';
 import type { Manned } from './garrison';
 import type { Physics, PhysicsBody } from './physics';
 import type { Raider } from './raiders';
@@ -37,6 +38,54 @@ export interface Arrow {
   /** Si ya ha hecho lo que tenía que hacer: tocar algo o caer. */
   spent: boolean;
 }
+
+/**
+ * F-0 · Lo que Rapier habría dicho de una flecha, al lado de lo que dijo el
+ * cilindro. 29 sep 2026, `docs/diagnostico-fisica-combate-2026-09-29.md` §3.
+ *
+ * **Sólo se escribe: nada de esta capa lo lee para decidir.** El acierto sigue
+ * siendo el del cilindro; esto guarda, flecha a flecha, a quién habría tocado
+ * la cápsula del cuerpo que se ve (`physics.ts`, `probes`), cuándo y a qué
+ * altura, para medir cuántos resultados cambiarían si decidiera el contacto.
+ */
+export interface ShadowArrow {
+  readonly loosed: number;
+  /** El primer cuerpo que toca la cápsula: quién, en qué paso, a qué altura sobre sus pies y a qué velocidad. */
+  rapier: {
+    readonly id: number; readonly step: number; readonly height: number; readonly speed: number;
+    /** Si se encontró mirando adelante desde el acierto del cilindro, y a qué distancia de él. */
+    readonly ahead: number | null;
+  } | null;
+  /** Lo que decidió el cilindro: quién cayó, en qué paso, dónde iba la flecha y dónde estaba él. */
+  cylinder: {
+    readonly id: number; readonly step: number; readonly at: PhysicalVector;
+    readonly body: { readonly x: number; readonly y?: number; readonly z: number };
+  } | null;
+  /** Tras el acierto del cilindro, si lo primero delante era muro o suelo y no el cuerpo. */
+  blocked: boolean;
+  /** Hoy la flecha que acierta sigue su vuelo: cuánto se aleja del caído antes de pararse, en celdas. */
+  beyond: number | null;
+  /** Si ya no vuela. */
+  done: boolean;
+}
+
+export interface ArcheryShadow {
+  readonly arrows: ShadowArrow[];
+  /** Por dónde iba cada flecha en el paso anterior: el tramo que se barre. */
+  readonly last: WeakMap<Arrow, { at: PhysicalVector; entry: ShadowArrow }>;
+}
+
+export function archeryShadow(): ArcheryShadow {
+  return { arrows: [], last: new WeakMap() };
+}
+
+/**
+ * Lo que se mira adelante cuando el cilindro acierta antes de que la flecha
+ * llegue al cuerpo: el radio del cilindro, el de la cápsula más ancha que se
+ * prueba y el de la flecha, redondeado a una celda. Es una recta; en una celda
+ * a doce por segundo la gravedad la dobla una centésima.
+ */
+const SHADOW_AHEAD = 1;
 
 /** Un arquero en su puesto, con su cadencia. */
 export interface Archer {
@@ -121,6 +170,15 @@ const ARROW_LIFE = 240;
  */
 const HIT_REACH = 0.45;
 const BODY_TOP = 0.7;
+
+/**
+ * F-0 · El cuerpo que se pinta, para la cápsula en sombra (`physics.ts`,
+ * `probes`). Medido el 29 sep 2026 sobre el GLB publicado en reposo: 0,65 de
+ * alto (la coronilla; cadera a 0,287, arranque de la cabeza a 0,493), y de
+ * radio 0,10–0,12 el tronco y 0,17 con los brazos. **No decide nada**: el
+ * acierto sigue siendo `HIT_REACH` × `BODY_TOP`.
+ */
+export const DRAWN_BODY = { height: 0.65, trunk: 0.12, arms: 0.17 } as const;
 
 /**
  * La altura a la que se suelta y a la que se apunta, en celdas.
@@ -275,6 +333,8 @@ export function stepArchery(
   occupied: ReadonlySet<string>,
   /** Posición real de quien ocupa los puestos elevados; el suelo conserva su origen previo. */
   positions: ReadonlyMap<string, OccupantPosition> = new Map(),
+  /** F-0 · La bitácora en sombra, si se mide. No cambia nada de lo que pasa. */
+  shadow: ArcheryShadow | null = null,
 ): void {
   for (const archer of archers) {
     if (!occupied.has(archer.post.place.id)) continue;
@@ -301,12 +361,18 @@ export function stepArchery(
     if (step < archer.nextShot) continue;
     const velocity = aimAt(finalFrom, target.at);
     if (velocity === null) continue;
-    arrows.push({
+    const loosedArrow: Arrow = {
       body: physics.launch(finalFrom, velocity),
       from: archer.post.place.id,
       loosed: step,
       spent: false,
-    });
+    };
+    arrows.push(loosedArrow);
+    if (shadow !== null) {
+      const entry: ShadowArrow = { loosed: step, rapier: null, cylinder: null, blocked: false, beyond: null, done: false };
+      shadow.arrows.push(entry);
+      shadow.last.set(loosedArrow, { at: { ...finalFrom }, entry });
+    }
     archer.loosed += 1;
     archer.lastShot = step;
     archer.nextShot = step + DRAW_STEPS;
@@ -318,7 +384,14 @@ export function stepArchery(
   // porque quien dibuja lee la lista y le pregunta la posición (`physics.ts`).
   for (let n = arrows.length - 1; n >= 0; n -= 1) {
     const arrow = arrows[n] as Arrow;
+    const tracked = shadow?.last.get(arrow);
     if (arrow.spent) {
+      // F-0 · la flecha que acertó sigue volando: se apunta dónde se para.
+      if (tracked !== undefined && tracked.entry.cylinder !== null && tracked.entry.beyond === null
+        && (arrow.body.resting || arrow.body.at.y <= 0.05)) {
+        const rest = arrow.body.at, hit = tracked.entry.cylinder.at;
+        tracked.entry.beyond = Math.hypot(rest.x - hit.x, rest.z - hit.z);
+      }
       if (step - arrow.loosed > ARROW_LIFE) {
         arrow.body.remove();
         arrows.splice(n, 1);
@@ -326,13 +399,32 @@ export function stepArchery(
       continue;
     }
     const at = arrow.body.at;
+    // F-0 · primero, qué cápsula habría tocado en el tramo de este paso.
+    if (tracked !== undefined) {
+      if (tracked.entry.rapier === null) {
+        const touch = physics.sweep(tracked.at, at);
+        // Un caído de este mismo paso conserva su sonda hasta el siguiente;
+        // el cilindro ya no lo mira, y la sombra tampoco.
+        if (touch !== null && touch.id !== null
+          && raiders.some((raider) => raider.body.id === touch.id && raider.phase !== 'down' && raider.phase !== 'gone')) {
+          const v = arrow.body.velocity;
+          tracked.entry.rapier = { id: touch.id, step, height: touch.height, speed: Math.hypot(v.x, v.y, v.z), ahead: null };
+        }
+      }
+      tracked.at = { ...at };
+    }
     // Ha caído: se queda clavada donde esté y deja de buscar a quien tocar.
-    if (arrow.body.resting || at.y <= 0.05) { arrow.spent = true; continue; }
+    if (arrow.body.resting || at.y <= 0.05) {
+      arrow.spent = true;
+      if (tracked !== undefined) tracked.entry.done = true;
+      continue;
+    }
     for (const raider of raiders) {
       if (raider.phase === 'gone' || raider.phase === 'down') continue;
       if (at.y > BODY_TOP) continue;
       if (Math.hypot(raider.body.x - at.x, raider.body.z - at.z) > HIT_REACH) continue;
       arrow.spent = true;
+      if (tracked !== undefined) shadowHit(tracked.entry, physics, arrow, raider, step);
       raider.hits += 1;
       raider.arrowHits = (raider.arrowHits ?? 0) + 1;
       // **Una flecha basta**, y es la decisión honesta mientras no haya cuerpo
@@ -346,6 +438,31 @@ export function stepArchery(
       break;
     }
   }
+}
+
+/**
+ * F-0 · El cilindro ha dado. Si la cápsula todavía no, se mira adelante en la
+ * dirección del vuelo: lo que la flecha habría tocado si siguiera, un cuerpo o
+ * antes un muro o el suelo.
+ */
+function shadowHit(entry: ShadowArrow, physics: Physics, arrow: Arrow, raider: Raider, step: number): void {
+  const at = arrow.body.at;
+  entry.cylinder = { id: raider.body.id, step, at: { ...at },
+    body: { x: raider.body.x, z: raider.body.z, ...(raider.body.y === undefined ? {} : { y: raider.body.y }) } };
+  entry.done = true;
+  if (entry.rapier !== null) return;
+  const v = arrow.body.velocity;
+  const speed = Math.hypot(v.x, v.y, v.z);
+  if (speed < 1e-6) return;
+  const to = {
+    x: at.x + (v.x / speed) * SHADOW_AHEAD,
+    y: at.y + (v.y / speed) * SHADOW_AHEAD,
+    z: at.z + (v.z / speed) * SHADOW_AHEAD,
+  };
+  const touch = physics.sweep(at, to, true);
+  if (touch === null) return;
+  if (touch.id === null) { entry.blocked = true; return; }
+  entry.rapier = { id: touch.id, step, height: touch.height, speed, ahead: touch.toi * SHADOW_AHEAD };
 }
 
 /** Las que siguen en el mundo, para que quien dibuje no vea las retiradas. */

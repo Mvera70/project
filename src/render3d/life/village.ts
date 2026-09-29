@@ -35,9 +35,9 @@ import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placedOffer, placesOf, seatAt, seatKey, strikeTurn, type Offer, type Place } from './offers';
 import { garrisonPlaces, isPost, mannedPlatformCells, type Manned, type RampartSelector, type RingSelector, type WalkwaySelector } from './garrison';
 import { advanceElevated, type ElevatedPoint, type ElevatedPost } from './elevated-post';
-import { archersOf, stepArchery, type Archer, type Arrow } from './archery';
+import { archersOf, archeryShadow, stepArchery, type Archer, type ArcheryShadow, type Arrow } from './archery';
 import { fallenDefenders, meleePose, stepMelee, type Defender } from './melee';
-import { bastionParapetObstacles, bastionWalkwayParapetObstacles, createPhysics, type Physics, type PhysicsOptions, type PhysicsSnapshot } from './physics';
+import { bastionParapetObstacles, bastionWalkwayParapetObstacles, createPhysics, type Physics, type PhysicsOptions, type PhysicsSnapshot, type ProbeShape } from './physics';
 import type { RagdollSeed } from '../contracts';
 import { commons } from './places';
 import {
@@ -273,6 +273,8 @@ export interface Village {
   readonly sack: SackSnapshot | null;
   /** D6 · pose física para el render y la sonda; null antes de cargar Rapier. */
   readonly physics: PhysicsSnapshot | null;
+  /** F-0 · la bitácora en sombra de las flechas, sólo si se pidió `shadow`. */
+  readonly shadow: ArcheryShadow | null;
   /** Puente estrecho para los escombros Three que comparten este mismo mundo. */
   battleWorld(): Physics | null;
   /** Tick del asalto que creó esta jornada; permite conservarla entre días escénicos. */
@@ -493,6 +495,15 @@ export interface DayOptions {
    * combate con el número de cuerpos que se quiera.
    */
   readonly battle?: { readonly raiders: number; readonly garrison: Garrison };
+  /**
+   * F-0 · **La flecha que toca, en sombra** (29 sep 2026,
+   * `docs/diagnostico-fisica-combate-2026-09-29.md` §3): una cápsula de Rapier
+   * de esta forma por asaltante en pie, que nada toca, y la bitácora de a quién
+   * habría dado cada flecha si decidiera el contacto (`Village.shadow`). **No
+   * cambia ningún resultado** y el juego no lo pone nunca: lo piden el banco sin
+   * navegador (`battle-report.ts --shadow`) y las pruebas.
+   */
+  readonly shadow?: ProbeShape;
   readonly land?: Terrain;
   /**
    * D2 · **El mundo físico, si quien llama ya lo tiene.**
@@ -1222,6 +1233,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     .filter((post): post is Manned & { readonly elevated: ElevatedPost } => post.elevated !== undefined)
     .map(post => [post.place.id, post.elevated]));
   const arrows: Arrow[] = [];
+  const shadowLog = options.shadow === undefined ? null : archeryShadow();
   // D4 · los que defienden cada puesto, para que el cuerpo a cuerpo tenga a
   // quién golpear. Se llena al empezar la jornada con quien el reparto haya
   // puesto en cada puesto, y se queda vacío los días de paz.
@@ -1525,6 +1537,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     props,
     get sack(): SackSnapshot | null { return sackScene === null ? null : sackSnapshot(sackScene); },
     get physics(): PhysicsSnapshot | null { return physics?.snapshot() ?? null; },
+    shadow: shadowLog,
     battleWorld(): Physics | null { return physics; },
     raidTick: bandSize === 0 ? null : state.threat.arrivedTick,
     get steps(): number { return steps; },
@@ -2845,6 +2858,13 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         });
       }
       if (physics !== null && (physics.count > 0 || arrows.length > 0 || raidersHere(raiders))) {
+        // F-0 · las sondas, a donde la vida tiene a cada asaltante en pie,
+        // antes del paso: las flechas que se barran después las encuentran ahí.
+        if (options.shadow !== undefined) {
+          physics.probes(raiders.filter((raider) => raider.phase !== 'down' && raider.phase !== 'gone')
+            .map((raider) => ({ id: raider.body.id, x: raider.body.x, z: raider.body.z,
+              ...(raider.body.y === undefined ? {} : { y: raider.body.y }) })), options.shadow);
+        }
         physics.step();
         // **Y sólo dispara el puesto que tiene a alguien dentro.** Se recalcula
         // cada paso porque el arquero llega, se va a beber y vuelve: lo que
@@ -2866,7 +2886,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             occupants.set(post.place.id, there.body);
           }
         }
-        stepArchery(archers, raiders, arrows, physics, steps, held, occupants);
+        stepArchery(archers, raiders, arrows, physics, steps, held, occupants, shadowLog);
       }
 
       // D4 no usa Rapier: distancia y reloj de golpes bastan. Encerrarlo en

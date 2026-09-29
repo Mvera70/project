@@ -30,6 +30,13 @@ export interface BattleSetup {
   readonly defenders: number;
   readonly arm: 'bow' | 'spear';
   readonly raiders: number;
+  /**
+   * F-0 · `&shadow=0.12`: una cápsula de Rapier de ese radio por asaltante,
+   * en sombra (`docs/diagnostico-fisica-combate-2026-09-29.md` §3). No cambia
+   * la batalla; el panel dice lo que cuestan las sondas y en cuántos aciertos
+   * coincidiría el contacto. Es la medida del aparato que F-1 necesita.
+   */
+  readonly shadow?: number;
 }
 
 /** Lo que pide la dirección, con valores por omisión que dan una batalla corta. */
@@ -45,7 +52,14 @@ export function battleSetupFrom(search: string): BattleSetup {
     defenders: number('defenders', 6, 0, 60),
     arm: query.get('arm') === 'spear' ? 'spear' : 'bow',
     raiders: number('raiders', 12, 1, 80),
+    ...(shadowFrom(query.get('shadow'))),
   };
+}
+
+function shadowFrom(value: string | null): { shadow?: number } {
+  const radius = Number(value);
+  if (value === null || !Number.isFinite(radius) || radius <= 0) return {};
+  return { shadow: Math.round(Math.max(0.05, Math.min(0.5, radius)) * 100) / 100 };
 }
 
 /** La dirección que abre esta misma batalla. */
@@ -53,6 +67,7 @@ export function battleUrl(setup: BattleSetup, path: string = location.pathname):
   const query = new URLSearchParams({
     sandbox: 'battle', seed: String(setup.seed), year: String(setup.year),
     defenders: String(setup.defenders), arm: setup.arm, raiders: String(setup.raiders),
+    ...(setup.shadow === undefined ? {} : { shadow: String(setup.shadow) }),
   });
   return `${path}?${query.toString()}`;
 }
@@ -72,6 +87,9 @@ export interface BattleSummary {
   readonly entered: boolean;
   readonly fps: number;
   readonly physicsMs: number;
+  /** F-0 · con sondas: ms por paso de Rapier y de las sondas, en total de la batalla, y el acuerdo. */
+  readonly probes?: { readonly stepMs: number; readonly probeMs: number; readonly arrows: number;
+    readonly cylinder: number; readonly rapier: number; readonly same: number };
 }
 
 /** Las fases en que un asaltante ya no pelea. */
@@ -240,7 +258,16 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
       entered: enteredEver,
       fps: Math.round(fps),
       physicsMs: Math.round((last?.physics?.stepMsAverage ?? 0) * 100) / 100,
+      ...(probed() === null ? {} : { probes: probed()! }),
     };
+  };
+  // F-0 · lo que cuestan las sondas y en cuántos aciertos coincidiría el contacto.
+  const probed = (): BattleSummary['probes'] | null => {
+    const physics = last?.physics ?? null;
+    const shadow = last?.shadow ?? null;
+    if (setup.shadow === undefined || physics === null || shadow === null || physics.steps === 0) return null;
+    const round = (value: number): number => Math.round(value * 1000) / 1000;
+    return { stepMs: round(physics.stepMsTotal / physics.steps), probeMs: round(physics.probeMsTotal / physics.steps), ...shadow };
   };
 
   const OUTCOME: Readonly<Record<string, string>> = {
@@ -248,7 +275,8 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
   };
   const tick = (): void => {
     if (!told && window.__valleyBattle !== undefined) {
-      window.__valleyBattle({ raiders: setup.raiders, hands: setup.defenders, arm: setup.arm });
+      window.__valleyBattle({ raiders: setup.raiders, hands: setup.defenders, arm: setup.arm,
+        ...(setup.shadow === undefined ? {} : { shadow: setup.shadow }) });
       if (gate !== null) window.__valleyLook?.(gate.x, gate.y);
       told = true;
     }
@@ -282,6 +310,9 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
       ['Cuerpos físicos', physics === null ? '—' : `${physics.bodies}`],
       ['Cayendo (ragdoll)', physics === null ? '—' : `${physics.activeRagdolls} de ${physics.ragdolls} (tope 24)`],
       ['Cascotes', physics === null ? '—' : `${physics.debris}`],
+      ...(setup.shadow === undefined ? [] : [['Sondas F-0', s.probes === undefined ? 'arrancan al llegar'
+        : `${physics?.probes ?? 0} · ${s.probes.probeMs.toFixed(3)} ms/paso (Rapier ${s.probes.stepMs.toFixed(3)}) · `
+          + `contacto ${s.probes.rapier} de ${s.probes.cylinder} aciertos, ${s.probes.same} iguales`] as [string, string]]),
       ['Llamadas de dibujo', `${last?.drawCalls ?? 0}`],
       ['Triángulos', `${(last?.triangles ?? 0).toLocaleString('es-ES')}`],
     ];
