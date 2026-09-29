@@ -405,78 +405,77 @@
     },
     {
       "id": "deer",
-      "artifactRound": "G-33",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/deer/deer.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-27T18-16-23-788Z-35320",
-        "directory": "artifacts/graphics/G-33/approved/8f8e553a93e64c81"
+        "runId": "deer-faceted",
+        "directory": "artifacts/graphics/deer-faceted/approved/deer"
       },
       "bounds": {
         "min": [
-          -0.465833,
+          -0.407,
           0,
-          -0.14
+          -0.163281
         ],
         "max": [
-          0.31,
-          0.853333,
-          0.14
+          0.247,
+          0.764894,
+          0.163281
         ],
         "size": [
-          0.775833,
-          0.853333,
-          0.279999
+          0.654,
+          0.764894,
+          0.326562
         ]
       },
-      "recipeSha256": "0A9657137E0C7D09D92AA89E04454DEE4E29C7F78ECFEAB7A9CD37DA63858728",
+      "recipeSha256": null,
       "materials": [
+        "belly",
         "coat",
-        "warm",
-        "cream",
+        "hoof",
+        "earInner",
         "antler",
-        "dark"
+        "eye",
+        "ivory",
+        "nose",
+        "mane",
+        "rump"
       ],
       "clips": [
-        "idle",
-        "walk"
+        "walk",
+        "idle"
       ],
       "motion": [
         {
-          "name": "idle",
-          "seconds": 4.041666666666667,
+          "name": "walk",
+          "seconds": 1.2,
           "loop": true,
-          "strideLength": null
+          "strideLength": 0.282
         },
         {
-          "name": "walk",
-          "seconds": 2.0416666666666665,
+          "name": "idle",
+          "seconds": 4,
           "loop": true,
-          "strideLength": 0.333
+          "strideLength": null
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 24,
-        "meshes": 5,
-        "materials": 5,
-        "triangles": 2972
+        "objects": 46,
+        "meshes": 27,
+        "materials": 10,
+        "triangles": 1600
       },
       "hashes": {
-        "deer.blend": "8A604227BE7E6D8C899652D4BD07D152C517A515BAE5B6B34484453B02D05E64",
-        "deer.glb": "8F8E553A93E64C81D31BE0025C1DBDA447F825A3CC9D0D06E353B4A4A538A176",
-        "deer-blender.png": "82A1E19C012F82A964E83D8D2C500AE8ACCC79D6880DCAF149E5A72057485F10",
-        "capture-1.png": "2CB6884DB41401FA6FED7C41EEA4FBF70CF695839C875142D1D42419CD6BDD27",
-        "capture-1-gray.png": "2DF1114DE99BFC9C94886350E4045FF1A306EB63AEC385B0B2D55A462B048D3B",
-        "capture.json": "ECFCD367751C511C245ED405D4E7D0B1AB931589DF34C16213E4660C4505C40A",
-        "build.json": "5039D764B7403F8FB53FD11B1D17D5A42CA9B4EC1B5E6664EAC2F3A5E9D16BB8",
-        "validation.json": "A4A8A1C058575316C22656872BC11E500CB85E910B7CC62459365343911748C6"
+        "deer.glb": "5887CF05DC7E41703964077376BC2B69B5B190BF9A0715EA87AF9D594451BB6B",
+        "deer-preview.png": "5B78450025A1FB1D8156AA7460EBC6C98AD95E07F20B9ACD4067C6E219BEA48C"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original procedural stag modeled for The Valley on 23 Sep 2026; no external provider.",
+        "source": "Ciervo facetado de The Valley (deliverables/marked-models-trial/build-models.py, deer(); 29 sep 2026), aprobado por Vera con las patas acortadas; clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     },

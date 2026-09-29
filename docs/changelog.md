@@ -1,5 +1,22 @@
 # The Valley — Registro de cambios
 
+## v5.05 · 29 sep 2026 · El ciervo, y ya no queda ningún animal de cajas
+
+El último de la receta G-23. `deer()` en
+`deliverables/marked-models-trial/build-models.py`, sobre la estructura de la
+mula de Vera: pardo rojizo con vientre claro y espejo blanco en la grupa, crin
+oscura, cuerna con luchadera, candil y corona. A Vera las patas le parecieron
+demasiado largas: `DEER_DROP` baja el cuerpo 0,11 y las acorta lo mismo.
+
+**El casco sigue plantado.** `animal-gait-axis.test.ts` —la prueba de cuando
+Vera vio que el ciervo «deslizaba»— falló con el paso genérico: girar la pata
+entera desde la cadera sube y baja el casco en el apoyo. `rigid-clips.mjs`
+aprende el paso plantado (`plantedGait`): cadera y rodilla por cinemática
+inversa, el casco plano y en línea recta a la velocidad del cuerpo, y el
+cuerpo un poco agachado al andar (la pata en reposo va casi estirada y el
+casco no llegaría adelante). Es lo que hacía `plant-gait.cjs` con el modelo
+de cajas. 94 pruebas en verde.
+
 ## v5.04 · 29 sep 2026 · El pato, y el pico de la gallina
 
 - **El pato** (`duck()` en `deliverables/marked-models-trial/build-models.py`):

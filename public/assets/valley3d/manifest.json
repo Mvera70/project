@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T19:28:52.325Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids hen,duck",
+  "generatedAt": "2026-09-29T19:53:56.273Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids deer",
   "assets": [
     {
       "id": "axis-marker",
@@ -1354,30 +1354,6 @@
       }
     },
     {
-      "id": "deer",
-      "file": "deer.glb",
-      "sha256": "8F8E553A93E64C81D31BE0025C1DBDA447F825A3CC9D0D06E353B4A4A538A176",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4.041666666666667,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.0416666666666665,
-          "loop": true,
-          "strideLength": 0.333
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Original procedural stag modeled for The Valley on 23 Sep 2026; no external provider.",
-        "license": "Project original"
-      }
-    },
-    {
       "id": "fox",
       "file": "fox.glb",
       "sha256": "0995B771C8FC6EA8A61D13954924DBB2920B6F387F457AD81B003CCE81829820",
@@ -1578,6 +1554,30 @@
       "provenance": {
         "kind": "original",
         "source": "Ánade real facetado de The Valley (deliverables/marked-models-trial/build-models.py, duck(); 29 sep 2026), aprobado por Vera; clips de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "deer",
+      "file": "deer.glb",
+      "sha256": "5887CF05DC7E41703964077376BC2B69B5B190BF9A0715EA87AF9D594451BB6B",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.282
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Ciervo facetado de The Valley (deliverables/marked-models-trial/build-models.py, deer(); 29 sep 2026), aprobado por Vera con las patas acortadas; clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     }

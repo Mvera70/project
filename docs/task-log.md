@@ -23,8 +23,9 @@ cortas y con pelo colgando. **Siguiente, uno a uno como pidió Vera:** el pez,
 (v5.00). Siguen, uno a uno: la vaca, **publicada** (v5.01, facetada y gorda), y
 la gallina, **publicada** (v5.02). Siguen, uno a uno: el cuervo, **publicado**
 (v5.03), el pato, **publicado** (v5.04, con
-el pico de la gallina arreglado), y el ciervo, el último de cajas,
-**candidato sin publicar** (`deer()`). El banco de fauna encuadra ya cada
+el pico de la gallina arreglado), y el ciervo, **publicado** (v5.05,
+con el casco plantado por cinemática inversa). **Ya no queda ningún animal
+de cajas.** El banco de fauna encuadra ya cada
 especie por su caja y mira a su centro. **Pendiente:** la ubre de la vaca, que la
 barriga gorda tapa (se probó sacarla y Vera prefirió seguir). El oso no se puede fotografiar dentro de la partida sin
 cazar antes la cadena entera: no hay `?hunt=`.

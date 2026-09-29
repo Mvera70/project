@@ -137,15 +137,17 @@ El banco de fauna pinta ahora la lámina de agua para el pato.
   [nadando](duck-swim.png)
 - `python3 build-models.py -- duck`
 
-## El ciervo (29 sep 2026) — candidato, **sin publicar**
+## El ciervo (29 sep 2026) — **publicado**
 
 El último de cajas. `deer()` en `build-models.py`, sobre la estructura de la
 mula de Vera: tronco esbelto sobre patas largas con el corvejón atrás, cuello
 alto con crin oscura, pardo rojizo con vientre claro y espejo blanco en la
 grupa, y cuerna con luchadera, candil y corona. A Vera las patas le parecieron demasiado
 largas: `DEER_DROP` baja el cuerpo y las acorta lo mismo (0,11; se probó 0,07). Mismo tamaño que el de G-23;
-`rigid-clips.mjs … deer` le da el paso con el casco apoyado en línea recta
-(sustituye al de `art/recipes/deer/plant-gait.cjs`, que era del modelo de cajas).
+`rigid-clips.mjs … deer` le da el paso con el casco plantado: cadera y rodilla
+por cinemática inversa y el cuerpo un poco agachado al andar, como hacía
+`art/recipes/deer/plant-gait.cjs` con el modelo de cajas. Lo vigila
+`animal-gait-axis.test.ts`.
 
 - [deer.glb](deer.glb) · [perfil](deer-profile.png) · [tres cuartos](deer-three-quarter.png) ·
   [andando](deer-walk.png)
