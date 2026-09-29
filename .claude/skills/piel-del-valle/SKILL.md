@@ -23,108 +23,107 @@ Ninguna estaba «mal» por sí sola. El conjunto sí.
 `background-color`: ponle la clase `skin-paper skin-paper--page`. Copiar valores
 crea la segunda verdad que mañana se queda atrás.
 
-## 0. UI-W · madera, piedra y pergamino (24 sep 2026): lo que manda hoy
+## 0. La piel v8/v9 (29 sep 2026): lo que manda hoy
 
-**Esta sección manda sobre el color y el acabado de todo lo de abajo.** Es el
-mockup que Vera trajo el 24 sep, el que la dirección del 22 sep
-(`docs/ui-redesign/game-ui-direction.md`) dejó pendiente «para fijar la
-dirección antes del acabado final». Referencia en
-`docs/visual-reference/ui-wood/` (el antes y el mockup del carro). Lo que decía
-§10 de que «la temática nueva es menos colorida» queda sustituido: la piel es
-ahora **madera, piedra y pergamino, con el verde azulado oscuro para actuar y
-lacre para cerrar**.
+**Esta sección manda sobre el color, el material y el acabado de todo lo de
+abajo.** Es la piel que Codex propuso en las láminas v6–v9
+(`docs/ui-redesign/propuesta-piel-v6…v8`, `propuesta-barra-v8`,
+`propuesta-texturas-v9-2026-09-29.md`, rama `art/astra-modelos`) y Vera aprobó
+pieza a pieza; está integrada en `main` (`e2ead14`, `1488533`, `d9f0fb9`,
+`c0b94a0`, `79e7270`) y publicada. Sustituye a UI-W del 24 sep en todo lo que
+contradiga: **sólo madera** (Vera: la piedra «este dije que no me gustaba»),
+**nada de verde** en los botones, y la edad de piedra ya no cambia la carcasa.
 
-**Cómo está hecho: una capa, `src/ui/redesign/wood.css`**, importada la última
-en `app.ts`, con tokens propios (`--wood-*`, `--stone*`, `--card*`, `--sheet`,
-`--ribbon*`, `--give*`, `--brass`, `--lacquer*`, `--want`) en `tokens.css`. Los
-tokens muestreados de los prototipos **no se tocan**: los vigila
-`ui-skin.test.ts` y los siguen usando treinta reglas. Y sus selectores llevan
-`:root` o `#root` delante porque tres pantallas inyectan su hoja con
-`ensureStyle()` después de la capa, y a igual peso gana la última.
+**Las tres reglas de Vera que están detrás de cada pieza:**
 
-| Pieza | Cómo es | Dónde |
+- **Las texturas son imágenes, nunca CSS.** «Las texturas no se hacen con CSS,
+  quedan horribles.» Y tampoco las dibuja un script: los clavos, los marcos,
+  el pergamino, las ilustraciones y los iconos los genera Codex con ImageGen
+  a partir de referencias aprobadas, o se recortan de ellas. **CSS coloca y
+  estira las nueve partes** (`border-image … fill stretch`) y pone el texto
+  encima. Cada PNG está a 2×; el corte va en píxeles del PNG y el borde en
+  píxeles CSS (`tokens.css`, bloques «v8 · las piezas de imagen» y «v9»).
+- **Papel = leer, madera = decidir.** Lo que sólo se lee va en pergamino; lo
+  que se toca para actuar va en una placa de madera con brasa ámbar.
+- **Los objetos del valle abren su propia ventana.** El cartel de la plaza abre
+  el tablón; una casa o una persona, la etiqueta A1. Nada de interfaz hasta
+  tocar.
+
+| Pieza | Cómo es | Token / dónde |
 |---|---|---|
-| La cabecera | Una tabla de madera con clavos; la fecha en un rótulo claro encastrado; las cinco cifras **hundidas** en la madera, en crema | `.ui-hud-header::before` (la caja mide cero: la tabla es su pseudo), `.hud-plate-date`, `.valley-vital` |
-| Las hojas | Pergamino `--sheet` con **dintel de piedra** de 14 px arriba | la caja de la carcasa de las cuatro hojas y la bandeja del valle; **no** en las superposiciones que se desplazan (§6: una tira absoluta se va con el scroll y tapa el título) |
-| La tarjeta | Marfil con **doble filete** y escalón debajo | `.skin-plate--card`, las opciones de la decisión, las filas de la gente |
-| La cinta | Pizarra que sale por el borde izquierdo con su doblez | el nombre de cada cosa del carro |
-| El medallón | El grabado de la cosa (`means-*.png`, el mismo de su línea de crónica) en un círculo con aro de madera | el carro |
-| Actuar | **El verde azulado oscuro que era de la barra** (`--give` apunta a `--skin-wood-plaque`), con borde de latón y escalón. El verde lacado del mockup se descartó: «ese verde chillón no me gusta» | `.skin-button--wood` en todas las pantallas (dar, seguir, coronar, empezar de nuevo, «Open the cart») |
-| Lo que no se puede | Madera apagada con borde a trazos, **nunca** un verde medio transparente | `:disabled` |
-| Secundario | Pergamino con borde de madera | `.skin-button--parchment` |
-| Cerrar | Un **sello de lacre** de 42 px con su aspa, en un toque de 48, **sin palabra a la vista** (Vera: «la palabra close sobra, el botón es grande y se intuye»). La palabra sigue en el botón a tamaño cero como nombre accesible; el aspa va en `::after` | `.cart-close`, `.ui-shell-content-close`, `.chronicle-close`, `.annals-close` |
-| Lo que falta | La cifra en la tinta del lacre y lo que hay entre paréntesis | el precio del carro (`paintCoins`) |
-| La navegación | **La misma pieza que la tabla de arriba**: su veteado, filete de latón y canto con luz y sombra (Vera, viendo los dos verdes juntos y después: «no tiene la calidad del que hiciste la primera vez»). La activa es **una placa de madera rica con latón y brillo de brasa**, en las dos materias: en gris claro se leía apagada | `.skin-nav` |
-| **La edad de piedra** | Con la primera obra de piedra (el peldaño de las 61 h), **la tabla, la barra y los aros pasan de madera a sillería** en un fundido de 1,4 s. Idea de Vera: «cuando la aldea pase a la edad de piedra, que se cambie la UI por una de piedra». Monótona: una obra de piedra perdida no devuelve la madera | `uiMaterialOf` (`derive/era.ts`) → `<html data-material>` → cinco tokens redefinidos al final de `wood.css`. El pergamino, las cintas, el lacre y el botón de actuar **no cambian**: son lo que se lee y se toca |
-| La carga | Una tabla con el grabado de la fundación y una barra que avanza **por los tramos reales** del relevo al 3D, nunca por un reloj | `backend.ts`, `loadingPlate` |
+| La cabecera | Una tabla de roble en nueve partes con sus clavos; la fecha en una placa de marfil encastrada, con el arco del sol; cada cifra en su **hueco tallado**, con el icono a color de su recurso (la cara del ánimo sigue siendo del sprite: es información) | `--wood-header`, `--plate-date`, `--well-vital`, `--res-*` · `.ui-hud-header::before`, `.hud-plate-date`, `.valley-vital[data-res]` |
+| Los mandos del valle | Vista, pausa, velocidad y caza en **marfil** cuadrado de 44 px, tinta oscura; la velocidad elegida en verde de tinta | `--control-ivory` · `.hud-round-btn`, `.valley-speeds` |
+| La brújula | La esfera armilar de anillas de latón con textura, canto oscuro, N y S; **sigue siendo la bola que gira**: arrastrar gira la cámara, un toque vuelve al norte. Sin bola de fondo | `ring-metal.png` como patrón SVG · `camera-controls.ts` |
+| Las hojas y la bandeja | Pergamino de loseta sin costura; **sin dintel de piedra** (Vera: «hay que quitar la línea de piedra») | `--parchment-sheet` · la caja de la carcasa de las cuatro hojas, `.ui-shell-message` |
+| La tarjeta | Pergamino **rasgado** en nueve partes, con su ilustración a color arriba a la derecha (56×48 en el tablón, 64×54 en el carro) | `--frame-parchment` · el tablón, el carro |
+| La cinta | Pizarra azul con doblez, para el nombre de cada cosa del carro | `--frame-ribbon` |
+| La ficha del precio | Marfil con canto de latón, los recursos a color y lo que falta en tinta de lacre | `--chip-cost` · `.valley-cost-chip`, `paintCoins` |
+| Actuar | **Placa de madera con canto de latón y brasa ámbar dentro**; apagada, la misma placa sin luz y la letra atenuada | `--plaque-wood`, `--plaque-wood-off` · `.skin-button--wood` (GIVE, SEND, Open the cart, seguir, coronar, fundar) |
+| Secundario | Botón de pergamino con canto de roble | `--button-parchment` · `.skin-button--parchment` |
+| Cerrar | Aro de madera con aspa, dibujo de 32 en un toque de 44, **sin palabra a la vista**; en la misma esquina en las cuatro hojas | `--btn-close` · `.ui-shell-content-close` |
+| La navegación | **Correa de cuero** con costura; cada pestaña un medallón de latón con su icono; la activa, elevada y encendida (Vera prefirió el cuero al metal y a la madera: la de madera era «muy pobre») | `--nav-leather`, `--nav-medal`, `--nav-medal-on` · `.skin-nav` |
+| El tablón | Ventana entre la cabecera y la barra: loseta de tablas, avisos de pergamino clavados (clavo recto y torcido alternando), −/+ de marfil, SEND en placa. El velo se cierra en `pointerdown` | `--wood-board`, `--nail`, `--nail-bent` · `board.ts` |
+| La etiqueta A1 | Pergamino pequeño con punta hacia la cosa, que la sigue cada fotograma por `screenOf` | `--frame-parchment` · `label.ts` |
+| La crónica | Hoja a toda altura; por entrada, la fecha «Anno 50 · Spring» (años en cifras, **nunca romanos**) y una viñeta apaisada de 130 px. **Las 44 escenas del índice están a color** desde `79e7270` (Codex, `cronica-color-v9-2026-09-29`); cae al respaldo por `kind` lo que no esté en `public/ui/art/index.json` | `screens/chronicle.ts`, `chronicle-art.ts` |
+| La encrucijada | El valle arriba; abajo papel de documento con el título en tinta oscura, sin sello, y cada opción en la **tira rasgada** con el verbo en Cinzel arriba y el precio en Garamond debajo. La brújula y los mandos se esconden | `--paper-document`, `--strip-status` · `screens/crossroad.ts` + `wood.css` |
+| Bienvenida, epitafio, anales | El mismo papel de documento | `--paper-document` |
+| La portada | **El cuadro 04 «Luces en la garganta»** a sangre (elegido por Vera entre cinco), el logotipo encima, el número en la placa de marfil con el dado suelto, fundar en la placa de madera, los anales y el idioma como rótulos sin caja | `--title-dusk` · `screens/title.ts` + `wood.css` |
 
-**La madera y la piedra son textura, nunca CSS.** Regla de Vera, 24 sep 2026,
-después de ver la primera portada: «úsalo para texturas en general, CSS se
-queda corto». Los degradados dan chapa lisa con rayas; la veta, los nudos, las
-juntas y el relieve de una piedra son dibujo. Salen de `tools/ui/textures.py`
-(semilla fija, sin costura) a `src/ui/redesign/wood-planks.png` y `cobble.png`,
-y se piden por token: `--plank-texture` con `--plank-size` para toda madera, que
-la edad de piedra apunta a `--cobble-texture`. Una materia nueva (hierro,
-cuero…) se añade a ese script, no a un degradado. El CSS sigue haciendo lo que
-sí sabe hacer: bordes, latón, escalones y sombras.
+**Cómo está hecho:** los tokens de imagen en `tokens.css`; la capa
+`src/ui/redesign/wood.css`, importada la última en `app.ts`, con sus bloques
+«v8», «v9 · texturas», «v9 · la portada» y «v9 · la encrucijada» al final, en
+ese orden, porque a igual peso gana la última. Los selectores llevan `:root` o
+`#root` delante porque varias pantallas inyectan su hoja con `ensureStyle()`
+después de la capa. La tarjeta del tablón vive en el CSS propio de `board.ts`.
 
-**La portada** es la tabla en arco del diseño de Vera
-(`docs/visual-reference/ui-wood/Gemini_Generated_Image_*`, y su versión con pie
-empedrado): tablones de textura, título tallado, el grabado virado a sepia con
-una capa `background-blend-mode: color` (un `filter` teñía también el marco),
-la ficha de pergamino con el dado, fundar en verde azulado, los anales en
-pergamino y el pie empedrado con idioma y sonido redondos.
+**Letra:** Cinzel (`--skin-font-display`) para títulos, cintas, verbos y
+placas; **EB Garamond (`--skin-font-story`) para todo lo que se lee** en un
+documento (la crónica, la decisión, los avisos del tablón); la sans para
+cifras y rótulos de la carcasa.
 
-Letra: **Cinzel (`--skin-font-display`) para títulos, cintas y botones**, la
-serif de la crónica para las descripciones, la sans para cifras. La regla del
-22 sep («sans para todo control») queda así matizada por el mockup; los tokens
-`--skin-font-voice`/`-read` siguen siendo sans y la prueba que lo vigila, verde.
+**Cuatro trampas de esta piel, cada una cazada en captura:**
 
-**La portada entró después, con diseño de Vera** (arriba): las tres propuestas
-mías del lienzo las descartó («muy, muy malas») y generó ella la referencia.
+- **En el sitio publicado, un token de imagen no sirve dentro de una hoja
+  inyectada.** Los tokens son `url(./x.png)` relativos a `assets/`, y Chrome
+  resuelve la `var()` donde se usa: en el `<style>` que `board.ts` o `label.ts`
+  cuelgan del documento apuntan a la raíz y dan 404. **El bundle local
+  (`bundle-game.ts`) las incrusta y no lo enseña**; lo encontró la auditoría
+  de Codex sobre el sitio vivo (`auditoria-v9-juego-2026-09-29`). Un módulo
+  que inyecta CSS con imágenes **las importa** (`import x from './x.png'`) y
+  redeclara el token en su raíz. Y una ronda de piel se cierra mirando
+  también el sitio publicado, no sólo la captura local.
+- **El atajo `border` con `!important` reinicia `border-image` y lo gana.**
+  Los huecos de las cifras no salían por eso: propiedades sueltas
+  (`border-style`, `border-color`, `border-width`).
+- **Un comentario con acentos graves dentro de un CSS en plantilla rompe el
+  build en silencio** y el bundle usa el CSS viejo. Después de tocar `board.ts`
+  se mira `bundle.log` por «Build failed».
+- **Un icono a color que se pierde es una regla `background:` genérica.** El
+  atajo a mayor especificidad pisaba la imagen: se escriben las propiedades
+  largas y se dobla `[data-res][data-res]`.
 
-**Lo que se decidió probando la demo (24 sep, tarde):**
+**Cómo se encarga una pieza nueva:** a Codex, con un prompt que diga fichero,
+tamaño a 2×, corte y qué tiene que enseñar; las piezas llegan por
+`art/astra-modelos` con sus maestros, prompts y `verification.json`, y se
+integran **por rutas** (la rama va detrás de `main`: nunca se mezcla su
+`src/`). Vera: «los diseños complicados pídelos, o pregunta si no puedes esa
+calidad; muchas veces crees que sí, pero no».
 
-- **Los botones y fichas de pergamino llevan textura**: beis con presencia
-  (`--parch-color`, `--parch-image`: el grano de `parchment.png` y bordes
-  envejecidos) y relieve. El marfil liso se leía «muy claro».
-- **Idioma y sonido de la portada son de madera**, no de piedra: la piedra «se
-  ve muy mal».
-- **El cierre está en la misma esquina en las cuatro hojas**: el sello de la
-  carcasa, arriba a la derecha bajo el dintel; los propios de la crónica y del
-  carro se apagan dentro de la hoja.
-- **El dintel mide 7 px** y el sello de la bandeja va encima: con 14 se lo comía.
-- **El título de la portada es el logotipo que generó Vera**: «THE» en hierro
-  picado, «VALLEY» en bronce martillado, contorno grueso y el roble en un
-  escudo de latón (`docs/visual-reference/ui-wood/title-logo-en-2026-09-24.jpg`).
-  Antes probamos tallado (no se veía), plata con CSS («un título de
-  PowerPoint») y hierro pintado por script (sin el acabado de un logotipo de
-  juego). **Los generadores de imágenes no dan transparencia: pintan el
-  tablero de cuadros dentro del JPG.** `tools/ui/cut-logo.py` lo quita: relleno
-  desde el borde con el contorno oscuro de muro, y los bolsillos encerrados
-  por su firma de dos grises. Hay un logotipo por lengua (`TITLE_LOGO` en
-  `title.ts`); **el español falta** y mientras tanto sale el inglés.
-- **La bandeja lleva el sello del árbol**, no la hoja de roble. La cera roja
-  sigue siendo sólo la marca de una decisión aplazada.
-- **Tirar del tirador no cambia de pestaña: aparca la hoja** en pantalla
-  completa, con el tirador asomando; tocarlo, o el botón de la esquina, la
-  devuelve (`valley:bare`, dueño `app.ts`). Antes la pantalla completa
-  escondía la barra y dejaba la hoja flotando.
+**Abierto de la auditoría de Codex (29 sep):** fundar en la portada usa
+`plaque-wood` donde la maqueta llevaba una placa fina de latón, la
+encrucijada no lleva el canto rasgado `parchment-sheet-edge.png` que ya
+existe, y a 320 px el mando de vista cae sobre el punto de toque del tablón.
+Ninguna de las tres pide una imagen nueva.
 
-**Y la regla nueva de esta ronda: el estilo no basta, se corrige el uso.** Lo
-dijo Vera a mitad de la ronda («no es solo estilo sino corregir UX»), y lo que
-salió de mirar las capturas con esa pregunta:
-
-- **Una hoja que empieza a media pantalla no gasta filas en su cabecera.** El
-  cierre va en la fila del tirador o en la del título, nunca en una fila sola.
-- **Una fila que abre algo lo dice**: su `›`.
-- **Volver es navegación, no acción**: enlace con flecha, sin caja, para que no
-  compita con la acción principal.
-- **Un botón apagado dice por qué** y la cifra que no llega se marca.
-- **Esperar se enseña**: nada de un fondo liso mientras carga.
-- **Lo que se esconde se esconde entero**: un adorno pintado en un pseudo tiene
-  que esconderse con las mismas clases que su contenido (la tabla vacía de la
-  decisión, cazada en captura).
+**Lo que UI-W (24 sep) dejó y sigue valiendo:** el logotipo de la portada es
+el que generó Vera (`title-logo-en.png`, recortado con `tools/ui/cut-logo.py`;
+falta el español y sale el inglés); tirar del tirador aparca la hoja en
+pantalla completa (`valley:bare`); la bandeja lleva el sello del árbol y la
+cera roja sólo marca una decisión aplazada; y **el estilo no basta, se
+corrige el uso**: una hoja que empieza a media pantalla no gasta filas en su
+cabecera, una fila que abre algo lo dice con su `›`, volver es navegación y
+no acción, un botón apagado dice por qué, esperar se enseña, y lo que se
+esconde se esconde entero.
 
 ## 1. La directriz de maquetación
 

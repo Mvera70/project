@@ -42,3 +42,4 @@ azulado desaparece de la interfaz.
 |---|---|---|
 | **A · Texturas y mandos** | Las piezas de ImageGen de `texturas-v9` en cabecera, fecha, cifras, tablón, hojas, bandeja y botón secundario; mandos de marfil; brújula de latón que gira | **Hecha y desplegada** (`d9f0fb9`) |
 | **B · Composición** | Portada 04 a sangre (`title-dusk.jpg`); encrucijada en `paper-document` con opciones en `strip-status`; papel de documento en bienvenida, epitafio y anales | **Hecha**, con captura lado a lado |
+| **C · Crónica a color y sitio publicado** | Las 44 escenas del índice a color; caché v8; las imágenes del tablón y la etiqueta importadas para que no den 404 en el sitio vivo; skill `piel-del-valle` §0 | **Hecha y desplegada** (`79e7270`) |

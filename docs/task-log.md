@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · La crónica a color y el tablón en el sitio publicado
+
+`79e7270`: las 44 escenas del índice de la crónica a color (Codex,
+`art/astra-modelos` c44e433, `cronica-color-v9-2026-09-29`), mismo nombre que
+el sepia; la caché de la PWA sube a v8 para que los dispositivos las suelten.
+Y el fallo que su auditoría del sitio vivo encontró: los tokens de imagen
+dentro del CSS inyectado del tablón y de la etiqueta daban 404 en el sitio
+publicado (el bundle local las incrusta). Ahora los importan. Comprobado con
+una sonda contra el sitio: cero 404, el tablón con sus papeles y la crónica a
+color. La skill `piel-del-valle` §0 reescrita con la piel v8/v9. Abierto: la
+placa de fundar, el canto rasgado de la encrucijada y el toque del tablón a
+320 px (auditoría de Codex).
+
 ## 29 sep 2026 · La v9 de Codex, al juego — texturas, marfil, brújula, portada y encrucijada
 
 Tanda A (`d9f0fb9`, desplegada): las texturas de ImageGen sustituyen a las
