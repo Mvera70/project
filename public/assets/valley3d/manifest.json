@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T19:18:39.192Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids hen",
+  "generatedAt": "2026-09-29T19:25:01.213Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids crow",
   "assets": [
     {
       "id": "axis-marker",
@@ -182,25 +182,6 @@
       "file": "reed.glb",
       "sha256": "3AE010539E86395BBFB41C13EC468FF48C75BE298E737255AB2DE17DEA87960D",
       "motion": []
-    },
-    {
-      "id": "crow",
-      "file": "crow.glb",
-      "sha256": "F9A171936F7695AFCAF975524C52E0569FB025D46F5B966FAEBE9C20ED51E16E",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.08
-        }
-      ]
     },
     {
       "id": "bundle",
@@ -1573,6 +1554,30 @@
       "provenance": {
         "kind": "original",
         "source": "Gallina facetada de The Valley (deliverables/marked-models-trial/build-models.py, hen(); 29 sep 2026), aprobada por Vera; paso y picoteo de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "crow",
+      "file": "crow.glb",
+      "sha256": "02E9D80EF1D62E90480D505FD340CB936E49860AFF52E5BEC59F2A318AEB4EAE",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.073
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Cuervo facetado de The Valley (deliverables/marked-models-trial/build-models.py, crow(); 29 sep 2026), aprobado por Vera; paso y picoteo de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     }

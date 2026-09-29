@@ -21,8 +21,9 @@ suave (`BEAR_HUMP` 0,35; 0,15 casi plano); mismo tamaño, nodos y pose erguida q
 cortas y con pelo colgando. **Siguiente, uno a uno como pidió Vera:** el pez,
 **publicado** (v4.99, una trucha facetada que nada); y el cerdo, **publicado**
 (v5.00). Siguen, uno a uno: la vaca, **publicada** (v5.01, facetada y gorda), y
-la gallina, **publicada** (v5.02). Siguen, uno a uno: el cuervo, **candidato sin
-publicar** (`crow()`), y después el pato y el ciervo, los últimos de cajas. **Pendiente:** la ubre de la vaca, que la
+la gallina, **publicada** (v5.02). Siguen, uno a uno: el cuervo, **publicado**
+(v5.03), y ahora el pato y el ciervo, los últimos de cajas. **Pendiente
+también:** el pico de la gallina, de rombo como el primero del cuervo. **Pendiente:** la ubre de la vaca, que la
 barriga gorda tapa (se probó sacarla y Vera prefirió seguir). El oso no se puede fotografiar dentro de la partida sin
 cazar antes la cadena entera: no hay `?hunt=`.
 

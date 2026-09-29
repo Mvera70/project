@@ -1,5 +1,15 @@
 # The Valley — Registro de cambios
 
+## v5.03 · 29 sep 2026 · El cuervo
+
+El de G-23 era de cajas. Ahora es facetado (`crow()` en
+`deliverables/marked-models-trial/build-models.py`), sobre la estructura de la
+gallina pero esbelto: negro con brillo azulado, alas largas pegadas al cuerpo,
+cola en cuña maciza y un pico macizo que se afina con una curva hacia abajo.
+Vera vio que de perfil el primero salía en punta de flecha —el rombo de las
+plumas— y se rehízo. Paso y picoteo, sin vuelo como hasta ahora. La gallina
+lleva el pico de rombo, más pequeño; queda anotado.
+
 ## v5.02 · 29 sep 2026 · La gallina, y el corral en un solo estilo
 
 Vera: «mucho mejor». La última de cajas del corral, facetada sobre la

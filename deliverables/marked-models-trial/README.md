@@ -110,7 +110,7 @@ no se confunde con la perdiz ni con el zorro. Mismo tamaño que la de G-23;
   [andando](hen-walk.png)
 - `python3 build-models.py -- hen`
 
-## El cuervo (29 sep 2026) — candidato, **sin publicar**
+## El cuervo (29 sep 2026) — **publicado**
 
 `crow()` en `build-models.py`, sobre la estructura de la gallina pero esbelto:
 negro con brillo azulado en las alas, pico macizo que se afina con una curva
