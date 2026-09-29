@@ -638,7 +638,9 @@ def crow():
     ell('Breast',(-.038,0,.106),(.090,.080,.088),'coat',body,12,7)
     neck=empty('neck',(-.058,0,.130),body); ell('Neck',(-.066,0,.140),(.056,.056,.072),'coat',neck)
     head=empty('head',(-.082,0,.162),neck); ell('Head',(-.088,0,.166),(.062,.054,.056),'coat',head,12,7)
-    leaf('Beak',(-.112,0,.166),(-.162,0,.156),.028,.020,'beak',head)
+    # Pico macizo que nace ancho de la cara y se afina con una curva hacia
+    # abajo; el rombo de las plumas lo dejaba de perfil en punta de flecha.
+    loft('Beak',[(-.104,.168,.016,.015),(-.122,.165,.013,.012),(-.140,.160,.008,.008),(-.156,.153,.004,.004),(-.164,.148,.001,.001)],'beak',head,8)
     for s in (-1,1):
         eye('Eye_'+str(s),-.102,s*.023,.175,.008,head)
     wings=[]
