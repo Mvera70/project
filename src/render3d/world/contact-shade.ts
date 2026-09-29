@@ -130,9 +130,17 @@ export function createContactShade(cellsWide: number, cellsHigh: number): Contac
   texture.needsUpdate = true;
   uniforms.uContactShade.value = texture;
   uniforms.uContactSize.value.set(cellsWide, cellsHigh);
+  // Un campo que crece o una puerta que cambia de hoja también es «un edificio
+  // que cambia», y rehacer la máscara son unos 4 ms de CPU y 516 KB de subida
+  // (medido en la villa 7/60): sólo se rehace si cambian las bases.
+  let drawn = '';
   return {
     update(buildings): void {
-      (texture.image.data as Uint8Array).set(contactMask(cellsWide, cellsHigh, contactBases(buildings), texels, reachNow));
+      const bases = contactBases(buildings);
+      const key = `${reachNow}|${bases.map((base) => `${base.minX},${base.minZ},${base.maxX},${base.maxZ}`).join(';')}`;
+      if (key === drawn) return;
+      drawn = key;
+      (texture.image.data as Uint8Array).set(contactMask(cellsWide, cellsHigh, bases, texels, reachNow));
       texture.needsUpdate = true;
     },
     dispose(): void {
