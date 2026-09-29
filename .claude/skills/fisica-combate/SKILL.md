@@ -98,15 +98,23 @@ pieza caída sube lo que el render mide sobre el modelo. Al llegar uno nuevo:
 1. `npx vitest run tests/fast/hunt-bodies.test.ts`: si falla, el mensaje trae
    la caja nueva; se copia en `PREY_MODEL`. Si el oso trae otro `attack`, la
    misma prueba pide cambiar `WARNING_SECONDS` (`life/bear.ts`).
-2. Si la forma del animal cambia mucho (un oso más largo de cuello, un ciervo
-   sin cornamenta), revisar `TORSO`: la cápsula tiene que ser el tronco y caber
-   en la caja (lo vigila la prueba).
+2. La misma prueba compara la cápsula con **la malla del tronco** de cada GLB
+   (`TRUNK_MESH`: `Torso`, `Barrel`, `Massive_Torso`, `Plump_Body`) y, si no
+   casan, dice cuánto mide el tronco y dónde va su eje: con eso se ajusta
+   `TORSO` (radio, medio lado corto de su sección; eje, su centro). **La caja
+   no es el tronco**: la del ciervo la ensancha la cuerna, y con la fracción
+   vieja su cápsula salía casi el doble de ancha que el ciervo. Si el modelo
+   nuevo llama de otra forma a su tronco, se cambia el nombre en la prueba.
+   Así se hizo con los de la PR #3 (ciervo nuevo, jabalí 8 cm más bajo, oso v4).
 3. `npx tsx tools/reports/hunt-report.ts` y
    `npx tsx tools/reports/bear-visit-report.ts`: el reparto de finales y la
    visita, comparados con `artifacts/physics/AN-5/`. Si cambian, la cifra va a
    Vera.
 4. La cabeza del modelo tiene que seguir en -X (`effects/animal-motion.ts`):
    si no, el render lo gira mal y el pecho y la grupa se cambian.
+5. La pieza caída se apoya en el costado **de su tronco** (`PREY_BODY.flank`,
+   que el render usa para las presas): lo vigila `graphics-animal-motion.test.ts`
+   con el ciervo, cuya cuerna es más ancha que el cuerpo.
 
 ## 4 · Trampas que ya costaron una tarde
 

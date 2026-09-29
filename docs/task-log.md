@@ -22,7 +22,7 @@ lo que toca se queda, la pieza cae de costado y el parte espera a que se vea.
 valles, `artifacts/physics/AN-5/antes.txt` y `despues.txt`; la medida es
 determinista, dos pasadas idénticas): antes **ninguna caza con lanza llegaba a
 darse** (0 % en ciervo, jabalí y oso); ahora ciervo 79 %, jabalí 50 %, oso
-17 %. La caza menor, que caía por suerte (67–68 %), cae ahora del 35 al 53 %
+15 %. La caza menor, que caía por suerte (67–68 %), cae ahora del 35 al 53 %
 porque se falla de verdad; el ciervo con arco, del 83 al 67 %; el jabalí con
 arco, igual (46 %). **Si la caza menor debe caer más**, las palancas son de
 una línea, en `hunt-encounter.ts`: el pulso (`AIM_SIGMA`) y dónde se planta el
@@ -34,12 +34,16 @@ y el conejo se espantan: medido, plantado a 4,2 la perdiz con honda caía 3 de
 7/30, de 9,5 s fuera a 63 (se mete a la tercera); en 3/30, de 62,7 a 102,6; en
 los otros tres ya estaba fuera el rato entero. Media, de 74,8 a 93,5 s.
 
-**Los modelos nuevos:** cuando llegue uno, `hunt-bodies.test.ts` falla con su
-caja nueva en el mensaje; se copia a `PREY_MODEL`, se remiran las proporciones
-del tronco (`TORSO`) con el modelo delante y se remiden `hunt-report.ts` y
-`bear-visit-report.ts` contra `artifacts/physics/AN-5/` (skill
-`fisica-combate`, §3b). Si el oso trae otro `attack`, la misma prueba avisa de
-que el aviso ya no dura lo que su clip.
+**Los modelos nuevos llegaron al cerrar**: la PR #3 (ciervo nuevo, jabalí 8 cm
+más bajo, oso v4) entró en `main` y se fusionó antes de abrir la PR de AN-5.
+`hunt-bodies.test.ts` saltó con las tres cajas nuevas, como se diseñó, y al
+seguir el procedimiento salió que **la caja no es el tronco**: la del ciervo
+la ensancha la cuerna y su cápsula salía casi el doble de ancha que el ciervo.
+Ahora cada cápsula sale de la malla del tronco del GLB, con una prueba que las
+compara, y la pieza caída se apoya en el costado de su tronco (el ciervo
+flotaba sobre su cuerna). En la caza sola, en valle: el ciervo con arco sigue
+cobrándose el 67 % y queda malherido el 21 % en vez del 29; el oso, del 17 al
+15 %; lo demás, igual. Para el siguiente modelo: skill `fisica-combate`, §3b.
 
 **Tomas** (`artifacts/graphics/AN-5/`, `take.sh`): el conejo 7/22 con honda;
 el jabalí 7/24 con lanza (dos estocadas bajas; la empalizada queda entre la

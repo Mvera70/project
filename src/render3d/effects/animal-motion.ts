@@ -25,10 +25,11 @@
 // el eje del ancho (Z) y no sobre el del largo (X, la cabeza en -X): la pieza
 // cobrada quedaba de pie sobre el hocico, medio enterrada (medido: el jabalí
 // caído medía 0,71 de alto con 0,29 bajo el suelo). Ahora rueda sobre su eje
-// largo y se apoya en el costado: sube lo que mide de medio ancho.
+// largo y se apoya en el costado: sube lo que mide de medio ancho su tronco.
 import { AnimationMixer, Box3, Group, LoopOnce, Mesh, SkinnedMesh, type AnimationAction, type Object3D } from 'three';
 import type { LoadedAsset } from '../assets';
 import type { Animal } from '@derive/animals';
+import { PREY_BODY } from '../life/hunt-bodies';
 import { dogGestures } from './animal-gestures';
 
 /** Correr abre la zancada lo mismo que abre las patas (`animal-gestures.ts`). */
@@ -92,7 +93,12 @@ export class AnimalMotion {
   private distance = 0;
   private readonly phase: number;
 
-  /** Medio ancho del modelo en reposo: lo que sube al tumbarse de costado. */
+  /**
+   * Lo que sube al tumbarse de costado: medio ancho del tronco, que es sobre lo
+   * que se apoya. Para las presas, el de la caza (`PREY_BODY`, medido sobre la
+   * malla del tronco); para los demás, medio ancho del modelo en reposo. Con lo
+   * más ancho del modelo, el ciervo quedaba flotando sobre su cuerna.
+   */
   private readonly flank: number;
 
   constructor(readonly kind: Animal['kind'], object: Object3D, asset: LoadedAsset, id: number) {
@@ -101,7 +107,8 @@ export class AnimalMotion {
     this.group.rotation.order = 'YXZ';
     this.group.add(object);
     const rest = new Box3().setFromObject(object);
-    this.flank = Number.isFinite(rest.max.z - rest.min.z) ? (rest.max.z - rest.min.z) / 2 : 0;
+    const trunk = (PREY_BODY as Partial<Record<Animal['kind'], { readonly flank: number }>>)[kind];
+    this.flank = trunk?.flank ?? (Number.isFinite(rest.max.z - rest.min.z) ? (rest.max.z - rest.min.z) / 2 : 0);
     object.traverse(node => {
       // Sin sombra (27 sep 2026): un animal a esta distancia apenas la deja ver,
       // y cada malla con sombra se dibuja dos veces. Eran 177 llamadas en la villa.

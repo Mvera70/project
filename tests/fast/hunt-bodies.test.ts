@@ -1,9 +1,12 @@
 // AN-5b · El cuerpo que decide un tiro de caza es el que se pinta: la cápsula
-// de cada presa cabe en la caja de su modelo, y lo que está de pie mide lo que
-// dice el catálogo. Si un modelo cambia de talla, esta prueba lo dice.
+// de cada presa cabe en la caja de su modelo y es la malla de su tronco, y lo
+// que está de pie mide lo que dice el catálogo. Si un modelo cambia de talla o
+// de forma, esta prueba lo dice con la medida nueva en el mensaje.
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { Box3, Vector3 } from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { BEAR_RISEN, PREY_BODY, PREY_MODEL, STANDING_HEIGHT, standingOf } from '../../src/render3d/life/hunt-bodies';
 import { WARNING_SECONDS } from '../../src/render3d/life/bear';
 import { TERRAIN_CODE } from '../../src/engine/state';
@@ -46,10 +49,36 @@ describe('AN-5b · los cuerpos de la caza', () => {
     expect(2 * body.radius, 'ancho').toBeLessThanOrEqual(width + 1e-9);
     expect(body.centre + body.radius, 'lomo').toBeLessThanOrEqual(height + 1e-9);
     expect(body.centre - body.radius, 'vientre').toBeGreaterThan(0);
-    // Y es un tronco de verdad: al menos dos tercios del ancho del modelo.
-    expect(2 * body.radius, 'no es un palillo').toBeGreaterThanOrEqual(width * 0.66);
-    // Caída, sube lo que el render la sube: medio ancho del modelo.
-    expect(body.flank, 'costado').toBeCloseTo(width / 2, 2);
+    // Y es un tronco de verdad, no un palillo: al menos la mitad del ancho del
+    // modelo (la cuerna del ciervo ensancha su caja; su tronco es el 58 %).
+    expect(2 * body.radius, 'no es un palillo').toBeGreaterThanOrEqual(width * 0.5);
+    // Caída, se apoya en el costado de su tronco (lo que prueba el render en
+    // `graphics-animal-motion.test.ts`), no en lo más ancho del modelo.
+    expect(body.flank, 'costado').toBeCloseTo(body.radius, 6);
+  });
+
+  /**
+   * La malla del tronco de cada modelo publicado. El conejo no la tiene aparte
+   * (su cuerpo lleva las orejas) y se queda con su caja.
+   */
+  const TRUNK_MESH: Partial<Record<keyof typeof PREY_BODY, string>> = {
+    partridge: 'Plump_Body', deer: 'Torso', boar: 'Barrel', bear: 'Massive_Torso',
+  };
+  it.each(Object.entries(TRUNK_MESH))('la cápsula de %s es el tronco que se pinta (`%s`)', async (species, mesh) => {
+    const bytes = readFileSync(`public/assets/valley3d/${species}.glb`);
+    const gltf = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
+    gltf.scene.updateMatrixWorld(true);
+    const trunk = gltf.scene.getObjectByName(mesh);
+    expect(trunk, `${species} ya no trae «${mesh}»: mide su tronco y ajusta TORSO (hunt-bodies.ts)`).toBeDefined();
+    const box = new Box3().setFromObject(trunk!);
+    const drawn = box.getSize(new Vector3());
+    const centre = (box.min.y + box.max.y) / 2;
+    // Medio lado corto de su sección: la cápsula es redonda.
+    const radius = Math.min(drawn.y, drawn.z) / 2;
+    const seen = `el tronco mide ${drawn.x.toFixed(3)} × ${drawn.y.toFixed(3)} × ${drawn.z.toFixed(3)} con el eje a ${centre.toFixed(3)}`;
+    const body = PREY_BODY[species as keyof typeof PREY_BODY];
+    expect(Math.abs(body.centre - centre), `eje de ${species}: ${seen}`).toBeLessThan(0.01);
+    expect(Math.abs(body.radius - radius), `radio de ${species}: ${seen}`).toBeLessThan(0.01);
   });
 
   it('el oso alzado es más alto que a cuatro patas y cabe en su largo', () => {

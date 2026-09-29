@@ -215,9 +215,11 @@ sin la autorización de Vera.
   recorrido. Un bucle (`bow_draw`) se envuelve con su duración.
 - **La pieza caída se tumba sobre su eje largo** (AN-5c): el modelo mira a -X,
   así que el vuelco va en X con el orden `YXZ` (primero el rumbo) y sube medio
-  ancho del modelo. Con `rotation.z` se ponía de pie sobre el hocico, medio
-  enterrada, y nadie lo vio en cinco rondas porque la prueba miraba el ángulo
-  y no la caja: mide la caja del cuerpo, no el número de la implementación.
+  ancho **de su tronco** (`PREY_BODY.flank` en las presas): con medio ancho del
+  modelo, el ciervo nuevo flotaba sobre su cuerna, que es más ancha que él.
+  Con `rotation.z` se ponía de pie sobre el hocico, medio enterrada, y nadie
+  lo vio en cinco rondas porque la prueba miraba el ángulo y no la caja: mide
+  la caja del cuerpo, no el número de la implementación.
 - **El parte de una escena espera a que se vea** (AN-5a, `settled`): si lo
   que se entrega al motor acaba la escena, la pieza cobrada desaparece en el
   fotograma del golpe. La semana ya esperaba a la caza; ahora espera también

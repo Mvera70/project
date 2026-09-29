@@ -568,8 +568,10 @@ cobrada desaparecía en el fotograma en que se daba el parte.
 - **Un mundo de contacto de Rapier sólo para la caza** (`createContactWorld`):
   el suelo del juego, lo que está de pie **con la altura con que se pinta**
   (empalizada 0,87, casa 1,58; `hunt-bodies.ts` contra el catálogo) y el cuerpo
-  que se pinta de la presa: una cápsula a lo largo del tronco sacada de las
-  cajas del catálogo. La montaña y el agua no son paredes.
+  que se pinta de la presa: una cápsula a lo largo del tronco, medida sobre la
+  malla del tronco de su GLB (con los animales nuevos de la PR #3: la caja del
+  ciervo la ensancha la cuerna y no sirve). La montaña y el agua no son
+  paredes.
 - Cada tiro vuela su parábola y **cada paso se barre contra ese mundo**: lo
   primero que toca decide. La estocada es el tramo de la mano a la punta tal
   como se pinta: si hay madera delante, **se clava en ella** y el gesto se

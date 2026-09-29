@@ -27,25 +27,36 @@ import { WALLED } from './terrain';
 export const PREY_MODEL: Readonly<Record<HuntSpecies, { readonly length: number; readonly height: number; readonly width: number }>> = {
   partridge: { length: 0.313, height: 0.204, width: 0.156 },
   rabbit: { length: 0.313, height: 0.285, width: 0.144 },
-  deer: { length: 0.776, height: 0.853, width: 0.28 },
-  boar: { length: 0.713, height: 0.42, width: 0.24 },
-  bear: { length: 1.16, height: 0.75, width: 0.537 },
+  deer: { length: 0.654, height: 0.765, width: 0.327 },
+  boar: { length: 0.713, height: 0.34, width: 0.24 },
+  bear: { length: 1.166, height: 0.728, width: 0.51 },
 };
 
 /**
  * Qué parte de la caja es tronco —lo que para una flecha—, sin cabeza, patas,
  * orejas ni cornamenta: el ancho del tronco, su largo de extremo a extremo y la
  * altura de su eje, como fracción del ancho, el largo y el alto del modelo.
- * TUNE, medido el 29 sep 2026 sobre los modelos de entonces: el conejo tiene
- * las orejas (su eje va a un tercio del alto) y el ciervo la cornamenta; el
- * jabalí es tronco casi entero.
+ *
+ * TUNE, medido sobre la malla del tronco de cada GLB publicado (29 sep 2026):
+ * el radio es medio lado corto de su sección y el eje, su centro.
+ *
+ * - **Ciervo** (el de la PR #3), `Torso`: 0,43 de largo, 0,19 de ancho, eje a
+ *   0,357. La caja es más ancha que el tronco porque la cuerna mide 0,327:
+ *   con la fracción de antes la cápsula salía casi el doble de ancha que el
+ *   ciervo que se pinta (0,13 de radio contra 0,07 del modelo viejo).
+ * - **Jabalí** (PR #3, `BOAR_DROP` 0,08), `Barrel`: el mismo barril, ocho
+ *   centímetros más bajo; eje a su centro, 0,208.
+ * - **Oso** (el v4 de la PR #3), `Massive_Torso`: de 0,235 a 0,728 de alto, eje
+ *   a 0,48; de largo, del cuello a la grupa, como el de antes.
+ * - Perdiz y conejo, sin cambio de modelo: `Plump_Body` (eje 0,10, radio
+ *   0,075) y el cuerpo del conejo sin las orejas (eje a un tercio del alto).
  */
 const TORSO: Readonly<Record<HuntSpecies, { readonly width: number; readonly length: number; readonly axis: number }>> = {
   partridge: { width: 0.96, length: 0.67, axis: 0.49 },
   rabbit: { width: 0.9, length: 0.735, axis: 0.316 },
-  deer: { width: 0.93, length: 0.644, axis: 0.586 },
-  boar: { width: 1, length: 0.785, axis: 0.595 },
-  bear: { width: 0.93, length: 0.776, axis: 0.56 },
+  deer: { width: 0.581, length: 0.657, axis: 0.467 },
+  boar: { width: 1, length: 0.785, axis: 0.612 },
+  bear: { width: 0.967, length: 0.776, axis: 0.66 },
 };
 
 type TorsoShape = { readonly radius: number; readonly halfLength: number; readonly centre: number; readonly flank: number };
@@ -53,7 +64,9 @@ type TorsoShape = { readonly radius: number; readonly halfLength: number; readon
 /**
  * El tronco de cada presa, en celdas: una cápsula a lo largo del cuerpo, sacada
  * de su caja (`PREY_MODEL`) con sus proporciones (`TORSO`), y lo que sube al
- * tumbarse de costado —medio ancho, como la sube `effects/animal-motion.ts`—.
+ * tumbarse de costado: medio ancho **del tronco**, que es sobre lo que se apoya
+ * (`effects/animal-motion.ts` lo sube igual). La cuerna del ciervo, más ancha,
+ * se hunde en la hierba en vez de dejarlo flotando.
  * `tests/fast/hunt-bodies.test.ts` vigila que cada cápsula quepa en su modelo.
  */
 export const PREY_BODY: Readonly<Record<HuntSpecies, TorsoShape>> = Object.fromEntries(
@@ -61,7 +74,7 @@ export const PREY_BODY: Readonly<Record<HuntSpecies, TorsoShape>> = Object.fromE
     const model = PREY_MODEL[species], torso = TORSO[species];
     const radius = torso.width * model.width / 2;
     return [species, { radius, halfLength: Math.max(0, torso.length * model.length / 2 - radius),
-      centre: torso.axis * model.height, flank: model.width / 2 }];
+      centre: torso.axis * model.height, flank: radius }];
   })) as Record<HuntSpecies, TorsoShape>;
 
 /**

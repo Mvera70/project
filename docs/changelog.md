@@ -46,8 +46,21 @@ matriz (§2.7).
   `artifacts/physics/AN-5/`): la caza menor cae menos que con la suerte
   —perdiz y conejo, del 67–68 % al 35–53 %: ahora se falla de verdad—, **las
   cazas con lanza pasan de no darse nunca (0 %) a darse** —ciervo 79 %,
-  jabalí 50 %, oso 17 %—, el ciervo con arco baja del 83 % al 67 % y el jabalí
-  con arco se queda en el 46 %.
+  jabalí 50 %, oso 15 %—, el ciervo con arco baja del 83 % al 67 % y el jabalí
+  con arco se queda en el 46 %. Son las cifras con los animales nuevos.
+- **Con los animales nuevos de la PR #3**, que llegaron a `main` mientras se
+  cerraba esta ronda y se fusionaron antes de la PR: la prueba de las cajas
+  saltó con las tres nuevas (ciervo, jabalí, oso), como se diseñó. **La caja no
+  es el tronco**: la del ciervo la ensancha la cuerna, y con la fracción vieja
+  su cápsula salía casi el doble de ancha que el ciervo que se pinta. Ahora
+  cada cápsula se mide sobre **la malla del tronco** del GLB (`Torso`,
+  `Barrel`, `Massive_Torso`, `Plump_Body`) y una prueba las compara; el jabalí
+  conserva su barril ocho centímetros más abajo, y el oso v4 sube el eje a su
+  tronco. La pieza caída se apoya en el costado de su tronco —el ciervo
+  flotaba sobre su cuerna—. Lo que mueve en la caza sola, en valle: el ciervo
+  con arco, igual en cobradas (67 %) y de 29 a 21 % malherido; el oso, de 17 a
+  15 %; el resto, igual (`artifacts/physics/AN-5/despues.txt`, y las de los
+  modelos de antes en `despues-modelos-viejos.txt`).
 - **Al cerrar, la prueba de la lanza clavada no comprobaba nada**: en su
   semilla la estocada salía al aire y la prueba volvía sin mirar. Recorriendo
   veinte salieron dos defectos: la estocada baja clavada no se quedaba en su

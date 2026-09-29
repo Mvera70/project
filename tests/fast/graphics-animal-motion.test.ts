@@ -165,4 +165,14 @@ describe('AN-1 · rumbo, carreras, mezclas y caída de los animales',()=>{
     expect(lying.min.y,'sobre el suelo, no enterrado').toBeGreaterThan(-0.02);
     fauna.dispose();lib.dispose();
   });
+  it('el ciervo caído se apoya en el costado de su tronco: la cuerna, más ancha, no lo deja flotando',async()=>{
+    const lib=await library('deer'),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
+    for(let i=0;i<=90;i++)fauna.paint([{id:8,kind:'deer',x:1,y:1,action:'down'}],i/60);
+    fauna.group.updateMatrixWorld(true);
+    const trunk=fauna.group.children[0]!.getObjectByName('Torso');
+    expect(trunk,'el ciervo publicado trae su tronco').toBeDefined();
+    const lying=new Box3().setFromObject(trunk!);
+    expect(Math.abs(lying.min.y),'el tronco toca el suelo').toBeLessThan(0.02);
+    fauna.dispose();lib.dispose();
+  });
 });
