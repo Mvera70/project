@@ -129,6 +129,15 @@ calidad de las zancadas: para eso conserva las tomas lentas de 15 fps.
   `python3 artifacts/graphics/AN-4b/trace-strip.py <toma> --find | --id N [--animal]`.
 - `export VALLEY_CHROMIUM=/opt/pw-browsers/chromium` cuando Playwright pide
   un Chromium que no está; un solo Chromium a la vez, encadenados con un
-  script y un `grep` de su marca de fin.
+  script y un `grep` de su marca de fin. Para saber si hay uno rodando,
+  `ps -eo args | grep "observe-life[.]mjs"`: el patrón con corchetes no se
+  encuentra a sí mismo (`pkill -f` con el texto de tu propia orden mata tu
+  propia shell).
+- **Rueda el empaquetado de `artifacts/graphics/G-10/game`**: tras tocar
+  código, `npx tsx tools/graphics/bundle-game.ts` primero.
+- La visita del oso dura 3 s desde el paso 0 (AN-4c): `--lead 0` y `--look`
+  en la guarida (`bearDen` en la traza). Si un actor que el motor pidió no
+  sale, mira la traza desde el paso 0: puede no haber nacido en el juego
+  (el oso no nacía con los troncos de `solidTerrain` hasta AN-4c).
 - Las comparaciones a escala nativa (GIF «antes | después» a 1:1 y tira):
   `python3 artifacts/graphics/AN-4/compare/build-compare.py`.

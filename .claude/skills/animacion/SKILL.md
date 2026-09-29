@@ -172,6 +172,21 @@ sin la autorización de Vera.
   `--means bows,arms --raid N --assault --follow -9000`. La oferta de caza de
   una semana es un hash de semilla y semana (`huntOpportunity`): se busca sin
   correr el motor. `--beast` sólo actúa con `--aftermath`.
+- **Que el motor lo pida no quiere decir que la pantalla lo enseñe** (AN-4c):
+  la visita del oso no nacía nunca en partida porque su guarida exigía una
+  celda de bosque libre y el juego pone un tronco en cada una
+  (`solidTerrain`); la prueba pasaba porque montaba la jornada sobre el
+  terreno a secas. Si una toma no encuentra a un actor, mira `bearDen` (o lo
+  que toque) en la traza desde el paso 0 antes de culpar a la semilla, y
+  prueba con la biblioteca real (`loadAssets` + `solidTerrain`).
+- El oso avisa en el paso 0 y se va en el 90 (el leñador está junto a la
+  guarida): se rueda con `--lead 0` y `--look` en la guarida. La presa de una
+  caza puede quedar fuera de cuadro (la cámara va al cazador): `--look` en la
+  presa. **La honda usa los gestos del arco** (`hunt-encounter.ts`): límite
+  anotado en `encargos-3d.md`.
+- El observatorio abre el empaquetado de `artifacts/graphics/G-10/game`: tras
+  tocar código, `npx tsx tools/graphics/bundle-game.ts` antes de rodar, o la
+  toma enseña el juego de antes.
 - Las tiras de un actor siguiendo la traza:
   `python3 artifacts/graphics/AN-4b/trace-strip.py <toma> --find` y
   `--id N [--animal]`; escala las coordenadas al PNG, que la resolución
