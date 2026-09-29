@@ -219,7 +219,7 @@ function bird() {
       [Y, (t) => (t > 0.6 ? 0.35 * Math.sin((Math.PI * (t - 0.6)) / 0.4) : 0)]] },
   });
   motion.push({ name: 'idle', seconds: idleSeconds, loop: true, strideLength: null });
-  // La gallina y el cuervo del campo no vuelan en el juego: andan y
+  // La gallina, el cuervo del campo y el pato no vuelan en el juego: andan y
   // picotean, y hasta ahí. Sólo la perdiz de caza despega.
   if (species !== 'partridge') return;
   // El vuelo en bucle: las alas arriba y abajo, las patas recogidas. La altura
@@ -271,7 +271,7 @@ function durationOf(animation) {
 }
 
 if (QUADS[species] !== undefined) quadruped(QUADS[species]);
-else if (['partridge', 'hen', 'crow'].includes(species)) bird();
+else if (['partridge', 'hen', 'crow', 'duck'].includes(species)) bird();
 else if (species === 'fish') fish();
 else throw new Error(`Especie sin clips: ${species}`);
 

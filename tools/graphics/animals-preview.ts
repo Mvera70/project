@@ -17,6 +17,8 @@ const sun=new DirectionalLight(0xffeed5,3);sun.position.set(-3,5,4);scene.add(su
 const plane=new Mesh(new PlaneGeometry(20,20),new MeshStandardMaterial({color:'#7f946f',roughness:1}));plane.rotation.x=-Math.PI/2;plane.position.y=-.015;scene.add(plane);
 // En el banco se descubre el cuerpo del pez; en partida conserva su cota bajo el agua.
 if(PREVIEW_ID==='fish'){plane.position.y=-.2;plane.material.color.set('#638c91');}
+// El pato flota: la lámina de agua del juego está diez centésimas bajo el prado.
+if(PREVIEW_ID==='duck'){plane.position.y=-.10;plane.material.color.set('#638c91');}
 const fauna=new Fauna(k=>library.instance(k),k=>library.get(k));scene.add(fauna.group);
 // Las siete especies de G-23 conservan su encuadre; las demás se encuadran por
 // su caja tal como las pinta el juego, que es la escala que ve el jugador.
@@ -28,7 +30,7 @@ const camera=new OrthographicCamera(-scale*.8,scale*.8,scale*.67,-scale*.67,.01,
 let time=0,x=0;
 window.sample=(t,moving)=>{
   while(time<t-1e-8){const dt=Math.min(1/60,t-time);time+=dt;if(moving)x-=.09*dt;fauna.paint([{id:71,kind:PREVIEW_ID,x,y:0}],time);}
-  const floor=PREVIEW_ID==='fish'?-.14:0;
+  const floor=PREVIEW_ID==='fish'?-.14:PREVIEW_ID==='duck'?-.16:0;
   camera.position.set(x-scale*1.7,scale*1.2+floor,scale*1.9);camera.lookAt(x,scale*.24+floor,0);
   scene.updateMatrixWorld(true);renderer.render(scene,camera);
   const joints:Record<string,number[]>={};let vertices=0;let finite=true;

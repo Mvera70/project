@@ -122,3 +122,16 @@ crow` le da el paso y el picoteo, sin vuelo, como hoy.
 - [crow.glb](crow.glb) · [perfil](crow-profile.png) · [tres cuartos](crow-three-quarter.png) ·
   [andando](crow-walk.png)
 - `python3 build-models.py -- crow`
+
+## El pato (29 sep 2026) — candidato, **sin publicar**
+
+`duck()` en `build-models.py`: un ánade real macho facetado sobre la
+estructura de la gallina, con casco de barca que flota a la altura a la que el
+juego lo pone (línea de agua a 0,06 del suelo del modelo), cabeza verde con
+collar blanco, pecho castaño, lomo gris, espejuelo azul, cola negra rizada y
+pico plano de pato. Mismo tamaño que el de G-23; `rigid-clips.mjs … duck`.
+El banco de fauna pinta ahora la lámina de agua para el pato.
+
+- [duck.glb](duck.glb) · [perfil](duck-profile.png) · [tres cuartos](duck-three-quarter.png) ·
+  [nadando](duck-swim.png)
+- `python3 build-models.py -- duck`
