@@ -31,7 +31,14 @@ probó una con las barras tumbadas y sin púas y la descartó. **La mula y el
 jabalí, publicados** (v5.11): patas más cortas y, el jabalí, colmillos mayores.
 Todo integrado sobre la animación de la PR #2 (fusión de `main`). **Pendiente:**
 la ubre de la vaca, que la barriga gorda tapa. **Regla de Vera desde hoy: no se
-sube nada sin su permiso final.** Nada se sube sin su permiso final. El banco de fauna encuadra ya cada
+sube nada sin su permiso final.**
+
+**La CI que se cortaba** (rota desde el 28 sep): los tres trabajos tenían un
+tope de 10 minutos y la suite rápida sola tarda más, así que salían
+«cancelled» sin decir nada. Topes de 45 (`fast`), 30 (`journeys`, ahora
+trabajo propio) y 30 (`browser`). Al dejar de cortarse asoma lo que ya se
+sabía: las dos jornadas rojas a propósito y las ~13 de `test:shots` que
+también fallan en `main` desde el rediseño de interfaz. Nada se sube sin su permiso final. El banco de fauna encuadra ya cada
 especie por su caja y mira a su centro. **Pendiente:** la ubre de la vaca, que la
 barriga gorda tapa (se probó sacarla y Vera prefirió seguir). El oso no se puede fotografiar dentro de la partida sin
 cazar antes la cadena entera: no hay `?hunt=`.
