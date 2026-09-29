@@ -8,7 +8,7 @@ const url=pathToFileURL(path.join(dir,'index.html')).href;
 const browser=await chromium.launch({headless:true,channel:'msedge'});
 const page=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:1});
 const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>errors.push(r.url()));
-const options=[['ivory','A · Marfil','Claro, con canto de plata.'],['slate','B · Pizarra azul','Recomendada: enlaza con las cintas.'],['iron','C · Hierro','Sobrio, mate y más severo.']];
+const options=[['ivory','A · Marfil','Elegida por Vera: clara, con canto de plata.'],['slate','B · Pizarra azul','Alternativa conservada.'],['iron','C · Hierro','Alternativa conservada.']];
 for(const [id] of options){
  await page.goto(`${url}?scene=valley&controls=${id}`);
  await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(180);
@@ -25,7 +25,7 @@ await page.mouse.move(45,715);await page.mouse.down();await page.mouse.move(115,
 const dragged=await page.evaluate(()=>window.r1Compass.getAngles());
 if(north.yaw!==0||dragged.yaw===0||errors.length)throw Error(JSON.stringify({north,dragged,errors}));
 fs.writeFileSync(path.join(dir,'qa-compass.json'),JSON.stringify({initial,rotated,north,dragged,errors,scope:'Solo esfera de la maqueta; sin cámara del juego.'},null,2)+'\n');
-const html=`<!doctype html><html lang="es"><meta charset="utf-8"><title>V9 · Acabados pendientes de elección</title><style>body{margin:0;padding:20px;background:#e8ddc5;color:#302b26;font:16px Georgia}h1{font-size:24px;margin:0 0 8px}p{margin:0 0 16px}main{display:flex;gap:16px}figure{margin:0;width:390px}h2{font-size:21px;margin:8px 0}img{display:block;width:390px;height:236px}a{color:inherit}</style><h1>Tres acabados para los mandos del valle</h1><p>Todos conservados · elección pendiente de Vera · la navegación mantiene sus medallones de latón</p><main>${options.map(([id,title,desc])=>`<figure><h2>${title}</h2><p>${desc}</p><a href="index.html?scene=valley&controls=${id}"><img src="capturas/opcion-${id}.png" alt="${title}"></a></figure>`).join('')}</main><p style="margin-top:16px">GIVE, SEND y OPEN THE CART conservan su acabado hasta confirmar el alcance del cambio.</p></html>`;
+const html=`<!doctype html><html lang="es"><meta charset="utf-8"><title>V9 · Acabados conservados</title><style>body{margin:0;padding:20px;background:#e8ddc5;color:#302b26;font:16px Georgia}h1{font-size:24px;margin:0 0 8px}p{margin:0 0 16px}main{display:flex;gap:16px}figure{margin:0;width:390px}h2{font-size:21px;margin:8px 0}img{display:block;width:390px;height:236px}a{color:inherit}</style><h1>Tres acabados para los mandos del valle</h1><p>Marfil elegido por Vera · todas las variantes conservadas · la navegación mantiene sus medallones de latón</p><main>${options.map(([id,title,desc])=>`<figure><h2>${title}</h2><p>${desc}</p><a href="index.html?scene=valley&controls=${id}"><img src="capturas/opcion-${id}.png" alt="${title}"></a></figure>`).join('')}</main><p style="margin-top:16px">GIVE, SEND y OPEN THE CART conservan su acabado hasta confirmar el alcance del cambio.</p></html>`;
 fs.writeFileSync(path.join(dir,'opciones.html'),html);
 await page.setViewportSize({width:1242,height:390});
 await page.goto(pathToFileURL(path.join(dir,'opciones.html')).href);await page.evaluate(()=>Promise.all([...document.images].map(i=>i.decode())));

@@ -14,9 +14,9 @@ description: El estándar visual de la interfaz de The Valley: qué papel, qué 
 - Crónica y carro: un solo canto superior; reservar espacio real para título
   y cierre de 44 px. Ningún borde ornamental puede invadirlos.
 - Diferenciar los mandos de vista/pausa/velocidad/caza de los medallones de
-  navegación. Marfil, pizarra azul e hierro son alternativas pendientes de
-  elección; la recomendación azul no equivale a aprobación. Confirmar con
-  Vera si el cambio se extiende a GIVE, SEND y OPEN THE CART.
+  navegación. **Vera eligió marfil** para esa fila. Pizarra azul e hierro se
+  conservan como alternativas. Queda pendiente confirmar si el cambio se
+  extiende a GIVE, SEND y OPEN THE CART.
 - Bajo navegación y medallones: franja translúcida localizada; menú nítido
   y prioritario. Desactivar también por teclado los controles parcialmente
   ocultos y restaurarlos al salir de esa zona mediante scroll.

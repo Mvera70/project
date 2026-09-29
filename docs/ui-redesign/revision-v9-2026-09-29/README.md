@@ -8,7 +8,7 @@ La fuente anterior y sus capturas permanecen en `../texturas-v9-2026-09-29/`.
 1. **Brújula:** esfera hueca de tres anillas, N y S, material de latón generado con ImageGen. Reutiliza la proyección de `src/ui/camera-controls.ts`. Se puede arrastrar, girar 360° con flechas y orientar al norte con Home o toque. En la maqueta gira la esfera: todavía no está conectada a la cámara del juego.
 2. **Crónica:** se elimina el canto duplicado que invadía la cabecera.
 3. **Carro:** mismo ajuste; título con espacio propio y cierre separado, área de toque de 44 px, cabecera de al menos 60 px y 24 px arriba.
-4. **Mandos diferenciados:** [tres opciones](opciones.html), todas pendientes de elección. A: marfil; B: pizarra azul (recomendación); C: hierro mate. B aparece provisionalmente en las seis capturas. No hay acabado aprobado. Pendiente confirmar si Vera quiere extender el cambio a GIVE, SEND y OPEN THE CART; por ahora conservan su acabado anterior. Los nuevos mandos son demostraciones visuales, no ejecutan acciones del juego.
+4. **Mandos diferenciados:** Vera eligió **A: marfil** para la fila de vista, pausa, velocidad y caza. [Comparativa de tres opciones](opciones.html): B, pizarra azul, y C, hierro mate, quedan conservadas. Las seis capturas muestran marfil. Pendiente confirmar si Vera quiere extender el cambio a GIVE, SEND y OPEN THE CART; por ahora conservan su acabado anterior. Los nuevos mandos son demostraciones visuales, no ejecutan acciones del juego.
 5. **Navegación prioritaria:** franja translúcida limitada a la zona del menú, incluyendo el medallón elevado y 6 px de margen. Menú nítido encima. Los botones parcialmente tapados quedan `inert` (toque y teclado); al desplazarlos fuera recuperan su uso. La franja intercepta toques al fondo.
 
 ## Conservar para futuras versiones
@@ -17,8 +17,8 @@ Vera, 29 sep: «Ve guardando todo esto […] decida una u otra porque en el futu
 
 | Material | Archivo | Estado |
 |---|---|---|
-| Marfil | `assets/control-ivory.png` | Alternativa conservada |
-| Pizarra azul | `assets/control-slate.png` | Provisional para revisar, no aprobada |
+| Marfil | `assets/control-ivory.png` | Elegida por Vera para la fila de mandos |
+| Pizarra azul | `assets/control-slate.png` | Alternativa conservada |
 | Hierro mate | `assets/control-iron.png` | Alternativa conservada |
 | Latón de anillas | `assets/ring-metal.png` | Propuesta de adaptación de brújula |
 
@@ -42,4 +42,4 @@ node docs/ui-redesign/revision-v9-2026-09-29/capture.mjs
 node docs/ui-redesign/revision-v9-2026-09-29/review.mjs
 ```
 
-Python requiere Pillow; Node usa Playwright con Edge sin ventana. Abrir `index.html?scene=valley&controls=slate` (también `ivory` o `iron`), `?scene=chronicle` o `?scene=cart`. `opciones.html` enlaza las tres variantes. La portada elegida y la idea día/noche aplazada no cambian en esta revisión.
+Python requiere Pillow; Node usa Playwright con Edge sin ventana. Abrir `index.html?scene=valley` para marfil (también `&controls=slate` o `&controls=iron`), `?scene=chronicle` o `?scene=cart`. `opciones.html` enlaza las tres variantes. La portada elegida y la idea día/noche aplazada no cambian en esta revisión.

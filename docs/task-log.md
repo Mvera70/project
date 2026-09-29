@@ -3354,6 +3354,6 @@ y carro a 390×844 y 320×568; QA DOM de toque bloqueado, navegación activa y
 recuperación por scroll en `qa-point-5.json`. Brújula hueca con la proyección
 original, anillas con material ImageGen, N/S y giro por arrastre/teclado,
 comprobado en `qa-compass.json`; no conectada a la cámara real en esta maqueta.
-Tres acabados ImageGen para mandos (marfil, pizarra, hierro), pendientes de
-elección de Vera. Su petición de conservar todas las alternativas queda en
+Tres acabados ImageGen para mandos (marfil, pizarra, hierro); Vera eligió marfil
+para la fila de vista/pausa/velocidad/caza. Su petición de conservar todas las alternativas queda en
 README y skill `piel-del-valle`. No se ejecutaron pruebas del juego.

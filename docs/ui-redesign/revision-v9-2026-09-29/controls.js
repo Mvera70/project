@@ -1,8 +1,8 @@
-/* Variantes para revisión de Vera, no seleccionadas ni integradas. */
+/* Vera eligió marfil; las otras variantes se conservan para futuras revisiones. */
 (() => {
   const variants=['ivory','slate','iron'];
   const requested=new URLSearchParams(location.search).get('controls');
-  const variant=variants.includes(requested)?requested:'slate';
+  const variant=variants.includes(requested)?requested:'ivory';
   const url=new URL(`assets/control-${variant}.png`,document.currentScript.src).href;
   const ink=variant==='ivory'?'#3e3428':'#fff1d5';
   document.body.dataset.controlProposal=variant;
