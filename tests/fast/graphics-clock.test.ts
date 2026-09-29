@@ -228,7 +228,7 @@ describe('G-04 · los clips del aldeano', () => {
     // con piernas y brazos en ciclo y por eso gobernada por suelo recorrido.
     for (const name of ACTION_CLIPS) {
       if (name === 'flee') {
-        expect(VILLAGER_CLIPS[name]).toMatchObject({ seconds: 0.8, loop: true, strideLength: 0.44 });
+        expect(VILLAGER_CLIPS[name]).toMatchObject({ seconds: 0.8, loop: true, strideLength: 0.7 });
       } else {
         expect(VILLAGER_CLIPS[name].strideLength, `${name} no puede tener zancada`).toBeNull();
       }

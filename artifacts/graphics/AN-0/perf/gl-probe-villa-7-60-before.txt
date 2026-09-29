@@ -1,0 +1,1 @@
+{"frames":7,"calls":503,"tris":826018,"programs":42,"linkMs":11,"jsMedianMs":1.6,"jsP90Ms":5503,"seconds":53}

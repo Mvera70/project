@@ -98,3 +98,48 @@ persistente permanece fijo. Con `--live` avanzan el bucle de la aplicación y el
 comprueba varias noches y ticks, y distingue el total de residentes en cada amanecer
 porque puede haber bajas o cambios de vivienda. A ×64 y 2 fps se miden ciclos, no la
 calidad de las zancadas: para eso conserva las tomas lentas de 15 fps.
+
+## Lo que la ronda AN añadió (29 sep 2026)
+
+- `--viewport 390x844` (o `320x568`) mira el valle al tamaño de un móvil;
+  `--look X,Z` encuadra una coordenada sin seguir a nadie; `--follow ID
+  --zoom 0.18` a 15 fps durante 4–8 s es la toma de detalle de un cuerpo.
+- **Antes y después del mismo estado:** misma semilla, año, lead, actor,
+  cámara y zoom; el «antes» con `--page <empaquetado-anterior>/valley.html`
+  (se construye con el GLB viejo copiado a `public/assets/valley3d/` y se
+  restaura después). Las trazas casan fotograma a fotograma (mismo
+  `engineTick`, mismas posiciones).
+- **Saltos y ritmo se miden sobre `trace.json`** (posiciones por fotograma,
+  pasos exactos): `film.mjs` rueda en tiempo real y bajo SwiftShader tarda
+  8 s por fotograma, así que su informe cuenta el reloj como saltos.
+- `--hunt` arranca la caza de la semana con el gancho `__valleyHunt` (lo
+  mismo que tocar la señal, sin depender de que esté en cuadro) y, si no
+  empieza, dice el motivo (`no-offer`, `no-prey`, `no-hunter`…): la
+  oportunidad la ofrece el motor (`huntOpportunity`), no el observatorio. La
+  traza lleva `hunt` (fase, especie, arma, acción de la presa, clip del
+  cazador) fotograma a fotograma.
+- `--hunted partridge,rabbit…` da por cazadas esas especies (abre las cazas
+  siguientes); con `--happening bear_in_the_wood` y el jabalí cazado llega la
+  visita del oso. `--beast` sólo actúa junto a `--aftermath`. Un asalto con
+  arqueros: `--means bows,arms --raid N --assault --follow -9000`.
+  `fps` tiene que dividir a 30; `page.goto` espera 240 s (una villa con
+  asalto tarda en cargar bajo SwiftShader).
+- Las tiras de un actor siguiendo la traza, escaladas al PNG que la
+  resolución adaptativa puede bajar:
+  `python3 artifacts/graphics/AN-4b/trace-strip.py <toma> --find | --id N [--animal]`.
+- `export VALLEY_CHROMIUM=/opt/pw-browsers/chromium` cuando Playwright pide
+  un Chromium que no está; un solo Chromium a la vez, encadenados con un
+  script y un `grep` de su marca de fin. Para saber si hay uno rodando,
+  `ps -eo args | grep "observe-life[.]mjs"`: el patrón con corchetes no se
+  encuentra a sí mismo (`pkill -f` con el texto de tu propia orden mata tu
+  propia shell).
+- **Rueda el empaquetado de `artifacts/graphics/G-10/game`**: tras tocar
+  código, `npx tsx tools/graphics/bundle-game.ts` primero.
+- La visita del oso empieza en el paso 0 con el oso en la boca de su cueva,
+  al pie de la montaña (AN-4c/AN-4d): `--lead 0` y `--look` en la cueva
+  (el oso de `wild` en el fotograma 0), con `--zoom 0.5` para que se lea la
+  ladera. Si un actor que el motor pidió no sale, mira la traza desde el
+  paso 0: puede no haber nacido en el juego (el oso no nacía con los troncos
+  de `solidTerrain` hasta AN-4c).
+- Las comparaciones a escala nativa (GIF «antes | después» a 1:1 y tira):
+  `python3 artifacts/graphics/AN-4/compare/build-compare.py`.

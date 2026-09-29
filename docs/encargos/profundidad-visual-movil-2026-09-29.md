@@ -457,7 +457,8 @@ Todo con el panel de taller abierto (el reparto del fotograma: dibujo, vida,
   `tools/graphics/shot.mjs`, las cuatro sondas de
   `tools/graphics/performance/`, `tools/README.md`, `tools/graphics/README.md`
   y la skill `performance`.
-- **Choca al fusionar con la tanda AN** (`ccr-48790acc-ibi65c`): las dos tocan
-  `renderer.ts`, `gl-probe.mjs`, `shot.mjs` y `tools/README.md`, y las dos
-  añadieron `VALLEY_CHROMIUM` con el mismo nombre. Nada de fondo, pero hay que
-  resolverlo a mano.
+- **Fusionada con `main` después de la PR #2** (la tanda AN, `da8836f`), el
+  mismo día: `renderer.ts`, `shot.mjs` y `tools/README.md` entraron solos; en
+  `gl-probe.mjs` y `scene-report.mjs` las dos tandas habían añadido
+  `VALLEY_CHROMIUM` con el mismo nombre, y se quedó la versión que hace las
+  dos cosas; los cuadernos llevan las entradas de las dos.

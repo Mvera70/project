@@ -12,11 +12,10 @@ import { existsSync, readdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
-// GV-0 · la ruta explícita (`VALLEY_CHROMIUM`), la de Windows si existe, o la
-// que traiga Playwright: sin respaldo esta sonda sólo arrancaba en Windows.
+// AN-0 · `VALLEY_CHROMIUM` manda; sin la carpeta de Windows, el Chromium de Playwright.
 const dir = existsSync(root) ? readdirSync(root).filter((d) => /^chromium-\d+$/.test(d)).sort().reverse()[0] : undefined;
-const exe = process.env.VALLEY_CHROMIUM || (dir === undefined ? undefined : join(root, dir, 'chrome-win64', 'chrome.exe'));
-const browser = await chromium.launch({ ...(exe ? { executablePath: exe } : {}), args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
+const executablePath = process.env.VALLEY_CHROMIUM ?? (dir === undefined ? undefined : join(root, dir, 'chrome-win64', 'chrome.exe'));
+const browser = await chromium.launch({ ...(executablePath ? { executablePath } : {}), args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
 const tab = await browser.newPage({ viewport: { width: 1180, height: 820 } });
 await tab.goto('file:///' + resolve(process.argv[3] ?? 'artifacts/graphics/alive/game/valley.html').split(String.fromCharCode(92)).join('/') + '?' + process.argv[2]);
 await tab.waitForFunction(() => typeof window.__valleySceneReport === 'function', null, { timeout: 180000 });

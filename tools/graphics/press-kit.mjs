@@ -79,6 +79,7 @@ const outDir = resolve(opt('out', 'artifacts/graphics/press'));
 const pageArg = opt('page', join(outDir, 'game', 'valley.html'));
 
 function browserExe() {
+  if (process.env.VALLEY_CHROMIUM) return process.env.VALLEY_CHROMIUM;
   const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
   if (existsSync(root)) {
     try {

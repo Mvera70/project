@@ -129,6 +129,8 @@ if (titled) {
     window.__probe.split.length = 0;
   }, { sky: flag('sky', ''), phase: flag('phase', ''), scale: flag('scale', ''), follow: flag('follow', '') });
 } else {
+  // AN-0 · La página empaquetada lleva los GLB dentro y con la sonda puesta
+  // tarda más de los 30 s por omisión en cargar bajo SwiftShader.
   await tab.goto(page + '?' + query, { timeout: 240_000 });
 }
 const t0 = Date.now();
