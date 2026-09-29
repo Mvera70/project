@@ -88,6 +88,7 @@ Carpetas: `AN-1/before/` y `AN-1/after/`.
 | `AN-1/before/walk-seed7-y60-follow208/` | 7 · 60 | 20 s · 15 fps × 6 s | 390×844 | 208 / — / 0.18 | página «antes»: `--page artifacts/graphics/AN-1/game-before/valley.html` | 91 | ninguno | `middle.png`, `strip-30-45.png` |
 | `AN-1/after/walk-seed7-y60-follow208/` | 7 · 60 | 20 s · 15 fps × 6 s | 390×844 | 208 / — / 0.18 | — | 91 | ninguno | `middle.png`, `strip-30-45.png` |
 | `AN-1/after/walk-seed11-y21-follow13/` | 11 · 21 | 20 s · 15 fps × 6 s | 390×844 | 13 / — / 0.18 | — | 91 | ninguno | `middle.png`, `strip-30-45.png` |
+| `AN-1/before/wide-seed7-y60/` | 7 · 60 | 20 s · 2 fps × 20 s | 390×844 (PNG 331×717) | — / — / — | página «antes»: `--page artifacts/graphics/AN-1/game-before/valley.html` | 41 | ninguno | `middle.png` |
 
 - Las filas de `before/` se rodaron sobre `AN-1/game-before/valley.html`, el
   empaquetado con el GLB anterior; las de `after/`, sobre el empaquetado por
@@ -101,6 +102,12 @@ Carpetas: `AN-1/before/` y `AN-1/after/`.
 
 - La matriz (§2.3) explica por qué el adulto de la semilla 7 tiene dos pares,
   `follow114` y `follow208`.
+
+- **`before/wide-seed7-y60`.** Es el «antes» de `AN-4/after/wide-seed7-y60` (par
+  `plaza-seed7`). Sus PNG miden 331×717 aunque la traza declara 390×844, como
+  los de `AN-0/baseline/wide-seed7-y60`; los de `AN-4/after/wide-seed7-y60`
+  miden 390×844, y `build-compare.py` reescala el «antes» al tamaño del
+  «después» en las parejas que no son estrictas.
 
 - **Fuera de las tablas.** `AN-1/gait-report-after.txt`;
   `AN-1/approved/cbc336551f462700/villager.glb`; `AN-1/game-before/` (el
@@ -127,10 +134,11 @@ toma: va en «Hojas de gestos».
 | Toma (carpeta) | Semilla · año | lead · fps × s | Viewport | Cámara (follow / look / zoom) | Escenario (raid, assault, beast, hunt, página «antes») | Fotogramas | Errores de página | Ficheros derivados |
 |---|---|---|---|---|---|---|---|---|
 | `AN-3/assault-seed11-y21/` | 11 · 21 | 20 s · 10 fps × 12 s | 390×844 | — / — / — | `--raid 12 --assault` | 121 | ninguno | `middle.png`, `strip-flee.png` |
-| `AN-3/gate-seed11-y21/` | 11 · 21 | 8 s · 10 fps × 14 s | 390×844 | — / — / — | `--raid 12 --assault` | 141 | ninguno | `middle.png`, `strip-gate.png` |
+| `AN-3/bear-seed11-y21/` | 11 · 21 | 40 s · 10 fps × 16 s | 390×844 | — / — / — | `--happening bear_in_the_wood` | 161 | ninguno | `middle.png` |
+| `AN-3/gate-seed11-y21/` | 11 · 21 | 8 s · 10 fps × 14 s | 390×844 | — / — / — | `--raid 12 --assault` | 141 | ninguno | `middle.png`, `strip-gate.png`, `zoom-gate-9005.png` |
 
-- `hunt-seed11-y21` y `hunt-seed7-y30` no llegaron a grabarse: véase
-  «Carpetas incompletas».
+- `hunt-seed11-y21`, `hunt-seed7-y30`, `hunt-seed5-y21` y `assault-seed7-y60` no
+  llegaron a grabarse: véase «Carpetas incompletas».
 
 ## AN-4 · Aceptación conjunta
 
@@ -151,9 +159,9 @@ carpetas de cada par; no son tomas nuevas. La tabla incluye también el par
 `speed`, `mode`), el número de fotogramas, los identificadores y las posiciones
 de mundo (`x`, `z`) y de pantalla (`screen`) de personas y animales en cada
 fotograma son idénticos (una muestra es una persona o un animal en un
-fotograma): la diferencia máxima es 0 en los cinco pares. `build-compare.py`
-prevé además el par `plaza-seed7` (`AN-1/before/wide-seed7-y60/` contra
-`AN-4/after/wide-seed7-y60/`), cuya carpeta «antes» no existe todavía.
+fotograma): la diferencia máxima es 0 en los seis pares. Se compara la traza,
+no los píxeles: en `plaza-seed7` los PNG del «antes» miden 331×717 y los del
+«después», 390×844.
 
 | Par (nombre en `compare/`) | Antes | Después | Muestras (personas / animales) | Diferencia máxima (mundo y pantalla) | Comparativa (`AN-4/compare/`) |
 |---|---|---|---|---|---|
@@ -162,6 +170,7 @@ prevé además el par `plaza-seed7` (`AN-1/before/wide-seed7-y60/` contra
 | — | `AN-1/before/walk-seed7-y60-follow114/` | `AN-1/after/walk-seed7-y60-follow114/` | 5 460 / 2 184 | 0 | — |
 | `walk-adulto-seed7` | `AN-1/before/walk-seed7-y60-follow208/` | `AN-1/after/walk-seed7-y60-follow208/` | 5 460 / 2 184 | 0 | `walk-adulto-seed7-native.gif`, `walk-adulto-seed7-native-x3.gif`, `walk-adulto-seed7-strip.png` |
 | `plaza-seed11` | `AN-0/baseline/wide-seed11-y21/` | `AN-2/after/wide-seed11-y21/` | 1 968 / 369 | 0 | `plaza-seed11-native.gif`, `plaza-seed11-native-x3.gif`, `plaza-seed11-strip.png` |
+| `plaza-seed7` | `AN-1/before/wide-seed7-y60/` | `AN-4/after/wide-seed7-y60/` | 2 460 / 984 | 0 | `plaza-seed7-native.gif`, `plaza-seed7-native-x3.gif`, `plaza-seed7-strip.png` |
 
 - **Fuera de las tablas.** `AN-4/perf/` guarda sondas de rendimiento; no son
   tomas.
@@ -248,46 +257,47 @@ Los fotogramas son `S × F + 1`, y el observatorio exige `--fps` divisor de 30 y
 `--lead` entre 0 y 120. Las cadencias usadas son 15 fps (seguimiento y cámara
 fija cercana), 2 fps (planos generales) y 10 fps (asalto, oso y caza). Para el
 «antes» se añade `--page artifacts/graphics/AN-1/game-before/valley.html`; el
-asalto es `--raid 12 --assault`, el oso `--beast` (con `--lead 30`) y la caza
-`--hunt`; la lectura estrecha se rueda con `--viewport 320x568`. La herramienta
-se niega a escribir sobre una carpeta que ya tiene `trace.json`
-(«La toma ya existe; usa otra carpeta --out.»), así que para repetir una toma se
-borra antes su carpeta. Las hojas de gestos se hacen con
+asalto es `--raid 12 --assault`, el oso `--happening bear_in_the_wood` (con
+`--lead 40`) y la caza `--hunt`; la lectura estrecha se rueda con
+`--viewport 320x568`. La herramienta se niega a escribir sobre una carpeta que
+ya tiene `trace.json` («La toma ya existe; usa otra carpeta --out.»), así que
+para repetir una toma se borra antes su carpeta. Las hojas de gestos se hacen
+con
 `node tools/graphics/gesture-sheet.mjs <clip> --model villager --frames 12 --out artifacts/graphics/AN-<n>/gestures`,
 y las de especie con
 `node tools/graphics/animal-gestures-bench.mjs --kind <especie> --actions <clips> --frame <encuadre>`.
 
 ## Carpetas incompletas
 
-Estado al generar este índice (29 sep 2026, 12:29 UTC). Una carpeta está
+Estado al generar este índice (29 sep 2026, 12:44 UTC). Una carpeta está
 incompleta si no tiene `trace.json`.
 
-- `AN-3/hunt-seed11-y21/` y `AN-3/hunt-seed7-y30/` — a las dos les faltan
-  `trace.json`, `summary.json`, `index.html`, `before.png`, `middle.png`,
-  `after.png`, y sus `frames/` están vacías. Las dos tomas se detuvieron con
+- `AN-3/hunt-seed11-y21/`, `AN-3/hunt-seed7-y30/` y `AN-3/hunt-seed5-y21/` — a
+  las tres les faltan `trace.json`, `summary.json`, `index.html`, `before.png`,
+  `middle.png`, `after.png`, y sus `frames/` están vacías. Las tres tomas se
+  detuvieron con
   «No hay señal de caza tocable ahora: cambia semilla, año o --lead.», el error
   que lanza `observe-life.mjs` cuando `--hunt` no encuentra la señal de caza
   tocable al acabar el `lead`. Comandos con los que se lanzaron:
 
   - `node tools/graphics/observe-life.mjs --seed 11 --year 21 --hunt --lead 20 --seconds 10 --fps 10 --viewport 390x844 --out artifacts/graphics/AN-3/hunt-seed11-y21`
   - `node tools/graphics/observe-life.mjs --seed 7 --year 30 --hunt --lead 20 --seconds 10 --fps 10 --viewport 390x844 --out artifacts/graphics/AN-3/hunt-seed7-y30`
+  - `node tools/graphics/observe-life.mjs --seed 5 --year 21 --hunt --lead 20 --seconds 12 --fps 10 --viewport 390x844 --out artifacts/graphics/AN-3/hunt-seed5-y21`
 
-- `AN-3/bear-seed11-y21/` — le faltan `trace.json`, `summary.json`,
+- `AN-3/assault-seed7-y60/` — le faltan `trace.json`, `summary.json`,
+  `index.html`, `before.png`, `middle.png`, `after.png`, y su `frames/` está
+  vacía. La toma se detuvo con `page.goto: Timeout 30000ms exceeded`: la página
+  del juego no terminó de cargar en 30 s al abrir la ruta de depuración de la
+  villa 7/60 (`debug=1&live=1&seed=7&year=60&season=summer&raid=24&assault=1`).
+  Comando:
+  `node tools/graphics/observe-life.mjs --seed 7 --year 60 --raid 24 --assault --lead 8 --seconds 26 --fps 6 --viewport 390x844 --out artifacts/graphics/AN-3/assault-seed7-y60`.
+
+- `AN-3/hunt-seed5-y21-live/` — le faltan `trace.json`, `summary.json`,
   `index.html`, `before.png`, `middle.png`, `after.png`; su `frames/` está
-  vacía. No había terminado al generar el índice. Comando:
-  `node tools/graphics/observe-life.mjs --seed 11 --year 21 --beast --lead 30 --seconds 10 --fps 10 --viewport 390x844 --out artifacts/graphics/AN-3/bear-seed11-y21`.
-
-- `AN-3/hunt-seed5-y21/` — le faltan `trace.json`, `summary.json`, `index.html`,
-  `before.png`, `middle.png`, `after.png`; su `frames/` está vacía. No había
-  terminado al generar el índice. Comando:
-  `node tools/graphics/observe-life.mjs --seed 5 --year 21 --hunt --lead 20 --seconds 12 --fps 10 --viewport 390x844 --out artifacts/graphics/AN-3/hunt-seed5-y21`.
+  vacía. No consta el comando con que se lanzó.
 
 - `AN-1/film/seed7-y60/` (fuera de las tablas: es de `film.mjs`, no del
   observatorio) — sólo `frames/` con 25 fotogramas; le faltan `trace.json`,
   `tira.png` e `informe.md`, que sí tiene `AN-1/film/seed11-y21/`. La rodó
   `node tools/graphics/film.mjs --seed 7 --year 60 --seconds 10 --fps 6 --out artifacts/graphics/AN-1/film/seed7-y60`
   y se abortó.
-
-## Al cierre de la ronda (29 sep 2026, 13:00 UTC)
-
-De las carpetas que arriba constan como incompletas o en marcha: `AN-3/gate-seed11-y21/` terminó (141 fotogramas; `strip-gate.png`, `zoom-gate-9005.png`); `AN-3/bear-seed11-y21/` se repitió con `--happening bear_in_the_wood --lead 40 --seconds 16` y tampoco trajo oso (161 fotogramas, sin `bear` en la traza); `AN-3/hunt-seed11-y21/`, `hunt-seed7-y30/` y `hunt-seed5-y21/` fallaron por no haber señal de caza tocable; `AN-3/assault-seed7-y60/` no llegó a cargar (tiempo agotado, dos intentos); `AN-1/before/wide-seed7-y60/` se rodó a 390×844 con la página «antes» y salió a 331×717 (41 fotogramas); `AN-4/after/wide-seed7-y60/` (41) y `AN-4/after/wide-seed11-y21-320/` (21, a 320×568) están completas, con `middle.png` y `strip-play.png` la primera. Las comparaciones a escala nativa están en `AN-4/compare/` (`build-compare.py`).
