@@ -142,7 +142,8 @@ El banco de fauna pinta ahora la lámina de agua para el pato.
 El último de cajas. `deer()` en `build-models.py`, sobre la estructura de la
 mula de Vera: tronco esbelto sobre patas largas con el corvejón atrás, cuello
 alto con crin oscura, pardo rojizo con vientre claro y espejo blanco en la
-grupa, y cuerna con luchadera, candil y corona. Mismo tamaño que el de G-23;
+grupa, y cuerna con luchadera, candil y corona. A Vera las patas le parecieron demasiado
+largas: `DEER_DROP` baja el cuerpo y las acorta lo mismo (0,11; se probó 0,07). Mismo tamaño que el de G-23;
 `rigid-clips.mjs … deer` le da el paso con el casco apoyado en línea recta
 (sustituye al de `art/recipes/deer/plant-gait.cjs`, que era del modelo de cajas).
 

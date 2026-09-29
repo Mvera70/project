@@ -516,6 +516,8 @@ def cow():
     ell('Tail_Tuft',(.281,0,.225),(.030,.030,.060),'hoof',tail,8,5)
     merge_parts(); save('cow')
 
+DEER_DROP=.11
+
 def deer():
     # 29 sep 2026. El ciervo de G-23 era de cajas, el último. Facetado sobre la
     # estructura de la mula de Vera: tronco esbelto sobre patas largas, cuello
@@ -548,14 +550,19 @@ def deer():
         tube('Trez_Tine_'+str(s),[(-.258,s*.078,.772),(-.280,s*.100,.800),(-.292,s*.112,.825)],[.006,.004,.002],'antler',head,6)
         tube('Crown_A_'+str(s),[(-.205,s*.140,.850),(-.215,s*.162,.872)],[.005,.002],'antler',head,6)
         tube('Crown_B_'+str(s),[(-.212,s*.132,.842),(-.196,s*.124,.874)],[.005,.002],'antler',head,6)
+    # Patas más cortas (Vera: «demasiado largas»): el cuerpo entero baja
+    # DEER_DROP y las patas se acortan lo mismo, con las pezuñas en el suelo.
+    body.location.z-=DEER_DROP
     for pre,x in [('fore',-.140),('hind',.150)]:
         for sd,l in [(-1,'L'),(1,'R')]:
             y=sd*.055
             if pre=='fore':
-                hip=(x,y,.450); knee=(x+.010,y,.250); ankle=(x-.004,y,.034); toe=(ankle[0]-.010,y,.016)
+                k=(.450-DEER_DROP)/.450
+                hip=(x,y,.450-DEER_DROP); knee=(x+.010,y,.034+(.250-.034)*k); ankle=(x-.004,y,.034); toe=(ankle[0]-.010,y,.016)
             else:
                 # El corvejón atrás, como en el ciervo de verdad.
-                hip=(x,y,.460); knee=(x-.035,y,.280); ankle=(x+.020,y,.034); toe=(ankle[0]-.010,y,.016)
+                k=(.460-DEER_DROP)/.460
+                hip=(x,y,.460-DEER_DROP); knee=(x-.035,y,.034+(.280-.034)*k); ankle=(x+.020,y,.034); toe=(ankle[0]-.010,y,.016)
             limb(pre+l,hip,knee,ankle,toe,.040,'coat',body,'hoof')
     merge_parts(); save('deer')
 
