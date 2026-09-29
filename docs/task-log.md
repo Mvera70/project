@@ -1,6 +1,6 @@
 # Cuaderno de tareas — el rework
 
-## 29 sep 2026 · Animación integral para móvil (AN): AN-0 y AN-1 entregadas, AN-2 en vuelo
+## 29 sep 2026 · Animación integral para móvil (AN): AN-0, AN-1 y AN-2 entregadas, AN-3 en vuelo
 
 Vera lo pidió con `/goal` («mejorar de forma visible todas las animaciones de
 aldeanos y animales; el juego se evalúa principalmente en móvil; trabajar
@@ -23,10 +23,18 @@ AN-1c: la parada con la pierna que baja (`world/cast.ts`,
 `tests/fast/cast-stops.test.ts`); segundo par antes/después en la semilla 7 y
 el informe de la traza en dos semillas.
 
-**En vuelo: AN-2, vida y oficios** (`action-clips.ts`: `talk`, `play`, `sort`,
-`pray`, `drink`, `hammer` con instante de golpe, `sit`; el planeo de la
-golondrina; hojas y tomas de cada gesto cambiado). Después AN-3 (combate) y
-AN-4 (aceptación, veredictos fila a fila, coste contra la línea de base).
+**AN-2 hecha** (v4.98): siete gestos con tres tiempos y su propiedad de
+silueta (`work-gestures.test.ts`), sentarse en el suelo, la pelota fechada
+con `fling` (brief AN-2a, `playSeconds`), chispas y astillas del martillo
+(brief AN-2b, `spark`); hojas en `artifacts/graphics/AN-2/gestures/`, tomas
+en `artifacts/graphics/AN-2/after/`; matriz §2.5.
+
+**En vuelo: AN-3, encuentros y combate**: `gate_strike` dura el segundo del
+golpe y carga el siguiente; el aviso del oso dura lo que su clip (brief
+AN-3a, `bear.ts`); toma de asalto, del oso y de la caza (`observe-life
+--hunt`), parte del banco de batallas. Después AN-4 (aceptación, veredictos
+fila a fila, coste contra la línea de base con `animation-cost.ts` y
+`gl-probe`).
 
 **Abierto, decisión de Vera:** un trote humano (1,8–2,8 Hz) exige bajar el
 paso de la vida o un clip de trote que cambia el carácter del aldeano

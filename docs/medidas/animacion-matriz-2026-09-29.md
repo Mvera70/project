@@ -206,6 +206,48 @@ y parada, de propiedades sobre el controlador real
 
 ---
 
+### 2.5 Después de AN-2 (29 sep 2026)
+
+Los gestos cotidianos, medidos sobre el rig publicado con el `Cast` real
+(`tests/fast/work-gestures.test.ts`, «AN-2 · los gestos cotidianos se leen a
+veinte píxeles») y en las hojas de `artifacts/graphics/AN-2/gestures/`. En
+partida: `artifacts/graphics/AN-2/after/` (plano general de la semilla 11,
+el herrero 27, el niño 60 sentado, el niño 224 de la semilla 7 lanzando).
+
+| Gesto | Antes | Después | Medida |
+|---|---|---|---|
+| sit | cadera a 0,31 m en el aire, muslos en ángulo recto: un banco que no existe | en el suelo: cadera a 0,25 m, rodillas alzadas, pies a ras, manos en las rodillas, un balanceo leve | pies a +0,016 / +0,001 celdas del suelo |
+| talk | antebrazo derecho ±0,25 rad y cabeza ±0,06: sólo se leía la burbuja | la mano derecha sube al pecho dos veces por ciclo, la izquierda contesta, la cabeza asiente (3 por ciclo) y se vuelve ±8° | mano derecha: 0,33 → 0,45 celdas (+0,12) |
+| pray | manos juntas y cabeza gacha, quietas 5 s | una inclinación por ciclo desde la cintura (26°), las manos suben al mentón, la cabeza baja a 48° | cabeza 0,26 → 0,83 rad de inclinación |
+| hammer | seno del brazo sin instante de golpe; nada salía | carga sobre el hombro (mano a 0,63, sobre la cabeza), golpe en 0,55 por debajo de la cintura (0,28) y rebote; la izquierda sujeta delante; chispas (`spark`, fragua) o astillas (`wood`, obra) desde la mano | baja 0,35 celdas en 0,15 del ciclo |
+| sort | vaivén de manos delante del pecho | coger (tronco a 72°, manos a la cintura), levantar al pecho, dejar a la derecha (giro 31°) | cabeza baja 0,048 celdas al coger |
+| drink | la taza a la boca con un vaivén de 0,12 rad | la taza sube (0–0,3), la cabeza atrás 23° con la taza en la boca (0,45–0,6), todo baja | mano a 0,515 de alto, 0,12 delante de la boca |
+| play (sin pelota) | balanceo de brazos abiertos por reloj, que a veinte píxeles era estar de pie | brinca: dos saltos por ciclo (cadera +0,12 m) con la rodilla que sube alterna, brazos abiertos, tronco que se vuelve. Es lo que un niño hace casi todo su día de juego: el `play` de `day.ts` se ofrece sin trasto, y en las tomas de las semillas 7 y 11 **no hay pelota** (`props: []`) | cadera +0,04 celdas y rodilla 0,07 más alta que la otra en lo alto del brinco |
+| throw (con pelota) | no existía: la pelota salía de la nada | de una vez, 1,0 s, fechado por el final de la oferta (`throwSeconds`): pelota sujeta con las dos manos, carga atrás y arriba (0,6), giro y barrido hasta la suelta al final; `world/cast.ts` funde a `idle` después | mano en la suelta a 0,22 celdas del punto de salida de `fling` (0, 0,53, 0,4); **sin toma en partida**: en las dos semillas de las tomas no hay pelota, la evidencia es la hoja y la propiedad |
+| dog · bark/play | entraban de golpe | fundido de 0,08 s (AN-1b); los gestos (dos tirones de cabeza; la reverencia) se conservan | banco de AN-0 |
+| golondrina | «sin planeo» en AN-0 | la fila estaba mal: bate y planea a ratos; se conserva | `ambience.ts`, `gliding` |
+| shelter, chop, mine, work_hoe, spread | correctos en AN-0 | se conservan | — |
+| sow, douse | sólo en preview | se conservan; verificación en partida pendiente de una toma en siembra y de un fuego (AN-4) | — |
+
+**Lo que AN-2 deja escrito (en `docs/encargos-3d.md`).** Un banco o un tronco
+donde la aldea se sienta (hoy, en el suelo); la pelota colgada de la mano
+mientras se lleva (`world/props.ts` la pinta 0,38 por delante a 0,45 de alto);
+un martillo publicado (hoy el respaldo de `hand-tools.ts`).
+
+### 2.6 Después de AN-3 (29 sep 2026)
+
+Los gestos fechados se revisaron sobre las hojas de AN-0 y el código que los
+fecha (`melee.ts`, `archery.ts`, `raiders.ts`: sin tocar). Tres cambios, todos
+del lado de la pantalla, y la evidencia en partida en `artifacts/graphics/AN-3/`.
+
+| Gesto | Antes | Después | Medida |
+|---|---|---|---|
+| gate_strike | 0,6 s: contacto en t=0, retirada, y los brazos caídos hasta el golpe siguiente (un asaltante que golpea sin levantar el arma) | 1,0 s, lo que tarda el golpe siguiente (`BLOW_STEPS` = 30 pasos): contacto en t=0, retirada (0–0,3), carga con los dos brazos por encima de la cabeza y el tronco atrás (0,3–0,85), y espera cargado hasta que el hecho siguiente lo devuelve al contacto | manos a 0,236 delante y 0,37 de alto en el contacto; a 0,65 (sobre la cabeza, 0,49) en la carga; `combat-clips.test.ts` |
+| flee | zancada 0,44 a 1,6–2,6 celdas/s: 3,7–5,8 ciclos por segundo, casi el paso de andar con las piernas abiertas; los pies flotaban 10 cm en cada apoyo | zancada 0,7 (2,3–3,7 Hz), piernas a ±46°, la de atrás casi recta y la de delante con la rodilla alta; la cadera sigue a la pierna que apoya (baja hasta 0,10 m) y sube 0,03 m en el cruce | pierna delantera a ras (pie ≤ 0,075), la de atrás 0,04 celdas más alta, cadera 0,038 celdas más baja al abrirse; `combat-clips.test.ts` |
+| bear · attack (aviso) | el aviso duraba 1,55 s y el clip 3 s: el oso se cortaba a media subida y se iba andando | el aviso dura lo que el clip: 3 s (brief AN-3a, `bear.ts`) | `life-bear.test.ts` sigue en verde |
+| bow_draw, bow_loose, spear_thrust, hit_take, fall | correctos en la hoja de AN-0: tensado sostenible con la mano en la mejilla, suelta que se separa en t=0, estocada con el contacto en t=0 y recuperación, retroceso del torso, caída de espaldas que termina tendida | se conservan; contacto en t=0 y daño intactos (`combat-clips`, `melee`, `archery`, `ragdoll-physics` en verde) | hojas en `artifacts/graphics/AN-0/gestures/` |
+| boar · charge, rabbit · flee, partridge · takeoff/flight | por reloj o de golpe (AN-0) | por suelo recorrido y con fundido (AN-1b); `attack` de jabalí y lobo `preview-only` | `graphics-animal-motion.test.ts` |
+
 ## 3 · La matriz: clips humanos
 
 | Clip | Origen | Situación en partida | Evidencia | Defecto concreto | Gravedad | Coste | Decisión |
@@ -215,18 +257,18 @@ y parada, de propiedades sobre el controlador real
 | carry_walk | GLB | acarreo de leña, piedra, grano, fardos | partida (wide-11), preview | Misma cadencia; el haz cuelga bien de `hand_l` | alta (igual que walk) | L | **AN-1a hecho**: 0,339, 3,1–4,9 Hz (§2.4) |
 | work_hoe | GLB | campo, fase de azada | partida (wide-11), preview | Azadona con la espalda y la azada llega al suelo. Sin defecto visto | — | — | conservar |
 | flee | fabricado | huida civil (asalto, oso); `carry_walk` no | preview | Carrera legible: torso adelante, brazos doblados; 3,7–5,8 Hz | media | S | AN-3: comprobar en asalto |
-| sit | fabricado | comer, hoguera, banco | partida (wide-11: 275 muestras), preview | Cadera baja 0,55 m y muslos en ángulo recto; sin banco se sienta en el aire a la altura de un banco | media | S | AN-2: revisar la altura sin asiento |
-| talk | fabricado | charla `peer`; pagar | partida (wide-11), preview | Antebrazo derecho y cabeza; a 6 px sólo se lee la burbuja | baja | S | AN-2: amplitud |
-| pray | fabricado | capilla, iglesia | partida (wide-11) | Manos juntas, cabeza gacha, estático 5 s | baja | S | AN-2: revisar |
-| hammer | fabricado | fragua, obra | partida (wide-11) | Vaivén del brazo con martillo; sin instante de golpe (`STRIKE_AT` no lo cubre) ni astilla | media | S | AN-2: golpe con contacto |
+| sit | fabricado | comer, hoguera, banco | partida (wide-11: 275 muestras), preview | Cadera baja 0,55 m y muslos en ángulo recto; sin banco se sienta en el aire a la altura de un banco | media | S | **AN-2 hecho**: se sienta en el suelo (cadera a 0,25 m, rodillas alzadas, pies a ras ±2 cm); un banco o un tronco es encargo (§2.5) |
+| talk | fabricado | charla `peer`; pagar | partida (wide-11), preview | Antebrazo derecho y cabeza; a 6 px sólo se lee la burbuja | baja | S | **AN-2 hecho**: la mano derecha sube 0,12 celdas al pecho dos veces por ciclo, la izquierda contesta, la cabeza asiente y se vuelve (§2.5) |
+| pray | fabricado | capilla, iglesia | partida (wide-11) | Manos juntas, cabeza gacha, estático 5 s | baja | S | **AN-2 hecho**: una inclinación por ciclo (tronco 26°, cabeza a 48°) (§2.5) |
+| hammer | fabricado | fragua, obra | partida (wide-11) | Vaivén del brazo con martillo; sin instante de golpe (`STRIKE_AT` no lo cubre) ni astilla | media | S | **AN-2b hecho**: carga sobre el hombro, golpe en `STRIKE_AT.hammer = 0,55` por debajo de la cintura y rebote; chispas en la fragua y astillas en la obra desde la mano (§2.5) |
 | chop | fabricado (IA-anim) | tala | partida (wide-11), preview | Carga, golpe y rebote con astillas; medido en IA-anim | — | — | conservar; re-verificar |
 | mine | fabricado (IA-anim) | cantera | preview | Ídem; picado filmado en IA-anim (semilla 23) | — | — | conservar; re-verificar |
 | sow | fabricado (IA-fields) | campo, fase de siembra | preview | Voleo con bolsa; semilla desde la mano | — | — | AN-2: verificar en partida |
 | spread | fabricado (IA-fields) | campo, estiércol; 434 muestras en wide-11 | partida (wide-11), preview | Horca a dos manos; carga abajo y lanza | — | — | AN-2: verificar |
 | douse | fabricado (E4) | brigada de cubos | preview | Cubo en `hand_r`; el agua sale de la mano | — | — | AN-3/AN-2: preview-only hasta filmar un fuego |
-| play | fabricado | niños con pelota | preview | Brazos abiertos y balanceo; no hay gesto de lanzar ni de coger | media | S | AN-2 |
-| drink | fabricado | vado, pozo | partida (wide-11: 155), preview | Taza a la boca; correcto | — | — | conservar |
-| sort | fabricado | granero, molino, preparar, entregar, saqueo | partida (wide-11) | Manos que se mueven delante; genérico | baja | S | AN-2: revisar amplitud |
+| play | fabricado | niños con pelota | preview | Brazos abiertos y balanceo; no hay gesto de lanzar ni de coger | media | S | **AN-2a hecho, en dos clips**: `play` sin pelota brinca (el día de juego de un niño, `day.ts`); `throw` con pelota es un lanzamiento de una vez fechado con el final de la oferta (`throwSeconds`), suelta a 0,22 celdas del punto de salida de `fling` (§2.5) |
+| drink | fabricado | vado, pozo | partida (wide-11: 155), preview | Taza a la boca; correcto | — | — | **AN-2**: tres tiempos (la taza sube, la cabeza atrás 23°, baja): antes la taza subía y se quedaba (§2.5) |
+| sort | fabricado | granero, molino, preparar, entregar, saqueo | partida (wide-11) | Manos que se mueven delante; genérico | baja | S | **AN-2 hecho**: coger (tronco a 72°, manos a la cintura), levantar y dejar a un lado (giro de 31°) (§2.5) |
 | shelter | fabricado | bajo alero con lluvia | partida (wide-11: 117) | Brazos cruzados y tiritón; correcto | — | — | conservar |
 | bow_draw | fabricado (E1) | arqueros de la guarnición, caza | preview | Tensado sostenible; sin dedos | — | — | AN-3: verificar en asalto |
 | bow_loose | fabricado (E1) | suelta, fechada por la flecha | preview | Suelta en t=0 | — | — | AN-3 |
@@ -254,7 +296,7 @@ y parada, de propiedades sobre el controlador real
 | wolf · idle/walk/attack | Vera + `rigid-clips` | corral (semana del suceso), manada de la sierra | preview | `walk` bien; **`attack` sólo mueve cabeza 4° y orejas** y nadie lo emite | — | — | `attack` = preview-only; anotar en `encargos-3d.md` |
 | dog · idle/walk/run/bark/play | Vera + `rigid-clips` + fabricados | casa, niños, pelota, forastero, zorro | preview | Los cinco legibles en el banco; `bark`/`play` con corte seco al cambiar (sin mezcla) | baja | S | **AN-1b hecho**: fundido de 0,08 s; AN-2 revisa el gesto |
 | mule · idle/walk | Vera + `rigid-clips` | detrás del buhonero | preview | Trote a 3,2 Hz | baja | — | conservar |
-| golondrina · batir | Astra + `ambience.ts` | cielo de día | partida (wide-11) | Batir de −55° a +35° a ritmo fijo; no hay planeo | baja | S | AN-2: planeo |
+| golondrina · batir | Astra + `ambience.ts` | cielo de día | partida (wide-11) | Batir de −55° a +35°; **sí hay planeo** (AN-0 lo anotó mal): `ambience.ts` alterna batir y planear (`gliding`, ala a −23°) y ladea con el vaivén | — | — | conservar; corregida la fila en AN-2 |
 
 **Orientación de los animales (todas las especies) — hecho en AN-1b, ver §2.4.** `AnimalMotion.place`
 gira el cuerpo hacia el desplazamiento de píxeles entre dos fotogramas con un

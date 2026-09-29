@@ -74,6 +74,8 @@ interface Player {
   playing: string | null;
   previous: Action | null;
   changedAt: number;
+  /** AN-1 · Dónde iba el clip que se apaga cuando empezó el fundido. */
+  previousAt: number;
   ragdolled: boolean;
   /** IA-anim · Fase del gesto de herramienta en el pintado anterior, para ver el golpe. */
   strikePhase?: number;
@@ -336,7 +338,7 @@ export class Cast {
         player = {
           model: modelFor(actor),
           object, mixer, actions: new Map(), owned: dress(object, actor.id),
-          held: new Map(), bind: bindPose(object), playing: null, previous: null, changedAt: 0, ragdolled: false,
+          held: new Map(), bind: bindPose(object), playing: null, previous: null, changedAt: 0, previousAt: 0, ragdolled: false,
         };
         this.players.set(actor.id, player);
         this.group.add(object);
@@ -515,6 +517,7 @@ export class Cast {
     if (player.playing !== clip) {
       player.previous?.stop();
       player.previous = player.playing === null ? null : player.actions.get(player.playing) ?? null;
+      player.previousAt = player.previous?.time ?? 0;
       player.changedAt = now;
       action.reset().play();
       player.playing = clip;
@@ -523,6 +526,17 @@ export class Cast {
     action.setEffectiveWeight(player.previous === null ? 1 : weight);
     if (player.previous !== null) {
       player.previous.setEffectiveWeight(1 - weight);
+      // AN-1 · Un clip de marcha va por suelo recorrido, y al pararse el suelo
+      // deja de correr: congelado donde estaba, el fundido dejaba un pie
+      // colgado a media zancada que se derretía en diagonal hacia el reposo.
+      // Mientras se apaga sigue su ciclo a su ritmo natural: la pierna que iba
+      // en el aire baja y planta, y después el reposo la recoge. El pie
+      // apoyado retrocede a lo sumo 0,165 ciclos (0,07 celdas) en los 0,22 s,
+      // que a la escala del juego no se ve; el pie colgado sí se veía.
+      const leaving = player.previous.getClip();
+      if ((VILLAGER_CLIPS[leaving.name as ClipName]?.strideLength ?? null) !== null) {
+        player.previous.time = (player.previousAt + (now - player.changedAt)) % leaving.duration;
+      }
       if (weight >= 1) { player.previous.stop(); player.previous = null; }
     }
     action.time = seconds;
@@ -601,7 +615,8 @@ export class Cast {
    * tampoco, y eso se ve.
    */
   private strike(player: Player, actor: Actor, seconds: number): void {
-    if (actor.clip !== 'chop' && actor.clip !== 'mine' && actor.clip !== 'sow' && actor.clip !== 'spread' && actor.clip !== 'douse') {
+    if (actor.clip !== 'chop' && actor.clip !== 'mine' && actor.clip !== 'sow' && actor.clip !== 'spread' && actor.clip !== 'douse'
+      && actor.clip !== 'hammer') {
       delete player.strikePhase; return;
     }
     const phase = seconds / VILLAGER_CLIPS[actor.clip].seconds;
@@ -612,6 +627,14 @@ export class Cast {
     const crossed = before <= phase ? before < moment && moment <= phase : before < moment || moment <= phase;
     if (!crossed) return;
     player.strikes = (player.strikes ?? 0) + 1;
+    if (actor.clip === 'hammer') {
+      // AN-2b · El martillo pega en la fragua y en la obra: chispas en una,
+      // astillas en la otra, desde la mano que lo lleva.
+      const hand = player.object.getObjectByName('hand_r');
+      if (hand === undefined) return;
+      this.chips.hit(hand.getWorldPosition(new Vector3()), actor.role === 'smith' ? 'spark' : 'wood', actor.id * 1009 + player.strikes);
+      return;
+    }
     if (actor.clip === 'sow' || actor.clip === 'spread' || actor.clip === 'douse') {
       // Sale de la mano que lanza: la simiente a voleo, el estiércol de la horca,
       // el agua del cubo.

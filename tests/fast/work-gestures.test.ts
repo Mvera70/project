@@ -8,11 +8,11 @@
 
 import { readFileSync } from 'node:fs';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { Mesh, Vector3, type AnimationClip, type Object3D } from 'three';
+import { Mesh, Quaternion, Vector3, type AnimationClip, type Object3D } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { Cast } from '../../src/render3d/world/cast';
-import { STRIKE_AT, STRIKE_HEAD, VILLAGER_CLIPS } from '../../src/render3d/clips';
+import { STRIKE_AT, STRIKE_HEAD, VILLAGER_CLIPS, type ClipName } from '../../src/render3d/clips';
 import { handTool } from '../../src/render3d/hand-tools';
 import type { Actor } from '../../src/render3d/contracts';
 
@@ -205,5 +205,90 @@ describe('IA-fields · sembrar a voleo y echar estiércol', () => {
     const scoop = handIn('spread', STRIKE_AT.spread - 0.2), toss = handIn('spread', STRIKE_AT.spread);
     expect(toss.y - scoop.y).toBeGreaterThan(0.15);
     expect(handTool('spread')).toBeDefined();
+  });
+});
+
+// AN-2 · Vida y oficios: cada gesto cotidiano tiene tres tiempos que se leen
+// a la distancia del juego, y lo que sale de la mano sale de donde está la
+// mano. Se guarda la silueta (la articulación que define el gesto y cuánto
+// se mueve), no los ángulos.
+describe('AN-2 · los gestos cotidianos se leen a veinte píxeles', () => {
+  const show = (clip: ClipName, fraction: number, role: Actor['role'] = null): Cast => {
+    const cast = new Cast({ id: 'villager', original: model, clips, motion: [] }, () => clone(model));
+    cast.show([{ ...actor('chop', 0), clip, activity: 'resting', role, clipSeconds: fraction * VILLAGER_CLIPS[clip].seconds }]);
+    cast.group.updateMatrixWorld(true);
+    return cast;
+  };
+  const at = (cast: Cast, name: string): Vector3 => cast.group.getObjectByName(name)!.getWorldPosition(new Vector3());
+  /** Cuánto mira hacia abajo la cabeza: cero es la vertical, positivo es hacia el suelo. */
+  const headPitch = (cast: Cast): number => {
+    const up = new Vector3(0, 1, 0).applyQuaternion(cast.group.getObjectByName('head')!.getWorldQuaternion(new Quaternion()));
+    return Math.atan2(up.z, up.y);
+  };
+
+  it('el martillo carga por encima del hombro, golpea por debajo de la cintura y baja más deprisa de lo que sube', () => {
+    const strike = STRIKE_AT.hammer;
+    const up = at(show('hammer', strike - 0.15), 'hand_r'), hit = at(show('hammer', strike), 'hand_r'), ready = at(show('hammer', 0), 'hand_r');
+    const shoulder = at(show('hammer', 0), 'upperarmR'), hips = at(show('hammer', 0), 'hips');
+    expect(up.y, 'carga').toBeGreaterThan(shoulder.y);
+    expect(hit.y, 'golpe').toBeLessThan(hips.y);
+    expect((up.y - hit.y) / 0.15, 'baja deprisa').toBeGreaterThan((up.y - ready.y) / (strike - 0.15));
+  });
+
+  it('la pelota sale de la mano: en la suelta la mano va por delante y por encima de la carga, junto al punto de salida', () => {
+    const wound = at(show('throw', 0.6), 'hand_r'), released = at(show('throw', 0.97), 'hand_r');
+    expect(released.z - wound.z, 'adelanta').toBeGreaterThan(0.2);
+    // Donde `fling` pone la pelota (`life/props.ts`): 0,4 por delante y 0,53 de alto.
+    expect(released.distanceTo(new Vector3(0, 0.53, 0.4)), 'punto de salida').toBeLessThan(0.25);
+    // Y antes de la ventana, la pelota sujeta con las dos manos delante.
+    const left = at(show('throw', 0), 'hand_l'), right = at(show('throw', 0), 'hand_r');
+    expect(left.distanceTo(right)).toBeLessThan(0.15);
+    expect(right.z).toBeGreaterThan(0.1);
+  });
+
+  it('jugar sin pelota es brincar: la cadera sube y una rodilla se alza, dos veces por ciclo', () => {
+    const still = show('play', 0), high = show('play', 0.125);
+    expect(at(high, 'hips').y - at(still, 'hips').y, 'salta').toBeGreaterThan(0.025);
+    const knees = [at(high, 'shinL').y, at(high, 'shinR').y];
+    expect(Math.max(...knees) - Math.min(...knees), 'una rodilla arriba').toBeGreaterThan(0.04);
+  });
+
+  it('sentarse es en el suelo: la cadera a un palmo y los pies a ras, no en un banco que no existe', () => {
+    const cast = show('sit', 0.5);
+    expect(at(cast, 'hips').y).toBeLessThan(0.1);
+    for (const foot of ['footL', 'footR']) {
+      const toe = cast.group.getObjectByName(foot)!.localToWorld(new Vector3(0, 0.2, 0));
+      expect(toe.y, `${foot} no se hunde`).toBeGreaterThan(-0.015);
+      expect(toe.y, `${foot} no flota`).toBeLessThan(0.05);
+    }
+  });
+
+  it('beber lleva la taza a la boca y echa la cabeza atrás', () => {
+    const sip = show('drink', 0.45), rest = show('drink', 0);
+    const hand = at(sip, 'hand_r'), head = at(sip, 'head');
+    expect(hand.y, 'a la altura de la cara').toBeGreaterThan(head.y - 0.02);
+    expect(Math.hypot(hand.x, hand.z - head.z), 'delante de la boca').toBeLessThan(0.16);
+    expect(headPitch(sip) - headPitch(rest), 'la cabeza atrás').toBeLessThan(-0.3);
+    expect(at(rest, 'hand_r').y, 'la taza baja entre trago y trago').toBeLessThan(head.y - 0.15);
+  });
+
+  it('hablar mueve una mano al pecho y la cabeza asiente', () => {
+    const ys = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875].map(f => at(show('talk', f), 'hand_r').y);
+    expect(Math.max(...ys) - Math.min(...ys), 'la mano sube y baja').toBeGreaterThan(0.08);
+    const pitches = [0, 0.083, 0.167].map(f => headPitch(show('talk', f)));
+    expect(Math.max(...pitches) - Math.min(...pitches), 'asiente').toBeGreaterThan(0.1);
+  });
+
+  it('ordenar se dobla a por la cosa y la deja a un lado', () => {
+    const erect = show('sort', 0.5), bent = show('sort', 0.3), placing = show('sort', 0.75);
+    expect(headPitch(bent), 'mira abajo').toBeGreaterThan(1);
+    expect(at(erect, 'head').y - at(bent, 'head').y, 'el tronco baja').toBeGreaterThan(0.03);
+    expect(at(bent, 'hand_r').y, 'las manos a la cintura').toBeLessThan(at(erect, 'hips').y);
+    expect(Math.abs(at(placing, 'hand_r').x - at(erect, 'hand_r').x), 'deja a un lado').toBeGreaterThan(0.1);
+  });
+
+  it('rezar se inclina una vez por ciclo', () => {
+    expect(headPitch(show('pray', 0.5)) - headPitch(show('pray', 0))).toBeGreaterThan(0.4);
+    expect(at(show('pray', 0), 'head').y - at(show('pray', 0.5), 'head').y).toBeGreaterThan(0.01);
   });
 });

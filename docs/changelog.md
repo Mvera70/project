@@ -1,5 +1,75 @@
 # The Valley — Registro de cambios
 
+## v4.99 · 29 sep 2026 · Animación integral, AN-3: el golpe que carga el siguiente, el esprint que pisa y el oso que se alza entero
+
+Tercera fase del `/goal` de animación (AN-0 y AN-1 en v4.97, AN-2 en v4.98).
+Los seis gestos fechados de E1 se revisaron sobre sus hojas y sobre el código
+que los fecha (`melee.ts`, `archery.ts`, `raiders.ts`, sin tocar): tensado,
+suelta, estocada, impacto y caída se conservan, con el contacto en t=0 y el
+daño intactos. Tres cosas no se leían y se cambian del lado de la pantalla:
+
+- **El golpe al portón carga el siguiente** (`action-clips.ts`, `clips.ts`):
+  los golpes van a paso fijo (`BLOW_STEPS`, uno por segundo) y el clip
+  duraba 0,6 s —contacto, retirada y los brazos caídos hasta el golpe
+  siguiente: un asaltante que golpea sin levantar el arma—. Ahora dura el
+  segundo entero: contacto en cero, retirada y carga con los dos brazos por
+  encima de la cabeza, sostenida hasta que el hecho siguiente lo devuelve al
+  contacto (`combat-clips.test.ts`).
+- **La huida es un esprint que pisa**: a 1,6–2,6 celdas/s (5–8 m/s) la
+  zancada de 0,44 daba 3,7–5,8 ciclos por segundo, casi el paso de andar con
+  las piernas abiertas, y los pies flotaban diez centímetros en cada apoyo
+  porque la cadera no seguía a la pierna. Zancada 0,7 (2,3–3,7 Hz), piernas a
+  ±46°, la de atrás casi recta y la de delante con la rodilla alta, y la
+  cadera que baja hasta 0,10 m con la pierna que apoya y sube en el cruce.
+- **El aviso del oso dura lo que su clip** (brief AN-3a, `life/bear.ts`):
+  1,55 s cortaban a media subida un `attack` de 3 s; ahora se alza entero y
+  amenaza antes de irse.
+- **Medido y visto** en `artifacts/graphics/AN-3/`: hojas de `gate_strike`
+  y `flee`, el asalto en partida (`observe-life --raid 12 --assault`), la
+  visita del oso (`--beast`) y la caza (`--hunt`, nuevo en el observatorio),
+  y el parte del banco de batallas sin cambio en sus cifras. Matriz §2.6.
+
+## v4.98 · 29 sep 2026 · Animación integral, AN-2: la vida y los oficios se leen a veinte píxeles
+
+Segunda fase del `/goal` de animación (AN-0 y AN-1 en v4.97). Lo que decidía
+si un gesto cotidiano existía para quien mira desde el móvil era la silueta,
+y siete de ellos no la tenían: `talk` movía un antebrazo, `pray` y `sit`
+estaban quietos, `hammer` era un seno sin golpe, `sort` un vaivén, `drink`
+una taza que subía y se quedaba, y `play` un balanceo mientras la pelota
+salía de la nada.
+
+- **Los gestos, con tres tiempos** (`action-clips.ts`): hablar (la mano al
+  pecho dos veces por ciclo, la otra contesta, la cabeza asiente y se
+  vuelve), rezar (una inclinación por ciclo desde la cintura), ordenar (coger
+  a la cintura, levantar, dejar a un lado girando), beber (la taza sube, la
+  cabeza atrás 23°, baja), sentarse **en el suelo** (cadera a 0,25 m,
+  rodillas alzadas, pies a ras; no hay banco en el valle y se encarga),
+  martillar con carga sobre el hombro y golpe en `STRIKE_AT.hammer`. Cada uno
+  con su propiedad de silueta en `work-gestures.test.ts`, medida sobre el
+  `Cast` real.
+- **La pelota sale de la mano** (brief AN-2a), y son dos clips: `play` sin
+  pelota **brinca** —es el día de juego de un niño (`day.ts`), casi siempre
+  sin trasto: en las tomas de las semillas 7 y 11 no hay pelota— y `throw`
+  con pelota es un gesto de una vez (1 s) **fechado por el hecho que viene**:
+  `life/cast.ts` (`throwSeconds`) lo hace correr hacia su final desde
+  `doing.until`, que es el paso en que `fling` pone la pelota en el aire, así
+  que la suelta del clip cae en la suelta real; antes de la ventana, la pelota
+  sujeta con las dos manos. `tests/fast/life-play-throw.test.ts`.
+- **Chispas y astillas del martillo** (brief AN-2b): `Cast.strike` suelta
+  `spark` (clase nueva de `work-chips.ts`, clara y de un tercio de segundo)
+  si el actor es el herrero y `wood` en la obra, desde la mano, en el golpe.
+- **La parada del aldeano** (AN-1c, `world/cast.ts`): el clip de marcha que
+  se apaga sigue su ciclo mientras se funde, así que el pie que iba en el
+  aire adelanta y baja en vez de quedarse colgado (`cast-stops.test.ts`).
+- **Medido y visto**: hojas de gesto en `artifacts/graphics/AN-2/gestures/`
+  y tomas en partida en `artifacts/graphics/AN-2/after/` (plano general de
+  la semilla 11 a 390×844, el herrero, un niño sentado, un niño lanzando en
+  la semilla 7); matriz §2.5. La golondrina ya planeaba (la fila de AN-0
+  estaba mal); `bark` y `play` del perro se conservan con el fundido de AN-1b;
+  `sow` y `douse` siguen con verificación en partida pendiente (AN-4).
+- **Encargos**: un banco o un tronco, la pelota colgada de la mano, un
+  martillo publicado (`docs/encargos-3d.md`).
+
 ## v4.97 · 29 sep 2026 · Animación integral para móvil, AN-0 y AN-1: la zancada del aldeano y el rumbo de los animales
 
 Vera pidió con `/goal` «mejorar de forma visible todas las animaciones de

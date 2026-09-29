@@ -289,11 +289,15 @@ la plaza de `play` sin pelota en la mano (`holding === null`, porque otro se
 la llevó) enseña `idle` y no un lanzamiento al aire. No se toca `village.ts`
 ni `props.ts`: el hecho y su instante ya existen.
 
-**Vía.** `action-clips.ts`: `play` deja de ser bucle (`clips.ts`: 1,0 s,
-`loop: false`) y es carga atrás y arriba (0–0,55), giro del tronco y barrido
-del brazo hasta la suelta en 0,85, y el resto hacia abajo; la pose 0 es la
-pelota sujeta con las dos manos delante, que es lo que se ve mientras la
-oferta dura y aún no toca lanzar. **Lo que no hace:** la pelota sigue
+**Vía.** `action-clips.ts`: un clip nuevo, `throw` (`clips.ts`: 1,0 s,
+`loop: false`): carga atrás y arriba (0–0,6), giro del tronco y barrido del
+brazo hasta la suelta al final; la pose 0 es la pelota sujeta con las dos
+manos delante, que es lo que se ve mientras la oferta dura y aún no toca
+lanzar. `play` sigue siendo bucle y es el juego **sin** pelota: el oficio del
+día de un niño (`day.ts`, `leisurePlaces`) se ofrece sin trasto y en las
+tomas no hay pelota (`props: []`), así que ahí se brinca en vez de lanzar al
+aire (ejecutado así el mismo día: la primera versión mandaba a `idle` y
+dejaba a los niños de pie). **Lo que no hace:** la pelota sigue
 pintándose 0,38 celdas por delante del cuerpo a 0,45 de alto mientras se
 lleva (`world/props.ts`), no en la mano que carga; colgarla del hueso es un
 cambio de `world/props.ts` que se anota en `encargos-3d.md`.

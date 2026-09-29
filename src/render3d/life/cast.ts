@@ -18,7 +18,7 @@ import type { ArrowSighting } from '../world/arrows';
 import type { VillagerId } from '@engine/state';
 import type { Activity, Actor } from '../contracts';
 import type { ClipName } from '../clips';
-import { clipTime } from '../clips';
+import { clipTime, VILLAGER_CLIPS } from '../clips';
 import { LIFE_STEP } from './clock';
 import { meleePose } from './melee';
 import type { Prop } from './props';
@@ -64,9 +64,23 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
     if (action === 'browse') return 'sort';
     // Pagando: habla con el que vende mientras cuenta.
     if (action === 'pay') return 'talk';
-    if (action === 'play') return 'play';
+    // AN-2a · Con la pelota en la mano se lanza (`throw`, fechado); sin ella
+    // —el juego del día de un niño, casi siempre sin trasto— se brinca (`play`).
+    if (action === 'play') return dweller.holding !== null ? 'throw' : 'play';
   }
   return 'idle';
+}
+
+/**
+ * AN-2a · Lanzar la pelota se fecha con el hecho que viene: `fling` suelta la
+ * pelota cuando la oferta acaba (`doing.until`, fijado al llegar, `village.ts`),
+ * así que el clip corre hacia su final desde ese paso —la suelta del gesto
+ * cae en el paso de la suelta real— y antes de su ventana se queda en la pose
+ * cero, la pelota sujeta delante. El último paso hecho lleva índice `steps - 1`.
+ */
+export function throwSeconds(until: number, steps: number): number {
+  const { seconds } = VILLAGER_CLIPS.throw;
+  return Math.min(seconds, Math.max(0, seconds - (until - (steps - 1)) * LIFE_STEP));
 }
 
 /** Y qué actividad, de las cinco que el render conoce. */
@@ -159,9 +173,9 @@ export function castOf(
       // El clip de andar lo mueve el suelo recorrido (G-04); los de estarse
       // quieto, el reloj, con un desfase por persona para que ochenta vecinos
       // no respiren a la vez.
-      clipSeconds: combat === undefined
-        ? clipTime(clip, dweller.travelled, seconds, (dweller.villager % 11) / 11)
-        : clipTime(clip, 0, combatSeconds, 0, combat.since * LIFE_STEP),
+      clipSeconds: combat !== undefined ? clipTime(clip, 0, combatSeconds, 0, combat.since * LIFE_STEP)
+        : clip === 'throw' && dweller.doing !== null ? throwSeconds(dweller.doing.until, life.steps)
+          : clipTime(clip, dweller.travelled, seconds, (dweller.villager % 11) / 11),
       travelled: dweller.travelled,
       cell: cellZ * width + cellX,
       named: named.has(dweller.villager),

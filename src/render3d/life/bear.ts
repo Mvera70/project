@@ -14,7 +14,10 @@ const BEAR_ID = 50_000;
 const RADIUS = 0.52;
 const PACE = 0.56;
 const ALARM = 5;
-const WARNING_STEPS = Math.round(1.55 / LIFE_STEP);
+// AN-3a · El aviso dura lo que el clip `attack` del oso de Vera (3 s, en el
+// catálogo): se alza en el primer segundo y medio y amenaza el resto. Con 1,55 s
+// se cortaba a media subida y se iba andando.
+const WARNING_STEPS = Math.round(3 / LIFE_STEP);
 const VISIT_END = stepOfPhase(0.78);
 
 export interface Bear {
