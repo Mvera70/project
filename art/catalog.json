@@ -2826,78 +2826,76 @@
     },
     {
       "id": "cow",
-      "artifactRound": "G-23",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/cow/cow.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T21-02-28-147Z-25912",
-        "directory": "artifacts/graphics/G-23/approved/6a922a86c1dbf645"
+        "runId": "cow-faceted",
+        "directory": "artifacts/graphics/cow-faceted/approved/cow"
       },
       "bounds": {
         "min": [
-          -0.460667,
+          -0.475,
           0,
-          -0.129067
+          -0.1525
         ],
         "max": [
-          0.288067,
-          0.519722,
-          0.129067
+          0.296,
+          0.520717,
+          0.1525
         ],
         "size": [
-          0.748733,
-          0.519722,
-          0.258133
+          0.771,
+          0.520717,
+          0.305
         ]
       },
-      "recipeSha256": "3144E6F52763092CFD406CB7F5D255E0A4CC8A6563EF7D6442024682B824BB81",
+      "recipeSha256": null,
       "materials": [
         "coat",
-        "light",
-        "dark",
-        "accent"
+        "white",
+        "udder",
+        "hoof",
+        "eye",
+        "ivory",
+        "nose",
+        "muzzle"
       ],
       "clips": [
-        "idle",
-        "walk"
+        "walk",
+        "idle"
       ],
       "motion": [
         {
-          "name": "idle",
-          "seconds": 8.041666666666666,
+          "name": "walk",
+          "seconds": 1.2,
           "loop": true,
-          "strideLength": null
+          "strideLength": 0.43
         },
         {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
+          "name": "idle",
+          "seconds": 4,
           "loop": true,
-          "strideLength": 0.21
+          "strideLength": null
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 24,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 3476
+        "objects": 45,
+        "meshes": 26,
+        "materials": 8,
+        "triangles": 1594
       },
       "hashes": {
-        "cow.blend": "9995A2CDECB142399A6332F43E8134B084583B84484F35F62DD1FCF8985D1839",
-        "cow.glb": "6A922A86C1DBF645EEA0E200403147099D5B3D6EE578DA145F1ABC2DC90FC713",
-        "cow-blender.png": "3CA10D9FA7942D009AD3DD3AB83CAE625556FD81F31258D3376928DC582A6244",
-        "capture-1.png": "1FC63169397452A46EC534D8DDE6F7790A7B340433B2A84D5997C2985EB1FDDE",
-        "capture-1-gray.png": "043E4F2E7A9C5543D0F9D0296266E7233AC7F1EB30C0F7193476939B796A0F7D",
-        "capture.json": "FEB516E3A134FC3A522EDAAB524D0F82233251A72DCFDA179175BF373EDD7BE0",
-        "build.json": "5AAE8A583993FCA041B74BC8C5EBC6EAB39A69C81BB94957DDF35BA2FC16255D",
-        "validation.json": "37290CB884D7F207540642F667019301EC5A2C76B1E9D1029F232B28669EF03E"
+        "cow.glb": "6B1474C09A3DDB26C8735D8182BD6DE8FF1957EBED0A04893BDD35FA51699C21",
+        "cow-preview.png": "CFDA2340511EA40E64FC6CAC697176588D5462C842F2D83DBC3289987545C01E"
       },
       "provenance": {
         "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
-        "license": "project-original"
+        "source": "Vaca facetada de The Valley (deliverables/marked-models-trial/build-models.py, cow(); 29 sep 2026), aprobada por Vera; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
       }
     },
     {

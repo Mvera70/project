@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T19:06:59.297Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids pig",
+  "generatedAt": "2026-09-29T19:13:02.531Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids cow",
   "assets": [
     {
       "id": "axis-marker",
@@ -182,25 +182,6 @@
       "file": "reed.glb",
       "sha256": "3AE010539E86395BBFB41C13EC468FF48C75BE298E737255AB2DE17DEA87960D",
       "motion": []
-    },
-    {
-      "id": "cow",
-      "file": "cow.glb",
-      "sha256": "6A922A86C1DBF645EEA0E200403147099D5B3D6EE578DA145F1ABC2DC90FC713",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.21
-        }
-      ]
     },
     {
       "id": "hen",
@@ -1563,6 +1544,30 @@
       "provenance": {
         "kind": "original",
         "source": "Cerdo facetado de The Valley (deliverables/marked-models-trial/build-models.py, pig(); 29 sep 2026), aprobado por Vera; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "cow",
+      "file": "cow.glb",
+      "sha256": "6B1474C09A3DDB26C8735D8182BD6DE8FF1957EBED0A04893BDD35FA51699C21",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.43
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Vaca facetada de The Valley (deliverables/marked-models-trial/build-models.py, cow(); 29 sep 2026), aprobada por Vera; clips idle/walk de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     }

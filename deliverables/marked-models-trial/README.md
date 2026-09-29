@@ -85,7 +85,7 @@ de `rigid-clips.mjs … pig`.
   [andando](pig-walk.png)
 - `python3 build-models.py -- pig`
 
-## La vaca (29 sep 2026) — candidata, **sin publicar**
+## La vaca (29 sep 2026) — **publicada**
 
 La de G-23 era de cajas, como la gallina, y con el cerdo facetado el corral
 quedaba en dos estilos. `cow()` en `build-models.py` la hace facetada sobre la

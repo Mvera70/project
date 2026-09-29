@@ -1,5 +1,15 @@
 # The Valley — Registro de cambios
 
+## v5.01 · 29 sep 2026 · La vaca
+
+La de G-23 era de cajas y con el cerdo facetado el corral quedaba en dos
+estilos. Ahora es facetada sobre la estructura de la mula de Vera (`cow()` en
+`deliverables/marked-models-trial/build-models.py`): barril hondo, papada,
+cuernos, pelo rojizo con la cara y el vientre blancos. Vera la quiso más gorda:
+`COW_GIRTH` ensancha y ahonda el tronco (1,22 y 1,14). La ubre queda dentro
+de la barriga nueva; sacarla por debajo se probó y Vera prefirió seguir.
+Mismo largo que la de G-23; marcha de `rigid-clips.mjs … cow`.
+
 ## v5.00 · 29 sep 2026 · El cerdo
 
 Vera: «me gusta». El de G-23 era una caja con dos losas por orejas que salían
