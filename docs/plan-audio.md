@@ -70,6 +70,13 @@ Cuando se recupere el fichero fuente, deberá cargarse al armar el
 los acentos. Hasta entonces `src/ui/sound.ts` conserva el ambiente Web Audio
 existente y el plan no declara una integración terminada.
 
+> **29 sep 2026 · Este apartado es historia.** La síntesis en vivo que describe se
+> retiró el 24 sep, y los cambios de era ya existen en el estado. **El análisis
+> vigente del sonido del mundo —ambiente, naturaleza, vida, sucesos, caza y
+> asedio, contrastado con el código— está en
+> [`plan-audio-mundo.md`](plan-audio-mundo.md)**, que corrige los desfases de
+> §4.1 a §4.8 (qué se pide y no existe, qué existe y no se pide).
+
 ## 1. De dónde se parte
 
 El juego ya tiene sonido, pero **todo se sintetiza con Web Audio** en

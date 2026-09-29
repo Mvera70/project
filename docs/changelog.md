@@ -1,5 +1,17 @@
 # The Valley — Registro de cambios
 
+## v4.99 · 29 sep 2026 · El sonido del mundo, analizado
+
+Vera pidió empezar por el sonido de la naturaleza y la vida: primero la lista de
+todo lo que se ve o se toca y no suena. **`docs/plan-audio-mundo.md`**: 80
+filas contra el código (entorno y clima; vida y animales; edificios, sucesos y
+combate), con la lectura de cada dato —hoy, descriptor o gancho—, qué se puede
+fabricar y qué no, las decisiones que son suyas y un orden en seis fases. Y el
+plan viejo (`plan-audio.md`) corregido por los dos lados: pedía espadas,
+cuerno, caballo y rueda de molino que no existen, y no pedía las cascadas, la
+caza ni los cambios de era que sí. Los huecos de imagen que destapó van a
+`encargos-3d.md`. Sin cambios de código ni de audio.
+
 ## v4.98 · 29 sep 2026 · La interfaz suena de materiales, no de notas
 
 Vera descartó los veinte sonidos de v4.97 («no me gusta ninguna»). Se buscó

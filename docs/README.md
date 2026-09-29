@@ -48,6 +48,7 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `interfaz/` | **La interfaz, versión a versión**: una carpeta por fecha con todas las pantallas y estados del juego (skill `press-kit`), para comparar qué cambió |
 | `plan-arte-pendiente.md` | La cola del arte: cada crónica nueva trae aquí su imagen pedida |
 | `plan-audio.md` | **Inventario maestro de audio**: ambiente, interfaz, economía, hitos, fases y asedio. En curso |
+| `plan-audio-mundo.md` | **El sonido del mundo, contra el código** (29 sep 2026): 80 filas —naturaleza, vida, animales, sucesos, caza y asedio—, qué se puede fabricar, qué hay que construir primero y qué decide Vera. Análisis, sin fabricar nada todavía |
 | `agents.md` | Cómo se delega y se audita |
 | `dos-sesiones.md` | Quién toca qué cuando hay dos sesiones a la vez |
 

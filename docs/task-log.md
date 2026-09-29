@@ -11,6 +11,13 @@ elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
 botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
 los momentos de §11.10.
 
+**El análisis del sonido del mundo está escrito** (`docs/plan-audio-mundo.md`,
+29 sep 2026): 80 filas contra el código, tres lecturas independientes. Lo que
+cambia el plan: el reproductor no sabe hacer bucles ni capas (fase 0), no hay
+flujo de sucesos, a ×64 una jornada dura 1,9 s, y el trueno ya tiene disparador
+y no fichero. Nueve decisiones abiertas para Vera en su §6, y un orden en seis
+fases (§7). **Nada fabricado todavía.**
+
 **Decisión de Vera, 29 sep 2026: «Eligo el K para ese botón».** El sonido del
 botón genérico es el **sello de cera** (K de la prueba del botón: al apretar,
 el golpe sordo sobre la cera; al soltar, la cera que se despega). Queda
