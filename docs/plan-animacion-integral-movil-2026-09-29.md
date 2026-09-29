@@ -434,6 +434,40 @@ jabalí cazado, no). Las tomas las rueda un agente con los comandos cerrados;
 su medida es la traza (fases del oso, acciones de la presa, clips del
 cazador y de la guarnición, fotograma a fotograma).
 
+### AN-4c · El oso nace con los troncos del juego (brief, 29 sep 2026)
+
+**Defecto medido.** La visita del oso **no nacía nunca en partida**, aunque el
+motor la tirara y la crónica la contara. `createBear` busca la guarida en una
+celda de bosque que admita el cuerpo del oso (radio 0,52); el juego mete el
+tronco del árbol publicado en cada celda de bosque (`world/obstacles.ts`,
+`solidTerrain`) y con ellos ninguna la admite. Medido fuera del navegador con
+la biblioteca de modelos real, en 7/30, 11/21 y 23/30: con el terreno a secas,
+22 guaridas posibles y un oso; con los troncos, **0 guaridas y ningún oso**
+(61 celdas de bosque bloqueadas y 84 donde no cabe). El observatorio lo
+confirmó: `bearDen` nulo desde el paso 0 en las tres tomas. La prueba de la
+visita (`life-bear.test.ts`) pasaba porque montaba la jornada sobre el terreno
+a secas: la trampa de CLAUDE.md, una prueba que llama a la función no sabe si
+el juego la llama.
+
+**Vía.** `src/render3d/life/bear.ts`, fuera de la lista (como AN-3a): la
+guarida puede ser también una celda de pradera pegada al bosque —la linde, de
+donde el oso sale de entre los árboles—, con las mismas condiciones de sitio,
+alcance y línea libre hasta el claro. No toca el motor ni el resultado de nada:
+la visita no hiere a nadie.
+
+**Prueba.** `life-bear.test.ts`: con un tronco de 0,3 en cada celda de bosque,
+donde el juego planta cada árbol (`scatterTransform`), la visita nace, el oso
+cabe y su guarida tiene bosque al lado. Sin el arreglo, la prueba falla
+(«expected [] to have a length of 1»). Con la biblioteca real, el oso nace en
+los tres valles.
+
+**Lo que no decide este brief, y es del dueño.** La guarida se elige junto al
+árbol que se tala, y ahí está el leñador (a 0,2–1,3 celdas en los tres valles):
+el oso avisa en el primer paso de la jornada y a los 3 s se ha ido, sin llegar
+a hozar en el claro. Para que se le vea salir, hozar y retirarse al ver gente
+habría que alejar la guarida del tajo —un cambio de cómo es la visita, no de
+cómo se anima—.
+
 ## 7 · AN-4 · Aceptación conjunta
 
 **Alcance (literal).** Repetir tomas antes/después del mismo estado. Cubrir

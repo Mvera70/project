@@ -109,6 +109,13 @@ con su malla (`world/arrows.ts`). Haría falta un gesto propio —el volteo sobr
 la cabeza y la suelta, fechado por el tiro como `bow_loose`— y elegirlo en
 `hunt-encounter.ts` según el arma.
 
+**La visita del oso** (AN-4c, 29 sep 2026): **no se veía nunca en partida**
+—con los troncos del juego no cabía en ninguna guarida de bosque— y desde
+AN-4c nace en la linde. Lo que queda es de diseño: la guarida está junto al
+árbol que se tala, con el leñador al lado, así que la visita es un aviso de
+3 s al empezar la jornada y el oso se va sin hozar en el claro. Alejar la
+guarida del tajo es decisión del dueño.
+
 ## 4 · De otras rondas, aún abierto
 
 - **El arado acarreado** el día que se da: una escena de dos con la carreta, no

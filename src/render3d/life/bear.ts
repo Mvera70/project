@@ -43,6 +43,14 @@ function clearLine(land: Terrain, from: Point, to: Point): boolean {
   return true;
 }
 
+/** Si alguna de las ocho celdas de alrededor es bosque. */
+function besideForest(state: GameState, width: number, x: number, z: number): boolean {
+  for (let dz = -1; dz <= 1; dz += 1) for (let dx = -1; dx <= 1; dx += 1) {
+    if ((dx !== 0 || dz !== 0) && state.map.terrain[(z + dz) * width + x + dx] === TERRAIN_CODE.forest) return true;
+  }
+  return false;
+}
+
 /** Una linde visible y transitable cerca del bosque de caza, nunca en una casa. */
 export function createBear(state: GameState, land: Terrain, heart: Point): Bear | null {
   // La guarida es el encuentro final: los avistamientos tempranos quedan en
@@ -62,7 +70,16 @@ export function createBear(state: GameState, land: Terrain, heart: Point): Bear 
         || !canReach(land, shore, at) || !fitsCircle(land, at.x, at.z, RADIUS)) continue;
       const kind = state.map.terrain[z * land.width + x];
       if (kind === TERRAIN_CODE.meadow) meadows.push(at);
-      else if (kind === TERRAIN_CODE.forest) woods.push(at);
+      // AN-4c · La guarida es la linde, no el fondo del bosque. El juego pone
+      // un tronco en cada celda de bosque (`world/obstacles.ts`,
+      // `solidTerrain`) y con ellos ninguna celda de bosque admite un oso de
+      // radio 0,52: medido el 29 sep en 7/30, 11/21 y 23/30, cero guaridas y
+      // ninguna visita en partida, cuando el terreno a secas daba veintidós.
+      // Vale también la pradera pegada al bosque: de ahí sale de entre los
+      // árboles, que es lo que se ve.
+      if (kind === TERRAIN_CODE.forest || (kind === TERRAIN_CODE.meadow && besideForest(state, land.width, x, z))) {
+        woods.push(at);
+      }
     }
   }
   // Un claro a la linde y una entrada entre árboles, unidos por suelo real.

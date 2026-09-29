@@ -4,7 +4,9 @@ import { createVillage } from '../../src/render3d/life/village';
 import { bearPosition, createBear, stepBear, type Bear } from '../../src/render3d/life/bear';
 import { stepDeer, type Deer } from '../../src/render3d/life/deer';
 import { terrainOf } from '../../src/render3d/life/terrain';
-import { fitsCircle, type Terrain } from '../../src/render3d/life/body';
+import { fitsCircle, indexSolids, type Solid, type Terrain } from '../../src/render3d/life/body';
+import { scatterTransform } from '../../src/render3d/world/forest';
+import { TERRAIN_CODE } from '@engine/state';
 
 describe('visita del oso', () => {
   it('sólo aparece durante el suceso real, estable y sobre suelo transitable', () => {
@@ -25,6 +27,34 @@ describe('visita del oso', () => {
     first.dispose(); second.dispose();
     state.tick += 2;
     expect(createBear(state, land, heart)).toBeNull();
+  });
+
+  it('AN-4c · con un tronco en cada celda de bosque, como en el juego, la visita sigue naciendo', () => {
+    // `solidTerrain` pone el tronco del árbol publicado en cada celda de
+    // bosque; con él ninguna celda de bosque admite al oso, y la visita no
+    // nacía nunca en partida (medido en 7/30, 11/21 y 23/30). Aquí el tronco
+    // es una caja de 0,3 en el sitio donde el juego planta cada árbol.
+    const state = foundTwenty(7);
+    state.flags['bear'] = state.tick + 2;
+    state.flags['hunt:boar'] = 0;
+    const bare = terrainOf(state);
+    const trunks: Solid[] = [];
+    for (let cell = 0; cell < state.map.terrain.length; cell += 1) {
+      if (state.map.terrain[cell] !== TERRAIN_CODE.forest) continue;
+      const { x, z } = scatterTransform(bare.width, cell);
+      trunks.push({ minX: x - 0.15, minZ: z - 0.15, maxX: x + 0.15, maxZ: z + 0.15 });
+    }
+    const land: Terrain = { ...bare, solids: indexSolids(bare.width, bare.height, trunks) };
+    const village = createVillage(state, 0, { land });
+    const bear = village.wildlife.filter(animal => animal.kind === 'bear');
+    expect(bear, 'el oso nace con los troncos puestos').toHaveLength(1);
+    expect(fitsCircle(land, bear[0]!.x, bear[0]!.y, 0.52)).toBe(true);
+    // Y sale de la linde: su guarida tiene bosque al lado.
+    const den = village.bearDen!;
+    const cell = Math.floor(den.z) * land.width + Math.floor(den.x);
+    const around = [-1, 0, 1].flatMap(dz => [-1, 0, 1].map(dx => cell + dz * land.width + dx));
+    expect(around.some(at => state.map.terrain[at] === TERRAIN_CODE.forest)).toBe(true);
+    village.dispose();
   });
 
   it('se detiene y enseña el zarpazo ante una persona; después se retira', () => {
