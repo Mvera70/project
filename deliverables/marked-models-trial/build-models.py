@@ -516,6 +516,49 @@ def cow():
     ell('Tail_Tuft',(.281,0,.225),(.030,.030,.060),'hoof',tail,8,5)
     merge_parts(); save('cow')
 
+def deer():
+    # 29 sep 2026. El ciervo de G-23 era de cajas, el último. Facetado sobre la
+    # estructura de la mula de Vera: tronco esbelto sobre patas largas, cuello
+    # alto con crin oscura, pardo rojizo con vientre claro y espejo blanco en la
+    # grupa, y cuerna ramificada. Mismo tamaño que el de G-23 con su cuerna.
+    reset(); mat('coat','5E361D'); mat('belly','D6C3A0'); mat('rump','E3D6BC'); mat('mane','3A2618')
+    mat('antler','CDB99A'); mat('hoof','33291F'); mat('earInner','5A3E2C')
+    body=empty('body',(0,0,.34),ROOT)
+    torso=[(-.220,.460,.050,.070),(-.180,.470,.085,.100),(-.080,.465,.095,.100),(.050,.465,.090,.095),(.150,.470,.085,.095),(.210,.475,.050,.070)]
+    loft('Torso',torso,'coat',body,12)
+    loft('Belly',[(x,z-rz*.40,ry*.86,rz*.62) for x,z,ry,rz in torso[1:-1]],'belly',body,12)
+    ell('Rump_Patch',(.212,0,.490),(.050,.120,.120),'rump',body,10,6)
+    tail=empty('tail',(.225,0,.525),body); ell('Tail',(.232,0,.515),(.030,.030,.050),'mane',tail,8,5)
+    neck=empty('neck',(-.200,0,.520),body)
+    tube('Neck',[(-.190,0,.515),(-.245,0,.600),(-.285,0,.660)],[(.062,.056),(.050,.045),(.042,.040)],'coat',neck,10)
+    tube('Mane',[(-.200,0,.470),(-.250,0,.560),(-.280,0,.630)],[(.052,.050),(.044,.042),(.030,.030)],'mane',neck,10)
+    head=empty('head',(-.290,0,.660),neck)
+    loft('Head',[(-.275,.676,.043,.046),(-.315,.666,.039,.041),(-.355,.648,.030,.031),(-.388,.636,.022,.022)],'coat',head,10)
+    ell('Nose',(-.397,0,.634),(.020,.034,.028),'nose',head,8,5)
+    for s in (-1,1):
+        eye('Eye_'+str(s),-.318,s*.039,.683,.010,head)
+        earP=empty('ear'+str(s),(-.280,s*.030,.700),head)
+        leaf('Ear_'+str(s),(-.280,s*.030,.700),(-.262,s*.088,.735),.042,.010,'coat',earP)
+        leaf('Ear_Inner_'+str(s),(-.283,s*.034,.703),(-.268,s*.078,.728),.022,.004,'earInner',earP)
+        # La cuerna: la vara sube hacia atrás y afuera, con luchadera, candil
+        # y la corona arriba.
+        beam=[(-.285,s*.026,.705),(-.262,s*.070,.765),(-.235,s*.110,.815),(-.205,s*.140,.850)]
+        tube('Antler_Beam_'+str(s),beam,[.010,.009,.007,.005],'antler',head,7)
+        tube('Brow_Tine_'+str(s),[(-.280,s*.040,.725),(-.305,s*.060,.748),(-.325,s*.070,.770)],[.007,.005,.002],'antler',head,6)
+        tube('Trez_Tine_'+str(s),[(-.258,s*.078,.772),(-.280,s*.100,.800),(-.292,s*.112,.825)],[.006,.004,.002],'antler',head,6)
+        tube('Crown_A_'+str(s),[(-.205,s*.140,.850),(-.215,s*.162,.872)],[.005,.002],'antler',head,6)
+        tube('Crown_B_'+str(s),[(-.212,s*.132,.842),(-.196,s*.124,.874)],[.005,.002],'antler',head,6)
+    for pre,x in [('fore',-.140),('hind',.150)]:
+        for sd,l in [(-1,'L'),(1,'R')]:
+            y=sd*.055
+            if pre=='fore':
+                hip=(x,y,.450); knee=(x+.010,y,.250); ankle=(x-.004,y,.034); toe=(ankle[0]-.010,y,.016)
+            else:
+                # El corvejón atrás, como en el ciervo de verdad.
+                hip=(x,y,.460); knee=(x-.035,y,.280); ankle=(x+.020,y,.034); toe=(ankle[0]-.010,y,.016)
+            limb(pre+l,hip,knee,ankle,toe,.040,'coat',body,'hoof')
+    merge_parts(); save('deer')
+
 def mule():
     reset(); mat('coat','978772'); mat('coatTop','514B40'); mat('light','C9C1A5'); mat('earInner','706658'); mat('pack','B19A6C'); mat('cloth','A28F63')
     body=empty('body',(0,0,.24),ROOT)
@@ -778,6 +821,6 @@ def hoe():
 # `-- bear` construye sólo esos; sin nombres, todos (el oso, en su v4).
 ONLY=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 BUILDS=[('wolf',lambda: canine('wolf')),('dog',lambda: canine('dog')),('boar',boar),('bear',bear),('bear_v3',bear_v3),('mule',mule),
-        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('crow',crow),('duck',duck),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
+        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('crow',crow),('duck',duck),('deer',deer),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
 for name,build in BUILDS:
     if (not ONLY and name!='bear_v3') or name in ONLY: build()
