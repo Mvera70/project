@@ -452,9 +452,9 @@ Todo con el panel de taller abierto (el reparto del fotograma: dibujo, vida,
 - **Suite rápida entera, sobre la rama fusionada: 219 de 220 ficheros y 2102
   de 2103 pruebas verdes** (24 min en este contenedor). La única roja es
   `catchUp · §13.2` («960 ticks en
-  menos de 2 s») tarda en este contenedor 2,2 s **también en `main`** (2,13 y
-  2,15 s, sola y sin carga): es la velocidad de la máquina, no el motor, que no
-  se tocó.
+  menos de 2 s»), que en este contenedor tarda 2,2 s **también en `main`**
+  (2,13 y 2,15 s, sola y sin carga): es la velocidad de la máquina, no el
+  motor, que no se tocó.
 
 ### Ficheros
 
