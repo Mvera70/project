@@ -71,8 +71,8 @@
       "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "marked-models-63db59c",
-        "directory": "artifacts/graphics/marked-models/approved/boar"
+        "runId": "boar-short",
+        "directory": "artifacts/graphics/boar-short/approved/boar"
       },
       "bounds": {
         "min": [
@@ -82,24 +82,24 @@
         ],
         "max": [
           0.287442,
-          0.42,
+          0.34,
           0.12
         ],
         "size": [
           0.712942,
-          0.42,
+          0.34,
           0.24
         ]
       },
       "recipeSha256": null,
       "materials": [
-        "coat_002",
-        "coatTop_002",
-        "nose_002",
-        "light_002",
-        "ivory_002",
-        "earInner_002",
-        "eye_002"
+        "coat",
+        "coatTop",
+        "nose",
+        "light",
+        "ivory",
+        "earInner",
+        "eye"
       ],
       "clips": [
         "walk",
@@ -112,7 +112,7 @@
           "name": "walk",
           "seconds": 1.2,
           "loop": true,
-          "strideLength": 0.342
+          "strideLength": 0.241
         },
         {
           "name": "idle",
@@ -124,7 +124,7 @@
           "name": "charge",
           "seconds": 0.8,
           "loop": true,
-          "strideLength": 0.513
+          "strideLength": 0.362
         },
         {
           "name": "attack",
@@ -141,12 +141,12 @@
         "triangles": 1574
       },
       "hashes": {
-        "boar.glb": "040873AABA5348C1EF1CB529B88264144D5C241256EB688C06FB9757C196C48C",
-        "boar-preview.png": "1668CCC6B25960B6BB05A3DCBE1846CD77DCD822B7061A734D545473720A86F5"
+        "boar.glb": "5630DCFB5FEC87A07EF4A37972F3D361638F693EAEA3A6E67D5122D877C2BDE3",
+        "boar-preview.png": "C8DECE06F652E0FD6490230FC97884B8C381B5115B39CC099C320E154A692280"
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, boar.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, boar()); 29 sep 2026: patas acortadas y colmillos mayores a petición suya (BOAR_DROP 0,08, BOAR_TUSK 1,5). Clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     },
@@ -5684,8 +5684,8 @@
       "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "marked-models-63db59c",
-        "directory": "artifacts/graphics/marked-models/approved/mule"
+        "runId": "mule-short",
+        "directory": "artifacts/graphics/mule-short/approved/mule"
       },
       "bounds": {
         "min": [
@@ -5695,26 +5695,26 @@
         ],
         "max": [
           0.294801,
-          0.695,
+          0.595,
           0.155912
         ],
         "size": [
           0.703801,
-          0.695,
+          0.595,
           0.311823
         ]
       },
       "recipeSha256": null,
       "materials": [
-        "light_004",
-        "rope_004",
-        "coat_004",
-        "coatTop_004",
-        "nose_004",
-        "earInner_004",
-        "eye_004",
-        "ivory_004",
-        "leather_004",
+        "light_001",
+        "rope_001",
+        "coat_001",
+        "coatTop_001",
+        "nose_001",
+        "earInner_001",
+        "eye_001",
+        "ivory_001",
+        "leather_001",
         "pack",
         "cloth"
       ],
@@ -5727,7 +5727,7 @@
           "name": "walk",
           "seconds": 1.2,
           "loop": true,
-          "strideLength": 0.449
+          "strideLength": 0.329
         },
         {
           "name": "idle",
@@ -5744,12 +5744,12 @@
         "triangles": 2474
       },
       "hashes": {
-        "mule.glb": "88B79BD57D0274ADAF2842B17F77E6B2CBE08AD7A92D2F9E9E7DB43F8F0B03AC",
-        "mule-preview.png": "64A46E7880357450145E55706A90D9478E6451DA0FC40C0BF462CDAAD6D8DBA6"
+        "mule.glb": "6544470455BA197DA6301F429E97369560C946626E49342E6C0501ED5F6973AA",
+        "mule-preview.png": "F93A6FD72EDDBAC800265477F89981DD71EE3C8FA932EEB6FE3999FB340C86FD"
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, mule.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, mule()); 29 sep 2026: patas acortadas a petición suya (MULE_DROP 0,10). Clips idle/walk de tools/art/rigid-clips.mjs.",
         "license": "project-original"
       }
     },

@@ -1,5 +1,18 @@
 # The Valley — Registro de cambios
 
+## v5.11 · 29 sep 2026 · La mula y el jabalí, con las patas más cortas
+
+Vera: «la mula, las patas son muy largas […] el jabalí es algo similar […]
+creo que la forma es muy buena; a lo mejor los cuernos destacarlos un poco
+más». Sus modelos, sin tocar la forma: `MULE_DROP` y `BOAR_DROP` en
+`deliverables/marked-models-trial/build-models.py` bajan el cuerpo con todo lo
+de encima y acortan las patas lo mismo, con la pezuña en el suelo (0,10 y
+0,08); `BOAR_TUSK` agranda los colmillos un 50 %. A su valor neutro dan el
+modelo de Vera idéntico. El jabalí sigue cargando y embistiendo.
+
+**Lo que se probó y no entra:** una golondrina de alas en hoz y una perdiz con
+las barras tumbadas; Vera prefirió las suyas y siguen publicadas las de antes.
+
 ## v5.10 · 29 sep 2026 · El ciervo, y ya no queda ningún animal de cajas
 
 El último de la receta G-23. `deer()` en

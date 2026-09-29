@@ -153,15 +153,18 @@ por cinemática inversa y el cuerpo un poco agachado al andar, como hacía
   [andando](deer-walk.png)
 - `python3 build-models.py -- deer`
 
-## La golondrina (29 sep 2026) — candidata, **sin publicar**
 
-La de Astra eran dos triángulos negros con un cuerpo diminuto. `bird()` en
-`build-models.py` guarda su contrato con `effects/ambience.ts` —tres piezas,
-`bird_body`, `bird_wing_l` y `bird_wing_r`, con la bisagra del ala en el
-origen de su pieza, en el mismo sitio— y cambia la silueta, que es lo que se
-ve a ×10 en el cielo: alas en hoz barridas hacia atrás con envergadura de casi
-el doble del largo, cola ahorquillada, lomo azul muy oscuro, garganta rojiza y
-vientre claro. Sin clips: el aleteo lo hace el juego.
+## La mula y el jabalí, con las patas más cortas (29 sep 2026) — **publicados**
 
-- [bird.glb](bird.glb) · [de frente](bird-front.png) · [tres cuartos](bird-three-quarter.png)
-- `python3 build-models.py -- bird`
+A Vera las patas le parecían muy largas. `mule()` y `boar()` siguen siendo sus
+modelos; dos parámetros de `build-models.py` bajan el cuerpo con todo lo que
+lleva encima y acortan las patas lo mismo, con la pezuña en el suelo y de su
+tamaño: `MULE_DROP` (0,10) y `BOAR_DROP` (0,08). `BOAR_TUSK` (1,5) agranda los
+colmillos desde su raíz, para que se vean («destacarlos»). Con los tres a su
+valor neutro (0, 0 y 1) sale el modelo de Vera pieza a pieza, comprobado
+contra el GLB publicado antes del cambio.
+
+- [mula](mule-short-three-quarter.png) · [jabalí](boar-short-three-quarter.png)
+
+La golondrina y la perdiz se quedan las de siempre: se probaron otras y Vera
+prefirió las suyas.

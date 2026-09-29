@@ -176,6 +176,9 @@ def canine(id):
         clip('attack',tracks,[1,10,24,34])
     save(id)
 
+BOAR_DROP=.08   # patas más cortas (Vera eligió ésta); 0 es el jabalí de Vera
+BOAR_TUSK=1.5   # colmillos más grandes (Vera: «destacarlos»); 1 es el suyo
+
 def boar():
     reset(); mat('coat','625B4D'); mat('coatTop','49483E'); mat('light','8B7B62'); mat('earInner','8C7962')
     body=empty('body',(.015,0,.18),ROOT)
@@ -188,15 +191,22 @@ def boar():
         ell('Nostril_'+str(s),(-.421,s*.020,.168),(.009,.017,.014),'nose',head,8,4)
         eye('Eye_'+str(s),-.246,s*.071,.274,.015,head)
         ear('ear'+str(s),(-.184,s*.061,.339),(-.197,s*.111,.410),.060,'coat',head)
-        tube('Curved_Tusk_'+str(s),[(-.335,s*.042,.152),(-.357,s*.062,.166),(-.368,s*.064,.187),(-.368,s*.060,.214),(-.359,s*.052,.232)],[.013,.013,.011,.007,.0008],'ivory',head,8)
+        # Colmillos: BOAR_TUSK los agranda desde su raíz (Vera: «destacarlos»).
+        root=Vector((-.335,s*.042,.152))
+        tusk=[tuple(root+(Vector(p)-root)*BOAR_TUSK) for p in [(-.335,s*.042,.152),(-.357,s*.062,.166),(-.368,s*.064,.187),(-.368,s*.060,.214),(-.359,s*.052,.232)]]
+        tube('Curved_Tusk_'+str(s),tusk,[r*(1+(BOAR_TUSK-1)*.6) for r in [.013,.013,.011,.007,.0008]],'ivory',head,8)
         for i in range(5): leaf('Coat_Ridge_'+str(s)+'_'+str(i),(-.13+i*.052,s*.029,.383-i*.009),(-.107+i*.052,s*.034,.416-i*.012),.019,.009,'coatTop',body)
-    for pre,x in [('fore',-.124),('hind',.169)]:
-        for s,l in [(-1,'L'),(1,'R')]:
-            y=s*.072; hip=(x,y,.272); knee=(x+(.004 if pre=='fore' else -.035),y,.131); ankle=(x+(-.013 if pre=='fore' else .019),y,.038); toe=(ankle[0]-.013,y,.019)
-            p,q,f=limb(pre+l,hip,knee,ankle,toe,.036,'coat',body)
-            box(pre+l+'_Cloven_Seam',(toe[0]-.023,y,.017),(.010,.004,.025),'coatTop',f)
     tail=empty('tail',(.218,0,.287),body); tube('Tail',[(.218,0,.287),(.256,0,.261),(.27,0,.197),(.276,0,.170)],[.009,.008,.006,.004],'coatTop',tail,7)
     leaf('Tail_Tuft',(.271,0,.20),(.283,0,.152),.018,.012,'coatTop',tail)
+    # Como la mula: baja el cuerpo con todo lo de encima y después se hacen las
+    # patas en su sitio, la pezuña en el suelo. Con BOAR_DROP=0, el de Vera.
+    body.location.z-=BOAR_DROP
+    k=(.272-BOAR_DROP-.038)/(.272-.038)
+    for pre,x in [('fore',-.124),('hind',.169)]:
+        for s,l in [(-1,'L'),(1,'R')]:
+            y=s*.072; hip=(x,y,.272-BOAR_DROP); knee=(x+(.004 if pre=='fore' else -.035),y,.038+(.131-.038)*k); ankle=(x+(-.013 if pre=='fore' else .019),y,.038); toe=(ankle[0]-.013,y,.019)
+            p,q,f=limb(pre+l,hip,knee,ankle,toe,.036,'coat',body)
+            box(pre+l+'_Cloven_Seam',(toe[0]-.023,y,.017),(.010,.004,.025),'coatTop',f)
     save('boar')
 
 def bear_v3():
@@ -566,6 +576,8 @@ def deer():
             limb(pre+l,hip,knee,ankle,toe,.040,'coat',body,'hoof')
     merge_parts(); save('deer')
 
+MULE_DROP=.10   # patas más cortas (Vera: «muy largas»; eligió ésta); 0 es la suya
+
 def mule():
     reset(); mat('coat','978772'); mat('coatTop','514B40'); mat('light','C9C1A5'); mat('earInner','706658'); mat('pack','B19A6C'); mat('cloth','A28F63')
     body=empty('body',(0,0,.24),ROOT)
@@ -583,12 +595,6 @@ def mule():
     ring('Halter_Nose',(-.35,0,.441),.035,.031,.008,'leather',head,12,axis='Y').hide_render=True
     # Crin vertical corta, siguiendo la nuca.
     for j in range(7): leaf('Mane_'+str(j),(-.239+j*.015,0,.515-j*.018),(-.218+j*.015,0,.555-j*.018),.017,.013,'coatTop',neck)
-    for pre,x in [('fore',-.146),('hind',.16)]:
-        for s,l in [(-1,'L'),(1,'R')]:
-            y=s*.055; hip=(x,y,.375); knee=(x+(.004 if pre=='fore' else -.037),y,.200); ankle=(x+(.003 if pre=='fore' else .028),y,.044); toe=(ankle[0]-.011,y,.021)
-            p,q,f=limb(pre+l,hip,knee,ankle,toe,.030,'coat',body)
-            ell(pre+l+'_Knee',knee,(.034,.034,.038),'coatTop',q,8,5)
-            tube(pre+l+'_Pale_Shin',[(ankle[0],y,.048),(ankle[0]+.001,y,.14)],[.013,.012],'light',q,8)
     tail=empty('tail',(.213,0,.39),body)
     tube('Fine_Tail',[(.213,0,.390),(.242,0,.333),(.254,0,.237),(.264,0,.151)],[.010,.009,.007,.005],'coatTop',tail,8)
     tube('Tail_Brush',[(.259,0,.197),(.273,0,.151),(.272,0,.101)],[.017,.022,.003],'coatTop',tail,8)
@@ -600,6 +606,18 @@ def mule():
         for xx in (-.030,.097): tube('Pack_Strap_'+str(s)+'_'+str(xx),[(xx,s*.135,.322),(xx,s*.151,.411),(xx,s*.077,.49)],[.006,.006,.006],'leather',body,6)
     box('Bundle',(.021,0,.532),(.152,.100,.067),'light',body,.018)
     for xx in (-.027,.069): tube('Bundle_Lashing_'+str(xx),[(xx,-.055,.514),(xx,-.049,.563),(xx,.048,.563),(xx,.055,.514)],[.003]*4,'rope',body,6)
+    # Primero baja el cuerpo con todo lo que lleva encima y después se hacen
+    # las patas ya en su sitio: la cadera MULE_DROP más abajo, la pezuña en el
+    # suelo y a su altura de siempre. Con MULE_DROP=0 es la mula de Vera tal cual.
+    body.location.z-=MULE_DROP
+    k=(.375-MULE_DROP-.044)/(.375-.044)
+    lz=lambda z: .044+(z-.044)*k
+    for pre,x in [('fore',-.146),('hind',.16)]:
+        for s,l in [(-1,'L'),(1,'R')]:
+            y=s*.055; hip=(x,y,.375-MULE_DROP); knee=(x+(.004 if pre=='fore' else -.037),y,lz(.200)); ankle=(x+(.003 if pre=='fore' else .028),y,.044); toe=(ankle[0]-.011,y,.021)
+            p,q,f=limb(pre+l,hip,knee,ankle,toe,.030,'coat',body)
+            ell(pre+l+'_Knee',knee,(.034,.034,.038),'coatTop',q,8,5)
+            tube(pre+l+'_Pale_Shin',[(ankle[0],y,.048),(ankle[0]+.001,y,lz(.14))],[.013,.012],'light',q,8)
     save('mule')
 
 def partridge():
@@ -748,47 +766,6 @@ def duck():
         leaf('Web_'+l,(ankle[0],s*.028,.006),(-.030,s*.028,.004),.030,.004,'orange',f)
     merge_parts(); save('duck')
 
-def bird():
-    # 29 sep 2026. La golondrina de Astra eran dos triángulos negros con un
-    # cuerpo diminuto. Mismo contrato que la suya (`effects/ambience.ts`): tres
-    # piezas, `bird_body` y `bird_wing_l`/`_r`, con la bisagra del ala en el
-    # origen de su pieza —el juego la bate girándola sobre el eje del vuelo—.
-    # El juego la escala ×10 y la ve alta en el cielo, así que lo que cuenta es
-    # la silueta: alas en hoz barridas hacia atrás, cola ahorquillada con sus
-    # dos plumas largas, lomo azul oscuro, garganta rojiza y vientre claro.
-    reset(); mat('feathers','141C2C'); mat('breast','D8CCB0'); mat('throat','A0482C'); mat('tips','101418')
-    # (lado, adelante, arriba) -> Blender; glTF recupera +Z como el vuelo.
-    B=lambda sd,fw,up:(sd,-fw,up)
-    body=empty('bird_body',(0,0,0),ROOT)
-    rings=[(-.032,.000,.0034,.0030),(-.014,.000,.0072,.0060),(.008,.001,.0085,.0068),(.026,.001,.0058,.0052),(.035,.001,.0022,.0022)]
-    def spindle(name,rs,m,dz=0,kw=1,kh=1):
-        vs=[];fs=[];n=8
-        for fw,up,w,h in rs:
-            for i in range(n):
-                a=2*pi*i/n; vs.append(B(cos(a)*w*kw,fw,up+dz+sin(a)*h*kh))
-        fs.append(tuple(range(n-1,-1,-1)))
-        for r in range(len(rs)-1):
-            for i in range(n):
-                j=(i+1)%n; fs.append((r*n+i,r*n+j,(r+1)*n+j,(r+1)*n+i))
-        fs.append(tuple((len(rs)-1)*n+i for i in range(n)))
-        return mesh(name,vs,fs,m,body)
-    spindle('Back',rings,'feathers')
-    spindle('Belly',rings[:-1],'breast',dz=-.0022,kw=.88,kh=.72)
-    ell('Throat',B(0,.025,-.0014),(.0074,.009,.0052),'throat',body,8,5)
-    loft_beak=[B(-.0016,.037,.0012),B(.0016,.037,.0012),B(0,.037,.0028),B(0,.045,.0010)]
-    mesh('Beak',loft_beak,[(0,2,1),(0,1,3),(1,2,3),(2,0,3)],'tips',body)
-    for sd in (-1,1):
-        # Timoneras: la horquilla, larga y fina.
-        slab('Tail_Streamer_'+str(sd),[B(sd*.0010,-.026,.0008),B(sd*.0055,-.028,.0008),B(sd*.0095,-.056,.0004),B(sd*.0070,-.053,.0004)],(0,0,.0007),'tips',body)
-    for side,sd in [('l',-1),('r',1)]:
-        w=empty('bird_wing_'+side,B(sd*.0027,.0027,.0007),ROOT)
-        # Hoz barrida hacia atrás: borde de ataque curvo, punta fina detrás.
-        # Envergadura casi el doble del largo, como una golondrina de verdad.
-        outline=[(0,.010),(.016,.012),(.034,.008),(.054,-.004),(.074,-.024),(.056,-.013),(.036,-.009),(.016,-.010),(0,-.008)]
-        slab('Wing_'+side,[B(sd*(.0027+x),.0027+fw,.0007) for x,fw in outline],(0,0,.0009),'feathers',w)
-        slab('Wing_Tip_'+side,[B(sd*(.0027+x),.0027+fw,.0009) for x,fw in [(.050,-.002),(.056,-.005),(.074,-.024),(.062,-.015)]],(0,0,.0008),'tips',w)
-    merge_parts(); save('bird')
-
 def bucket():
     reset(); mat('staveA','A07C50'); mat('staveB','927044'); mat('staveC','B18B59'); mat('inside','71573A')
     # Duela individual, hueco real y espesor visible en el canto.
@@ -869,6 +846,6 @@ def hoe():
 # `-- bear` construye sólo esos; sin nombres, todos (el oso, en su v4).
 ONLY=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 BUILDS=[('wolf',lambda: canine('wolf')),('dog',lambda: canine('dog')),('boar',boar),('bear',bear),('bear_v3',bear_v3),('mule',mule),
-        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('crow',crow),('duck',duck),('deer',deer),('bird',bird),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
+        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('crow',crow),('duck',duck),('deer',deer),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
 for name,build in BUILDS:
     if (not ONLY and name!='bear_v3') or name in ONLY: build()

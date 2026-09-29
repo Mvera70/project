@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T19:53:56.273Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids deer",
+  "generatedAt": "2026-09-29T20:19:37.522Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids mule,boar",
   "assets": [
     {
       "id": "axis-marker",
@@ -1007,66 +1007,6 @@
       }
     },
     {
-      "id": "mule",
-      "file": "mule.glb",
-      "sha256": "88B79BD57D0274ADAF2842B17F77E6B2CBE08AD7A92D2F9E9E7DB43F8F0B03AC",
-      "motion": [
-        {
-          "name": "walk",
-          "seconds": 1.2,
-          "loop": true,
-          "strideLength": 0.449
-        },
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, mule.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
-        "license": "project-original"
-      }
-    },
-    {
-      "id": "boar",
-      "file": "boar.glb",
-      "sha256": "040873AABA5348C1EF1CB529B88264144D5C241256EB688C06FB9757C196C48C",
-      "motion": [
-        {
-          "name": "walk",
-          "seconds": 1.2,
-          "loop": true,
-          "strideLength": 0.342
-        },
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "charge",
-          "seconds": 0.8,
-          "loop": true,
-          "strideLength": 0.513
-        },
-        {
-          "name": "attack",
-          "seconds": 1.2,
-          "loop": false,
-          "strideLength": null
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, boar.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
-        "license": "Project original"
-      }
-    },
-    {
       "id": "partridge",
       "file": "partridge.glb",
       "sha256": "5DA9BEDE8836660B0D5CF2D4BF512DAF88FD824969E3ABAD4FB9DAB674A15998",
@@ -1583,6 +1523,66 @@
       "provenance": {
         "kind": "original",
         "source": "Original villager: rediseño low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md. AN-1 (29 sep 2026): walk y carry_walk reescritos por art/recipes/villager/plant-gait.mjs y horneados en el GLB de G-17 con tools/art/bake-clips.mjs (sin Blender en la ronda); geometría, rig e idle/work_hoe intactos.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "mule",
+      "file": "mule.glb",
+      "sha256": "6544470455BA197DA6301F429E97369560C946626E49342E6C0501ED5F6973AA",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.329
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, mule()); 29 sep 2026: patas acortadas a petición suya (MULE_DROP 0,10). Clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "boar",
+      "file": "boar.glb",
+      "sha256": "5630DCFB5FEC87A07EF4A37972F3D361638F693EAEA3A6E67D5122D877C2BDE3",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.241
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "charge",
+          "seconds": 0.8,
+          "loop": true,
+          "strideLength": 0.362
+        },
+        {
+          "name": "attack",
+          "seconds": 1.2,
+          "loop": false,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, boar()); 29 sep 2026: patas acortadas y colmillos mayores a petición suya (BOAR_DROP 0,08, BOAR_TUSK 1,5). Clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     }
