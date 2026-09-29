@@ -9,6 +9,7 @@ explica cada una; este índice sirve para escoger la entrada correcta.
 |---|---|---|
 | Una imagen de una partida real | `shot.mjs` | `bundle-game.ts`, `serve.mjs`, `capture.ts` |
 | Una secuencia con trazas de vida | `film.mjs` | `film-sheet.py`, `day-report.mjs` |
+| Seguir a un aldeano igual en dos versiones (oclusión) | `follow-sequence.mjs` | `shot.mjs` para la toma suelta |
 | Observar cuerpos y rutas en el navegador | `observe-life.mjs` | `evidence-index.mjs` |
 | Todas las pantallas y metraje de prensa | `press-kit.mjs` | — |
 | Revisar la entrada de caza | `hunt-smoke.mjs` | — |

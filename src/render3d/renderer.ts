@@ -44,6 +44,10 @@ import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
 import { updateMountainVeil } from './effects/mountain-veil';
 import { createGrass, meadowWeight } from './world/grass';
+import {
+  contactShadeAsked, createContactShade, enableContactShade, tuneContactShade, type ContactShade,
+} from './world/contact-shade';
+import { aaTrialOf, createScreenAa, type ScreenAa } from './effects/screen-aa';
 import { buildRoadStones, buildSignposts, valleyRoad } from './world/road';
 import { createTrampleMap, setTramplers, snowTracks, SNOW_FROM, type TrampleMap, type Trampler } from './effects/trample';
 import { cloudsFor, stepClouds } from './effects/clouds';
@@ -89,6 +93,7 @@ import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
 import type { PhysicsSnapshot } from './life/physics';
+import { DRAWN_BODY, type ArcheryShadow } from './life/archery';
 import { garrisonAs, type Arm } from '@derive/garrison';
 import { createHuntEncounter, type HuntEncounter, type HuntReport } from './life/hunt-encounter';
 import { createWildPrey, stepWildPrey, wildPreyPosition, type WildKind, type WildPrey } from './life/wild-prey';
@@ -96,6 +101,7 @@ import { indoors } from './life/home';
 import type { Dweller } from './life/village';
 import { createBear } from './life/bear';
 import { huntOpportunity, type HuntSpecies, type HuntWeapon } from '@engine/world/hunting';
+import { hash32 } from '@engine/rng';
 import { valleyCore } from '@derive/anchors';
 import type { DayPlan } from './life/day';
 import { arrowsOf, castOf, propsOf } from './life/cast';
@@ -303,7 +309,16 @@ export async function createGraphicsRenderer(
   const profile = resolveProfile(options.graphics ?? DEFAULT_GRAPHICS, handheld);
   const shadowsOn = options.quality !== 'low' && profile.shadows;
   const pixelCap = profile.pixelRatioCap;
-  const renderer = new WebGLRenderer({ canvas: options.canvas, antialias: options.quality !== 'low' && profile.antialias });
+  // GV-3 · `?aa=` en la dirección sustituye sólo el suavizado, para el
+  // experimento comparativo (`effects/screen-aa.ts`); sin él, el del perfil.
+  // Vale también en el sitio publicado: la medida que decide es la del aparato.
+  const aaTrial = typeof window === 'undefined' ? null : aaTrialOf(window.location);
+  // GV-1 · y `?contact=off` monta el suelo sin el pie de los edificios, ni su
+  // máscara, para leer en el aparato lo que cuesta (`world/contact-shade.ts`).
+  const contactOn = typeof window === 'undefined' || contactShadeAsked(window.location);
+  enableContactShade(contactOn);
+  const antialias = aaTrial === 'msaa' ? true : aaTrial !== null ? false : options.quality !== 'low' && profile.antialias;
+  const renderer = new WebGLRenderer({ canvas: options.canvas, antialias });
   renderer.outputColorSpace = SRGBColorSpace;
   // **El valle estaba sobreexpuesto, y era la causa de que se viera lavado.**
   //
@@ -335,6 +350,19 @@ export async function createGraphicsRenderer(
   scene.background = new Color(VALLEY_COLOURS.sky);
   const view = createValleyCamera();
   const camera = view.camera;
+  /** GV-3 · la cadena de FXAA del experimento; `null` en el juego. */
+  const screenAa: ScreenAa | null = aaTrial === 'fxaa' ? await createScreenAa(renderer, scene, camera) : null;
+  /** El fotograma al lienzo: directo, o por el filtro del experimento. */
+  const drawFrame = (): void => {
+    if (screenAa !== null) screenAa.render();
+    else renderer.render(scene, camera);
+  };
+  /** La densidad y el tamaño del lienzo (y del filtro del experimento, si lo hay). */
+  function sizeCanvas(): void {
+    renderer.setPixelRatio(Math.min(viewport.pixelRatio, pixelCap) * renderScale);
+    renderer.setSize(viewport.widthCss, viewport.heightCss, false);
+    screenAa?.setSize(viewport.widthCss, viewport.heightCss, renderer.getPixelRatio());
+  }
   const world = new Group();
   world.name = 'Valley';
   scene.add(world);
@@ -524,6 +552,9 @@ export async function createGraphicsRenderer(
   // menos matas en táctil. Se replanta cuando cambia la semana y se recolorea
   // con la estación (`world/grass.ts`).
   const grass = createGrass(profile.lightGrass);
+  // GV-1 · la máscara del pie de los edificios, una para el valle; se hace
+  // al llegar el primer plan, cuando se sabe el tamaño del mapa.
+  let contact: ContactShade | null = null;
   world.add(grass.group);
   let grassTick = -1;
   // Las pisadas (`effects/trample.ts`): un mapa por valle, que sobrevive a los
@@ -825,8 +856,25 @@ export async function createGraphicsRenderer(
     }
   }
 
+  /**
+   * Lo que el bosque tiene que dejar ver: el encuentro —la caza o el frente
+   * del asalto— y, desde GV-2, **quien se sigue**. Sólo se atenúan las copas
+   * que se interponen entre la cámara y alguno de ellos (`forestOccluders`).
+   */
   function revealAssault(): number {
     if (forest === null || life === null) return 0;
+    const targets = encounterTargets(life);
+    // GV-2 · Quien se sigue se suma al encuentro, no lo sustituye: seguir a
+    // alguien durante un asalto no puede volver a tapar la puerta. Al dejar
+    // de seguir, `trackedNow` es `null` y el próximo fotograma devuelve las
+    // copas que sólo tapaban a esa persona.
+    const followed = trackedTarget();
+    if (followed !== null) targets.push(followed);
+    return forest.reveal(camera, targets);
+  }
+
+  /** La caza o el frente del asalto, como volúmenes a dejar ver; nada si no hay encuentro. */
+  function encounterTargets(scene: NonNullable<typeof life>): ForestRevealTarget[] {
     if (huntScene !== null) {
       const hunter = huntScene.hunter;
       const targets: ForestRevealTarget[] = [{
@@ -837,15 +885,15 @@ export async function createGraphicsRenderer(
         x: animal.x, y: groundFloor(animal.x, animal.y) + ACTOR_VISUAL_HEIGHT / 2,
         z: animal.y, radius: ACTOR_VISUAL_HEIGHT,
       });
-      return forest.reveal(camera, targets);
+      return targets;
     }
-    const gate = life.defence.gate;
-    if (gate === null) return forest.reveal(camera, []);
-    const active = life.raiders.filter(raider => raider.phase !== 'down'
+    const gate = scene.defence.gate;
+    if (gate === null) return [];
+    const active = scene.raiders.filter(raider => raider.phase !== 'down'
       && raider.phase !== 'gone' && raider.phase !== 'leaving');
     // El portón puede conservar su parte después de caer el último atacante.
     // Sin un cuerpo hostil activo ya no hay encuentro que revelar.
-    if (active.length === 0) return forest.reveal(camera, []);
+    if (active.length === 0) return [];
     const targets: ForestRevealTarget[] = [{
       x: gate.at.x,
       y: groundFloor(gate.at.x, gate.at.z) + GATE_REVEAL_RADIUS / 2,
@@ -869,7 +917,7 @@ export async function createGraphicsRenderer(
       z,
       radius,
     });
-    return forest.reveal(camera, targets);
+    return targets;
   }
 
   /**
@@ -1345,6 +1393,24 @@ export async function createGraphicsRenderer(
         id: animal.id, kind: animal.kind, action: animal.action ?? null,
         x: round(animal.x), z: round(animal.y), screen: screen(animal.x, animal.y),
       })),
+      // AN-4b · la caza: ofrecida (con su presa), en marcha o hecha. Sin esto
+      // el observatorio no sabía si una semana ofrecía caza ni si empezó.
+      hunt: huntScene !== null
+        ? { stage: huntScene.completed === null ? 'running' as const : 'done' as const,
+          species: huntScene.animals.find(animal => animal.id === huntScene!.targetId)?.kind ?? null,
+          weapon: huntScene.weapon, targetId: huntScene.targetId,
+          hunter: { x: round(huntScene.hunter.x), z: round(huntScene.hunter.z), clip: huntScene.hunter.clip },
+          prey: (() => {
+            const target = huntScene!.animals.find(animal => animal.id === huntScene!.targetId);
+            return target === undefined ? null : { x: round(target.x), z: round(target.y), action: target.action ?? null };
+          })() }
+        : huntSighting === null ? null : (() => {
+          const at = huntSighting.prey !== null
+            ? { x: huntSighting.prey.body.x, z: huntSighting.prey.body.z }
+            : (() => { const found = life.wildlife.find(animal => animal.kind === huntSighting!.species); return found === undefined ? null : { x: found.x, z: found.y }; })();
+          return { stage: 'offered' as const, species: huntSighting.species, weapon: null, targetId: null,
+            prey: at === null ? null : { x: round(at.x), z: round(at.z) } };
+        })(),
       // El valle más vivo · los que vienen por el camino, y en qué andan.
       visitors: life.visitors.map(visitor => ({
         id: visitor.body.id, kind: visitor.kind, phase: visitor.phase,
@@ -1494,7 +1560,7 @@ export async function createGraphicsRenderer(
     revealAssault();
     poolLights();
     renderer.shadowMap.needsUpdate = true;
-    renderer.render(scene, camera);
+    drawFrame();
     return { image: options.canvas.toDataURL('image/png'), life: window.__valleyLife?.() ?? null };
   };
   let observingLive = false;
@@ -1555,7 +1621,7 @@ export async function createGraphicsRenderer(
   // cuántos asaltantes y qué guarnición, y se rehace la jornada con ellos. Es
   // la capa de vida la que los pone —`garrisonAs`, sin el tope de §12—; el
   // motor sigue sin saber nada. `null` vuelve a lo que diga el motor.
-  let battleChoice: { raiders: number; hands: number; arm: Arm } | null = null;
+  let battleChoice: { raiders: number; hands: number; arm: Arm; shadow?: number } | null = null;
   window.__valleyBattle = (choice) => { battleChoice = choice; life = null; };
   // Y lo que el banco enseña en directo, en una llamada ligera: sin posiciones
   // en pantalla, que es lo caro de `__valleyLife`.
@@ -1571,6 +1637,7 @@ export async function createGraphicsRenderer(
       phases,
       defence: life?.defence ?? null,
       physics: life?.physics?.stats ?? null,
+      shadow: shadowTally(life?.shadow ?? null),
       drawCalls: info.render.calls,
       triangles: info.render.triangles,
       actors: cast.count,
@@ -1619,6 +1686,83 @@ export async function createGraphicsRenderer(
     } finally { sampling = false; }
   };
 
+  /**
+   * El arranque de una caza, con el motivo si no empieza. `startHunt` (el
+   * toque de la señal) responde sí o no; el observatorio (`__valleyHunt`)
+   * necesita saber por qué no, para no adivinarlo (AN-4b).
+   */
+  function beginHunt(state: Readonly<GameState>, species: HuntSpecies, weapon: HuntWeapon):
+    'started' | 'busy' | 'other-valley' | 'no-offer' | 'no-prey' | 'no-hunter' | 'no-scene' {
+    if (life === null || lifeState === null || huntScene !== null || huntReport !== null) return 'busy';
+    // El valle escénico conserva el terreno de la jornada, pero la oferta y
+    // el tick del parte pertenecen al motor vivo (puede ir semanas por delante).
+    if (state.seed !== lifeState.seed) return 'other-valley';
+    const offer = huntOpportunity(state);
+    if (offer?.species !== species || !offer.weapons.includes(weapon)) return 'no-offer';
+    const sighting = huntSighting?.species === species && huntSighting.tick === state.tick ? huntSighting : null;
+    const liveBear = species === 'bear' && life.bearDen === null
+      ? createBear(state as GameState, life.land,
+        (() => { const core = valleyCore(state as GameState); return { x: core.x, z: core.y }; })(), groundFloor)
+      : null;
+    const den = life.bearDen ?? (liveBear === null ? null : {
+      x: liveBear.den.x, z: liveBear.den.z, mouthX: liveBear.mouth.x, mouthZ: liveBear.mouth.z,
+      clearingX: liveBear.clearing.x, clearingZ: liveBear.clearing.z,
+      facing: Math.atan2(liveBear.clearing.x - liveBear.den.x,
+        liveBear.clearing.z - liveBear.den.z),
+    });
+    const wildlife = species === 'bear' && den !== null
+      && !life.wildlife.some(animal => animal.kind === 'bear')
+      ? [...life.wildlife, { id: 50_000, kind: 'bear' as const,
+        x: den.clearingX, y: den.clearingZ }]
+      : life.wildlife;
+    // Dónde está la presa, para elegir al cazador más cercano.
+    const sightedPrey = sighting?.prey ?? null;
+    const preyAt = sightedPrey !== null ? { x: sightedPrey.body.x, z: sightedPrey.body.z }
+      : (() => { const found = wildlife.find(animal => animal.kind === species); return found === undefined ? null : { x: found.x, z: found.y }; })();
+    if (preyAt === null) return 'no-prey';
+    const hunter = nearestHunter(state, preyAt);
+    if (hunter === null) return 'no-hunter';
+    const scene = createHuntEncounter(state, life.land, species, weapon,
+      groundFloor, wildlife, state.seed ^ state.tick,
+      // El oso de la caza vuelve a la boca de su cueva (AN-4c): el centro está
+      // dentro de la roca y no se llega andando.
+      den === null ? null : { x: den.mouthX, z: den.mouthZ }, true,
+      { hunter: hunter.body, prey: sighting?.prey ?? null });
+    if (scene === null) return 'no-scene';
+    if (species === 'bear' && den !== null && denVisual === null) {
+      denVisual = library.instance('bear-den') ?? null;
+      if (denVisual !== null) {
+        denVisual.position.set(den.x, groundFloor(den.x, den.z) - 0.13, den.z);
+        denVisual.rotation.y = den.facing;
+        world.add(denVisual);
+      }
+    }
+    huntScene = scene;
+    huntSighting = null;
+    hunter.hunting = true;
+    hunter.doing = null;
+    huntHunter = hunter;
+    flight = null;
+    focusFlight = null;
+    disturbed = true;
+    // De cerca, para ver la pieza, sin alejar a quien ya está más cerca.
+    view.zoom(Math.min(1, 13 / view.view.height), viewport.widthCss / 2, viewport.heightCss / 2);
+    return 'started';
+  }
+
+  // AN-4b · La caza desde el observatorio: lo que hace tocar la señal
+  // (`app.ts`: la especie de la oferta y el arma por el hash de la semana),
+  // pero con el motivo si no empieza. Sin la regla de la señal —entre los
+  // árboles no se ofrece—, que es de la interfaz y no de la caza.
+  window.__valleyHunt = () => {
+    const state = observedState;
+    if (state === null) return 'no-state';
+    const offer = huntOpportunity(state);
+    if (offer === null) return 'no-offer';
+    const weapon = offer.weapons[hash32(state.seed, `hunt:weapon:${offer.tick}`) % offer.weapons.length]!;
+    return beginHunt(state, offer.species, weapon);
+  };
+
   let firstPaintTraced = false;
   // Los sombreadores se compilan **antes** del primer dibujo y en paralelo
   // (`compileAsync`, 27 sep 2026). Dibujar sin más los compilaba uno tras otro
@@ -1656,6 +1800,16 @@ export async function createGraphicsRenderer(
     lifeMs: lastLifeMs,
     lifeSteps: lastLifeSteps,
     paintMs: lastPaintMs,
+    // GV-3 · qué suavizado se está usando y lo que ocupa su filtro.
+    aa: aaTrial ?? 'profile',
+    aaBytes: screenAa?.memoryBytes() ?? 0,
+    // GV-0 · cuántas copas están atenuadas, y si quien se sigue queda detrás
+    // de alguna desde esta cámara (`null`: nadie seguido a la vista).
+    revealed: forest?.revealedCount ?? 0,
+    trackedHidden: (() => {
+      const target = trackedTarget();
+      return target === null || forest === null ? null : forest.hides(camera, target);
+    })(),
   });
   let frameAverage = 1 / 60;
   let sinceAdapt = 0;
@@ -1668,10 +1822,65 @@ export async function createGraphicsRenderer(
   // necesitaba (la tablet de Vera, 29 sep 2026: 0 fps y «resolución 100 %»).
   // Se acota a un segundo para que una pestaña que vuelve de dormir no cuente
   // como un aparato lento.
+  // GV-0 · Gancho de observación: seguir a alguien como lo hace el dedo
+  // (mantener pulsado, «Follow»), sin pasar por la interfaz: la herramienta
+  // no sabe dónde cae cada aldeano en la pantalla. `null` deja de seguir.
+  let observedTrack: number | null = null;
+  window.__valleyTrack = (id: number | null) => {
+    observedTrack = id;
+    if (id === null) graphics.track(null);
+  };
+  /** A quién se sigue ahora, por la ficha o por la herramienta. */
+  let trackedNow: number | null = null;
+  // GV-2 · Gancho de observación: quién está ahora detrás de alguna copa desde
+  // esta cámara. Es ortográfica, así que no depende de a quién mire: sirve
+  // para buscar a alguien que pase bajo el bosque y grabarlo. No lo usa el juego.
+  window.__valleyCanopyHidden = () => forest === null ? [] : lastActors
+    .filter((actor) => actor.id >= 0 && forest!.hides(camera, {
+      x: actor.x, y: groundFloor(actor.x, actor.z) + ACTOR_VISUAL_HEIGHT / 2,
+      z: actor.z, radius: ACTOR_VISUAL_HEIGHT / 2, canopyOnly: true,
+    }))
+    .map((actor) => actor.id);
+  /**
+   * El cuerpo de quien se sigue, para el bosque; `null` si no está a la vista.
+   * GV-2 · Ajustado y contra la copa sola: con el volumen de la presa (radio
+   * de un cuerpo entero) y la esfera del árbol completo se atenuaba el árbol
+   * que el leñador estaba talando, que no lo tapaba.
+   */
+  function trackedTarget(): ForestRevealTarget | null {
+    if (trackedNow === null) return null;
+    const followed = lastActors.find((actor) => actor.id === trackedNow);
+    if (followed === undefined) return null;
+    return {
+      x: followed.x, y: groundFloor(followed.x, followed.z) + ACTOR_VISUAL_HEIGHT / 2,
+      z: followed.z, radius: ACTOR_VISUAL_HEIGHT / 2, canopyOnly: true,
+    };
+  }
+  // GV-1 · Gancho de taller: la fuerza y el alcance del pie de los edificios,
+  // para comparar variantes en la misma toma. El juego no lo llama.
+  window.__valleyContactShade = (tune: { ambient?: number; direct?: number; reach?: number }) => {
+    tuneContactShade(tune);
+    if (tune.reach !== undefined && plan !== null) contact?.update(plan.buildings);
+  };
+  // GV-0 · Gancho de observación: fija la escala de la adaptativa para las
+  // tomas comparadas; `null` la suelta. En un dibujo por software todo
+  // fotograma es lento y la adaptativa baja sola: cinco tomas del 29 sep 2026
+  // salieron a cuatro escalas distintas (0,55 a 1,0), y un «antes/después» así
+  // compara resoluciones, no técnicas. El juego no lo llama.
+  let heldScale: number | null = null;
+  window.__valleyHoldScale = (scale: number | null) => {
+    heldScale = scale === null || !Number.isFinite(scale) ? null : Math.max(0.25, Math.min(1, scale));
+    if (heldScale === null || disposed) return;
+    renderScale = heldScale;
+    sinceAdapt = 0;
+    easySeconds = 0;
+    sizeCanvas();
+  };
   const adaptResolution = (): void => {
     const now = performance.now();
     const realDelta = lastAdaptAt === 0 ? 0 : Math.min(1, (now - lastAdaptAt) / 1000);
     lastAdaptAt = now;
+    if (heldScale !== null) return;
     if (!(realDelta > 0)) return;
     frameAverage = frameAverage * 0.9 + realDelta * 0.1;
     sinceAdapt += realDelta;
@@ -1684,8 +1893,7 @@ export async function createGraphicsRenderer(
     renderScale = next;
     sinceAdapt = 0;
     easySeconds = 0;
-    renderer.setPixelRatio(Math.min(viewport.pixelRatio, pixelCap) * renderScale);
-    renderer.setSize(viewport.widthCss, viewport.heightCss, false);
+    sizeCanvas();
   };
   /** La presa de la ocasión, ya en el valle: la suelta se crea; ciervo y oso ya están. */
   function sightingFor(state: Readonly<GameState>, species: HuntSpecies): typeof huntSighting {
@@ -1720,8 +1928,7 @@ export async function createGraphicsRenderer(
     resize(next: GraphicsViewport): void {
       if (disposed) return;
       viewport = next;
-      renderer.setPixelRatio(Math.min(next.pixelRatio, pixelCap) * renderScale);
-      renderer.setSize(next.widthCss, next.heightCss, false);
+      sizeCanvas();
       // Girar el movil cambia cuanto valle cabe, pero no tiene por que
       // devolver al jugador al encuadre de partida si se habia acercado.
       view.resize({ width: next.widthCss, height: next.heightCss });
@@ -1731,6 +1938,9 @@ export async function createGraphicsRenderer(
       if (observing && !sampling) return;
       observedState = state; observedFrame = frame;
       if (disposed) return;
+      // GV-0 · el seguimiento de la herramienta, repetido como lo repite
+      // `app.ts` antes de cada `paint` (VZ-4).
+      if (observedTrack !== null) graphics.track(observedTrack);
       const paintStarted = performance.now();
       const firstPaint = traceStages && !firstPaintTraced;
       if (firstPaint) markStage('paint:first-start');
@@ -1828,6 +2038,16 @@ export async function createGraphicsRenderer(
       if (change.rampart) village.rampart(next.rampart);
       // La muralla, en lote: una llamada por material en vez de una por tramo.
       if (change.removed.length > 0 || change.added.length > 0 || change.changed.length > 0) village.batchWalls();
+      // GV-1 · y el suelo al pie de cada uno, en lote: se rehace con los
+      // edificios, no con el fotograma.
+      if (contactOn && (change.cleared || contact === null
+        || change.removed.length > 0 || change.added.length > 0 || change.changed.length > 0)) {
+        if (change.cleared || contact === null) {
+          contact?.dispose();
+          contact = createContactShade(shown.map.width, shown.map.height);
+        }
+        contact.update(next.buildings);
+      }
       for (const id of change.works.removed) works.remove(id);
       for (const work of [...change.works.added, ...change.works.changed]) works.add(work);
       plan = next;
@@ -1893,6 +2113,8 @@ export async function createGraphicsRenderer(
           ...(battleChoice === null ? {} : { battle: {
             raiders: battleChoice.raiders, garrison: garrisonAs(shown, battleChoice.hands, battleChoice.arm),
           } }),
+          // F-0 · la flecha que toca, en sombra: sólo el banco la pide.
+          ...(battleChoice?.shadow === undefined ? {} : { shadow: { radius: battleChoice.shadow, height: DRAWN_BODY.height } }),
         });
         if (denVisual !== null) world.remove(denVisual);
         denVisual = null;
@@ -2192,8 +2414,9 @@ export async function createGraphicsRenderer(
       stepShakes(frame.deltaSeconds);
       // D.7 · sólo el robledal realmente interpuesto ante el encuentro pierde
       // opacidad. Se calcula después de mover los cuerpos; no toca mapa,
-      // obstáculos ni geometría física.
+      // obstáculos ni geometría física. GV-2 · y se funde, no salta.
       revealAssault();
+      forest?.stepReveal(frame.realDeltaSeconds);
 
       // §11.1.1 · la nube sobre la cabeza de quien esta viviendo algo. Lo que
       // lleva sale del estado; que este parado hablando lo dice el actor.
@@ -2267,6 +2490,7 @@ export async function createGraphicsRenderer(
         ...mountainWolves(shown.map, shown.terrainSeed, frame.presentationSeconds),
         ...life.beasts.map(beast => ({
         id: beast.dweller.body.id, kind: beast.kind, x: beast.dweller.body.x, y: beast.dweller.body.z,
+        facing: beast.dweller.body.facing,
       }))], frame.presentationSeconds);
       // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
       // no depende de nada de ello: solo de la hora.
@@ -2371,7 +2595,7 @@ export async function createGraphicsRenderer(
         }
         if (warmUp === 'done') {
           const renderStarted = performance.now();
-          renderer.render(scene, camera);
+          drawFrame();
           lastRenderMs = performance.now() - renderStarted;
         } else renderer.shadowMap.needsUpdate = true;
         if (firstPaint) { markStage('paint:submit-end'); firstPaintTraced = true; }
@@ -2470,59 +2694,7 @@ export async function createGraphicsRenderer(
       };
     },
     startHunt(state: Readonly<GameState>, species: HuntSpecies, weapon: HuntWeapon): boolean {
-      if (life === null || lifeState === null || huntScene !== null || huntReport !== null) return false;
-      // El valle escénico conserva el terreno de la jornada, pero la oferta y
-      // el tick del parte pertenecen al motor vivo (puede ir semanas por delante).
-      if (state.seed !== lifeState.seed) return false;
-      const offer = huntOpportunity(state);
-      if (offer?.species !== species || !offer.weapons.includes(weapon)) return false;
-      const sighting = huntSighting?.species === species && huntSighting.tick === state.tick ? huntSighting : null;
-      const liveBear = species === 'bear' && life.bearDen === null
-        ? createBear(state as GameState, life.land,
-          (() => { const core = valleyCore(state as GameState); return { x: core.x, z: core.y }; })())
-        : null;
-      const den = life.bearDen ?? (liveBear === null ? null : {
-        x: liveBear.den.x, z: liveBear.den.z,
-        clearingX: liveBear.clearing.x, clearingZ: liveBear.clearing.z,
-        facing: Math.atan2(liveBear.clearing.x - liveBear.den.x,
-          liveBear.clearing.z - liveBear.den.z),
-      });
-      const wildlife = species === 'bear' && den !== null
-        && !life.wildlife.some(animal => animal.kind === 'bear')
-        ? [...life.wildlife, { id: 50_000, kind: 'bear' as const,
-          x: den.clearingX, y: den.clearingZ }]
-        : life.wildlife;
-      // Dónde está la presa, para elegir al cazador más cercano.
-      const sightedPrey = sighting?.prey ?? null;
-      const preyAt = sightedPrey !== null ? { x: sightedPrey.body.x, z: sightedPrey.body.z }
-        : (() => { const found = wildlife.find(animal => animal.kind === species); return found === undefined ? null : { x: found.x, z: found.y }; })();
-      if (preyAt === null) return false;
-      const hunter = nearestHunter(state, preyAt);
-      if (hunter === null) return false;
-      const scene = createHuntEncounter(state, life.land, species, weapon,
-        groundFloor, wildlife, state.seed ^ state.tick,
-        den === null ? null : { x: den.x, z: den.z }, true,
-        { hunter: hunter.body, prey: sighting?.prey ?? null });
-      if (scene === null) return false;
-      if (species === 'bear' && den !== null && denVisual === null) {
-        denVisual = library.instance('bear-den') ?? null;
-        if (denVisual !== null) {
-          denVisual.position.set(den.x, groundFloor(den.x, den.z) - 0.13, den.z);
-          denVisual.rotation.y = den.facing;
-          world.add(denVisual);
-        }
-      }
-      huntScene = scene;
-      huntSighting = null;
-      hunter.hunting = true;
-      hunter.doing = null;
-      huntHunter = hunter;
-      flight = null;
-      focusFlight = null;
-      disturbed = true;
-      // De cerca, para ver la pieza, sin alejar a quien ya está más cerca.
-      view.zoom(Math.min(1, 13 / view.view.height), viewport.widthCss / 2, viewport.heightCss / 2);
-      return true;
+      return beginHunt(state, species, weapon) === 'started';
     },
     /** Esquema 12 · los avisos de la leñera en la pantalla: cuánto, dónde y cuánto llevan. */
     woodGains(): readonly { id: number; count: number; x: number; y: number; age: number }[] {
@@ -2626,6 +2798,7 @@ export async function createGraphicsRenderer(
       // a cada uno— así que no toca a nadie más. Idempotente: `app.ts` llama a
       // esto en cada fotograma desde VZ-4 para que la cámara vaya detrás.
       cast.highlight(id);
+      trackedNow = id;
       if (id === null) return;
       focusFlight = null;
       // Seguir a alguien es mirarle, no acercarse a el: la distancia la elige
@@ -2752,6 +2925,8 @@ export async function createGraphicsRenderer(
       steading.dispose();
       grass.dispose();
       trample?.dispose();
+      contact?.dispose();
+      screenAa?.dispose();
       if (ground !== null) {
         world.remove(ground.mesh);
         ground.dispose();
@@ -2821,20 +2996,26 @@ declare global {
      */
     __valleyLife?: () => LifeSnapshot | null;
     __valleyAdvance?: (steps: number, reset?: boolean) => void;
+    __valleyHunt?: () => string;
     __valleyCapture?: (follow?: number, zoom?: number, gateStudy?: boolean, point?: { x: number; z: number }) => { image: string; life: LifeSnapshot | null };
     __valleyObserveLive?: () => void;
     __valleyStrike?: (index?: number) => { x: number; z: number };
     __valleyHoldPhase?: (value: number | null) => void;
     __valleyFestoon?: (on: boolean) => void;
     __valleyHoldSky?: (kind: SkyKind | null) => void;
+    __valleyHoldScale?: (scale: number | null) => void;
     __valleyHoldFlood?: (level: number | null) => void;
     __valleyVisit?: (kind?: HappeningId, dealt?: boolean) => void;
-    __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm } | null) => void;
+    __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm; shadow?: number } | null) => void;
     __valleyBattleStats?: () => BattleStats;
     __valleyRenderStats?: () => {
       calls: number; triangles: number; scale: number; level: string; targetFps: number;
       renderMs: number; lifeMs: number; lifeSteps: number; paintMs: number;
+      aa: string; aaBytes: number; revealed: number; trackedHidden: boolean | null;
     };
+    __valleyTrack?: (id: number | null) => void;
+    __valleyCanopyHidden?: () => number[];
+    __valleyContactShade?: (tune: { ambient?: number; direct?: number; reach?: number }) => void;
     __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];
     __valleyTrampleAt?: (x: number, z: number) => { grass: number; snow: number } | null;
     __valleyBoardScreen?: () => { x: number; y: number } | null;
@@ -2846,6 +3027,15 @@ declare global {
 interface ScreenPoint { readonly x: number; readonly y: number }
 interface ObservedPoint { readonly x: number; readonly z: number; readonly screen: ScreenPoint }
 interface LifeSnapshot {
+  /** AN-4b · La caza de la semana, para el observatorio. */
+  readonly hunt: {
+    readonly stage: 'offered' | 'running' | 'done';
+    readonly species: string | null;
+    readonly weapon: string | null;
+    readonly targetId: number | null;
+    readonly prey?: { readonly x: number; readonly z: number; readonly action?: string | null } | null;
+    readonly hunter?: { readonly x: number; readonly z: number; readonly clip: string };
+  } | null;
   readonly renderedGates: readonly { readonly id: number; readonly x: number; readonly z: number;
     readonly offset: readonly number[]; readonly rotation: readonly number[] }[];
   readonly nightOutcomes: readonly { readonly tick: number; readonly residents: number; readonly sleeping: number; readonly pending: readonly number[] }[];
@@ -2963,6 +3153,20 @@ function wadingCell(map: GameState['map'], x: number, z: number): boolean {
   return t === TERRAIN_CODE.ford || t === TERRAIN_CODE.water;
 }
 
+/** F-0 · La cuenta de la bitácora en sombra, para el banco (`?sandbox=battle&shadow=`). */
+export interface ShadowTally { readonly arrows: number; readonly cylinder: number; readonly rapier: number; readonly same: number }
+
+function shadowTally(shadow: ArcheryShadow | null): ShadowTally | null {
+  if (shadow === null) return null;
+  const done = shadow.arrows.filter((arrow) => arrow.done);
+  return {
+    arrows: done.length,
+    cylinder: done.filter((arrow) => arrow.cylinder !== null).length,
+    rapier: done.filter((arrow) => arrow.rapier !== null).length,
+    same: done.filter((arrow) => arrow.cylinder !== null && arrow.rapier?.id === arrow.cylinder.id).length,
+  };
+}
+
 /** Lo que el banco de batallas lee en directo (`window.__valleyBattleStats`). */
 export interface BattleStats {
   readonly garrison: number;
@@ -2971,6 +3175,8 @@ export interface BattleStats {
   readonly phases: Readonly<Record<string, number>>;
   readonly defence: LifeVillage['defence'] | null;
   readonly physics: PhysicsSnapshot['stats'] | null;
+  /** F-0 · con `&shadow=`: flechas acabadas, aciertos de cada juez y en cuántas coinciden. */
+  readonly shadow: ShadowTally | null;
   readonly drawCalls: number;
   readonly triangles: number;
   readonly actors: number;

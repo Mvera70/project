@@ -1,0 +1,16 @@
+== aldea-before
+{"year":"13:00","vitals":["52","40","379","210","13"],"season":"Year 22 · Winter, day 44","doing":null,"ordersNow":"Open the cart","brightness":0.585} → /home/user/project/artifacts/graphics/visual-depth/invierno/aldea-before.png
+render: {"level":"medium","scale":1,"calls":287,"triangles":378588,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-before
+{"year":"14:00","vitals":["59","51","403","210","5"],"season":"Year 61 · Winter, day 44","doing":null,"ordersNow":"Open the cart","brightness":0.423} → /home/user/project/artifacts/graphics/visual-depth/invierno/villa-before.png
+render: {"level":"medium","scale":1,"calls":243,"triangles":396058,"coarse":true,"dpr":3}
+errores de página: ninguno
+== aldea-after
+{"year":"13:00","vitals":["52","40","379","210","13"],"season":"Year 22 · Winter, day 44","doing":null,"ordersNow":"Open the cart","brightness":0.581} → /home/user/project/artifacts/graphics/visual-depth/invierno/aldea-after.png
+render: {"level":"medium","scale":1,"calls":287,"triangles":378588,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-after
+{"year":"14:00","vitals":["59","51","403","210","5"],"season":"Year 61 · Winter, day 44","doing":null,"ordersNow":"Open the cart","brightness":0.421} → /home/user/project/artifacts/graphics/visual-depth/invierno/villa-after.png
+render: {"level":"medium","scale":1,"calls":243,"triangles":396058,"coarse":true,"dpr":3}
+errores de página: ninguno

@@ -1,0 +1,4 @@
+animation-cost · 100 personas, 40 animales, 300 fotogramas (tras 30 de calentamiento), Node v22.22.2
+cast.show   mediana 2.734 ms · p90 3.429 ms · media 2.835 ms · 27.3 µs por persona
+fauna.paint mediana 1.276 ms · p90 1.575 ms · media 1.281 ms · 31.9 µs por animal
+total       mediana 4.010 ms por fotograma de JS de animación (sin dibujar)

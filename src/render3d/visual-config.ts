@@ -102,6 +102,46 @@ export const RUIN = {
 export const GROUND_BIAS = 0.002;
 
 /**
+ * GV-1 · El pie de los edificios: cuánto oscurece el suelo pegado a una pared
+ * y hasta dónde (`world/contact-shade.ts`).
+ *
+ * TUNE visual, contrastado en las tomas de GV-1 (aldea 11/21 y villa 7/60 a
+ * 390×844, despejado y nublado, `docs/encargos/profundidad-visual-movil-2026-09-29.md`).
+ * `ambient` es la parte de la luz del cielo que no llega al pie de la pared y
+ * `direct` la del sol, menor: al sol el pie de un muro sigue alumbrado, y
+ * comerse la misma fracción lo pintaba como una mancha de barro. Se probaron
+ * tres juegos (`ambient` · `direct` · `reach`): C1 0,62 · 0,24 · 0,42, la más
+ * clara al sol (con el cielo cubierto, casi la de C3 y más corta); C2 0,85 ·
+ * 0,40 · 0,55, que en el lado de sombra dejaba el pie de la
+ * capilla casi negro (allí sólo llega luz de cielo, y se comía el 85 %); y C3
+ * 0,55 · 0,42 · 0,55, más marcada al sol. **Vera eligió C1** (29 sep 2026, a
+ * la vista de las tres: «me gusta la sombra más clara, C1, o la de antes»).
+ * Con el cielo cubierto —o en Low, sin sombras— es lo único que apoya la casa
+ * en el suelo.
+ *
+ * `bases` es cuánto se mete la malla dentro de su huella por cada lado, en
+ * celdas y por eje, **medido sobre la caja de los GLB publicados** (29 sep
+ * 2026; los que no están llenan la huella): la atalaya es la celda central de
+ * su 2 × 2, el pozo un brocal dentro de su celda, la capilla deja 0,18 a cada
+ * costado. `round` redondea las esquinas de la base; al pozo, casi un disco.
+ */
+export const CONTACT_SHADE = {
+  texels: 8,
+  reach: 0.42,
+  ambient: 0.62,
+  direct: 0.24,
+  bases: {
+    watchtower: { x: 0.51, z: 0.51, round: 0.12 },
+    well: { x: 0.1, z: 0.1, round: 0.34 },
+    chapel: { x: 0.18, z: 0, round: 0.08 },
+    mill: { x: 0.08, z: 0.08, round: 0.08 },
+    church: { x: 0.08, z: 0, round: 0.08 },
+  } as Partial<Record<BuildingKind, { readonly x: number; readonly z: number; readonly round: number }>>,
+  /** Lo que no está en `bases`: la malla llena su huella. */
+  base: { x: 0, z: 0, round: 0.06 },
+} as const;
+
+/**
  * Parámetros de la sombra solar. El mapa cubre el valle jugable, no la sierra
  * decorativa: cuanto más volumen vacío dejamos, menos texels tiene cada tejado
  * y más saltan los bordes al girar el sol. Los sesgos evitan que una superficie

@@ -1,0 +1,18 @@
+EstadoEsperando a la partidaDuración0.0 sDefensores en pie10 / 10Asaltantes en pie24 / 24Bajas (def · asalt)0 · 0Flechas · aciertos0 · 0 (0 %)Golpes de lanza0Portón0 / 60 golpesFPS0Física por pasoarranca al llegarCuerpos físicos—Cayendo (ragdoll)—Cascotes—Sondas F-0arrancan al llegarLlamadas de dibujo443Triángulos772.178
+
+{
+  "phases": {
+    "coming": 24
+  },
+  "physics": null,
+  "shadow": {
+    "arrows": 0,
+    "cylinder": 0,
+    "rapier": 0,
+    "same": 0
+  },
+  "loosed": 0,
+  "hits": 0,
+  "life": 0
+}
+errores: []

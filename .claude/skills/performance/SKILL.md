@@ -21,7 +21,8 @@ no representan una tablet.** Lo que sí es comparable entre versiones:
 | Llamadas de dibujo por fotograma | `node tools/graphics/performance/gl-probe.mjs <valley.html> "<query>" 60` | Lo que más castiga a una tablet con WebGL (CPU del driver + JS de Three por llamada) |
 | Triángulos por fotograma | la misma | Carga de vértices (menos crítica que las llamadas) |
 | Programas enlazados | la misma | Sombreadores distintos: cada uno se compila, y en móvil compilar tarda |
-| JS por fotograma (mediana · p90) | la misma | CPU del juego: vida, animación, escena y el envío de las llamadas |
+| JS por fotograma (mediana · p90) | la misma | CPU del juego: vida, animación, escena y el envío de las llamadas. **Mezcla el callback del juego con otros ligeros**: para el coste del fotograma, el reparto de abajo |
+| Reparto del fotograma (`paint`, `render`, vida y el resto) | `gl-probe.mjs <valley.html> --seed 11 --year 21 --touch --scale 1 --sky clear --phase 0.45` (por la portada; `--follow <id>` sigue a alguien) | Lo que mide el propio renderer (`__valleyRenderStats`, el panel de taller). `restMs` es el JS fuera del dibujo y de la vida: bosque, gente, luces. **En SwiftShader `render` incluye el dibujo por software**; el resto sí es comparable |
 | Reparto de mallas por grupo | `node tools/graphics/performance/scene-report.mjs "<query>"` (usa `window.__valleySceneReport()`) | De dónde salen las llamadas: mallas visibles, con sombra e instanciadas, por grupo y los edificios por tipo |
 | Recompilaciones | `node tools/graphics/performance/shader-churn.mjs <valley.html> "<query>"` | Programas enlazados tras cargar, tras un rayo y con la fiesta. **Cada uno de más es un tirón en una tablet** |
 | CPU por función | `node tools/graphics/performance/cpu-profile.mjs <valley.html> "<query>" <espera> <perfil> <función>` sobre `bundle-game.ts --no-minify` | Tiempo inclusivo y quién llama a una función |
@@ -31,6 +32,15 @@ Escenas de referencia (siempre las dos, nunca una):
 
 - **La villa grande**: `debug=1&seed=7&year=60&season=summer&live=1`
 - **La aldea**: `debug=1&seed=11&year=21&season=summer&live=1`
+
+**Y como juega el jugador, por la portada** (GV-0, 29 sep 2026): `gl-probe.mjs` y
+`shot.mjs` con `--seed 7 --year 60` o `--seed 11 --year 21`, `--touch` (el perfil
+de un teléfono: en un contexto no táctil `auto` resuelve High aunque la ventana sea
+de móvil), `--scale 1` (la adaptativa sujeta: en un dibujo por software baja sola,
+y cinco tomas del mismo día salieron a cuatro escalas) y `--sky`/`--phase` fijos.
+Así, dos tomas seguidas de la misma versión dan **0 % de píxeles distintos**. La
+ruta `?debug=1` pinta además el Canvas 2D debajo del 3D: vale para llamadas,
+triángulos y programas, **no para el JS por fotograma**.
 
 Se mide sobre el juego empaquetado (`npx tsx tools/graphics/bundle-game.ts --out
 artifacts/graphics/alive/game`) y, para comparar con una versión anterior, se monta
@@ -88,9 +98,10 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
    saca a su bisagra antes). Se llama después de la bisagra y de copiar los tejados.
 5. **Sombras de lo pequeño, fuera**: los animales (177 mallas) proyectaban sombra; a esta
    distancia no se ve y costaba 177 llamadas. `animal-motion.ts` las apaga.
-6. **Aparatos táctiles** (`(pointer: coarse)`, `renderer.ts`): sin MSAA, densidad de
-   píxeles tope 1,5 (en vez de 2) y mapa de sombras de 1024 (en vez de 2048). Constantes
-   `HANDHELD`. En una tablet la pantalla tiene el doble de píxeles y la GPU la mitad.
+6. **Aparatos táctiles** (`(pointer: coarse)`): `auto` resuelve al nivel Medium de
+   `render3d/profile.ts` —sin MSAA, densidad de píxeles tope 1,5 (en vez de 2) y mapa
+   de sombras de 1024 (en vez de 2048)—, y «Graphics» deja elegir otro. En una tablet
+   la pantalla tiene el doble de píxeles y la GPU la mitad.
 7. **Resolución adaptativa** (`adaptResolution`, constantes `ADAPT`): si la media entre
    fotogramas pasa de 36 ms baja la densidad un 15 % cada 2 s, hasta la mitad; si pasa 6 s
    por debajo de 20 ms, sube un paso. Cambiar la densidad rehace el lienzo: nunca más de
@@ -171,10 +182,49 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
     mide con `window.__valleyShadowStats()` (reorientaciones por segundo), no
     con diferencias de píxeles, que el viento contamina.
 
+19. **Oscurecer el suelo va en el sombreador del suelo, no en objetos** (GV-1,
+    `world/contact-shade.ts`): el pie de los edificios es una máscara R8 para todo el
+    valle (8 texeles por celda, 516 KB) que el suelo lee donde three aplica su
+    oclusión. Cero llamadas, ningún programa más (el del suelo cambia de clave), sin
+    z-fighting, y se rehace sólo cuando cambian los edificios con tejado (unos 4 ms
+    de CPU en un portátil, una vez por obra). Un disco o una luz por edificio habría
+    sido una llamada —y una sombra— por casa. Lo que cuesta de verdad es un
+    muestreo por fragmento de suelo, que en software no se distingue del ruido: se
+    lee en el aparato con `?contact=off`.
+20. **Una copa atenuada no puede perder su sombra ni su viento** (GV-2): el clon
+    translúcido de un material no hereda su `onBeforeCompile` —sin volver a
+    aplicarle el viento se queda quieto— y sin `castShadow` la sombra salta al
+    atenuar. El fundido va por instancia (atributo `instanceFade`): ningún programa
+    más por árbol, y la copa conserva sombra y vaivén.
+21. **FXAA con three r185 no es barato en este renderer** (GV-3): obliga a dibujar la
+    escena en un búfer de media precisión y a mapear tonos en un pase aparte
+    —24 bytes por píxel entre los dos búferes: 17,8 MB en un teléfono de 390×844,
+    55 MB en una tablet de 800×1280—, recompila la escena para ese destino (70
+    programas enlazados contra 41) y añade dos pases de pantalla completa. Y borra
+    el 80–83 % del detalle fino, con aldeanos de seis píxeles. Descartado. El candidato
+    es el MSAA del lienzo, y se decide en el aparato (`?aa=msaa` contra `?aa=none`).
+
+22. **Un fotograma de más de un segundo se toma por una ausencia, y en la villa
+    eso es un bucle** (29 sep 2026, sin arreglar): `presentation-clock.ts`
+    (`SUSPEND_GAP_SECONDS = 1`) marca el fotograma siguiente `discontinuity`,
+    la jornada se reinicia y el renderer rehace la capa de vida; en la villa
+    7/60, `createVillage` (rutas de A* del común y la orilla) tarda más de un
+    segundo en un aparato lento, y vuelta a empezar: 3,8 s por `paint`, la vida
+    en cero pasos y la fecha quieta. Se ve en el reparto del fotograma (`paint`
+    enorme, `lifeMs` 0) y en el perfil de CPU (`createVillage`). Con el umbral a
+    30 s se recupera a 18–78 ms. **Mientras no se arregle, la villa no sirve
+    para medir el dibujo**: mide el bucle. La nota entera, con cómo
+    reproducirlo: `docs/medidas/bucle-villa-2026-09-29.md`.
+
 ## Lo que queda (por lo que pesa)
 
+- **Romper el bucle de la villa** (lección 22): que el hueco que cuenta como
+  ausencia descuente el trabajo del propio fotograma, y abaratar `createVillage`.
+  Es la causa probable de la tablet a 0 fps con fotogramas de dos segundos.
 - **Medir en un aparato real** (la tablet de Vera) y apuntar aquí las cifras: FPS, y
-  si siguen los tirones al caer un rayo o empezar una fiesta.
+  si siguen los tirones al caer un rayo o empezar una fiesta. Y las dos lecturas que
+  dejó GV (29 sep 2026): el pie de los edificios (`?contact=off` contra el valle
+  normal) y el suavizado (`?aa=msaa` contra `?aa=none`), con el panel de taller.
 - **El coste por píxel**: todo es `MeshStandardMaterial` (PBR). Si la tablet sigue
   limitada por píxeles, pasar lo lejano o lo pequeño a `MeshLambertMaterial`, o bajar
   la densidad de partida en táctil (hoy 1,5; la adaptativa baja hasta la mitad).
@@ -195,3 +245,15 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
 - Un personaje nuevo con esqueleto se funde solo si es de colores lisos; con textura,
   cuenta una llamada por pieza.
 - Tras un cambio que pueda pesar, pasa `gl-probe` en las dos escenas y apunta la cifra.
+
+## El coste de animar (ronda AN, 29 sep 2026)
+
+`npx tsx tools/reports/animation-cost.ts [--people N] [--animals N] [--frames N]`
+mide el JS de `cast.show` y `fauna.paint` por fotograma sin navegador (mediana
+y p90, µs por cuerpo): la medida controlada para comparar dos commits en la
+misma máquina, uno detrás de otro y con la máquina sola (con Chromium
+corriendo hay 0,2–0,5 ms de ruido entre pasadas iguales). Referencia del 29
+sep: 4,0–4,7 ms por fotograma con 100 personas y 40 animales, 27–32 µs por
+persona. `gl-probe` sigue valiendo para llamadas y triángulos; su cuenta de
+programas depende de lo que entró en cuadro con el reloj vivo y no compara.
+Nada de esto son FPS de un teléfono.

@@ -1,7 +1,7 @@
 // Juego real + reloj del navegador controlado + píxel y traza atómicos.
 import { chromium } from '@playwright/test';
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
-import { homedir } from 'node:os';
+import { withBrowser } from './browser.mjs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -11,6 +11,15 @@ const seed = Number(opt('seed', '43')), year = Number(opt('year', '60'));
 const lead = Number(opt('lead', '0'));
 const advanceWeeks = Number(opt('advance', '0'));
 const follow = Number(opt('follow', '-1')), zoom = Number(opt('zoom', '1'));
+// AN-0 · `--look X,Z` encuadra una coordenada del mapa (un ciervo, un perro,
+// un puesto de tiro) sin fingir que allí hay alguien que seguir: es el
+// `point` que `__valleyCapture` ya acepta.
+const lookArg = opt('look', '');
+const look = lookArg === '' ? undefined : (() => {
+  const [x, z] = lookArg.split(',').map(Number);
+  if (!Number.isFinite(x) || !Number.isFinite(z)) throw new Error('--look debe ser X,Z.');
+  return { x, z };
+})();
 const seconds = Number(opt('seconds', '120')), fps = Number(opt('fps', '2'));
 const live = args.includes('--live');
 const speed = Number(opt('speed', '16'));
@@ -24,6 +33,10 @@ const means = opt('means', '');
 // semana, por la misma razón: la visita del lobo sale pocas veces en sesenta
 // años y esperarla mirando no es grabarla.
 const happening = opt('happening', '');
+// AN-4b · `--hunted partridge,rabbit,deer` da por cazadas esas especies
+// (`&hunted=`, `huntedNow`): abre las cazas que vienen detrás y la visita del
+// oso, que sólo nace superado el jabalí. Se combina con `--happening`.
+const hunted = opt('hunted', '');
 // K-5 · `--crown ready` deja la fila de la corona encendida y `--crown <oficio>`
 // corona ya a alguien de ese oficio, para ver la sala y el estilo del valle.
 const crown = opt('crown', '');
@@ -32,13 +45,15 @@ if (!Number.isFinite(seconds) || seconds < 0 || !Number.isInteger(30 / fps) || f
 const out = resolve(opt('out', `artifacts/graphics/IA-10/seed-${seed}`));
 if (existsSync(join(out, 'trace.json'))) throw new Error('La toma ya existe; usa otra carpeta --out.');
 mkdirSync(join(out, 'frames'), { recursive: true });
-const root = join(homedir(), 'AppData/Local/ms-playwright');
-const executablePath = readdirSync(root).filter(x => /^chromium-\d+$/.test(x)).sort().reverse()
-  .map(x => join(root, x, 'chrome-win64/chrome.exe')).find(existsSync);
-const browser = await chromium.launch({ executablePath,
-  args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+const browser = await chromium.launch(withBrowser({
+  args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }));
+// AN-0 · `--viewport 390x844` mira el valle al tamaño normal de un móvil; por
+// omisión se conserva el encuadre ancho de siempre para no mover las tomas previas.
+const viewportMatch = /^(\d{2,4})x(\d{2,4})$/u.exec(opt('viewport', '1100x850'));
+if (viewportMatch === null) throw new Error('--viewport debe ser ANCHOxALTO.');
+const viewport = { width: Number(viewportMatch[1]), height: Number(viewportMatch[2]) };
 try {
-  const tab = await browser.newPage({ viewport: { width: 1100, height: 850 } });
+  const tab = await browser.newPage({ viewport });
   if (live || advanceWeeks > 0) {
     await tab.clock.install({ time: new Date('2026-09-17T12:00:00Z') });
     if (live) await tab.clock.pauseAt(new Date('2026-09-17T12:00:00Z'));
@@ -63,11 +78,12 @@ try {
   const progress = opt('progress', '');
   // D3b · `--assault` hace que la partida venga a tirar el porton.
   const assault = args.includes('--assault') ? '1' : '';
-  const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== ''
+  const debugRoute = means !== '' || happening !== '' || hunted !== '' || crown !== '' || raid !== ''
     || braced !== '' || coming !== '' || warning !== '' || assault !== '' || aftermath !== '' || aftermathControl !== '' || wallwork !== '';
   if (debugRoute) {
     const extra = (means === '' ? '' : `&means=${means}`)
       + (happening === '' ? '' : `&happening=${happening}`)
+      + (hunted === '' ? '' : `&hunted=${hunted}`)
       + (crown === '' ? '' : `&crown=${crown}`)
       + (raid === '' ? '' : `&raid=${raid}`)
       + (coming === '' ? '' : `&coming=${coming}`)
@@ -81,7 +97,9 @@ try {
       + (assault === '' ? '' : `&assault=${assault}`);
     pageUrl.search = `?debug=1&live=1&seed=${seed}&year=${year}&season=${opt('season', 'summer')}${extra}`;
   }
-  await tab.goto(pageUrl.href);
+  // AN-4b · una villa con asalto (sesenta personas, muralla, Rapier) tarda
+  // más de los 30 s por omisión en cargar bajo SwiftShader.
+  await tab.goto(pageUrl.href, { timeout: 240_000 });
   if (!debugRoute) {
     await tab.locator('#valley-seed').fill(String(seed));
     if (await tab.locator('.title-dev').getAttribute('aria-pressed') === 'false') await tab.locator('.title-dev').click();
@@ -92,7 +110,8 @@ try {
     if (await tab.evaluate(() => (window.__valleyLife?.()?.people.length ?? 0) > 0)) break;
     await tab.clock.runFor(100);
   }
-  await tab.waitForFunction(() => window.__valleyLife?.()?.people.length > 0);
+  // AN-0 · Una villa de cien personas tarda más de 30 s en abrir bajo SwiftShader.
+  await tab.waitForFunction(() => window.__valleyLife?.()?.people.length > 0, undefined, { timeout: 240_000 });
   if (advanceWeeks > 0) {
     const MS_PER_WEEK = 840_000, CHUNK = 48;
     for (let left = advanceWeeks; left > 0; left -= CHUNK) {
@@ -149,6 +168,28 @@ try {
       await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(lead * 30) - warmup);
     }
   }
+  // AN-3 · `--hunt` toca la señal de caza (`.hunt-sign`) al acabar el lead y
+  // rueda la escena: el juego sigue al cazador por su cuenta (`renderer.ts`,
+  // `view.look(hunter)`). Si el valle no ofrece caza en ese instante se dice y
+  // se para: la caza no se inventa desde fuera.
+  if (args.includes('--hunt')) {
+    // AN-4b · La caza se arranca con el gancho del renderer (`__valleyHunt`):
+    // lo mismo que tocar la señal —la especie de la oferta del motor y el arma
+    // por el hash de la semana— pero sin depender de que la señal esté en
+    // cuadro (sólo se coloca con la presa a la vista) y con el motivo si no
+    // empieza. La cámara la lleva el juego, detrás del cazador.
+    const offered = await tab.evaluate(() => window.__valleyLife?.()?.hunt ?? null);
+    process.stdout.write(`Caza antes de empezar: ${JSON.stringify(offered)}\n`);
+    const why = await tab.evaluate(() => window.__valleyHunt?.() ?? 'sin-gancho');
+    if (why !== 'started') {
+      throw new Error(`La caza no empezó: ${why} (oferta: ${JSON.stringify(offered)}). Cambia semilla, año o --hunted.`);
+    }
+    // AN-4c · Se graba desde el paso en que arranca: antes se adelantaba un
+    // segundo para comprobarla, y una caza con lanza (el jabalí de 7/24) carga
+    // y se resuelve dentro de ese segundo; la toma empezaba con la caza hecha.
+    const started = await tab.evaluate(() => window.__valleyLife?.()?.hunt ?? null);
+    process.stdout.write(`Caza en marcha: ${JSON.stringify(started)}\n`);
+  }
   const frames = [];
   let basePhase = null;
   for (let n = 0; n <= seconds * fps; n += 1) {
@@ -157,7 +198,7 @@ try {
       if (await decision.isVisible()) await decision.click();
       if (n) await tab.clock.runFor(1000 / fps);
     } else if (n) await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(30 / fps));
-    const shot = await tab.evaluate(({ follow, zoom }) => window.__valleyCapture(follow, zoom), { follow, zoom: n === 0 ? zoom : 1 });
+    const shot = await tab.evaluate(({ follow, zoom, look }) => window.__valleyCapture(follow, zoom, false, look), { follow, zoom: n === 0 ? zoom : 1, look });
     if (shot.life === null) throw new Error('Fotograma sin vida.');
     if (basePhase === null) basePhase = (shot.life.phase - n / fps / 120 + 1) % 1;
     const expectedPhase = (basePhase + n / fps / 120) % 1;

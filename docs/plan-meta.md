@@ -184,6 +184,70 @@ camino ya en el motor.
 | J1 · Llegadas y expediciones · **en vuelo** (v4.95) | Cinco llegadas por el camino; cinco misiones con cinco finales; el tablón de la plaza y su ventana. Motor, vida y pruebas hechos; falta que el toque abra la ventana y la suite (`task-log.md`) | P1 | Media | — | — |
 | J2 · Las misiones que tocan el asedio | Espiar al clan vecino (retrasa o adelanta el aviso), ir a pedir ayuda a otro valle | P2 | Media | Sol | J1 y B1 |
 
+### AN · Animación integral de aldeanos y animales para móvil (29 sep 2026)
+
+Pedida por el dueño del diseño el 29 sep 2026 con `/goal`: «mejorar de forma
+visible todas las animaciones de aldeanos y animales; el juego se evalúa
+principalmente en móvil; trabajar hasta completar AN-0 a AN-4». El plan y los
+briefs por fase están en `docs/plan-animacion-integral-movil-2026-09-29.md`;
+la matriz con la evidencia, en `docs/medidas/animacion-matriz-2026-09-29.md`.
+**Dependencias comprobadas ese día: todas cerradas** (G-04, G-23, IA-anim,
+IA-fields, E1–E3, D4/D6, E2, «el valle más vivo»). Dos límites del entorno,
+no bloqueos: sin Blender (una corrección de GLB va por brief y por la vía de
+script de `rigid-clips.mjs`, o queda encargada) y sin dispositivo real (se
+compara coste, no FPS).
+
+| Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
+|---|---|---|---|---|---|
+| ~~AN-0 · Inventario y línea de base~~ | **hecha el 29 sep 2026** (`d82bd84`): 24 clips humanos (4 del GLB, 20 fabricados), 15 especies, gestos del perro y golondrina, verificados en código y catálogo; matriz en `docs/medidas/animacion-matriz-2026-09-29.md`; tomas a 390×844 con semilla, año, actor, cámara y zoom; coste de referencia con `gl-probe` (villa 503 llamadas, aldea 441); `tools/reports/gait-report.ts`. Medido: los clips están plantados y lo que falla es el ritmo (aldeano 3,3–5,2 Hz, niño 6–9, gallina y zorro 7, perdiz 23) y dos carreras por reloj que patinan | Hecho | Baja | Claude | — |
+| ~~AN-1 · Locomoción~~ | **hecha el 29 sep 2026** (`c8834ff`, `c7755bf`, AN-1c): la zancada del aldeano 0,317 → 0,423 y 0,260 → 0,339, horneada sin Blender (`tools/art/bake-clips.mjs` sobre `art/recipes/villager/plant-gait.mjs`), plantado 0,97–1,03×, cadencia 2,5–3,9 Hz; la parada con la pierna que baja; `Animal.facing` desde la vida, `charge`/`flee` por suelo recorrido, fundidos de 0,08–0,14 s, zorro a 0,6; comprobado en el controlador real (`cast-stops`, `graphics-animal-motion`) y en partida (pares antes/después en las semillas 11 y 7). Límites dichos (matriz §2.4): gallina 7,3 Hz, niño 4,5–7,1 Hz, trote humano = decisión de Vera, `walk` perdiz y `attack` lobo/jabalí `preview-only`, ciervo sin carrera | Hecho | Media-alta | Claude | AN-0 |
+| ~~AN-2 · Vida y oficios~~ | **hecha el 29 sep 2026** (`759e1e7`): siete gestos con tres tiempos y propiedad de silueta sobre el `Cast` real (hablar, rezar, ordenar, beber, sentarse en el suelo, martillar con golpe y chispas, brincar); `throw` fechado con `fling` (brief AN-2a); chispas y astillas del martillo (brief AN-2b); hojas y tomas en partida (herrero con chispas, niño sentado); la golondrina ya planeaba; encargos: banco, pelota en la mano, martillo publicado | Hecho | Media | Claude | AN-1 |
+| ~~AN-3 · Encuentros y combate~~ | **hecha el 29 sep 2026**: `gate_strike` dura el segundo del golpe y carga el siguiente (portón de la semilla 11: golpes en los fotogramas 41 y 51, brazos sobre la cabeza entre ambos); `flee` esprint que pisa (43 huyendo a 2,4 Hz en el asalto); aviso del oso = su clip (brief AN-3a); arco, lanza, impacto y caída conservados con `combat-clips`, `melee`, `archery`, `ragdoll-physics`; parte del banco de batallas sin cambio. Límites dichos: oso, caza y asalto de la villa sin toma (ruta pendiente en `encargos-3d.md`) | Hecho | Media-alta | Claude | AN-1, AN-2 |
+| ~~AN-4 · Aceptación conjunta~~ | **hecha el 29 sep 2026**: pares antes/después del mismo instante (trazas alineadas) en dos semillas y dos edades, la plaza a 390×844 y a 320×568, el asalto de la semilla 11; matriz cerrada fila a fila con veredicto y observación que lo refutaría (§5; `preview-only` y «sin toma» donde toca); coste: llamadas y triángulos iguales en la aldea, `animation-cost.ts` dentro del ruido (4,0–4,7 ms por fotograma); índice de tomas; **iPhone/iPad pendiente y dicho así** | Hecho | Media | Claude | AN-0 a AN-3 |
+| ~~AN-4b · Las tomas que faltaban~~ y ~~AN-4c · El oso que no nacía~~ | **hechas el 29 sep 2026**: en partida el asalto de la villa 7/60 con arqueros, el conejo, la perdiz (despegue y vuelo) y la carga del jabalí; el observatorio arranca cazas (`--hunt`, `--hunted`) y las graba desde su primer paso. AN-4c: la visita del oso no nacía nunca en partida (los troncos de `solidTerrain` no dejaban guarida) y ahora nace en la linde. Límites apuntados: la honda con gestos de arco; la visita del oso de 3 s (decisión del dueño) | Hecho | Media | Claude + agentes Sonnet | AN-4 |
+| ~~AN-4d · La cueva del oso en la montaña~~ | **hecha el 29 sep 2026**, pedido de Vera («la cueva del oso debe salir en la montaña»): la cueva va al pie de la montaña, contra una ladera que sube (tres celdas de roca y +0,5 a la espalda del modelo), con la boca y el claro hacia el valle; la visita y la caza del oso la comparten. Cinco valles con el terreno real: +0,52 a +0,80 detrás; en partida (7/30) el oso sale, se alza y se mete | Hecho | Baja | Claude | AN-4c |
+| AN-5a · La caza enseña el golpe que la decide | **Propuesta, no empezada** (brief en el plan de animación): la estocada o la suelta que resuelve la caza se dibuja fechada por el tiro, el arma sigue en la mano hasta que acaba el gesto y la presa espantada huye antes de irse. Medida: una toma de caza con lanza a 30 fps donde `spear_thrust` empieza en el paso del tiro (candidata 33/22) | P3 | Baja | Claude | AN-4b |
+
+**Criterio de cierre del goal:** matriz completa, defectos corregidos o límites
+explícitos, comparaciones reproducibles a escala móvil, sincronía de contactos
+y combate conservada, coste comparado, pruebas superadas y papel al día. No se
+cierra con clips sin revisar.
+
+### GV · Profundidad visual del valle en móvil (29 sep 2026)
+
+Encargo de Astra (`art/astra-modelos`, `15b4f84`) que Vera pidió ejecutar con
+`/goal` el mismo día: «la aldea se lee poco anclada al suelo y el prado pierde
+estructura en el zoom habitual». Brief y resultado, con cifras, lo descartado
+y lo pendiente, en `docs/encargos/profundidad-visual-movil-2026-09-29.md`; la
+lectura crítica previa, en `…-revision-2026-09-29.md`; la evidencia, en
+`artifacts/graphics/visual-depth/`. **Dependencias: ninguna abierta.** Límite
+del entorno: sin aparato, se compara coste por software y no FPS.
+
+| Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
+|---|---|---|---|---|---|
+| ~~GV-0 · Línea de base reproducible~~ | **hecha el 29 sep 2026** (`89136b2`): `shot.mjs` y `gl-probe.mjs` con perfil táctil, cielo, hora y escala sujetos (dos tomas seguidas: 0 % de píxeles distintos), `follow-sequence.mjs`, y las sondas fuera de Windows; aldea 11/21 y villa 7/60 a 390×844 y 320×568, despejado, nublado y Low | — | Media | Claude | — |
+| ~~GV-1 · El pie de los edificios y el prado~~ | **hecha el 29 sep 2026**: máscara R8 del valle leída por el sombreador del suelo (`world/contact-shade.ts`): cero llamadas, 516 KB, 0,3–1,9 ms al cambiar edificios; fuerza C1 de tres, **elegida por Vera**. El prado hondo, variante C de tres (**su visto bueno, pendiente**) | — | Media | Claude | GV-0 |
+| ~~GV-2 · El seguido a la vista~~ | **hecha el 29 sep 2026**: quien se sigue se suma a `forest.reveal` contra la copa sola, fundido en 0,35 s con sombra y viento; el asalto conserva sus 28 copas; el hachazo vuelve a mover su árbol; 24 µs por fotograma | — | Media | Claude | GV-0 |
+| GV-3 · Suavizado | **Medido, sin cambiar el valor por omisión**: FXAA descartado (borra el 80–83 % del detalle, 18–55 MB, ~30 programas más); MSAA el mejor a la vista. `?aa=none\|msaa\|fxaa` vale en el sitio publicado | P2 | Baja | Vera, con un iPhone o un iPad | — |
+| GV-3b · La lectura en el aparato | En la aldea 11/21 y con el panel de taller: `?contact=off` contra el valle normal (lo que cuesta el pie) y `?aa=msaa` contra `?aa=none`. Si MSAA cabe, se propone para Medium o como opción de «Graphics» (eso ya es interfaz) | P2 | Baja | Vera → Claude | GV-4 para medir en la villa |
+| GV-4 · Romper el bucle de la villa | **Hallazgo de GV, fuera del encargo y sin tocar.** La villa 7/60 se queda en 3,8 s por fotograma con la vida parada: un hueco de más de un segundo entre fotogramas se toma por una ausencia (`presentation-clock.ts`, `SUSPEND_GAP_SECONDS = 1`), la jornada se reinicia y rehacer la vida de la villa (`createVillage`, rutas de A*) vuelve a pasar del segundo. Con el umbral a 30 s se recupera a 18–78 ms. **Causa probable de la tablet a 0 fps del año 60.** Arreglo propuesto: que el hueco descuente el trabajo del propio fotograma, y abaratar `createVillage`; con una prueba de que un fotograma lento no encadena discontinuidades. [La nota](medidas/bucle-villa-2026-09-29.md) | **P1 (propuesta)** | Media | Claude o Sol | — |
+
+### F · Consecuencias físicas en el combate (propuesta, 29 sep 2026)
+
+Pedida por el dueño del diseño al cerrar la ronda AN: que impactos, bloqueos,
+empujes, caídas y proyectiles respondan a posiciones y colisiones. El
+diagnóstico (`docs/diagnostico-fisica-combate-2026-09-29.md`) dice que hoy
+Rapier sólo decide por dónde vuela una flecha y si la para una almena; el
+acierto, el cuerpo a cuerpo, el portón y las caídas son distancias y relojes.
+**F-0 está hecho, en sombra y sin cambiar nada**; lo demás no está empezado, y
+el orden es del dueño.
+
+| Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
+|---|---|---|---|---|---|
+| ~~F-0 · La flecha que toca, en sombra~~ | **hecha el 29 sep 2026** (`eb845ea`): una cápsula de Rapier del tamaño del aldeano que se pinta por asaltante, en un mundo de consulta aparte, y la bitácora de a quién habría dado cada flecha; `battle-report.ts --shadow`, `?sandbox=battle&shadow=0.12`, `physics-probes.test.ts`. Medido en veinte batallas del año 60 (ocho villas 10 contra 24 en llano y con relieve, cuatro 6 contra 12): **las 56 pasadas con sondas acaban igual que su batalla sin ellas**; con el cuerpo que se pinta cambiaría **entre el 31 y el 40 % de las bajas por flecha** (5–7 % es el ruido del método), siempre a menos —flechas que se clavan a medio metro o más de los pies o pasan a más de un metro del pecho—; la flecha que acierta **sigue volando 7 m** (mediana); las sondas, 0,08 ms por paso sobre 0,21 de Rapier en este contenedor. Veredicto y salidas en el diagnóstico §3 | Hecho | Media | Claude | AN (cerrada) |
+| F-0b · La línea de base en el aparato | En el iPhone y el iPad: `?sandbox=battle&defenders=10&raiders=24` y «Copiar métricas» en el pico de la pelea; después lo mismo con `&shadow=0.12`. Fotogramas, peor fotograma y lo que añaden las sondas como fracción del fotograma. Es lo único de esta línea que no se puede medir aquí | P2 | Baja | Vera (con el aparato) | F-0 |
+| F-1 · La flecha que se clava | **Propuesta, no empezada.** Detrás de una opción `contact` (y `&contact=1` en el banco): decide el barrido de F-0; la altura desde el suelo del blanco; la flecha se para donde toca y se cuelga del segmento del ragdoll; el ragdoll recibe su velocidad y `hit_take`/la caída miran en contra de ella. Medida: veinte batallas o más con y sin contacto como distribuciones (la cifra de balance para Vera), una tira a 390×844 con la caída en la dirección de la flecha en 9 de 10, y el coste de F-0b. **Antes, una decisión del dueño**: aceptar la muralla un tercio menos letal, apuntar con el aire, o separar lo que se ve de lo que decide (diagnóstico §3) | P2 | Media | Claude | F-0, F-0b; decisión del dueño |
+
 ### H · Deuda medida (el cuaderno)
 
 Lo que `docs/task-log.md` §4 lleva anotado con su medida y **no bloquea la
@@ -257,6 +321,10 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
    techo de la partida y cómo se juega el anillo final.
 6. **Deuda no bloqueante** — medida adicional en móvil tras P-1, reunión de
    §11.8, jornadas declaradas y F3f.
+7. **Nuevo, 29 sep — el bucle de la villa (GV-4)**, propuesto como P1 porque
+   es la causa probable de que la tablet vaya a 0 fps en el año 60: sin él, la
+   villa —las fases 3 y 4 de la meta— no se puede jugar ni medir en el aparato.
+   El orden es del dueño.
 
 ---
 

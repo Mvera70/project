@@ -1,0 +1,62 @@
+semilla 7 sin sombra: 127 flechas, 26 aciertos, 23 asaltantes y 1 defensores caídos; portón 60/60, roto, entraron; acabó en el paso 2866 (96 s de escena)
+semilla 7 sombra 0.12: mismo resultado que sin sombra
+semilla 7 sombra 0.17: mismo resultado que sin sombra
+semilla 7 sombra 0.37: mismo resultado que sin sombra
+semilla 11 sin sombra: 199 flechas, 23 aciertos, 23 asaltantes y 0 defensores caídos; portón 51/60; acabó en el paso — (— s de escena)
+semilla 11 sombra 0.12: mismo resultado que sin sombra
+semilla 11 sombra 0.17: mismo resultado que sin sombra
+semilla 11 sombra 0.37: mismo resultado que sin sombra
+semilla 21 sin sombra: 117 flechas, 22 aciertos, 16 asaltantes y 3 defensores caídos; portón 60/60, roto, entraron; acabó en el paso 2327 (78 s de escena)
+semilla 21 sombra 0.12: mismo resultado que sin sombra
+semilla 21 sombra 0.17: mismo resultado que sin sombra
+semilla 21 sombra 0.37: mismo resultado que sin sombra
+semilla 42 sin sombra: 235 flechas, 23 aciertos, 21 asaltantes y 1 defensores caídos; portón 19/60; acabó en el paso — (— s de escena)
+semilla 42 sombra 0.12: mismo resultado que sin sombra
+semilla 42 sombra 0.17: mismo resultado que sin sombra
+semilla 42 sombra 0.37: mismo resultado que sin sombra
+semilla 3 sin sombra: 86 flechas, 24 aciertos, 24 asaltantes y 0 defensores caídos; portón 60/60, roto; acabó en el paso 1046 (35 s de escena)
+semilla 3 sombra 0.12: mismo resultado que sin sombra
+semilla 3 sombra 0.17: mismo resultado que sin sombra
+semilla 3 sombra 0.37: mismo resultado que sin sombra
+semilla 5 sin sombra: 119 flechas, 27 aciertos, 21 asaltantes y 2 defensores caídos; portón 60/60, roto, entraron; acabó en el paso 2322 (77 s de escena)
+semilla 5 sombra 0.12: mismo resultado que sin sombra
+semilla 5 sombra 0.17: mismo resultado que sin sombra
+semilla 5 sombra 0.37: mismo resultado que sin sombra
+semilla 13 sin sombra: 94 flechas, 27 aciertos, 23 asaltantes y 2 defensores caídos; portón 60/60, roto, entraron; acabó en el paso 2020 (67 s de escena)
+semilla 13 sombra 0.12: mismo resultado que sin sombra
+semilla 13 sombra 0.17: mismo resultado que sin sombra
+semilla 13 sombra 0.37: mismo resultado que sin sombra
+semilla 23 sin sombra: 103 flechas, 1 aciertos, 1 asaltantes y 0 defensores caídos; portón 0/60; acabó en el paso — (— s de escena)
+semilla 23 sombra 0.12: mismo resultado que sin sombra
+semilla 23 sombra 0.17: mismo resultado que sin sombra
+semilla 23 sombra 0.37: mismo resultado que sin sombra
+
+F-0 · la flecha que toca, en sombra: 8 batallas por radio, 10 en el cerco (bow) contra 24, año 60, cápsula de 0.65 de alto, suelo plano
+sin sombra: paso de Rapier 0.224 ms de media en 19883 pasos
+
+cápsula de radio 0.12: paso de Rapier 0.210 ms y sondas 0.082 ms de media por paso (hasta 24 sondas a la vez)
+  flechas acabadas 1070: aciertos del cilindro 151, de Rapier 100
+  ambos al mismo 98 · a otro 2 · sólo cilindro 51 (47 con muro o suelo delante) · sólo Rapier 0 · ninguno 919
+  cambiaría el resultado en 53 flechas: 5 % de las flechas, 35 % de los aciertos
+  los de sólo cilindro iban a 0.07, 0.07, 0.07, 0.07, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.09, 0.09, 0.10, 0.10, 0.23, 0.25, 0.41, 0.43, 0.43, 0.46, 0.49, 0.50, 0.56, 0.57, 0.57, 0.57, 0.59, 0.61, 0.62, 0.63, 0.63, 0.64, 0.64, 0.65, 0.66, 0.68, 0.69 sobre los pies y a 0.19, 0.23, 0.23, 0.30, 0.30, 0.32, 0.32, 0.33, 0.33, 0.34, 0.36, 0.37, 0.38, 0.39, 0.39, 0.39, 0.39, 0.39, 0.39, 0.40, 0.40, 0.40, 0.41, 0.41, 0.41, 0.42, 0.42, 0.42, 0.42, 0.42, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45 del eje del cuerpo
+  altura del contacto de Rapier: piernas 2 · tronco 17 · cabeza 81
+  el cilindro da antes de llegar al cuerpo: mediana 0.13 celdas (49 flechas)
+  la flecha que acierta sigue volando: se para a 2.35 celdas del impacto (p90 6.26, 149 flechas)
+
+cápsula de radio 0.17: paso de Rapier 0.204 ms y sondas 0.077 ms de media por paso (hasta 24 sondas a la vez)
+  flechas acabadas 1070: aciertos del cilindro 151, de Rapier 106
+  ambos al mismo 104 · a otro 2 · sólo cilindro 45 (42 con muro o suelo delante) · sólo Rapier 0 · ninguno 919
+  cambiaría el resultado en 47 flechas: 4 % de las flechas, 31 % de los aciertos
+  los de sólo cilindro iban a 0.07, 0.07, 0.07, 0.07, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.09, 0.09, 0.10, 0.10, 0.23, 0.25, 0.41, 0.43, 0.46, 0.49, 0.50, 0.56, 0.57, 0.57, 0.57, 0.62, 0.64, 0.64, 0.65, 0.66, 0.69 sobre los pies y a 0.32, 0.32, 0.33, 0.33, 0.34, 0.37, 0.38, 0.39, 0.39, 0.39, 0.39, 0.39, 0.39, 0.40, 0.40, 0.40, 0.41, 0.41, 0.41, 0.42, 0.42, 0.42, 0.42, 0.42, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45 del eje del cuerpo
+  altura del contacto de Rapier: piernas 2 · tronco 16 · cabeza 88
+  el cilindro da antes de llegar al cuerpo: mediana 0.11 celdas (43 flechas)
+  la flecha que acierta sigue volando: se para a 2.35 celdas del impacto (p90 6.26, 149 flechas)
+
+cápsula de radio 0.37: paso de Rapier 0.201 ms y sondas 0.076 ms de media por paso (hasta 24 sondas a la vez)
+  flechas acabadas 1070: aciertos del cilindro 151, de Rapier 148
+  ambos al mismo 143 · a otro 3 · sólo cilindro 5 (4 con muro o suelo delante) · sólo Rapier 2 · ninguno 917
+  cambiaría el resultado en 10 flechas: 1 % de las flechas, 7 % de los aciertos
+  los de sólo cilindro iban a 0.57, 0.64, 0.64, 0.66, 0.69 sobre los pies y a 0.34, 0.39, 0.39, 0.42, 0.44 del eje del cuerpo
+  altura del contacto de Rapier: piernas 30 · tronco 20 · cabeza 98
+  el cilindro da antes de llegar al cuerpo: mediana 0.05 celdas (33 flechas)
+  la flecha que acierta sigue volando: se para a 2.35 celdas del impacto (p90 6.26, 149 flechas)

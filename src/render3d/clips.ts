@@ -42,14 +42,14 @@ export interface ClipMotion {
   readonly strideLength: number | null;
 }
 
-export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'mine' | 'sow' | 'spread' | 'douse' | 'play' | 'drink' | 'sort' | 'shelter'
+export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'mine' | 'sow' | 'spread' | 'douse' | 'play' | 'throw' | 'drink' | 'sort' | 'shelter'
   | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'spear_thrust' | 'hit_take' | 'fall' | 'flee';
 
 /**
  * IA-anim · En qué fracción del ciclo pega la herramienta. Lo lee el clip para
  * poner ahí el impacto y el render para soltar las astillas en ese instante.
  */
-export const STRIKE_AT: Readonly<Record<'chop' | 'mine' | 'sow' | 'spread' | 'douse', number>> = { chop: 0.52, mine: 0.5, sow: 0.45, spread: 0.55, douse: 0.55 };
+export const STRIKE_AT: Readonly<Record<'chop' | 'mine' | 'sow' | 'spread' | 'douse' | 'hammer', number>> = { chop: 0.52, mine: 0.5, sow: 0.45, spread: 0.55, douse: 0.55, hammer: 0.55 };
 
 /**
  * IA-anim · Dónde cae la cabeza de la herramienta en `STRIKE_AT`, en celdas y
@@ -74,15 +74,18 @@ export function combatClip(clip: string): boolean {
 }
 
 export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
-  // E1: carrera civil, no gesto de combate. TUNE: ciclo de 0,8 s y zancada
-  // grande de 0,44 celdas, gobernada por suelo recorrido como `walk`.
-  flee: { seconds: 0.8, loop: true, strideLength: 0.44 },
+  // E1: carrera civil, no gesto de combate. TUNE: ciclo de 0,8 s gobernado
+  // por suelo recorrido como `walk`. AN-3 · zancada 0,44 → 0,7 celdas: a
+  // 1,6–2,6 celdas/s (un esprint) daba 3,7–5,8 ciclos por segundo; ahora
+  // 2,3–3,7, con dos vuelos por ciclo en el clip.
+  flee: { seconds: 0.8, loop: true, strideLength: 0.7 },
   spear_thrust: { seconds: 0.9, loop: false, strideLength: null },
   hit_take: { seconds: 0.5, loop: false, strideLength: null },
   bow_draw: { seconds: 1.5, loop: true, strideLength: null },
   bow_loose: { seconds: 0.6, loop: false, strideLength: null },
-  // Un golpe por segundo en raiders.ts; la recuperación ocupa el resto.
-  gate_strike: { seconds: 0.6, loop: false, strideLength: null },
+  // Un golpe por segundo en raiders.ts (`BLOW_STEPS`). AN-3 · El clip dura ese
+  // segundo entero: contacto en cero, retirada y carga del golpe siguiente.
+  gate_strike: { seconds: 1, loop: false, strideLength: null },
   fall: { seconds: 1.2, loop: false, strideLength: null },
   sort: { seconds: 3, loop: true, strideLength: null },
   sit: { seconds: 5, loop: true, strideLength: null },
@@ -101,16 +104,30 @@ export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
   spread: { seconds: 1.8, loop: true, strideLength: null },
   // E4 · echar un cubo de agua al fuego: el lanzamiento de la horca, más vivo.
   douse: { seconds: 1.5, loop: true, strideLength: null },
+  // AN-2a · Dos clips donde había uno. `play` es el juego sin pelota —el
+  // oficio del día de un niño (`day.ts`), tres a seis segundos cada vez y las
+  // más de las veces sin trasto que lanzar: brinca y bracea, en bucle—. `throw`
+  // es lanzar la pelota: un gesto de una vez fechado por el hecho que viene
+  // (`life/cast.ts`, `throwSeconds`): la suelta del clip cae en el paso en que
+  // `fling` pone la pelota en el aire. TUNE: 1,0 s, que cabe en la oferta más
+  // corta (1 s) y deja la carga legible.
   play: { seconds: 2.4, loop: true, strideLength: null },
+  throw: { seconds: 1, loop: false, strideLength: null },
   drink: { seconds: 3, loop: true, strideLength: null },
   // El valle más vivo · bajo el alero con lluvia: encogido, brazos cruzados y
   // un tiritón. TUNE: 2,2 s, un temblor lento que se lea como frío y no como
   // risa.
   shelter: { seconds: 2.2, loop: true, strideLength: null },
   idle: { seconds: 4, loop: true, strideLength: null },
-  walk: { seconds: 4 / 3, loop: true, strideLength: 0.317 },
+  // AN-1 (29 sep 2026) · La zancada era 0,317 (un paseo de 0,95 m) y la vida
+  // anda a 1,05–1,65 celdas/s, así que las piernas daban de 3,3 a 5,2 ciclos
+  // por segundo: hormigas. `art/recipes/villager/plant-gait.mjs` reescribe el
+  // paso con el pie plantado y 1,27 m por ciclo; medido sobre el GLB publicado
+  // (`tools/reports/gait-report.ts`): 0,423 andando y 0,339 cargando, con el
+  // pie apoyado a 0,97–1,03× de lo que avanza el cuerpo. Cadencia: 2,5–3,9 Hz.
+  walk: { seconds: 4 / 3, loop: true, strideLength: 0.423 },
   work_hoe: { seconds: 2, loop: true, strideLength: null },
-  carry_walk: { seconds: 4 / 3, loop: true, strideLength: 0.26 },
+  carry_walk: { seconds: 4 / 3, loop: true, strideLength: 0.339 },
 };
 
 /**

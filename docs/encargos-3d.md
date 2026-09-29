@@ -32,12 +32,12 @@ queda, no el estado anterior a las rondas del 20 de septiembre.
 | ~~**La semana de después**~~ (B2, `just_sacked`) · **hecha el 20 sep 2026** | La aldea acaba de perder grano y ganado | Durante el único tick posterior, 2–3 cargas fijas quedan junto a almacén/molino (o casa); `raid.beast` deja además dos haces tumbados junto a un ancla real de ganado/casa. No son recursos ni bloquean rutas | Cerrado en E0c reutilizando `Prop`, sin malla ni animación nueva. [Evidencia y límites](historico/life-rounds/E0c-semana-posterior.md) |
 | ~~**La segunda puerta, abierta en la muralla hecha**~~ · **hecha el 21 sep 2026** | El jugador paga una puerta y la aldea sustituye un tramo del cerco | Durante la obra, la fuente desaparece y un solar procedural abre el hueco; al completar, entra el portón sin restos | Cerrado en E0d sin derribo físico ni activo nuevo. [Informe](historico/life-rounds/E0d-transiciones-muralla.md) |
 | **Las armas** (C1) | La aldea se lleva un cuarto menos de golpe | Lanzas y escudos en guarnición y atacantes (20 sep) | Identidad propia del clan y armas almacenadas |
-| **Los arcos** (C1, D2) | Flechas físicas cada 2,1 s | Arco en mano, flecha GLB y tensado/suelta desde el paso real | No hay huesos de dedos: la suelta se expresa con palma y brazo |
+| **Los arcos** (C1, D2) | Flechas físicas cada 2,1 s | Arco en mano, flecha GLB y tensado/suelta desde el paso real | No hay huesos de dedos: la suelta se expresa con palma y brazo. **Y la flecha que acierta no se para** (medido en F-0, 29 sep 2026): Rapier no sabe que ha dado y la flecha atraviesa el cuerpo y se clava una mediana de 7 m detrás (19 m en una de cada diez). Pararla donde toca y colgarla del segmento del ragdoll es F-1 (`docs/diagnostico-fisica-combate-2026-09-29.md` §3) |
 | ~~**El asalto que se decide**~~ (B4) | La semana que llegan el juego dice «vienen a por el pueblo» y la siguiente se resuelve con lo que la muralla hizo | La crónica lo cuenta las dos semanas (`raid.assault`, `raid.held`) **y desde F2 (19 sep) lo dice la línea de estado mientras pasa**: la víspera con su cuenta atrás, el clan encima —«en la puerta» sólo si hay puerta— y los tres estados del portón, que salen de la escena y no del motor (`gateNow`, `src/ui/doing.ts`). Medido: el 4,0 % de las semanas de una partida, seis valles de seis | Lo que queda de esta fila es **arte, no interfaz**: las cuatro filas de abajo (el cuerpo a cuerpo, la avalancha en el portón, el saqueador que cae, el valle tomado). La semana ya se siente como una víspera; lo que no se ve es la pelea |
 | **El cuerpo a cuerpo** (D4) | Ambos bandos golpean y pueden caer | Gestos, armas y ragdolls de once segmentos con suelo y obstáculos; también sin arqueros | Persistencia entre jornadas no incluida; respaldo animado sin Rapier |
 | **La avalancha en el portón** (D3b/D5) | Sesenta golpes y cede | `gate_strike`, hoja articulada, rotura visible y seis tablas físicas; robledal atenuado y separación | Contacto preciso: alcance mecánico de grupo, no de mano; persisten contactos estrechos en embudos |
 | **El valle tomado** (B3) | El clan entra y acaba la partida (`stormed`) | D6: objetivos reales, cargas, huellas y transición de 8–12 s sin avanzar el motor | Persistencia de cadáveres entre jornadas. Sangre/fuego siguen siendo decisión del dueño |
-| **El saqueador que cae** (D2) | Una flecha lo deja `down` | Caída física articulada y apoyo en terreno/obstáculos; `fall` animado como respaldo | Sangre sin decidir (E4) |
+| **El saqueador que cae** (D2) | Una flecha lo deja `down` | Caída física articulada y apoyo en terreno/obstáculos; `fall` animado como respaldo | Sangre sin decidir (E4). **La caída no sabe de dónde vino el golpe**: el ragdoll nace de la pose `fall` en reposo, sin la velocidad de la flecha; F-0 midió que la flecha toca sobre todo cabeza y hombros (81 de 100), así que el retroceso y el impulso vendrían de arriba (F-1) |
 | ~~**La muralla de piedra**~~ (A4, transición) · **hecha el 21 sep 2026** | El cerco cerrado mejora estacas a piedra | `wall.glb` se ve terminado; E0d añade el hueco y solar de obra intermedio, sin ocultar defensas vecinas | Cerrado para transición, sin cascotes ni animación de derribo. [Informe](historico/life-rounds/E0d-transiciones-muralla.md) |
 | **La era del valle** (A4, A5) | El valle es caserío, aldea o villa cerrada, y eso ya se puede preguntar (`derive/era.ts`) | La cabecera lo dice desde A5; E0e añade color de caminos existentes, bancos de plaza y humo por era. §7.4b fija tierra pisada → piedra parcial → piedra completa. Doce tomas históricas sin rótulo, dos semillas y móvil/tableta fueron clasificadas 12/12 por otro agente | **Aceptada con reserva:** la separación aldea/villa tiene poco margen en algunos encuadres y la piedra sigue lisa, sin juntas. Ese detalle sería arte de superficie futuro. [Brief](historico/encargos/encargo-e0e-aceptacion-historica.md) e [informe](historico/life-rounds/E0e-ambiente-eras.md) |
 
@@ -91,6 +91,47 @@ ausentes quedan superadas por [esta entrega](historico/life-rounds/E1b-cuerpo-a-
 | **Talar y picar** (IA-anim, 24 sep) | **Entregados por código:** `chop` y `mine` con carga, golpe acelerado, rebote y astillas en el impacto; el filo del hacha va por delante. **Contacto medido:** la cabeza de la herramienta queda de −0,06 a 0,19 de la corteza y el pico en el borde de la roca (`tests/journeys/work-contact.test.ts`); el árbol golpeado oscila y suelta hojas. **Falta:** que la roca cambie al picarla (se dibuja como cantos sueltos y no se lee como cara de cantera) |
 | **Fuego, humo y gore** (E4) | Nada. Cómo se ve arder una casa en un asalto y cómo se ve morir. **El gore es decisión del dueño** |
 | **Escombros y ragdoll** | Entregados por código el 20 sep: once segmentos por cuerpo, suelo real, obstáculos y tablas físicas. Topes 24/24; reposo conservado y liberación al cambiar escena. [Evidencia](historico/life-rounds/D6-saqueo-y-fisica.md) |
+| **Un trote para el aldeano** (AN-1, 29 sep) | Con la zancada plantada de AN-1a, el paso de la vida (1,05–1,65 celdas/s) da 2,5–3,9 ciclos de pierna por segundo; un paseo humano es ~1. Llegar a 1,8–2,8 Hz exige o bajar el paso de la vida (la jornada de D.6.1 deja de caber en sus segundos) o un clip de trote —`art/recipes/villager/plant-gait.mjs` puede escribirlo con zancada de 0,55–0,6 y `bake-clips.mjs` hornearlo sin Blender— que cambia el carácter del aldeano. **Decisión de Vera.** El niño (talla 0,55) va a 4,5–7,1 Hz por la misma razón |
+| **`attack` del lobo y del jabalí** (AN-0) | Los GLB de Vera traen `attack` en los dos (`rigid-clips.mjs`): el lobo mueve la cabeza 4° y las orejas, el jabalí el cuello 9°; **nadie los emite** (el lobo del corral anda; el jabalí carga con `charge`). `preview-only` en la matriz. Ver morder pide un clip con cuerpo y un hecho de la vida que lo llame |
+| **`walk` de la perdiz** (AN-0) | 23 ciclos por segundo si anduviera (zancada 0,064 con paso 1,5); en la caza no anda (`wild-prey.ts`: se queda en casa hasta huir). `preview-only`. Un paseo de perdiz pediría un roam corto en `wild-prey.ts` y una zancada de ~0,15 en la receta |
+| **La carrera del ciervo** (AN-1) | Huye a 1,35 celdas/s con el `walk` (4,1 Hz): la receta propia (`plant-gait.cjs`) no trae carrera. Un clip `run` con zancada de ~0,6 en la receta del ciervo, que `AnimalMotion` ya sabe llevar por suelo recorrido |
+| **Un banco o un tronco** (AN-2) | La aldea se sienta a comer, al fuego y a la puerta de casa sin asiento: hasta AN-2 en el aire a 0,31 m, ahora en el suelo. Un banco junto a la puerta y troncos alrededor de la hoguera son dos mallas pequeñas; `sit` volvería a la altura de banco el día que existan |
+| **La pelota en la mano** (AN-2a) | **Hoy no hay pelota en la partida**: los trastos sueltos van apagados desde el 15 sep por decisión del dueño (`createVillage` sin `props: true`), así que este encargo sólo vale si vuelven; **Vera decidió conservar `throw` (29 sep 2026)**, así que el encargo se queda para ese día. Mientras un niño la lleva, `world/props.ts` la pinta 0,38 celdas por delante del cuerpo a 0,45 de alto, no en la mano que carga; el lanzamiento ya está fechado con `fling`. Colgarla del hueso `hand_r` como las herramientas es un cambio de `world/props.ts` + `cast.ts` |
+| **Un martillo publicado** (AN-2b) | El herrero y la obra usan el respaldo de `hand-tools.ts` (mango de 0,4 y cabeza en caja); `HELD.hammer` ya pide `hammer.glb` y lo colgará el día que exista |
+| **Una vía para ver la visita del oso, la caza y el asalto de una villa en el observatorio** (AN-3) | `observe-life.mjs --beast` sólo actúa con `--aftermath`, `--happening bear_in_the_wood` no hizo aparecer al oso en 56 s de jornada, `--hunt` exige una señal de caza tocable que en tres valles con oferta del motor no llegó a verse, y el asalto de la villa 7/60 (sesenta personas, muralla, 24 hombres, Rapier) agota el tiempo de carga bajo SwiftShader. Sin esa vía, el aviso del oso (3 s), la carga del jabalí, la huida del conejo, el despegue de la perdiz y el arco, la lanza, el impacto y la caída de la guarnición sólo se han visto en banco y en hoja: `preview-only` o «sin toma en partida» en la matriz hasta que exista la toma (una villa más pequeña con guarnición, o el banco de batallas `?sandbox=battle` fotografiado) |
+| **El ciervo, tapado desde la cámara de reposo** (AN-0) | Vive en la linde y la copa del bosque lo esconde en el encuadre de reposo (`artifacts/graphics/AN-0/baseline/deer-seed11-y21`); sólo se ve en la caza, donde el bosque se atenúa. No es una malla que falte: es que el jugador no ve al ciervo salvo cazando |
+
+**La honda** (visto en partida en AN-4b, 29 sep 2026): el cazador con honda
+tensa y suelta como un arquero —`life/hunt-encounter.ts` da `bow_draw` y
+`bow_loose` a toda arma que no sea la lanza— mientras la honda cuelga de la mano
+izquierda (`AN-4b/hunt-rabbit-seed7-y22/strip-hunter.png`). La piedra ya vuela
+con su malla (`world/arrows.ts`). Haría falta un gesto propio —el volteo sobre
+la cabeza y la suelta, fechado por el tiro como `bow_loose`— y elegirlo en
+`hunt-encounter.ts` según el arma.
+
+**La visita del oso** (AN-4c y AN-4d, 29 sep 2026): **no se veía nunca en
+partida** —con los troncos del juego no cabía en ninguna guarida de bosque, y
+cuando cupo nacía dentro de la roca de su cueva—. Desde AN-4c nace en la boca
+de la cueva, y desde AN-4d (pedido de Vera) la cueva está **al pie de la
+montaña**, contra una ladera que sube, con la boca hacia el valle, y se ve
+entera: sale, hoza, se alza si alguien se acerca y se mete (7/30). Lo que
+queda de este encargo es de arte: el modelo es sólo la entrada exterior
+(«nadie entra en una sala interior», 23 sep), y al meterse el oso desaparece
+tras el hueco oscuro.
+
+**La caza no enseña el golpe que la decide** (visto en partida en AN-4b, 29
+sep 2026, jabalí de 7/24 con lanza, `AN-4b/hunt-boar-seed7-y24-desde-el-inicio`).
+El jabalí carga 32 pasos hacia el cazador; en el 33 la lanza llega (1,35 de
+distancia), falla, el jabalí se espanta y la caza se da por hecha. En pantalla:
+(1) **la estocada no se ve** —en ese mismo paso `life/hunt-encounter.ts` pone
+al cazador en `idle`, y el renderer le quita el arma al completarse la caza—;
+(2) **los gestos de la caza no van fechados por el tiro** —el renderer pone al
+cazador `clipSeconds` del reloj de presentación, no desde el tiro, como sí hace
+el asalto con `combatClip`—; (3) **la presa espantada desaparece en el sitio**
+(`wild.phase = 'gone'`) en vez de huir; y (4) **la lanza llega a través de la
+empalizada**: la caza sólo mira distancias (`spearCanHit`). Los tres primeros
+son de presentación y tienen vía en el brief AN-5a del plan de animación; el
+cuarto cambia el resultado de la caza y es decisión del dueño.
 
 ## 4 · De otras rondas, aún abierto
 
@@ -106,6 +147,18 @@ cuenta, se añade aquí **en la misma ronda**, con qué hace el motor, qué se v
 hoy y qué haría falta. Un encargo que sólo vive en un comentario del código es
 un encargo que nadie hará — y una mecánica que no se ve no existe para quien
 juega.
+
+## La profundidad del valle (GV, 29 sep 2026)
+
+Lo que la ronda de profundidad visual (`docs/encargos/profundidad-visual-movil-2026-09-29.md`)
+vio y dejó fuera de su encargo. Ninguna es una malla: son cosas del render.
+
+| Qué | Qué se ve hoy | Qué haría falta |
+|---|---|---|
+| **La gente no da sombra propia** | Los aldeanos y los animales no proyectan: con el sol alto es lo que más flota de la escena, más que las casas (revisión del encargo, §3.5) | Un disco oscuro instanciado bajo los pies, una llamada para todos, que siga la cota; o que la máscara del pie lea también los cuerpos |
+| **Las defensas no tienen pie** | Muralla, empalizada y portón quedan fuera de la máscara del pie (`contactBases`, sólo edificios con tejado): en la villa, el cerco largo es lo que más lo pediría | Añadirlas a `contactBases` con una caída más estrecha |
+| **La hierba tapa el pie** | Una mata clara puede quedar encima de la franja oscura al pie de una pared (`grass.ts` no lee la máscara) | Que la hierba lea la misma máscara y se oscurezca con el suelo |
+| **Al seguido lo tapan troncos y casas** | Sólo se atenúan las copas (GV-2): detrás de una casa, o con un tronco delante de las piernas, no se le ve; y en los 0,35 s del fundido su anillo se ve por encima de la copa | Atenuar también techos, con el mismo criterio de «sólo lo que tapa», si en el aparato se echa en falta |
 
 ## El camino del valle (28 sep 2026)
 
@@ -224,8 +277,8 @@ Lo que la tanda dejó a medias, y lo que se hizo después el mismo día:
   cerrado se ve: le llevan la leña o el grano, la mula sale cargada, la vaca va
   al pasto, la sal se queda. **Hecho después (26 sep):** se ve pagar
   (monedas de mano a mano, `effects/coins.ts`) y la perdiz despega con su
-  `takeoff` antes de aletear. **Pendiente:** el zorro de Vera, con esqueleto
-  hecho por script, espera su visto bueno para publicarse.
+  `takeoff` antes de aletear. **Hecho después (29 sep):** el zorro de Vera,
+  con esqueleto por script, publicado (`fox.glb`, 0,56 celdas, `idle`/`walk`/`flee`).
 - ~~**Los postes del tendedero y el bancal, sólidos.**~~ Hecho
   (`yardSolids`, `world/obstacles.ts`).
 - ~~**A cubierto bajo un alero, y con gesto.**~~ Hechos: `shelterUnder` y el

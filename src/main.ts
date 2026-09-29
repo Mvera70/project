@@ -2,7 +2,7 @@
 import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { HAPPENINGS, MEANS_IDS, SCHEMA_VERSION, type HappeningId, type MeansId, type SaveFile } from '@engine/state';
-import { archivedGames, crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYearCooperative,
+import { archivedGames, crownNow, crownReady, giveNow, happenNow, huntedNow, mountDebug, offerNow, openAtYearCooperative,
   parseDebugRequest, raidNow, bracedNow, comingNow, warningNow, warningPendingNow, aftermathNow, wallWorkNow,
   runToCrossroad, runToSky, runToWoodChain, stateAt, walkwayNow, WOOD_DEMO_START } from './ui/debug';
 import { boot } from './ui/app';
@@ -118,6 +118,10 @@ if (root) {
     if (happening !== null && (HAPPENINGS as readonly string[]).includes(happening)) {
       happenNow(state, happening as HappeningId);
     }
+    // AN-4b · y `&hunted=partridge,rabbit` da por cazadas esas especies, para
+    // grabar las cazas que vienen detrás y la visita del oso (`huntedNow`).
+    const hunted = query.get('hunted');
+    if (hunted !== null) huntedNow(state, hunted.split(','));
     // K-5 · `&crown=ready` deja la fila de la corona encendida, y
     // `&crown=<oficio>` corona ya a alguien de ese oficio para ver lo que viene
     // después (la sala, la palabra «king», el estilo del valle).

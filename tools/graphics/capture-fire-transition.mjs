@@ -1,22 +1,8 @@
 import { chromium } from '@playwright/test';
-import { existsSync, mkdirSync, readdirSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { mkdirSync } from 'node:fs';
+import { withBrowser } from './browser.mjs';
 
-function browserExe() {
-  const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
-  if (existsSync(root)) {
-    try {
-      for (const dir of readdirSync(root).filter((name) => /^chromium-\d+$/.test(name)).sort().reverse()) {
-        const exe = join(root, dir, 'chrome-win64', 'chrome.exe');
-        if (existsSync(exe)) return exe;
-      }
-    } catch { /* Browser cache is outside the workspace sandbox. */ }
-  }
-  return 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-}
-
-const browser = await chromium.launch({ executablePath: browserExe(), args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
+const browser = await chromium.launch(withBrowser({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }));
 const page = await browser.newPage({ viewport: { width: 1000, height: 700 } });
 const port = process.env.VITE_PORT ?? '5173';
 await page.goto(`http://127.0.0.1:${port}/tools/graphics/fire-transition.html`);

@@ -228,12 +228,16 @@ export function dogAction(dog: Dog): Animal['action'] {
 
 export function dogPosition(dog: Dog | null): Animal[] {
   if (dog === null) return [];
-  return [{ id: dog.body.id, kind: 'dog', x: dog.body.x, y: dog.body.z, action: dogAction(dog) }];
+  return [{ id: dog.body.id, kind: 'dog', x: dog.body.x, y: dog.body.z, facing: dog.body.facing, action: dogAction(dog) }];
 }
 
 // --- el zorro ----------------------------------------------------------------
 
-const FOX_PACE = 0.95;
+// TUNE: 0,6 (AN-1, 29 sep 2026; era 0,95). El zorro que se acerca al
+// gallinero **se acerca**, no trota: a 0,95 celdas/s (2,85 m/s) sus patas —las
+// de la receta G-23, cortas: 0,13 celdas de zancada— daban 7,3 ciclos por
+// segundo (`tools/reports/gait-report.ts`); a 0,6 dan 4,6. Huir sigue a 2,2.
+const FOX_PACE = 0.6;
 const FOX_FLEE = 2.2;
 const FOX_RADIUS = 0.2;
 /**
@@ -333,7 +337,7 @@ export function stepFox(fox: Fox | null, land: Terrain, seed: number, step: numb
 
 export function foxPosition(fox: Fox | null): Animal[] {
   if (fox === null || fox.phase === 'den' && Math.hypot(fox.body.x - fox.den.x, fox.body.z - fox.den.z) < 0.2) return [];
-  return [{ id: fox.body.id, kind: 'fox', x: fox.body.x, y: fox.body.z,
+  return [{ id: fox.body.id, kind: 'fox', x: fox.body.x, y: fox.body.z, facing: fox.body.facing,
     action: fox.phase === 'fleeing' ? 'flee' : actionOf(fox.body) }];
 }
 
@@ -423,6 +427,6 @@ export function stepDucks(ducks: readonly Duck[], state: GameState, seed: number
 }
 
 export function duckPositions(ducks: readonly Duck[]): Animal[] {
-  return ducks.map((duck) => ({ id: duck.id, kind: 'duck' as const, x: duck.x, y: duck.z,
+  return ducks.map((duck) => ({ id: duck.id, kind: 'duck' as const, x: duck.x, y: duck.z, facing: duck.facing,
     action: duck.moving ? 'walk' as const : undefined }));
 }

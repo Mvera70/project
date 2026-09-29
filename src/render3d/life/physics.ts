@@ -136,6 +136,41 @@ export interface PhysicsOptions {
   readonly maxDebris?: number;
 }
 
+/**
+ * F-0 · La sonda de un cuerpo vivo: la cápsula que se pinta, en un mundo de
+ * Rapier aparte donde no choca con nada. 29 sep 2026,
+ * `docs/diagnostico-fisica-combate-2026-09-29.md` §3.
+ *
+ * **Es un experimento en sombra y no decide nada.** El acierto de una flecha lo
+ * sigue decidiendo el cilindro de `archery.ts`; la sonda le pregunta a Rapier
+ * lo mismo con la forma del cuerpo que se ve, para medir en cuántas flechas
+ * cambiaría el resultado. Viven en un mundo de consulta aparte: ninguna
+ * flecha, cascote ni ragdoll nota que existen, y sólo las encuentra `sweep`.
+ */
+export interface ProbeSpec {
+  readonly id: number;
+  /** Los pies. Sin `y`, la cota del mismo suelo que tiene este mundo. */
+  readonly x: number; readonly y?: number; readonly z: number;
+}
+
+export interface ProbeShape {
+  /** Radio de la cápsula, en celdas. */
+  readonly radius: number;
+  /** Alto total, de los pies a la coronilla, en celdas. */
+  readonly height: number;
+}
+
+export interface ProbeHit {
+  /** La sonda tocada, o null si lo primero que se toca es muro o suelo. */
+  readonly id: number | null;
+  /** La fracción del tramo recorrida al tocar: 0 al salir, 1 al llegar. */
+  readonly toi: number;
+  /** Dónde se toca, en el mundo. */
+  readonly at: PhysicalVector;
+  /** A qué altura sobre los pies de la sonda; 0 si es muro o suelo. */
+  readonly height: number;
+}
+
 export interface PhysicsRagdoll {
   readonly id: number;
   snapshot(): RagdollPose;
@@ -152,6 +187,12 @@ export interface PhysicsSnapshot {
      * Lo lee el banco de batallas (`?sandbox=battle`); el juego no lo usa.
      */
     readonly stepMs: number; readonly stepMsAverage: number;
+    /**
+     * F-0 · Las sondas vivas, lo que ha costado en total el paso de Rapier y lo
+     * que han costado en total las sondas (colocarlas y consultarlas), en ms.
+     * Los totales y no la media móvil: comparar dos batallas pide sumas.
+     */
+    readonly probes: number; readonly stepMsTotal: number; readonly probeMsTotal: number;
   };
 }
 
@@ -162,6 +203,18 @@ export interface Physics {
   articulate(seed: RagdollSeed): PhysicsRagdoll | null;
   debris(spec: DebrisSpec): PhysicsBody;
   snapshot(): PhysicsSnapshot;
+  /**
+   * F-0 · Las sondas de este paso: las de la lista se mueven, las nuevas nacen
+   * y las que faltan se quitan, en su mundo de consulta. Se llama una vez por
+   * paso de vida, antes de `step()`, con los cuerpos donde la vida los tiene.
+   */
+  probes(list: readonly ProbeSpec[], shape: ProbeShape): void;
+  /**
+   * F-0 · Lo primero que toca una bola del radio de la flecha que va de `from`
+   * a `to`: una sonda o, con `solid`, también un muro o el suelo si están antes.
+   * Es una consulta: no mueve nada ni cambia el mundo.
+   */
+  sweep(from: PhysicalVector, to: PhysicalVector, solid?: boolean): ProbeHit | null;
   clearBattle(): void;
   readonly count: number;
   dispose(): void;
@@ -204,6 +257,29 @@ export async function createPhysics(land: Terrain, options: PhysicsOptions = {})
   const debrisOrder: LiveBody[] = [];
   let steps = 0;
   let disposed = false;
+  // F-0 · las sondas viven en **un mundo de consulta aparte**, que nunca se
+  // mezcla con el de la batalla. Con los grupos de colisión a cero en el mismo
+  // mundo no tocaban nada, pero cambiaban qué ranura recibe cada flecha y cada
+  // ragdoll y el orden en que Rapier recorre los contactos: medido el 29 sep,
+  // en la semilla 42 (año 60, 10 contra 24, 235 flechas y un montón de caídos)
+  // la batalla acababa con uno o dos aciertos de más o de menos. Un mundo sólo
+  // de sondas no puede mover nada del otro.
+  let probeWorld: RAPIER_NS.World | null = null;
+  const probeBodies = new Map<number, RAPIER_NS.RigidBody>();
+  const probeOf = new Map<number, number>();
+  let probeShape: ProbeShape | null = null;
+  let probeMsTotal = 0;
+  let stepMsTotal = 0;
+  const arrowBall = new rapier.Ball(ARROW_RADIUS);
+  const removeProbe = (id: number, body: RAPIER_NS.RigidBody): void => {
+    for (let n = 0; n < body.numColliders(); n += 1) probeOf.delete(body.collider(n).handle);
+    probeWorld?.removeRigidBody(body);
+    probeBodies.delete(id);
+  };
+  const freeProbes = (): void => {
+    probeBodies.clear(); probeOf.clear();
+    probeWorld?.free(); probeWorld = null;
+  };
 
   function rigidBody(kind: LiveBody['kind'], at: PhysicalVector, velocity: PhysicalVector,
     rotation: PhysicalRotation, collider: RAPIER_NS.ColliderDesc,
@@ -248,6 +324,7 @@ export async function createPhysics(land: Terrain, options: PhysicsOptions = {})
       const started = performance.now();
       world.step(); steps += 1;
       lastStepMs = performance.now() - started;
+      stepMsTotal += lastStepMs;
       averageStepMs = steps === 1 ? lastStepMs : averageStepMs * 0.95 + lastStepMs * 0.05;
       for (const body of [...bodies]) if (body.ttlSteps !== null && steps - body.bornAt >= body.ttlSteps) body.remove();
       for (const entry of ragdolls.values()) if (!entry.sleeping
@@ -291,10 +368,72 @@ export async function createPhysics(land: Terrain, options: PhysicsOptions = {})
         ragdolls: entries.length, activeRagdolls: entries.filter((entry) => !entry.sleeping).length,
         debris: [...bodies].filter((body) => body.kind === 'debris').length,
         stepMs: lastStepMs, stepMsAverage: averageStepMs,
+        probes: probeBodies.size, stepMsTotal, probeMsTotal,
       } };
+    },
+    probes(list, shape): void {
+      if (disposed) return;
+      const started = performance.now();
+      if (probeShape !== null && (probeShape.radius !== shape.radius || probeShape.height !== shape.height)) {
+        for (const [id, body] of [...probeBodies]) removeProbe(id, body);
+      }
+      probeShape = shape;
+      // La cápsula de Rapier se mide por la mitad de su tramo recto. El tramo
+      // arranca en los pies y la semiesfera de abajo queda enterrada: con ella
+      // fuera, el cuerpo sería un huevo que no tiene pies, y una flecha baja
+      // entre los tobillos daría en el suelo (medido en la primera pasada).
+      const halfHeight = Math.max(0, (shape.height - shape.radius) / 2);
+      const seen = new Set<number>();
+      const probes = probeWorld ??= new rapier.World({ x: 0, y: 0, z: 0 });
+      for (const probe of list) {
+        seen.add(probe.id);
+        const feet = probe.y ?? safeGround(ground, probe.x, probe.z);
+        const centre = { x: probe.x, y: feet + halfHeight, z: probe.z };
+        const existing = probeBodies.get(probe.id);
+        if (existing !== undefined) { existing.setNextKinematicTranslation(centre); continue; }
+        const body = probes.createRigidBody(rapier.RigidBodyDesc.kinematicPositionBased()
+          .setTranslation(centre.x, centre.y, centre.z));
+        const collider = probes.createCollider(rapier.ColliderDesc.capsule(halfHeight, shape.radius), body);
+        probeBodies.set(probe.id, body);
+        probeOf.set(collider.handle, probe.id);
+      }
+      for (const [id, body] of [...probeBodies]) if (!seen.has(id)) removeProbe(id, body);
+      // Un paso del mundo de consulta lleva cada sonda a su sitio y pone al
+      // día lo que ven las consultas; no hay nada más en él que simular.
+      probes.step();
+      probeMsTotal += performance.now() - started;
+    },
+    sweep(from, to, solid = false): ProbeHit | null {
+      if (disposed || probeShape === null || probeWorld === null) return null;
+      const started = performance.now();
+      const motion = { x: to.x - from.x, y: to.y - from.y, z: to.z - from.z };
+      const hit = probeBodies.size === 0 ? null
+        : probeWorld.castShape(from, IDENTITY, motion, arrowBall, 0, 1, true);
+      // Lo sólido está en el mundo de la batalla: suelo, muralla y almenas,
+      // sin lo que se mueve (flechas, cascotes, ragdolls). Gana lo más cercano.
+      const wall = solid ? world.castShape(from, IDENTITY, motion, arrowBall, 0, 1, true,
+        rapier.QueryFilterFlags.EXCLUDE_DYNAMIC | rapier.QueryFilterFlags.EXCLUDE_KINEMATIC) : null;
+      probeMsTotal += performance.now() - started;
+      if (wall !== null && (hit === null || wall.time_of_impact < hit.time_of_impact)) {
+        const toi = wall.time_of_impact;
+        return { id: null, toi, at: { x: from.x + motion.x * toi, y: from.y + motion.y * toi, z: from.z + motion.z * toi }, height: 0 };
+      }
+      if (hit === null) return null;
+      const toi = hit.time_of_impact;
+      const id = probeOf.get(hit.collider.handle);
+      if (id === undefined) return null;
+      // En Rapier 0.20 `witness1` es el punto tocado del colisionador **en
+      // coordenadas del mundo**, aunque el tipado diga «local»: medido el
+      // 29 sep, una bola a 0,4 contra una cápsula en x=10 da (9,88; 0,40; 10)
+      // en `witness1` y (0,08; 0; 0) —el punto de la bola— en `witness2`. La
+      // prueba de las sondas lo vigila por si cambia de versión.
+      const centre = hit.collider.translation();
+      const at = { x: hit.witness1.x, y: hit.witness1.y, z: hit.witness1.z };
+      return { id, toi, at, height: at.y - (centre.y - Math.max(0, (probeShape.height - probeShape.radius) / 2)) };
     },
     clearBattle(): void {
       if (disposed) return;
+      freeProbes();
       for (const body of [...bodies]) body.remove();
       for (const entry of ragdolls.values()) entry.runtime.remove();
       ragdolls.clear(); debrisOrder.length = 0;
