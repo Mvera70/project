@@ -108,9 +108,15 @@ export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
   // risa.
   shelter: { seconds: 2.2, loop: true, strideLength: null },
   idle: { seconds: 4, loop: true, strideLength: null },
-  walk: { seconds: 4 / 3, loop: true, strideLength: 0.317 },
+  // AN-1 (29 sep 2026) · La zancada era 0,317 (un paseo de 0,95 m) y la vida
+  // anda a 1,05–1,65 celdas/s, así que las piernas daban de 3,3 a 5,2 ciclos
+  // por segundo: hormigas. `art/recipes/villager/plant-gait.mjs` reescribe el
+  // paso con el pie plantado y 1,27 m por ciclo; medido sobre el GLB publicado
+  // (`tools/reports/gait-report.ts`): 0,423 andando y 0,339 cargando, con el
+  // pie apoyado a 0,97–1,03× de lo que avanza el cuerpo. Cadencia: 2,5–3,9 Hz.
+  walk: { seconds: 4 / 3, loop: true, strideLength: 0.423 },
   work_hoe: { seconds: 2, loop: true, strideLength: null },
-  carry_walk: { seconds: 4 / 3, loop: true, strideLength: 0.26 },
+  carry_walk: { seconds: 4 / 3, loop: true, strideLength: 0.339 },
 };
 
 /**

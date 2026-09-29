@@ -231,6 +231,46 @@ catálogo actualizado), la prueba que fija la propiedad, y la publicación por
 `publish-assets.ts --ids`. Nunca se edita un GLB a mano ni se cambian bytes
 publicados sin catálogo y manifiesto.
 
+### AN-1a · La zancada del aldeano (brief ejecutado el 29 sep 2026)
+
+**Defecto medido.** `walk` cubre 0,317 celdas por ciclo (0,95 m) y la vida
+mueve a la gente a 1,05–1,65 celdas/s (`village.ts`, `pace`): 3,3–5,2 ciclos
+de pierna por segundo en todo trayecto, 6–9 en un niño; el pie apoyado
+retrocede a 0,79–0,90× de lo que avanza el cuerpo (`gait-report.ts`, AN-0).
+Es la «aldea de esprínters» que D.6.1 quiso evitar, vuelta por otro lado:
+D.6.2 bajó la zancada al escalar el aldeano y el paso de la vida se calibró
+después contra la jornada de ciento veinte segundos, no contra el clip.
+
+**Recurso.** `art/recipes/villager/villager.json`, clips `walk` y
+`carry_walk`. Los 17 aldeanos comparten los clips del base (`world/cast.ts`),
+así que basta con el `villager.glb`.
+
+**Vía.** Sin Blender en la ronda. (1) `art/recipes/villager/plant-gait.mjs`
+reescribe las dos pistas en la receta con el pie plantado —el tobillo apoyado
+retrocede en línea recta, el talón se levanta al final, la pierna vuelve
+levantada; cadera y rodilla por cinemática inversa; brazos en oposición—, con
+claves cada dos fotogramas e `interpolation: 'LINEAR'`. (2)
+`tools/art/bake-clips.mjs` (nuevo) muestrea la receta a 24 fps como el
+exportador y reescribe sólo esas dos animaciones en el GLB de G-17; con
+`--check` reproduce las claves publicadas a 0,03°, que es lo que valida las
+convenciones. (3) `gait-report.ts --only villager --glb <candidato>` mide la
+zancada; la medida (0,423 y 0,339 celdas) va a la receta, al catálogo y a
+`clips.ts`. (4) El GLB horneado se aprueba en
+`artifacts/graphics/AN-1/approved/<hash>/` y se publica con
+`publish-assets.ts --ids villager`. Un `npm run art -- all villager` con
+Blender produce las mismas muestras (claves lineales) y sustituye este horneado.
+
+**Prueba.** `tests/fast/villager-rig.test.ts` (rodilla y codo hacia su lado,
+zancada cargada menor, receta y catálogo iguales) y
+`tests/fast/graphics-clock.test.ts` (tabla y catálogo) siguen en verde con las
+cifras nuevas; el reporte de marcha deja el «plantado» en 0,97–1,03×.
+
+**Medida.** Cadencia 2,5–3,9 Hz andando (era 3,3–5,2) y 3,1–4,9 cargando
+(era 4,0–6,3); apoyo 44–49 % del ciclo (era 26–32 %); rodilla a 14° al apoyar
+el talón. **Lo que no arregla, y es decisión del dueño:** a 3–5 m/s reales la
+gente sigue yendo deprisa; un clip de trote (dos pies en el aire) bajaría la
+cadencia a 1,8–2,8 Hz con el mismo paso, pero cambia el carácter del valle.
+
 ## 7 · AN-4 · Aceptación conjunta
 
 **Alcance (literal).** Repetir tomas antes/después del mismo estado. Cubrir
