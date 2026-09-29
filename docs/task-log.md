@@ -1,5 +1,73 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · AN-5: la caza física, y la visita del oso que dura
+
+Vera, al leer el brief AN-5a: «que la caza enseñe el golpe… cuanto más física
+y realista, mejor; que pueda fallar, que pueda acertar; que impacte»; la lanza
+«debe clavarse» en la empalizada; la visita del oso «hay que ampliarla». Y al
+final: «se van a subir nuevos modelos en 3D de los animales; el oso, por
+ejemplo, cambia». Hecho en cuatro partes, todo en la capa de vida y el render:
+**el motor no cambia**. Brief, porqué y cifras en
+`docs/plan-animacion-integral-movil-2026-09-29.md` (AN-5); evidencia en la
+matriz, §2.7; filas AN-5a–d en `plan-meta.md`.
+
+**Qué decide ahora la caza:** el contacto. Un mundo de Rapier sólo de consulta
+(suelo, lo que está de pie con su altura pintada, la cápsula de la presa
+sacada de la caja de su modelo); el tiro se barre paso a paso y la estocada va
+de la mano a la punta que se pinta. Pulso sembrado en vez de dados; el cuarto
+trasero hiere y no mata; la lanza se clava en la madera. El golpe va fechado,
+lo que toca se queda, la pieza cae de costado y el parte espera a que se vea.
+
+**Las cifras, y el reparto es de Vera** (`tools/reports/hunt-report.ts`, cinco
+valles, `artifacts/physics/AN-5/antes.txt` y `despues.txt`; la medida es
+determinista, dos pasadas idénticas): antes **ninguna caza con lanza llegaba a
+darse** (0 % en ciervo, jabalí y oso); ahora ciervo 79 %, jabalí 50 %, oso
+17 %. La caza menor, que caía por suerte (67–68 %), cae ahora del 35 al 53 %
+porque se falla de verdad; el ciervo con arco, del 83 al 67 %; el jabalí con
+arco, igual (46 %). **Si la caza menor debe caer más**, las palancas son de
+una línea, en `hunt-encounter.ts`: el pulso (`AIM_SIGMA`) y dónde se planta el
+cazador (`RANGE`, que no puede bajar de las cuatro celdas a las que la perdiz
+y el conejo se espantan: medido, plantado a 4,2 la perdiz con honda caía 3 de
+60). Cada cambio se remide con `hunt-report.ts`.
+
+**El oso** (`bear-visit-report.ts`, `oso-antes.txt` y `oso-despues.txt`): en
+7/30, de 9,5 s fuera a 63 (se mete a la tercera); en 3/30, de 62,7 a 102,6; en
+los otros tres ya estaba fuera el rato entero. Media, de 74,8 a 93,5 s.
+
+**Los modelos nuevos:** cuando llegue uno, `hunt-bodies.test.ts` falla con su
+caja nueva en el mensaje; se copia a `PREY_MODEL`, se remiran las proporciones
+del tronco (`TORSO`) con el modelo delante y se remiden `hunt-report.ts` y
+`bear-visit-report.ts` contra `artifacts/physics/AN-5/` (skill
+`fisica-combate`, §3b). Si el oso trae otro `attack`, la misma prueba avisa de
+que el aviso ya no dura lo que su clip.
+
+**Tomas** (`artifacts/graphics/AN-5/`, `take.sh`): el conejo 7/22 con honda;
+el jabalí 7/24 con lanza (dos estocadas bajas; la empalizada queda entre la
+cámara y la caza, así que la presa se ve a medias); el oso 7/30 durante 80 s.
+
+**Al cerrar salieron dos defectos**, porque la prueba de la lanza clavada no
+comprobaba nada en su semilla: la estocada baja clavada no se quedaba en su
+contacto, y tras el zarpazo del oso el cazador seguía agarrado a la lanza
+clavada media celda más atrás. Arreglados, y la prueba recorre veinte
+semillas y falla sin el arreglo (comprobado).
+
+**Abierto:**
+
+- **El relevo del anochecer y el oso.** En la toma de 7/30 la aldea se estrena
+  en la fase 0,805 y el oso, que seguía fuera, vuelve a nacer en la boca de la
+  cueva (dos celdas de salto). Sólo la primera jornada de una sesión: las
+  siguientes se estrenan al anochecer y su rato acaba antes. Antes de AN-5d no
+  se veía porque se metía al primer aviso. Y sale **cada jornada** de las dos
+  semanas del suceso (`FATE.BEAR_WEEKS`): eso no es de esta ronda, pero con la
+  visita larga se nota más; decisión de Vera si molesta.
+- Lo clavado no dura más que la escena; la empalizada choca como su celda
+  entera; el cazador herido por el oso no sale herido en el parte; sin sangre;
+  la honda sin gesto propio, y su piedra desaparece donde da (todo en
+  `encargos-3d.md`).
+- **El coste en el teléfono, sin medir**: crear el mundo de contacto cuesta 12–22 ms
+  en esta máquina (el WASM se calienta al avistar la presa) y un paso de caza,
+  0,13–0,2 ms; en un iPhone está por medir, como todo lo demás.
+
 ## 29 sep 2026 · AN-4b y AN-4c: las tomas que faltaban, y el oso que no nacía
 
 Vera: «termina esto: toma en partida la visita del oso, la caza y el asalto

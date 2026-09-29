@@ -610,15 +610,28 @@ cobrada desaparecía en el fotograma en que se daba el parte.
   celdas), y cuando se apartan **vuelve a hozar**; se mete si lo acosan de cerca
   (1,6), si ha tenido que alzarse tres veces o cuando se le acaba el rato (el
   78 % de la jornada). Quien huyó de él vuelve a lo suyo cuando lleva 6 s
-  calmado. Medida en `tools/reports/bear-visit-report.ts`.
+  calmado. Medida en `tools/reports/bear-visit-report.ts`, cinco valles en el
+  año 30 con su día entero (`artifacts/physics/AN-5/oso-antes.txt` y
+  `oso-despues.txt`): en 7/30, de 9,5 s fuera a 63 (se mete a la tercera); en
+  3/30, de 62,7 a 102,6; en los otros tres nadie pasaba a 5 celdas y ya estaba
+  fuera el rato entero (95–109 s), que sigue igual. Media, de 74,8 a 93,5 s.
 
-**Pruebas.** `physics-contact.test.ts`, `hunt-bodies.test.ts`,
-`hunt-shot.test.ts`, `hunt-gestures.test.ts`, `life-hunt-encounter.test.ts`
-(la lanza no atraviesa la empalizada; se clava y el gesto espera; la estocada
-en t = 0; la pieza se queda y el parte espera; los tres finales en la caza
-sola), `graphics-animal-motion.test.ts` (tumbada de costado) y
-`life-bear.test.ts` (se alza y vuelve a lo suyo; acosada o a la tercera, se
-mete; en el valle entero, fuera más de 20 s).
+**Pruebas.** `physics-contact.test.ts`, `hunt-bodies.test.ts` (las cajas de
+los modelos contra el catálogo: falla, con la caja nueva en el mensaje, cuando
+llega un modelo nuevo), `hunt-shot.test.ts`, `hunt-gestures.test.ts`,
+`life-hunt-encounter.test.ts` (la lanza no atraviesa la empalizada; clavada en
+un tronco, el gesto se queda en su contacto hasta sacarla o hasta que el
+zarpazo se la arranca, en veinte semillas; la estocada en t = 0; la presa se
+sacude hacia donde va la lanza y vuelve; la pieza se queda y el parte espera;
+los tres finales en la caza sola), `graphics-animal-motion.test.ts` (tumbada
+de costado) y `life-bear.test.ts` (se alza y vuelve a lo suyo; acosada o a la
+tercera, se mete). La visita con el valle entero —fuera más de 20 s— es una
+jornada (`tests/journeys/life-bear-visit.test.ts`, 6 s).
+
+**Tomas** (`artifacts/graphics/AN-5/`, matriz §2.7): el conejo 7/22 con honda
+(suelta, la piedra sale de la mano, cae de costado); el jabalí 7/24 con lanza
+(dos estocadas bajas y cae; la empalizada queda entre la cámara y la caza); la
+visita del oso 7/30 durante 80 s (sale, se alza, vuelve a hozar y sigue fuera).
 
 ## 7 · AN-4 · Aceptación conjunta
 

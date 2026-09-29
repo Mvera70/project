@@ -1,5 +1,67 @@
 # The Valley — Registro de cambios
 
+## v5.02 · 29 sep 2026 · AN-5: la caza física, y la visita del oso que dura
+
+Vera, al leer el brief AN-5a: «que la caza enseñe el golpe; tiene que ser
+natural; cuanto más física y realista, mejor; que pueda fallar, que pueda
+acertar; que impacte». De la lanza que atravesaba la empalizada, «debe
+clavarse». Y de la visita del oso, «hay que ampliarla, claramente». Todo en la
+capa de vida y el render: **el motor no cambia** y el parte entra por
+`PlayerAct` `hunt` como siempre. El porqué y las cifras, en
+`docs/plan-animacion-integral-movil-2026-09-29.md` (AN-5); la evidencia, en la
+matriz (§2.7).
+
+- **AN-5a · el golpe, fechado.** La estocada y la suelta empiezan en el paso
+  que deciden (`clipSeconds` = 0 en el contacto), el arma sigue en la mano y
+  el parte espera a que la escena se vea (`settled`: la pieza tumbada 3 s, la
+  que se escapa huyendo 3 s). Dos estocadas nuevas, `spear_thrust_high` y
+  `spear_thrust_low`, y las tres medidas sobre el GLB con el arma colgada de su
+  `grip` (`hunt-gestures.test.ts`); el tiro sale de la mano que suelta, no de
+  1,2 celdas de alto.
+- **AN-5b · el contacto decide.** Un mundo de contacto de Rapier sólo de
+  consulta para la caza (`createContactWorld`): el suelo, lo que está de pie
+  con la altura con que se pinta y la cápsula de la presa, sacada de la caja
+  de su modelo (`hunt-bodies.ts`). Sin dados de «falla» ni de «roza»: pulso
+  sembrado, presa que se mueve, roce de refilón y **cuarto trasero que hiere y
+  no mata**. El cazador busca un puesto con la línea libre y se cuela entre
+  los árboles (0,22 de holgura). **La lanza ya no atraviesa la empalizada: se
+  clava en ella.**
+- **AN-5c · el impacto se ve.** La flecha que toca se queda con la punta
+  dentro —en la presa, en la madera, en el suelo—, la lanza clavada en madera
+  se queda hasta que el cazador la saca, la presa se sacude con el golpe, y
+  **la pieza caída se tumba de costado**: antes quedaba de pie sobre el hocico
+  y medio enterrada, y eso valía para todo animal que cae.
+- **AN-5d · la visita del oso.** Se alza a quien se acerca a 3,5 celdas y
+  vuelve a hozar; se mete si lo acosan a 1,6, a la tercera vez o al acabar su
+  rato. En 7/30, de 9,5 s fuera a 63; en 3/30, de 62,7 a 102,6; en los otros
+  tres valles medidos nadie pasaba a 5 celdas y el oso ya estaba fuera el rato
+  entero. Media, de 74,8 a 93,5 s (`tools/reports/bear-visit-report.ts`).
+- **Listos para los modelos nuevos** (Vera: «se van a subir nuevos modelos en
+  3D de los animales; el oso, por ejemplo, cambia»). Las cápsulas salen de la
+  caja de cada modelo (`PREY_MODEL`, copia del catálogo) con proporciones de
+  tronco; cuando un modelo cambia, `hunt-bodies.test.ts` falla y trae la caja
+  nueva en el mensaje, y la skill `fisica-combate` (§3b) dice qué se remide.
+- **Lo que cambia en el reparto, y es del dueño.** Medido con la caza sola en
+  cinco valles de verdad (`tools/reports/hunt-report.ts`,
+  `artifacts/physics/AN-5/`): la caza menor cae menos que con la suerte
+  —perdiz y conejo, del 67–68 % al 35–53 %: ahora se falla de verdad—, **las
+  cazas con lanza pasan de no darse nunca (0 %) a darse** —ciervo 79 %,
+  jabalí 50 %, oso 17 %—, el ciervo con arco baja del 83 % al 67 % y el jabalí
+  con arco se queda en el 46 %.
+- **Al cerrar, la prueba de la lanza clavada no comprobaba nada**: en su
+  semilla la estocada salía al aire y la prueba volvía sin mirar. Recorriendo
+  veinte salieron dos defectos: la estocada baja clavada no se quedaba en su
+  contacto, y el zarpazo del oso dejaba al cazador agarrado a la lanza clavada
+  media celda más atrás y retomaba la estocada a medias. Ahora el empujón se la
+  arranca. Y la prueba del empujón del impacto, que la matriz citaba, no
+  existía: está escrita.
+- **Límites**, en `encargos-3d.md`: lo clavado no dura más que la escena; la
+  empalizada choca como su celda entera, no como sus estacas; el cazador al que
+  hiere el oso no sale herido en el parte; sin sangre (decisión del dueño); la
+  honda sigue con los gestos del arco, y su piedra desaparece donde da. Y de la toma del oso: el relevo del
+  anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
+  primera jornada de una sesión (matriz §2.7).
+
 ## v5.01 · 29 sep 2026 · AN-4b y AN-4c: las tomas que faltaban, y el oso que no nacía
 
 Vera pidió cerrar las tomas en partida que el observatorio no había podido dar

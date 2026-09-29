@@ -235,27 +235,42 @@ describe('AN-5 · la caza física, fechada y a la vista', () => {
     expect(encounter.completed?.hits ?? 0).toBe(0);
   });
 
-  it('la estocada que se tuerce contra un tronco se clava, y el gesto se queda en el contacto hasta sacarla', async () => {
+  it('la estocada que se tuerce contra un tronco se clava: el gesto se queda en el contacto hasta sacarla, o hasta que el zarpazo se la arranca', async () => {
     const state = foundTwenty(13);
-    const land = open();
     // Un tronco justo a la izquierda de donde entra la lanza.
-    const withTrunk: Terrain = { ...land, solids: indexSolids(50, 50, [{ minX: 25.2, maxX: 25.45, minZ: 24.1, maxZ: 24.35 }]) };
-    const world = (await createContactWorld(withTrunk, { ground: () => 0 }))!;
-    worlds.push(world);
-    const bear: Animal = { id: 50_000, kind: 'bear', x: 25, y: 25 };
-    const encounter = createHuntEncounter(state, withTrunk, 'bear', 'spear', () => 0, [bear], 13, { x: 30, z: 30 }, false, { world })!;
-    let stuckAt = -1;
-    const held: number[] = [];
-    for (let step = 0; step < 400 && encounter.completed === null; step += 1) {
-      // Con la puntería a cero la estocada entra torcida a propósito, hacia el tronco o hacia fuera.
-      encounter.attack(0);
-      encounter.step([bear]);
-      const last = encounter.strokes.at(-1);
-      if (stuckAt < 0 && last?.outcome === 'standing') stuckAt = step;
-      if (stuckAt >= 0 && step - stuckAt < 20) held.push(encounter.hunter.clipSeconds ?? -1);
+    const withTrunk: Terrain = { ...open(), solids: indexSolids(50, 50, [{ minX: 25.2, maxX: 25.45, minZ: 24.1, maxZ: 24.35 }]) };
+    let stuck = 0;
+    // Dónde se planta el cazador depende del ritmo sembrado de cada oso: en unas
+    // semillas la lanza torcida da en el tronco y en otras sale al aire.
+    for (let seed = 1; seed <= 20; seed += 1) {
+      const world = (await createContactWorld(withTrunk, { ground: () => 0 }))!;
+      worlds.push(world);
+      const bear: Animal = { id: 50_000, kind: 'bear', x: 25, y: 25 };
+      const encounter = createHuntEncounter(state, withTrunk, 'bear', 'spear', () => 0, [bear], seed, { x: 30, z: 30 }, false, { world })!;
+      let stuckAt = -1;
+      let strokesThen = 0;
+      let torn = false;
+      for (let step = 0; step < 400 && encounter.completed === null; step += 1) {
+        // Con la puntería a cero la estocada entra torcida a propósito, hacia el tronco o hacia fuera.
+        encounter.attack(0);
+        encounter.step([bear]);
+        if (stuckAt < 0 && encounter.strokes.at(-1)?.outcome === 'standing') { stuckAt = step; strokesThen = encounter.strokes.length; }
+        // Hasta la estocada siguiente: 0,8 s clavada, y el zarpazo y su medio segundo.
+        const since = step - stuckAt;
+        if (stuckAt < 0 || since >= 45 || encounter.strokes.length !== strokesThen) continue;
+        const { clip, clipSeconds } = encounter.hunter;
+        if (clip === 'hit_take') { torn = true; continue; }
+        const thrusting = clip === 'spear_thrust' || clip === 'spear_thrust_high' || clip === 'spear_thrust_low';
+        if (torn) {
+          expect(thrusting, `semilla ${seed}: arrancada la lanza, la estocada no se retoma a medias`).toBe(false);
+        } else if (since < 20) {
+          expect(thrusting, `semilla ${seed}: clavada, el gesto sigue en la estocada`).toBe(true);
+          expect(clipSeconds, `semilla ${seed}: clavada, el gesto sigue en su contacto`).toBe(0);
+        }
+      }
+      if (stuckAt >= 0) stuck += 1;
     }
-    if (stuckAt < 0) return; // la desviación salió hacia el otro lado en esta semilla
-    expect(held.every(seconds => seconds === 0), 'la lanza sigue clavada: el gesto, en su contacto').toBe(true);
+    expect(stuck, 'en alguna semilla la lanza torcida da en el tronco').toBeGreaterThan(0);
   });
 
   it('el golpe va fechado: la estocada empieza en el paso que decide', async () => {
@@ -278,6 +293,48 @@ describe('AN-5 · la caza física, fechada y a la vista', () => {
       }
     }
     expect(checked).toBeGreaterThan(0);
+  });
+
+  it('la presa acusa el golpe: se sacude hacia donde va la lanza y vuelve a su sitio en dos décimas', async () => {
+    const state = foundTwenty(13);
+    const land = open();
+    let shaken = 0;
+    let back = 0;
+    for (const seed of [13, 17, 23]) {
+      const bear: Animal = { id: 50_000, kind: 'bear', x: 25, y: 25 };
+      const encounter = createHuntEncounter(state, land, 'bear', 'spear', () => 0, [bear], seed, { x: 30, z: 30 }, false,
+        { world: await contactOf(land) })!;
+      for (let step = 0; step < 600 && encounter.completed === null; step += 1) {
+        const rest = encounter.animals[0]!;
+        const before = encounter.strokes.length;
+        encounter.attack();
+        encounter.step([bear]);
+        if (encounter.strokes.length === before || encounter.strokes.at(-1)!.kind !== 'thrust') continue;
+        // Al alcance de la lanza el oso no se mueve: lo que se aparta es la sacudida.
+        const struck = encounter.animals[0]!;
+        const push = { x: struck.x - rest.x, z: struck.y - rest.y };
+        const along = { x: rest.x - encounter.hunter.x, z: rest.y - encounter.hunter.z };
+        expect(Math.hypot(push.x, push.z), `semilla ${seed}: se sacude`).toBeGreaterThan(0.01);
+        expect(push.x * along.x + push.z * along.z, `semilla ${seed}: hacia donde va la lanza`).toBeGreaterThan(0);
+        shaken += 1;
+        // Si en esas dos décimas el cazador sigue a su lado (el oso sólo embiste
+        // a quien está a más de 1,2) y no acaba la caza, vuelve justo adonde estaba.
+        let moved = false;
+        for (let n = 0; n < Math.round(0.2 * 30); n += 1) {
+          moved ||= Math.hypot(encounter.hunter.x - rest.x, encounter.hunter.z - rest.y) > 1.1;
+          encounter.step([bear]);
+          moved ||= encounter.completed !== null || encounter.animals.length === 0;
+        }
+        if (!moved) {
+          const after = encounter.animals[0]!;
+          expect(Math.hypot(after.x - rest.x, after.y - rest.y), `semilla ${seed}: y vuelve a su sitio`).toBeLessThan(1e-9);
+          back += 1;
+        }
+        break;
+      }
+    }
+    expect(shaken, 'las tres cazas dan una estocada').toBe(3);
+    expect(back, 'y en alguna se ve volver').toBeGreaterThan(0);
   });
 
   it('la pieza cobrada se queda en el suelo con la flecha clavada antes del parte, y el parte espera', async () => {

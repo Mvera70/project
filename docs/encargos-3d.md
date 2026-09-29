@@ -149,7 +149,10 @@ de este encargo, visto al hacerlo:
 - **Sin sangre**: una presa alcanzada se sacude y cae, sin mancha. El gore
   contenido de E4 está en el asedio y no en la caza; ponerlo es decisión del
   dueño.
-- **La honda sigue con los gestos del arco** (entrada de arriba).
+- **La honda sigue con los gestos del arco** (entrada de arriba), **y su
+  piedra desaparece donde da**: ni rebota ni se queda en el suelo. Una piedra
+  que cae y rueda es un cuerpo de Rapier más en el mundo de contacto de la
+  caza, que hoy es sólo de consulta.
 
 ## 4 · De otras rondas, aún abierto
 

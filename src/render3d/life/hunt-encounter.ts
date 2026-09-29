@@ -72,6 +72,9 @@ const DRAW_STEPS = Math.round(0.9 / LIFE_STEP);
 const SPEAR_STEPS = Math.round(VILLAGER_CLIPS.spear_thrust.seconds / LIFE_STEP);
 /** TUNE: la lanza clavada en la madera, hasta que el cazador la saca. */
 const STUCK_STEPS = Math.round(0.8 / LIFE_STEP);
+/** Las tres estocadas de la caza, sacadas de `THRUST` para que no se quede ninguna fuera. */
+const THRUST_CLIPS: readonly ClipName[] = Object.values(THRUST).map(thrust => thrust.clip);
+const isThrust = (clip: ClipName): boolean => THRUST_CLIPS.includes(clip);
 /**
  * Dónde se planta para tirar y hasta dónde tira, en celdas. TUNE: fuera de las
  * cuatro celdas a las que la perdiz y el conejo se espantan (`wild-prey.ts`):
@@ -719,10 +722,10 @@ export function createHuntEncounter(
         hunterBody.vz = Math.cos(away) * SHOVE / (SHOVE_STEPS * LIFE_STEP);
         moveHunter();
       }
-      // El zarpazo recibido se ve entero, salvo que una estocada lo corte.
-      const hurt = stepNumber - lastBearSwipe < Math.round(VILLAGER_CLIPS.hit_take.seconds / LIFE_STEP)
-        && lastBearSwipe > lastThrust;
-      const thrusting = stepNumber < Math.max(lastThrust + SPEAR_STEPS, holdUntil);
+      // El zarpazo recibido se ve entero, salvo que una estocada lo corte; y
+      // corta la estocada que lo encajó, aunque cayeran en el mismo paso.
+      const hurt = stepNumber - lastBearSwipe < STAGGER_STEPS && lastBearSwipe >= lastThrust;
+      const thrusting = lastBearSwipe < lastThrust && stepNumber < Math.max(lastThrust + SPEAR_STEPS, holdUntil);
       if (!inReach || (!clear && world !== null)) {
         // Al ciervo, al acecho; con el ciervo alerta, a la carrera: o llega
         // antes de que arranque, o lo pierde.
@@ -831,6 +834,9 @@ export function createHuntEncounter(
       // El zarpazo que cae en el mismo paso que una estocada no la borra: se
       // ve la estocada en su contacto, y el golpe recibido después.
       if (lastThrust !== stepNumber) { clip = 'hit_take'; gestureSince = stepNumber; }
+      // El empujón arranca la lanza de la madera: el cazador no sigue agarrado
+      // a ella media celda más atrás.
+      holdUntil = Math.min(holdUntil, stepNumber);
       // AN-5b · Igual en la caza sola que tocando: con el alcance real de la
       // lanza el cazador tiene que ponerse al lado del oso y encaja el primer
       // zarpazo antes de clavar; con tres, la cuarta estocada no llegaba nunca.
@@ -860,7 +866,7 @@ export function createHuntEncounter(
       // contacto hasta que se saca, y la retirada corre desde entonces.
       let clipSeconds: number | null = null;
       if (combatClip(clip)) {
-        const stuckThrust = (clip === 'spear_thrust' || clip === 'spear_thrust_high') && holdUntil > gestureSince;
+        const stuckThrust = isThrust(clip) && holdUntil > gestureSince;
         const elapsed = stuckThrust ? Math.max(0, stepNumber - 1 - holdUntil) : Math.max(0, stepNumber - 1 - gestureSince);
         const motion = VILLAGER_CLIPS[clip];
         const seconds = elapsed * LIFE_STEP;
