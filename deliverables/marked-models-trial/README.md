@@ -90,7 +90,8 @@ de `rigid-clips.mjs … pig`.
 La de G-23 era de cajas, como la gallina, y con el cerdo facetado el corral
 quedaba en dos estilos. `cow()` en `build-models.py` la hace facetada sobre la
 estructura de la mula de Vera: barril hondo, cuello corto con papada, cuernos,
-pelo rojizo con la cara y el vientre blancos, y ubre. Mismo tamaño que la de
+pelo rojizo con la cara y el vientre blancos, y ubre. Vera la quiso más gorda: `COW_GIRTH`
+ensancha y ahonda el tronco (1,22 y 1,14) con el lomo donde estaba. Mismo tamaño que la de
 G-23 (0,75 celdas); marcha de `rigid-clips.mjs … cow`.
 
 - [cow.glb](cow.glb) · [perfil](cow-profile.png) · [tres cuartos](cow-three-quarter.png) ·

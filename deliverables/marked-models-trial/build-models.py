@@ -477,6 +477,8 @@ def pig():
     tube('Curly_Tail',[(.203,0,.200),(.222,0,.212),(.234,.008,.230),(.228,.018,.244),(.216,.014,.240),(.214,.004,.228)],[.008,.007,.006,.005,.004,.002],'skin',tail,7)
     merge_parts(); save('pig')
 
+COW_GIRTH=(1.22,1.14)   # ancho y hondo del tronco sobre la primera versión
+
 def cow():
     # 29 sep 2026. La vaca de G-23 era de cajas, como la gallina; con el cerdo
     # facetado el corral quedaba en dos estilos. Facetada, sobre la estructura
@@ -486,13 +488,15 @@ def cow():
     reset(); mat('coat','58301B'); mat('white','E6DCC6'); mat('muzzle','C9A99A'); mat('hoof','3C3029'); mat('udder','D8A89A')
     body=empty('body',(0,0,.26),ROOT)
     barrel=[(-.270,.370,.050,.070),(-.230,.370,.100,.110),(-.140,.365,.120,.120),(.000,.360,.125,.125),(.120,.365,.120,.120),(.200,.370,.100,.110),(.245,.372,.060,.080)]
+    # Más gorda (Vera): más ancha y más honda por abajo, con el lomo donde estaba.
+    barrel=[(x,z+rz-rz*COW_GIRTH[1],ry*COW_GIRTH[0],rz*COW_GIRTH[1]) for x,z,ry,rz in barrel]
     loft('Barrel',barrel,'coat',body,12)
     loft('Belly',[(x,z-rz*.38,ry*.86,rz*.66) for x,z,ry,rz in barrel[1:-1]],'white',body,12)
     ell('Udder',(.120,0,.245),(.090,.080,.055),'udder',body,10,5)
     for i,(dx,dy) in enumerate([(-.02,-.02),(-.02,.02),(.02,-.02),(.02,.02)]):
         tube('Teat_'+str(i),[(.12+dx,dy,.225),(.12+dx,dy,.205)],[.007,.005],'udder',body,6)
     neck=empty('neck',(-.25,0,.40),body)
-    loft('Neck',[(-.235,.395,.085,.100),(-.285,.405,.072,.085),(-.325,.415,.062,.072)],'coat',neck,12)
+    loft('Neck',[(-.235,.395,.085*COW_GIRTH[0],.100*COW_GIRTH[1]),(-.285,.405,.072*COW_GIRTH[0],.085),(-.325,.415,.062,.072)],'coat',neck,12)
     leaf('Dewlap',(-.255,0,.335),(-.315,0,.330),.070,.030,'white',neck)
     head=empty('head',(-.33,0,.42),neck)
     loft('Head',[(-.310,.432,.074,.080),(-.360,.414,.068,.070),(-.412,.388,.061,.056),(-.444,.375,.054,.049)],'white',head,12)
