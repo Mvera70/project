@@ -278,6 +278,12 @@ def bear_v3():
     clip('rear',tracks,[1,25,48,72]); save('bear-v3')
 
 BEAR_HUMP=.35
+# Las patas de delante, que a Vera le parecían largas: `BEAR_FORE_DROP` baja el
+# pecho y las acorta (en celdas; 0 las deja como estaban), y `BEAR_FORE_FUR`
+# cuelga pelo del pecho y del antebrazo para que se lean más cortas sin
+# cambiar la postura.
+BEAR_FORE_DROP=0
+BEAR_FORE_FUR=False
 
 def bear():
     # v4 · 29 sep 2026. Lo que el v3 no tenía: la joroba de la cruz como punto
@@ -311,6 +317,9 @@ def bear():
     line=lambda x: .668+(.21-x)*.05
     sections=[(x,(line(x)+BEAR_HUMP*(top-line(x)) if top>line(x) and x<.21 else top),bottom,width,waist)
               for x,top,bottom,width,waist in sections]
+    # El pecho baja con las patas de delante y la grupa se queda donde estaba.
+    drop=lambda x: BEAR_FORE_DROP*min(1,max(0,(.21-x)/.45))
+    sections=[(x,top-drop(x),bottom-drop(x),width,waist-drop(x)) for x,top,bottom,width,waist in sections]
     vertices=[]; faces=[]; sides=16
     for x,top,bottom,width,waist in sections:
         for j in range(sides):
@@ -339,12 +348,16 @@ def bear():
         ell('Ear_Inner_'+str(s),(-.478,s*.100,.572),(.024,.030,.036),'earInner',earP,8,5)
         eye('Eye_'+str(s),-.585,s*.078,.482,.016,head)
         tube('Mouth_'+str(s),[(-.575,s*.060,.398),(-.630,s*.050,.394),(-.665,s*.034,.402)],[.005,.004,.003],'nose',head,6)
+    neck.location.z-=BEAR_FORE_DROP
+    if BEAR_FORE_FUR:
+        ell('Chest_Fur',(-.225,0,.285-drop(-.225)),(.180,.250,.140),'coat',body,12,6)
     fronts=[]; hinds=[]
     for pre,x in [('fore',-.195),('hind',.265)]:
         for s,l in [(-1,'L'),(1,'R')]:
             y=s*.140
             if pre=='fore':
-                hip=(x,y,.500); knee=(x+.010,y,.255); ankle=(x-.010,y,.070); paw=(x-.030,y,.034); pawSize=(.150,.120,.068)
+                k=(.500-drop(x))/.500
+                hip=(x,y,.500-drop(x)); knee=(x+.010,y,.255*k); ankle=(x-.010,y,.070*k); paw=(x-.030,y,.034); pawSize=(.150,.120,.068)
             else:
                 # Plantígrado: el corvejón atrás y un pie largo apoyado entero.
                 hip=(x,y,.480); knee=(x-.030,y,.265); ankle=(x+.012,y,.075); paw=(x-.018,y,.034); pawSize=(.175,.118,.068)
@@ -354,7 +367,9 @@ def bear():
             q=empty(pre+l+'Lower',knee,p); tube(pre+l+'_Shin',[knee,ankle],[(.072,.064),(.064,.058)],'legs',q,10)
             f=empty(pre+l+'Foot',ankle,q); ell(pre+l+'_Paw',paw,pawSize,'legs',f,10,5)
             if pre=='fore':
-                ell('Shoulder_'+l,(x+.010,y*.93,.450),(.215,.165,.300),'coat',p,12,7)
+                ell('Shoulder_'+l,(x+.010,y*.93,.450-drop(x)),(.215,.165,.300),'coat',p,12,7)
+                if BEAR_FORE_FUR:
+                    ell('Forearm_Fur_'+l,(x+.030,y*.97,.255-drop(x)),(.170,.145,.240),'coat',p,10,6)
             else:
                 # Muslo ligado al pivote existente; sostiene también la pose erguida.
                 ell('Haunch_'+l,(x+.010,y*.90,.395),(.255,.190,.320),'coat',p,12,7)

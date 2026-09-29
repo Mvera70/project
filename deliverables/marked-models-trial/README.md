@@ -44,7 +44,10 @@ marrón (`775A3E`) que con la luz del juego se leía color arena. El v4
 sube apenas hacia la cruz, la cabeza baja por delante, patas en columna con la
 zarpa saliendo de la pata y un pardo oscuro. La joroba entera del primer
 intento a Vera le pareció horrible: `BEAR_HUMP` dice cuánto queda (0,35 la
-suave, que es la de estos ficheros; 0,15 casi plano). Mismo tamaño que
+suave, que es la de estos ficheros; 0,15 casi plano). Las patas de delante le parecían
+largas: `BEAR_FORE_DROP` baja el pecho y las acorta (0,07 se nota; 0 las deja)
+y `BEAR_FORE_FUR` cuelga pelo del pecho y del antebrazo sin cambiar la postura.
+Los ficheros de aquí van con los dos a cero, a la espera de que elija. Mismo tamaño que
 el v3, mismos nodos y la misma pose erguida.
 
 - [bear-v4.glb](bear-v4.glb) · [perfil](bear-v4-profile.png) ·
