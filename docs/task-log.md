@@ -81,6 +81,9 @@ de las villas medidas el suelo está a cota 0, así que la regla «desde y=0» n
 muerde ahí; pero el informe en llano no es la batalla del juego (la 7/60 dura
 36 s con relieve y 96 en llano): para medir combate, `--relief`.
 
+**Skill `fisica-combate`** para quien abra F-1 o toque la física del combate:
+el método de esta entrada y sus trampas en una página.
+
 **La trampa que costó una pasada:** con las sondas en el mismo mundo y los
 grupos de colisión a cero, la semilla 42 acababa con uno o dos aciertos
 distintos —añadir colisionadores cambia ranuras y orden de contactos—. Se

@@ -89,6 +89,10 @@ ningún resultado del combate**.
 - Pruebas: `tests/fast/physics-probes.test.ts` (la cápsula a la altura justa
   y con pies, el muro que tapa, una flecha que vuela igual al bit con sondas,
   la arquería con bitácora que da lo mismo) y el caso `&shadow=` del banco.
+- **Skill `fisica-combate`** (`.claude/skills/fisica-combate/SKILL.md`): el
+  método de esta línea en una página —qué decide qué, primero en sombra,
+  comparar con distribuciones, el cuerpo que se pinta como cuerpo que decide,
+  el coste en el aparato— y las trampas que ya costaron una tarde.
   Apuntado en `encargos-3d.md`: la flecha que no se para y la caída sin el
   impulso del golpe.
 

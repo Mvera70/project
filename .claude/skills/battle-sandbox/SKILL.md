@@ -10,6 +10,9 @@ métricas en directo … yo mismo quiero ver y probar cómo se reproduce el comb
 corregirlo: físicas, animaciones, gore». **En el futuro se le irán integrando más
 cosas del combate para probarlas**: esta skill es cómo hacerlo sin romper lo que hay.
 
+**Si lo que tocas es qué decide la física** (Rapier, contactos, la sombra de
+F-0, el acierto de la flecha), lee antes la skill `fisica-combate`.
+
 ## Qué es, en una frase
 
 `?sandbox=battle` abre **el combate del juego, no una copia**: la villa amurallada de
