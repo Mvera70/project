@@ -1,0 +1,72 @@
+== aldea-390x844-despejado-escena
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.457} → /home/user/project/artifacts/graphics/visual-depth/after/aldea-390x844-despejado-escena.png
+render: {"level":"medium","scale":1,"calls":426,"triangles":691454,"coarse":true,"dpr":3}
+errores de página: ninguno
+== aldea-390x844-despejado-ui
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.467} → /home/user/project/artifacts/graphics/visual-depth/after/aldea-390x844-despejado-ui.png
+render: {"level":"medium","scale":1,"calls":261,"triangles":445530,"coarse":true,"dpr":3}
+errores de página: ninguno
+== aldea-390x844-nublado-escena
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.311} → /home/user/project/artifacts/graphics/visual-depth/after/aldea-390x844-nublado-escena.png
+render: {"level":"medium","scale":1,"calls":261,"triangles":445530,"coarse":true,"dpr":3}
+errores de página: ninguno
+== aldea-390x844-nublado-ui
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.391} → /home/user/project/artifacts/graphics/visual-depth/after/aldea-390x844-nublado-ui.png
+render: {"level":"medium","scale":1,"calls":426,"triangles":691454,"coarse":true,"dpr":3}
+errores de página: ninguno
+== aldea-320x568-despejado-escena
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.449} → /home/user/project/artifacts/graphics/visual-depth/after/aldea-320x568-despejado-escena.png
+render: {"level":"medium","scale":1,"calls":277,"triangles":453928,"coarse":true,"dpr":2}
+errores de página: ninguno
+== aldea-320x568-despejado-ui
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.481} → /home/user/project/artifacts/graphics/visual-depth/after/aldea-320x568-despejado-ui.png
+render: {"level":"medium","scale":1,"calls":277,"triangles":453928,"coarse":true,"dpr":2}
+errores de página: ninguno
+== aldea-320x568-nublado-escena
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.305} → /home/user/project/artifacts/graphics/visual-depth/after/aldea-320x568-nublado-escena.png
+render: {"level":"medium","scale":1,"calls":277,"triangles":453928,"coarse":true,"dpr":2}
+errores de página: ninguno
+== aldea-320x568-nublado-ui
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.44} → /home/user/project/artifacts/graphics/visual-depth/after/aldea-320x568-nublado-ui.png
+render: {"level":"medium","scale":1,"calls":277,"triangles":453928,"coarse":true,"dpr":2}
+errores de página: ninguno
+== aldea-390x844-despejado-low-escena
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.475} → /home/user/project/artifacts/graphics/visual-depth/after/aldea-390x844-despejado-low-escena.png
+render: {"level":"low","scale":1,"calls":261,"triangles":445530,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-390x844-despejado-escena
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.354} → /home/user/project/artifacts/graphics/visual-depth/after/villa-390x844-despejado-escena.png
+render: {"level":"medium","scale":1,"calls":240,"triangles":485810,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-390x844-despejado-ui
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.397} → /home/user/project/artifacts/graphics/visual-depth/after/villa-390x844-despejado-ui.png
+render: {"level":"medium","scale":1,"calls":449,"triangles":757156,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-390x844-nublado-escena
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.234} → /home/user/project/artifacts/graphics/visual-depth/after/villa-390x844-nublado-escena.png
+render: {"level":"medium","scale":1,"calls":240,"triangles":485810,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-390x844-nublado-ui
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.339} → /home/user/project/artifacts/graphics/visual-depth/after/villa-390x844-nublado-ui.png
+render: {"level":"medium","scale":1,"calls":449,"triangles":757156,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-320x568-despejado-escena
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.36} → /home/user/project/artifacts/graphics/visual-depth/after/villa-320x568-despejado-escena.png
+render: {"level":"medium","scale":1,"calls":284,"triangles":495880,"coarse":true,"dpr":2}
+errores de página: ninguno
+== villa-320x568-despejado-ui
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.433} → /home/user/project/artifacts/graphics/visual-depth/after/villa-320x568-despejado-ui.png
+render: {"level":"medium","scale":1,"calls":493,"triangles":767226,"coarse":true,"dpr":2}
+errores de página: ninguno
+== villa-320x568-nublado-escena
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.239} → /home/user/project/artifacts/graphics/visual-depth/after/villa-320x568-nublado-escena.png
+render: {"level":"medium","scale":1,"calls":284,"triangles":495880,"coarse":true,"dpr":2}
+errores de página: ninguno
+== villa-320x568-nublado-ui
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.404} → /home/user/project/artifacts/graphics/visual-depth/after/villa-320x568-nublado-ui.png
+render: {"level":"medium","scale":1,"calls":493,"triangles":767226,"coarse":true,"dpr":2}
+errores de página: ninguno
+== villa-390x844-despejado-low-escena
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.375} → /home/user/project/artifacts/graphics/visual-depth/after/villa-390x844-despejado-low-escena.png
+render: {"level":"low","scale":1,"calls":240,"triangles":485810,"coarse":true,"dpr":3}
+errores de página: ninguno

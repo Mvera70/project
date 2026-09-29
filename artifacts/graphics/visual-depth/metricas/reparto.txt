@@ -1,0 +1,20 @@
+-- antes aldea (escala 1)
+{"frames":54,"calls":314,"tris":514934,"programs":41,"linkMs":11,"jsMedianMs":0.1,"jsP90Ms":42.1,"level":"medium","scale":1,"paintMs":22.3,"renderMs":7.2,"lifeMs":4.2,"restMs":9.6,"seconds":40}
+-- después aldea (escala 1)
+{"frames":55,"calls":314,"tris":515087,"programs":41,"linkMs":12,"jsMedianMs":0.2,"jsP90Ms":42.3,"level":"medium","scale":1,"paintMs":21,"renderMs":7.2,"lifeMs":3.6,"restMs":9.3,"seconds":40}
+-- antes aldea siguiendo a 66 (escala 1)
+{"frames":69,"calls":128,"tris":436795,"programs":41,"linkMs":10,"jsMedianMs":0.2,"jsP90Ms":36,"level":"medium","scale":1,"paintMs":18.7,"renderMs":5,"lifeMs":3.5,"restMs":9.3,"seconds":40}
+-- después aldea siguiendo a 66 (escala 1)
+{"frames":63,"calls":139,"tris":442469,"programs":41,"linkMs":8,"jsMedianMs":0.2,"jsP90Ms":38.5,"level":"medium","scale":1,"paintMs":21.4,"renderMs":5.6,"lifeMs":5,"restMs":9.3,"seconds":40}
+-- antes villa (escala 0,25)
+{"frames":10,"calls":303,"tris":567222,"programs":41,"linkMs":10,"jsMedianMs":0.2,"jsP90Ms":4062.5,"level":"medium","scale":0.25,"paintMs":3949.4,"renderMs":10,"lifeMs":0,"restMs":3941.2,"seconds":44}
+-- después villa (escala 0,25)
+{"frames":10,"calls":303,"tris":567222,"programs":41,"linkMs":10,"jsMedianMs":0.1,"jsP90Ms":3820,"level":"medium","scale":0.25,"paintMs":3743.9,"renderMs":12.9,"lifeMs":0,"restMs":3731,"seconds":42}
+-- final aldea r1 (escala 1)
+{"frames":55,"calls":312,"tris":512840,"programs":41,"linkMs":8,"jsMedianMs":0.2,"jsP90Ms":43,"level":"medium","scale":1,"paintMs":20.6,"renderMs":7.1,"lifeMs":3.6,"restMs":8.9,"seconds":40}
+-- final aldea r1, ?contact=off (escala 1)
+{"frames":56,"calls":314,"tris":515239,"programs":41,"linkMs":13,"jsMedianMs":0.1,"jsP90Ms":38.1,"level":"medium","scale":1,"paintMs":19.2,"renderMs":6.8,"lifeMs":3.5,"restMs":8.6,"seconds":41}
+-- final aldea r2 (escala 1)
+{"frames":56,"calls":314,"tris":515239,"programs":41,"linkMs":6,"jsMedianMs":0.1,"jsP90Ms":40,"level":"medium","scale":1,"paintMs":19.6,"renderMs":7.7,"lifeMs":3.4,"restMs":9.3,"seconds":40}
+-- final aldea r2, ?contact=off (escala 1)
+{"frames":55,"calls":314,"tris":514934,"programs":41,"linkMs":8,"jsMedianMs":0.1,"jsP90Ms":39.9,"level":"medium","scale":1,"paintMs":21,"renderMs":7.5,"lifeMs":4,"restMs":9,"seconds":40}

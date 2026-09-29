@@ -81,6 +81,7 @@ adarve.
 |---|---|
 | `encargos/encargo-astra-modelos.md` | **Los modelos 3D para Astra**, con el prompt listo para pegar. Entregados la sala del líder, los puestos, la cantera, las rocas y la golondrina; **quedan el roble y la casa quemada**, a la espera de que Vera decida |
 | `encargos/opciones-graficas-v10.md` | **La pantalla «Graphics» para Codex**: lámina de revisión, un estado «elegido» del botón de pergamino si hace falta, y un grabado de cabecera |
+| `encargos/profundidad-visual-movil-2026-09-29.md` | **La profundidad visual del valle en móvil** (encargo de Astra, `art/astra-modelos` `15b4f84`), **ejecutado el 29 sep 2026** con su resultado al final: el pie de los edificios, el prado hondo, el seguido a la vista bajo el bosque y el experimento de suavizado (sin cambiar el valor por omisión). Pendiente de verlo en un iPhone o iPad |
 | `encargos/profundidad-visual-movil-revision-2026-09-29.md` | **La revisión crítica del encargo de profundidad visual en móvil** (el de Astra, `art/astra-modelos` `15b4f84`) y el plan que propone en su lugar: instrumentos, línea de base en el aparato, sombra de los pies, máscara de contacto, el seguido a la vista y suavizado. Pendiente de Vera |
 | `encargos/respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos, con decisiones que el dueño dejó sin contestar |
 

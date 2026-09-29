@@ -4,7 +4,10 @@
 // dónde llega y que la misma aldea da siempre los mismos bytes.
 
 import { describe, expect, it } from 'vitest';
-import { contactBases, contactMask, type ContactBase } from '../../src/render3d/world/contact-shade';
+import { MeshStandardMaterial } from 'three';
+import {
+  contactBases, contactMask, contactShade, contactShadeAsked, enableContactShade, type ContactBase,
+} from '../../src/render3d/world/contact-shade';
 import { planFor, type PlannedBuilding } from '../../src/render3d/world/plan';
 import { CONTACT_SHADE } from '../../src/render3d/visual-config';
 import type { BuildingKind } from '../../src/engine/state';
@@ -84,5 +87,21 @@ describe('el pie de los edificios', () => {
     // Y es el pie de la aldea, no el valle: casi todo el mapa queda intacto.
     const touched = first.reduce((count, value) => count + (value > 0 ? 1 : 0), 0);
     expect(touched / first.length).toBeLessThan(0.05);
+  });
+
+  it('está siempre, salvo que la dirección pida `contact=off` para medirlo en el aparato', () => {
+    expect(contactShadeAsked({ search: '' })).toBe(true);
+    expect(contactShadeAsked({ search: '?aa=msaa&contact=on' })).toBe(true);
+    expect(contactShadeAsked({ search: '?aa=msaa&contact=off' })).toBe(false);
+    const programOf = (material: MeshStandardMaterial): string => material.customProgramCacheKey();
+    const plain = new MeshStandardMaterial();
+    const without = new MeshStandardMaterial();
+    const shaded = new MeshStandardMaterial();
+    enableContactShade(false);
+    contactShade(without);
+    enableContactShade(true);
+    contactShade(shaded);
+    expect(programOf(without)).toBe(programOf(plain));
+    expect(programOf(shaded)).not.toBe(programOf(plain));
   });
 });

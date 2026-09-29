@@ -1,5 +1,13 @@
 # Revisión del encargo «profundidad visual del valle en móvil», y el plan que propongo (29 sep 2026)
 
+> **Después, el mismo día:** Vera pidió ejecutar el encargo tal cual, con GV-2
+> reutilizando `forest.reveal`. Se hizo tomando de aquí lo que el código pedía
+> —herramientas de toma comparables antes de la línea de base, la máscara en
+> el sombreador del suelo, el choque con el hachazo y la copa medida sola— y
+> el resultado está al final del propio encargo
+> (`profundidad-visual-movil-2026-09-29.md`, «Resultado»). La sombra de los
+> pies (V-2a) no estaba en el encargo y no se hizo.
+
 **Qué se revisa:** `docs/encargos/profundidad-visual-movil-2026-09-29.md`, en la
 rama `art/astra-modelos`, commit `15b4f84` (Astra/Codex, 29 sep). Vera lo pasó
 a Claude Code con el encargo de leerlo con ojo crítico —«no hagas porque sí lo

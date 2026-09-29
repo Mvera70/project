@@ -62,7 +62,8 @@ function distanceTo(base: ContactBase, x: number, z: number): number {
   const round = Math.min(base.round, hx, hz);
   const qx = Math.abs(x - cx) - (hx - round);
   const qz = Math.abs(z - cz) - (hz - round);
-  const outside = Math.hypot(Math.max(qx, 0), Math.max(qz, 0));
+  const ox = Math.max(qx, 0), oz = Math.max(qz, 0);
+  const outside = Math.sqrt(ox * ox + oz * oz);
   return outside + Math.min(Math.max(qx, qz), 0) - round;
 }
 
@@ -74,31 +75,47 @@ function distanceTo(base: ContactBase, x: number, z: number): number {
  * verdad. Dos casas juntas **suman** como suma el cielo que pierden
  * (1 − Π(1 − oᵢ)): el callejón entre dos es más oscuro que la fachada suelta.
  * Pura y determinista: la misma lista da los mismos bytes.
+ *
+ * Sólo se recorre la caja que cubren las bases con su alcance; el resto del
+ * valle se queda a cero. Recorrer el mapa entero costaba 3 ms en la aldea y
+ * 6,7 en una villa de 140 casas (29 sep 2026, en un portátil), cada vez que se
+ * termina un edificio: un tirón de más de un fotograma en un teléfono.
  */
 export function contactMask(
   cellsWide: number, cellsHigh: number, bases: readonly ContactBase[],
   texels: number = CONTACT_SHADE.texels, reach: number = CONTACT_SHADE.reach,
 ): Uint8Array {
   const width = cellsWide * texels, height = cellsHigh * texels;
-  const open = new Float32Array(width * height).fill(1);
-  for (const base of bases) {
-    const x0 = Math.max(0, Math.floor((base.minX - reach) * texels));
-    const x1 = Math.min(width - 1, Math.ceil((base.maxX + reach) * texels));
-    const z0 = Math.max(0, Math.floor((base.minZ - reach) * texels));
-    const z1 = Math.min(height - 1, Math.ceil((base.maxZ + reach) * texels));
+  const mask = new Uint8Array(width * height);
+  const boxes = bases.map((base) => ({
+    x0: Math.max(0, Math.floor((base.minX - reach) * texels)),
+    x1: Math.min(width - 1, Math.ceil((base.maxX + reach) * texels)),
+    z0: Math.max(0, Math.floor((base.minZ - reach) * texels)),
+    z1: Math.min(height - 1, Math.ceil((base.maxZ + reach) * texels)),
+  }));
+  const left = Math.min(...boxes.map((box) => box.x0)), right = Math.max(...boxes.map((box) => box.x1));
+  const top = Math.min(...boxes.map((box) => box.z0)), bottom = Math.max(...boxes.map((box) => box.z1));
+  if (boxes.length === 0 || right < left || bottom < top) return mask;
+  const span = right - left + 1;
+  const open = new Float32Array(span * (bottom - top + 1)).fill(1);
+  bases.forEach((base, i) => {
+    const { x0, x1, z0, z1 } = boxes[i]!;
     for (let tz = z0; tz <= z1; tz += 1) {
       const z = (tz + 0.5) / texels;
+      const row = (tz - top) * span - left;
       for (let tx = x0; tx <= x1; tx += 1) {
         const d = distanceTo(base, (tx + 0.5) / texels, z);
         if (d >= reach) continue;
         const t = Math.max(0, d) / reach;
         const occluded = (1 - t) * (1 - t);
-        open[tz * width + tx]! *= 1 - occluded;
+        open[row + tx]! *= 1 - occluded;
       }
     }
+  });
+  for (let tz = top; tz <= bottom; tz += 1) {
+    const row = (tz - top) * span - left;
+    for (let tx = left; tx <= right; tx += 1) mask[tz * width + tx] = Math.round((1 - open[row + tx]!) * 255);
   }
-  const mask = new Uint8Array(width * height);
-  for (let at = 0; at < mask.length; at += 1) mask[at] = Math.round((1 - open[at]!) * 255);
   return mask;
 }
 
@@ -169,7 +186,21 @@ export function tuneContactShade(tune: { readonly ambient?: number; readonly dir
  * cielo al pie de la pared y un poco de la del sol, antes del mapeo de tonos,
  * así que se lee igual sobre prado, senda, plaza o nieve.
  */
+/**
+ * `?contact=off`: el suelo se monta sin leer la máscara. Es la comparación en
+ * el aparato —el reparto del fotograma del taller con y sin ella, en la misma
+ * versión—, como `?aa=` para el suavizado. El juego no lo pide nunca.
+ */
+let enabled = true;
+export function contactShadeAsked(location: Pick<Location, 'search'>): boolean {
+  return new URLSearchParams(location.search).get('contact') !== 'off';
+}
+export function enableContactShade(on: boolean): void {
+  enabled = on;
+}
+
 export function contactShade(material: Material): void {
+  if (!enabled) return;
   const marked = material as Material & { userData: { contact?: boolean } };
   if (marked.userData.contact === true) return;
   marked.userData.contact = true;

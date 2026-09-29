@@ -13,7 +13,15 @@
 //
 //   node tools/graphics/performance/gl-probe.mjs <valley.html> --seed 7 --year 60 \
 //     [--seconds 40] [--viewport 390x844] [--touch] [--dpr 3] [--quality medium] \
-//     [--sky clear] [--phase 0.45] [--scale 1] [--query "aa=fxaa"] [--report]
+//     [--sky clear] [--phase 0.45] [--scale 1] [--query "aa=fxaa"] [--follow 66] [--report]
+//
+// Por la portada da además **el reparto del fotograma que mide el propio
+// renderer** (`__valleyRenderStats`, el del panel de taller): el `paint` entero,
+// el `render` —el dibujo—, la vida, y lo que queda (`restMs`, el JS fuera del
+// dibujo y de la vida: el bosque, la gente, las luces). La mediana de los
+// callbacks de rAF (`jsMedianMs`) mezcla el del juego con otros ligeros y no
+// dice cuánto cuesta el fotograma. `--follow <id>` sigue a esa persona como lo
+// hace su ficha (`__valleyTrack`).
 //
 // La ruta `?debug=1` monta además el valle en Canvas 2D y lo pinta debajo del
 // 3D en cada fotograma (`docs/medidas/rendimiento-piel-v9-2026-09-29.md`):
@@ -83,7 +91,18 @@ await tab.addInitScript(() => {
   probe.js = [];
   const raf = window.requestAnimationFrame.bind(window);
   window.requestAnimationFrame = (cb) => raf((t) => { const s = performance.now(); cb(t); const d = performance.now() - s; if (d > 0.05) probe.js.push(d); });
-  const tick = () => { if (probe.frame.calls > 0) probe.frames.push(probe.frame); probe.frame = { calls: 0, tris: 0 }; requestAnimationFrame(tick); };
+  // Y el reparto del renderer, una vez por fotograma dibujado: lo que dice es
+  // el del último `paint`, que es el que dibujó lo que se acaba de contar.
+  probe.split = [];
+  const tick = () => {
+    if (probe.frame.calls > 0) {
+      probe.frames.push(probe.frame);
+      const drawn = window.__valleyRenderStats?.();
+      if (drawn !== undefined) probe.split.push([drawn.paintMs, drawn.renderMs, drawn.lifeMs]);
+    }
+    probe.frame = { calls: 0, tris: 0 };
+    requestAnimationFrame(tick);
+  };
   requestAnimationFrame(tick);
 });
 const page = 'file:///' + resolve(file).split(String.fromCharCode(92)).join('/');
@@ -91,7 +110,7 @@ if (titled) {
   // El camino de `shot.mjs`: el menú de inicio, el número del valle y el año
   // detrás del interruptor de taller (U-10b). `--query "aa=fxaa"` añade eso a
   // la dirección, para las opciones de taller que se leen de ella (GV-3).
-  await tab.goto(page + (flag('query', '') === '' ? '' : '?' + flag('query', '')));
+  await tab.goto(page + (flag('query', '') === '' ? '' : '?' + flag('query', '')), { timeout: 240_000 });
   await tab.locator('.title-scrim').waitFor({ timeout: 5000 }).catch(() => {});
   await tab.locator('#valley-seed').fill(flag('seed', '7')).catch(() => {});
   const toggle = tab.locator('.title-dev');
@@ -99,16 +118,18 @@ if (titled) {
   await tab.locator('#valley-year').fill(flag('year', '1')).catch(() => {});
   await tab.locator('.title-new').click().catch(() => {});
   await tab.waitForFunction(() => typeof window.__valleyCapture === 'function', null, { timeout: 180_000 });
-  await tab.evaluate(({ sky, phase, scale }) => {
+  await tab.evaluate(({ sky, phase, scale, follow }) => {
     if (sky !== '') window.__valleyHoldSky?.(sky);
     if (phase !== '') window.__valleyHoldPhase?.(Number(phase));
     if (scale !== '') window.__valleyHoldScale?.(Number(scale));
+    if (follow !== '') window.__valleyTrack?.(Number(follow));
     // Lo que se midió antes de este instante es la carga, no el valle.
     window.__probe.frames.length = 0;
     window.__probe.js.length = 0;
-  }, { sky: flag('sky', ''), phase: flag('phase', ''), scale: flag('scale', '') });
+    window.__probe.split.length = 0;
+  }, { sky: flag('sky', ''), phase: flag('phase', ''), scale: flag('scale', ''), follow: flag('follow', '') });
 } else {
-  await tab.goto(page + '?' + query);
+  await tab.goto(page + '?' + query, { timeout: 240_000 });
 }
 const t0 = Date.now();
 await tab.waitForTimeout(Number(seconds) * 1000);
@@ -119,8 +140,15 @@ const r = await tab.evaluate(() => {
   const med = js.length ? js[Math.floor(js.length / 2)] : 0;
   const p90 = js.length ? js[Math.floor(js.length * 0.9)] : 0;
   const drawn = window.__valleyRenderStats?.();
+  // Medianas del reparto; el primer fotograma tras sujetar la escala se descarta.
+  const split = p.split.slice(1);
+  const middle = (i) => {
+    const xs = split.map((row) => i === 3 ? row[0] - row[1] - row[2] : row[i]).sort((a, b) => a - b);
+    return xs.length ? Math.round(xs[Math.floor(xs.length / 2)] * 100) / 100 : 0;
+  };
   return { frames: p.frames.length, calls: avg('calls'), tris: avg('tris'), programs: p.programs.size, linkMs: Math.round(p.linkMs), jsMedianMs: Math.round(med * 10) / 10, jsP90Ms: Math.round(p90 * 10) / 10,
-    ...(drawn === undefined ? {} : { level: drawn.level, scale: drawn.scale }) };
+    ...(drawn === undefined ? {} : { level: drawn.level, scale: drawn.scale }),
+    ...(split.length === 0 ? {} : { paintMs: middle(0), renderMs: middle(1), lifeMs: middle(2), restMs: middle(3) }) };
 });
 console.log(JSON.stringify({ ...r, seconds: Math.round((Date.now() - t0) / 1000) }));
 // `--report`: y de dónde salen, con el reparto de `scene-report.mjs` sobre el

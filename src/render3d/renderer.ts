@@ -44,7 +44,9 @@ import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
 import { updateMountainVeil } from './effects/mountain-veil';
 import { createGrass, meadowWeight } from './world/grass';
-import { createContactShade, tuneContactShade, type ContactShade } from './world/contact-shade';
+import {
+  contactShadeAsked, createContactShade, enableContactShade, tuneContactShade, type ContactShade,
+} from './world/contact-shade';
 import { aaTrialOf, createScreenAa, type ScreenAa } from './effects/screen-aa';
 import { buildRoadStones, buildSignposts, valleyRoad } from './world/road';
 import { createTrampleMap, setTramplers, snowTracks, SNOW_FROM, type TrampleMap, type Trampler } from './effects/trample';
@@ -305,9 +307,14 @@ export async function createGraphicsRenderer(
   const profile = resolveProfile(options.graphics ?? DEFAULT_GRAPHICS, handheld);
   const shadowsOn = options.quality !== 'low' && profile.shadows;
   const pixelCap = profile.pixelRatioCap;
-  // GV-3 · `?aa=` en una página local sustituye sólo el suavizado, para el
+  // GV-3 · `?aa=` en la dirección sustituye sólo el suavizado, para el
   // experimento comparativo (`effects/screen-aa.ts`); sin él, el del perfil.
+  // Vale también en el sitio publicado: la medida que decide es la del aparato.
   const aaTrial = typeof window === 'undefined' ? null : aaTrialOf(window.location);
+  // GV-1 · y `?contact=off` monta el suelo sin el pie de los edificios, ni su
+  // máscara, para leer en el aparato lo que cuesta (`world/contact-shade.ts`).
+  const contactOn = typeof window === 'undefined' || contactShadeAsked(window.location);
+  enableContactShade(contactOn);
   const antialias = aaTrial === 'msaa' ? true : aaTrial !== null ? false : options.quality !== 'low' && profile.antialias;
   const renderer = new WebGLRenderer({ canvas: options.canvas, antialias });
   renderer.outputColorSpace = SRGBColorSpace;
@@ -1935,10 +1942,10 @@ export async function createGraphicsRenderer(
       if (change.removed.length > 0 || change.added.length > 0 || change.changed.length > 0) village.batchWalls();
       // GV-1 · y el suelo al pie de cada uno, en lote: se rehace con los
       // edificios, no con el fotograma.
-      if (change.cleared || contact === null || change.removed.length > 0 || change.added.length > 0 || change.changed.length > 0) {
+      if (contactOn && (change.cleared || contact === null
+        || change.removed.length > 0 || change.added.length > 0 || change.changed.length > 0)) {
         if (change.cleared || contact === null) {
           contact?.dispose();
-      screenAa?.dispose();
           contact = createContactShade(shown.map.width, shown.map.height);
         }
         contact.update(next.buildings);
@@ -2870,6 +2877,7 @@ export async function createGraphicsRenderer(
       grass.dispose();
       trample?.dispose();
       contact?.dispose();
+      screenAa?.dispose();
       if (ground !== null) {
         world.remove(ground.mesh);
         ground.dispose();
