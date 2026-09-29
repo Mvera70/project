@@ -1,5 +1,24 @@
 # The Valley — Registro de cambios
 
+## v4.98 · 29 sep 2026 · El oso nuevo
+
+Vera: «el oso no termina de convencerme». El v3 se leía como un perro grande
+o un capibara: lomo de barril, patas que se afinaban hasta 6 cm y acababan en
+un disco con garras, y un marrón (`775A3E`) que con la luz del juego salía
+color arena. El v4 (`bear()` en `deliverables/marked-models-trial/build-models.py`):
+
+- **Cabeza baja** por delante de un lomo que sube apenas hacia la cruz. La
+  joroba entera del primer intento le pareció horrible a Vera; `BEAR_HUMP`
+  dice cuánto queda (0,35).
+- **Patas en columna** que casi no se afinan, con la zarpa saliendo de la pata.
+- **Pardo oscuro** (`35261B`, patas `261B14`) y sin las púas del costado ni la
+  espiral de la cola.
+- **Mismo tamaño, nodos y pose erguida** que el v3: la caza no cambia. 50
+  mallas y 3508 triángulos, contra 65 y 3560.
+
+Se probaron también las patas de delante más cortas y con pelo colgando
+(`BEAR_FORE_DROP`, `BEAR_FORE_FUR`); Vera se quedó con el normal.
+
 ## v4.97 · 29 sep 2026 · El zorro de Vera, publicado, y las herramientas de modelos fuera de Windows
 
 Vera: «el zorro tiene una versión por ahí que ya se hizo que no sé por qué no

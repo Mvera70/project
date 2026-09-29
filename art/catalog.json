@@ -329,34 +329,35 @@
       "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "marked-models-63db59c",
-        "directory": "artifacts/graphics/marked-models/approved/bear"
+        "runId": "bear-v4",
+        "directory": "artifacts/graphics/bear-v4/approved/bear"
       },
       "bounds": {
         "min": [
-          -0.701,
+          -0.706,
           0,
-          -0.268343
+          -0.255
         ],
         "max": [
-          0.459,
-          0.75,
-          0.268343
+          0.46,
+          0.727975,
+          0.255
         ],
         "size": [
-          1.16,
-          0.75,
-          0.536685
+          1.166,
+          0.727975,
+          0.51
         ]
       },
       "recipeSha256": null,
       "materials": [
-        "coatTop",
-        "coat",
+        "legs",
         "claw",
+        "coat",
         "earInner",
         "eye",
         "ivory",
+        "coatTop",
         "nose",
         "light"
       ],
@@ -376,7 +377,7 @@
           "name": "walk",
           "seconds": 1.2,
           "loop": true,
-          "strideLength": 0.444
+          "strideLength": 0.477
         },
         {
           "name": "idle",
@@ -387,18 +388,18 @@
       ],
       "connectors": [],
       "statistics": {
-        "objects": 84,
-        "meshes": 65,
-        "materials": 8,
-        "triangles": 3560
+        "objects": 69,
+        "meshes": 50,
+        "materials": 9,
+        "triangles": 3508
       },
       "hashes": {
-        "bear.glb": "B7581168250260DE7EADEA519F7950AD97473AB9C8C73A93DE9E5DC0110D2E1E",
-        "bear-preview.png": "8442477D9282F43B149B80BEB74C9DEA9110F4B887FE333C432626770A52F608"
+        "bear.glb": "BF440A608C6E2DEAC65CAA186C86E0D9697EF30B7910B81AEB4EE17657E1AA1C",
+        "bear-preview.png": "4D026ADA2181727542F06057D6FC12F547D00284532B0319B65674EE73AC7BAB"
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelo original de The Valley (deliverables/marked-models-trial/bear-v3.glb); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
+        "source": "Oso v4 de The Valley (deliverables/marked-models-trial/build-models.py, bear(); 29 sep 2026): lomo casi recto, cabeza baja, patas en columna y pardo oscuro, elegido por Vera; clips idle/walk de tools/art/rigid-clips.mjs, rear publicado como attack.",
         "license": "Project original"
       }
     },

@@ -35,7 +35,7 @@ Los GLB de esta carpeta están articulados con nodos rígidos y no incorporan
 publicados. El `rear` del oso se publica como `attack`. La revisión v3 cambia
 solo la anatomía del oso; los otros diez modelos permanecen intactos.
 
-## El oso v4 (29 sep 2026) — candidato, **sin publicar**
+## El oso v4 (29 sep 2026) — **publicado**
 
 Vera: «el oso no termina de convencerme». El v3 tenía el lomo plano, patas que
 se afinaban hasta 6 cm en el tobillo y acababan en un disco de 15 cm, y un
@@ -47,12 +47,12 @@ intento a Vera le pareció horrible: `BEAR_HUMP` dice cuánto queda (0,35 la
 suave, que es la de estos ficheros; 0,15 casi plano). Las patas de delante le parecían
 largas: `BEAR_FORE_DROP` baja el pecho y las acorta (0,07 se nota; 0 las deja)
 y `BEAR_FORE_FUR` cuelga pelo del pecho y del antebrazo sin cambiar la postura.
-Los ficheros de aquí van con los dos a cero, a la espera de que elija. Mismo tamaño que
+Eligió el «normal»: los dos a cero, que es lo publicado (`artifacts/graphics/bear-v4/approved/bear/`). Mismo tamaño que
 el v3, mismos nodos y la misma pose erguida.
 
 - [bear-v4.glb](bear-v4.glb) · [perfil](bear-v4-profile.png) ·
   [tres cuartos](bear-v4-three-quarter.png) · [quieto, andando y erguido](bear-v4-gestures.png)
 - `python3 build-models.py -- bear` (con `pip install bpy==5.0.1`) sólo
   construye el oso; sin nombres, todos.
-- Para publicarlo: `rigid-clips.mjs bear-v4.glb <salida> bear`,
+- Publicado con `rigid-clips.mjs bear-v4.glb <salida> bear`,
   `adopt-models.mjs` y `publish-assets.ts --ids bear`.

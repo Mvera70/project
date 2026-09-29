@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T18:27:34.866Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids fox",
+  "generatedAt": "2026-09-29T18:56:11.195Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bear",
   "assets": [
     {
       "id": "axis-marker",
@@ -1181,36 +1181,6 @@
       }
     },
     {
-      "id": "bear",
-      "file": "bear.glb",
-      "sha256": "B7581168250260DE7EADEA519F7950AD97473AB9C8C73A93DE9E5DC0110D2E1E",
-      "motion": [
-        {
-          "name": "attack",
-          "seconds": 3,
-          "loop": false,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 1.2,
-          "loop": true,
-          "strideLength": 0.444
-        },
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Modelo original de The Valley (deliverables/marked-models-trial/bear-v3.glb); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
-        "license": "Project original"
-      }
-    },
-    {
       "id": "boar",
       "file": "boar.glb",
       "sha256": "040873AABA5348C1EF1CB529B88264144D5C241256EB688C06FB9757C196C48C",
@@ -1554,6 +1524,36 @@
         "kind": "original",
         "source": "Zorro de Astra con el hocico suavizado, elegido por Vera (deliverables/fox-model-trial, 26 sep 2026); esqueleto, pesos y clips idle/walk/flee de tools/art/rig-single-mesh.py a 0,56 celdas.",
         "license": "project-original"
+      }
+    },
+    {
+      "id": "bear",
+      "file": "bear.glb",
+      "sha256": "BF440A608C6E2DEAC65CAA186C86E0D9697EF30B7910B81AEB4EE17657E1AA1C",
+      "motion": [
+        {
+          "name": "attack",
+          "seconds": 3,
+          "loop": false,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.477
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Oso v4 de The Valley (deliverables/marked-models-trial/build-models.py, bear(); 29 sep 2026): lomo casi recto, cabeza baja, patas en columna y pardo oscuro, elegido por Vera; clips idle/walk de tools/art/rigid-clips.mjs, rear publicado como attack.",
+        "license": "Project original"
       }
     }
   ]
