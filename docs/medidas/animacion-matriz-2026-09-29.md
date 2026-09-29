@@ -145,10 +145,11 @@ compara en AN-4.
 
 | Toma | Semilla · año · `lead` | Cámara | Qué enseña | Carpeta |
 |---|---|---|---|---|
+| Aldea a 320×568 (AN-4) | 11 · 21 · 20 s, 2 fps × 10 s | **320×568**, encuadre de reposo | La misma aldea en pantalla estrecha: la gente mide 10 px y la plaza sigue leyéndose (`AN-4/after/wide-seed11-y21-320/middle.png`) | `artifacts/graphics/AN-4/after/wide-seed11-y21-320/` |
 | Aldea, plano general | 11 · 21 · 20 s, 2 fps × 20 s | 390×844, encuadre de reposo | 48 personas, 9 gallinas, 2 ciervos, perro, 3 patos, lluvia (`shelter`) | `artifacts/graphics/AN-0/baseline/wide-seed11-y21/` |
 | Adulto andando | 11 · 21 · 20 s, 15 fps × 6 s | `--follow 13 --zoom 0.18` | La marcha del aldeano en el juego | `…/walk-seed11-y21-follow13/` (`strip-30-45.png`) |
 | Niño andando | 11 · 21 · 20 s, 15 fps × 6 s | `--follow 54 --zoom 0.18` | La marcha a talla 0,55 | `…/walk-seed11-y21-child54/` |
-| Villa, plano general | 7 · 60 · 20 s, 2 fps × 20 s | 390×844 | Cien personas, mayores, guarnición | `…/wide-seed7-y60/` |
+| Villa, plano general | 7 · 60 · 20 s, 2 fps × 20 s | **331×717** (la ventana no llegó a 390×844 en esa toma; AN-4 la repite a 390×844 con la página «antes» en `AN-1/before/wide-seed7-y60/`) | Cien personas, mayores, guarnición | `…/wide-seed7-y60/` |
 | Gallinas, patos | 11 · 21 · 20 s, 15 fps × 6 s | `--look 31.5,48.6` / `--look 36.5,54`, `--zoom 0.18` | Reposo y picoteo del corral; los patos a la deriva en el agua | `…/hens-seed11-y21/`, `…/ducks-seed11-y21/` (`strip-0-16.png`) |
 | Niño andando, villa (AN-1) | 7 · 60 · 20 s, 15 fps × 6 s | `--follow 242 --zoom 0.18` | La marcha a talla 0,64 antes (GLB de G-17, `--page artifacts/graphics/AN-1/game-before/valley.html`) y después (AN-1a), mismo estado | `artifacts/graphics/AN-1/before/walk-seed7-y60-child242/`, `…/after/walk-seed7-y60-child242/` (`strip-30-45.png`) |
 | Adulto andando, villa (AN-1) | 7 · 60 · 20 s, 15 fps × 6 s | `--follow 114` → **bajo la copa del bosque, no sirve**; se repite con `--follow 208 --zoom 0.18` | El par antes/después del adulto en la villa: en los mismos 16 fotogramas (1,07 s) el «después» abre la pierna adelante y da menos pasos; el «antes» va con las piernas juntas | `…/AN-1/before/walk-seed7-y60-follow208/strip-30-45.png`, `…/after/walk-seed7-y60-follow208/strip-30-45.png` |
@@ -347,7 +348,7 @@ qué se ve a 390×844 y qué observación la refutaría.
 | sow | hoja AN-0 | voleo con bolsa | **conservado · preview-only esta ronda** (sin toma en siembra) | — |
 | spread | plano general 11/21 (434 muestras); hoja AN-0 | horca a dos manos | **conservado** | — |
 | douse | hoja AN-0 (sin cubo en el banco) | — | **conservado · preview-only** (sin fuego en las tomas) | — |
-| play | hoja `AN-3/gestures/play-villager-sheet.png` (pendiente: cadena 5); niños en su sitio de juego en el plano general 7/60 «después» (`AN-4/after/wide-seed7-y60`, pendiente: cadena 4) | brinca: cadera +0,12 m y rodilla alta, se lee como salto a escala nativa | **mejorado** (era un balanceo que parecía estar de pie) | niños de pie en sus sitios de juego en el plano general 7/60 |
+| play | hoja `AN-3/gestures/play-villager-sheet.png` (pendiente: cadena 5); plano general 7/60 «después» (`AN-4/after/wide-seed7-y60`): los niños 224, 243 y 240 en `play` 29, 26 y 23 de 41 fotogramas, `strip-play.png` (el 224 en la linde, tapado a medias por las copas) | brinca: cadera +0,12 m y rodilla alta; en el plano general el niño mide 10 px y el brinco es un salto de 2 px: se ve que se mueve, no la rodilla | **mejorado** (era un balanceo que parecía estar de pie); la lectura fina es con zoom | niños quietos de pie en sus sitios de juego en el plano general 7/60 |
 | throw | hoja `AN-3/gestures/throw-villager-sheet.png` (pendiente: cadena 5); `life-play-throw.test.ts`, `work-gestures.test.ts` | — | **preview-only**: en las semillas de las tomas no hay pelota; queda la toma de integración pendiente | — |
 | drink | hoja `AN-2/gestures/drink-villager-sheet.png`; pozo y vado en el plano general 11/21 (51, 56, 10, 46) | la cabeza atrás se ve como silueta | **mejorado** | — |
 | sort | hoja `AN-2/gestures/sort-villager-sheet.png`; granero en el plano general 11/21 (16) | doblarse a por la cosa se ve | **mejorado** | — |
@@ -399,8 +400,27 @@ más de la misma familia; las chispas comparten la malla y el material de las
 astillas).
 
 **JS de posar reparto y fauna por fotograma** (`tools/reports/animation-cost.ts`,
-Node, sin dibujar; antes en un worktree de `d82bd84`, después en la rama;
-dos pasadas cada uno, seguidas): pendiente de la cadena 4, se rellena abajo.
+Node, sin dibujar: 100 personas —60 andando, 20 de pie, 10 talando, 10
+sentadas— y 40 animales de las quince especies en círculos, 300 fotogramas;
+antes en un worktree de `d82bd84`, después en la rama; dos pasadas cada uno,
+seguidas, **con otras cadenas de Chromium corriendo en la misma máquina**):
+
+| Pasada | `cast.show` mediana · p90 | `fauna.paint` mediana · p90 | Total mediana |
+|---|---|---|---|
+| antes 1 | 2,73 · 3,43 ms | 1,28 · 1,58 ms | 4,01 ms |
+| después 1 | 2,77 · 3,73 ms | 1,41 · 2,03 ms | 4,18 ms |
+| antes 2 | 2,82 · 4,51 ms | 1,37 · 2,11 ms | 4,19 ms |
+| después 2 | 3,19 · 4,77 ms | 1,55 · 2,29 ms | 4,74 ms |
+
+Lectura: 27–32 µs por persona y 32–39 µs por animal; entre dos pasadas
+iguales hay 0,2–0,5 ms de ruido (la máquina estaba cargada), y el «después»
+queda dentro de ese ruido en la primera pareja y 0,5 ms por encima en la
+segunda. Lo que la ronda añade por fotograma es pequeño y conocido: una
+pista más de cadera en `play` y `flee`, el fundido de los gestos animales y
+el giro suavizado. **No hay regresión medible fuera del ruido**; la cifra
+limpia (máquina sola) se remide al cerrar si queda tiempo, y en ningún caso
+son fotogramas por segundo de un teléfono. Ficheros:
+`artifacts/graphics/AN-4/perf/animation-cost-*.txt`.
 
 ### 5.4 Pendiente en dispositivo real
 

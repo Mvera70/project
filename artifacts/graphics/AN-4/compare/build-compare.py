@@ -82,6 +82,11 @@ PAIRS = [
     Pair("plaza-seed11", "AN-0/baseline/wide-seed11-y21",
          "AN-2/after/wide-seed11-y21", fps=2, crop=260, first=0, count=40,
          strict=False, person=None),   # «40 fotogramas, o los que haya»
+    # AN-4 · la villa 7/60 al encuadre de reposo: antes (GLB de G-17 en la página
+    # «antes», a 390×844: la toma de AN-0 era de 331×717 y no casa) y después (AN-4).
+    Pair("plaza-seed7", "AN-1/before/wide-seed7-y60",
+         "AN-4/after/wide-seed7-y60", fps=2, crop=260, first=0, count=40,
+         strict=False, person=None),
 ]
 
 
