@@ -14,7 +14,7 @@ import { STRIKE_AT, VILLAGER_CLIPS, type ClipName } from './clips';
  */
 export const ACTION_CLIPS: readonly ClipName[] = [
   'sit', 'talk', 'pray', 'hammer', 'chop', 'mine', 'sow', 'spread', 'douse', 'play', 'throw', 'drink', 'sort', 'shelter',
-  'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall', 'flee',
+  'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'spear_thrust_high', 'spear_thrust_low', 'hit_take', 'fall', 'flee',
 ];
 
 export function actionClips(idle: AnimationClip): AnimationClip[] {
@@ -127,15 +127,19 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
       }
       turn('spine', x, keyed([[0, 0.3, 'smooth'], [0.3, 0.05, 'smooth'], [0.85, -0.18, 'smooth'], [1, -0.18, 'hold']]));
       turn('head', x, keyed([[0, 0.1, 'smooth'], [0.3, 0, 'smooth'], [0.85, -0.15, 'smooth'], [1, -0.15, 'hold']]));
-    } else if (name === 'spear_thrust') {
+    } else if (name === 'spear_thrust' || name === 'spear_thrust_high' || name === 'spear_thrust_low') {
       // Contacto en cero, como el daño real. Recuperación sin mover el cuerpo
       // físico: un nuevo golpe puede interrumpir los 0,9 s del encargo.
+      // AN-5b · La alta sube los dos brazos y endereza el tronco: la punta pasa
+      // de 0,35 a la altura del pecho de un ciervo; la baja los baja y dobla
+      // la espalda, y clava hacia abajo en el lomo del jabalí (`hunt-shot.ts`, `THRUST`).
+      const raise = name === 'spear_thrust_high' ? 1 : name === 'spear_thrust_low' ? -0.5 : 0;
       const recoil = (t: number): number => Math.min(1, t * 3);
-      turn('upperarm.R', x, t => -1.55 + 1.1 * recoil(t));
+      turn('upperarm.R', x, t => -1.55 - (raise < 0 ? 0.3 : 0.2) * raise * (1 - recoil(t)) + 1.1 * recoil(t));
       turn('forearm.R', x, t => -0.08 - 0.8 * recoil(t));
-      turn('upperarm.L', x, t => -0.7 + 0.4 * recoil(t));
+      turn('upperarm.L', x, t => -0.7 - 0.2 * raise * (1 - recoil(t)) + 0.4 * recoil(t));
       turn('forearm.L', x, () => -0.65);
-      turn('spine', x, t => 0.22 * (1 - recoil(t)));
+      turn('spine', x, t => (0.22 - (raise < 0 ? 0.25 : 0.1) * raise) * (1 - recoil(t)));
       turn('thigh.L', x, t => -0.2 * (1 - recoil(t)));
       turn('shin.L', x, t => 0.25 * (1 - recoil(t)));
     } else if (name === 'hit_take') {

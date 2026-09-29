@@ -1,8 +1,8 @@
 # Cuaderno de tareas — el rework
 
-## 29 sep 2026 · Sonidos de materiales (v5.14) — **a la espera de que Vera elija variantes**
+## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
 
-Vera descartó los veinte de v5.13 y se buscó la dirección con un solo botón en
+Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en
 cuatro tandas (`Prueba del botón`, no versionada). Gustó el foley de
 materiales; el tambor no; las notas afinadas agudas sonaron «infantil».
 `tools/ui/sounds.py` está reescrito con esa dirección (`plan-audio.md`, §29
@@ -11,7 +11,7 @@ elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
 botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
 los momentos de §11.10.
 
-## 30 sep 2026 · Fase 2 del sonido: día y noche sí; aldea, hoguera y fiesta, no (v5.19)
+## 30 sep 2026 · Fase 2 del sonido: día y noche sí; aldea, hoguera y fiesta, no (v5.20)
 
 **Paramos aquí por crédito** (Vera, 30 sep). Estado exacto: fases 0 y 1
 aprobadas; de la 2 entran pájaros, grillos y noche fría, y **Vera tachó** el
@@ -28,7 +28,7 @@ recorrido lo volvió a demostrar). 64 pruebas verdes.
 que el renderer diga dónde está); y las nueve decisiones de
 `plan-audio-mundo.md` §6, de las que la fase 4 depende entera.
 
-## 29 sep 2026 · El día claro, corregido (v5.18)
+## 29 sep 2026 · El día claro, corregido (v5.19)
 
 Vera aprobó la fase 1 menos la primera escena: «un día claro suena muy fuerte
 el viento y el río». La brisa no seguía la fuerza del viento (sólo decidía la
@@ -38,7 +38,7 @@ el sellador no conocía su forma, y cambiar un lecho no habría llegado a un
 teléfono con el viejo. Arreglado y con prueba. 54 pruebas y el recorrido
 (21 toques, 6 escenas) en verde.
 
-## 29 sep 2026 · El valle suena (v5.17) — **escuchado y aprobado salvo el día claro**
+## 29 sep 2026 · El valle suena (v5.18) — **escuchado y aprobado salvo el día claro**
 
 Fases 0 y 1 de `plan-audio-mundo.md` ejecutadas. El motor de ambiente
 (`src/ui/ambience.ts`, puro; las capas en `sound.ts`) y quince sonidos: once
@@ -54,7 +54,7 @@ de escucha publicada con las ocho escenas que el juego produce de verdad.
 - Con dos incendios a la vez, el día del fuego es el del primero y la
   distancia la del más cercano. Escrito en `encargos-3d.md`.
 
-## 29 sep 2026 · El plan del sonido y su skill (v5.16)
+## 29 sep 2026 · El plan del sonido y su skill (v5.17)
 
 **La skill `sonido-del-valle`** registra cómo se hace un sonido en este
 proyecto, que es lo que Vera pidió para poder iterarlo: la historia de los
@@ -86,7 +86,7 @@ después por **el sonido del mundo** (ambiente, naturaleza, vida): primero la
 lista de todo lo que se ve o se toca y no suena, y luego decide ella cómo
 procedemos.
 
-### (anterior, v5.13) La interfaz suena
+### (anterior, v5.14) La interfaz suena
 
 Veinte sonidos fabricados por `tools/ui/sounds.py` en `public/audio/`, cada
 uno en variantes *a*, *b* y *c*; en el juego suenan en *a*. Cuándo suena cada
@@ -114,6 +114,79 @@ El plan enumera además las pruebas técnicas y los requisitos de tiendas,
 privacidad, derechos, clasificación y fiscalidad antes de vender. La skill
 `monetizacion-marketing-valley` conservará futuras decisiones y resultados en
 el registro del plan. Precio, presupuesto y orden de lanzamiento siguen abiertos.
+
+## 29 sep 2026 · AN-5: la caza física, y la visita del oso que dura
+
+Vera, al leer el brief AN-5a: «que la caza enseñe el golpe… cuanto más física
+y realista, mejor; que pueda fallar, que pueda acertar; que impacte»; la lanza
+«debe clavarse» en la empalizada; la visita del oso «hay que ampliarla». Y al
+final: «se van a subir nuevos modelos en 3D de los animales; el oso, por
+ejemplo, cambia». Hecho en cuatro partes, todo en la capa de vida y el render:
+**el motor no cambia**. Brief, porqué y cifras en
+`docs/plan-animacion-integral-movil-2026-09-29.md` (AN-5); evidencia en la
+matriz, §2.7; filas AN-5a–d en `plan-meta.md`.
+
+**Qué decide ahora la caza:** el contacto. Un mundo de Rapier sólo de consulta
+(suelo, lo que está de pie con su altura pintada, la cápsula de la presa
+sacada de la caja de su modelo); el tiro se barre paso a paso y la estocada va
+de la mano a la punta que se pinta. Pulso sembrado en vez de dados; el cuarto
+trasero hiere y no mata; la lanza se clava en la madera. El golpe va fechado,
+lo que toca se queda, la pieza cae de costado y el parte espera a que se vea.
+
+**Las cifras, y el reparto es de Vera** (`tools/reports/hunt-report.ts`, cinco
+valles, `artifacts/physics/AN-5/antes.txt` y `despues.txt`; la medida es
+determinista, dos pasadas idénticas): antes **ninguna caza con lanza llegaba a
+darse** (0 % en ciervo, jabalí y oso); ahora ciervo 79 %, jabalí 50 %, oso
+15 %. La caza menor, que caía por suerte (67–68 %), cae ahora del 35 al 53 %
+porque se falla de verdad; el ciervo con arco, del 83 al 67 %; el jabalí con
+arco, igual (46 %). **Si la caza menor debe caer más**, las palancas son de
+una línea, en `hunt-encounter.ts`: el pulso (`AIM_SIGMA`) y dónde se planta el
+cazador (`RANGE`, que no puede bajar de las cuatro celdas a las que la perdiz
+y el conejo se espantan: medido, plantado a 4,2 la perdiz con honda caía 3 de
+60). Cada cambio se remide con `hunt-report.ts`.
+
+**El oso** (`bear-visit-report.ts`, `oso-antes.txt` y `oso-despues.txt`): en
+7/30, de 9,5 s fuera a 63 (se mete a la tercera); en 3/30, de 62,7 a 102,6; en
+los otros tres ya estaba fuera el rato entero. Media, de 74,8 a 93,5 s.
+
+**Los modelos nuevos llegaron al cerrar**: la PR #3 (ciervo nuevo, jabalí 8 cm
+más bajo, oso v4) entró en `main` y se fusionó antes de abrir la PR de AN-5.
+`hunt-bodies.test.ts` saltó con las tres cajas nuevas, como se diseñó, y al
+seguir el procedimiento salió que **la caja no es el tronco**: la del ciervo
+la ensancha la cuerna y su cápsula salía casi el doble de ancha que el ciervo.
+Ahora cada cápsula sale de la malla del tronco del GLB, con una prueba que las
+compara, y la pieza caída se apoya en el costado de su tronco (el ciervo
+flotaba sobre su cuerna). En la caza sola, en valle: el ciervo con arco sigue
+cobrándose el 67 % y queda malherido el 21 % en vez del 29; el oso, del 17 al
+15 %; lo demás, igual. Para el siguiente modelo: skill `fisica-combate`, §3b.
+
+**Tomas** (`artifacts/graphics/AN-5/`, `take.sh`): el conejo 7/22 con honda;
+el jabalí 7/24 con lanza (dos estocadas bajas; la empalizada queda entre la
+cámara y la caza, así que la presa se ve a medias); el oso 7/30 durante 80 s.
+
+**Al cerrar salieron dos defectos**, porque la prueba de la lanza clavada no
+comprobaba nada en su semilla: la estocada baja clavada no se quedaba en su
+contacto, y tras el zarpazo del oso el cazador seguía agarrado a la lanza
+clavada media celda más atrás. Arreglados, y la prueba recorre veinte
+semillas y falla sin el arreglo (comprobado).
+
+**Abierto:**
+
+- **El relevo del anochecer y el oso.** En la toma de 7/30 la aldea se estrena
+  en la fase 0,805 y el oso, que seguía fuera, vuelve a nacer en la boca de la
+  cueva (dos celdas de salto). Sólo la primera jornada de una sesión: las
+  siguientes se estrenan al anochecer y su rato acaba antes. Antes de AN-5d no
+  se veía porque se metía al primer aviso. Y sale **cada jornada** de las dos
+  semanas del suceso (`FATE.BEAR_WEEKS`): eso no es de esta ronda, pero con la
+  visita larga se nota más; decisión de Vera si molesta.
+- Lo clavado no dura más que la escena; la empalizada choca como su celda
+  entera; el cazador herido por el oso no sale herido en el parte; sin sangre;
+  la honda sin gesto propio, y su piedra desaparece donde da (todo en
+  `encargos-3d.md`).
+- **El coste en el teléfono, sin medir**: crear el mundo de contacto cuesta 12–22 ms
+  en esta máquina (el WASM se calienta al avistar la presa) y un paso de caza,
+  0,13–0,2 ms; en un iPhone está por medir, como todo lo demás.
+
 
 ## 29 sep 2026 · Profundidad visual en móvil: el pie de los edificios, el prado hondo y el seguido a la vista (v5.12)
 
@@ -215,6 +288,7 @@ subido a 60, con permiso de Vera. Nada se sube sin su permiso final. El banco de
 especie por su caja y mira a su centro. **Pendiente:** la ubre de la vaca, que la
 barriga gorda tapa (se probó sacarla y Vera prefirió seguir). El oso no se puede fotografiar dentro de la partida sin
 cazar antes la cadena entera: no hay `?hunt=`.
+
 ## 29 sep 2026 · AN-4b y AN-4c: las tomas que faltaban, y el oso que no nacía
 
 Vera: «termina esto: toma en partida la visita del oso, la caza y el asalto

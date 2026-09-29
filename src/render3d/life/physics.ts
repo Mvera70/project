@@ -449,7 +449,7 @@ export async function createPhysics(land: Terrain, options: PhysicsOptions = {})
 }
 
 function addGround(RAPIER: Rapier, world: RAPIER_NS.World, land: Terrain,
-  ground: (x: number, z: number) => number): void {
+  ground: (x: number, z: number) => number): RAPIER_NS.Collider {
   const heights = new Float32Array((land.height + 1) * (land.width + 1));
   let at = 0;
   // Rapier recibe la matriz en column-major: columna x por fuera, fila z por
@@ -457,7 +457,7 @@ function addGround(RAPIER: Rapier, world: RAPIER_NS.World, land: Terrain,
   for (let x = 0; x <= land.width; x += 1) for (let z = 0; z <= land.height; z += 1) {
     heights[at++] = safeGround(ground, x, z);
   }
-  world.createCollider(RAPIER.ColliderDesc.heightfield(land.height, land.width, heights,
+  return world.createCollider(RAPIER.ColliderDesc.heightfield(land.height, land.width, heights,
     { x: land.width, y: 1, z: land.height }).setTranslation(land.width / 2, 0, land.height / 2).setFriction(0.9));
 }
 
@@ -560,4 +560,156 @@ const DEFAULT_DEBRIS_STEPS = 60 / LIFE_STEP;
 /** Nacimiento histórico de las flechas desde lo alto de la muralla. */
 export function fromWall(at: Point, height = WALL_HEIGHT): PhysicalVector {
   return { x: at.x, y: height, z: at.z };
+}
+
+/**
+ * AN-5b · El mundo de contacto de la caza (29 sep 2026). Vera: «cuanto más
+ * física y realista, mejor; que pueda fallar, que pueda acertar; que
+ * impacte», y la lanza «debe clavarse» en la empalizada, no atravesarla.
+ *
+ * Un mundo de Rapier **sólo de consulta**, aparte del de la batalla (la regla
+ * de F-0: lo que no decide un asalto no vive en su mundo). Tiene el suelo del
+ * juego, lo que está de pie en el valle **con la altura con que se pinta** —una
+ * empalizada mide 0,87 y no los 2 de la muralla de la batalla— y las formas
+ * vivas que se pintan (la presa). Nada se simula: un tiro pregunta qué toca
+ * primero, y la caza decide con eso.
+ */
+export interface ContactShape {
+  readonly id: number;
+  /** El centro del tronco del cuerpo, en el mundo (celdas, `y` absoluta). */
+  readonly x: number; readonly y: number; readonly z: number;
+  /** Hacia dónde mira (`facing` de la vida: 0 mira a +z). */
+  readonly facing: number;
+  /** Medio tramo recto del eje, sin las semiesferas, y el radio, en celdas. */
+  readonly halfLength: number;
+  readonly radius: number;
+  /** De pie, con el eje vertical; si no, a lo largo del cuerpo (a cuatro patas). */
+  readonly upright?: boolean;
+}
+
+/** Lo que se toca: un cuerpo, el suelo o algo que está de pie (muro, casa, tronco). */
+export type ContactSurface = 'body' | 'ground' | 'standing';
+
+export interface Contact {
+  /** La forma tocada, o null si es el suelo o algo de pie. */
+  readonly id: number | null;
+  readonly surface: ContactSurface;
+  /** La fracción del tramo recorrida al tocar: 0 al salir, 1 al llegar. */
+  readonly toi: number;
+  /** El centro de la bola al tocar: donde queda la punta. */
+  readonly at: PhysicalVector;
+}
+
+export interface ContactOptions {
+  /** La cota del suelo que pinta el juego (`groundFloor`). */
+  readonly ground: (x: number, z: number) => number;
+  /**
+   * La altura con que se pinta lo que cierra una celda de la máscara, o null si
+   * lo que la cierra no está de pie: el agua y el lago, y la montaña, que ya es
+   * el suelo. Sin ella, cada celda cerrada es una muralla de la batalla.
+   */
+  readonly standing?: (x: number, z: number) => number | null;
+  /** Hasta dónde sube un sólido suelto (tronco, poste). TUNE: el árbol se pinta de 2,6. */
+  readonly solidHeight?: number;
+}
+
+export interface ContactWorld {
+  /** Las formas vivas de este paso: las de la lista se mueven, nacen o se quitan. */
+  shapes(list: readonly ContactShape[]): void;
+  /**
+   * Lo primero que toca una bola de `radius` que va de `from` a `to`; con
+   * `bodies` a false, sólo lo fijo (para mirar si hay línea libre).
+   */
+  cast(from: PhysicalVector, to: PhysicalVector, radius: number, bodies?: boolean): Contact | null;
+  /** Cuántos colisionadores fijos tiene: el coste de crearlo. */
+  readonly fixed: number;
+  dispose(): void;
+}
+
+/** TUNE: 2 celdas; un árbol se pinta de 2,6 con la copa, y la copa no para una flecha baja. */
+const SOLID_HEIGHT = 2;
+
+export async function createContactWorld(land: Terrain, options: ContactOptions): Promise<ContactWorld | null> {
+  const RAPIER = await loadPhysics();
+  if (RAPIER === null) return null;
+  const rapier: Rapier = RAPIER;
+  const world = new rapier.World({ x: 0, y: 0, z: 0 });
+  const groundCollider = addGround(rapier, world, land, options.ground);
+  let fixed = 1;
+  for (let z = 0; z < land.height; z += 1) for (let x = 0; x < land.width; x += 1) {
+    if (land.blocked[z * land.width + x] !== 1) continue;
+    const floor = safeGround(options.ground, x + 0.5, z + 0.5);
+    const height = options.standing === undefined ? WALL_HEIGHT : options.standing(x, z);
+    if (height === null || !(height > 0)) continue;
+    addWallCollider(rapier, world, x, z, x + 1, z + 1, floor, floor + height);
+    fixed += 1;
+  }
+  const seen = new Set<Solid>();
+  for (const list of land.solids?.values() ?? []) for (const solid of list) {
+    if (seen.has(solid)) continue; seen.add(solid);
+    const floor = safeGround(options.ground, (solid.minX + solid.maxX) / 2, (solid.minZ + solid.maxZ) / 2);
+    addWallCollider(rapier, world, solid.minX, solid.minZ, solid.maxX, solid.maxZ, floor,
+      floor + (options.solidHeight ?? SOLID_HEIGHT));
+    fixed += 1;
+  }
+  // Las consultas de Rapier no ven un colisionador hasta el primer paso: sin
+  // él, una caza sin presa todavía colocada tiraba a través de la empalizada.
+  world.step();
+  const bodies = new Map<number, RAPIER_NS.RigidBody>();
+  const shapeOf = new Map<number, number>();
+  const sizes = new Map<number, string>();
+  const balls = new Map<number, RAPIER_NS.Ball>();
+  let disposed = false;
+  const remove = (id: number, body: RAPIER_NS.RigidBody): void => {
+    for (let n = 0; n < body.numColliders(); n += 1) shapeOf.delete(body.collider(n).handle);
+    world.removeRigidBody(body); bodies.delete(id); sizes.delete(id);
+  };
+  return {
+    get fixed() { return fixed; },
+    shapes(list): void {
+      if (disposed) return;
+      const alive = new Set<number>();
+      for (const shape of list) {
+        alive.add(shape.id);
+        const size = `${shape.halfLength}:${shape.radius}`;
+        const existing = bodies.get(shape.id);
+        // Una forma que cambia de talla (el oso que se alza) se rehace.
+        if (existing !== undefined && sizes.get(shape.id) !== size) remove(shape.id, existing);
+        // La cápsula de Rapier va a lo largo de su Y: a cuatro patas, esa Y se
+        // tumba hacia donde mira el cuerpo (un cuarto de vuelta sobre el eje
+        // horizontal que le es perpendicular).
+        const half = Math.SQRT1_2;
+        const rotation = shape.upright === true ? IDENTITY
+          : { x: Math.cos(shape.facing) * half, y: 0, z: -Math.sin(shape.facing) * half, w: half };
+        const centre = { x: shape.x, y: shape.y, z: shape.z };
+        const body = bodies.get(shape.id);
+        if (body !== undefined) {
+          body.setNextKinematicTranslation(centre); body.setNextKinematicRotation(rotation); continue;
+        }
+        const made = world.createRigidBody(rapier.RigidBodyDesc.kinematicPositionBased()
+          .setTranslation(centre.x, centre.y, centre.z).setRotation(rotation));
+        const collider = world.createCollider(rapier.ColliderDesc.capsule(shape.halfLength, shape.radius), made);
+        bodies.set(shape.id, made); sizes.set(shape.id, size); shapeOf.set(collider.handle, shape.id);
+      }
+      for (const [id, body] of [...bodies]) if (!alive.has(id)) remove(id, body);
+      // Como las sondas de F-0: sin un paso, lo que ven las consultas es la
+      // postura de antes. No hay nada más que simular.
+      world.step();
+    },
+    cast(from, to, radius, withBodies = true): Contact | null {
+      if (disposed) return null;
+      let ball = balls.get(radius);
+      if (ball === undefined) { ball = new rapier.Ball(radius); balls.set(radius, ball); }
+      const motion = { x: to.x - from.x, y: to.y - from.y, z: to.z - from.z };
+      const hit = world.castShape(from, IDENTITY, motion, ball, 0, 1, true,
+        withBodies ? undefined : rapier.QueryFilterFlags.EXCLUDE_KINEMATIC);
+      if (hit === null) return null;
+      const toi = hit.time_of_impact;
+      const at = { x: from.x + motion.x * toi, y: from.y + motion.y * toi, z: from.z + motion.z * toi };
+      const id = shapeOf.get(hit.collider.handle);
+      if (id !== undefined) return { id, surface: 'body', toi, at };
+      return { id: null, surface: hit.collider.handle === groundCollider.handle ? 'ground' : 'standing', toi, at };
+    },
+    dispose(): void { if (disposed) return; disposed = true; world.free(); },
+  };
 }

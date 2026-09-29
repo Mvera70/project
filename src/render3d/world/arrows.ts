@@ -27,6 +27,12 @@ export interface ArrowSighting {
   readonly vx: number;
   readonly vy: number;
   readonly vz: number;
+  /**
+   * AN-5c · Clavada: el punto es donde entró la punta y la velocidad, la
+   * dirección con que entró. Se pinta con la punta metida `EMBED` y el astil
+   * fuera, aunque no se mueva.
+   */
+  readonly stuck?: boolean;
 }
 
 /**
@@ -55,6 +61,14 @@ const WOOD = 0x6b4a2b;
 
 /** Por debajo de esta velocidad no se reorienta: una flecha clavada no gira. */
 const STILL = 0.2;
+
+/**
+ * AN-5c · Lo que se mete la punta de una flecha clavada, en celdas: un cuarto
+ * del astil del GLB (0,27), lo que se ve entrar en un costado o en un poste.
+ */
+const EMBED = 0.07;
+/** El astil del GLB aprobado, de la cola (origen) a la punta (+Z). */
+const GLB_LENGTH = 0.267;
 
 /** El eje del cilindro de reserva de Three, para girarlo hacia donde vuela. */
 const UP = new Vector3(0, 1, 0);
@@ -101,7 +115,15 @@ export class Arrows {
       }
       shaft.position.set(sighting.x, sighting.y, sighting.z);
       const speed = Math.hypot(sighting.vx, sighting.vy, sighting.vz);
-      if (speed > STILL && sighting.weapon !== 'sling') {
+      if (sighting.stuck === true && speed > 1e-9 && sighting.weapon !== 'sling') {
+        // Clavada: la punta, dentro; la cola, fuera. El GLB nace en la cola y
+        // la reserva, centrada en su largo.
+        this.heading.set(sighting.vx / speed, sighting.vy / speed, sighting.vz / speed);
+        const back = (shaft instanceof Mesh ? SHAFT / 2 : GLB_LENGTH) - EMBED;
+        shaft.position.addScaledVector(this.heading, -back);
+        this.turn.setFromUnitVectors(shaft instanceof Mesh ? UP : FORWARD, this.heading);
+        shaft.quaternion.copy(this.turn);
+      } else if (speed > STILL && sighting.weapon !== 'sling') {
         this.heading.set(sighting.vx / speed, sighting.vy / speed, sighting.vz / speed);
         // El fallback histórico es un cilindro vertical; el GLB nuevo apunta
         // hacia +Z. Cada uno conserva su eje local para no tumbar sólo la

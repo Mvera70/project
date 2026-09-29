@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, it, expect } from 'vitest';
-import { AnimationMixer, Bone, Mesh, SkinnedMesh, Vector3, type Object3D } from 'three';
+import { AnimationMixer, Bone, Box3, Mesh, SkinnedMesh, Vector3, type Object3D } from 'three';
 import { loadAssets } from '../../src/render3d/assets';
 import { Fauna } from '../../src/render3d/effects/fauna';
 import type { AnimalKind } from '../../src/derive/animals';
@@ -151,11 +151,28 @@ describe('AN-1 · rumbo, carreras, mezclas y caída de los animales',()=>{
   it('caer tumba el cuerpo en un tercio de segundo, no en un fotograma',async()=>{
     const lib=await library('boar'),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
     fauna.paint([{id:9,kind:'boar',x:1,y:1}],0);
-    fauna.paint([{id:9,kind:'boar',x:1,y:1,action:'down'}],1/60);
     const body=fauna.group.children[0]!;
-    expect(body.rotation.z).toBeGreaterThan(-Math.PI/2*0.5);
+    const standing=new Box3().setFromObject(body);
+    fauna.paint([{id:9,kind:'boar',x:1,y:1,action:'down'}],1/60);
+    const first=new Box3().setFromObject(body);
     for(let i=2;i<=60;i++)fauna.paint([{id:9,kind:'boar',x:1,y:1,action:'down'}],i/60);
-    expect(body.rotation.z).toBeCloseTo(-Math.PI/2,2);
+    const lying=new Box3().setFromObject(body);
+    // Al primer fotograma apenas se ha movido; al cabo del segundo, del todo.
+    expect(standing.max.y-first.max.y).toBeLessThan((standing.max.y-lying.max.y)*0.5);
+    // AN-5c · Y de costado: tumbado mide de alto lo que medía de ancho, y se
+    // apoya en el suelo. Antes quedaba de pie sobre el hocico, medio enterrado.
+    expect(lying.max.y-lying.min.y,'de costado, no de pie').toBeLessThan((standing.max.y-standing.min.y)*0.75);
+    expect(lying.min.y,'sobre el suelo, no enterrado').toBeGreaterThan(-0.02);
+    fauna.dispose();lib.dispose();
+  });
+  it('el ciervo caído se apoya en el costado de su tronco: la cuerna, más ancha, no lo deja flotando',async()=>{
+    const lib=await library('deer'),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
+    for(let i=0;i<=90;i++)fauna.paint([{id:8,kind:'deer',x:1,y:1,action:'down'}],i/60);
+    fauna.group.updateMatrixWorld(true);
+    const trunk=fauna.group.children[0]!.getObjectByName('Torso');
+    expect(trunk,'el ciervo publicado trae su tronco').toBeDefined();
+    const lying=new Box3().setFromObject(trunk!);
+    expect(Math.abs(lying.min.y),'el tronco toca el suelo').toBeLessThan(0.02);
     fauna.dispose();lib.dispose();
   });
 });

@@ -1,0 +1,9 @@
+CMD: node tools/graphics/observe-life.mjs --seed 7 --year 24 --hunted partridge,rabbit,deer --means bows,arms --hunt --lead 20 --seconds 24 --fps 5 --zoom 0.35 --viewport 390x844 --out artifacts/graphics/AN-5/hunt-boar-seed7-y24
+INICIO 21:36:50
+Caza antes de empezar: {"stage":"offered","species":"boar","weapon":null,"targetId":null,"prey":{"x":18.5,"z":50.5}}
+Caza en marcha: {"stage":"running","species":"boar","weapon":"spear","targetId":42002,"hunter":{"x":16.32,"z":52.262,"clip":"walk"},"prey":{"x":18.5,"z":50.5,"action":null}}
+0s, fase 0.447, 71 personas
+10s, fase 0.53, 71 personas
+20s, fase 0.613, 71 personas
+Observatorio: /home/user/project/artifacts/graphics/AN-5/hunt-boar-seed7-y24/index.html · errores: 0
+rc=0

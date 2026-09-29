@@ -529,26 +529,111 @@ del juego, la cueva toca la montaña, a su espalda hay tres celdas de roca y la
 ladera sube al menos 0,5, la boca mira al valle y el oso nace en ella mirando
 al claro.
 
-### AN-5a · La caza enseña el golpe que la decide (brief propuesto, no ejecutado)
+### AN-5 · La caza física: el golpe que la decide, a la vista (aprobado y hecho el 29 sep 2026)
 
-**Defecto medido** en la toma del jabalí de AN-4b (7/24, lanza, 30 fps): la
-carga se ve 32 pasos y la estocada que resuelve la caza, ninguno. En el paso
-en que la lanza llega, `life/hunt-encounter.ts` resuelve la caza (espantada o
-muerta) y pone el clip del cazador en `idle`; el renderer
-(`renderer.ts`, actor del cazador) le quita el arma al completarse y le da
-`clipSeconds` del reloj de presentación, así que ni `spear_thrust` ni
-`bow_loose` empiezan en el tiro. Y la presa espantada pasa a `gone` en el
-sitio.
+**Lo que pidió Vera**, al leer el brief propuesto: «Sí, que la caza enseñe el
+golpe. Tiene que ser natural. Cuanto más física y realista, mejor. Que pueda
+fallar. Que pueda acertar. Todo. Que impacte». Y de la lanza que atravesaba la
+empalizada: «debe clavarse; no creo que pueda atravesar una empalizada de
+madera». Y de la visita del oso: «hay que ampliarla, claramente». Se partió en
+cuatro, todo en la capa de vida y el render; **el motor no cambia** y el parte
+de la caza entra por `PlayerAct` `hunt` como siempre.
 
-**Vía propuesta.** (1) `HuntHunterPose` lleva los pasos desde el último tiro
-y el renderer los usa como tiempo de los clips de gesto —lo que el asalto ya
-hace con `combatClip` y `since`—; (2) al completarse, el gesto del último tiro
-y el arma se quedan hasta que acaba el clip; (3) la presa espantada huye unos
-segundos con `stepWildPrey` antes de irse. Módulos: `hunt-encounter.ts` y la
-parte del cazador en `renderer.ts`. Prueba: una caza con lanza que acaba en
-estocada enseña `spear_thrust` con el contacto en t=0 del paso que decidió.
-**Fuera de este brief, y del dueño:** que la lanza no pase a través de una
-empalizada (mirar la línea libre cambia cuántas cazas salen bien).
+**Lo medido antes** (`tools/reports/hunt-report.ts`, `artifacts/physics/AN-5/antes.txt`):
+en cinco valles de verdad **ninguna caza con lanza llegaba a darse** (ciervo,
+jabalí y oso, 0 %): el cazador iba en línea recta, se quedaba contra un tronco o
+un muro y la presa se iba. Las flechas salían de 3,6 m de alto (1,2 celdas),
+se tiraban desde cualquier distancia y tocaban una bola de «huella + 0,06» a
+0,42 del suelo, más ancha que un conejo y por encima de su lomo. La lanza
+tocaba por distancia (1,1 + radio), también a través de la madera. Y la pieza
+cobrada desaparecía en el fotograma en que se daba el parte.
+
+#### AN-5a · El golpe, fechado por el tiro
+
+- La estocada y la suelta van en el paso que deciden: `HuntHunterPose` lleva
+  `clipSeconds` (0 en el contacto, como `combatClip` en el asalto) y el render
+  lo usa; andar sigue por suelo recorrido (`clipTime`).
+- El arma sigue en la mano hasta que la escena acaba (`weapon` en la pose).
+- **El parte espera a que la escena acabe de verse** (`settled`): la pieza
+  cobrada se queda tumbada 3 s con lo que lleve clavado, la que se escapa huye
+  3 s antes de irse, y lo que vuela aterriza. El render sólo lo entrega
+  entonces, y la semana, que ya esperaba a la caza, espera eso también.
+- **Tres estocadas medidas sobre el GLB** (`hunt-shot.ts`, `THRUST`, vigiladas
+  por `hunt-gestures.test.ts`): la de siempre, a la altura del pecho (punta a
+  0,35: el oso); la alta (0,50: el pecho del ciervo) y la baja, que entra hacia
+  abajo (0,20: el lomo del jabalí). Cada presa recibe la que le llega al tronco.
+
+#### AN-5b · El contacto decide
+
+- **Un mundo de contacto de Rapier sólo para la caza** (`createContactWorld`):
+  el suelo del juego, lo que está de pie **con la altura con que se pinta**
+  (empalizada 0,87, casa 1,58; `hunt-bodies.ts` contra el catálogo) y el cuerpo
+  que se pinta de la presa: una cápsula a lo largo del tronco, medida sobre la
+  malla del tronco de su GLB (con los animales nuevos de la PR #3: la caja del
+  ciervo la ensancha la cuerna y no sirve). La montaña y el agua no son
+  paredes.
+- Cada tiro vuela su parábola y **cada paso se barre contra ese mundo**: lo
+  primero que toca decide. La estocada es el tramo de la mano a la punta tal
+  como se pinta: si hay madera delante, **se clava en ella** y el gesto se
+  queda en el contacto hasta sacarla (0,8 s).
+- **No hay dado de «falla» ni de «roza»**: el cazador apunta con su pulso (una
+  desviación sembrada, 1° con arco, 1,6° con honda, 6° con lanza) y adelanta a
+  la presa que corre con su error; roza lo que entra de refilón contra la piel;
+  y **dónde entra decide**: el pecho mata, el cuarto trasero hiere y la presa se
+  va (la «malherida» de Vera). En la perdiz y el conejo todo acierto tumba.
+- **El cazador busca por dónde**: un puesto alrededor de la presa al que se
+  llega andando, con la línea libre y mejor de costado; se cuela entre árboles
+  con 0,22 de holgura (el aldeano anda con 0,32, que en el bosque no cabía). No
+  tira ni pincha a través de un muro.
+- **Cada animal es distinto**, sembrado: un ciervo ve venir al cazador a 2,5 y
+  otro a 6,5 celdas, y arranca tras medio segundo o uno y pico; el que caza con
+  lanza lo acecha y, cuando alza la cabeza, echa a correr. Cada oso tiene su
+  ritmo de zarpazo (0,9–1,6 s) y el zarpazo empuja al cazador media celda. El
+  jabalí herido embiste, y su embestida se para al llegar al cuerpo (antes se
+  metía dentro y se daba la vuelta).
+
+#### AN-5c · El impacto se ve
+
+- La flecha que toca **se queda clavada**: en la presa, en su marco (se mueve,
+  gira y cae con ella); en la empalizada, el tronco o el suelo, donde tocó, con
+  la punta dentro (`world/arrows.ts`, `stuck`).
+- La presa **acusa el golpe**: un empujón en la dirección del tiro que se apaga
+  en dos décimas.
+- **La pieza caída se tumba de costado de verdad.** Se giraba sobre el eje del
+  ancho y quedaba de pie sobre el hocico, medio enterrada (el jabalí caído medía
+  0,71 de alto con 0,29 bajo tierra); ahora rueda sobre su eje largo y se apoya
+  en el suelo (`effects/animal-motion.ts`). Vale para todo animal que cae.
+
+#### AN-5d · La visita del oso, más larga
+
+- Duraba lo que su aviso: la cueva está junto al claro que se tala, el leñador
+  pasaba a menos de 5 celdas, el oso se alzaba 3 s y se metía.
+- Ahora tolera a quien trabaja a su distancia, se alza a quien se acerca (3,5
+  celdas), y cuando se apartan **vuelve a hozar**; se mete si lo acosan de cerca
+  (1,6), si ha tenido que alzarse tres veces o cuando se le acaba el rato (el
+  78 % de la jornada). Quien huyó de él vuelve a lo suyo cuando lleva 6 s
+  calmado. Medida en `tools/reports/bear-visit-report.ts`, cinco valles en el
+  año 30 con su día entero (`artifacts/physics/AN-5/oso-antes.txt` y
+  `oso-despues.txt`): en 7/30, de 9,5 s fuera a 63 (se mete a la tercera); en
+  3/30, de 62,7 a 102,6; en los otros tres nadie pasaba a 5 celdas y ya estaba
+  fuera el rato entero (95–109 s), que sigue igual. Media, de 74,8 a 93,5 s.
+
+**Pruebas.** `physics-contact.test.ts`, `hunt-bodies.test.ts` (las cajas de
+los modelos contra el catálogo: falla, con la caja nueva en el mensaje, cuando
+llega un modelo nuevo), `hunt-shot.test.ts`, `hunt-gestures.test.ts`,
+`life-hunt-encounter.test.ts` (la lanza no atraviesa la empalizada; clavada en
+un tronco, el gesto se queda en su contacto hasta sacarla o hasta que el
+zarpazo se la arranca, en veinte semillas; la estocada en t = 0; la presa se
+sacude hacia donde va la lanza y vuelve; la pieza se queda y el parte espera;
+los tres finales en la caza sola), `graphics-animal-motion.test.ts` (tumbada
+de costado) y `life-bear.test.ts` (se alza y vuelve a lo suyo; acosada o a la
+tercera, se mete). La visita con el valle entero —fuera más de 20 s— es una
+jornada (`tests/journeys/life-bear-visit.test.ts`, 6 s).
+
+**Tomas** (`artifacts/graphics/AN-5/`, matriz §2.7): el conejo 7/22 con honda
+(suelta, la piedra sale de la mano, cae de costado); el jabalí 7/24 con lanza
+(dos estocadas bajas y cae; la empalizada queda entre la cámara y la caza); la
+visita del oso 7/30 durante 80 s (sale, se alza, vuelve a hozar y sigue fuera).
 
 ## 7 · AN-4 · Aceptación conjunta
 
