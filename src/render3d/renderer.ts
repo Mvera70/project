@@ -1345,6 +1345,24 @@ export async function createGraphicsRenderer(
         id: animal.id, kind: animal.kind, action: animal.action ?? null,
         x: round(animal.x), z: round(animal.y), screen: screen(animal.x, animal.y),
       })),
+      // AN-4b · la caza: ofrecida (con su presa), en marcha o hecha. Sin esto
+      // el observatorio no sabía si una semana ofrecía caza ni si empezó.
+      hunt: huntScene !== null
+        ? { stage: huntScene.completed === null ? 'running' as const : 'done' as const,
+          species: huntScene.animals.find(animal => animal.id === huntScene!.targetId)?.kind ?? null,
+          weapon: huntScene.weapon, targetId: huntScene.targetId,
+          hunter: { x: round(huntScene.hunter.x), z: round(huntScene.hunter.z), clip: huntScene.hunter.clip },
+          prey: (() => {
+            const target = huntScene!.animals.find(animal => animal.id === huntScene!.targetId);
+            return target === undefined ? null : { x: round(target.x), z: round(target.y), action: target.action ?? null };
+          })() }
+        : huntSighting === null ? null : (() => {
+          const at = huntSighting.prey !== null
+            ? { x: huntSighting.prey.body.x, z: huntSighting.prey.body.z }
+            : (() => { const found = life.wildlife.find(animal => animal.kind === huntSighting!.species); return found === undefined ? null : { x: found.x, z: found.y }; })();
+          return { stage: 'offered' as const, species: huntSighting.species, weapon: null, targetId: null,
+            prey: at === null ? null : { x: round(at.x), z: round(at.z) } };
+        })(),
       // El valle más vivo · los que vienen por el camino, y en qué andan.
       visitors: life.visitors.map(visitor => ({
         id: visitor.body.id, kind: visitor.kind, phase: visitor.phase,
@@ -2847,6 +2865,15 @@ declare global {
 interface ScreenPoint { readonly x: number; readonly y: number }
 interface ObservedPoint { readonly x: number; readonly z: number; readonly screen: ScreenPoint }
 interface LifeSnapshot {
+  /** AN-4b · La caza de la semana, para el observatorio. */
+  readonly hunt: {
+    readonly stage: 'offered' | 'running' | 'done';
+    readonly species: string | null;
+    readonly weapon: string | null;
+    readonly targetId: number | null;
+    readonly prey?: { readonly x: number; readonly z: number; readonly action?: string | null } | null;
+    readonly hunter?: { readonly x: number; readonly z: number; readonly clip: string };
+  } | null;
   readonly renderedGates: readonly { readonly id: number; readonly x: number; readonly z: number;
     readonly offset: readonly number[]; readonly rotation: readonly number[] }[];
   readonly nightOutcomes: readonly { readonly tick: number; readonly residents: number; readonly sleeping: number; readonly pending: readonly number[] }[];

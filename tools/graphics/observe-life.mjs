@@ -33,6 +33,10 @@ const means = opt('means', '');
 // semana, por la misma razón: la visita del lobo sale pocas veces en sesenta
 // años y esperarla mirando no es grabarla.
 const happening = opt('happening', '');
+// AN-4b · `--hunted partridge,rabbit,deer` da por cazadas esas especies
+// (`&hunted=`, `huntedNow`): abre las cazas que vienen detrás y la visita del
+// oso, que sólo nace superado el jabalí. Se combina con `--happening`.
+const hunted = opt('hunted', '');
 // K-5 · `--crown ready` deja la fila de la corona encendida y `--crown <oficio>`
 // corona ya a alguien de ese oficio, para ver la sala y el estilo del valle.
 const crown = opt('crown', '');
@@ -79,11 +83,12 @@ try {
   const progress = opt('progress', '');
   // D3b · `--assault` hace que la partida venga a tirar el porton.
   const assault = args.includes('--assault') ? '1' : '';
-  const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== ''
+  const debugRoute = means !== '' || happening !== '' || hunted !== '' || crown !== '' || raid !== ''
     || braced !== '' || coming !== '' || warning !== '' || assault !== '' || aftermath !== '' || aftermathControl !== '' || wallwork !== '';
   if (debugRoute) {
     const extra = (means === '' ? '' : `&means=${means}`)
       + (happening === '' ? '' : `&happening=${happening}`)
+      + (hunted === '' ? '' : `&hunted=${hunted}`)
       + (crown === '' ? '' : `&crown=${crown}`)
       + (raid === '' ? '' : `&raid=${raid}`)
       + (coming === '' ? '' : `&coming=${coming}`)
@@ -97,7 +102,9 @@ try {
       + (assault === '' ? '' : `&assault=${assault}`);
     pageUrl.search = `?debug=1&live=1&seed=${seed}&year=${year}&season=${opt('season', 'summer')}${extra}`;
   }
-  await tab.goto(pageUrl.href);
+  // AN-4b · una villa con asalto (sesenta personas, muralla, Rapier) tarda
+  // más de los 30 s por omisión en cargar bajo SwiftShader.
+  await tab.goto(pageUrl.href, { timeout: 240_000 });
   if (!debugRoute) {
     await tab.locator('#valley-seed').fill(String(seed));
     if (await tab.locator('.title-dev').getAttribute('aria-pressed') === 'false') await tab.locator('.title-dev').click();
@@ -171,12 +178,31 @@ try {
   // `view.look(hunter)`). Si el valle no ofrece caza en ese instante se dice y
   // se para: la caza no se inventa desde fuera.
   if (args.includes('--hunt')) {
-    const sign = tab.locator('.hunt-sign');
-    const covered = ((await sign.getAttribute('class').catch(() => '')) ?? '').includes('covered');
-    if (!(await sign.isVisible()) || covered) throw new Error('No hay señal de caza tocable ahora: cambia semilla, año o --lead.');
-    process.stdout.write(`Caza: ${await sign.getAttribute('aria-label')}\n`);
-    await sign.click({ force: true });
-    if (live) await tab.clock.runFor(2500); else await tab.evaluate(steps => window.__valleyAdvance(steps), 75);
+    // AN-4b · Sin depender de que la señal esté en cuadro: la señal sólo se
+    // coloca con la presa a la vista (`huntSign()`), y desde el encuadre de
+    // reposo casi nunca lo está. Se lee la oferta de la traza (`hunt`), se
+    // toca la señal con un clic del DOM —su manejador valida la oferta del
+    // motor igual que un toque: semana, especie, arma, presa entre árboles— y
+    // se comprueba que la caza empezó. La cámara la lleva el juego, detrás
+    // del cazador.
+    const offered = await tab.evaluate(() => window.__valleyLife?.()?.hunt ?? null);
+    if (offered === null || offered.stage !== 'offered') {
+      throw new Error(`El motor no ofrece caza esta semana (${JSON.stringify(offered)}): cambia semilla, año o --hunted.`);
+    }
+    process.stdout.write(`Caza ofrecida: ${offered.species}, presa en ${JSON.stringify(offered.prey)}\n`);
+    const clicked = await tab.evaluate(() => {
+      const sign = document.querySelector('.hunt-sign');
+      if (!(sign instanceof HTMLElement)) return false;
+      sign.click();
+      return true;
+    });
+    if (!clicked) throw new Error('No hay señal de caza en la página.');
+    if (live) await tab.clock.runFor(1000); else await tab.evaluate(steps => window.__valleyAdvance(steps), 30);
+    const started = await tab.evaluate(() => window.__valleyLife?.()?.hunt ?? null);
+    if (started === null || started.stage === 'offered') {
+      throw new Error(`La caza no empezó al tocar la señal (${JSON.stringify(started)}): presa entre árboles o semana pasada.`);
+    }
+    process.stdout.write(`Caza en marcha: ${started.species} con ${started.weapon}\n`);
   }
   const frames = [];
   let basePhase = null;

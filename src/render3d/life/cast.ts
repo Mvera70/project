@@ -66,7 +66,10 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
     if (action === 'pay') return 'talk';
     // AN-2a · Con la pelota en la mano se lanza (`throw`, fechado); sin ella
     // —el juego del día de un niño, casi siempre sin trasto— se brinca (`play`).
-    if (action === 'play') return dweller.holding !== null ? 'throw' : 'play';
+    // Un trasto tiene id >= 0; las cargas (leña, piedra, grano) son negativas.
+    // AN-4b · y los trastos sueltos van apagados en la partida desde el 15 sep
+    // (decisión del dueño): hoy nadie lanza; la rama queda para cuando vuelvan.
+    if (action === 'play') return dweller.holding !== null && dweller.holding >= 0 ? 'throw' : 'play';
   }
   return 'idle';
 }

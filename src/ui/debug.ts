@@ -2,12 +2,13 @@
 
 import { skyAt } from '../derive/weather';
 import { bastionWalkwayOf } from '../derive/bastion-walkway';
-import { CROWN, OFFER, TIME } from '@engine/balance';
+import { CROWN, FATE, OFFER, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { archiveGame } from '@engine/save';
 import { MEANS_SPEC, giveMeans } from '@engine/world/means';
+import { HUNT_ORDER } from '@engine/world/hunting';
 import { woodCostOf } from '@engine/world/works';
 import { crownCandidates } from '@engine/people/crown';
 import { crownKing } from '@engine/world/crown';
@@ -201,6 +202,24 @@ export function giveNow(state: GameState, id: MeansId): void {
  */
 export function happenNow(state: GameState, id: HappeningId): void {
   state.happenings.push({ tick: state.tick, id, visible: [], who: [] });
+  // AN-4b · El oso no se lee del registro sino de la bandera que el motor pone
+  // al resolverlo (`fate.ts`): sin ella, `?happening=bear_in_the_wood` apuntaba
+  // el suceso y la visita no llegaba nunca.
+  if (id === 'bear_in_the_wood') state.flags['bear'] = state.tick + FATE.BEAR_WEEKS;
+}
+
+/**
+ * AN-4b · Da por cazadas estas especies (`hunt:<especie>` = 0, lo mismo que
+ * apunta `settleHunt` al cobrar la primera pieza), para poder **ver** las
+ * cazas que vienen después en `HUNT_ORDER` —conejo, ciervo, jabalí, oso— y la
+ * visita del oso, que sólo nace superado el jabalí (`createBear`). Como
+ * `?happening=`, es la única forma de grabar lo que una partida tarda
+ * decenas de horas en abrir. Lo que no es una especie se ignora.
+ */
+export function huntedNow(state: GameState, species: readonly string[]): void {
+  for (const one of species) {
+    if ((HUNT_ORDER as readonly string[]).includes(one)) state.flags[`hunt:${one}`] = 0;
+  }
 }
 
 /**

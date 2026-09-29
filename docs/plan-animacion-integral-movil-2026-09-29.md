@@ -392,6 +392,42 @@ amenaza y que después se retira y se va. La toma en partida no se pudo
 rodar (el observatorio no provoca la visita: `encargos-3d.md`); la evidencia
 del gesto es el banco de AN-0.
 
+### AN-4b · Las tomas que faltaban (brief, 29 sep 2026)
+
+**Defecto medido.** Cuatro familias quedaron sin toma en partida porque el
+observatorio no podía llegar a ellas, no por mala suerte de semilla: (1) la
+**visita del oso** sólo nace superada la caza del jabalí (`createBear`:
+`hunt:boar` = 0), así que `--happening bear_in_the_wood` solo no la trae
+nunca; (2) la **caza** exige tocar la señal, y la señal sólo se coloca con la
+presa en cuadro (`huntSign()`), que desde el encuadre de reposo casi nunca
+está: tres valles con oferta del motor y ninguna señal tocable; (3) el
+**asalto de la villa 7/60** agotó los 30 s de `page.goto` (sesenta personas,
+muralla y Rapier bajo SwiftShader), y sin `--means bows,arms` no hay arqueros
+que tensen; (4) el **lanzamiento** (`throw`) no se puede grabar: la pelota
+suelta la retiró el dueño del diseño el 15 sep («eran el descarte de
+físicas»; `createVillage` no recibe `props: true` en el juego). Eso no es una
+ruta que falte sino una decisión: `throw` queda como límite dicho, y sólo se
+enseña si hay un trasto de verdad en la mano (`holding >= 0`, no una carga).
+
+**Módulos fuera de la lista, y por qué.** `src/main.ts` y `src/ui/debug.ts`:
+un parámetro de la ruta de depuración, `&hunted=perdiz,conejo…`, que da por
+cazadas esas especies (`hunt:<especie>` = 0, lo mismo que apunta
+`settleHunt`); es la familia de `&happening=` y `&raid=` —poner el valle en el
+estado que se quiere mirar— y no toca el motor ni la partida normal.
+`src/render3d/renderer.ts`: un campo `hunt` en la instantánea del
+observatorio (ofrecida, en marcha o hecha; especie, arma, presa), sin
+cambiar nada de lo que se pinta. `tools/graphics/observe-life.mjs`:
+`page.goto` con 240 s, `--hunted`, y `--hunt` que mira el campo `hunt`, toca
+la señal con un clic del DOM (su manejador valida la oferta del motor igual
+que un toque, esté o no la señal en pantalla) y comprueba que la caza empezó.
+`src/render3d/life/cast.ts`: `throw` sólo con un trasto en la mano.
+
+**Prueba.** Una propiedad nueva: con las especies anteriores cazadas, la
+oferta del motor puede ser la siguiente y el oso de la visita nace (y sin el
+jabalí cazado, no). Las tomas las rueda un agente con los comandos cerrados;
+su medida es la traza (fases del oso, acciones de la presa, clips del
+cazador y de la guarnición, fotograma a fotograma).
+
 ## 7 · AN-4 · Aceptación conjunta
 
 **Alcance (literal).** Repetir tomas antes/después del mismo estado. Cubrir
