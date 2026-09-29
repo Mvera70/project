@@ -1,5 +1,43 @@
 # The Valley — Registro de cambios
 
+## v5.19 · 30 sep 2026 · Fase 2: el día y la noche entran; la aldea, la hoguera y la fiesta, tachadas
+
+Vera aprobó la fase 1 («sigue perfecto»). De los siete lechos de la fase 2
+**quedan tres** —pájaros de día, grillos de verano, noche fría— y **cuatro
+fuera**: el caserío, el pueblo, la hoguera y la fiesta. Escuchados en su tablet:
+«horrible, no tiene ningún sentido»; la hoguera «medianamente se salva, pero
+es un sonido muy raro de fondo». Los cuatro se retiran del juego, de la
+fábrica y de las pruebas; los datos que los alimentaban (población, plaza,
+fiesta, ventana de la hoguera) siguen llegando a `ambience.ts` para cuando
+haya ficheros que valgan. **Lección, en la skill: una multitud no se
+sintetiza, se graba** (decisión 1 de `plan-audio-mundo.md` §6). La hoguera
+se rehará sin el lecho de ruido bajo los chasquidos, que es el fondo raro.
+
+- **Ninguno tiene una garganta.** Es la decisión de fondo: una voz sintética
+  es lo que más «de dibujos» suena, así que el bullicio de una aldea se hace
+  con lo que la aldea **hace** —golpes lejanos, una puerta, pasos— más un
+  rumor de banda estrecha que el oído completa solo. Si aparecen voces de
+  verdad, sustituyen a esto sin tocar nada más.
+- **Los umbrales de población están medidos, no inventados**:
+  `founding-report.ts` sobre seis semillas da 6–13 personas el primer año,
+  20–39 el quinto y 50–80 en un valle maduro, así que el rumor entra por
+  encima de las familias fundadoras, llena hacia las veinte, y el segundo
+  lecho —el que hace que los golpes se solapen— sube desde la treintena.
+- Pájaros de día (callan con tormenta y nieve, se retiran con lluvia),
+  grillos en las noches de primavera y verano, el aire quieto el resto del
+  año, la hoguera de la plaza en su rato y la fiesta. **De noche la aldea
+  calla**: la gente duerme y ni siquiera se dibuja.
+- **El corazón de la aldea es la plaza**, no la media de los edificios.
+  Probé la media y caí en el mismo fallo que el esquema 8 ya tiene escrito:
+  se mueve sola mientras la aldea crece, y una muralla o una atalaya la
+  sacan del pueblo. Medido con el recorrido: en un valle del año 30 el
+  bullicio se apagaba entero por eso.
+- Los grillos salieron con un 40 % de energía por encima de 4 kHz —siseo,
+  y toda la noche—: bajados al 3,7 %. La ventana de la hoguera se muda a
+  `day-phases.ts`, que no importa Three, como se hizo con la tabla del
+  viento.
+- 64 pruebas de sonido. El sonido entero pesa 1043 KB.
+
 ## v5.18 · 29 sep 2026 · Un día claro, como un valle de montaña
 
 > Las seis entradas del sonido se numeraron v4.97–v5.02 en su rama y chocaban

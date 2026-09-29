@@ -27,7 +27,7 @@
 import { SOUND } from '@engine/balance';
 import type { Season } from '@engine/state';
 import type { SkyKind } from '@derive/weather';
-import { hearthAt, PHASES } from '../render3d/effects/day-phases';
+import { PHASES } from '../render3d/effects/day-phases';
 
 /** Cada lecho que puede estar sonando. Son los ficheros de `public/audio/`. */
 export type AmbienceLayer =
@@ -45,18 +45,13 @@ export type AmbienceLayer =
   // Fase 2: el día, la noche y la aldea que crece.
   | 'amb_birds_day'
   | 'amb_night_summer'
-  | 'amb_night_cold'
-  | 'amb_village_sparse'
-  | 'amb_village_busy'
-  | 'amb_hearth'
-  | 'amb_festival';
+  | 'amb_night_cold';
 
 export const AMBIENCE_LAYERS: readonly AmbienceLayer[] = [
   'amb_wind_calm', 'amb_wind_gust', 'amb_wind_winter',
   'amb_rain_light', 'amb_rain_heavy', 'amb_storm_bed', 'amb_snow_hush',
   'amb_river', 'amb_waterfall', 'amb_fire_flame', 'amb_fire_embers',
   'amb_birds_day', 'amb_night_summer', 'amb_night_cold',
-  'amb_village_sparse', 'amb_village_busy', 'amb_hearth', 'amb_festival',
 ];
 
 /** Cuánto suena cada capa, de 0 a 1. Lo que no está, no suena. */
@@ -226,20 +221,13 @@ export function mixFor(world: WorldSound): Mix {
   const dry = world.sky === 'clear' || world.sky === 'overcast';
   add(mix, summerNight && dry ? 'amb_night_summer' : 'amb_night_cold', night, dim);
 
-  // **La aldea, y cuánta hay.** Dos lechos que se cruzan con la población
-  // medida (`SOUND.MURMUR_*`): el primero dice que hay alguien, el segundo que
-  // los golpes se solapan. **De noche no suena**: la gente duerme y ni
-  // siquiera se dibuja, así que un pueblo que murmura a oscuras sería mentira.
-  const crowd = nearness(world.villageCells, world.viewHeight) * day;
-  add(mix, 'amb_village_sparse',
-    ramp(world.people, SOUND.MURMUR_SPARSE_FROM, SOUND.MURMUR_SPARSE_FULL) * crowd, dim);
-  add(mix, 'amb_village_busy',
-    ramp(world.people, SOUND.MURMUR_BUSY_FROM, SOUND.MURMUR_BUSY_FULL) * crowd, dim);
-  // Y la fiesta, encima: la plaza engalanada y todo el mundo fuera.
-  if (world.festivity) add(mix, 'amb_festival', crowd, dim);
-  // La hoguera de la plaza arde en su rato de la tarde y nada más.
-  add(mix, 'amb_hearth', hearthAt(world.phase) * nearness(world.villageCells, world.viewHeight), dim);
-
+  // **La aldea no suena, todavía.** Se probó un bullicio hecho de actividad
+  // —golpes lejanos, una puerta, un rumor de banda estrecha— y con él la
+  // hoguera y la fiesta, y Vera los tachó los cuatro: «horrible, no tiene
+  // ningún sentido» (30 sep 2026). Una aldea que se oye necesita gente de
+  // verdad, y eso son grabaciones o voces generadas (decisión 1 de
+  // `plan-audio-mundo.md` §6). Los datos siguen llegando (`people`,
+  // `villageCells`, `festivity`, `hearthAt`) para cuando existan los ficheros.
   // **El fuego no suena en avance rápido.** Arde tres jornadas, que a ×64 son
   // seis segundos: encenderlo y apagarlo en ese tiempo es un parpadeo, no un
   // incendio.

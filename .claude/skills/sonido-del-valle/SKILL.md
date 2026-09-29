@@ -69,9 +69,9 @@ Cada material tiene su papel, para que la interfaz se aprenda de oído:
 - **Realce de presencia** a 2–3 kHz. Se probó y añade filo.
 - **Ataques de 0,2 ms con ruido hasta 10 kHz.** Suena a interfaz de sistema
   operativo. El contacto va entre 600 y 3200 Hz con 0,5–1,5 ms de ataque.
-- **Voces sintéticas** (personas o animales). Es lo que más «de dibujos» suena.
-  El bullicio de una aldea se sugiere con su actividad —golpes, pasos, puertas,
-  un perro lejano—, no con gargantas.
+- **Voces sintéticas** (personas o animales), y **también el bullicio hecho de
+  actividad**: se probó (golpes, pasos, cacharros, rumor) y fue «horrible».
+  Una aldea que se oye es gente grabada o generada; hasta entonces, calla.
 
 ---
 
@@ -249,6 +249,25 @@ así que se resuelve por construcción y no escuchando:
   duración de cada bucle viaja con su fichero (`LOOP_FILES` en `sound.ts`);
 - cada capa arranca **por un punto distinto** del bucle, o dos partidas con el
   mismo cielo suenan sincronizadas.
+
+**Una multitud no se sintetiza.** El 30 sep 2026 se probó un bullicio de aldea
+hecho de actividad —golpes lejanos, cacharros, un rumor de banda estrecha,
+palmas— y Vera lo tachó entero: «horrible, no tiene ningún sentido». La
+regla de §1 («el bullicio se sugiere con actividad») **está retirada**: lo que
+sugiere gente sin gente suena a nada reconocible. Gente se graba o se genera
+con voces de verdad (decisión 1 de `plan-audio-mundo.md`). Y un lecho de ruido
+continuo bajo un sonido puntual (la hoguera) se oye como «fondo raro»: los
+chasquidos solos, sin cama.
+
+**Y un recorrido de navegador no puede comprobarlo todo.** Lo que depende de
+**dónde apunta la cámara** no se puede fijar desde fuera: al intentar comparar
+el bullicio de un valle joven contra uno hecho, lo que se medía era el encuadre
+de cada uno, no su población. La regla que queda: **una propiedad del contenido
+—más gente, más bullicio— va a la prueba pura; el recorrido comprueba que eso
+llega vivo al juego**, y nada más. Y dos trampas suyas, medidas: hay que esperar
+al vuelo de entrada (9 s) antes de medir nada posicional, porque hasta entonces
+la cámara está a 92 celdas y todo lo que tiene sitio vale cero; y un cruce de
+capas tarda 2,5 s, así que medir antes es medir una capa a medio entrar.
 
 **Y una mezcla se equivoca de otra manera que un sonido.** Un lecho puede estar
 bien fabricado y sonar mal porque se pide demasiado alto. La corrección de Vera

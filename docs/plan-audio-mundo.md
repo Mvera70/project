@@ -479,6 +479,13 @@ las espadas (no hay) y el sonido de sangre (decisión 7).
   tirada. Comprobado con clics reales: 21 toques y 6 escenas de ambiente.
   **Pendiente:** la cascada no suena todavía porque nadie le dice dónde está
   (`encargos-3d.md`).
+- **Fase 2 · el día y la noche, hechos; la aldea, tachada** (30 sep 2026).
+  Entran pájaros, grillos y noche fría. El bullicio de aldea hecho de
+  actividad, la hoguera y la fiesta los tachó Vera («horrible»; la hoguera
+  «se salva a medias, fondo muy raro»). **El bullicio espera grabaciones o
+  voces generadas** —no se vuelve a sintetizar—; la hoguera se rehará sin el
+  lecho de ruido bajo los chasquidos. Los umbrales de población medidos
+  (`SOUND.MURMUR_*`) se quedan para entonces.
 - **El botón corriente suena** (29 sep 2026): `ui_button_press` y
   `ui_button_release`, el sello de cera que Vera eligió («Eligo el K»). Lo
   llevan todos los botones **menos los que ya tienen voz propia**, listados en

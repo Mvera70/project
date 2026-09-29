@@ -506,47 +506,11 @@ describe('el fondo del mundo · el día y la noche se relevan', () => {
   });
 });
 
-describe('el fondo del mundo · la aldea suena a lo grande que es', () => {
-  it('cuanta más gente, más bullicio: la escalera medida en seis semillas', () => {
-    // `founding-report.ts`: 6-13 personas el primer año, 20-39 el quinto,
-    // 50-80 en un valle maduro. El sonido tiene que separar esos tres valles.
-    const loudness = [3, 10, 25, 45, 75].map((people) => total(mixFor({ ...CALM, people })));
-    for (let i = 1; i < loudness.length; i += 1) {
-      expect(loudness[i]!, `${i}`).toBeGreaterThan(loudness[i - 1]!);
+describe('el fondo del mundo · lo que Vera tachó no suena', () => {
+  it('ni aldea, ni hoguera, ni fiesta: «horrible, no tiene ningún sentido» (30 sep 2026)', () => {
+    const busy = mixFor({ ...CALM, people: 75, festivity: true, phase: 0.62 });
+    for (const layer of Object.keys(busy)) {
+      expect(layer, layer).not.toMatch(/village|hearth|festival/);
     }
-  });
-
-  it('la pareja fundadora casi no suena, y un valle lleno tiene los dos lechos', () => {
-    const founding = mixFor({ ...CALM, people: 2 });
-    expect(founding.amb_village_sparse).toBeUndefined();
-    expect(founding.amb_village_busy).toBeUndefined();
-    const town = mixFor({ ...CALM, people: 75 });
-    expect(town.amb_village_sparse ?? 0).toBeGreaterThan(0);
-    expect(town.amb_village_busy ?? 0).toBeGreaterThan(0);
-  });
-
-  it('de noche la aldea calla: la gente duerme y ni siquiera se dibuja', () => {
-    const night = mixFor({ ...NIGHT, people: 75 });
-    expect(night.amb_village_sparse).toBeUndefined();
-    expect(night.amb_village_busy).toBeUndefined();
-  });
-
-  it('y se va si la cámara se lleva la mirada lejos del pueblo', () => {
-    const here = mixFor({ ...CALM, people: 60 }).amb_village_sparse ?? 0;
-    const away = mixFor({ ...CALM, people: 60, villageCells: 40 }).amb_village_sparse ?? 0;
-    expect(away).toBeLessThan(here);
-  });
-});
-
-describe('el fondo del mundo · la plaza', () => {
-  it('la hoguera arde en su rato de la tarde y en ningún otro', () => {
-    expect(mixFor({ ...CALM, phase: 0.62 }).amb_hearth ?? 0).toBeGreaterThan(0);
-    expect(mixFor({ ...CALM, phase: 0.3 }).amb_hearth).toBeUndefined();
-    expect(mixFor({ ...CALM, phase: 0.95 }).amb_hearth).toBeUndefined();
-  });
-
-  it('una fiesta se oye, y sin fiesta no hay fiesta', () => {
-    expect(mixFor(CALM).amb_festival).toBeUndefined();
-    expect(mixFor({ ...CALM, festivity: true }).amb_festival ?? 0).toBeGreaterThan(0);
   });
 });

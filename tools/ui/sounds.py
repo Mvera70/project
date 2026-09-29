@@ -780,71 +780,10 @@ def _(v: Voice):
     return 'life', d, air + _far(v, calls, 0.6, 0.6) * 0.5
 
 
-def thuds(v: Voice, seconds: float, per_second: float, level: float,
-          lo: float = 300, hi: float = 1500) -> np.ndarray:
-    """La actividad de la aldea: golpes de madera, cacharros, una puerta."""
-    n = int(seconds * SR)
-    out = np.zeros(n)
-    for _ in range(max(1, int(per_second * seconds))):
-        at = int(v.rng.uniform(0, n - 3000))
-        f = v.rng.uniform(lo, hi)
-        d = v.rng.uniform(0.03, 0.12)
-        m = int(d * SR)
-        exc = v.noise(m) * np.exp(-np.arange(m) / (0.0008 * SR))
-        hit = bp(exc, f * 0.85, f * 1.25) * np.exp(-np.arange(m) / (m * 0.3))
-        out[at:at + m] += hit * v.rng.uniform(0.25, 1.0)
-    return unit(out, level)
-
-
-@loop('amb_village_sparse')
-def _(v: Voice):
-    # Un caserío: se oye que hay alguien, y poco más.
-    d = 14.0
-    return 'life', d, _far(v, thuds(v, d + 1.5, 1.1, 1.0), 0.45, 0.5)
-
-
-@loop('amb_village_busy')
-def _(v: Voice):
-    # Un pueblo: los golpes se solapan y debajo hay un rumor. **El rumor es
-    # ruido de banda estrecha con su respiración**, no voces: sugiere gente sin
-    # fabricar una garganta, que es el truco de toda sala llena de un juego.
-    d = 14.0
-    work = thuds(v, d + 1.5, 4.5, 1.0)
-    n = int((d + 1.5) * SR)
-    t = np.arange(n) / SR
-    swell = np.zeros(n)
-    for _ in range(5):
-        swell += np.sin(2 * np.pi * v.rng.uniform(0.3, 1.4) * t + v.rng.uniform(0, 6.28))
-    murmur = bp(v.noise(n), 320, 1000) * (0.45 + 0.55 * unit(swell, 1.0))
-    return 'life', d, _far(v, work + murmur * 0.8, 0.5, 0.55)
-
-
-@loop('amb_hearth')
-def _(v: Voice):
-    # La hoguera de la plaza: más pequeña y más lejos que una casa ardiendo.
-    d = 10.0
-    bedding = bed_noise(v, d + 1.5, 320, 1100) * wobble(v, d + 1.5, 0.35, 0.35, 0.6) * 0.4
-    return 'life', d, _far(v, bedding + crackles(v, d + 1.5, 5.5, 0.7), 0.3, 0.3)
-
-
-@loop('amb_festival')
-def _(v: Voice):
-    # Fiesta: la aldea entera fuera. Golpes, cacharros y palmas sueltas —una
-    # palma es un transitorio de banda ancha, no una voz—. **Es la capa que más
-    # pide grabaciones de verdad**, y queda apuntada como tal.
-    d = 14.0
-    n = int((d + 1.5) * SR)
-    claps = np.zeros(n)
-    for _ in range(int(2.2 * (d + 1.5))):
-        at = int(v.rng.uniform(0, n - 2000))
-        m = int(v.rng.uniform(0.01, 0.03) * SR)
-        clap = bp(v.noise(m), 900, 3000) * np.exp(-np.arange(m) / (m * 0.2))
-        claps[at:at + m] += clap * v.rng.uniform(0.4, 1.0)
-    work = thuds(v, d + 1.5, 5.5, 1.0, lo=350, hi=1800)
-    t = np.arange(n) / SR
-    swell = sum(np.sin(2 * np.pi * v.rng.uniform(0.25, 1.1) * t + v.rng.uniform(0, 6.28)) for _ in range(4))
-    murmur = bp(v.noise(n), 340, 1100) * (0.5 + 0.5 * unit(np.asarray(swell), 1.0))
-    return 'life', d, _far(v, work + unit(claps, 0.55) + murmur * 0.9, 0.5, 0.5)
+# **La aldea, la hoguera y la fiesta no están.** Se fabricaron con actividad
+# (golpes, cacharros, un rumor de banda estrecha, palmas) y Vera las tachó las
+# cuatro: «horrible, no tiene ningún sentido» (30 sep 2026). La lección va en
+# la skill `sonido-del-valle`: **una multitud no se sintetiza**; se graba.
 
 
 def render_loop(cue: str, variant: str) -> np.ndarray:

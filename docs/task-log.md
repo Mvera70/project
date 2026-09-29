@@ -11,6 +11,23 @@ elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
 botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
 los momentos de §11.10.
 
+## 30 sep 2026 · Fase 2 del sonido: día y noche sí; aldea, hoguera y fiesta, no (v5.19)
+
+**Paramos aquí por crédito** (Vera, 30 sep). Estado exacto: fases 0 y 1
+aprobadas; de la 2 entran pájaros, grillos y noche fría, y **Vera tachó** el
+caserío, el pueblo, la hoguera y la fiesta («horrible»; la hoguera «se salva
+a medias, sonido muy raro de fondo»). Retirados del juego. Al retomar: la
+hoguera se rehace sin el lecho de ruido bajo los chasquidos; el bullicio de
+la aldea espera grabaciones o voces generadas (decisión 1 de §6) — no se
+vuelve a intentar sintetizado. Siete lechos se fabricaron, ninguno con voces: Los umbrales de población salen de
+`founding-report.ts` en seis semillas. El corazón de la aldea es **la plaza**
+(la media de edificios se mueve sola: el esquema 8 ya lo tenía escrito, y el
+recorrido lo volvió a demostrar). 64 pruebas verdes.
+
+**Abierto:** que Vera escuche la fase 2; la cascada sigue sin sonar (le falta
+que el renderer diga dónde está); y las nueve decisiones de
+`plan-audio-mundo.md` §6, de las que la fase 4 depende entera.
+
 ## 29 sep 2026 · El día claro, corregido (v5.18)
 
 Vera aprobó la fase 1 menos la primera escena: «un día claro suena muy fuerte

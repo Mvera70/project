@@ -221,10 +221,6 @@ export const LOOP_FILES: Readonly<Record<AmbienceLayer, { file: string; seconds:
   amb_birds_day: { file: 'amb_birds_day.mp3?v=96e5469b', seconds: 14 },
   amb_night_summer: { file: 'amb_night_summer.mp3?v=41d4fedf', seconds: 12 },
   amb_night_cold: { file: 'amb_night_cold.mp3?v=0e5a8c06', seconds: 14 },
-  amb_village_sparse: { file: 'amb_village_sparse.mp3?v=05fd35e8', seconds: 14 },
-  amb_village_busy: { file: 'amb_village_busy.mp3?v=35804cdc', seconds: 14 },
-  amb_hearth: { file: 'amb_hearth.mp3?v=cf5891dd', seconds: 10 },
-  amb_festival: { file: 'amb_festival.mp3?v=d8d32b5a', seconds: 14 },
   amb_fire_embers: { file: 'amb_fire_embers.mp3?v=ea930d6b', seconds: 10 },
 };
 
