@@ -14,6 +14,14 @@
 
 import { panelFor, type InspectTarget } from '../inspect';
 import type { UiActions, UiPanel, UiSnapshot } from './contracts';
+// **Las imágenes de la piel, importadas y no por token.** En el sitio publicado
+// los tokens de `tokens.css` son URL relativas a `assets/`, y Chrome resuelve
+// una `var()` con URL donde se usa: en una hoja inyectada en el documento
+// apuntan a la raíz y dan 404 (auditoría de Codex, 29 sep 2026: el marco
+// de esta etiqueta y seis texturas del tablón perdidos). El bundle
+// local las incrusta y por eso nunca se vio. Importadas desde el módulo, Vite
+// escribe la dirección buena; los tokens se redeclaran aquí con ellas.
+import frameParchment from './frame-parchment.png';
 
 const STYLE_ID = 'valley-label-style';
 
@@ -22,7 +30,7 @@ const WIDTH = 300;
 const LIFT = 14;
 
 const CSS = `
-.valley-label { position: absolute; z-index: 18; width: min(${WIDTH}px, calc(100% - 32px)); left: 16px; top: 120px;
+.valley-label { --frame-parchment: url(${frameParchment}); position: absolute; z-index: 18; width: min(${WIDTH}px, calc(100% - 32px)); left: 16px; top: 120px;
   box-sizing: border-box; padding: 4px 6px 6px; color: var(--skin-ink);
   border: var(--frame-parchment-edge) solid transparent;
   border-image: var(--frame-parchment) var(--frame-parchment-slice) fill stretch;

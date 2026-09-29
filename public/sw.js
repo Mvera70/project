@@ -28,7 +28,10 @@
 // diseño, que es donde se vio el problema.
 // v7 · 27 sep 2026: el manifiesto de modelos se quedaba congelado (abajo). Subir
 // el nombre tira la caché vieja y con ella ese manifiesto rancio.
-const CACHE = 'valley-v7';
+// v8 · 29 sep 2026: las 44 escenas de la crónica pasan a color **con el mismo
+// nombre** que su sepia (`public/ui/art/`), y un dispositivo con las sepia
+// guardadas las seguiría enseñando para siempre. Subir el nombre las tira.
+const CACHE = 'valley-v8';
 
 const SHELL = ['./', './index.html', './manifest.webmanifest'];
 

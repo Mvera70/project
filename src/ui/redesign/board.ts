@@ -19,10 +19,26 @@ import { TIME } from '@engine/balance';
 import type { MissionId } from '@engine/state';
 import { missionsOpen, outNow, type MissionOpen } from '@engine/world/expeditions';
 import type { UiActions, UiPanel, UiSnapshot } from './contracts';
+// **Las imágenes de la piel, importadas y no por token.** En el sitio publicado
+// los tokens de `tokens.css` son URL relativas a `assets/`, y Chrome resuelve
+// una `var()` con URL donde se usa: en una hoja inyectada en el documento
+// apuntan a la raíz y dan 404 (auditoría de Codex, 29 sep 2026: seis texturas
+// del tablón perdidas, «los papeles y las tablas desaparecen»). El bundle
+// local las incrusta y por eso nunca se vio. Importadas desde el módulo, Vite
+// escribe la dirección buena; los tokens se redeclaran aquí con ellas.
+import woodBoard from './wood-board.png';
+import btnClose from './btn-close.png';
+import frameParchment from './frame-parchment.png';
+import nail from './nail.png';
+import nailBent from './nail-bent.png';
+import chipCost from './chip-cost.png';
+import resSilver from './res-silver.png';
 
 const STYLE_ID = 'valley-board-style';
 
 const CSS = `
+.valley-board-veil { --wood-board: url(${woodBoard}); --btn-close: url(${btnClose}); --frame-parchment: url(${frameParchment});
+  --nail: url(${nail}); --nail-bent: url(${nailBent}); --chip-cost: url(${chipCost}); --res-silver: url(${resSilver}); }
 /* Entre la cabecera y la barra, como en la lámina v8: ni tapa las cifras ni la
    navegación. --ui-hud-height lo publica la cabecera (hud.ts). */
 .valley-board-veil { position: fixed; inset: 0; z-index: 20; display: grid; place-items: start center;
