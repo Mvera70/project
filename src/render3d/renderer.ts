@@ -1628,16 +1628,42 @@ export async function createGraphicsRenderer(
   let renderScale = 1;
   // El panel de taller (`ui/dev-hud.ts`): lo que costó el último dibujo y a
   // qué resolución va la adaptativa. Ligero: lo lee dos veces por segundo.
+  //
+  // **Y el reparto del fotograma** (29 sep 2026, la tablet de Vera a 0 fps con
+  // fotogramas de dos segundos y sin manera de saber desde aquí si se los
+  // llevaba el dibujo, la vida o el resto): cuánto costó el `render`, cuánto
+  // los pasos de vida y cuántos fueron, y el `paint` entero. Es lo único que
+  // mide el juego **en el dispositivo**; todo lo demás está medido en un
+  // portátil.
+  let lastRenderMs = 0;
+  let lastLifeMs = 0;
+  let lastLifeSteps = 0;
+  let lastPaintMs = 0;
   window.__valleyRenderStats = () => ({
     calls: renderer.info.render.calls,
     triangles: renderer.info.render.triangles,
     scale: renderScale,
+    renderMs: lastRenderMs,
+    lifeMs: lastLifeMs,
+    lifeSteps: lastLifeSteps,
+    paintMs: lastPaintMs,
   });
   let frameAverage = 1 / 60;
   let sinceAdapt = 0;
   let easySeconds = 0;
-  const adaptResolution = (realDelta: number): void => {
-    if (!(realDelta > 0) || realDelta > 0.5) return;
+  let lastAdaptAt = 0;
+  // Se mide el hueco real entre dos `paint`, no `realDeltaSeconds`: ése llega
+  // recortado a `MAX_STEP_SECONDS` (0,1 s) por el reloj de presentación, así
+  // que un fotograma de dos segundos contaba como uno de cien milisegundos y
+  // la resolución tardaba minutos en bajar justo en el aparato que más lo
+  // necesitaba (la tablet de Vera, 29 sep 2026: 0 fps y «resolución 100 %»).
+  // Se acota a un segundo para que una pestaña que vuelve de dormir no cuente
+  // como un aparato lento.
+  const adaptResolution = (): void => {
+    const now = performance.now();
+    const realDelta = lastAdaptAt === 0 ? 0 : Math.min(1, (now - lastAdaptAt) / 1000);
+    lastAdaptAt = now;
+    if (!(realDelta > 0)) return;
     frameAverage = frameAverage * 0.9 + realDelta * 0.1;
     sinceAdapt += realDelta;
     easySeconds = frameAverage < ADAPT.easySeconds ? easySeconds + realDelta : 0;
@@ -1696,6 +1722,7 @@ export async function createGraphicsRenderer(
       if (observing && !sampling) return;
       observedState = state; observedFrame = frame;
       if (disposed) return;
+      const paintStarted = performance.now();
       const firstPaint = traceStages && !firstPaintTraced;
       if (firstPaint) markStage('paint:first-start');
       // La hora escenica primero, porque de ella cuelga todo lo demas: es la
@@ -1970,6 +1997,7 @@ export async function createGraphicsRenderer(
         }
       };
       let given = 0;
+      const lifeStarted = performance.now();
       while (lifeCarry >= LIFE_STEP && given < 240) {
         const stepPhase = (phase - (lifeCarry - LIFE_STEP) / 120 + 1) % 1;
         if (isNight(steppedPhase) && !isNight(stepPhase)) {
@@ -1996,6 +2024,8 @@ export async function createGraphicsRenderer(
         lifeCarry -= LIFE_STEP;
         given += 1;
       }
+      lastLifeMs = performance.now() - lifeStarted;
+      lastLifeSteps = given;
       rememberDoors();
       const battleWorld = life.battleWorld();
       if (battleWorld !== null && battleWorld !== debrisPhysics) {
@@ -2308,7 +2338,7 @@ export async function createGraphicsRenderer(
 
       if (!sampling && !observingLive) {
         if (firstPaint) markStage('paint:submit-start');
-        adaptResolution(frame.realDeltaSeconds);
+        adaptResolution();
         scheduleShadows();
         poolLights();
         if (warmUp === 'pending') {
@@ -2330,9 +2360,13 @@ export async function createGraphicsRenderer(
           };
           wait();
         }
-        if (warmUp === 'done') renderer.render(scene, camera);
-        else renderer.shadowMap.needsUpdate = true;
+        if (warmUp === 'done') {
+          const renderStarted = performance.now();
+          renderer.render(scene, camera);
+          lastRenderMs = performance.now() - renderStarted;
+        } else renderer.shadowMap.needsUpdate = true;
         if (firstPaint) { markStage('paint:submit-end'); firstPaintTraced = true; }
+        lastPaintMs = performance.now() - paintStarted;
       }
     },
 
@@ -2788,7 +2822,10 @@ declare global {
     __valleyVisit?: (kind?: HappeningId, dealt?: boolean) => void;
     __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm } | null) => void;
     __valleyBattleStats?: () => BattleStats;
-    __valleyRenderStats?: () => { calls: number; triangles: number; scale: number };
+    __valleyRenderStats?: () => {
+      calls: number; triangles: number; scale: number;
+      renderMs: number; lifeMs: number; lifeSteps: number; paintMs: number;
+    };
     __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];
     __valleyTrampleAt?: (x: number, z: number) => { grass: number; snow: number } | null;
     __valleyBoardScreen?: () => { x: number; y: number } | null;

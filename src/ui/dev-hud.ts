@@ -8,7 +8,10 @@
 //
 //   1 · fotogramas por segundo y el peor fotograma del último medio segundo
 //   2 · llamadas de dibujo y triángulos del último dibujo
-//   3 · la resolución a la que va la adaptativa (`adaptResolution`)
+//   3 · la resolución a la que va la adaptativa (`adaptResolution`), y el
+//       reparto del último fotograma: el dibujo, los pasos de vida (y cuántos)
+//       y el `paint` entero, en milisegundos. Añadido el 29 sep 2026 para
+//       leer desde la tablet de Vera dónde se van dos segundos por fotograma.
 //
 // Cuesta un `requestAnimationFrame` que sólo suma, y reescribir tres líneas
 // dos veces por segundo.
@@ -57,7 +60,8 @@ export function startDevHud(host: HTMLElement): DevHud {
       const lines = [`${fps.toFixed(0)} fps · peor ${worst.toFixed(0)} ms`];
       if (stats !== undefined) {
         lines.push(`${stats.calls} llamadas · ${(stats.triangles / 1000).toFixed(0)}k tri`);
-        lines.push(`resolución ${(stats.scale * 100).toFixed(0)} %`);
+        lines.push(`resolución ${(stats.scale * 100).toFixed(0)} % · dibujo ${stats.renderMs.toFixed(0)}`
+          + ` · vida ${stats.lifeMs.toFixed(0)}/${stats.lifeSteps}p · paint ${stats.paintMs.toFixed(0)} ms`);
       }
       panel.textContent = lines.join('\n');
       frames = 0;
