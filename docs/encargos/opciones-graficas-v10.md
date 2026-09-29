@@ -26,3 +26,14 @@ es mirarla con el ojo de la piel y decidir si le hace falta algo propio:
 
 **Qué no se pide.** Ni más opciones ni cambiar dónde está el botón: la
 portada 04 se queda como está.
+
+## Resuelto (29 sep 2026)
+
+Codex entregó la revisión en `docs/ui-redesign/opciones-graficas-v10-2026-09-29/`
+(láminas a 390×844 y 320×568 con la captura del juego al lado, medidas del
+DOM y `verification.json`). Su recomendación, aceptada: **conservar la placa
+de madera como «elegido»** —Auto y 60 se distinguen a primera vista— y **no
+poner grabado de cabecera**, que a 320 px taparía 48 px más de la portada sin
+aclarar nada. Los dos candidatos (`button-parchment-on.png`,
+`graphics-header-engraving.png`) quedan archivados con maestros y prompts,
+sin integrar. Ni `src/` ni CSS cambian.
