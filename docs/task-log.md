@@ -15,8 +15,9 @@ de que Vera la lea en la tablet.** «Graphics» en la portada
 calidad Auto/High/Medium/Low y 30/60 fps, guardado en el aparato, aplicado al
 abrir el valle; el bucle lleva tope de fotogramas (`loop.ts`, `frameDue`).
 Cerrado lo que la auditoría de Codex dejó abierto: el canto rasgado de la
-encrucijada y el rincón en columna a 320 px (`a056659`). Encargo a Codex:
-`docs/encargos/opciones-graficas-v10.md`. Abierto: la placa de fundar
+encrucijada y el rincón en columna a 320 px (`a056659`). Encargo a Codex resuelto
+(`docs/encargos/opciones-graficas-v10.md`): conservar la placa de madera y
+sin grabado de cabecera; candidatos archivados, nada que integrar. Abierto: la placa de fundar
 (`plaque-wood` contra la placa fina de la maqueta), decisión de Vera.
 
 ## 29 sep 2026 · La crónica a color y el tablón en el sitio publicado
