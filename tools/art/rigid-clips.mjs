@@ -219,6 +219,8 @@ function bird() {
       [Y, (t) => (t > 0.6 ? 0.35 * Math.sin((Math.PI * (t - 0.6)) / 0.4) : 0)]] },
   });
   motion.push({ name: 'idle', seconds: idleSeconds, loop: true, strideLength: null });
+  // La gallina no vuela: anda y picotea, y hasta ahí.
+  if (species === 'hen') return;
   // El vuelo en bucle: las alas arriba y abajo, las patas recogidas. La altura
   // la pone el juego (`altitude`), no el clip.
   clip('flight', 0.3, {
@@ -268,7 +270,7 @@ function durationOf(animation) {
 }
 
 if (QUADS[species] !== undefined) quadruped(QUADS[species]);
-else if (species === 'partridge') bird();
+else if (species === 'partridge' || species === 'hen') bird();
 else if (species === 'fish') fish();
 else throw new Error(`Especie sin clips: ${species}`);
 

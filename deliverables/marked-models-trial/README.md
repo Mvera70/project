@@ -97,3 +97,15 @@ G-23 (0,75 celdas); marcha de `rigid-clips.mjs … cow`.
 - [cow.glb](cow.glb) · [perfil](cow-profile.png) · [tres cuartos](cow-three-quarter.png) ·
   [andando](cow-walk.png)
 - `python3 build-models.py -- cow`
+
+## La gallina (29 sep 2026) — candidata, **sin publicar**
+
+La última de cajas del corral. `hen()` en `build-models.py`, sobre la
+estructura de la perdiz de Vera: cuerpo lleno, cola alzada hacia atrás, cresta
+y barbillas rojas, pico y patas amarillos. Blanca, que se lee sobre la hierba y
+no se confunde con la perdiz ni con el zorro. Mismo tamaño que la de G-23;
+`rigid-clips.mjs … hen` le da el paso y el picoteo, sin vuelo.
+
+- [hen.glb](hen.glb) · [perfil](hen-profile.png) · [tres cuartos](hen-three-quarter.png) ·
+  [andando](hen-walk.png)
+- `python3 build-models.py -- hen`

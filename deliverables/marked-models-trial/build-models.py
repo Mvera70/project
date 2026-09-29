@@ -591,6 +591,42 @@ def partridge():
     tracks=[(wings[0],'rotation_euler',[(0,0,0),(-1.3,0,-.18),(-.28,0,0),(-1.1,0,-.12),(0,0,0)]),(wings[1],'rotation_euler',[(0,0,0),(1.3,0,.18),(.28,0,0),(1.1,0,.12),(0,0,0)]),(body,'location',[tuple(bl),tuple(bl+Vector((0,0,.012))),tuple(bl+Vector((0,0,.035))),tuple(bl+Vector((0,0,.02))),tuple(bl)])]
     clip('takeoff',tracks,[1,8,14,20,28]); save('partridge')
 
+def hen():
+    # 29 sep 2026. La gallina de G-23 era de cajas, la última del corral. Sobre
+    # la estructura de la perdiz de Vera: cuerpo lleno, cola alzada hacia atrás,
+    # cresta y barbillas rojas, pico y patas amarillos. Blanca, que es lo que
+    # se lee sobre la hierba y no se confunde con la perdiz ni con el zorro.
+    # Mismo tamaño que la de G-23.
+    reset(); mat('coat','E9E2D0'); mat('wing','D6CBB2'); mat('shade','BFB29A'); mat('red','C23A2A'); mat('yellow','D9A441')
+    body=empty('body',(0,0,.085),ROOT)
+    ell('Plump_Body',(.012,0,.110),(.200,.118,.135),'coat',body,12,8)
+    ell('Breast',(-.045,0,.105),(.110,.108,.120),'coat',body,12,7)
+    neck=empty('neck',(-.058,0,.150),body); ell('Neck',(-.066,0,.160),(.068,.066,.100),'coat',neck)
+    head=empty('head',(-.078,0,.192),neck); ell('Head',(-.082,0,.196),(.062,.056,.060),'coat',head,12,7)
+    for j,(x,h) in enumerate([(-.100,.020),(-.086,.026),(-.072,.022),(-.060,.016)]):
+        ell('Comb_'+str(j),(x,0,.222+h*.4),(.016,.008,h),'red',head,8,5)
+    leaf('Beak',(-.108,0,.197),(-.132,0,.190),.020,.010,'yellow',head)
+    for s in (-1,1):
+        ell('Wattle_'+str(s),(-.104,s*.006,.174),(.012,.008,.022),'red',head,8,5)
+        ell('Face_'+str(s),(-.096,s*.022,.198),(.022,.008,.020),'red',head,8,5)
+        eye('Eye_'+str(s),-.098,s*.026,.203,.010,head)
+    wings=[]
+    for s,l in [(-1,'L'),(1,'R')]:
+        w=empty('wing'+l,(-.020,s*.050,.140),body); wings.append(w)
+        ell('Folded_Wing_'+l,(.025,s*.056,.122),(.125,.030,.080),'wing',w,12,6)
+        for j in range(4):
+            leaf('Wing_Feather_'+l+str(j),(.010+j*.014,s*.068,.130-j*.004),(.080+j*.006,s*.066,.095-j*.002),.020,.004,'shade' if j%2 else 'wing',w)
+    tail=empty('tail',(.085,0,.130),body)
+    for j in range(5):
+        y=(j-2)*.010
+        leaf('Tail_Feather_'+str(j),(.078,y*.5,.128),(.128-abs(j-2)*.006,y*1.3,.205-abs(j-2)*.010),.046,.010,'shade' if j%2 else 'coat',tail)
+    for s,l in [(-1,'L'),(1,'R')]:
+        hip=(.004,s*.028,.060); knee=(.012,s*.028,.032); ankle=(-.002,s*.028,.010)
+        p=empty('leg'+l,hip,body); tube('Leg_'+l,[hip,knee,ankle],[.008,.006,.005],'yellow',p,7); f=empty('foot'+l,ankle,p)
+        for j in (-1,0,1): tube('Toe_'+l+str(j),[ankle,(-.026,s*.028+j*.012,.004)],[.0035,.0018],'yellow',f,6)
+        tube('Rear_Toe_'+l,[ankle,(.014,s*.028,.004)],[.003,.0012],'yellow',f,6)
+    merge_parts(); save('hen')
+
 def bucket():
     reset(); mat('staveA','A07C50'); mat('staveB','927044'); mat('staveC','B18B59'); mat('inside','71573A')
     # Duela individual, hueco real y espesor visible en el canto.
@@ -671,6 +707,6 @@ def hoe():
 # `-- bear` construye sólo esos; sin nombres, todos (el oso, en su v4).
 ONLY=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 BUILDS=[('wolf',lambda: canine('wolf')),('dog',lambda: canine('dog')),('boar',boar),('bear',bear),('bear_v3',bear_v3),('mule',mule),
-        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
+        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
 for name,build in BUILDS:
     if (not ONLY and name!='bear_v3') or name in ONLY: build()
