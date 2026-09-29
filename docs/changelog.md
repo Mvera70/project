@@ -24,10 +24,16 @@ daño intactos. Tres cosas no se leían y se cambian del lado de la pantalla:
 - **El aviso del oso dura lo que su clip** (brief AN-3a, `life/bear.ts`):
   1,55 s cortaban a media subida un `attack` de 3 s; ahora se alza entero y
   amenaza antes de irse.
-- **Medido y visto** en `artifacts/graphics/AN-3/`: hojas de `gate_strike`
-  y `flee`, el asalto en partida (`observe-life --raid 12 --assault`), la
-  visita del oso (`--beast`) y la caza (`--hunt`, nuevo en el observatorio),
-  y el parte del banco de batallas sin cambio en sus cifras. Matriz §2.6.
+- **Medido y visto** en `artifacts/graphics/AN-3/`: hojas de `gate_strike`,
+  `flee`, `play` y `throw`; el asalto en partida en la semilla 11
+  (`observe-life --raid 12 --assault`: la huida de 43 vecinos a 2,4 ciclos
+  por segundo, y el portón con los golpes en los fotogramas 41 y 51 y la
+  carga sobre la cabeza entre ambos); el parte del banco de batallas sin
+  cambio en sus cifras. **Lo que no se pudo filmar**: la visita del oso
+  (`--beast` sólo actúa con `--aftermath` y `--happening bear_in_the_wood`
+  no la provocó) y la caza (`--hunt`, nuevo en el observatorio, exige una
+  señal tocable que no llegó a verse en tres valles con oferta): quedan
+  `preview-only` con su ruta pendiente en `docs/encargos-3d.md`. Matriz §2.6.
 
 ## v4.98 · 29 sep 2026 · Animación integral, AN-2: la vida y los oficios se leen a veinte píxeles
 
