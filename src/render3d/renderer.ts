@@ -1656,6 +1656,13 @@ export async function createGraphicsRenderer(
     lifeMs: lastLifeMs,
     lifeSteps: lastLifeSteps,
     paintMs: lastPaintMs,
+    // GV-0 · cuántas copas están atenuadas, y si quien se sigue queda detrás
+    // de alguna desde esta cámara (`null`: nadie seguido a la vista).
+    revealed: forest?.revealedCount ?? 0,
+    trackedHidden: (() => {
+      const target = trackedTarget();
+      return target === null || forest === null ? null : forest.hides(camera, target);
+    })(),
   });
   let frameAverage = 1 / 60;
   let sinceAdapt = 0;
@@ -1668,10 +1675,46 @@ export async function createGraphicsRenderer(
   // necesitaba (la tablet de Vera, 29 sep 2026: 0 fps y «resolución 100 %»).
   // Se acota a un segundo para que una pestaña que vuelve de dormir no cuente
   // como un aparato lento.
+  // GV-0 · Gancho de observación: seguir a alguien como lo hace el dedo
+  // (mantener pulsado, «Follow»), sin pasar por la interfaz: la herramienta
+  // no sabe dónde cae cada aldeano en la pantalla. `null` deja de seguir.
+  let observedTrack: number | null = null;
+  window.__valleyTrack = (id: number | null) => {
+    observedTrack = id;
+    if (id === null) graphics.track(null);
+  };
+  /** A quién se sigue ahora, por la ficha o por la herramienta. */
+  let trackedNow: number | null = null;
+  /** El volumen de quien se sigue, medido como el bosque mide a la presa; `null` si no está a la vista. */
+  function trackedTarget(): ForestRevealTarget | null {
+    if (trackedNow === null) return null;
+    const followed = lastActors.find((actor) => actor.id === trackedNow);
+    if (followed === undefined) return null;
+    return {
+      x: followed.x, y: groundFloor(followed.x, followed.z) + ACTOR_VISUAL_HEIGHT / 2,
+      z: followed.z, radius: ACTOR_VISUAL_HEIGHT,
+    };
+  }
+  // GV-0 · Gancho de observación: fija la escala de la adaptativa para las
+  // tomas comparadas; `null` la suelta. En un dibujo por software todo
+  // fotograma es lento y la adaptativa baja sola: cinco tomas del 29 sep 2026
+  // salieron a cuatro escalas distintas (0,55 a 1,0), y un «antes/después» así
+  // compara resoluciones, no técnicas. El juego no lo llama.
+  let heldScale: number | null = null;
+  window.__valleyHoldScale = (scale: number | null) => {
+    heldScale = scale === null || !Number.isFinite(scale) ? null : Math.max(0.25, Math.min(1, scale));
+    if (heldScale === null || disposed) return;
+    renderScale = heldScale;
+    sinceAdapt = 0;
+    easySeconds = 0;
+    renderer.setPixelRatio(Math.min(viewport.pixelRatio, pixelCap) * renderScale);
+    renderer.setSize(viewport.widthCss, viewport.heightCss, false);
+  };
   const adaptResolution = (): void => {
     const now = performance.now();
     const realDelta = lastAdaptAt === 0 ? 0 : Math.min(1, (now - lastAdaptAt) / 1000);
     lastAdaptAt = now;
+    if (heldScale !== null) return;
     if (!(realDelta > 0)) return;
     frameAverage = frameAverage * 0.9 + realDelta * 0.1;
     sinceAdapt += realDelta;
@@ -1731,6 +1774,9 @@ export async function createGraphicsRenderer(
       if (observing && !sampling) return;
       observedState = state; observedFrame = frame;
       if (disposed) return;
+      // GV-0 · el seguimiento de la herramienta, repetido como lo repite
+      // `app.ts` antes de cada `paint` (VZ-4).
+      if (observedTrack !== null) graphics.track(observedTrack);
       const paintStarted = performance.now();
       const firstPaint = traceStages && !firstPaintTraced;
       if (firstPaint) markStage('paint:first-start');
@@ -2626,6 +2672,7 @@ export async function createGraphicsRenderer(
       // a cada uno— así que no toca a nadie más. Idempotente: `app.ts` llama a
       // esto en cada fotograma desde VZ-4 para que la cámara vaya detrás.
       cast.highlight(id);
+      trackedNow = id;
       if (id === null) return;
       focusFlight = null;
       // Seguir a alguien es mirarle, no acercarse a el: la distancia la elige
@@ -2827,6 +2874,7 @@ declare global {
     __valleyHoldPhase?: (value: number | null) => void;
     __valleyFestoon?: (on: boolean) => void;
     __valleyHoldSky?: (kind: SkyKind | null) => void;
+    __valleyHoldScale?: (scale: number | null) => void;
     __valleyHoldFlood?: (level: number | null) => void;
     __valleyVisit?: (kind?: HappeningId, dealt?: boolean) => void;
     __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm } | null) => void;
@@ -2834,7 +2882,9 @@ declare global {
     __valleyRenderStats?: () => {
       calls: number; triangles: number; scale: number; level: string; targetFps: number;
       renderMs: number; lifeMs: number; lifeSteps: number; paintMs: number;
+      revealed: number; trackedHidden: boolean | null;
     };
+    __valleyTrack?: (id: number | null) => void;
     __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];
     __valleyTrampleAt?: (x: number, z: number) => { grass: number; snow: number } | null;
     __valleyBoardScreen?: () => { x: number; y: number } | null;

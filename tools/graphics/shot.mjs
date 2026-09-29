@@ -164,12 +164,48 @@ function browserExe() {
   return undefined;
 }
 
-const exe = browserExe();
+// GV-0 · **Una ruta explícita del navegador manda sobre todo lo demás.** En
+// una sesión en la nube el Playwright del proyecto pide su Chromium y la
+// máquina trae otro (29 sep 2026: pedía el 1243 y había el 1194), así que sin
+// esto la captura no arrancaba: `VALLEY_CHROMIUM=/opt/pw-browsers/chromium`.
+const exe = process.env.VALLEY_CHROMIUM || browserExe();
 const browser = await chromium.launch({
   ...(exe ? { executablePath: exe } : {}),
   args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],
 });
-const tab = await browser.newPage({ viewport, deviceScaleFactor: 2 });
+// GV-0 · **Qué ve un teléfono, y no qué ve el portátil.** Sin `--touch` la
+// página se abre sin tacto y `auto` resuelve el perfil alto (MSAA, 2× y
+// sombras 2048), que no es lo que dibuja un móvil: con `--touch` el contexto
+// es táctil y móvil, `(pointer: coarse)` es cierto y `auto` resuelve como en
+// un teléfono. `--quality` fija el nivel de «Graphics» antes de cargar, como
+// si el jugador lo hubiera elegido (`valley.graphics`, `ui/graphics-settings.ts`).
+// `--dpr` es la densidad de la pantalla emulada: 2 por omisión y 3 con tacto.
+const touch = args.includes('--touch');
+const quality = opt('quality', '');
+if (quality !== '' && !['auto', 'high', 'medium', 'low'].includes(quality)) {
+  throw new Error(`--quality must be auto, high, medium or low; got '${quality}'.`);
+}
+const dpr = Number(opt('dpr', touch ? '3' : '2'));
+const tab = await browser.newPage({ viewport, deviceScaleFactor: dpr, hasTouch: touch, isMobile: touch });
+if (quality !== '') {
+  await tab.addInitScript((level) => {
+    try { localStorage.setItem('valley.graphics', JSON.stringify({ quality: level, frameRate: 60 })); } catch { /* sin almacenamiento */ }
+  }, quality);
+}
+// GV-0 · **La luz, el cielo y la escala, fijos**, con los ganchos del
+// renderer que ya existían para mirar (`__valleyHoldSky`, `__valleyHoldPhase`)
+// y el de la escala (`__valleyHoldScale`). `--year N` abre siempre en
+// primavera, día 1, con el cielo que toque, y la adaptativa baja la densidad
+// sola en un dibujo por software: sin esto dos tomas no son comparables.
+//   --sky clear|overcast|rain|storm|snow   --phase 0..1 (0,45 es el mediodía)
+//   --scale 1   la densidad de la adaptativa, fija
+//   --pause     pausa el juego en cuanto el valle está puesto: la gente, las
+//               nubes y el viento quedan quietos y dos tomas salen iguales
+const holdSky = opt('sky', '');
+const holdPhase = opt('phase', '');
+const holdScale = opt('scale', '');
+const pauseEarly = args.includes('--pause');
+const holding = holdSky !== '' || holdPhase !== '' || holdScale !== '' || pauseEarly;
 let gateOverrideHits = 0;
 if (gateOverride !== '') {
   const candidate = readFileSync(gateOverride);
@@ -204,8 +240,16 @@ if (yearArg !== '') {
 if (open !== 'title') await tab.locator('.title-new').click().catch(() => {});
 // Las fundaciones de años avanzados pueden tardar bastante más que `--settle`.
 // Espera al renderer antes de intentar un encuadre de diagnóstico.
-if (open !== 'title' && (lookPoint !== null || sceneOnly)) {
+if (open !== 'title' && (lookPoint !== null || sceneOnly || holding)) {
   await tab.waitForFunction(() => typeof window.__valleyCapture === 'function', null, { timeout: 180_000 });
+}
+if (open !== 'title' && holding) {
+  await tab.evaluate(({ sky, phase, scale, pause }) => {
+    if (sky !== '') window.__valleyHoldSky?.(sky);
+    if (phase !== '') window.__valleyHoldPhase?.(Number(phase));
+    if (scale !== '') window.__valleyHoldScale?.(Number(scale));
+    if (pause) window.__valleySpeed?.(0);
+  }, { sky: holdSky, phase: holdPhase, scale: holdScale, pause: pauseEarly });
 }
 //   --settle S   segundos que se espera tras fundar antes de hacer nada (8 por defecto;
 //                0.5 para ver el vuelo de entrada de U-11 fotograma a fotograma)
@@ -500,5 +544,15 @@ const hud = await tab.evaluate(() => ({
   vitals: [...document.querySelectorAll('.valley-vital')].map((e) => e.textContent),
 }));
 console.log(JSON.stringify({ ...hud, season, doing, ordersNow, brightness }), '→', out);
+// GV-0 · y con qué se dibujó: nivel, escala, llamadas y triángulos del último
+// fotograma, que es lo que hace falta para decir si dos tomas son comparables.
+const drawn = await tab.evaluate(() => {
+  const stats = window.__valleyRenderStats?.();
+  return stats === undefined ? null : {
+    level: stats.level, scale: stats.scale, calls: stats.calls, triangles: stats.triangles,
+    coarse: matchMedia('(pointer: coarse)').matches, dpr: devicePixelRatio,
+  };
+});
+console.log('render:', JSON.stringify(drawn));
 console.log('errores de página:', errors.length === 0 ? 'ninguno' : errors.slice(0, 5));
 await browser.close();
