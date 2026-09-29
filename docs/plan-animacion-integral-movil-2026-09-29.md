@@ -386,8 +386,11 @@ lo que se veía era un oso que empieza a alzarse y se lo piensa.
 una constante: el aviso pasa a 3 s. No decide daño ni resultado —la visita
 del oso no hiere a nadie— y no toca el motor.
 
-**Prueba.** `tests/fast/life-bear.test.ts` sigue en verde (no fija la
-duración); la matriz recoge la toma `--beast` con el oso alzado entero.
+**Prueba.** `tests/fast/life-bear.test.ts` fijaba la duración por los pasos
+que daba (60 tras el aviso): ahora comprueba que a los dos segundos todavía
+amenaza y que después se retira y se va. La toma en partida no se pudo
+rodar (el observatorio no provoca la visita: `encargos-3d.md`); la evidencia
+del gesto es el banco de AN-0.
 
 ## 7 · AN-4 · Aceptación conjunta
 

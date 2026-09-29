@@ -38,7 +38,11 @@ describe('visita del oso', () => {
     stepBear(bear, land, 7, 0, [{ body: { x: 12, z: 10 } }]);
     expect(bear.phase).toBe('warning');
     expect(bearPosition(bear)[0]?.action).toBe('attack');
+    // AN-3a · el aviso dura lo que el clip `attack` del oso (3 s): a los dos
+    // segundos todavía amenaza, y después se retira y se va.
     for (let step = 1; step < 60; step++) stepBear(bear, land, 7, step, []);
+    expect(bear.phase).toBe('warning');
+    for (let step = 60; step < 150; step++) stepBear(bear, land, 7, step, []);
     expect(bear.phase).toBe('gone');
     expect(bearPosition(bear)).toEqual([]);
   });
