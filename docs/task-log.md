@@ -1,6 +1,6 @@
 # Cuaderno de tareas — el rework
 
-## 29 sep 2026 · Animación integral para móvil (AN): AN-0, AN-1 y AN-2 entregadas, AN-3 en vuelo
+## 29 sep 2026 · Animación integral para móvil (AN): las cinco fases entregadas; pendiente el aparato
 
 Vera lo pidió con `/goal` («mejorar de forma visible todas las animaciones de
 aldeanos y animales; el juego se evalúa principalmente en móvil; trabajar
@@ -29,12 +29,28 @@ con `fling` (brief AN-2a, `playSeconds`), chispas y astillas del martillo
 (brief AN-2b, `spark`); hojas en `artifacts/graphics/AN-2/gestures/`, tomas
 en `artifacts/graphics/AN-2/after/`; matriz §2.5.
 
-**En vuelo: AN-3, encuentros y combate**: `gate_strike` dura el segundo del
-golpe y carga el siguiente; el aviso del oso dura lo que su clip (brief
-AN-3a, `bear.ts`); toma de asalto, del oso y de la caza (`observe-life
---hunt`), parte del banco de batallas. Después AN-4 (aceptación, veredictos
-fila a fila, coste contra la línea de base con `animation-cost.ts` y
-`gl-probe`).
+**AN-3 hecha** (v4.99): `gate_strike` dura el segundo del golpe y carga el
+siguiente (visto en el portón de la semilla 11: golpes en los fotogramas 41
+y 51 y los brazos sobre la cabeza entre ambos); `flee` es un esprint que
+pisa (zancada 0,7, la cadera sigue a la pierna; 43 vecinos huyendo a 2,4 Hz
+en el asalto); el aviso del oso dura lo que su clip (brief AN-3a); arco,
+lanza, impacto y caída se conservan con sus pruebas. **AN-4 hecha**: la
+matriz cierra fila a fila con evidencia, veredicto y la observación que lo
+refutaría (§5); comparaciones antes/después a escala nativa del mismo
+instante (`artifacts/graphics/AN-4/compare/`, GIF y tira; agente con
+instrucciones cerradas); la aldea a 320×568; coste comparado (llamadas y
+triángulos iguales en la aldea; `animation-cost.ts` 4,0–4,2 → 4,2–4,7 ms
+por fotograma con 100 personas y 40 animales, dentro del ruido de una
+máquina cargada); índice de tomas (`docs/medidas/animacion-tomas-2026-09-29.md`);
+skill `animacion` para quien toque un clip, y `observe-valley-life` y
+`performance` con lo que la ronda añadió.
+
+**Pendiente y dicho:** la comprobación en iPhone/iPad (nada de esto es una
+medida en el aparato); las tomas que el observatorio no pudo dar —la visita
+del oso, la caza y el asalto de una villa de cien personas (tiempo de carga
+agotado bajo SwiftShader)—, con su ruta en `docs/encargos-3d.md`; el
+lanzamiento (`throw`) sólo en hoja porque en los valles de las tomas no hay
+pelota; y remedir `animation-cost.ts` con la máquina sola.
 
 **Abierto, decisión de Vera:** un trote humano (1,8–2,8 Hz) exige bajar el
 paso de la vida o un clip de trote que cambia el carácter del aldeano

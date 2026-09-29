@@ -1,6 +1,6 @@
 # The Valley — Registro de cambios
 
-## v4.99 · 29 sep 2026 · Animación integral, AN-3: el golpe que carga el siguiente, el esprint que pisa y el oso que se alza entero
+## v4.99 · 29 sep 2026 · Animación integral, AN-3 y AN-4: el golpe que carga el siguiente, el esprint que pisa, y la matriz cerrada con su coste
 
 Tercera fase del `/goal` de animación (AN-0 y AN-1 en v4.97, AN-2 en v4.98).
 Los seis gestos fechados de E1 se revisaron sobre sus hojas y sobre el código
@@ -32,8 +32,28 @@ daño intactos. Tres cosas no se leían y se cambian del lado de la pantalla:
   cambio en sus cifras. **Lo que no se pudo filmar**: la visita del oso
   (`--beast` sólo actúa con `--aftermath` y `--happening bear_in_the_wood`
   no la provocó) y la caza (`--hunt`, nuevo en el observatorio, exige una
-  señal tocable que no llegó a verse en tres valles con oferta): quedan
-  `preview-only` con su ruta pendiente en `docs/encargos-3d.md`. Matriz §2.6.
+  señal tocable que no llegó a verse en tres valles con oferta) y el asalto
+  de la villa de cien personas (tiempo de carga agotado): quedan
+  `preview-only` o «sin toma» con su ruta pendiente en `docs/encargos-3d.md`.
+  Matriz §2.6.
+- **AN-4, la aceptación**: la matriz cierra fila a fila (§5) con la
+  evidencia del después, qué se ve a 390×844, el veredicto (mejorado,
+  conservado, límite, `preview-only`) y **la observación que lo refutaría**,
+  como pide el encargo original de Astra (`docs/encargos/animacion-integral-goal.md`,
+  que llegó a media tanda y se concilió con el plan). Comparaciones
+  antes/después **del mismo instante** (trazas alineadas) a escala nativa:
+  GIF «antes | después» a 1:1 y tira por par, en dos semillas y dos edades,
+  la plaza de la aldea y la de la villa (`artifacts/graphics/AN-4/compare/`,
+  construidas por un agente con instrucciones cerradas y el script
+  reproducible); la aldea a 320×568. Coste: llamadas y triángulos iguales en
+  la aldea (446/706 k contra 441/695 k), y `tools/reports/animation-cost.ts`
+  (nuevo: JS de posar reparto y fauna sin navegador) 4,0–4,2 ms antes y
+  4,2–4,7 ms después por fotograma con 100 personas y 40 animales, dentro del
+  ruido de una máquina cargada. Índice de todas las tomas en
+  `docs/medidas/animacion-tomas-2026-09-29.md`. **iPhone/iPad: pendiente.**
+- **Skill `animacion`** (`.claude/skills/animacion/SKILL.md`): el método de la
+  ronda en una página para quien toque un clip, y `observe-valley-life` y
+  `performance` con lo que la ronda añadió.
 
 ## v4.98 · 29 sep 2026 · Animación integral, AN-2: la vida y los oficios se leen a veinte píxeles
 

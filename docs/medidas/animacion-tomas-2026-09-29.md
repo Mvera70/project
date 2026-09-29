@@ -287,3 +287,7 @@ incompleta si no tiene `trace.json`.
   `tira.png` e `informe.md`, que sí tiene `AN-1/film/seed11-y21/`. La rodó
   `node tools/graphics/film.mjs --seed 7 --year 60 --seconds 10 --fps 6 --out artifacts/graphics/AN-1/film/seed7-y60`
   y se abortó.
+
+## Al cierre de la ronda (29 sep 2026, 13:00 UTC)
+
+De las carpetas que arriba constan como incompletas o en marcha: `AN-3/gate-seed11-y21/` terminó (141 fotogramas; `strip-gate.png`, `zoom-gate-9005.png`); `AN-3/bear-seed11-y21/` se repitió con `--happening bear_in_the_wood --lead 40 --seconds 16` y tampoco trajo oso (161 fotogramas, sin `bear` en la traza); `AN-3/hunt-seed11-y21/`, `hunt-seed7-y30/` y `hunt-seed5-y21/` fallaron por no haber señal de caza tocable; `AN-3/assault-seed7-y60/` no llegó a cargar (tiempo agotado, dos intentos); `AN-1/before/wide-seed7-y60/` se rodó a 390×844 con la página «antes» y salió a 331×717 (41 fotogramas); `AN-4/after/wide-seed7-y60/` (41) y `AN-4/after/wide-seed11-y21-320/` (21, a 320×568) están completas, con `middle.png` y `strip-play.png` la primera. Las comparaciones a escala nativa están en `AN-4/compare/` (`build-compare.py`).

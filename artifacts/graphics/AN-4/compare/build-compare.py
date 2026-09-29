@@ -152,7 +152,13 @@ def load_pair(pair: Pair, indices: list[int]) -> Loaded:
     for i in indices:
         full = {s: load_rgb(folders[s], i) for s in SIDES}
         if full["antes"].size != full["después"].size:
-            raise SystemExit(f"{pair.name}: el fotograma {i} tiene distinto tamaño antes/después")
+            if pair.strict:
+                raise SystemExit(f"{pair.name}: el fotograma {i} tiene distinto tamaño antes/después")
+            # AN-4 · el empaquetado «antes» (código de d82bd84) captura a 331×717
+            # aunque se le pida 390×844 (su adaptativa bajaba la resolución bajo
+            # SwiftShader): para el plano general se reescala al tamaño del
+            # «después» y se dice; no vale para medir píxeles, sí para mirar.
+            full["antes"] = full["antes"].resize(full["después"].size, Image.LANCZOS)
         box = box or crop_box(full["antes"].size, pair.crop)
         for s, im in full.items():
             grey = np.asarray(im.convert("L"), dtype=np.float32)
