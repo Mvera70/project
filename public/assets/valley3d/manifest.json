@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T19:25:01.213Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids crow",
+  "generatedAt": "2026-09-29T19:28:52.325Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids hen,duck",
   "assets": [
     {
       "id": "axis-marker",
@@ -929,30 +929,6 @@
       }
     },
     {
-      "id": "duck",
-      "file": "duck.glb",
-      "sha256": "3540D24E786CFCE87CE49C6581E7297D0D55C28FCABD96C216B7849ACE2F73CE",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.075
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
-        "license": "project-original"
-      }
-    },
-    {
       "id": "hoe",
       "file": "hoe.glb",
       "sha256": "11933454050B93980F2C37E0A52CFAB5B488B8AFBB2315FBF4E34769EE5D6D8D",
@@ -1534,30 +1510,6 @@
       }
     },
     {
-      "id": "hen",
-      "file": "hen.glb",
-      "sha256": "A17C37A414070DCD363B813FBFAF163D5AE6AF98E06F35E988C0B1F676CECDAA",
-      "motion": [
-        {
-          "name": "walk",
-          "seconds": 0.6,
-          "loop": true,
-          "strideLength": 0.063
-        },
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Gallina facetada de The Valley (deliverables/marked-models-trial/build-models.py, hen(); 29 sep 2026), aprobada por Vera; paso y picoteo de tools/art/rigid-clips.mjs.",
-        "license": "Project original"
-      }
-    },
-    {
       "id": "crow",
       "file": "crow.glb",
       "sha256": "02E9D80EF1D62E90480D505FD340CB936E49860AFF52E5BEC59F2A318AEB4EAE",
@@ -1578,6 +1530,54 @@
       "provenance": {
         "kind": "original",
         "source": "Cuervo facetado de The Valley (deliverables/marked-models-trial/build-models.py, crow(); 29 sep 2026), aprobado por Vera; paso y picoteo de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "hen",
+      "file": "hen.glb",
+      "sha256": "9A45C00951C0B5D8C4A471A4B2A3A9CC06680F650D1E345BE8505425F5B63319",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.063
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Gallina facetada de The Valley (deliverables/marked-models-trial/build-models.py, hen(); 29 sep 2026), aprobada por Vera, con el pico en cono; paso y picoteo de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "duck",
+      "file": "duck.glb",
+      "sha256": "0B84E0B5C32CA4FD1876E88F59F6090B78E95EC02A4A4C8AE6E11CE44A4D3D4C",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.065
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Ánade real facetado de The Valley (deliverables/marked-models-trial/build-models.py, duck(); 29 sep 2026), aprobado por Vera; clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     }

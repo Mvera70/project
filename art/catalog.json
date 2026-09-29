@@ -2983,7 +2983,7 @@
       },
       "bounds": {
         "min": [
-          -0.132,
+          -0.133,
           0.002254,
           -0.0772
         ],
@@ -2993,7 +2993,7 @@
           0.0772
         ],
         "size": [
-          0.26,
+          0.261,
           0.243146,
           0.1544
         ]
@@ -3031,15 +3031,15 @@
         "objects": 28,
         "meshes": 17,
         "materials": 7,
-        "triangles": 1928
+        "triangles": 1978
       },
       "hashes": {
-        "hen.glb": "A17C37A414070DCD363B813FBFAF163D5AE6AF98E06F35E988C0B1F676CECDAA",
-        "hen-preview.png": "DD96E0708670F62BCE1C4763FD09E00AB00F556AE3B21B8F48587519E04D1A50"
+        "hen.glb": "9A45C00951C0B5D8C4A471A4B2A3A9CC06680F650D1E345BE8505425F5B63319",
+        "hen-preview.png": "4079166C6E2AE239515D0254E7ABEEF36A1172DB2D2624885295793D74511FD9"
       },
       "provenance": {
         "kind": "original",
-        "source": "Gallina facetada de The Valley (deliverables/marked-models-trial/build-models.py, hen(); 29 sep 2026), aprobada por Vera; paso y picoteo de tools/art/rigid-clips.mjs.",
+        "source": "Gallina facetada de The Valley (deliverables/marked-models-trial/build-models.py, hen(); 29 sep 2026), aprobada por Vera, con el pico en cono; paso y picoteo de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     },
@@ -5763,79 +5763,79 @@
     },
     {
       "id": "duck",
-      "artifactRound": "G-23",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/duck/duck.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-25T10-48-15-659Z-19440",
-        "directory": "artifacts/graphics/G-23/approved/3540d24e786cfce8"
+        "runId": "duck-faceted",
+        "directory": "artifacts/graphics/duck-faceted/approved/duck"
       },
       "bounds": {
         "min": [
-          -0.135,
-          0.000333,
-          -0.054167
+          -0.158,
+          0.001209,
+          -0.056
         ],
         "max": [
-          0.113333,
-          0.203333,
-          0.054167
+          0.14,
+          0.204,
+          0.056
         ],
         "size": [
-          0.248333,
-          0.203,
-          0.108333
+          0.298,
+          0.202791,
+          0.112
         ]
       },
-      "recipeSha256": "94E1E56B3B0B0350147B0B86A48787AB7C8282F5314FC0FB0D50CEE5C1834BC2",
+      "recipeSha256": null,
       "materials": [
-        "coat",
-        "light",
-        "dark",
-        "accent",
-        "bill"
+        "chestnut",
+        "grey",
+        "orange",
+        "white",
+        "bill",
+        "green",
+        "eye",
+        "ivory",
+        "black",
+        "wing",
+        "blue"
       ],
       "clips": [
-        "idle",
-        "walk"
+        "walk",
+        "idle"
       ],
       "motion": [
         {
-          "name": "idle",
-          "seconds": 8.041666666666666,
+          "name": "walk",
+          "seconds": 0.6,
           "loop": true,
-          "strideLength": null
+          "strideLength": 0.065
         },
         {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
+          "name": "idle",
+          "seconds": 4,
           "loop": true,
-          "strideLength": 0.075
+          "strideLength": null
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 19,
-        "meshes": 5,
-        "materials": 5,
-        "triangles": 816
+        "objects": 30,
+        "meshes": 19,
+        "materials": 11,
+        "triangles": 1462
       },
       "hashes": {
-        "duck.blend": "0A731D4222293EAE334F3336383450AE6B1D33BC1BA5FD36D8CA37322F6D94CA",
-        "duck.glb": "3540D24E786CFCE87CE49C6581E7297D0D55C28FCABD96C216B7849ACE2F73CE",
-        "duck-blender.png": "735EF30855A674AD0BF073785443AD0B5585FF58308E43E1E18923CB40CD93AB",
-        "capture-1.png": "0B77024AD77026D7AA9786094BFBD6789360974852C16D080BA68F9511293209",
-        "capture-1-gray.png": "4EB9E8C25335BD3F10F48355755002EEC954C2DF829520A29250979E38061B85",
-        "capture.json": "0DC582E0F50BA1FDD01FB6ACEEBB4DFD7946291EFD7D9D178F4C689D4FB50AA5",
-        "build.json": "C0CDBC4A93AD4D2430D82D9746A836C4284B7A6070D8FC8F4C549118C07B81BF",
-        "validation.json": "721745075D11B4128596339FEA1DB7B5359CB0FA10D91AA2CBF6E9FDDC124BF5"
+        "duck.glb": "0B84E0B5C32CA4FD1876E88F59F6090B78E95EC02A4A4C8AE6E11CE44A4D3D4C",
+        "duck-preview.png": "03AF1206416ADA23066F7BFF413FFED8F989305E3232858CDFC99F1584E93005"
       },
       "provenance": {
         "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
-        "license": "project-original"
+        "source": "Ánade real facetado de The Valley (deliverables/marked-models-trial/build-models.py, duck(); 29 sep 2026), aprobado por Vera; clips de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
       }
     },
     {

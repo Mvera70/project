@@ -605,7 +605,9 @@ def hen():
     head=empty('head',(-.078,0,.192),neck); ell('Head',(-.082,0,.196),(.062,.056,.060),'coat',head,12,7)
     for j,(x,h) in enumerate([(-.100,.020),(-.086,.026),(-.072,.022),(-.060,.016)]):
         ell('Comb_'+str(j),(x,0,.222+h*.4),(.016,.008,h),'red',head,8,5)
-    leaf('Beak',(-.108,0,.197),(-.132,0,.190),.020,.010,'yellow',head)
+    # Pico corto que nace ancho de la cara y se afina: el rombo de las plumas lo
+    # dejaba de perfil en punta de flecha, como el primer cuervo.
+    loft('Beak',[(-.103,.198,.011,.010),(-.115,.195,.008,.007),(-.126,.191,.004,.004),(-.133,.188,.001,.001)],'yellow',head,8)
     for s in (-1,1):
         ell('Wattle_'+str(s),(-.104,s*.006,.174),(.012,.008,.022),'red',head,8,5)
         ell('Face_'+str(s),(-.096,s*.022,.198),(.022,.008,.020),'red',head,8,5)

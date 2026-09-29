@@ -104,7 +104,8 @@ La última de cajas del corral. `hen()` en `build-models.py`, sobre la
 estructura de la perdiz de Vera: cuerpo lleno, cola alzada hacia atrás, cresta
 y barbillas rojas, pico y patas amarillos. Blanca, que se lee sobre la hierba y
 no se confunde con la perdiz ni con el zorro. Mismo tamaño que la de G-23;
-`rigid-clips.mjs … hen` le da el paso y el picoteo, sin vuelo.
+`rigid-clips.mjs … hen` le da el paso y el picoteo, sin vuelo. El pico es un
+cono corto desde el 29 sep: el rombo de las plumas lo dejaba en punta de flecha.
 
 - [hen.glb](hen.glb) · [perfil](hen-profile.png) · [tres cuartos](hen-three-quarter.png) ·
   [andando](hen-walk.png)
@@ -123,7 +124,7 @@ crow` le da el paso y el picoteo, sin vuelo, como hoy.
   [andando](crow-walk.png)
 - `python3 build-models.py -- crow`
 
-## El pato (29 sep 2026) — candidato, **sin publicar**
+## El pato (29 sep 2026) — **publicado**
 
 `duck()` en `build-models.py`: un ánade real macho facetado sobre la
 estructura de la gallina, con casco de barca que flota a la altura a la que el

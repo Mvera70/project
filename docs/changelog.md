@@ -1,5 +1,15 @@
 # The Valley — Registro de cambios
 
+## v5.04 · 29 sep 2026 · El pato, y el pico de la gallina
+
+- **El pato** (`duck()` en `deliverables/marked-models-trial/build-models.py`):
+  el ánade real de siempre, facetado, con casco de barca a la altura de agua
+  del juego, collar blanco, espejuelo azul, cola rizada y pico plano de pato.
+  El banco de fauna pinta ahora la lámina de agua para el pato.
+- **El pico de la gallina**, como el del cuervo: el rombo de las plumas lo
+  dejaba de perfil en punta de flecha; ahora es un cono corto que nace de la
+  cara. Queda de cajas sólo el ciervo.
+
 ## v5.03 · 29 sep 2026 · El cuervo
 
 El de G-23 era de cajas. Ahora es facetado (`crow()` en
