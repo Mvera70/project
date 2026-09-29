@@ -1,5 +1,15 @@
 # The Valley — Registro de cambios
 
+## v5.00 · 29 sep 2026 · El cerdo
+
+Vera: «me gusta». El de G-23 era una caja con dos losas por orejas que salían
+de lado como alas. Ahora es facetado, sobre la estructura del jabalí de Vera
+(`pig()` en `deliverables/marked-models-trial/build-models.py`): barril
+redondo, patas cortas y firmes, hocico de disco, orejas grandes caídas hacia
+delante y rabo rizado. Mismo tamaño; marcha de `rigid-clips.mjs … pig`.
+Con él, en el corral conviven los dos estilos: la vaca y la gallina siguen
+siendo de cajas, y son las siguientes.
+
 ## v4.99 · 29 sep 2026 · La trucha
 
 Vera: «mucho mejor». El pez de G-23 era una cápsula con rombos pegados y se

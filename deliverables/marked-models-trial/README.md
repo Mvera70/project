@@ -73,7 +73,7 @@ tres tramos, las pectorales reman) y el reposo.
   comparten articulación y material: de 37 mallas a 19, y hay hasta cuatro
   peces a la vez.
 
-## El cerdo (29 sep 2026) — candidato, **sin publicar**
+## El cerdo (29 sep 2026) — **publicado**
 
 El de G-23 era una caja con dos losas por orejas que salían de lado como alas.
 `pig()` en `build-models.py` lo hace facetado, sobre la estructura del jabalí
