@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T18:56:11.195Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bear",
+  "generatedAt": "2026-09-29T19:01:14.957Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids fish",
   "assets": [
     {
       "id": "axis-marker",
@@ -256,25 +256,6 @@
           "seconds": 2.7083333333333335,
           "loop": true,
           "strideLength": 0.08
-        }
-      ]
-    },
-    {
-      "id": "fish",
-      "file": "fish.glb",
-      "sha256": "9E6D26667F104C3375FB7F7E0575281D1E6ABF468C082B705BB8471917A81C60",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.13
         }
       ]
     },
@@ -1553,6 +1534,30 @@
       "provenance": {
         "kind": "original",
         "source": "Oso v4 de The Valley (deliverables/marked-models-trial/build-models.py, bear(); 29 sep 2026): lomo casi recto, cabeza baja, patas en columna y pardo oscuro, elegido por Vera; clips idle/walk de tools/art/rigid-clips.mjs, rear publicado como attack.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "fish",
+      "file": "fish.glb",
+      "sha256": "51EAF7FBD80AF38C1BB825D80B8DB470407EC9FA87070162233195F74EF34540",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true,
+          "strideLength": 0.1
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Trucha facetada de The Valley (deliverables/marked-models-trial/build-models.py, fish(); 29 sep 2026), aprobada por Vera; nado e idle de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     }

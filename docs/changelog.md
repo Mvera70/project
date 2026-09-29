@@ -1,5 +1,17 @@
 # The Valley — Registro de cambios
 
+## v4.99 · 29 sep 2026 · La trucha
+
+Vera: «mucho mejor». El pez de G-23 era una cápsula con rombos pegados y se
+leía como un submarino. Ahora es una trucha facetada (`fish()` en
+`deliverables/marked-models-trial/build-models.py`): huso afinado, caudal
+ahorquillada, dorsal alta que sigue asomando del agua, lomo oscuro —es lo que
+se ve desde arriba—, costado dorado con pintas y vientre claro. Mismo tamaño.
+**Nada de verdad**: el `walk` del de G-23 estaba vacío y el pez iba rígido;
+`rigid-clips.mjs … fish` ondula la cola en tres tramos y rema con las
+pectorales. 19 mallas, juntadas por articulación y material (`merge_parts`),
+porque hay hasta cuatro peces a la vez.
+
 ## v4.98 · 29 sep 2026 · El oso nuevo
 
 Vera: «el oso no termina de convencerme». El v3 se leía como un perro grande

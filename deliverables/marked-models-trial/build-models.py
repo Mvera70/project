@@ -391,6 +391,20 @@ def slab(n,pts,off,m,parent=None):
     fs=[tuple(range(k-1,-1,-1)),tuple(range(k,2*k))]+[(i,(i+1)%k,(i+1)%k+k,i+k) for i in range(k)]
     return mesh(n,vs,fs,m,parent)
 
+def merge_parts():
+    # Junta en una malla las piezas que comparten articulación y material: se
+    # ven igual y cada pieza suelta es una llamada de dibujo más por animal.
+    groups={}
+    for o in [o for o in bpy.context.scene.objects if o.type=='MESH']:
+        groups.setdefault((o.parent.name if o.parent else '',o.data.materials[0].name),[]).append(o)
+    for (parent,material),parts in groups.items():
+        if len(parts)<2: continue
+        bpy.ops.object.select_all(action='DESELECT')
+        for o in parts: o.select_set(True)
+        bpy.context.view_layer.objects.active=parts[0]
+        bpy.ops.object.join()
+        parts[0].name=(parent or 'Root')+'_'+material
+
 def fish():
     # 29 sep 2026. El pez de G-23 era una cápsula con rombos pegados: se leía
     # como un submarino. Una trucha facetada, como los animales de Vera: huso
@@ -432,7 +446,7 @@ def fish():
         for j,(x,z,m) in enumerate([(-.030,.010,'spot'),(-.014,.014,'spot'),(.000,.006,'red'),(.012,.013,'spot'),(.024,.004,'spot'),(-.004,-.002,'spot'),(.030,.011,'red')]):
             ry=next(a[2]+(b[2]-a[2])*(x-a[0])/(b[0]-a[0]) for a,b in zip(front,front[1:]) if a[0]<=x<=b[0])
             ell('Spot_'+str(s)+'_'+str(j),(x,s*ry*.93,z),(.0045,.0015,.0040),m,body,6,4)
-    save('fish')
+    merge_parts(); save('fish')
 
 def mule():
     reset(); mat('coat','978772'); mat('coatTop','514B40'); mat('light','C9C1A5'); mat('earInner','706658'); mat('pack','B19A6C'); mat('cloth','A28F63')

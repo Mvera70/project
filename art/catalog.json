@@ -3210,78 +3210,76 @@
     },
     {
       "id": "fish",
-      "artifactRound": "G-23",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/fish/fish.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T21-27-17-551Z-37688",
-        "directory": "artifacts/graphics/G-23/approved/9e6d26667f104c33"
+        "runId": "fish-trout",
+        "directory": "artifacts/graphics/fish-trout/approved/fish"
       },
       "bounds": {
         "min": [
-          -0.074667,
-          -0.033333,
-          -0.041667
+          -0.075,
+          -0.03,
+          -0.036
         ],
         "max": [
-          0.113333,
-          0.067667,
-          0.041667
+          0.118,
+          0.064,
+          0.036
         ],
         "size": [
-          0.188,
-          0.101,
-          0.083333
+          0.193,
+          0.094,
+          0.072
         ]
       },
-      "recipeSha256": "7B3BA5F821FDAF6F656223DDC085CC957B13E76A1AF027B46FE868FBA7C9F86F",
+      "recipeSha256": null,
       "materials": [
-        "coat",
-        "light",
-        "dark",
-        "accent"
+        "fin",
+        "red",
+        "spot",
+        "back",
+        "belly",
+        "flank",
+        "eye",
+        "ivory"
       ],
       "clips": [
-        "idle",
-        "walk"
+        "walk",
+        "idle"
       ],
       "motion": [
         {
-          "name": "idle",
-          "seconds": 8.041666666666666,
+          "name": "walk",
+          "seconds": 1,
           "loop": true,
-          "strideLength": null
+          "strideLength": 0.1
         },
         {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
+          "name": "idle",
+          "seconds": 4,
           "loop": true,
-          "strideLength": 0.13
+          "strideLength": null
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 12,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 700
+        "objects": 26,
+        "meshes": 19,
+        "materials": 8,
+        "triangles": 1732
       },
       "hashes": {
-        "fish.blend": "B6814E9F51419FCEF4026031146E174E706FB50ED4463A621C03A7336C1BED9F",
-        "fish.glb": "9E6D26667F104C3375FB7F7E0575281D1E6ABF468C082B705BB8471917A81C60",
-        "fish-blender.png": "7E1E0AB1599E6DF62AE52D78159A395037AC00438E9256B36CB8E920BA8B3F2E",
-        "capture-1.png": "141B293E34E50F2832387644A1803B4D828FB4BA45276F9A18C15043C75CB06D",
-        "capture-1-gray.png": "345EC876DB5AC198E0F19321809CB5B9CEFD02C32A47E8C016FA806C772607DC",
-        "capture.json": "2C45B1C7CBD4F211ADE2B01A26F1C742C800581EBB2EAE1C8BF77EB45FD43C26",
-        "build.json": "33ABC9CA13E95ECDC97DB6FB949626BA129C55512D2C277434B463DBD6407082",
-        "validation.json": "9405AD4D7F2A6E4DD3F48FFBA33BB022A96713893C2B6A0E8F35B5CF0C6C0AA6"
+        "fish.glb": "51EAF7FBD80AF38C1BB825D80B8DB470407EC9FA87070162233195F74EF34540",
+        "fish-preview.png": "75B1DEA686FB58BDDCE4DA9E0CB08928257046FBA1E91E8F8D878E31F8861440"
       },
       "provenance": {
         "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
-        "license": "project-original"
+        "source": "Trucha facetada de The Valley (deliverables/marked-models-trial/build-models.py, fish(); 29 sep 2026), aprobada por Vera; nado e idle de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
       }
     },
     {

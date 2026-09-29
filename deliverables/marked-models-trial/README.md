@@ -57,7 +57,7 @@ el v3, mismos nodos y la misma pose erguida.
 - Publicado con `rigid-clips.mjs bear-v4.glb <salida> bear`,
   `adopt-models.mjs` y `publish-assets.ts --ids bear`.
 
-## El pez (29 sep 2026) — candidato, **sin publicar**
+## El pez (29 sep 2026) — **publicado**
 
 El de G-23 era una cápsula con rombos pegados y se leía como un submarino.
 `fish()` en `build-models.py` hace una trucha facetada: huso que se afina hacia
@@ -69,4 +69,6 @@ tres tramos, las pectorales reman) y el reposo.
 
 - [fish.glb](fish.glb) · [perfil](fish-profile.png) · [tres cuartos](fish-three-quarter.png) ·
   [nadando bajo el agua](fish-swim.png)
-- `python3 build-models.py -- fish`
+- `python3 build-models.py -- fish`. `merge_parts()` junta las piezas que
+  comparten articulación y material: de 37 mallas a 19, y hay hasta cuatro
+  peces a la vez.
