@@ -33,7 +33,7 @@ daño intactos. Tres cosas no se leían y se cambian del lado de la pantalla:
   (`--beast` sólo actúa con `--aftermath` y `--happening bear_in_the_wood`
   no la provocó) y la caza (`--hunt`, nuevo en el observatorio, exige una
   señal tocable que no llegó a verse en tres valles con oferta) y el asalto
-  de la villa de cien personas (tiempo de carga agotado): quedan
+  de la villa de sesenta personas con muralla (tiempo de carga agotado): quedan
   `preview-only` o «sin toma» con su ruta pendiente en `docs/encargos-3d.md`.
   Matriz §2.6.
 - **AN-4, la aceptación**: la matriz cierra fila a fila (§5) con la

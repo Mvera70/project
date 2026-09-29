@@ -47,7 +47,7 @@ skill `animacion` para quien toque un clip, y `observe-valley-life` y
 
 **Pendiente y dicho:** la comprobación en iPhone/iPad (nada de esto es una
 medida en el aparato); las tomas que el observatorio no pudo dar —la visita
-del oso, la caza y el asalto de una villa de cien personas (tiempo de carga
+del oso, la caza y el asalto de la villa (sesenta personas y muralla; tiempo de carga
 agotado bajo SwiftShader)—, con su ruta en `docs/encargos-3d.md`; el
 lanzamiento (`throw`) sólo en hoja porque en los valles de las tomas no hay
 pelota; y remedir `animation-cost.ts` con la máquina sola.
