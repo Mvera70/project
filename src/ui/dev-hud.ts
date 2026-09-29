@@ -60,7 +60,7 @@ export function startDevHud(host: HTMLElement): DevHud {
       const lines = [`${fps.toFixed(0)} fps · peor ${worst.toFixed(0)} ms`];
       if (stats !== undefined) {
         lines.push(`${stats.calls} llamadas · ${(stats.triangles / 1000).toFixed(0)}k tri`);
-        lines.push(`resolución ${(stats.scale * 100).toFixed(0)} % · dibujo ${stats.renderMs.toFixed(0)}`
+        lines.push(`${stats.level} @${stats.targetFps} · resolución ${(stats.scale * 100).toFixed(0)} % · dibujo ${stats.renderMs.toFixed(0)}`
           + ` · vida ${stats.lifeMs.toFixed(0)}/${stats.lifeSteps}p · paint ${stats.paintMs.toFixed(0)} ms`);
       }
       panel.textContent = lines.join('\n');

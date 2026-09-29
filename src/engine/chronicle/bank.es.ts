@@ -99,6 +99,18 @@ export const UI_BANK_ES: Record<string, string> = {
   // al inglés por el respaldo de `renderUiText`, igual que ya hace el epitafio:
   // son el texto grabado en la piedra y el juego se escribe en inglés (§2.2).
   'title.annals': 'El cronicón',
+  'title.graphics': 'Gráficos',
+  'graphics.title': 'Gráficos',
+  'graphics.note': 'Se aplica al abrir el valle.',
+  'graphics.quality': 'Calidad',
+  'graphics.quality.auto': 'Automática',
+  'graphics.quality.high': 'Alta',
+  'graphics.quality.medium': 'Media',
+  'graphics.quality.low': 'Baja',
+  'graphics.frame_rate': 'Fotogramas por segundo',
+  'graphics.frame_rate.30': '30',
+  'graphics.frame_rate.60': '60',
+  'graphics.done': 'Hecho',
   'annals.title': 'El cronicón',
   'annals.count': 'El cronicón guarda {count} valles.',
   'annals.empty': 'Todavía no hay nada. Cada valle que termina queda escrito aquí; los anteriores a ti no lo estaban.',

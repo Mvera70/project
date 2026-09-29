@@ -10,6 +10,7 @@
 // canvas for 2D returns nothing. The spec says so and it is the kind of thing
 // that looks like a blank screen rather than an error.
 
+import { readGraphicsSettings } from './graphics-settings';
 import { WORLD } from '@engine/balance';
 import type { GameState } from '@engine/state';
 import type { HuntSpecies, HuntWeapon } from '@engine/world/hunting';
@@ -353,6 +354,7 @@ export function attachBackend(
         canvas: webgl,
         assetBaseUrl: options.assetBaseUrl ?? './assets/valley3d/',
         quality: 'standard',
+        graphics: readGraphicsSettings(),
         // E0e/P-1a · rutas de diagnóstico locales, nunca controles de UI. Sólo
         // afectan a la presentación; el estado y el guardado siguen intactos.
         ...(() => {

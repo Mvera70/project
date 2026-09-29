@@ -26,6 +26,19 @@ export interface Loop {
   stop(): void;
 }
 
+/**
+ * Si toca dibujar este fotograma o se deja pasar (29 sep 2026). Con un tope
+ * de 60 en una pantalla de 120 Hz se dibuja uno de cada dos; con 30, uno de
+ * cada dos en una de 60. El margen de un cuarto de fotograma evita que un
+ * `requestAnimationFrame` que llega unas décimas antes de tiempo se salte y
+ * el siguiente se dibuje tarde: sin él, a 60 en una pantalla de 60 Hz se
+ * perdía uno de cada tres. Puro, para probarse sin pantalla.
+ */
+export function frameDue(now: number, lastPainted: number | null, minFrameMs: number): boolean {
+  if (lastPainted === null || !(minFrameMs > 0)) return true;
+  return now - lastPainted >= minFrameMs * 0.75;
+}
+
 export function startLoop(
   speed: () => Speed,
   step: () => void,
@@ -37,9 +50,14 @@ export function startLoop(
   // Esquema 12 · dónde de la semana empieza el bucle. El juego abre al empezar
   // la semana; la demo de la madera (`&demo=wood`) abre a media semana.
   startFraction = 0,
+  // El tope de fotogramas por segundo que eligió el jugador («Graphics»), en
+  // milisegundos por fotograma; 0 es dibujar cada uno. Los fotogramas que se
+  // dejan pasar no pierden tiempo: se acumula en el siguiente.
+  minFrameMs: () => number = () => 0,
 ): Loop {
   let frameId = 0;
   let previous: number | null = null;
+  let lastPainted: number | null = null;
   let remainder = Math.max(0, Math.min(0.999, startFraction)) * TIME.REAL_MS_PER_TICK;
   let stopped = false;
 
@@ -54,6 +72,11 @@ export function startLoop(
       frameId = requestAnimationFrame(frame);
       return;
     }
+    if (!frameDue(now, lastPainted, minFrameMs())) {
+      frameId = requestAnimationFrame(frame);
+      return;
+    }
+    lastPainted = now;
     const advanced = advanceAccumulator(remainder, (now - previous) * scale(), speed());
     previous = now;
     remainder = advanced.remainderMs;

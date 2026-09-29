@@ -1,5 +1,6 @@
 // G-01 · Public boundary between the simulation, presentation owner and 3D renderer.
 
+import type { GraphicsSettings } from './profile';
 import type { GameState, PlayerAct, Role, VillagerId } from '../engine/state';
 import type { ClipName } from './clips';
 import type { Occupation } from './world/models';
@@ -409,6 +410,13 @@ export interface GraphicsRendererOptions {
   readonly canvas: HTMLCanvasElement;
   readonly assetBaseUrl: string;
   readonly quality: 'low' | 'standard';
+  /**
+   * Lo que el jugador eligió en «Graphics» (29 sep 2026, `render3d/profile.ts`).
+   * Sin esto vale `auto`, que es lo que el renderer hacía solo hasta hoy:
+   * medio en un aparato táctil, alto en un ordenador. `quality: 'low'` sigue
+   * mandando por encima, para las pruebas que lo piden.
+   */
+  readonly graphics?: GraphicsSettings;
   /**
    * G-06 · Una biblioteca de recursos ya cargada, si el llamante la trae.
    *

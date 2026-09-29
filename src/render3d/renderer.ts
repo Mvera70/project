@@ -37,6 +37,7 @@ import type {
   GraphicsTarget, GraphicsViewport,
 } from './contracts';
 import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
+import { DEFAULT_GRAPHICS, resolveProfile } from './profile';
 import { quantizeReach, stepSun } from './effects/sun-steps';
 import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './world/ground';
 import { buildBackdrop, type Backdrop } from './world/backdrop';
@@ -113,8 +114,9 @@ import { BattleDebris } from './world/battle-debris';
 import { Works } from './world/works';
 import type { Physics } from './life/physics';
 
-/** Lo que cambia en un aparato táctil. TUNE: medido el 27 sep 2026 (ver `adaptResolution`). */
-const HANDHELD = { pixelRatio: 1.5, shadowMapSize: 1024 } as const;
+/* Lo que cambia en un aparato táctil (1,5 de densidad, sombras de 1024; TUNE
+   medido el 27 sep 2026) **lo dice desde el 29 sep el perfil** (`profile.ts`):
+   lo que el jugador elige en «Graphics», o `auto`, que reproduce esas cifras. */
 /** La señal de caza flota esta altura sobre la presa, en celdas. TUNE visual. */
 const HUNT_SIGN_LIFT = 0.9;
 /** Radio de la presa al preguntar si el bosque la tapa: poco, para que el borde del bosque no la esconda. */
@@ -139,7 +141,8 @@ const HUNTER_AGE = { min: 16, max: 60 } as const;
  * era tirar la mitad del trabajo. Al mover o acercar la cámara se rehace en el
  * mismo fotograma. TUNE: dos en ordenador, cuatro en un aparato táctil.
  */
-const SHADOW_EVERY = { desk: 2, handheld: 4 } as const;
+// (Dos en ordenador y cuatro en táctil; desde el 29 sep lo pone el perfil:
+// 2, 4 u 8 según el nivel.)
 /**
  * Cuántas luces puntuales hay siempre en la escena (`effects/light-pool.ts`).
  * Fijo para que cambiar de luces no recompile los sombreadores. Y pocas,
@@ -162,7 +165,9 @@ const WARM_UP_MS = 8000;
  * cada 2 s, hasta la mitad de la densidad; con más de ~50 FPS durante 6 s la
  * recupera un paso.
  */
-const ADAPT = { slowSeconds: 0.036, easySeconds: 0.02, everySeconds: 2, recoverSeconds: 6, step: 0.15, lowest: 0.5 } as const;
+const ADAPT = { everySeconds: 2, recoverSeconds: 6, step: 0.15 } as const;
+// (Los umbrales «lento» y «holgado» y el suelo los pone el perfil desde el
+// 29 sep 2026: salen del objetivo de fotogramas que eligió el jugador.)
 const VILLAGER = 'villager';
 const TREE = 'tree';
 const TREE_PINE = 'tree-pine';
@@ -295,8 +300,10 @@ export async function createGraphicsRenderer(
   // en vez de 2 y el mapa de sombras a la mitad. En un ordenador, lo de antes.
   const handheld = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
     && window.matchMedia('(pointer: coarse)').matches;
-  const pixelCap = handheld ? HANDHELD.pixelRatio : 2;
-  const renderer = new WebGLRenderer({ canvas: options.canvas, antialias: options.quality !== 'low' && !handheld });
+  const profile = resolveProfile(options.graphics ?? DEFAULT_GRAPHICS, handheld);
+  const shadowsOn = options.quality !== 'low' && profile.shadows;
+  const pixelCap = profile.pixelRatioCap;
+  const renderer = new WebGLRenderer({ canvas: options.canvas, antialias: options.quality !== 'low' && profile.antialias });
   renderer.outputColorSpace = SRGBColorSpace;
   // **El valle estaba sobreexpuesto, y era la causa de que se viera lavado.**
   //
@@ -316,7 +323,7 @@ export async function createGraphicsRenderer(
   // el problema por otra puerta.
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.toneMappingExposure = TONE_EXPOSURE;
-  renderer.shadowMap.enabled = options.quality !== 'low';
+  renderer.shadowMap.enabled = shadowsOn;
   renderer.shadowMap.type = PCFShadowMap;
   // Se rehace a mano, cuando toca (`SHADOW_EVERY`).
   renderer.shadowMap.autoUpdate = false;
@@ -333,8 +340,8 @@ export async function createGraphicsRenderer(
   scene.add(world);
 
   const sun = new DirectionalLight('#FFF4D8', 2.6);
-  sun.castShadow = options.quality !== 'low';
-  const shadowSize = handheld ? HANDHELD.shadowMapSize : SUN_SHADOW.mapSize;
+  sun.castShadow = shadowsOn;
+  const shadowSize = profile.shadowMapSize;
   sun.shadow.mapSize.set(shadowSize, shadowSize);
   sun.shadow.bias = SUN_SHADOW.bias;
   sun.shadow.normalBias = SUN_SHADOW.normalBias;
@@ -392,7 +399,7 @@ export async function createGraphicsRenderer(
     const reach = sun.shadow.camera.right;
     const moved = !(sun.target.position.distanceTo(shadowDrawnAt) <= reach * 0.02)
       || Math.abs(reach - shadowDrawnReach) > reach * 0.01;
-    if (!moved && shadowAge < (handheld ? SHADOW_EVERY.handheld : SHADOW_EVERY.desk)) return;
+    if (!moved && shadowAge < profile.shadowEvery) return;
     renderer.shadowMap.needsUpdate = true;
     shadowStats.redraws += 1;
     shadowAge = 0;
@@ -479,7 +486,7 @@ export async function createGraphicsRenderer(
     // sombras que calcular: se apaga la pasada entera mientras dura la noche.
     // Con intensidad cero no oscurecia nada de todos modos; esto es el ahorro,
     // no el arreglo.
-    sun.castShadow = options.quality !== 'low' && day.sunIntensity > 0;
+    sun.castShadow = shadowsOn && day.sunIntensity > 0;
     ambient.color.set(day.skyColour);
     ambient.groundColor.set(day.groundBounce);
     ambient.intensity = day.ambientIntensity;
@@ -516,7 +523,7 @@ export async function createGraphicsRenderer(
   // La hierba (28 sep 2026): dos mallas instanciadas para todo el valle, con
   // menos matas en táctil. Se replanta cuando cambia la semana y se recolorea
   // con la estación (`world/grass.ts`).
-  const grass = createGrass(handheld);
+  const grass = createGrass(profile.lightGrass);
   world.add(grass.group);
   let grassTick = -1;
   // Las pisadas (`effects/trample.ts`): un mapa por valle, que sobrevive a los
@@ -1643,6 +1650,8 @@ export async function createGraphicsRenderer(
     calls: renderer.info.render.calls,
     triangles: renderer.info.render.triangles,
     scale: renderScale,
+    level: profile.level,
+    targetFps: profile.targetFps,
     renderMs: lastRenderMs,
     lifeMs: lastLifeMs,
     lifeSteps: lastLifeSteps,
@@ -1666,10 +1675,10 @@ export async function createGraphicsRenderer(
     if (!(realDelta > 0)) return;
     frameAverage = frameAverage * 0.9 + realDelta * 0.1;
     sinceAdapt += realDelta;
-    easySeconds = frameAverage < ADAPT.easySeconds ? easySeconds + realDelta : 0;
+    easySeconds = frameAverage < profile.easySeconds ? easySeconds + realDelta : 0;
     if (sinceAdapt < ADAPT.everySeconds) return;
     let next = renderScale;
-    if (frameAverage > ADAPT.slowSeconds && renderScale > ADAPT.lowest) next = Math.max(ADAPT.lowest, renderScale - ADAPT.step);
+    if (frameAverage > profile.slowSeconds && renderScale > profile.lowestScale) next = Math.max(profile.lowestScale, renderScale - ADAPT.step);
     else if (easySeconds > ADAPT.recoverSeconds && renderScale < 1) next = Math.min(1, renderScale + ADAPT.step);
     if (next === renderScale) return;
     renderScale = next;
@@ -2823,7 +2832,7 @@ declare global {
     __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm } | null) => void;
     __valleyBattleStats?: () => BattleStats;
     __valleyRenderStats?: () => {
-      calls: number; triangles: number; scale: number;
+      calls: number; triangles: number; scale: number; level: string; targetFps: number;
       renderMs: number; lifeMs: number; lifeSteps: number; paintMs: number;
     };
     __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];

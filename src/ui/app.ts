@@ -45,6 +45,7 @@ import { persistSave } from './idb';
 import { recogniseGesture, type Point } from './gestures';
 import { checkpointSavedAtMs, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
+import { readGraphicsSettings } from './graphics-settings';
 import { startStormedTransition, type StormedTransition } from './stormed-transition';
 import { milestonesAt } from './milestones';
 import { doingNow, gateNow } from './doing';
@@ -1524,7 +1525,9 @@ export function boot(
   let loopStarted = false;
   const beginLoop = (): void => {
     loop = startLoop(() => speed, () => { if (!ticksHeld) runTick(); }, paint, () => timeScale,
-      loopStarted ? 0 : options.startFraction ?? 0);
+      loopStarted ? 0 : options.startFraction ?? 0,
+      // «Graphics»: el tope de fotogramas que eligió el jugador (29 sep 2026).
+      () => 1000 / readGraphicsSettings().frameRate);
     loopStarted = true;
   };
 

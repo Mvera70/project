@@ -1,5 +1,24 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · Rendimiento en la tablet, «Graphics» y lo que quedaba de la v9
+
+Vera abrió el sitio en su tablet a 0 fps con fotogramas de dos segundos (año
+60). Medido en el portátil contra el sitio publicado
+(`docs/medidas/rendimiento-piel-v9-2026-09-29.md`): la piel no cuesta por
+fotograma; `?debug=1` no sirve para medir el 3D porque pinta el Canvas 2D
+debajo; y la adaptativa se alimentaba de un delta recortado a 0,1 s, así que
+no bajaba la resolución donde hacía falta (`6acc645`, mide el hueco real). El
+panel de taller enseña desde entonces el reparto del fotograma (dibujo, vida
+y pasos, paint): **la primera medida del juego en el dispositivo, pendiente
+de que Vera la lea en la tablet.** «Graphics» en la portada
+(`screens/graphics.ts`, `render3d/profile.ts`, `ui/graphics-settings.ts`):
+calidad Auto/High/Medium/Low y 30/60 fps, guardado en el aparato, aplicado al
+abrir el valle; el bucle lleva tope de fotogramas (`loop.ts`, `frameDue`).
+Cerrado lo que la auditoría de Codex dejó abierto: el canto rasgado de la
+encrucijada y el rincón en columna a 320 px (`a056659`). Encargo a Codex:
+`docs/encargos/opciones-graficas-v10.md`. Abierto: la placa de fundar
+(`plaque-wood` contra la placa fina de la maqueta), decisión de Vera.
+
 ## 29 sep 2026 · La crónica a color y el tablón en el sitio publicado
 
 `79e7270`: las 44 escenas del índice de la crónica a color (Codex,

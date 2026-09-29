@@ -1,5 +1,41 @@
 # The Valley — Registro de cambios
 
+## v4.96 · 29 sep 2026 · La piel v9 en el juego, la crónica a color, y «Graphics» en la portada
+
+Vera abrió el sitio publicado en su tablet a 0 fps con fotogramas de dos
+segundos y pidió: «optimizar la nueva UI, o el error que diseño lo introdujo
+pudo ser otra cosa […] me gustaría lockear el juego a 60 FPS estables […] en
+el menú principal añadir un botón para abrir un menú de opciones gráficas».
+
+- **La piel v9 de Codex, integrada** (`d9f0fb9`, `c0b94a0`): texturas de
+  ImageGen en cabecera, fecha, cifras, tablón, hojas, bandeja y botón
+  secundario; mandos de marfil; brújula de latón que sigue girando; la portada
+  04 «Luces en la garganta» a sangre; la encrucijada en papel de documento
+  con las opciones en la tira rasgada; el mismo papel en bienvenida, epitafio
+  y anales. Después, el canto rasgado de la encrucijada y el rincón en
+  columna a 320 px (`a056659`).
+- **Las 44 escenas de la crónica a color** (`79e7270`, Codex), mismo nombre
+  que su sepia; la caché de la PWA sube a v8. Y el fallo que su auditoría del
+  sitio vivo encontró: los tokens de imagen en el CSS inyectado del tablón y
+  la etiqueta daban 404 en el sitio publicado; ahora importan sus imágenes.
+- **El rendimiento, medido antes de tocar**
+  (`docs/medidas/rendimiento-piel-v9-2026-09-29.md`): la piel no cuesta por
+  fotograma; `?debug=1` no sirve para medir el 3D. Dos fallos nuestros: la
+  adaptativa medía un delta recortado a 0,1 s y no bajaba la resolución en el
+  aparato que más lo necesitaba (`6acc645`, mide el hueco real), y no había
+  manera de bajar la calidad.
+- **«Graphics»** desde la portada (`screens/graphics.ts`,
+  `render3d/profile.ts`, `ui/graphics-settings.ts`): calidad Auto, High,
+  Medium o Low y 30 o 60 fotogramas por segundo, guardado en el aparato y
+  aplicado al abrir el valle. `auto` reproduce lo que el renderer hacía solo
+  (medio en táctil, alto en ordenador); los umbrales de la adaptativa salen
+  del objetivo; el bucle lleva tope de fotogramas (`loop.ts`, `frameDue`,
+  con margen de un cuarto para no perder uno de cada tres a 60 en 60 Hz).
+- **El panel de taller enseña el reparto del fotograma**: dibujo, vida (y
+  cuántos pasos) y `paint`. Es la primera medida del juego en el dispositivo.
+- La skill `piel-del-valle` §0 reescrita con la piel v8/v9 y sus trampas.
+  Encargo a Codex: `docs/encargos/opciones-graficas-v10.md`.
+
 ## v4.95 · 28 sep 2026 · Más gente por el camino, las expediciones y el tablón de la plaza
 
 **En `main` a medias, a propósito:** se subió para que el agente del diseño

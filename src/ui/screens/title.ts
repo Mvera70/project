@@ -29,6 +29,7 @@ import { retireOverlay } from '../motion';
 import { ORNAMENT_VIEWBOX, YEAR_FLOURISH } from '../redesign/chronicle-ornaments';
 import { currentLocale, loadLocale, setSavedLocale } from '../locale';
 import { openAnnals } from './annals';
+import { openGraphics } from './graphics';
 import type { Locale } from '@engine/chronicle/render';
 
 const STYLE_ID = 'valley-title-style';
@@ -190,6 +191,7 @@ const STYLE = `
   text-underline-offset: 4px; text-decoration-thickness: 1px;
   -webkit-tap-highlight-color: transparent; }
 .title-annals:active { color: var(--skin-ink); }
+.title-links { display: flex; justify-content: center; gap: 22px; flex-wrap: wrap; }
 .title-annals:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
 
 /* El pie: dos interruptores pequeños, y el de taller a la derecha porque no es
@@ -583,11 +585,25 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
     openAnnals(save, () => { annals.focus(); });
   });
 
+  // Y las opciones gráficas (29 sep 2026, Vera: «un botón para abrir un menú
+  // de opciones gráficas»). Como el cronicón: se abre encima y devuelve el
+  // foco, no es una ruta. Van los dos en una fila de rótulos.
+  const graphics = document.createElement('button');
+  graphics.type = 'button';
+  graphics.className = 'title-annals title-graphics';
+  graphics.textContent = renderUiText('title.graphics');
+  graphics.addEventListener('click', () => {
+    openGraphics(() => { graphics.focus(); });
+  });
+  const links = document.createElement('div');
+  links.className = 'title-links';
+  links.append(annals, graphics);
+
   const bottom = document.createElement('div');
   bottom.className = 'title-bottom';
   bottom.append(language, dev);
 
-  actions.append(seedRow, hint, devRow, begin, annals, bottom);
+  actions.append(seedRow, hint, devRow, begin, links, bottom);
   const sheet = document.createElement('div');
   sheet.className = 'title-sheet';
   sheet.append(head, vignette, actions);

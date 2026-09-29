@@ -2855,6 +2855,19 @@ export const UI_BANK: Record<string, string> = {
   // haya ninguno: el dueño del diseño eligió que empezara vacío y se llenara,
   // así que la página vacía es una pantalla del juego y no un hueco.
   'title.annals': 'The annals',
+  // «Graphics» (29 sep 2026): la pantalla de opciones gráficas de la portada.
+  'title.graphics': 'Graphics',
+  'graphics.title': 'Graphics',
+  'graphics.note': 'Takes effect when the valley opens.',
+  'graphics.quality': 'Quality',
+  'graphics.quality.auto': 'Auto',
+  'graphics.quality.high': 'High',
+  'graphics.quality.medium': 'Medium',
+  'graphics.quality.low': 'Low',
+  'graphics.frame_rate': 'Frames per second',
+  'graphics.frame_rate.30': '30',
+  'graphics.frame_rate.60': '60',
+  'graphics.done': 'Done',
   'annals.title': 'The annals',
   'annals.count': 'The annals hold {count} valleys.',
   // La línea de la página vacía. Dice **qué la llenará**, no que esté vacía:
