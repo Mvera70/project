@@ -1,5 +1,47 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · Las herramientas de modelos, el zorro publicado y el juicio de la fauna
+
+Vera preguntó qué animales flojean (el oso no la convence) y pidió capturas de
+los peores, sin tocar modelos todavía. Las herramientas de captura buscaban
+Chromium sólo en `~/AppData` y en la nube no arrancaban: `browser.mjs` lo busca
+ahora en cualquier máquina y lo usan las diez. `model-sheet` gana `--ids` y
+`--sides` (cuatro lados: de tres cuartos el oso parece un oso, de perfil es un
+barril), el banco de fauna abre las quince especies y acepta `--out` (sin él
+pisa la entrega de G-23, que está en el repositorio), y `shot.mjs` encuadra un
+animal vivo con `--look-animal`. Juicio, sin tocar nada: **oso, zorro, pez y
+cerdo**, por ese orden; y conviven dos estilos, cajas (aldeanos y la receta
+G-23) contra facetado (los de Vera). **Después, el zorro**: el de Astra con
+el hocico suavizado, esqueleto por script, **publicado** (v5.02, 0,56 celdas,
+`idle`/`walk`/`flee`). Y **el oso v4, candidato sin publicar**
+(`deliverables/marked-models-trial/bear-v4.glb`): cabeza baja, patas en
+columna, pardo oscuro; la joroba grande le pareció horrible a Vera y queda
+suave (`BEAR_HUMP` 0,35; 0,15 casi plano); mismo tamaño, nodos y pose erguida que el v3.
+**Publicado** (v5.03), el «normal»: se probaron también patas de delante más
+cortas y con pelo colgando. **Siguiente, uno a uno como pidió Vera:** el pez,
+**publicado** (v5.04, una trucha facetada que nada); y el cerdo, **publicado**
+(v5.05). Siguen, uno a uno: la vaca, **publicada** (v5.06, facetada y gorda), y
+la gallina, **publicada** (v5.07). Siguen, uno a uno: el cuervo, **publicado**
+(v5.08), el pato, **publicado** (v5.09, con
+el pico de la gallina arreglado), y el ciervo, **publicado** (v5.10,
+con el casco plantado por cinemática inversa). **Ya no queda ningún animal
+de cajas.** La golondrina se queda la de Astra: Vera la prefiere a la candidata que se
+probó y se retiró. La perdiz también se queda la de Vera: se
+probó una con las barras tumbadas y sin púas y la descartó. **La mula y el
+jabalí, publicados** (v5.11): patas más cortas y, el jabalí, colmillos mayores.
+Todo integrado sobre la animación de la PR #2 (fusión de `main`). **Pendiente:**
+la ubre de la vaca, que la barriga gorda tapa. **Regla de Vera desde hoy: no se
+sube nada sin su permiso final.**
+
+**La CI que se cortaba** (rota desde el 28 sep): los tres trabajos tenían un
+tope de 10 minutos y la suite rápida sola tarda más, así que salían
+«cancelled» sin decir nada. Topes de 45 (`fast`), 30 (`journeys`, ahora
+trabajo propio) y 30 (`browser`). Al dejar de cortarse asoma lo que ya se
+sabía: las dos jornadas rojas a propósito y las ~13 de `test:shots` que
+también fallan en `main` desde el rediseño de interfaz. Nada se sube sin su permiso final. El banco de fauna encuadra ya cada
+especie por su caja y mira a su centro. **Pendiente:** la ubre de la vaca, que la
+barriga gorda tapa (se probó sacarla y Vera prefirió seguir). El oso no se puede fotografiar dentro de la partida sin
+cazar antes la cadena entera: no hay `?hunt=`.
 ## 29 sep 2026 · AN-4b y AN-4c: las tomas que faltaban, y el oso que no nacía
 
 Vera: «termina esto: toma en partida la visita del oso, la caza y el asalto

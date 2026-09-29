@@ -13,9 +13,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Los tres trabajos tenían un tope de 10 minutos y la suite rápida sola tarda
+  # más: desde el 28 sep 2026 la CI se cortaba («cancelled») antes de decir
+  # nada. Topes con margen, y las jornadas en su propio trabajo para que su
+  # resultado no tape el de la compilación y el lint.
   fast:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,16 +29,27 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      - run: npm run build
+      - run: npm run lint
+
+  journeys:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
       # El tercer nivel de §14: jornadas y siglos en varias semillas. Fuera del
       # bucle de trabajo por lo que cuesta, dentro de la puerta porque es lo que
       # prueba la capa que hoy mueve la aldea.
       - run: npm run test:journeys
-      - run: npm run build
-      - run: npm run lint
 
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -103,7 +103,7 @@ function clip(name, seconds, spec) {
 const wave = (t, cycles = 1, offset = 0) => Math.sin((t * cycles + offset) * Math.PI * 2);
 // Cuánto abre las patas cada una al andar, en radianes. TUNE: lo que se lee a
 // la distancia de juego sin que el animal parezca que patina ni que salta.
-const QUADS = { wolf: 0.45, dog: 0.5, mule: 0.38, bear: 0.3, boar: 0.4 };
+const QUADS = { wolf: 0.45, dog: 0.5, mule: 0.38, bear: 0.3, boar: 0.4, pig: 0.4, cow: 0.34, deer: 0.26 };
 const motion = [];
 // El `rear` del oso es su amenaza, lo que el juego llama `attack`. El `takeoff`
 // de la perdiz se conserva con su nombre: es un despegue de una vez, y el juego
@@ -131,6 +131,60 @@ function legAngle(p, travel, length) {
   return Math.asin(Math.max(-0.95, Math.min(0.95, dx / length)));
 }
 
+// Las especies que andan con el casco plantado de verdad: cadera y rodilla
+// salen de una cinemática inversa de dos huesos para que, apoyado, el casco
+// vaya en línea recta por el suelo a la velocidad del cuerpo, aunque el cuerpo
+// suba y baje. Girar la pata entera desde la cadera (`gait`) sube y baja el
+// casco en el apoyo; en el ciervo eso lo vigila `animal-gait-axis.test.ts`
+// desde que Vera vio que «siguen pareciendo que deslizan» (27 sep 2026).
+const PLANTED = new Set(['deer']);
+const CROUCH = 0.025;
+function plantedGait(legs, travel, bob) {
+  const rotate = {};
+  const lift = travel * 0.28;
+  for (const [leg, phase] of Object.entries(legs)) {
+    const lower = nodes[byName.get(`${leg}Lower`)].translation ?? [0, 0, 0];
+    const foot = nodes[byName.get(`${leg}Foot`)].translation ?? [0, 0, 0];
+    const K = [lower[0], lower[1]];
+    const A = [lower[0] + foot[0], lower[1] + foot[1]];
+    const L1 = Math.hypot(K[0], K[1]);
+    const L2 = Math.hypot(A[0] - K[0], A[1] - K[1]);
+    const thighRest = Math.atan2(K[1], K[0]);
+    const shinRest = Math.atan2(A[1] - K[1], A[0] - K[0]);
+    // Hacia dónde dobla esta articulación en reposo, y que siga doblando igual.
+    const bend = Math.sign(K[0] * (A[1] - K[1]) - K[1] * (A[0] - K[0])) || 1;
+    const solve = (t) => {
+      const p = (t + phase) % 1;
+      const swing = p > STANCE;
+      const u = swing ? (p - STANCE) / (1 - STANCE) : p / STANCE;
+      // Apoyado, el casco va de delante (−X) a atrás en línea recta; en el aire
+      // vuelve adelante levantado. El cuerpo sube `bob` y el casco no.
+      const dx = swing ? travel / 2 - travel * (0.5 - 0.5 * Math.cos(Math.PI * u)) : -travel / 2 + travel * u;
+      const T = [A[0] + dx, A[1] - bob(t) + (swing ? lift * Math.sin(Math.PI * u) : 0)];
+      const d = Math.min(L1 + L2 - 1e-4, Math.max(Math.abs(L1 - L2) + 1e-4, Math.hypot(T[0], T[1])));
+      const base = Math.atan2(T[1], T[0]);
+      const alpha = Math.acos(Math.max(-1, Math.min(1, (L1 * L1 + d * d - L2 * L2) / (2 * L1 * d))));
+      let thigh = base + alpha;
+      let knee = [L1 * Math.cos(thigh), L1 * Math.sin(thigh)];
+      if (Math.sign(knee[0] * (T[1] - knee[1]) - knee[1] * (T[0] - knee[0])) !== bend) {
+        thigh = base - alpha;
+        knee = [L1 * Math.cos(thigh), L1 * Math.sin(thigh)];
+      }
+      const shin = Math.atan2(T[1] - knee[1], T[0] - knee[0]);
+      const hip = thigh - thighRest;
+      const bendKnee = (shin - thigh) - (shinRest - thighRest);
+      return { hip, knee: bendKnee, foot: -(hip + bendKnee) };
+    };
+    rotate[leg] = [[Z, (t) => solve(t).hip]];
+    rotate[`${leg}Lower`] = [[Z, (t) => solve(t).knee]];
+    // El casco no gira con la pata: se queda plano en el suelo.
+    rotate[`${leg}Foot`] = [[Z, (t) => solve(t).foot]];
+  }
+  rotate.neck = [[Z, (t) => 0.05 * wave(t, 2)]];
+  rotate.tail = [[Y, (t) => 0.18 * wave(t, 1)]];
+  return rotate;
+}
+
 function quadruped(amp) {
   const hip = worldY(byName.get('foreL'));
   // Lo que recorre el pie en el apoyo, y de ahí la zancada del ciclo: el cuerpo
@@ -156,9 +210,13 @@ function quadruped(amp) {
     return rotate;
   };
   const walkSeconds = 1.2;
+  // Con el casco plantado el cuerpo anda un poco agachado (`CROUCH`): con la
+  // pata casi estirada en reposo, el casco no llegaría adelante sin despegarse.
+  const crouch = PLANTED.has(species) ? CROUCH : 0;
+  const bob = (t) => 0.006 * Math.abs(wave(t, 2)) - crouch;
   clip('walk', walkSeconds, {
-    rotate: gait(1, 0.7),
-    lift: { body: (t) => 0.006 * Math.abs(wave(t, 2)) },
+    rotate: PLANTED.has(species) ? plantedGait(legs, travel, bob) : gait(1, 0.7),
+    lift: { body: bob },
   });
   motion.push({ name: 'walk', seconds: walkSeconds, loop: true, strideLength: Number(stride.toFixed(3)) });
   // Quieto: baja la cabeza a olisquear y la sube, la cola se mueve despacio y
@@ -219,6 +277,9 @@ function bird() {
       [Y, (t) => (t > 0.6 ? 0.35 * Math.sin((Math.PI * (t - 0.6)) / 0.4) : 0)]] },
   });
   motion.push({ name: 'idle', seconds: idleSeconds, loop: true, strideLength: null });
+  // La gallina, el cuervo del campo y el pato no vuelan en el juego: andan y
+  // picotean, y hasta ahí. Sólo la perdiz de caza despega.
+  if (species !== 'partridge') return;
   // El vuelo en bucle: las alas arriba y abajo, las patas recogidas. La altura
   // la pone el juego (`altitude`), no el clip.
   clip('flight', 0.3, {
@@ -234,12 +295,42 @@ function bird() {
   if (takeoff !== undefined) motion.push({ name: 'takeoff', seconds: durationOf(takeoff), loop: false, strideLength: null });
 }
 
+// El pez nada: la cola ondula en tres tramos, cada uno con retraso sobre el
+// anterior y más amplitud que él, y las pectorales reman. En glTF la vertical es
+// Y, así que la cola gira en torno a Y. La zancada es lo que avanza por ciclo.
+function fish() {
+  const Xaxis = [1, 0, 0];
+  const swimSeconds = 1;
+  clip('walk', swimSeconds, {
+    rotate: {
+      body: [[Y, (t) => 0.05 * wave(t)]],
+      tail: [[Y, (t) => 0.28 * wave(t, 1, -0.15)]],
+      tailTip: [[Y, (t) => 0.42 * wave(t, 1, -0.3)]],
+      'fin-1': [[Xaxis, (t) => 0.35 * wave(t, 2)]],
+      fin1: [[Xaxis, (t) => -0.35 * wave(t, 2)]],
+    },
+  });
+  motion.push({ name: 'walk', seconds: swimSeconds, loop: true, strideLength: 0.1 });
+  // Quieto contra la corriente: la cola apenas, las aletas despacio.
+  const idleSeconds = 4;
+  clip('idle', idleSeconds, {
+    rotate: {
+      tail: [[Y, (t) => 0.08 * wave(t, 2)]],
+      tailTip: [[Y, (t) => 0.14 * wave(t, 2, -0.15)]],
+      'fin-1': [[Xaxis, (t) => 0.25 * wave(t, 3)]],
+      fin1: [[Xaxis, (t) => -0.25 * wave(t, 3)]],
+    },
+  });
+  motion.push({ name: 'idle', seconds: idleSeconds, loop: true, strideLength: null });
+}
+
 function durationOf(animation) {
   return Math.max(...animation.samplers.map((sampler) => gltf.accessors[sampler.input].max?.[0] ?? 0));
 }
 
 if (QUADS[species] !== undefined) quadruped(QUADS[species]);
-else if (species === 'partridge') bird();
+else if (['partridge', 'hen', 'crow', 'duck'].includes(species)) bird();
+else if (species === 'fish') fish();
 else throw new Error(`Especie sin clips: ${species}`);
 
 // --- escribir --------------------------------------------------------------
