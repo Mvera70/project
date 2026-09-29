@@ -54,7 +54,7 @@ eso está comprobado.
 | Movimiento, choques y empujes entre cuerpos | **Integrador propio en rejilla**: círculos contra celdas bloqueadas y una separación blanda entre vecinos. No hay empuje físico | `life/body.ts`, `integrate`, `fitsCircle`; `separate` en `village.ts` |
 | La caída | El hecho lo decide la regla; **Rapier pinta la caída**: un ragdoll de once segmentos sembrado desde la pose `fall` en t=0, **sin el impulso del golpe**. Tope 24; sin Rapier o por encima del tope, cae el clip `fall` | `life/ragdoll.ts`, `buildRagdoll`; `physics.articulate`; `world/cast.ts`, `captureRagdoll` |
 | Flechas contra caídos y cascotes | **Rapier, de verdad**: los ragdolls (`RAGDOLL_COLLISION_GROUPS`) y los cascotes chocan con las flechas; los vivos no | `ragdoll.ts`; `physics.ts` |
-| La caza | **Sin Rapier**: proyectiles propios con gravedad explícita y prueba de segmento contra círculo; lanza por distancia; y una tirada de suerte decide rozar o fallar | `life/hunt-shot.ts`, `stepHuntShots`, `spearCanHit`; `life/hunt-encounter.ts`, `LUCK` |
+| La caza | **Sin Rapier**: proyectiles propios con gravedad explícita y prueba de segmento contra círculo; lanza por distancia —en la toma del jabalí de 7/24 la lanzada que decide **llega a través de una empalizada**—; y una tirada de suerte decide rozar o fallar | `life/hunt-shot.ts`, `stepHuntShots`, `spearCanHit`; `life/hunt-encounter.ts`, `LUCK` |
 | Las animaciones de combate | **Fechan los hechos, no los deciden**: el contacto está en t=0 del hecho (`since`) | `clips.ts`, `combatClip`, `clipTime`; `life/cast.ts` |
 | El resultado para la partida | El parte de la capa de vida (`life.defence`) entra al motor como dato por `PlayerAct` `kind: 'battle'`; si nadie miró, decide la cuenta de B3. El parte sólo salva si adelgazó la partida | `engine/world/threat.ts`, `settle`; `engine/world/garrison.ts` |
 
@@ -119,7 +119,11 @@ línea de base primero**: fotogramas, peor fotograma, memoria y el ms del paso
 de Rapier (`?sandbox=battle`, «Copiar métricas» en el pico de la pelea); si
 una batalla larga calienta el aparato y baja los fotogramas a los dos o tres
 minutos; la memoria y el tiempo de carga del WASM. Y después **lo mismo con
-las sondas encendidas**, que es lo que F-1 pediría pagar.
+las sondas encendidas** (`&shadow=0.12`: la fila «Sondas F-0» del panel y el
+bloque `probes` de «Copiar métricas»), que es lo que F-1 pediría pagar. Aquí
+no se puede: en el Chromium sin GPU del contenedor el banco se pinta, con su
+fila de sondas, pero va a 0 fps y la pelea no llega
+(`artifacts/physics/F-0/banco/`).
 
 **Qué obligaría a pensar en un motor nativo**, y hoy no se ha visto: que el
 paso de Rapier en el teléfono no quepa en el presupuesto con los

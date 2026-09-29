@@ -18,6 +18,15 @@ const ALARM = 5;
 // catálogo): se alza en el primer segundo y medio y amenaza el resto. Con 1,55 s
 // se cortaba a media subida y se iba andando.
 const WARNING_STEPS = Math.round(3 / LIFE_STEP);
+/**
+ * AN-4c · La boca de la guarida, en celdas por delante de su centro.
+ *
+ * Sale del modelo publicado (`art/recipes/bear-den`): «la entrada está a 0,55
+ * por delante del centro, mirando al claro; el oso se retira hacia dentro y se
+ * esconde tras el hueco oscuro». El oso nacía en el centro, dentro de la roca,
+ * y su aviso de 3 s no se veía (toma de 11/21 en AN-4b).
+ */
+const DEN_MOUTH = 0.55;
 const VISIT_END = stepOfPhase(0.78);
 
 export interface Bear {
@@ -98,9 +107,13 @@ export function createBear(state: GameState, land: Terrain, heart: Point): Bear 
   const { clearing, den } = best;
   const pasture = meadows.filter(at => Math.hypot(at.x - clearing.x, at.z - clearing.z) < 3.5
     && clearLine(land, clearing, at));
+  // Nace en la boca, mirando al claro; si la boca no le cabe, en el centro.
+  const toward = Math.hypot(clearing.x - den.x, clearing.z - den.z);
+  const mouth = { x: den.x + (clearing.x - den.x) / toward * DEN_MOUTH, z: den.z + (clearing.z - den.z) / toward * DEN_MOUTH };
+  const start = fitsCircle(land, mouth.x, mouth.z, RADIUS) ? mouth : den;
   return {
-    body: { id: BEAR_ID, x: den.x, z: den.z, vx: 0, vz: 0, facing: 0,
-      radius: RADIUS, pace: PACE },
+    body: { id: BEAR_ID, x: start.x, z: start.z, vx: 0, vz: 0,
+      facing: Math.atan2(clearing.x - den.x, clearing.z - den.z), radius: RADIUS, pace: PACE },
     den, clearing, pasture, phase: 'approach', target: clearing,
     nextChoice: 0, warningUntil: 0, choices: 0,
   };

@@ -54,6 +54,12 @@ describe('visita del oso', () => {
     const cell = Math.floor(den.z) * land.width + Math.floor(den.x);
     const around = [-1, 0, 1].flatMap(dz => [-1, 0, 1].map(dx => cell + dz * land.width + dx));
     expect(around.some(at => state.map.terrain[at] === TERRAIN_CODE.forest)).toBe(true);
+    // Nace en la boca de la cueva, por delante del modelo y mirando al claro,
+    // no en su centro, donde la roca lo tapaba (la receta de `bear-den`).
+    const toClearing = Math.atan2(den.clearingX - den.x, den.clearingZ - den.z);
+    const out = Math.atan2(bear[0]!.x - den.x, bear[0]!.y - den.z);
+    expect(Math.hypot(bear[0]!.x - den.x, bear[0]!.y - den.z)).toBeGreaterThan(0.5);
+    expect(Math.abs(Math.atan2(Math.sin(out - toClearing), Math.cos(out - toClearing)))).toBeLessThan(0.01);
     village.dispose();
   });
 

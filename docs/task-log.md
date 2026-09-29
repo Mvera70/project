@@ -1,5 +1,39 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · AN-4b y AN-4c: las tomas que faltaban, y el oso que no nacía
+
+Vera: «termina esto: toma en partida la visita del oso, la caza y el asalto
+de la villa». Rodado con dos agentes Sonnet con órdenes cerradas y revisado
+tira a tira; filas de la matriz al día.
+
+**Vistas en partida:** el asalto de la villa 7/60 con arqueros; el conejo que
+huye y cae (7/22); la perdiz que despega de la hierba y vuela (11/24, cámara en
+la presa); el jabalí que carga a galope (7/24, 30 fps). El observatorio graba
+ahora la caza desde el paso en que arranca (se saltaba un segundo, y ahí cabía
+la carga entera con su desenlace).
+
+**AN-4c (`6337c46`):** la visita del oso **no nacía nunca en partida** —con los
+troncos que `solidTerrain` mete en cada celda de bosque no cabía en ninguna
+guarida— y la prueba no lo veía porque usaba el terreno a secas. La guarida
+puede ser ya la linde; la prueba monta los troncos. Y al rodarlo salió la
+segunda mitad: nacía en el centro del modelo de la cueva y la roca lo tapaba;
+ahora nace en la boca que marca la receta y **se ve en partida** (11/21:
+se alza 3 s delante de la cueva y se mete dentro). 7/30 agota la carga del
+observatorio (240 s) con el empaquetado nuevo, dos veces; 11/21 carga bien.
+
+**Abierto, decisión de Vera:** la visita del oso dura 3 s (el leñador está en
+la guarida); la lanza de la caza atraviesa empalizadas. **Propuesto sin
+ejecutar:** AN-5a, que la caza enseñe el golpe que la decide (hoy la estocada
+final no se dibuja, los gestos no van fechados por el tiro y la presa espantada
+desaparece en el sitio), y el gesto propio de la honda.
+
+**La puerta de la tanda** (29 sep, 16:40): typecheck y lint limpios; suite
+rápida 216 de 218 ficheros y 2089 de 2091 pruebas en 44 min con la máquina
+compartida con Chromium. Rojas: la de tiempo de `catchUp` (8,2 s bajo carga;
+la de siempre, también en `d82bd84`) y `life-bear` en la pasada completa, que
+corrió justo en los segundos en que se retiró el arreglo a propósito para ver
+fallar su prueba —el mensaje es el del fallo sin arreglo—; a solas, 4 de 4.
+
 ## 29 sep 2026 · ¿Decide la física las batallas? F-0, la flecha que toca, en sombra
 
 Vera, con `/goal` al cerrar la animación: «me preocupa que tener Rapier para

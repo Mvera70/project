@@ -461,12 +461,43 @@ cabe y su guarida tiene bosque al lado. Sin el arreglo, la prueba falla
 («expected [] to have a length of 1»). Con la biblioteca real, el oso nace en
 los tres valles.
 
+**Y una segunda mitad, vista al rodarlo.** Con la guarida arreglada, la toma
+de 11/21 enseñó al oso **dentro de la roca**: nacía en el centro del modelo de
+la cueva (`bear-den`) y los 3 s del aviso pasaban tapados. La receta publicada
+dice dónde va: «la entrada está a 0,55 por delante del centro, mirando al
+claro; el oso se retira hacia dentro y se esconde tras el hueco oscuro». El oso
+nace ahora en esa boca, mirando al claro (`DEN_MOUTH`), y al retirarse vuelve
+al centro, dentro. La prueba lo guarda y la toma lo enseña
+(`AN-4b/bear-seed11-y21-an4c/strip-bear-wide.png`: se alza delante de la cueva
+en los fotogramas 1–30 y entra del 31 al 36).
+
 **Lo que no decide este brief, y es del dueño.** La guarida se elige junto al
 árbol que se tala, y ahí está el leñador (a 0,2–1,3 celdas en los tres valles):
 el oso avisa en el primer paso de la jornada y a los 3 s se ha ido, sin llegar
 a hozar en el claro. Para que se le vea salir, hozar y retirarse al ver gente
 habría que alejar la guarida del tajo —un cambio de cómo es la visita, no de
 cómo se anima—.
+
+### AN-5a · La caza enseña el golpe que la decide (brief propuesto, no ejecutado)
+
+**Defecto medido** en la toma del jabalí de AN-4b (7/24, lanza, 30 fps): la
+carga se ve 32 pasos y la estocada que resuelve la caza, ninguno. En el paso
+en que la lanza llega, `life/hunt-encounter.ts` resuelve la caza (espantada o
+muerta) y pone el clip del cazador en `idle`; el renderer
+(`renderer.ts`, actor del cazador) le quita el arma al completarse y le da
+`clipSeconds` del reloj de presentación, así que ni `spear_thrust` ni
+`bow_loose` empiezan en el tiro. Y la presa espantada pasa a `gone` en el
+sitio.
+
+**Vía propuesta.** (1) `HuntHunterPose` lleva los pasos desde el último tiro
+y el renderer los usa como tiempo de los clips de gesto —lo que el asalto ya
+hace con `combatClip` y `since`—; (2) al completarse, el gesto del último tiro
+y el arma se quedan hasta que acaba el clip; (3) la presa espantada huye unos
+segundos con `stepWildPrey` antes de irse. Módulos: `hunt-encounter.ts` y la
+parte del cazador en `renderer.ts`. Prueba: una caza con lanza que acaba en
+estocada enseña `spear_thrust` con el contacto en t=0 del paso que decidió.
+**Fuera de este brief, y del dueño:** que la lanza no pase a través de una
+empalizada (mirar la línea libre cambia cuántas cazas salen bien).
 
 ## 7 · AN-4 · Aceptación conjunta
 

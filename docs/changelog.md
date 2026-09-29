@@ -1,5 +1,42 @@
 # The Valley — Registro de cambios
 
+## v5.01 · 29 sep 2026 · AN-4b y AN-4c: las tomas que faltaban, y el oso que no nacía
+
+Vera pidió cerrar las tomas en partida que el observatorio no había podido dar
+—la visita del oso, la caza (el despegue de la perdiz, la carga del jabalí, la
+huida del conejo) y el asalto de la villa— y conservar `throw`. Las rodaron
+dos agentes con órdenes cerradas; la matriz (`docs/medidas/animacion-matriz-2026-09-29.md`)
+lleva cada fila con su toma.
+
+- **Vistas en partida**: el asalto de la villa 7/60 con arqueros (tensado y
+  suelta cada 2,1 s, lanza, impacto y caída); la huida y la caída del conejo
+  (7/22); el despegue de la perdiz de entre la hierba y su vuelo (11/24, con la
+  cámara en la presa: con la cámara en el cazador no salía en cuadro); la carga
+  del jabalí a galope (7/24, a 30 fps, un paso por fotograma).
+- **El observatorio** (`observe-life.mjs`): `--hunted`, `--hunt` con el gancho
+  `__valleyHunt` y el motivo si no empieza, 240 s de carga, la traza `hunt`, y
+  **la caza se graba desde el paso en que arranca**: se adelantaba un segundo,
+  y la carga del jabalí con su desenlace cabía entera dentro.
+  `trace-strip.py` saca la tira de un actor siguiendo la traza.
+- **AN-4c · el oso no nacía nunca en partida** (`life/bear.ts`): su guarida
+  tenía que ser una celda de bosque libre para un cuerpo de 0,52, y el juego
+  pone un tronco en cada celda de bosque (`solidTerrain`). Con la biblioteca
+  real, 0 guaridas en 7/30, 11/21 y 23/30 (22 sobre el terreno a secas, que es
+  lo que usaba la prueba). Ahora la guarida puede ser la linde; la prueba monta
+  troncos donde el juego planta cada árbol y falla sin el arreglo. Rodado
+  eso, **el oso nacía en el centro del modelo de su cueva y la roca lo
+  tapaba**: ahora nace en la boca que dice la receta publicada (0,55 por
+  delante, mirando al claro) y se retira hacia dentro. En partida (11/21): se
+  alza delante de la cueva 3 s y entra. **Queda para Vera**: la guarida está junto al árbol que se tala y
+  el leñador a su lado, así que la visita es un aviso de 3 s al empezar la
+  jornada, sin hozar en el claro.
+- **Límites que las tomas han sacado**, apuntados en `encargos-3d.md`: la honda
+  usa los gestos del arco; en la caza, la estocada que decide no se dibuja, los
+  gestos no van fechados por el tiro y la presa espantada desaparece en el sitio
+  (brief AN-5a, propuesto); y la lanza llega a través de una empalizada (sólo
+  distancia; decisión del dueño).
+- **Vera conserva `throw`** para cuando vuelvan los trastos sueltos.
+
 ## v5.00 · 29 sep 2026 · ¿Decide la física las batallas? F-0, la flecha que toca, en sombra
 
 Vera, al cerrar la animación: «me preocupa que tener Rapier para flechas y

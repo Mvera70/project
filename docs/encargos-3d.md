@@ -110,11 +110,27 @@ la cabeza y la suelta, fechado por el tiro como `bow_loose`— y elegirlo en
 `hunt-encounter.ts` según el arma.
 
 **La visita del oso** (AN-4c, 29 sep 2026): **no se veía nunca en partida**
-—con los troncos del juego no cabía en ninguna guarida de bosque— y desde
-AN-4c nace en la linde. Lo que queda es de diseño: la guarida está junto al
+—con los troncos del juego no cabía en ninguna guarida de bosque, y cuando
+cupo nacía dentro de la roca de su cueva—; desde AN-4c nace en la linde, en la
+boca de la cueva, y se ve alzarse y meterse dentro (toma de 11/21). Lo que
+queda es de diseño: la guarida está junto al
 árbol que se tala, con el leñador al lado, así que la visita es un aviso de
 3 s al empezar la jornada y el oso se va sin hozar en el claro. Alejar la
 guarida del tajo es decisión del dueño.
+
+**La caza no enseña el golpe que la decide** (visto en partida en AN-4b, 29
+sep 2026, jabalí de 7/24 con lanza, `AN-4b/hunt-boar-seed7-y24-desde-el-inicio`).
+El jabalí carga 32 pasos hacia el cazador; en el 33 la lanza llega (1,35 de
+distancia), falla, el jabalí se espanta y la caza se da por hecha. En pantalla:
+(1) **la estocada no se ve** —en ese mismo paso `life/hunt-encounter.ts` pone
+al cazador en `idle`, y el renderer le quita el arma al completarse la caza—;
+(2) **los gestos de la caza no van fechados por el tiro** —el renderer pone al
+cazador `clipSeconds` del reloj de presentación, no desde el tiro, como sí hace
+el asalto con `combatClip`—; (3) **la presa espantada desaparece en el sitio**
+(`wild.phase = 'gone'`) en vez de huir; y (4) **la lanza llega a través de la
+empalizada**: la caza sólo mira distancias (`spearCanHit`). Los tres primeros
+son de presentación y tienen vía en el brief AN-5a del plan de animación; el
+cuarto cambia el resultado de la caza y es decisión del dueño.
 
 ## 4 · De otras rondas, aún abierto
 

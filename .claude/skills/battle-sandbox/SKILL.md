@@ -101,6 +101,12 @@ lo que añaden las sondas (`probes.probeMs`) como fracción del fotograma de la 
 base en ese aparato (`docs/diagnostico-fisica-combate-2026-09-29.md` §2 y §3). En el
 portátil de este contenedor: Rapier ~0,3 ms por paso y las sondas ~0,08 ms.
 
+**En el Chromium sin GPU del contenedor el banco no avanza** (29 sep 2026): el panel
+se pinta —con la fila «Sondas F-0»— pero la página va a 0 fps, la vida no da ni un
+paso en veinte minutos y `__valleyAdvance` no tiene fotograma del que partir. Aquí se
+mide con `battle-report.ts`; el banco, en un navegador de verdad
+(`artifacts/physics/F-0/banco/`).
+
 ## Comprobar un cambio del combate
 
 1. **Sin navegador, primero** (segundos):
