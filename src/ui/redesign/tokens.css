@@ -233,6 +233,7 @@
   --wood-header: url('./wood-header.png');           /* 748×184: la tabla de la cabecera */
   --wood-board: url('./wood-board.png');             /* 512×512: loseta del tablón */
   --parchment-sheet: url('./parchment-sheet.png');   /* 1024×1024: loseta de las hojas y la bandeja */
+  --parchment-sheet-edge: url('./parchment-sheet-edge.png'); /* 780×48: el canto rasgado de arriba de un documento */
   --plate-date: url('./plate-date.png');             /* 716×68: la placa de la fecha y el sol */
   --well-vital: url('./well-vital.png');             /* 136×68: el hueco de cada cifra */
   --strip-status: url('./strip-status.png');         /* 716×80: la tira de la frase de estado */

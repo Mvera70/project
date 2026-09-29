@@ -1044,6 +1044,28 @@ html.bare .valley-hud-right.hud-speed-corner {
      diente más profundo. */
   bottom: calc(var(--ui-stack-height, 60px) + 14px);
 }
+/* v9 · **En una pantalla baja el rincón se hace columna en el borde derecho,
+   bajo la cabecera.** A 320×568 el lienzo mide 320×~280 y el rincón, pegado
+   abajo a la derecha, tapaba el punto de toque del cartel de la plaza (medido:
+   el cartel en 171,243 y el mando de vista en 162,220 de 44×44): tocar el
+   tablón encendía «sólo el valle». Lo cazó la auditoría de Codex del 29 sep.
+   En columna a la derecha el rincón no cae sobre la plaza, y la regleta de
+   velocidad, que se apila encima del rincón, aquí se abre hacia abajo. */
+@media (max-height: 640px) {
+  html:not(.bare) .valley-hud-right.hud-speed-corner {
+    flex-direction: column;
+    bottom: auto;
+    top: calc(var(--ui-hud-height, 96px) + 8px);
+    right: 8px;
+    width: auto;
+  }
+  html:not(.bare) .valley-speeds.hud-speeds {
+    bottom: auto;
+    top: 100%;
+    margin-bottom: 0;
+    margin-top: 8px;
+  }
+}
 
 /* ------------------------------------------------- la regleta de velocidad */
 
