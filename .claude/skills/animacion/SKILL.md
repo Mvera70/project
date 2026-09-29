@@ -163,10 +163,21 @@ sin la autorización de Vera.
 - El `play` de un niño casi nunca lleva pelota (`day.ts`, `leisurePlaces`):
   el juego sin trasto es lo común y se brinca; mandarlo a `idle` deja a los
   niños de pie.
-- `--beast` del observatorio sólo actúa con `--aftermath`; el oso de la
-  visita se provoca con `--happening bear_in_the_wood`. La caza (`--hunt`)
-  exige que el motor ofrezca una en ese instante: se busca semilla y año con
-  `huntOpportunity(state)` en un script del motor antes de rodar.
+- **Las situaciones raras se provocan, no se esperan** (AN-4b): la visita del
+  oso con `--hunted partridge,rabbit,deer,boar --happening bear_in_the_wood`
+  (sólo nace superado el jabalí); una caza con `--hunt`, que la arranca con
+  el gancho `__valleyHunt` y dice el motivo si no empieza; las presas
+  siguientes con `--hunted` (conejo tras la perdiz, jabalí tras el ciervo,
+  con `--means bows,arms` para tener arma); un asalto con arqueros con
+  `--means bows,arms --raid N --assault --follow -9000`. La oferta de caza de
+  una semana es un hash de semilla y semana (`huntOpportunity`): se busca sin
+  correr el motor. `--beast` sólo actúa con `--aftermath`.
+- Las tiras de un actor siguiendo la traza:
+  `python3 artifacts/graphics/AN-4b/trace-strip.py <toma> --find` y
+  `--id N [--animal]`; escala las coordenadas al PNG, que la resolución
+  adaptativa puede bajar (273×590 en una villa con asalto).
+- La pelota suelta **no existe en la partida** desde el 15 sep (decisión del
+  dueño: `createVillage` sin `props: true`), así que `throw` no sale nunca.
 - `fps` del observatorio tiene que dividir a 30. Un solo Chromium a la vez.
 - La hoja de gestos pone el clip a `action.time = t` sobre el GLB a secas:
   un salto de 0,12 m son 7 px en la hoja; la propiedad lo guarda mejor.

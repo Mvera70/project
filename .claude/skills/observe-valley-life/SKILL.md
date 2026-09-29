@@ -112,11 +112,21 @@ calidad de las zancadas: para eso conserva las tomas lentas de 15 fps.
 - **Saltos y ritmo se miden sobre `trace.json`** (posiciones por fotograma,
   pasos exactos): `film.mjs` rueda en tiempo real y bajo SwiftShader tarda
   8 s por fotograma, así que su informe cuenta el reloj como saltos.
-- `--hunt` toca la señal de caza al acabar el lead y rueda la escena (el
-  juego sigue al cazador); si no hay señal, se para y lo dice: la
-  oportunidad la ofrece el motor (`huntOpportunity`), no el observatorio.
-- `--beast` sólo actúa junto a `--aftermath`; la visita del oso se provoca
-  con `--happening bear_in_the_wood`. `fps` tiene que dividir a 30.
+- `--hunt` arranca la caza de la semana con el gancho `__valleyHunt` (lo
+  mismo que tocar la señal, sin depender de que esté en cuadro) y, si no
+  empieza, dice el motivo (`no-offer`, `no-prey`, `no-hunter`…): la
+  oportunidad la ofrece el motor (`huntOpportunity`), no el observatorio. La
+  traza lleva `hunt` (fase, especie, arma, acción de la presa, clip del
+  cazador) fotograma a fotograma.
+- `--hunted partridge,rabbit…` da por cazadas esas especies (abre las cazas
+  siguientes); con `--happening bear_in_the_wood` y el jabalí cazado llega la
+  visita del oso. `--beast` sólo actúa junto a `--aftermath`. Un asalto con
+  arqueros: `--means bows,arms --raid N --assault --follow -9000`.
+  `fps` tiene que dividir a 30; `page.goto` espera 240 s (una villa con
+  asalto tarda en cargar bajo SwiftShader).
+- Las tiras de un actor siguiendo la traza, escaladas al PNG que la
+  resolución adaptativa puede bajar:
+  `python3 artifacts/graphics/AN-4b/trace-strip.py <toma> --find | --id N [--animal]`.
 - `export VALLEY_CHROMIUM=/opt/pw-browsers/chromium` cuando Playwright pide
   un Chromium que no está; un solo Chromium a la vez, encadenados con un
   script y un `grep` de su marca de fin.
