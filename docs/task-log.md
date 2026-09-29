@@ -1,5 +1,26 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · Revisión del encargo de profundidad visual en móvil — **propuesta, sin código**
+
+Vera pidió leer con ojo crítico el encargo de Astra (`art/astra-modelos`,
+`15b4f84`, `docs/encargos/profundidad-visual-movil-2026-09-29.md`) y sacar un
+plan. Revisión y plan en
+`docs/encargos/profundidad-visual-movil-revision-2026-09-29.md` (rama
+`ccr-81589d5f-v4dxsy`). **Vale** el objetivo, el contacto en lote, los límites
+de capa y no tocar la sombra solar. **No se puede ejecutar tal cual**: no
+cuenta con la tablet a 0 fps; parte de un `main` sin «Graphics» (en Low no hay
+sombras); sus capturas no están en ninguna rama; GV-0 no se puede tomar
+(`gl-probe`, `scene-report`, `shader-churn` y `cpu-profile` sólo arrancan en
+Windows, `shot.mjs` fotografía el perfil High, y la adaptativa dejó cinco tomas
+a cuatro escalas, de 0,55 a 1,0); falta la sombra de la gente (los aldeanos
+nunca la han dado); y GV-3 descansa en un MSAA que no se midió aislado, cuando
+con three r185 FXAA son dos pases de pantalla completa más. **Plan**: V-0
+instrumentos → V-1 línea de base y lectura en el aparato (la puerta de lo que
+cueste por píxel) → V-2 anclaje (disco instanciado bajo los pies, máscara de
+contacto en el sombreador del suelo, prado) → V-3 el seguido (medir antes; velo
+de tramado como el de la montaña, que no apaga el hachazo del leñador) → V-4
+suavizado. **Abierto**: las cinco decisiones de su §6.
+
 ## 29 sep 2026 · Rendimiento en la tablet, «Graphics» y lo que quedaba de la v9
 
 Vera abrió el sitio en su tablet a 0 fps con fotogramas de dos segundos (año
