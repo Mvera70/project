@@ -43,7 +43,7 @@ export interface ClipMotion {
 }
 
 export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'mine' | 'sow' | 'spread' | 'douse' | 'play' | 'throw' | 'drink' | 'sort' | 'shelter'
-  | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'spear_thrust' | 'hit_take' | 'fall' | 'flee';
+  | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'spear_thrust' | 'spear_thrust_high' | 'spear_thrust_low' | 'hit_take' | 'fall' | 'flee';
 
 /**
  * IA-anim · En qué fracción del ciclo pega la herramienta. Lo lee el clip para
@@ -70,7 +70,7 @@ export const STRIKE_HEAD: Readonly<Record<'chop' | 'mine', { readonly x: number;
 /** Gestos de combate: su reloj procede del hecho, nunca del primer pintado. */
 export function combatClip(clip: string): boolean {
   return clip === 'bow_draw' || clip === 'bow_loose' || clip === 'gate_strike'
-    || clip === 'spear_thrust' || clip === 'hit_take' || clip === 'fall';
+    || clip === 'spear_thrust' || clip === 'spear_thrust_high' || clip === 'spear_thrust_low' || clip === 'hit_take' || clip === 'fall';
 }
 
 export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
@@ -80,6 +80,11 @@ export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
   // 2,3–3,7, con dos vuelos por ciclo en el clip.
   flee: { seconds: 0.8, loop: true, strideLength: 0.7 },
   spear_thrust: { seconds: 0.9, loop: false, strideLength: null },
+  // AN-5b · La misma estocada con los brazos altos, para la presa cuyo tronco
+  // queda por encima de la baja: el ciervo (0,37–0,63) sobre la punta a 0,35.
+  spear_thrust_high: { seconds: 0.9, loop: false, strideLength: null },
+  // Y la que baja, para el jabalí: el lomo (0,13–0,37) queda bajo la media.
+  spear_thrust_low: { seconds: 0.9, loop: false, strideLength: null },
   hit_take: { seconds: 0.5, loop: false, strideLength: null },
   bow_draw: { seconds: 1.5, loop: true, strideLength: null },
   bow_loose: { seconds: 0.6, loop: false, strideLength: null },

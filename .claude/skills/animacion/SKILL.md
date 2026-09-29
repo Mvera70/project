@@ -201,3 +201,24 @@ sin la autorización de Vera.
   un salto de 0,12 m son 7 px en la hoja; la propiedad lo guarda mejor.
 - Un clip nuevo se añade a `ClipName`, a `VILLAGER_CLIPS`, a `ACTION_CLIPS`
   y a `clipOf`; `graphics-clock` cuenta que las tres listas casen.
+- **Un gesto que decide algo se mide sobre lo que se pinta y se vigila con
+  una prueba** (AN-5): la punta de las tres estocadas de la caza en su
+  contacto y la mano que suelta el tiro están en `life/hunt-shot.ts`
+  (`THRUST`, `RELEASE`) y las guarda `hunt-gestures.test.ts` sobre el GLB con
+  el arma colgada por su `grip`. Si tocas `spear_thrust*` o `bow_loose` en
+  `action-clips.ts`, esa prueba falla y se vuelve a medir. Tocar
+  `spear_thrust` mueve también la estocada del asalto: para la caza se
+  añadieron la alta y la baja sin cambiar la de siempre.
+- **El gesto fechado por la vida llega al render como `clipSeconds`**, no se
+  calcula con el reloj de presentación: la pose de la caza lo trae (0 en el
+  contacto) y el render sólo lo pinta; andar va por `clipTime` con el suelo
+  recorrido. Un bucle (`bow_draw`) se envuelve con su duración.
+- **La pieza caída se tumba sobre su eje largo** (AN-5c): el modelo mira a -X,
+  así que el vuelco va en X con el orden `YXZ` (primero el rumbo) y sube medio
+  ancho del modelo. Con `rotation.z` se ponía de pie sobre el hocico, medio
+  enterrada, y nadie lo vio en cinco rondas porque la prueba miraba el ángulo
+  y no la caja: mide la caja del cuerpo, no el número de la implementación.
+- **El parte de una escena espera a que se vea** (AN-5a, `settled`): si lo
+  que se entrega al motor acaba la escena, la pieza cobrada desaparece en el
+  fotograma del golpe. La semana ya esperaba a la caza; ahora espera también
+  a que la presa caiga y se quede, o se vaya.

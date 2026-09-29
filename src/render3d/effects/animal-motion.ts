@@ -20,7 +20,13 @@
 //     de una décima larga, independiente de la tasa de fotogramas.
 //   · **Caer no es un giro instantáneo.** `down` ponía el cuerpo de costado en
 //     un fotograma; ahora se tumba en un tercio de segundo.
-import { AnimationMixer, Group, LoopOnce, Mesh, SkinnedMesh, type AnimationAction, type Object3D } from 'three';
+//
+// AN-5c (29 sep 2026) · **Y se tumba de costado de verdad.** El giro iba sobre
+// el eje del ancho (Z) y no sobre el del largo (X, la cabeza en -X): la pieza
+// cobrada quedaba de pie sobre el hocico, medio enterrada (medido: el jabalí
+// caído medía 0,71 de alto con 0,29 bajo el suelo). Ahora rueda sobre su eje
+// largo y se apoya en el costado: sube lo que mide de medio ancho.
+import { AnimationMixer, Box3, Group, LoopOnce, Mesh, SkinnedMesh, type AnimationAction, type Object3D } from 'three';
 import type { LoadedAsset } from '../assets';
 import type { Animal } from '@derive/animals';
 import { dogGestures } from './animal-gestures';
@@ -49,6 +55,12 @@ const TURN_PROGRESS = 0.05;
 const BLEND = { walk: 0.1, gesture: 0.08, down: 0.14 };
 /** Una vuelta de la cara por segundo, como `TURN_RATE` de `body.ts` (seis radianes). */
 const TURN = 12;
+/**
+ * El vuelco de la pieza caída sobre su eje largo: queda sobre el costado -Z,
+ * con las patas hacia fuera. `life/hunt-encounter.ts` rueda igual lo que lleva
+ * clavado (`DOWN_ROLL` de allí).
+ */
+export const DOWN_ROLL = -Math.PI / 2;
 
 const ease = (seconds: number, delta: number): number => 1 - Math.exp(-delta / seconds);
 
@@ -80,9 +92,16 @@ export class AnimalMotion {
   private distance = 0;
   private readonly phase: number;
 
+  /** Medio ancho del modelo en reposo: lo que sube al tumbarse de costado. */
+  private readonly flank: number;
+
   constructor(readonly kind: Animal['kind'], object: Object3D, asset: LoadedAsset, id: number) {
     this.group.name = `Animal_${kind}_${id}`;
+    // Primero el rumbo y después, en su propio marco, el vuelco sobre el eje largo.
+    this.group.rotation.order = 'YXZ';
     this.group.add(object);
+    const rest = new Box3().setFromObject(object);
+    this.flank = Number.isFinite(rest.max.z - rest.min.z) ? (rest.max.z - rest.min.z) / 2 : 0;
     object.traverse(node => {
       // Sin sombra (27 sep 2026): un animal a esta distancia apenas la deja ver,
       // y cada malla con sombra se dibuja dos veces. Eran 177 llamadas en la villa.
@@ -223,8 +242,8 @@ export class AnimalMotion {
     }
     this.mixer.update(0);
     const settle = this.downBlend * this.downBlend * (3 - 2 * this.downBlend);
-    this.group.rotation.z = -Math.PI / 2 * settle;
-    this.group.position.set(animal.x, floor + (animal.altitude ?? 0), animal.y);
+    this.group.rotation.x = DOWN_ROLL * settle;
+    this.group.position.set(animal.x, floor + (animal.altitude ?? 0) + this.flank * settle, animal.y);
     this.previous = { x: animal.x, y: animal.y };
   }
 

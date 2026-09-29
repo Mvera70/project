@@ -89,6 +89,9 @@ import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
 import type { PhysicsSnapshot } from './life/physics';
+import { createContactWorld, loadPhysics, type ContactWorld } from './life/physics';
+import { standingOf } from './life/hunt-bodies';
+import { clipTime } from './clips';
 import { DRAWN_BODY, type ArcheryShadow } from './life/archery';
 import { garrisonAs, type Arm } from '@derive/garrison';
 import { createHuntEncounter, type HuntEncounter, type HuntReport } from './life/hunt-encounter';
@@ -723,6 +726,12 @@ export async function createGraphicsRenderer(
   let life: LifeVillage | null = null;
   let denVisual: Object3D | null = null;
   let huntScene: HuntEncounter | null = null;
+  /**
+   * AN-5b · El mundo de contacto de la caza en marcha: el suelo, lo que está de
+   * pie y la presa, en Rapier. Se crea al empezar y se suelta al acabar.
+   */
+  let huntWorld: ContactWorld | null = null;
+  const dropHuntWorld = (): void => { huntWorld?.dispose(); huntWorld = null; };
   /**
    * La ocasión de caza, a la vista (`senales-en-el-mapa`, 27 sep 2026): la
    * presa ya está en el valle con su señal encima mientras dure la semana, y
@@ -1692,6 +1701,14 @@ export async function createGraphicsRenderer(
       }
     }
     huntScene = scene;
+    dropHuntWorld();
+    // El contacto llega en cuanto Rapier está: mientras, el cazador se acerca.
+    void createContactWorld(life.land, { ground: groundFloor, standing: standingOf(state as GameState) }).then((made) => {
+      if (made === null) return;
+      if (huntScene !== scene) { made.dispose(); return; }
+      huntWorld = made;
+      scene.attach(made);
+    });
     huntSighting = null;
     hunter.hunting = true;
     hunter.doing = null;
@@ -1965,6 +1982,7 @@ export async function createGraphicsRenderer(
       if (frame.discontinuity || (!holdPresentation && (life === null || lifeState !== shown))) {
         const previous = life;
         huntScene = null;
+        dropHuntWorld();
         huntSighting = null;
         huntSightingTick = -1;
         if (huntHunter !== null) { huntHunter.hunting = false; huntHunter = null; }
@@ -2124,7 +2142,9 @@ export async function createGraphicsRenderer(
         life.step(stepPhase);
         if (huntScene !== null) {
           huntScene.step(life.wildlife);
-          if (huntScene.completed !== null && huntReport === null) huntReport = huntScene.completed;
+          // AN-5a · El parte espera a que la escena acabe de verse: la pieza
+          // cae y se queda, o la que se escapa se va.
+          if (huntScene.completed !== null && huntScene.settled && huntReport === null) huntReport = huntScene.completed;
         } else if (huntSighting !== null && huntSighting.prey !== null) {
           // Esperando: pace a su aire; con el paso congelado en 0 no caduca.
           stepWildPrey(huntSighting.prey, life.land, state.seed ^ huntSighting.tick, 0, []);
@@ -2198,10 +2218,14 @@ export async function createGraphicsRenderer(
         const villager = huntHunter.villager;
         lastActors = lastActors.map(actor => actor.id !== villager ? actor : {
           ...actor, x: hunter.x, z: hunter.z, facing: hunter.facing,
-          activity: hunter.clip === 'walk' ? 'walking' : 'resting',
+          activity: hunter.clip === 'walk' || hunter.clip === 'flee' ? 'walking' : 'resting',
           clip: hunter.clip, load: null, poseSeconds: frame.presentationSeconds,
-          clipSeconds: frame.presentationSeconds, travelled: hunter.travelled,
-          weapon: scene.completed === null ? scene.weapon : null,
+          // AN-5a · El gesto, fechado por el hecho (la estocada y la suelta en su
+          // t = 0); andar, por el suelo recorrido, como cualquier aldeano.
+          clipSeconds: hunter.clipSeconds ?? clipTime(hunter.clip, hunter.travelled, frame.presentationSeconds, 0),
+          travelled: hunter.travelled,
+          // Y el arma en la mano hasta que la escena termina, no al dar el golpe.
+          weapon: hunter.weapon,
         });
         // Y la cámara va detrás, como con el seguimiento de la ficha.
         if (scene.completed === null) { cast.highlight(villager); view.look(hunter.x, hunter.z); }
@@ -2212,6 +2236,8 @@ export async function createGraphicsRenderer(
         huntSightingTick = state.tick;
         const offer = huntOpportunity(state);
         huntSighting = offer === null ? null : sightingFor(state, offer.species);
+        // AN-5b · Rapier se carga cuando se ofrece la caza, no al tocarla.
+        if (huntSighting !== null) void loadPhysics();
       }
       // V-09b: la pelota, el palo, el cubo, el haz de leña.
       props.update(propsOf(life), groundFloor);
@@ -2606,6 +2632,7 @@ export async function createGraphicsRenderer(
       huntReport = null;
       if (report !== null) {
         huntScene = null;
+        dropHuntWorld();
         // El cazador vuelve a su día desde donde terminó, sin saltos.
         if (huntHunter !== null && life !== null) {
           huntHunter.hunting = false;
@@ -2776,6 +2803,7 @@ export async function createGraphicsRenderer(
       if (disposed) return;
       disposed = true;
       clearBattleDebris();
+      dropHuntWorld();
       life?.dispose();
       if (denVisual !== null) world.remove(denVisual);
       denVisual = null;

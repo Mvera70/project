@@ -1,0 +1,23 @@
+CAMPO · llano de 50 × 50, presa en el centro, cazador a 12 celdas, 60 semillas
+especie · arma   cazas   cobrada  malherida  ilesa   golpes  tiros  segundos
+partridge · sling   60    52 %    27 %    22 %    0.93     1.8      4.4
+partridge · bow    60    52 %    27 %    22 %    0.93     1.8      4.2
+rabbit · sling     60    50 %    28 %    22 %    0.92     1.7      4.3
+rabbit · bow       60    50 %    28 %    22 %    0.92     1.7      4.2
+deer · bow         60    53 %    27 %    20 %    0.95     1.8      4.2
+deer · spear       60    53 %    27 %    20 %    0.95     0.0     10.0
+boar · bow         60    35 %    45 %    20 %    1.37     2.5      5.8
+boar · spear       60     0 %     0 %   100 %    0.00     0.0     11.6
+bear · spear       60    15 %    83 %     2 %    3.57     0.0     15.3
+
+VALLE · semillas 7, 11, 23, 3, 5, año 30, relieve y troncos, cazador desde la aldea
+especie · arma   cazas   cobrada  malherida  ilesa   golpes  tiros  segundos
+partridge · sling   60    68 %    17 %    15 %    0.93     1.6      4.0
+partridge · bow    60    68 %    17 %    15 %    0.93     1.6      3.9
+rabbit · sling     60    67 %    18 %    15 %    0.92     1.6      4.0
+rabbit · bow       60    67 %    18 %    15 %    0.92     1.6      3.9
+deer · bow         24    83 %    13 %     4 %    1.17     1.6      4.2
+deer · spear       24     0 %     0 %   100 %    0.00     0.0     20.0
+boar · bow         24    46 %    50 %     4 %    1.92     3.0      6.9
+boar · spear       24     0 %     0 %   100 %    0.00     0.0     11.9
+bear · spear       60     0 %     0 %   100 %    0.00     0.0     20.0

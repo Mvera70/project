@@ -1,0 +1,27 @@
+CAMPO · llano de 50 × 50, presa en el centro, cazador a 12 celdas, 60 semillas
+especie · arma   cazas   cobrada  malherida  ilesa   golpes  tiros  segundos   pecho/trasero/roce/de pie/suelo/aire
+partridge · sling   60    40 %     3 %    57 %    0.43     1.3     13.9   24/0/2/0/50/0
+partridge · bow    60    58 %     5 %    37 %    0.63     1.3     11.8   35/0/3/0/38/0
+rabbit · sling     60    33 %     5 %    62 %    0.38     1.2     14.3   20/0/3/0/51/0
+rabbit · bow       60    55 %     7 %    38 %    0.62     1.3     12.1   33/0/4/0/39/0
+deer · bow         60    42 %    48 %    10 %    0.90     1.1     11.4   25/26/3/0/10/0
+deer · spear       60    58 %    10 %    32 %    0.68     0.7     15.6   35/6/0/0/0/0
+boar · bow         60    45 %     0 %    55 %    1.30     1.4     17.2   54/19/5/0/8/0
+boar · spear       60    48 %     3 %    48 %    1.00     1.0     14.8   60/0/0/0/0/0
+bear · spear       60    22 %    78 %     0 %    3.07     3.3     13.0   184/0/0/0/0/13
+
+VALLE · semillas 7, 11, 23, 3, 5, año 30, relieve y troncos, cazador desde la aldea
+especie · arma   cazas   cobrada  malherida  ilesa   golpes  tiros  segundos   pecho/trasero/roce/de pie/suelo/aire
+partridge · sling   60    33 %     2 %    65 %    0.35     1.2     13.4   20/0/1/16/33/0
+partridge · bow    60    42 %     3 %    55 %    0.45     1.1     12.1   25/0/2/12/29/0
+rabbit · sling     60    42 %     5 %    53 %    0.47     1.6     13.0   25/0/3/27/43/0
+rabbit · bow       60    53 %     3 %    43 %    0.60     2.0     12.7   32/0/4/34/49/0
+deer · bow         24    67 %    29 %     4 %    1.17     1.6     15.7   16/11/1/11/0/0
+deer · spear       24    79 %    21 %     0 %    2.58     2.6     22.2   19/43/0/0/0/0
+boar · bow         24    46 %     0 %    54 %    1.46     1.9     16.6   22/10/3/9/2/0
+boar · spear       24    50 %     0 %    50 %    1.00     1.0     14.0   24/0/0/0/0/0
+bear · spear       60    17 %    83 %     0 %    2.73     3.2     31.2   164/0/0/0/0/30
+
+real	2m40.032s
+user	2m45.689s
+sys	0m1.640s

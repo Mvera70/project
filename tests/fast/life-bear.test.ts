@@ -82,24 +82,74 @@ describe('visita del oso', () => {
     village.dispose();
   });
 
-  it('se detiene y enseña el zarpazo ante una persona; después se retira', () => {
-    const land: Terrain = { width: 24, height: 24, blocked: new Uint8Array(24 * 24) };
-    const bear: Bear = {
-      body: { id: 50_000, x: 10, z: 10, vx: 0, vz: 0, facing: 0, radius: 0.52, pace: 0.56 },
-      den: { x: 10, z: 10 }, mouth: { x: 10, z: 10 }, clearing: { x: 13, z: 10 }, pasture: [],
-      phase: 'approach', target: { x: 13, z: 10 }, nextChoice: 0,
-      warningUntil: 0, choices: 0,
-    };
+  const meadow = (): Terrain => ({ width: 24, height: 24, blocked: new Uint8Array(24 * 24) });
+  const visitor = (): Bear => ({
+    body: { id: 50_000, x: 10, z: 10, vx: 0, vz: 0, facing: 0, radius: 0.52, pace: 0.56 },
+    den: { x: 10, z: 10 }, mouth: { x: 10, z: 10 }, clearing: { x: 13, z: 10 }, pasture: [],
+    phase: 'approach', target: { x: 13, z: 10 }, nextChoice: 0,
+    warningUntil: 0, choices: 0,
+  });
+
+  it('se detiene y enseña el zarpazo ante quien se acerca; si se aparta, vuelve a lo suyo (AN-5d)', () => {
+    const land = meadow();
+    const bear = visitor();
     stepBear(bear, land, 7, 0, [{ body: { x: 12, z: 10 } }]);
     expect(bear.phase).toBe('warning');
     expect(bearPosition(bear)[0]?.action).toBe('attack');
     // AN-3a · el aviso dura lo que el clip `attack` del oso (3 s): a los dos
-    // segundos todavía amenaza, y después se retira y se va.
+    // segundos todavía amenaza.
     for (let step = 1; step < 60; step++) stepBear(bear, land, 7, step, []);
     expect(bear.phase).toBe('warning');
-    for (let step = 60; step < 150; step++) stepBear(bear, land, 7, step, []);
-    expect(bear.phase).toBe('gone');
-    expect(bearPosition(bear)).toEqual([]);
+    // AN-5d · Y la visita no se acaba ahí (Vera, 29 sep: «hay que ampliarla»):
+    // con la gente apartada, vuelve al claro y sigue fuera medio día después.
+    for (let step = 60; step < 1200; step++) stepBear(bear, land, 7, step, []);
+    expect(bear.phase === 'approach' || bear.phase === 'forage').toBe(true);
+    expect(bearPosition(bear)).toHaveLength(1);
+  });
+
+  it('acosado de cerca, o con tres avisos, se mete en la cueva (AN-5d)', () => {
+    const land = meadow();
+    // Alguien encima al acabar el aviso: se retira.
+    const pressed = visitor();
+    for (let step = 0; step < 200; step++) stepBear(pressed, land, 7, step, [{ body: { x: pressed.body.x + 1.2, z: pressed.body.z } }]);
+    expect(pressed.phase === 'retreat' || pressed.phase === 'gone').toBe(true);
+    // Alguien que se queda a su distancia de aviso: se alza, se calma, vuelve a
+    // alzarse… y a la tercera se va.
+    const watched = visitor();
+    let warnings = 0, rising = false;
+    for (let step = 0; step < 900 && watched.phase !== 'gone'; step++) {
+      stepBear(watched, land, 7, step, [{ body: { x: watched.body.x + 2.8, z: watched.body.z } }]);
+      const up = watched.phase === 'warning';
+      if (up && !rising) warnings += 1;
+      rising = up;
+    }
+    expect(warnings).toBe(3);
+    expect(watched.phase).toBe('gone');
+  });
+
+  it('con el valle entero, la visita dura mucho más que un aviso (AN-5d)', () => {
+    // La jornada con su gente y los troncos puestos, como en el juego: antes, el
+    // leñador del claro lo espantaba en el primer momento y la visita duraba el
+    // aviso (3 s) y la vuelta a la cueva.
+    const state = foundTwenty(7);
+    state.flags['bear'] = state.tick + 2;
+    state.flags['hunt:boar'] = 0;
+    const bare = terrainOf(state);
+    const trunks: Solid[] = [];
+    for (let cell = 0; cell < state.map.terrain.length; cell += 1) {
+      if (state.map.terrain[cell] !== TERRAIN_CODE.forest) continue;
+      const { x, z } = scatterTransform(bare.width, cell);
+      trunks.push({ minX: x - 0.15, minZ: z - 0.15, maxX: x + 0.15, maxZ: z + 0.15 });
+    }
+    const land: Terrain = { ...bare, solids: indexSolids(bare.width, bare.height, trunks) };
+    const village = createVillage(state, 0, { land, ground: (x, z) => elevationAt(state.map, x, z) });
+    let out = 0;
+    for (let step = 0; step < 1500; step++) {
+      village.step();
+      if (village.wildlife.some(animal => animal.kind === 'bear')) out += 1;
+    }
+    expect(out * (1 / 30), 'segundos fuera de la cueva').toBeGreaterThan(20);
+    village.dispose();
   });
 
   it('espanta al ciervo y la visita no altera GameState', () => {
