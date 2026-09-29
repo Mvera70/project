@@ -14,8 +14,9 @@ cerdo**, por ese orden; y conviven dos estilos, cajas (aldeanos y la receta
 G-23) contra facetado (los de Vera). **Después, el zorro**: el de Astra con
 el hocico suavizado, esqueleto por script, **publicado** (v4.97, 0,56 celdas,
 `idle`/`walk`/`flee`). Y **el oso v4, candidato sin publicar**
-(`deliverables/marked-models-trial/bear-v4.glb`): joroba, cabeza baja, patas
-en columna, pardo oscuro; mismo tamaño, nodos y pose erguida que el v3.
+(`deliverables/marked-models-trial/bear-v4.glb`): cabeza baja, patas en
+columna, pardo oscuro; la joroba grande le pareció horrible a Vera y queda
+suave (`BEAR_HUMP` 0,35; 0,15 casi plano); mismo tamaño, nodos y pose erguida que el v3.
 **Abierto:** el visto bueno de Vera al oso; después, pez y cerdo. El oso no se puede fotografiar dentro de la partida sin
 cazar antes la cadena entera: no hay `?hunt=`.
 

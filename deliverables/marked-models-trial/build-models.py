@@ -277,6 +277,8 @@ def bear_v3():
     for i,p in enumerate(fronts): tracks.append((p,'rotation_euler',[(0,0,0),((-.18 if i==0 else .18),-.40,0),((-.23 if i==0 else .23),-.65,0),(0,0,0)]))
     clip('rear',tracks,[1,25,48,72]); save('bear-v3')
 
+BEAR_HUMP=.35
+
 def bear():
     # v4 · 29 sep 2026. Lo que el v3 no tenía: la joroba de la cruz como punto
     # más alto, la cabeza baja por delante de ella, patas en columna que no se
@@ -303,6 +305,12 @@ def bear():
         (.400,.550,.352,.130,.450),
         (.425,.490,.400,.050,.445),
     ]
+    # La joroba, rebajada: el lomo es casi una recta que sube un poco hacia la
+    # cruz, y `BEAR_HUMP` dice cuánto de la cruz del primer v4 queda por encima
+    # (1 era la joroba entera, que a Vera le pareció horrible).
+    line=lambda x: .668+(.21-x)*.05
+    sections=[(x,(line(x)+BEAR_HUMP*(top-line(x)) if top>line(x) and x<.21 else top),bottom,width,waist)
+              for x,top,bottom,width,waist in sections]
     vertices=[]; faces=[]; sides=16
     for x,top,bottom,width,waist in sections:
         for j in range(sides):
@@ -318,7 +326,7 @@ def bear():
             faces.extend([(a,b,c),(a,c,d)] if (i+j)%2 else [(a,b,d),(b,c,d)])
     faces.append(tuple((len(sections)-1)*sides+j for j in range(sides)))
     mesh('Massive_Torso',vertices,faces,'coat',body)
-    # Cuello grueso que baja hacia delante: la cabeza va por debajo de la cruz.
+    # Cuello grueso que baja hacia delante: la cabeza va por debajo del lomo.
     neck=empty('neck',(-.33,0,.51),body); ell('Neck',(-.400,0,.470),(.22,.27,.25),'coat',neck)
     head=empty('head',(-.46,0,.46),neck); ell('Head',(-.500,0,.455),(.22,.24,.21),'coat',head)
     ell('Brow',(-.540,0,.505),(.11,.17,.07),'coat',head,10,5)

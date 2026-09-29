@@ -40,9 +40,11 @@ solo la anatomía del oso; los otros diez modelos permanecen intactos.
 Vera: «el oso no termina de convencerme». El v3 tenía el lomo plano, patas que
 se afinaban hasta 6 cm en el tobillo y acababan en un disco de 15 cm, y un
 marrón (`775A3E`) que con la luz del juego se leía color arena. El v4
-(`bear()` en `build-models.py`; el v3 sigue en `bear_v3()`) pone la joroba de
-la cruz como punto más alto, la cabeza baja por delante de ella, patas en
-columna con la zarpa saliendo de la pata y un pardo oscuro. Mismo tamaño que
+(`bear()` en `build-models.py`; el v3 sigue en `bear_v3()`) pone un lomo que
+sube apenas hacia la cruz, la cabeza baja por delante, patas en columna con la
+zarpa saliendo de la pata y un pardo oscuro. La joroba entera del primer
+intento a Vera le pareció horrible: `BEAR_HUMP` dice cuánto queda (0,35 la
+suave, que es la de estos ficheros; 0,15 casi plano). Mismo tamaño que
 el v3, mismos nodos y la misma pose erguida.
 
 - [bear-v4.glb](bear-v4.glb) · [perfil](bear-v4-profile.png) ·
