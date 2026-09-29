@@ -13,11 +13,29 @@ const BEAR_ID = 50_000;
 // TUNE: un ejemplar, radio 0,52; sólo vive mientras dura el suceso.
 const RADIUS = 0.52;
 const PACE = 0.56;
-const ALARM = 5;
-// AN-3a · El aviso dura lo que el clip `attack` del oso de Vera (3 s, en el
-// catálogo): se alza en el primer segundo y medio y amenaza el resto. Con 1,55 s
-// se cortaba a media subida y se iba andando.
-const WARNING_STEPS = Math.round(3 / LIFE_STEP);
+/**
+ * AN-5d · **La visita, más larga** (Vera, 29 sep 2026: «la visita del oso hay
+ * que ampliarla, claramente»). Duraba tres segundos: la cueva está junto al
+ * claro que se tala, el leñador pasaba a menos de 5 celdas, el oso se alzaba y
+ * se metía. Ahora tolera a la gente que trabaja a su distancia, se alza a quien
+ * se acerca (`ALARM`), y cuando se apartan vuelve a hozar; sólo se mete si lo
+ * acosan de cerca (`TOO_CLOSE`), si ha tenido que avisar `WARNINGS` veces, o
+ * cuando se le acaba el día (`VISIT_END`). TUNE: 3,5 y 1,6 celdas; tres avisos.
+ */
+const ALARM = 3.5;
+const TOO_CLOSE = 1.6;
+const WARNINGS = 3;
+/** Lo que tarda en volver a avisar a quien sigue ahí, después de un aviso. TUNE: 2 s. */
+const CALM_STEPS = Math.round(2 / LIFE_STEP);
+/**
+ * AN-3a · El aviso dura lo que el clip `attack` del oso de Vera (3 s, en el
+ * catálogo): se alza en el primer segundo y medio y amenaza el resto. Con 1,55 s
+ * se cortaba a media subida y se iba andando. **El oso va a cambiar de modelo**
+ * (Vera, 29 sep 2026): `hunt-bodies.test.ts` compara esto con el `attack` del
+ * catálogo y falla si el clip nuevo dura otra cosa.
+ */
+export const WARNING_SECONDS = 3;
+const WARNING_STEPS = Math.round(WARNING_SECONDS / LIFE_STEP);
 /**
  * AN-4c · La boca de la guarida, en celdas por delante de su centro.
  *
@@ -56,6 +74,11 @@ export interface Bear {
   nextChoice: number;
   warningUntil: number;
   choices: number;
+  /** AN-5d · Cuántas veces ha tenido que alzarse, y a qué fase vuelve cuando se calma. */
+  warnings?: number;
+  settleTo?: 'approach' | 'forage';
+  /** El paso en que salió de la cueva, para medir cuánto se ha dejado ver. */
+  since?: number;
 }
 
 function clearLine(land: Terrain, from: Point, to: Point): boolean {
@@ -180,24 +203,34 @@ export function createBear(state: GameState, land: Terrain, heart: Point,
   };
 }
 
-/** Sale de su cueva, hoza en el claro y se retira al ver gente. */
+/** Sale de su cueva, hoza en el claro, se alza a quien se acerca y se retira si lo acosan. */
 export function stepBear(bear: Bear, land: Terrain, seed: number, step: number,
   people: readonly { readonly body: Point }[]): void {
   if (bear.phase === 'gone') return;
+  bear.since ??= step;
   const { body } = bear;
-  const nearPerson = people.some(person => Math.hypot(person.body.x - body.x,
-    person.body.z - body.z) < ALARM);
-  if (bear.phase !== 'warning' && bear.phase !== 'retreat' && nearPerson) {
+  let nearest = Infinity;
+  for (const person of people) nearest = Math.min(nearest, Math.hypot(person.body.x - body.x, person.body.z - body.z));
+  const calm = bear.warnings === undefined || step - bear.warningUntil >= CALM_STEPS;
+  if (bear.phase !== 'warning' && bear.phase !== 'retreat' && nearest < ALARM && calm) {
+    bear.settleTo = bear.phase === 'approach' ? 'approach' : 'forage';
     bear.phase = 'warning';
+    bear.warnings = (bear.warnings ?? 0) + 1;
     bear.warningUntil = step + WARNING_STEPS;
     body.vx = 0; body.vz = 0;
   }
   if (bear.phase === 'warning') {
     body.vx = 0; body.vz = 0;
-    if (step >= bear.warningUntil) {
+    if (step < bear.warningUntil) return;
+    // Acabado el aviso: si lo acosan de cerca o ya ha avisado bastante, se
+    // mete; si no, vuelve a lo suyo.
+    if (nearest < TOO_CLOSE || (bear.warnings ?? 0) >= WARNINGS) {
       bear.phase = 'retreat';
       bear.target = bear.mouth;
-    } else return;
+    } else {
+      bear.phase = bear.settleTo ?? 'forage';
+      bear.nextChoice = step;
+    }
   }
   if (step >= VISIT_END && bear.phase !== 'retreat') {
     bear.phase = 'retreat';

@@ -1,0 +1,9 @@
+CMD: node tools/graphics/observe-life.mjs --seed 7 --year 22 --hunted partridge --hunt --lead 20 --seconds 24 --fps 5 --zoom 0.35 --viewport 390x844 --out artifacts/graphics/AN-5/hunt-rabbit-seed7-y22
+INICIO 21:32:40
+Caza antes de empezar: {"stage":"offered","species":"rabbit","weapon":null,"targetId":null,"prey":{"x":36.5,"z":53.5}}
+Caza en marcha: {"stage":"running","species":"rabbit","weapon":"sling","targetId":42001,"hunter":{"x":35.905,"z":52.613,"clip":"bow_draw"},"prey":{"x":36.5,"z":53.5,"action":null}}
+0s, fase 0.447, 70 personas
+10s, fase 0.53, 70 personas
+20s, fase 0.613, 70 personas
+Observatorio: /home/user/project/artifacts/graphics/AN-5/hunt-rabbit-seed7-y22/index.html · errores: 0
+rc=0

@@ -114,24 +114,45 @@ partida** —con los troncos del juego no cabía en ninguna guarida de bosque, y
 cuando cupo nacía dentro de la roca de su cueva—. Desde AN-4c nace en la boca
 de la cueva, y desde AN-4d (pedido de Vera) la cueva está **al pie de la
 montaña**, contra una ladera que sube, con la boca hacia el valle, y se ve
-entera: sale, hoza, se alza si alguien se acerca y se mete (7/30). Lo que
-queda de este encargo es de arte: el modelo es sólo la entrada exterior
+entera: sale, hoza, se alza si alguien se acerca y se mete (7/30). **Y desde
+AN-5d (pedido de Vera: «hay que ampliarla, claramente») la visita dura**: se
+alza a quien se acerca y, si se aparta, vuelve a hozar; se mete si lo acosan de
+cerca, a la tercera vez o al acabar su rato (`tools/reports/bear-visit-report.ts`).
+Lo que queda de este encargo es de arte: el modelo es sólo la entrada exterior
 («nadie entra en una sala interior», 23 sep), y al meterse el oso desaparece
 tras el hueco oscuro.
 
-**La caza no enseña el golpe que la decide** (visto en partida en AN-4b, 29
-sep 2026, jabalí de 7/24 con lanza, `AN-4b/hunt-boar-seed7-y24-desde-el-inicio`).
-El jabalí carga 32 pasos hacia el cazador; en el 33 la lanza llega (1,35 de
-distancia), falla, el jabalí se espanta y la caza se da por hecha. En pantalla:
-(1) **la estocada no se ve** —en ese mismo paso `life/hunt-encounter.ts` pone
-al cazador en `idle`, y el renderer le quita el arma al completarse la caza—;
-(2) **los gestos de la caza no van fechados por el tiro** —el renderer pone al
-cazador `clipSeconds` del reloj de presentación, no desde el tiro, como sí hace
-el asalto con `combatClip`—; (3) **la presa espantada desaparece en el sitio**
-(`wild.phase = 'gone'`) en vez de huir; y (4) **la lanza llega a través de la
-empalizada**: la caza sólo mira distancias (`spearCanHit`). Los tres primeros
-son de presentación y tienen vía en el brief AN-5a del plan de animación; el
-cuarto cambia el resultado de la caza y es decisión del dueño.
+**~~La caza no enseña el golpe que la decide~~ — hecho en AN-5 (29 sep
+2026, pedido de Vera: «que la caza enseñe el golpe… cuanto más física y
+realista, mejor; que pueda fallar, que pueda acertar; que impacte»).** Las
+cuatro cosas de AN-4b quedan resueltas: la estocada y la suelta van fechadas
+por el tiro y el arma sigue en la mano; la presa espantada huye antes de irse;
+el parte espera a que la escena acabe de verse; y **la lanza ya no atraviesa
+la empalizada**: el contacto de Rapier decide y, si hay madera delante, se
+clava (`docs/plan-animacion-integral-movil-2026-09-29.md`, AN-5). Lo que queda
+de este encargo, visto al hacerlo:
+
+- **Lo clavado no dura más que la escena.** La flecha en la empalizada, en el
+  tronco o en la presa desaparece cuando el parte se entrega (unos segundos
+  después de caer la pieza). Que se quede el día, o que alguien vaya a
+  recogerla, pide que la jornada guarde restos (lo mismo que el cadáver y el
+  portón astillado del asedio, más arriba).
+- **La empalizada choca como su celda entera**, no como sus estacas: la
+  máscara de la vida cierra la celda y el mundo de contacto la levanta a su
+  altura pintada (0,87), pero la estacada del modelo es una franja de 0,17 en
+  medio. Una flecha puede clavarse hasta 0,4 celdas por delante de la madera
+  que se ve. Pide la forma de cada pieza de muralla desde `world/defences.ts`.
+- **El cazador herido por el oso no queda herido**: el zarpazo lo empuja y lo
+  aturde medio segundo, y a los cuatro el oso se va, pero el parte no lleva
+  nada del cazador. Si el cazador debe salir malherido (o no volver), es un
+  cambio del motor y del dueño.
+- **Sin sangre**: una presa alcanzada se sacude y cae, sin mancha. El gore
+  contenido de E4 está en el asedio y no en la caza; ponerlo es decisión del
+  dueño.
+- **La honda sigue con los gestos del arco** (entrada de arriba), **y su
+  piedra desaparece donde da**: ni rebota ni se queda en el suelo. Una piedra
+  que cae y rueda es un cuerpo de Rapier más en el mundo de contacto de la
+  caza, que hoy es sólo de consulta.
 
 ## 4 · De otras rondas, aún abierto
 

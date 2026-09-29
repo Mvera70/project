@@ -257,6 +257,35 @@ del lado de la pantalla, y la evidencia en partida en `artifacts/graphics/AN-3/`
 | bow_draw, bow_loose, spear_thrust, hit_take, fall | correctos en la hoja de AN-0: tensado sostenible con la mano en la mejilla, suelta que se separa en t=0, estocada con el contacto en t=0 y recuperación, retroceso del torso, caída de espaldas que termina tendida | se conservan; contacto en t=0 y daño intactos (`combat-clips`, `melee`, `archery`, `ragdoll-physics` en verde) | hojas en `artifacts/graphics/AN-0/gestures/` |
 | boar · charge, rabbit · flee, partridge · takeoff/flight | por reloj o de golpe (AN-0) | por suelo recorrido y con fundido (AN-1b); `attack` de jabalí y lobo `preview-only` | `graphics-animal-motion.test.ts` |
 
+### 2.7 Después de AN-5 (29 sep 2026, noche)
+
+Vera, al leer el brief AN-5a: «que la caza enseñe el golpe; tiene que ser
+natural; cuanto más física y realista, mejor; que pueda fallar, que pueda
+acertar; que impacte», que la lanza «debe clavarse» en la empalizada y que la
+visita del oso «hay que ampliarla». El porqué y las cifras están en el plan
+(`docs/plan-animacion-integral-movil-2026-09-29.md`, AN-5); la medida de la
+caza sola, en `artifacts/physics/AN-5/`, y las tomas, en
+`artifacts/graphics/AN-5/` (`take.sh` las rueda aisladas y con su log).
+
+| Gesto | Antes | Después | Medida |
+|---|---|---|---|
+| caza · bow_draw, bow_loose (arco y honda) | por el reloj de la escena: la suelta no caía en el paso del tiro, y el tiro salía de 1,2 celdas de alto (3,6 m) | fechados por el tiro (`clipSeconds` = 0 en la suelta, como `combatClip` en el asalto); el tiro sale de la mano que suelta, medida sobre el GLB con el arma colgada de su `grip` (arco 0,43; honda 0,41) | `hunt-gestures.test.ts`. En partida: el conejo 7/22 con honda (`--hunted partridge --hunt`, 5 fps): tensa, suelta en el fotograma 5 y la piedra sale de la mano (`AN-5/hunt-rabbit-seed7-y22/strip-hunter.png`) |
+| caza · spear_thrust, **spear_thrust_high**, **spear_thrust_low** (las dos últimas, nuevas) | la estocada que decidía no se dibujaba; había una sola, a la altura del pecho, y pasaba por encima del lomo del jabalí | tres alturas medidas sobre el GLB —pecho (punta a 0,35), alta (0,50) y baja hacia abajo (0,20)— y cada presa recibe la que le llega al tronco; contacto en t = 0; clavada en madera, el gesto se queda en el contacto 0,8 s hasta sacarla, salvo que el zarpazo del oso se la arranque | `hunt-gestures.test.ts`, `life-hunt-encounter.test.ts` (fechada; clavada, y arrancada sin retomarse a medias, en veinte semillas). En partida: el jabalí 7/24 con lanza, el cazador 110 estoca bajo en los fotogramas 8 y 11 (5 fps) y el jabalí cae en el 12 (`AN-5/hunt-boar-seed7-y24/strip-hunter.png`; la presa, tapada a medias por la empalizada que queda entre la cámara y la caza, `strip-prey.png`) |
+| boar, rabbit, deer, partridge, bear · down | giraba sobre el eje del ancho: la pieza quedaba de pie sobre el hocico, medio enterrada (el jabalí caído medía 0,71 de alto con 0,29 bajo tierra) | rueda sobre su eje largo (orden de Euler `YXZ`) y se alza medio ancho: se apoya de costado en el suelo | `graphics-animal-motion.test.ts`, por la caja del modelo posado. En partida: el conejo 7/22 cae de costado en el fotograma 6 (`strip-prey.png`) |
+| presa · el golpe | nada: la pieza caía o seguía igual | acusa el golpe: un empujón en la dirección del tiro que se apaga en 0,2 s | `life-hunt-encounter.test.ts` |
+| flecha, piedra y lanza · lo que toca | la flecha que acertaba seguía volando; la pieza desaparecía en el fotograma del parte | la flecha se queda con la punta dentro —en la presa (se mueve y cae con ella), en la madera o en el suelo—; la lanza clavada en madera, hasta que se saca; **la piedra de la honda desaparece donde da** (límite: ni rebota ni cae); y el parte espera a que la escena se vea (`settled`: la pieza tumbada 3 s, la que se escapa huye 3 s) | `hunt-shot.test.ts`, `life-hunt-encounter.test.ts` |
+| bear · la visita | se metía al primer aviso: en 7/30, fuera 9,5 s (el leñador pasa a menos de 5 celdas en el segundo 2,9) | tolera a quien trabaja a su distancia, se alza a quien se acerca a 3,5 y vuelve a hozar; se mete si lo acosan a 1,6, a la tercera o al acabar su rato. En 7/30, fuera 63 s y se mete a la tercera | `bear-visit-report.ts`, cinco valles (`artifacts/physics/AN-5/oso-antes.txt`, `oso-despues.txt`); `life-bear.test.ts` y la jornada `life-bear-visit.test.ts`. En partida: 7/30 (`--happening bear_in_the_wood --lead 0 --look 13.5,66.5`, 1 fps × 80 s), sale de la cueva, se alza en los fotogramas 3–5, sigue hozando, vuelve a alzarse en 17–19 (fuera de cuadro) y sigue fuera los 80 s (`AN-5/bear-seed7-y30/strip-bear-visita.png`) |
+
+**Lo que la toma del oso enseña además, y no es de AN-5.** En el fotograma 63
+(fase 0,805) la aldea se estrena de nuevo —el relevo de la jornada al
+anochecer, `scenic-state.ts`— y el oso, que seguía fuera, vuelve a nacer en
+la boca de su cueva: un salto de dos celdas. En partida sólo pasa la primera
+jornada de una sesión: las siguientes se estrenan al anochecer, y el rato del
+oso (`VISIT_END`, 0,78 de jornada desde que se estrena) acaba antes del
+anochecer siguiente. Antes de AN-5d no se veía porque el oso se metía al
+primer aviso. Y, como antes, el oso sale **cada jornada** de las dos semanas
+que dura el suceso (`FATE.BEAR_WEEKS`).
+
 ## 3 · La matriz: clips humanos
 
 | Clip | Origen | Situación en partida | Evidencia | Defecto concreto | Gravedad | Coste | Decisión |

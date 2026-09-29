@@ -1,6 +1,6 @@
 ---
 name: fisica-combate
-description: Cómo se trabaja la física del combate de The Valley —qué decide hoy Rapier y qué deciden distancias y relojes, cómo se mide en sombra antes de dejar que un contacto decida, cómo se compara (con distribuciones, nunca batalla a batalla), el cuerpo que se pinta como cuerpo que decide, y qué se mide en el aparato—, con el método del diagnóstico y del experimento F-0 (29 sep 2026). Úsala antes de tocar physics.ts, archery.ts, melee.ts, el golpe al portón de raiders.ts, ragdoll.ts, hunt-shot.ts o hunt-encounter.ts, al abrir una fase F (F-1 «la flecha que se clava» y siguientes), o cuando Vera pregunte si la física decide algo.
+description: Cómo se trabaja la física del combate de The Valley —qué decide hoy Rapier y qué deciden distancias y relojes, cómo se mide en sombra antes de dejar que un contacto decida, cómo se compara (con distribuciones, nunca batalla a batalla), el cuerpo que se pinta como cuerpo que decide, y qué se mide en el aparato—, con el método del diagnóstico y del experimento F-0 y la caza física de AN-5 (29 sep 2026). Úsala antes de tocar physics.ts, archery.ts, melee.ts, el golpe al portón de raiders.ts, ragdoll.ts, hunt-shot.ts, hunt-bodies.ts o hunt-encounter.ts, al abrir una fase F (F-1 «la flecha que se clava» y siguientes), o cuando Vera pregunte si la física decide algo.
 ---
 
 # La física del combate
@@ -23,7 +23,7 @@ ordena lo que viene. Esta skill es ese método en una página. Lee también
 | Cuerpo a cuerpo | Distancia 0,9, un golpe cada 15 pasos, cae a los 3 | `life/melee.ts`, `stepMelee` |
 | Portón | Distancia 2,6, un golpe por segundo, 60 lo rompen | `life/raiders.ts` |
 | Movimiento y empujes | Integrador de la vida en rejilla, no Rapier | `life/body.ts`, `integrate`; `separate` |
-| Caza | Balística propia, lanza por distancia (atraviesa empalizadas) y suerte | `life/hunt-shot.ts`, `life/hunt-encounter.ts` |
+| Caza | **Rapier, desde AN-5b**: un mundo de contacto sólo de consulta (suelo, lo que está de pie con su altura pintada, la cápsula que se pinta de la presa); el tiro se barre paso a paso, la estocada va de la mano a la punta medidas; el fallo sale del pulso sembrado, de la presa que se mueve y de lo que hay en medio | `life/physics.ts` `createContactWorld`; `life/hunt-shot.ts`; `life/hunt-bodies.ts`; `life/hunt-encounter.ts` |
 | Resultado para la partida | El parte `life.defence` entra por `PlayerAct` `battle`; si nadie miró, B3 | `engine/world/threat.ts`, `settle` |
 
 **Rapier sólo ve a los muertos**: los ragdolls son colisionadores y los vivos
@@ -87,6 +87,35 @@ deciden.
   al bit con sondas, la arquería con bitácora que da lo mismo), no umbrales de
   una batalla.
 
+## 3b · Cuando llega un modelo nuevo de animal
+
+Los modelos de los animales van a cambiar (Vera, 29 sep 2026: «el oso, por
+ejemplo, cambia»). Lo que decide la caza no guarda medidas sueltas: guarda la
+caja de cada modelo (`PREY_MODEL` en `life/hunt-bodies.ts`, copia de
+`art/catalog.json`) y saca de ella el tronco con proporciones (`TORSO`); la
+pieza caída sube lo que el render mide sobre el modelo. Al llegar uno nuevo:
+
+1. `npx vitest run tests/fast/hunt-bodies.test.ts`: si falla, el mensaje trae
+   la caja nueva; se copia en `PREY_MODEL`. Si el oso trae otro `attack`, la
+   misma prueba pide cambiar `WARNING_SECONDS` (`life/bear.ts`).
+2. La misma prueba compara la cápsula con **la malla del tronco** de cada GLB
+   (`TRUNK_MESH`: `Torso`, `Barrel`, `Massive_Torso`, `Plump_Body`) y, si no
+   casan, dice cuánto mide el tronco y dónde va su eje: con eso se ajusta
+   `TORSO` (radio, medio lado corto de su sección; eje, su centro). **La caja
+   no es el tronco**: la del ciervo la ensancha la cuerna, y con la fracción
+   vieja su cápsula salía casi el doble de ancha que el ciervo. Si el modelo
+   nuevo llama de otra forma a su tronco, se cambia el nombre en la prueba.
+   Así se hizo con los de la PR #3 (ciervo nuevo, jabalí 8 cm más bajo, oso v4).
+3. `npx tsx tools/reports/hunt-report.ts` y
+   `npx tsx tools/reports/bear-visit-report.ts`: el reparto de finales y la
+   visita, comparados con `artifacts/physics/AN-5/`. Si cambian, la cifra va a
+   Vera.
+4. La cabeza del modelo tiene que seguir en -X (`effects/animal-motion.ts`):
+   si no, el render lo gira mal y el pecho y la grupa se cambian.
+5. La pieza caída se apoya en el costado **de su tronco** (`PREY_BODY.flank`,
+   que el render usa para las presas): lo vigila `graphics-animal-motion.test.ts`
+   con el ciervo, cuya cuerna es más ancha que el cuerpo.
+
 ## 4 · Trampas que ya costaron una tarde
 
 - **`castShape` de Rapier 0.20**: el punto tocado en coordenadas del mundo es
@@ -106,8 +135,25 @@ deciden.
   de calentamiento antes de medir coste.
 - **Un criterio por flecha se diluye**: cuatro de cada cinco flechas no dan a
   nadie. Lo que decide quién cae son los aciertos; mídelo por acierto.
-- **La caza no pasa por Rapier** (`hunt-shot.ts`): lo que se mida del asalto
-  no vale para la caza, ni al revés.
+- **La caza pasa por Rapier por su cuenta** (AN-5b): su mundo de contacto no
+  es el de la batalla ni el de las sondas. Lo que se mida del asalto no vale
+  para la caza, ni al revés; la caza se mide con
+  `npx tsx tools/reports/hunt-report.ts` (llano y valles de verdad, reparto de
+  finales y qué tocó cada tiro).
+- **Rapier no ve un colisionador fijo hasta el primer `world.step()`**: sin él,
+  una caza sin presa colocada todavía tiraba a través de la empalizada. El
+  mundo de contacto da un paso al crearse.
+- **La montaña no es una pared**: en el mundo de la batalla cada celda cerrada
+  es un muro de 2; en el de la caza sólo lo que está de pie (`standingOf`), con
+  su altura pintada, y la montaña y el agua son el suelo.
+- **La holgura del cuerpo decide si hay caza**: el aldeano navega con 0,32 y
+  entre los troncos del bosque no cabe; el cazador va con 0,22 y busca un
+  puesto con línea libre, no la presa. Sin eso, ninguna caza en el bosque
+  llegaba a darse.
+- **Un informe que avanza el encuentro sin un cazador que venga de lejos no
+  mide la caza**: con el cazador a 4,2 de la presa (lo que hacían las pruebas)
+  el ciervo arisco se va antes del primer tiro; `hunt-report.ts` lo pone a doce
+  celdas, como en el juego.
 
 ## 5 · Cerrar una fase F
 

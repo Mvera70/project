@@ -1,0 +1,13 @@
+CMD: node tools/graphics/observe-life.mjs --seed 7 --year 30 --hunted partridge,rabbit,deer,boar --happening bear_in_the_wood --lead 0 --seconds 80 --fps 1 --zoom 0.5 --viewport 390x844 --look 13.5,66.5 --out artifacts/graphics/AN-5/bear-seed7-y30
+INICIO 21:41:43
+0s, fase 0.28, 76 personas
+10s, fase 0.363, 76 personas
+20s, fase 0.447, 76 personas
+30s, fase 0.53, 76 personas
+40s, fase 0.613, 76 personas
+50s, fase 0.697, 76 personas
+60s, fase 0.78, 76 personas
+70s, fase 0.863, 76 personas
+80s, fase 0.947, 76 personas
+Observatorio: /home/user/project/artifacts/graphics/AN-5/bear-seed7-y30/index.html · errores: 0
+rc=0

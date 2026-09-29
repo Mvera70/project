@@ -113,6 +113,11 @@ const WOOD_WAIT_LIMIT = Math.round(40 / LIFE_STEP);
 const WOOD_CHECK_STEPS = Math.round(0.5 / LIFE_STEP);
 /** Lo más lejos que se mira una entrega, en fracción de semana: dos minutos escénicos. */
 const WOOD_MAX_LEAD = 120 / WEEK_SECONDS;
+/**
+ * AN-5d · Cuánto lleva el oso sin alzarse antes de que quien huyó de él vuelva
+ * a lo suyo. TUNE: 6 s, lo que tarda en volver a hozar y en verse tranquilo.
+ */
+const BEAR_ALL_CLEAR = Math.round(6 / LIFE_STEP);
 
 export interface Dweller {
   /** E0 · Porte efímero de la plata que hace volver al clan. */
@@ -3008,7 +3013,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             dweller.doing = null;
             bearFleeing.add(dweller.body.id);
           }
-        } else if (bear.phase === 'gone' && bearFleeing.size > 0) {
+        } else if (bearFleeing.size > 0 && (bear.phase === 'gone' || steps - bear.warningUntil >= BEAR_ALL_CLEAR)) {
+          // AN-5d · Quien huyó vuelve a lo suyo cuando el oso se ha ido, o
+          // cuando lleva un rato calmado: la visita dura ahora casi todo el
+          // día, y la aldea no se queda encerrada mientras hoza en su claro.
           for (const dweller of dwellers) {
             if (!bearFleeing.has(dweller.body.id)) continue;
             dweller.flight = null;

@@ -24,12 +24,20 @@ export interface WildPrey {
   /** Cuándo echó a volar (la perdiz), y si aún está despegando. */
   fleeSince?: number;
   takingOff?: boolean;
+  /**
+   * AN-5b · El jabalí herido embiste a quien le hirió aunque esté lejos: un
+   * jabalí con una flecha dentro no se aparta, carga (la caza del jabalí se
+   * hacía con lanza de travesaño por eso).
+   */
+  enraged?: boolean;
 }
 
 const IDS: Record<WildKind, number> = { partridge: 42_000, rabbit: 42_001, boar: 42_002 };
 const RADII: Record<WildKind, number> = { partridge: 0.2, rabbit: 0.25, boar: 0.38 };
 const SPEEDS: Record<WildKind, number> = { partridge: 1.5, rabbit: 1.15, boar: 0.85 };
 const MAX_RANGE = 11;
+/** Hasta dónde llega una embestida: la huella del jabalí (0,38) más la de un aldeano (0,3). */
+const CHARGE_STOP = 0.68;
 /** Lo que dura el despegue de la perdiz, en pasos: el clip `takeoff` (1,17 s). */
 const TAKEOFF_STEPS = Math.round(1.17 / LIFE_STEP);
 
@@ -82,8 +90,12 @@ export function createWildPrey(
   };
 }
 
-function escapeTarget(prey: WildPrey, threat: Point, land: Terrain): Point {
-  const { body } = prey;
+/**
+ * Adónde huye un cuerpo: lejos de la amenaza, a donde quepa y se pueda llegar
+ * andando, o a su querencia si no hay tal sitio. AN-5b · también la usa el
+ * ciervo espantado de la caza, que no es una presa suelta.
+ */
+export function escapeFrom(body: Body, home: Point, threat: Point, land: Terrain): Point {
   const away = Math.atan2(body.z - threat.z, body.x - threat.x);
   const connected = reachableFrom(land, body);
   for (const distance of [8, 6, 4]) {
@@ -92,7 +104,11 @@ function escapeTarget(prey: WildPrey, threat: Point, land: Terrain): Point {
       if (fitsCircle(land, p.x, p.z, body.radius) && canReach(land, connected, p)) return p;
     }
   }
-  return prey.home;
+  return home;
+}
+
+function escapeTarget(prey: WildPrey, threat: Point, land: Terrain): Point {
+  return escapeFrom(prey.body, prey.home, threat, land);
 }
 
 export function stepWildPrey(
@@ -107,7 +123,7 @@ export function stepWildPrey(
     if (d < nearestD) { nearest = person.body; nearestD = d; }
   }
   if (step >= prey.expiresAt) { prey.phase = 'gone'; return; }
-  else if (prey.kind === 'boar' && nearest !== null && nearestD < 4) {
+  else if (prey.kind === 'boar' && nearest !== null && (nearestD < 4 || (prey.enraged === true && nearestD < 12))) {
     prey.phase = 'charge'; prey.target = nearest;
   } else if (nearest !== null && nearestD < (prey.kind === 'boar' ? 7 : 4)) {
     if (prey.phase !== 'flee') { prey.target = escapeTarget(prey, nearest, land); prey.fleeSince = step; }
@@ -115,10 +131,16 @@ export function stepWildPrey(
   }
   const distance = Math.hypot(prey.target.x - body.x, prey.target.z - body.z);
   const speed = prey.phase === 'charge' ? 1.2 : SPEEDS[prey.kind];
-  body.vx = distance > 0.18 ? speed * (prey.target.x - body.x) / distance : 0;
-  body.vz = distance > 0.18 ? speed * (prey.target.z - body.z) / distance : 0;
+  // AN-5b · La embestida se para al llegar al cuerpo, no en su centro: antes
+  // seguía hasta 0,18 del cazador, se le metía dentro y se daba la vuelta, y
+  // la lanza entraba una y otra vez por el cuarto trasero.
+  const stop = prey.phase === 'charge' ? CHARGE_STOP : 0.18;
+  body.vx = distance > stop ? speed * (prey.target.x - body.x) / distance : 0;
+  body.vz = distance > stop ? speed * (prey.target.z - body.z) / distance : 0;
   integrate(body, land, LIFE_STEP);
   if (Math.hypot(body.vx, body.vz) > 0.01) turnTo(body, Math.atan2(body.vx, body.vz), LIFE_STEP);
+  // Parado encima de quien embiste, lo encara: no le da la grupa.
+  else if (prey.phase === 'charge') turnTo(body, Math.atan2(prey.target.x - body.x, prey.target.z - body.z), LIFE_STEP);
   // El aleteo de la perdiz es bajo y de duración corta, suficiente para leerse en pantalla.
   // El despegue va antes que el aleteo: el modelo de Vera trae `takeoff`, de
   // una vez, y mientras dura la perdiz sube poco a poco en vez de saltar de
@@ -128,7 +150,7 @@ export function stepWildPrey(
   const lift = Math.min(1, since / TAKEOFF_STEPS);
   prey.altitude = prey.kind === 'partridge' && prey.phase === 'flee'
     ? lift * (0.18 + Math.max(0, Math.sin((step - prey.start) * 0.18)) * 0.24) : 0;
-  if (prey.phase === 'charge' && distance < 0.7) { body.vx = 0; body.vz = 0; }
+
   // seed se conserva en la API para que la trayectoria pueda ampliarse con variación estable.
   void seed;
 }
