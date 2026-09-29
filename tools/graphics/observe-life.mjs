@@ -11,6 +11,15 @@ const seed = Number(opt('seed', '43')), year = Number(opt('year', '60'));
 const lead = Number(opt('lead', '0'));
 const advanceWeeks = Number(opt('advance', '0'));
 const follow = Number(opt('follow', '-1')), zoom = Number(opt('zoom', '1'));
+// AN-0 · `--look X,Z` encuadra una coordenada del mapa (un ciervo, un perro,
+// un puesto de tiro) sin fingir que allí hay alguien que seguir: es el
+// `point` que `__valleyCapture` ya acepta.
+const lookArg = opt('look', '');
+const look = lookArg === '' ? undefined : (() => {
+  const [x, z] = lookArg.split(',').map(Number);
+  if (!Number.isFinite(x) || !Number.isFinite(z)) throw new Error('--look debe ser X,Z.');
+  return { x, z };
+})();
 const seconds = Number(opt('seconds', '120')), fps = Number(opt('fps', '2'));
 const live = args.includes('--live');
 const speed = Number(opt('speed', '16'));
@@ -33,12 +42,19 @@ const out = resolve(opt('out', `artifacts/graphics/IA-10/seed-${seed}`));
 if (existsSync(join(out, 'trace.json'))) throw new Error('La toma ya existe; usa otra carpeta --out.');
 mkdirSync(join(out, 'frames'), { recursive: true });
 const root = join(homedir(), 'AppData/Local/ms-playwright');
-const executablePath = readdirSync(root).filter(x => /^chromium-\d+$/.test(x)).sort().reverse()
-  .map(x => join(root, x, 'chrome-win64/chrome.exe')).find(existsSync);
-const browser = await chromium.launch({ executablePath,
+// AN-0 · Fuera de Windows la carpeta no existe y `readdirSync` abortaba la
+// toma; sin ejecutable explícito Playwright usa el Chromium que tenga instalado.
+const executablePath = process.env.VALLEY_CHROMIUM ?? (existsSync(root) ? readdirSync(root).filter(x => /^chromium-\d+$/.test(x)).sort().reverse()
+  .map(x => join(root, x, 'chrome-win64/chrome.exe')).find(existsSync) : undefined);
+const browser = await chromium.launch({ ...(executablePath ? { executablePath } : {}),
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+// AN-0 · `--viewport 390x844` mira el valle al tamaño normal de un móvil; por
+// omisión se conserva el encuadre ancho de siempre para no mover las tomas previas.
+const viewportMatch = /^(\d{2,4})x(\d{2,4})$/u.exec(opt('viewport', '1100x850'));
+if (viewportMatch === null) throw new Error('--viewport debe ser ANCHOxALTO.');
+const viewport = { width: Number(viewportMatch[1]), height: Number(viewportMatch[2]) };
 try {
-  const tab = await browser.newPage({ viewport: { width: 1100, height: 850 } });
+  const tab = await browser.newPage({ viewport });
   if (live || advanceWeeks > 0) {
     await tab.clock.install({ time: new Date('2026-09-17T12:00:00Z') });
     if (live) await tab.clock.pauseAt(new Date('2026-09-17T12:00:00Z'));
@@ -92,7 +108,8 @@ try {
     if (await tab.evaluate(() => (window.__valleyLife?.()?.people.length ?? 0) > 0)) break;
     await tab.clock.runFor(100);
   }
-  await tab.waitForFunction(() => window.__valleyLife?.()?.people.length > 0);
+  // AN-0 · Una villa de cien personas tarda más de 30 s en abrir bajo SwiftShader.
+  await tab.waitForFunction(() => window.__valleyLife?.()?.people.length > 0, undefined, { timeout: 240_000 });
   if (advanceWeeks > 0) {
     const MS_PER_WEEK = 840_000, CHUNK = 48;
     for (let left = advanceWeeks; left > 0; left -= CHUNK) {
@@ -157,7 +174,7 @@ try {
       if (await decision.isVisible()) await decision.click();
       if (n) await tab.clock.runFor(1000 / fps);
     } else if (n) await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(30 / fps));
-    const shot = await tab.evaluate(({ follow, zoom }) => window.__valleyCapture(follow, zoom), { follow, zoom: n === 0 ? zoom : 1 });
+    const shot = await tab.evaluate(({ follow, zoom, look }) => window.__valleyCapture(follow, zoom, false, look), { follow, zoom: n === 0 ? zoom : 1, look });
     if (shot.life === null) throw new Error('Fotograma sin vida.');
     if (basePhase === null) basePhase = (shot.life.phase - n / fps / 120 + 1) % 1;
     const expectedPhase = (basePhase + n / fps / 120) % 1;

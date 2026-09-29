@@ -184,6 +184,32 @@ camino ya en el motor.
 | J1 · Llegadas y expediciones · **en vuelo** (v4.95) | Cinco llegadas por el camino; cinco misiones con cinco finales; el tablón de la plaza y su ventana. Motor, vida y pruebas hechos; falta que el toque abra la ventana y la suite (`task-log.md`) | P1 | Media | — | — |
 | J2 · Las misiones que tocan el asedio | Espiar al clan vecino (retrasa o adelanta el aviso), ir a pedir ayuda a otro valle | P2 | Media | Sol | J1 y B1 |
 
+### AN · Animación integral de aldeanos y animales para móvil (29 sep 2026)
+
+Pedida por el dueño del diseño el 29 sep 2026 con `/goal`: «mejorar de forma
+visible todas las animaciones de aldeanos y animales; el juego se evalúa
+principalmente en móvil; trabajar hasta completar AN-0 a AN-4». El plan y los
+briefs por fase están en `docs/plan-animacion-integral-movil-2026-09-29.md`;
+la matriz con la evidencia, en `docs/medidas/animacion-matriz-2026-09-29.md`.
+**Dependencias comprobadas ese día: todas cerradas** (G-04, G-23, IA-anim,
+IA-fields, E1–E3, D4/D6, E2, «el valle más vivo»). Dos límites del entorno,
+no bloqueos: sin Blender (una corrección de GLB va por brief y por la vía de
+script de `rigid-clips.mjs`, o queda encargada) y sin dispositivo real (se
+compara coste, no FPS).
+
+| Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
+|---|---|---|---|---|---|
+| AN-0 · Inventario y línea de base | 24 clips humanos, 15 especies, gestos del perro y aves ambientales, verificados en código y catálogo; matriz por clip y especie; tomas reproducibles a 390×844 y 320×568 con semilla, año, actor, cámara y zoom; coste de referencia con `gl-probe` | P1 | Baja | Claude | — |
+| AN-1 · Locomoción | Reposo, marcha, carga, huida, arranque, parada y giro de aldeanos (adultos, niños, mayores, clan vecino); desplazamiento de las quince especies (salto, carrera, nado, vuelo); apoyos que resbalan, fases, mezclas bruscas, orientación y ritmo entre especies, comprobado en el controlador real | P1 | Media-alta | Claude | AN-0 |
+| AN-2 · Vida y oficios | Trabajo, conversación, descanso, siembra, herramientas, bebida, juego y refugio; `bark` y `play` del perro; vuelo ambiental; preparación, contacto y recuperación legibles en móvil; manos, herramientas, suelo y objetos en sincronía | P1 | Media | Claude | AN-1 |
+| AN-3 · Encuentros y combate | Arco, golpe al portón, lanza, impacto, caída, huida y ataque/fuga de animales; el instante de los hechos, el daño, las físicas, el parte y la frontera render/vida/motor intactos; acción y reacción en secuencia, con el respaldo del ragdoll | P1 | Media-alta | Claude | AN-1, AN-2 |
+| AN-4 · Aceptación conjunta | Antes/después del mismo estado en dos semillas, edades, una villa y un asalto; cada fila de la matriz con veredicto (`preview-only` lo que sólo se ve en galería); coste JS/llamadas/recursos contra la línea de base; iPhone/iPad pendiente y dicho así | P1 | Media | Claude | AN-0 a AN-3 |
+
+**Criterio de cierre del goal:** matriz completa, defectos corregidos o límites
+explícitos, comparaciones reproducibles a escala móvil, sincronía de contactos
+y combate conservada, coste comparado, pruebas superadas y papel al día. No se
+cierra con clips sin revisar.
+
 ### H · Deuda medida (el cuaderno)
 
 Lo que `docs/task-log.md` §4 lleva anotado con su medida y **no bloquea la

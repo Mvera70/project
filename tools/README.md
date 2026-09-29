@@ -64,6 +64,7 @@ las encrucijadas y con ellas se van sus consecuencias y sus obras. Se juega con
 | `balance-report.ts` | Las medidas del banco de §12.9. Lo importa `tests/balance/balance.test.ts` | `npm run balance:report` |
 | `balance-verdict.ts` | Lee `artifacts/balance-summary.json` y dice, aserto por aserto, qué pide §12.9 y qué salió. **No simula**: evita triar a ojo un banco de treinta y dos minutos | `npx tsx tools/reports/balance-verdict.ts` |
 | `migration-ab-report.ts` | El experimento A/B de la puerta de migración, restaurando la constante al salir | `npm run migration:ab` |
+| `gait-report.ts` | **La zancada de cada clip de desplazamiento, sobre el GLB publicado y sin navegador** (AN-0, 29 sep 2026): cadencia de las patas al paso que da la vida (`paso / zancada`), fracción de apoyo y cuánto retrocede el pie apoyado respecto al cuerpo (1,00× es plantado). Es la medida del antes y el después de la locomoción; los pasos de la vida van copiados en la cabecera porque los módulos no los exportan | `npx tsx tools/reports/gait-report.ts` |
 | `life-report.ts` | Las cuatro cifras de la capa de vida sobre personas **y** animales: el «antes» que se escribe antes de tocar `body.ts` | `npx tsx tools/reports/life-report.ts [semillas…] [--days N]` |
 | `life-report-species.ts` | Cuánto cuerpo-tiempo pasa cada especie en cada actividad y cuántos sitios usa en una jornada | `npx tsx tools/reports/life-report-species.ts` |
 | `life-traits-report.ts` | Cuánto tiempo pasa cada rasgo en cada actividad, y si una persona se parece a sí misma de un día a otro | `npx tsx tools/reports/life-traits-report.ts` |
@@ -119,7 +120,7 @@ rendimiento y revisión. La tabla siguiente conserva el detalle de cada script.
 | `shot.mjs` | **Fotografiar el juego montado.** `--seed`, `--year`, `--run`, `--speed`, `--wait moment\|crossroad`, `--look X,Z` para centrar una celda real y `--scene-only` para guardar el PNG WebGL sin HUD/DOM. `--capture-zoom 0.1..1` amplía esa captura del hook y exige `--look` o `--scene-only`. Abre el valle en un año concreto sin falsear el reloj (U-10b) |
 | `film.mjs` | **Rodar el valle**: fotogramas seguidos más la traza de cada cuerpo en cada uno (`window.__valleyLife`) |
 | `film-sheet.py` | Convierte esa película en tira de contactos e informe de anomalías. **Es la única forma de medir la capa de vida como la ejecuta el navegador** |
-| `observe-life.mjs` | Juego real con el reloj del navegador controlado, píxel y traza atómicos. Lo usa la skill `observe-valley-life`. Quien anda por su ruta elevada (escalera, adarve) se cuenta en `elevatedSamples`, no como choque |
+| `observe-life.mjs` | Juego real con el reloj del navegador controlado, píxel y traza atómicos. Lo usa la skill `observe-valley-life`. Quien anda por su ruta elevada (escalera, adarve) se cuenta en `elevatedSamples`, no como choque. **AN-0 (29 sep 2026):** `--viewport 390x844` mira el valle al tamaño de un móvil (por omisión sigue el encuadre ancho de 1100×850) y `--look X,Z` encuadra una coordenada sin seguir a nadie (un ciervo, un puesto) |
 | `evidence-index.mjs` | **El índice verificable de una toma del observatorio**: comprueba que la traza, los fotogramas y el informe de una carpeta de `observe-life.mjs` casan, con su huella, y escribe `evidence-index.json` en la carpeta sin tocar lo demás. `node tools/graphics/evidence-index.mjs <carpeta-toma>` (Codex, ronda de agentes del 17 sep; integrado el 27 sep) |
 | `day-report.mjs` | Resume la traza del renderer (IA-12) — la traza real, no una simulación paralela |
 | `press-kit.mjs` | **El paquete de prensa**: todas las pantallas y todos sus estados en una pasada, con hoja de contactos, y el metraje del tráiler sin interfaz. El grupo `raros` trae lo que casi no se ve: la carga, el valle fundándose, el parte de bienvenida, el panel al tocar, la caza, avisos de amenaza, obras y el banco de batallas. `--only <grupos>`, `--offset N` |
@@ -157,6 +158,16 @@ captura de la primera réplica de cada condición después del asentamiento.
 La comparación de partición del primer fotograma está cerrada en el
 [informe P-1b.2](../docs/historico/graphics-rounds/P-1b2-primer-fotograma.md);
 la partición se retiró.
+
+**El navegador de las capturas, fuera de Windows (AN-0, 29 sep 2026).** Todas
+las herramientas de esta carpeta que abren Chromium buscan el `chrome.exe` de
+`~/AppData/Local/ms-playwright` y, si no está, dejan que Playwright use el suyo.
+Cuando la revisión instalada no es la que pide `@playwright/test` —el caso de
+la máquina de la ronda AN, con `/opt/pw-browsers/chromium`—, se señala el
+ejecutable con `VALLEY_CHROMIUM=/ruta/a/chrome`, que manda sobre las dos
+búsquedas en `shot.mjs`, `film.mjs`, `observe-life.mjs`, `gesture-sheet.mjs`,
+`animals-preview.mjs`, `animal-gestures-bench.mjs`, `press-kit.mjs`,
+`performance/gl-probe.mjs` y `performance/scene-report.mjs`.
 
 `npm run shot`, `npm run bundle`, `npm run serve:shots`, `npx tsx tools/graphics/publish-assets.ts --ids bow,spear`.
 

@@ -12,8 +12,8 @@ const M={...all,assets:all.assets.filter(x=>x.id===KIND).map(x=>GLB===null?x:{..
 const B=Object.fromEntries(M.assets.map(x=>[x.id,readFileSync(GLB??a+x.file).toString('base64')]));
 const res=await build({entryPoints:['tools/graphics/animal-gestures-bench.ts'],bundle:true,write:false,format:'esm',define:{B:JSON.stringify(B),M:JSON.stringify(M),KIND:JSON.stringify(KIND),FRAME:String(FRAME)}});
 writeFileSync(dir+'/bench.html',`<!doctype html><meta charset="utf-8"><body style="margin:0"><script type="module">${res.outputFiles[0].text}</script>`);
-const root=join(homedir(),'AppData','Local','ms-playwright');const exe=readdirSync(root).filter(d=>/^chromium-\d+$/.test(d)).sort().reverse().map(d=>join(root,d,'chrome-win64','chrome.exe')).find(existsSync);
-const br=await chromium.launch({executablePath:exe,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const root=join(homedir(),'AppData','Local','ms-playwright');const exe=process.env.VALLEY_CHROMIUM??(existsSync(root)?readdirSync(root).filter(d=>/^chromium-\d+$/.test(d)).sort().reverse().map(d=>join(root,d,'chrome-win64','chrome.exe')).find(existsSync):undefined);
+const br=await chromium.launch({...(exe?{executablePath:exe}:{}),args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const p=await br.newPage({viewport:{width:300,height:260}});p.on('pageerror',e=>console.log(String(e)));
 await p.goto(pathToFileURL(resolve(dir+'/bench.html')).href);await p.waitForFunction(()=>window.ready===true);
 const rows=[];for(const [action,moving] of ACTIONS.map(x=>[x,['walk','run','charge','flee'].includes(x)])){const imgs=[];for(let i=1;i<=5;i++)imgs.push(await p.evaluate(([a,t,m])=>window.frame(a,t,m),[action,i*.22,moving]));rows.push([action,imgs]);}
