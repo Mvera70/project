@@ -110,12 +110,14 @@ export const GROUND_BIAS = 0.002;
  * `ambient` es la parte de la luz del cielo que no llega al pie de la pared y
  * `direct` la del sol, menor: al sol el pie de un muro sigue alumbrado, y
  * comerse la misma fracción lo pintaba como una mancha de barro. Se probaron
- * tres juegos (`ambient` · `direct` · `reach`): C1 0,62 · 0,24 · 0,42, que a
- * escala de móvil casi no se veía al sol; C2 0,85 · 0,40 · 0,55, que en el
- * lado de sombra dejaba el pie de la capilla casi negro (allí sólo llega luz
- * de cielo, y se comía el 85 %); y C3, el que queda: el sol pinta el apoyo y
- * la sombra se oscurece sin ennegrecer. Con el cielo cubierto —o en Low, sin
- * sombras— es lo único que apoya la casa en el suelo. El visto bueno es de Vera.
+ * tres juegos (`ambient` · `direct` · `reach`): C1 0,62 · 0,24 · 0,42, la más
+ * clara al sol (con el cielo cubierto, casi la de C3 y más corta); C2 0,85 ·
+ * 0,40 · 0,55, que en el lado de sombra dejaba el pie de la
+ * capilla casi negro (allí sólo llega luz de cielo, y se comía el 85 %); y C3
+ * 0,55 · 0,42 · 0,55, más marcada al sol. **Vera eligió C1** (29 sep 2026, a
+ * la vista de las tres: «me gusta la sombra más clara, C1, o la de antes»).
+ * Con el cielo cubierto —o en Low, sin sombras— es lo único que apoya la casa
+ * en el suelo.
  *
  * `bases` es cuánto se mete la malla dentro de su huella por cada lado, en
  * celdas y por eje, **medido sobre la caja de los GLB publicados** (29 sep
@@ -125,9 +127,9 @@ export const GROUND_BIAS = 0.002;
  */
 export const CONTACT_SHADE = {
   texels: 8,
-  reach: 0.55,
-  ambient: 0.55,
-  direct: 0.42,
+  reach: 0.42,
+  ambient: 0.62,
+  direct: 0.24,
   bases: {
     watchtower: { x: 0.51, z: 0.51, round: 0.12 },
     well: { x: 0.1, z: 0.1, round: 0.34 },

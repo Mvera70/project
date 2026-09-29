@@ -191,9 +191,13 @@ node tools/graphics/follow-sequence.mjs --page artifacts/graphics/visual-depth/g
 
 ### GV-1 · El pie de los edificios y el prado
 
+> **Las hojas antes | después de este apartado se tomaron con C3**, la fuerza
+> que propuse. Vera eligió C1, más clara (tabla de abajo); la hoja
+> `gv1-c1-final.jpg` enseña C1 en la aldea y la villa a la misma escala.
+
 **Qué se ve.** Las casas se apoyan: una franja oscura y corta pegada a cada
 pared, más marcada del lado de la sombra y en los callejones entre dos casas, y
-que desaparece a metro y medio. Con el cielo cubierto —y en Low, que no tiene
+que desaparece a poco más de un metro. Con el cielo cubierto —y en Low, que no tiene
 sombras— es lo único que las ata al suelo; antes flotaban. El prado deja de
 ser un verde liso a escala de móvil: las alfombras de hierba se leen como
 masas oscuras entre el césped claro. Hojas, antes | después, a escala normal:
@@ -220,9 +224,9 @@ cubierto (`hojas/gv1-variantes-contacto-aldea-nublado.jpg`):
 
 | | Cielo | Sol | Alcance | Qué pasó |
 |---|---|---|---|---|
-| C1 | 0,62 | 0,24 | 0,42 celdas | A escala de móvil casi no se veía al sol |
+| **C1** | **0,62** | **0,24** | **0,42 celdas** | **Se queda: la eligió Vera** («me gusta la sombra más clara, C1, o la de antes»). La más sutil al sol; con el cielo cubierto sigue apoyando la casa |
 | C2 | 0,85 | 0,40 | 0,55 | Al lado de la sombra, el pie de la capilla quedaba casi negro: allí sólo llega luz de cielo y se comía el 85 % — el encargo pide «sin manchas negras» |
-| **C3** | **0,55** | **0,42** | **0,55** | **Se queda**: el sol pinta el apoyo y la sombra oscurece sin ennegrecer |
+| C3 | 0,55 | 0,42 | 0,55 | La que propuse: el sol pinta el apoyo y la sombra oscurece sin ennegrecer. Vera la vio más marcada de lo que quería |
 
 **El prado.** Se tocaron sólo las capas que ya había en `ground.ts`, y se
 compararon tres variantes contra hoy sobre la aldea en primavera y en invierno
@@ -376,8 +380,8 @@ fotograma lento no encadena discontinuidades.
 
 ### Lo descartado
 
-- **El pie C1 y C2** (arriba): uno no se veía al sol, el otro ennegrecía la
-  sombra. **Un disco o una luz por edificio** no se probó: el propio encargo lo
+- **El pie C2 y C3** (arriba): C2 ennegrecía la sombra, y C3 —la que propuse—
+  a Vera le pareció más marcada que C1 o que no tener ninguna. **Un disco o una luz por edificio** no se probó: el propio encargo lo
   deja fuera de presupuesto, y la máscara da lo mismo sin llamadas.
 - **El prado A y B** (arriba): uno ensuciaba la nieve, el otro no se veía.
 - **FXAA**: borra a los aldeanos, apenas mejora el parpadeo, 18–55 MB y 29–31
@@ -422,7 +426,7 @@ Todo con el panel de taller abierto (el reparto del fotograma: dibujo, vida,
 3. **El fundido de las copas**: que 0,35 s se lean como fundido y no como
    parpadeo, y que la sombra de una copa atenuada no despiste.
 4. **El pie y el prado a la luz del teléfono**: las tomas son de SwiftShader con
-   perfil sRGB forzado. **El visto bueno de C3 y del prado C es de Vera.**
+   perfil sRGB forzado. **El pie C1 lo eligió Vera; el visto bueno del prado C sigue siendo suyo.**
 5. **La tablet a 0 fps no es de esta ronda, pero ya tiene causa probable**: el
    bucle de la villa de arriba. Hasta que se arregle, las lecturas 1 y 2 en la
    tablet conviene hacerlas en la aldea (11/21), o la villa medirá el bucle y

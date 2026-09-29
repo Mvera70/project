@@ -13,7 +13,7 @@ distintos entre dos tomas— y las sondas fuera de Windows (`89136b2`, el
 «antes»). **GV-1**: `world/contact-shade.ts`, una máscara R8 para todo el
 valle leída por el sombreador del suelo: cero llamadas, 516 KB, se rehace al
 cambiar los edificios con tejado (0,3 ms la aldea, 1,9 una villa de 140 casas);
-**C3** entre tres fuerzas, y el **prado hondo** (variante C de tres) en las
+**C1** entre tres fuerzas —la más clara, la eligió Vera—, y el **prado hondo** (variante C de tres) en las
 capas que ya había. **GV-2**: quien se sigue se suma a `forest.reveal` contra
 la copa sola, fundido en 0,35 s, con sombra y viento; el asalto conserva sus 28
 copas y el hachazo vuelve a mover su árbol; 24 µs por fotograma siguiendo a
@@ -23,7 +23,7 @@ por omisión no cambia** hasta medirlo en un iPhone o iPad. **Coste**: mismas
 llamadas, triángulos, programas y recompilaciones en el mismo fotograma; el
 reparto del fotograma, igual dentro del ruido. **Abierto**: la lectura en el
 aparato (`?contact=off` y `?aa=msaa`, con el panel de taller), el visto bueno
-de Vera a C3 y al prado C. Fusionada con `main` tras la PR #2 (AN) el mismo
+de Vera al prado C (el pie C1 ya es suyo). Fusionada con `main` tras la PR #2 (AN) el mismo
 día; en las sondas se quedó la versión que hace lo de las dos tandas. **Y dos rojas
 que no son de aquí**: las jornadas `e3b-corridor` (5) y `work-contact` (1), y
 `catchUp · §13.2` en la suite rápida (2,2 s en este contenedor), fallan igual

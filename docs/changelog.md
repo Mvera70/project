@@ -18,8 +18,9 @@ entero, con sus cifras, está al final del propio encargo.
   R8 para todo el valle, hecha en lote desde el plan y leída por el
   sombreador del suelo donde three aplica su oclusión. Cero llamadas, sin
   halos ni z-fighting, vale en Low y con el cielo cubierto, y se rehace sólo
-  cuando cambian los edificios con tejado. Fuerza C3 de tres probadas (C2
-  ennegrecía la sombra de la capilla). `?contact=off` la apaga para medirla en
+  cuando cambian los edificios con tejado. Fuerza C1 de tres probadas, la más clara:
+  la eligió Vera (C2 ennegrecía la sombra de la capilla; C3 le pareció más
+  marcada de lo que quería). `?contact=off` la apaga para medirla en
   el aparato.
 - **GV-1 · el prado hondo** (`world/ground.ts`): el verde de debajo de la
   hierba, un 40 % más oscuro y mezclado entero, y las manchas lentas a 0,09.
