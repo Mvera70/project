@@ -1,5 +1,32 @@
 # The Valley — Registro de cambios
 
+## v5.00 · 29 sep 2026 · El plan del sonido, detallado; el botón suena; y una skill que lo registra
+
+Vera: «detalla el plan… todo esto tiene que registrar una skill de cómo se
+hace para poder iterarlo en futuro».
+
+- **La skill `sonido-del-valle`**, que es el encargo: cómo se fabrica, se mide,
+  se hace escuchar, se elige y se integra un sonido. Guarda **la historia de
+  los cinco rechazos como reglas** (síntesis en vivo → «malísimo»; saturación →
+  cruje; chasquidos de 10 kHz → ratón de ordenador; **notas afinadas agudas →
+  «infantil»**; materiales → «magnífico»), la paleta que manda, los números que
+  no se negocian, las trampas y el bucle de aprobación. La regla que resume las
+  otras: **cuando algo no gusta, cambia de familia, no de variante**, y **un
+  botón antes que veinte sonidos**.
+- **El plan por fases** (`plan-audio-mundo.md` §8): las seis fases con su
+  contrato, sus ficheros, su prueba, su medida y lo que se quedará pendiente.
+  La fase 0 no suena —es el motor: bucles, capas, fundidos, compuertas, oyente
+  y un descriptor de sólo lectura— y es la que decide si el resto es posible.
+- **El botón corriente suena**: `ui_button_press` y `ui_button_release`, el
+  sello de cera de la elección de Vera («Eligo el K»). Lo llevan todos los
+  botones menos los que ya tienen voz propia, listados en **un solo sitio**
+  (`OWN_VOICE`), porque un botón que suena dos veces no se ve: se oye. Con
+  teclado también. El recorrido gana un `forbidden` por paso para comprobarlo:
+  21 de 21, incluido que una pestaña no suena además a sello.
+- Y dos cosas que salieron de medir al implementar: la cera al despegarse tenía
+  un 6 % de energía por encima de 4 kHz (se bajó a 1,6 %), y el botón de
+  silencio de la portada se quedaba sin listar en `OWN_VOICE`.
+
 ## v4.99 · 29 sep 2026 · El sonido del mundo, analizado
 
 Vera pidió empezar por el sonido de la naturaleza y la vida: primero la lista de

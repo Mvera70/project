@@ -11,6 +11,22 @@ elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
 botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
 los momentos de §11.10.
 
+## 29 sep 2026 · El plan del sonido y su skill (v5.00)
+
+**La skill `sonido-del-valle`** registra cómo se hace un sonido en este
+proyecto, que es lo que Vera pidió para poder iterarlo: la historia de los
+cinco rechazos convertida en reglas, la paleta, las medidas obligatorias, el
+bucle de aprobación y las trampas. **El plan por fases** está en
+`plan-audio-mundo.md` §8 (seis fases, con contrato, prueba y medida de cada
+una). **El botón K está implementado**: sello de cera en todo botón sin voz
+propia, la lista en `OWN_VOICE`.
+
+**Abierto, y bloquea el resto:** las nueve decisiones de
+`plan-audio-mundo.md` §6. Las tres que más mandan son de dónde salen las voces
+y los animales (1), si hay sonido con posición (2) y qué suena a ×16 y ×64 (3).
+Sin la 1, la fase 4 se queda en el perro y la campana. **La fase 0 —el motor de
+ambiente— no depende de ninguna y se puede empezar ya.**
+
 **El análisis del sonido del mundo está escrito** (`docs/plan-audio-mundo.md`,
 29 sep 2026): 80 filas contra el código, tres lecturas independientes. Lo que
 cambia el plan: el reproductor no sabe hacer bucles ni capas (fase 0), no hay

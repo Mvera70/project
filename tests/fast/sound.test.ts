@@ -224,6 +224,7 @@ describe('los ficheros · lo que se registra, existe', () => {
   it('todo momento de la interfaz tiene fichero; sólo el trueno sigue esperando el suyo', () => {
     const silent = (['thunder'] as Cue[]);
     const every: Cue[] = [
+      'ui_button_press', 'ui_button_release',
       'ui_title_begin', 'ui_title_continue', 'ui_panel_open', 'ui_panel_close', 'ui_tab_change',
       'ui_person_select', 'ui_pause', 'ui_resume', 'ui_speed_change', 'ui_action_success',
       'ui_action_refused', 'ui_offer_arrives', 'ui_offer_accept', 'ui_offer_decline',

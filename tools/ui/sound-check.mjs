@@ -45,10 +45,12 @@ tab.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 const played = async () => tab.evaluate(() => (window.__valleySound?.played ?? []).map((p) => ({ ...p })));
 const steps = [];
 /**
- * Un paso: hace algo y apunta qué empezó a sonar después. `expect` es lo que
+ * Un paso: hace algo y apunta qué empezó a sonar después. `forbidden` es lo que
+ * **no** puede sonar además, que es como se comprueba que el sello genérico no
+ * se pone encima de un botón con voz propia. `expect` es lo que
  * debería haber sonado —`null`, que nada—; el informe dice si coincidió.
  */
-async function step(name, expect, act) {
+async function step(name, expect, act, forbidden) {
   const before = (await played()).length;
   await act();
   // El sonido se decodifica después del toque (`SOUND.LATE_PLAY_MS`): se da
@@ -56,8 +58,10 @@ async function step(name, expect, act) {
   await tab.waitForTimeout(500);
   const after = await played();
   const heard = after.slice(before).map((p) => (p.rate === 1 ? p.cue : `${p.cue}@${p.rate}`));
-  const ok = expect === null ? heard.length === 0 : heard.some((cue) => cue === expect || cue.startsWith(`${expect}@`));
-  steps.push({ name, expect, heard, ok });
+  const matches = (want) => heard.some((cue) => cue === want || cue.startsWith(`${want}@`));
+  const ok = (expect === null ? heard.length === 0 : matches(expect))
+    && (forbidden === undefined || !matches(forbidden));
+  steps.push({ name, expect, forbidden, heard, ok });
   console.log(`${ok ? '✓' : '✗'} ${name.padEnd(42)} ${heard.join(', ') || '—'}`);
 }
 const tabButton = (label) => tab.locator(`.skin-nav-tab[aria-label="${label}"]`);
@@ -66,9 +70,10 @@ await tab.goto(base);
 await tab.locator('.title-scrim').waitFor({ timeout: 15_000 });
 await tab.waitForTimeout(800);
 await tab.screenshot({ path: `${OUT}/title.png` });
+await step('portada · el dado de la semilla suena a sello', 'ui_button_press', () => tab.locator('.title-reroll').click());
 await step('portada · abrir opciones gráficas', 'ui_panel_open', () => tab.locator('.title-graphics').click());
 await step('portada · cerrarlas', 'ui_panel_close', () => tab.keyboard.press('Escape'));
-await step('portada · silenciar', null, () => tab.locator('.title-sound').click());
+await step('portada · silenciar (el propio botón calla)', null, () => tab.locator('.title-sound').click());
 await step('portada · volver a encender (se oye)', 'ui_resume', async () => {
   await tab.waitForTimeout(100);
   await tab.locator('.title-sound').click();
@@ -77,21 +82,26 @@ await step('portada · Begin', 'ui_title_begin', () => tab.locator('.title-new')
 await tab.waitForFunction(() => document.documentElement.dataset.appReady === 'true', null, { timeout: 60_000 });
 await tab.waitForTimeout(1500);
 
-await step('valle · abrir la crónica', 'ui_panel_open', () => tabButton('Chronicle').click());
+// Y lo que el sello **no** debe tapar: una pestaña tiene voz propia, así que
+// suena a cofre y **no además** a botón corriente (`OWN_VOICE` en `sound.ts`).
+await step('valle · abrir la crónica (y sin sello encima)', 'ui_panel_open',
+  () => tabButton('Chronicle').click(), 'ui_button_press');
 await step('crónica → gente', 'ui_tab_change', () => tabButton('People').click());
 await step('gente · tocar una persona', 'ui_person_select', () => tab.locator('.people-row').first().click());
 await step('volver al valle', 'ui_panel_close', () => tabButton('Valley').click());
 await tab.waitForTimeout(400);
 await step('pausar', 'ui_pause', () => tab.locator('.hud-speed-cluster .hud-round-btn').first().click());
 await step('seguir', 'ui_resume', () => tab.locator('.hud-speed-cluster .hud-round-btn').first().click());
-await step('abrir la regleta (no suena)', null, () => tab.locator('.valley-speed-badge').click());
+// El badge sólo despliega la regleta: es un botón corriente y suena a sello.
+await step('abrir la regleta (sello, no velocidad)', 'ui_button_press',
+  () => tab.locator('.valley-speed-badge').click(), 'ui_speed_change');
 await step('velocidad ×4 (más aguda)', 'ui_speed_change', () => tab.locator('.valley-speeds button', { hasText: '4' }).first().click());
 await tab.screenshot({ path: `${OUT}/valley-corner.png` });
 await step('silenciar el valle', null, () => tab.locator('.valley-sound').click());
 await step('en silencio, abrir la crónica no suena', null, () => tabButton('Chronicle').click());
 await step('en silencio, cerrarla no suena', null, () => tabButton('Valley').click());
 await step('encender el valle (se oye)', 'ui_resume', () => tab.locator('.valley-sound').click());
-await step('despejar la pantalla (no suena)', null, () => tab.locator('.valley-bare').click());
+await step('despejar la pantalla (sello)', 'ui_button_press', () => tab.locator('.valley-bare').click());
 await tab.screenshot({ path: `${OUT}/valley-bare.png` });
 
 // Lo que no es un clic en un botón de la carcasa: la respuesta del motor a lo

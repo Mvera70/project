@@ -323,3 +323,152 @@ sonar un solo ambiente.
 Cada fase acaba como las demás: medida, prueba de propiedad del diseño, puerta y
 papel. Ningún nivel se cierra a ojo: `SOUND` en `balance.ts` con su `TUNE` y su
 medición.
+
+---
+
+## 8 · El plan, fase por fase
+
+Cada fase es una ronda de la skill `goal`: medida, prueba de propiedad, puerta
+(`typecheck`, `lint`, ficheros tocados) y papel. **Cómo se fabrica y se aprueba
+un sonido está en la skill `sonido-del-valle`**; esto es qué toca cada fase.
+
+Dos reglas que valen para las seis:
+
+- **Un sonido no entra sin que Vera lo haya escuchado.** Cada fase acaba con su
+  página de escucha y espera.
+- **Ninguna fase inventa un sonido para algo que no se ve.** Si aparece uno, el
+  hueco de imagen va a `encargos-3d.md` y el sonido espera.
+
+### Fase 0 · El motor (no suena nada, y es la más importante)
+
+Lo que hay hoy sólo lanza ficheros sueltos. Sin esto no puede sonar un ambiente.
+
+| Qué | Contrato |
+|---|---|
+| **Capas en bucle** | `layer(id, file)` con ganancia propia, y un cruce corto para que la repetición no se reconozca |
+| **Mezclador** | Ganancia por capa, tope de voces simultáneas y un `duck` para que un hito no se pierda bajo la tormenta |
+| **Fundidos** | Todo cambio de estado se cruza; nada entra ni sale de golpe |
+| **Compuertas** | Por velocidad (decisión 3), por letargo, por pausa, por `valley.sound` y por pestaña oculta |
+| **Oyente** | `viewCentre` y `viewHeight` por fotograma → distancia y zoom; atenuación con una curva, sin panorámica todavía |
+| **Descriptor** | `audioSnapshot()` en el renderer, o campos nuevos en `GraphicsStats`: intensidad del cielo, fuegos con posición, puertas, contadores de vida y combate. **Sólo lectura, sin proyecciones** — `__valleyLife()` es para depurar |
+
+**Ficheros:** `src/ui/sound.ts` (o un `src/ui/audio/` nuevo si crece),
+`src/render3d/contracts.ts`, `src/render3d/renderer.ts`, `balance.ts` (`SOUND`).
+
+**Prueba:** que una capa en bucle no se corta al pasar de ×1 a ×64 y vuelta;
+que en pausa y en letargo no suena nada; que con `valley.sound` en `off` no
+suena nada; que el descriptor **no gasta ninguna tirada del motor** (la partida
+tiene que salir idéntica con y sin sonido).
+
+**Medida:** coste por fotograma del descriptor, en el taller de rendimiento.
+
+**Riesgo:** es donde se puede colar un fallo de rendimiento en móvil. Se mide
+antes de seguir (skill `performance`).
+
+### Fase 1 · La naturaleza
+
+Lo que Vera pidió primero y lo que mejor sale sintetizado.
+
+| Sonidos | Notas |
+|---|---|
+| `amb_wind_calm` · `amb_wind_gust` · `amb_wind_winter` | Por cielo, no por estación |
+| `amb_rain_light` · `amb_rain_heavy` · `amb_storm_bed` · `amb_snow_hush` | El lecho de tormenta, sin truenos |
+| `weather_thunder_near/mid/far` · `weather_lightning_crack` | **Por distancia real** (decisión 8) |
+| `amb_river` · `amb_waterfall` · `amb_river_flood` | Con posición |
+| `amb_fire_crackle` · `amb_fire_embers` · `amb_fire_steam` | Por estado del fuego |
+
+**Prueba:** que el cielo y el sonido no discrepan nunca; que un rayo lejano
+suena más tarde y más apagado que uno cerca; que el río se oye al acercar la
+cámara y se va al alejarla.
+
+**Medida:** en un año de juego y varias semillas, cuántos minutos suena cada
+capa. Si el viento suena siempre, tiene que ser el más discreto de todos.
+
+### Fase 2 · Día, noche y la aldea que crece
+
+| Sonidos | Notas |
+|---|---|
+| `amb_birds_day` · `amb_night_summer` · `amb_night_cold` | Con sus ventanas de hora y estación ya definidas |
+| `amb_village_murmur_*` (3 o 4 niveles) | **Por población**, con fundido entre niveles |
+| `amb_hearth_plaza` · `amb_festival` | La hoguera y la plaza engalanada |
+
+**La medida que decide esta fase:** la escalera de población real, de
+`founding-report.ts` sobre varias semillas —cuánta gente hay en el año 5, 10,
+20 y 40—. **Los umbrales salen de ahí**, no de mi cabeza, y van a `SOUND` con
+su `TUNE` y la medida escrita al lado.
+
+**Prueba:** que el murmullo crece con la población y **calla de noche**; que
+dos valles del mismo año con poblaciones distintas suenan distinto.
+
+**Pendiente probable:** si no hay voces (decisión 1), el murmullo se hace con
+actividad —golpes lejanos, puertas, un perro— y el papel dice que no es un
+murmullo de gargantas.
+
+### Fase 3 · El trabajo y la aldea
+
+El foley de materiales que ya gustó. Varios tienen el gancho medio hecho.
+
+| Sonidos | Gancho |
+|---|---|
+| `world_tree_chop` ×4 · `world_mine_stone` | `cast.onStrike` **ya existe**: sólo falta consumirlo |
+| `world_tree_fall` | Diferencia de celdas de bosque |
+| `world_hammer` | **Necesita marcador de impacto** en el gesto, que no lo tiene |
+| `world_wood_drop` · `world_stone_drop` · `world_grain_drop` | `woodGains()` ya es un flujo real de sucesos |
+| `world_door_house` · `world_gate_open` · `world_gate_close` | Conjunto de puertas activas; **callar a ×16 y ×64** |
+| `world_footsteps_*` (5 superficies) | Capa agregada, **no un sonido por pie** |
+| `world_coins` · `world_sow` · `world_hoe` · `world_douse` | |
+| `stinger_era_village` · `stinger_era_town` · `world_wall_closed` | Ya se disparan hoy |
+
+**Prueba:** que diez leñadores a la vez no suenan diez veces (tope de voces);
+que a ×64 no suena ni una puerta; que las pisadas no pasan de un número de
+voces por segundo con cuarenta personas en pantalla.
+
+**Medida:** cuántos golpes por minuto salen en una aldea madura
+(`observe-valley-life`). Si son más de unos pocos por segundo, el tope de voces
+manda sobre la fidelidad.
+
+### Fase 4 · Animales y sucesos
+
+**Depende de la decisión 1.** Sin voces generadas, esta fase se queda en el
+perro (que ya tiene gesto), la campana y la riada; el resto espera.
+
+| Sonidos | Condición |
+|---|---|
+| `animal_dog_bark` | Tiene gesto: entra seguro |
+| `animal_hen` · `animal_pig` · `animal_cow` · `animal_crow` · `animal_wolf` | Sólo si Vera los consigue o autoriza generarlos |
+| `world_chapel_bell` | **Necesita la decisión 5 y no tiene disparador** |
+| `world_death_bell` · `stinger_crown` · `world_plague` | Del `TickReport`; ojo al desfase del relevo |
+| `weather_flood_surge` | |
+
+### Fase 5 · La caza y el asedio
+
+Lo más raro del juego —el clan está encima el 4 % de las semanas— y lo que más
+ganchos pide. Va la última por eso, no por poco importante: es el final del
+juego y merece sonar.
+
+| Bloque | Sonidos |
+|---|---|
+| Caza | Honda, arco, lanza, acierto, roce, pieza caída |
+| Flechas | Tensar, soltar, vuelo, impacto en cuerpo, clavarse |
+| Cuerpo a cuerpo | Lanza, golpe recibido, caída, muñeco que asienta |
+| El portón | Golpe, el que cede, las tablas |
+| El final | El valle aguanta · la villa cae |
+
+**Prueba:** el banco de batallas (`?sandbox=battle`, skill `battle-sandbox`),
+porque un asalto real tarda horas en llegar.
+
+**Pendiente seguro:** el cuerno de aviso (no existe), la flecha que sepa si dio
+en madera o en piedra (no hay material), el muro que se rompe (sólo el portón),
+las espadas (no hay) y el sonido de sangre (decisión 7).
+
+---
+
+## 9 · Lo que ya quedó hecho de este plan
+
+- **El botón corriente suena** (29 sep 2026): `ui_button_press` y
+  `ui_button_release`, el sello de cera que Vera eligió («Eligo el K»). Lo
+  llevan todos los botones **menos los que ya tienen voz propia**, listados en
+  un solo sitio (`OWN_VOICE` en `sound.ts`) para que se vea de un vistazo quién
+  suena por su cuenta. Con teclado también (barra y retorno). Comprobado con
+  clics reales: 21 de 21 pasos, incluido que una pestaña **no** suena además a
+  sello.

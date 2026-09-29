@@ -4156,6 +4156,7 @@ Lo normativo es **cuándo**; cómo suena cada cosa lo decide
 
 | Momento | Suena | Por qué ahí |
 |---|---|---|
+| **Tocar cualquier botón que no tenga voz propia** | `ui_button_press` al bajar el dedo, `ui_button_release` al levantarlo | El sello de cera que eligió Vera («Eligo el K», 29 sep 2026). Los que sí tienen voz propia están listados en `OWN_VOICE` (`sound.ts`) y no lo llevan encima. Soltar fuera del botón —arrepentirse— no suena |
 | Fundar / continuar en la portada | `ui_title_begin` / `ui_title_continue` | Volver es más discreto que empezar |
 | Abrir una hoja desde el valle, y el cronicón o las opciones gráficas | `ui_panel_open` | Un cambio de contexto |
 | Volver al valle | `ui_panel_close` | La pareja, más corta y más baja |

@@ -38,6 +38,9 @@ import type { Milestone } from './milestones';
 
 /** Cada momento que suena. Los nombres son los de `docs/plan-audio.md` §4. */
 export type Cue =
+  // El botón corriente, el que no tiene voz propia (§`OWN_VOICE`).
+  | 'ui_button_press'
+  | 'ui_button_release'
   | 'ui_title_begin'
   | 'ui_title_continue'
   | 'ui_panel_open'
@@ -72,6 +75,8 @@ export type Cue =
  * `tools/ui/sounds.py` y la vigila `tests/fast/sound.test.ts`.
  */
 export const CUE_FILES: Readonly<Partial<Record<Cue, string>>> = {
+  ui_button_press: 'ui_button_press.mp3?v=b9625e27',
+  ui_button_release: 'ui_button_release.mp3?v=b5c781c5',
   ui_title_begin: 'ui_title_begin.mp3?v=e19bbc1d',
   ui_title_continue: 'ui_title_continue.mp3?v=0ea9ea9d',
   ui_panel_open: 'ui_panel_open.mp3?v=73234a2e',
@@ -319,6 +324,43 @@ export function createSoundEngine(): SoundEngine {
 export const sound: SoundEngine = createSoundEngine();
 
 /**
+ * **Los botones que ya tienen voz propia**, y que por tanto no llevan encima el
+ * sello genérico: abrir una hoja suena a cofre, una velocidad a ficha de
+ * piedra, una decisión a cera. Una lista en **un solo sitio** y no un atributo
+ * repartido por siete ficheros, para que se vea de un vistazo quién suena por
+ * su cuenta; `data-sfx="off"` queda como escape para un caso suelto.
+ *
+ * Lo que **no** está aquí y es deliberado: el badge de la velocidad (sólo
+ * despliega la regleta), el botón de despejar, la señal de caza, los cierres,
+ * el dado de la semilla, el taller, los mandos del carro y del tablón y los de
+ * las opciones gráficas. Ésos son botones corrientes y suenan a sello.
+ */
+const OWN_VOICE = [
+  '.skin-nav-tab',                                        // las pestañas · routeCue
+  '.valley-speeds button',                                // la regleta · speedCue
+  '.hud-speed-cluster .hud-round-btn:not(.valley-speed-badge)', // parar y seguir · speedCue
+  '.valley-sound, .title-sound',                          // el silencio · se oye al encenderlo
+  '.title-new, .title-continue, .title-preset',           // fundar y continuar
+  '.title-annals, .title-graphics',                       // abren y cierran hoja
+  '.crossroad-options button',                            // el sello de la decisión
+  '.valley-voice-answer',                                 // aceptar o dejar pasar un trato
+  '.people-row',                                          // abre una ficha
+  '[data-sfx="off"]',                                     // el escape puntual
+].join(', ');
+
+/**
+ * El botón corriente bajo un toque, si lo hay: uno de verdad, habilitado y sin
+ * voz propia. Devuelve `null` para todo lo demás, incluido el lienzo del valle.
+ */
+function plainButton(target: EventTarget | null): HTMLButtonElement | null {
+  if (!(target instanceof Element)) return null;
+  const button = target.closest('button');
+  if (button === null || button.disabled || button.matches(OWN_VOICE)) return null;
+  // Un contenedor marcado calla a todo lo que lleva dentro.
+  return button.closest('[data-sfx="off"]') === null ? button : null;
+}
+
+/**
  * Lo engancha a la página: pide los ficheros ya y se arma con el primer toque
  * **en cualquier sitio**, en la fase de captura para ir antes que el botón
  * que lo recibe. Se llama una vez, desde `main.ts`.
@@ -332,6 +374,27 @@ export function installSound(): void {
   for (const type of ['pointerdown', 'pointerup', 'click'] as const) {
     document.addEventListener(type, () => { sound.arm(); }, { capture: true });
   }
+  // **El sello de cera en todo botón corriente** (Vera, 29 sep 2026: «Eligo el
+  // K para ese botón»): el golpe al bajar el dedo y la cera que se despega al
+  // levantarlo, como en un juego de móvil. En captura, para ir antes que el
+  // manejador del propio botón; y separados, porque soltar fuera del botón
+  // —arrastrar el dedo para arrepentirse— no debe sonar a confirmación.
+  document.addEventListener('pointerdown', (event) => {
+    if (plainButton(event.target) !== null) sound.tap('ui_button_press', Date.now());
+  }, { capture: true });
+  document.addEventListener('pointerup', (event) => {
+    if (plainButton(event.target) !== null) sound.tap('ui_button_release', Date.now());
+  }, { capture: true });
+  // Y con el teclado, que no manda punteros: la barra y el retorno aprietan un
+  // botón igual que un dedo. `repeat` se ignora, o mantenerla pulsada tabletea.
+  document.addEventListener('keydown', (event) => {
+    if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return;
+    if (plainButton(event.target) !== null) sound.tap('ui_button_press', Date.now());
+  }, { capture: true });
+  document.addEventListener('keyup', (event) => {
+    if (event.key !== ' ' && event.key !== 'Enter') return;
+    if (plainButton(event.target) !== null) sound.tap('ui_button_release', Date.now());
+  }, { capture: true });
   // Pedir los ficheros no necesita permiso: así el primer botón ya los tiene.
   if (document.readyState === 'complete') sound.prefetch();
   else window.addEventListener('load', () => { sound.prefetch(); }, { once: true });

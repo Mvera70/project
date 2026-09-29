@@ -285,6 +285,26 @@ def _(v: Voice):
     return 'nav', 0.09, v.room(x)
 
 
+# ---- sello de cera: el botón corriente ---------------------------------------------
+# **El K.** De las cuatro tandas de un solo botón, Vera eligió éste: «Eligo el K
+# para ese botón» (29 sep 2026). Al apretar, el sello sobre la cera; al soltar,
+# la cera que se despega. Lo lleva **todo botón que no tenga voz propia**
+# (`OWN_VOICE` en `sound.ts`).
+
+@recipe('ui_button_press')
+def _(v: Voice):
+    x = place((0, v.contact(0.07, 350, 1700, 0.02, 3.0, 0.5)), (0, v.knock(470, 0.09, 0.03, 0.9)),
+              (0, v.drop(440, 0.09, 0.028, 1.3, 0.015, 0.55)), dur=0.13)
+    return 'nav', 0.13, v.room(x)
+
+
+@recipe('ui_button_release')
+def _(v: Voice):
+    # Más corto y más bajo que apretar: es la respuesta, no el gesto.
+    x = place((0, v.grains(0.09, 900, 2700, 3, 0.4)), (0.01, v.knock(520, 0.05, 0.014, 0.3)), dur=0.11)
+    return 'tick', 0.11, x
+
+
 # ---- piedra sobre madera: los toques ----------------------------------------------
 
 @recipe('ui_tab_change')
