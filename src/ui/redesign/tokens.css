@@ -240,6 +240,7 @@
   --button-parchment-off: url('./button-parchment-off.png');
   --paper-document: url('./paper-document.png');     /* 1024×1024: loseta de los documentos */
   --control-ivory: url('./control-ivory.png');       /* 128×96: los mandos del valle, marfil (elegido por Vera) */
+  --title-dusk: url('./title-dusk.jpg');             /* 780×1688: la portada 04, «Luces en la garganta» */
 
   /* ------------------------------------------- los `--ui-*` de UI-R1, vivos */
   /* Cinco rondas los usan. Se conservan y **apuntan a los de arriba**, así

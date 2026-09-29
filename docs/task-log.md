@@ -1,5 +1,19 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · La v9 de Codex, al juego — texturas, marfil, brújula, portada y encrucijada
+
+Tanda A (`d9f0fb9`, desplegada): las texturas de ImageGen sustituyen a las
+antiguas —tabla de la cabecera, placa de la fecha, hueco de cada cifra, loseta
+del tablón, pergamino de hojas y bandeja, botón secundario— y los mandos del
+valle van en marfil. La brújula lleva el dibujo de Codex (anillas de latón, N y
+S) y sigue siendo la bola que gira. Trampa encontrada: el atajo `border` con
+`!important` reinicia `border-image` y la gana. Tanda B: la portada 04 «Luces
+en la garganta» a sangre, con el número en la placa de marfil y fundar en la
+placa de madera; la encrucijada en papel de documento con las opciones en la
+tira rasgada, sin sello y en Garamond; el mismo papel en bienvenida, epitafio
+y anales. Capturas lado a lado con las de Codex a 390 y 320. Abierto: la
+crónica a color cuando estén las 51; la skill `piel-del-valle`.
+
 ## 29 sep 2026 · La piel v8, al juego — tandas 1 a 3 subidas y desplegadas
 
 **Capturas y comparación con las láminas (29 sep, noche):** valle, carro,

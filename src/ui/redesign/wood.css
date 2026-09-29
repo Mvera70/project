@@ -1114,3 +1114,188 @@ html:has(.valley-board-veil) .valley-compass { visibility: hidden; }
   box-shadow: none;
 }
 :root .skin-button--parchment:disabled { border-image-source: var(--button-parchment-off); }
+
+
+/* ============================================================ v9 · la portada
+
+   **La portada 04, «Luces en la garganta»**, que eligió Vera entre las cinco
+   de Codex (29 sep 2026). El cuadro de ImageGen a sangre sustituye a la tabla
+   con arco, al grabado y al empedrado: el valle al anochecer, con las luces
+   del pueblo en la garganta, y encima sólo el logotipo y los mandos. El
+   número va en la placa de marfil, fundar en la placa de madera con brasa, y
+   los anales y el idioma como rótulos, sin caja: no compiten con fundar. */
+:root .title-scrim { padding: 0; background: #0a111a; }
+:root .title-book {
+  width: 100%;
+  max-width: 560px;
+  border: 0;
+  border-radius: 0;
+  background-color: #0a111a;
+  background-image: var(--title-dusk);
+  background-size: cover;
+  background-position: 50% 0;
+  background-repeat: no-repeat;
+  box-shadow: none;
+}
+:root .title-book::before,
+:root .title-book::after { display: none; }
+:root .title-sheet { padding: max(24px, env(safe-area-inset-top)) 28px 0; }
+:root .title-vignette { display: none; }
+:root .title-logo { width: min(100%, 290px); filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .6)); }
+/* Los mandos, abajo, sobre la parte oscura del cuadro. */
+:root .title-actions { flex: 0 0 auto; margin-top: auto; justify-content: flex-end; gap: 14px; }
+:root .title-seed-row {
+  align-items: center;
+  padding: 0;
+  background: none;
+  clip-path: none;
+  filter: none;
+}
+:root .title-seed-field { align-items: center; gap: 8px; }
+:root .title-seed-row label,
+:root .title-dev-row label {
+  color: #F3E3C2;
+  font: 700 12px/1.1 var(--skin-font-display);
+  letter-spacing: .08em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .8);
+}
+:root .title-seed {
+  min-height: 52px;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 10px 14px;
+  border-image: var(--plate-date) 20 28 fill stretch;
+  border-image-width: 10px 14px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: #2B1A0E;
+  text-align: center;
+  font: 700 25px/1 var(--skin-font-display);
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .5));
+}
+/* El dado, suelto sobre el cuadro: el taco de madera sobraba. */
+:root .title-reroll.skin-button--parchment {
+  align-self: flex-end;
+  width: 44px;
+  min-width: 44px;
+  min-height: 52px;
+  border: 0;
+  border-image: none;
+  background: none;
+  box-shadow: none;
+}
+:root .title-reroll.skin-button--parchment:active { transform: translateY(2px); box-shadow: none; }
+:root .title-new.skin-button--wood {
+  min-height: 60px;
+  padding: 0;
+  font-size: 17px;
+  white-space: nowrap;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 18px;
+  border-image: var(--plaque-wood) var(--plaque-slice) fill stretch;
+  border-image-width: var(--plaque-edge);
+  border-radius: 0;
+  background: none;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .6);
+  box-shadow: none;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .5));
+}
+:root .title-new.skin-button--wood:active { transform: translateY(2px); box-shadow: none; }
+:root .title-annals {
+  min-width: 0;
+  padding: 0 12px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: #F3E3C2;
+  font: 700 15px/1 var(--skin-font-display);
+  letter-spacing: .06em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+}
+:root .title-annals:active { transform: translateY(2px); box-shadow: none; color: #FFF3D6; }
+:root .title-bottom {
+  margin: 0 -28px;
+  padding: 4px 18px max(12px, env(safe-area-inset-bottom));
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+:root .title-language {
+  min-width: 0;
+  min-height: var(--ui-tap-min);
+  padding: 0 8px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  filter: none;
+  color: rgba(243, 227, 194, .8);
+  font: 700 12px/1 var(--skin-font-display);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+
+/* ======================================================= v9 · la encrucijada
+
+   La composición de Codex (29 sep 2026): el valle arriba, y abajo un
+   documento de papel (`paper-document.png`, loseta) con el título en tinta
+   oscura y cada opción en la tira de pergamino de canto rasgado
+   (`strip-status.png`, nueve partes; la versión final de Codex), el verbo
+   arriba y el precio debajo, en Garamond como todo lo que se lee. Sin sello: el título ya dice que es una
+   decisión, y el lacre queda para el riesgo. */
+:root .crossroad {
+  border-radius: 0;
+  background-color: #efe0c0;
+  background-image: var(--paper-document);
+  background-size: 512px 512px;
+  background-repeat: repeat;
+}
+:root .crossroad-head .skin-seal { display: none; }
+:root .crossroad h1 {
+  color: #2B1A0E;
+  font: 700 22px/1.2 var(--skin-font-display);
+  letter-spacing: .02em;
+}
+:root .crossroad p.crossroad-body { margin: 12px 0 18px; font: 400 18px/1.4 var(--skin-font-story); color: #34302B; }
+:root .crossroad-options { gap: 12px; }
+:root .crossroad-options button {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3px;
+  min-height: 68px;
+  padding: 3px 1px;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 10px 16px;
+  border-image: var(--strip-status) 20 32 fill stretch;
+  border-image-width: 10px 16px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  filter: drop-shadow(0 2px 3px rgba(60, 40, 20, .25));
+}
+:root .crossroad-options button:hover { filter: drop-shadow(0 2px 3px rgba(60, 40, 20, .25)) brightness(1.04); }
+:root .crossroad-options button:active { transform: translateY(2px); box-shadow: none; filter: none; }
+:root .crossroad-label { color: #3A2412; font: 700 13px/1.2 var(--skin-font-display); letter-spacing: .04em; }
+:root .crossroad-cost { color: #392C20; font: 400 17px/1.15 var(--skin-font-story); }
+/* La brújula no se pinta encima de la decisión (z-index 30 contra 10). */
+html.crossroad-open .valley-compass,
+html.crossroad-open .hud-round-btn { visibility: hidden; }
+
+
+/* Los otros tres documentos que se leen —la bienvenida, el epitafio y los
+   anales— van en el mismo papel que la encrucijada: «papel = leer». */
+:root .welcome,
+:root .epitaph,
+:root .annals {
+  background-color: #efe0c0;
+  background-image: var(--paper-document);
+  background-size: 512px 512px;
+  background-repeat: repeat;
+}

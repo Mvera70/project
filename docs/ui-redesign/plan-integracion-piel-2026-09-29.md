@@ -35,3 +35,10 @@ quedan sólo para el pie de la portada hasta que se rehaga.
 El arco del sol con sus cinco cuentas, la brújula, los tres iconos de las
 pestañas, Cinzel y Garamond, el sello de lacre sólo para riesgo, el verde
 azulado desaparece de la interfaz.
+
+## La v9 (29 sep 2026)
+
+| Tanda | Qué | Estado |
+|---|---|---|
+| **A · Texturas y mandos** | Las piezas de ImageGen de `texturas-v9` en cabecera, fecha, cifras, tablón, hojas, bandeja y botón secundario; mandos de marfil; brújula de latón que gira | **Hecha y desplegada** (`d9f0fb9`) |
+| **B · Composición** | Portada 04 a sangre (`title-dusk.jpg`); encrucijada en `paper-document` con opciones en `strip-status`; papel de documento en bienvenida, epitafio y anales | **Hecha**, con captura lado a lado |
