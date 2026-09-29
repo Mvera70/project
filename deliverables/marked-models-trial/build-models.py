@@ -748,6 +748,47 @@ def duck():
         leaf('Web_'+l,(ankle[0],s*.028,.006),(-.030,s*.028,.004),.030,.004,'orange',f)
     merge_parts(); save('duck')
 
+def bird():
+    # 29 sep 2026. La golondrina de Astra eran dos triángulos negros con un
+    # cuerpo diminuto. Mismo contrato que la suya (`effects/ambience.ts`): tres
+    # piezas, `bird_body` y `bird_wing_l`/`_r`, con la bisagra del ala en el
+    # origen de su pieza —el juego la bate girándola sobre el eje del vuelo—.
+    # El juego la escala ×10 y la ve alta en el cielo, así que lo que cuenta es
+    # la silueta: alas en hoz barridas hacia atrás, cola ahorquillada con sus
+    # dos plumas largas, lomo azul oscuro, garganta rojiza y vientre claro.
+    reset(); mat('feathers','141C2C'); mat('breast','D8CCB0'); mat('throat','A0482C'); mat('tips','101418')
+    # (lado, adelante, arriba) -> Blender; glTF recupera +Z como el vuelo.
+    B=lambda sd,fw,up:(sd,-fw,up)
+    body=empty('bird_body',(0,0,0),ROOT)
+    rings=[(-.032,.000,.0034,.0030),(-.014,.000,.0072,.0060),(.008,.001,.0085,.0068),(.026,.001,.0058,.0052),(.035,.001,.0022,.0022)]
+    def spindle(name,rs,m,dz=0,kw=1,kh=1):
+        vs=[];fs=[];n=8
+        for fw,up,w,h in rs:
+            for i in range(n):
+                a=2*pi*i/n; vs.append(B(cos(a)*w*kw,fw,up+dz+sin(a)*h*kh))
+        fs.append(tuple(range(n-1,-1,-1)))
+        for r in range(len(rs)-1):
+            for i in range(n):
+                j=(i+1)%n; fs.append((r*n+i,r*n+j,(r+1)*n+j,(r+1)*n+i))
+        fs.append(tuple((len(rs)-1)*n+i for i in range(n)))
+        return mesh(name,vs,fs,m,body)
+    spindle('Back',rings,'feathers')
+    spindle('Belly',rings[:-1],'breast',dz=-.0022,kw=.88,kh=.72)
+    ell('Throat',B(0,.025,-.0014),(.0074,.009,.0052),'throat',body,8,5)
+    loft_beak=[B(-.0016,.037,.0012),B(.0016,.037,.0012),B(0,.037,.0028),B(0,.045,.0010)]
+    mesh('Beak',loft_beak,[(0,2,1),(0,1,3),(1,2,3),(2,0,3)],'tips',body)
+    for sd in (-1,1):
+        # Timoneras: la horquilla, larga y fina.
+        slab('Tail_Streamer_'+str(sd),[B(sd*.0010,-.026,.0008),B(sd*.0055,-.028,.0008),B(sd*.0095,-.056,.0004),B(sd*.0070,-.053,.0004)],(0,0,.0007),'tips',body)
+    for side,sd in [('l',-1),('r',1)]:
+        w=empty('bird_wing_'+side,B(sd*.0027,.0027,.0007),ROOT)
+        # Hoz barrida hacia atrás: borde de ataque curvo, punta fina detrás.
+        # Envergadura casi el doble del largo, como una golondrina de verdad.
+        outline=[(0,.010),(.016,.012),(.034,.008),(.054,-.004),(.074,-.024),(.056,-.013),(.036,-.009),(.016,-.010),(0,-.008)]
+        slab('Wing_'+side,[B(sd*(.0027+x),.0027+fw,.0007) for x,fw in outline],(0,0,.0009),'feathers',w)
+        slab('Wing_Tip_'+side,[B(sd*(.0027+x),.0027+fw,.0009) for x,fw in [(.050,-.002),(.056,-.005),(.074,-.024),(.062,-.015)]],(0,0,.0008),'tips',w)
+    merge_parts(); save('bird')
+
 def bucket():
     reset(); mat('staveA','A07C50'); mat('staveB','927044'); mat('staveC','B18B59'); mat('inside','71573A')
     # Duela individual, hueco real y espesor visible en el canto.
@@ -828,6 +869,6 @@ def hoe():
 # `-- bear` construye sólo esos; sin nombres, todos (el oso, en su v4).
 ONLY=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 BUILDS=[('wolf',lambda: canine('wolf')),('dog',lambda: canine('dog')),('boar',boar),('bear',bear),('bear_v3',bear_v3),('mule',mule),
-        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('crow',crow),('duck',duck),('deer',deer),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
+        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('crow',crow),('duck',duck),('deer',deer),('bird',bird),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
 for name,build in BUILDS:
     if (not ONLY and name!='bear_v3') or name in ONLY: build()

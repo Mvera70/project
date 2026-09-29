@@ -152,3 +152,16 @@ por cinemática inversa y el cuerpo un poco agachado al andar, como hacía
 - [deer.glb](deer.glb) · [perfil](deer-profile.png) · [tres cuartos](deer-three-quarter.png) ·
   [andando](deer-walk.png)
 - `python3 build-models.py -- deer`
+
+## La golondrina (29 sep 2026) — candidata, **sin publicar**
+
+La de Astra eran dos triángulos negros con un cuerpo diminuto. `bird()` en
+`build-models.py` guarda su contrato con `effects/ambience.ts` —tres piezas,
+`bird_body`, `bird_wing_l` y `bird_wing_r`, con la bisagra del ala en el
+origen de su pieza, en el mismo sitio— y cambia la silueta, que es lo que se
+ve a ×10 en el cielo: alas en hoz barridas hacia atrás con envergadura de casi
+el doble del largo, cola ahorquillada, lomo azul muy oscuro, garganta rojiza y
+vientre claro. Sin clips: el aleteo lo hace el juego.
+
+- [bird.glb](bird.glb) · [de frente](bird-front.png) · [tres cuartos](bird-three-quarter.png)
+- `python3 build-models.py -- bird`
