@@ -1,6 +1,6 @@
 # The Valley — Registro de cambios
 
-## v5.02 · 29 sep 2026 · AN-5: la caza física, y la visita del oso que dura
+## v5.13 · 29 sep 2026 · AN-5: la caza física, y la visita del oso que dura
 
 Vera, al leer el brief AN-5a: «que la caza enseñe el golpe; tiene que ser
 natural; cuanto más física y realista, mejor; que pueda fallar, que pueda
@@ -61,6 +61,178 @@ matriz (§2.7).
   honda sigue con los gestos del arco, y su piedra desaparece donde da. Y de la toma del oso: el relevo del
   anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
   primera jornada de una sesión (matriz §2.7).
+
+## v5.12 · 29 sep 2026 · La profundidad del valle en móvil: el pie de las casas, el prado hondo y el seguido a la vista
+
+Vera pidió ejecutar el encargo de Astra
+(`docs/encargos/profundidad-visual-movil-2026-09-29.md`) por orden: «las
+casas se leen poco ancladas al suelo y el prado pierde estructura en el zoom
+habitual». Numerada tras las de las ramas de animación y de animales (v4.97–v5.11). El resultado
+entero, con sus cifras, está al final del propio encargo.
+
+- **GV-0 · tomas comparables** (`89136b2`, sin cambio visible): `shot.mjs` y
+  `gl-probe.mjs` abren el valle con el perfil de un teléfono, el cielo, la hora
+  y la escala sujetos, y dos tomas seguidas salen idénticas al píxel;
+  `follow-sequence.mjs` graba la misma secuencia del seguido en dos versiones;
+  las sondas de `performance/` arrancan fuera de Windows y `gl-probe` da el
+  reparto del fotograma que mide el propio renderer.
+- **GV-1 · el pie de los edificios** (`world/contact-shade.ts`): una máscara
+  R8 para todo el valle, hecha en lote desde el plan y leída por el
+  sombreador del suelo donde three aplica su oclusión. Cero llamadas, sin
+  halos ni z-fighting, vale en Low y con el cielo cubierto, y se rehace sólo
+  cuando cambian los edificios con tejado. Fuerza C1 de tres probadas, la más clara:
+  la eligió Vera (C2 ennegrecía la sombra de la capilla; C3 le pareció más
+  marcada de lo que quería). `?contact=off` la apaga para medirla en
+  el aparato.
+- **GV-1 · el prado hondo** (`world/ground.ts`): el verde de debajo de la
+  hierba, un 40 % más oscuro y mezclado entero, y las manchas lentas a 0,09.
+  Variante C de tres (A ensuciaba la nieve; B no se veía).
+- **GV-2 · quien se sigue, a la vista**: se suma a `forest.reveal` (la caza y
+  el asalto se conservan) y se mide contra la copa sola; las copas se funden en
+  0,35 s, conservan su sombra y se mecen. Y el hachazo vuelve a mover su
+  árbol con copas atenuadas: seguir al leñador lo dejaba quieto.
+- **GV-3 · suavizado, sólo experimento** (`effects/screen-aa.ts`,
+  `?aa=none|msaa|fxaa`, también en el sitio publicado). FXAA descartado;
+  MSAA pendiente de medirse en un iPhone o iPad. **El valor por omisión no
+  cambia.**
+- Coste medido por software (comparativo, no FPS de móvil): las mismas
+  llamadas, triángulos, programas y recompilaciones; 516 KB de máscara; 24 µs
+  por fotograma siguiendo a alguien.
+- **Hallazgo, sin tocar**: la villa 7/60 se queda en bucle —un fotograma de
+  más de un segundo se toma por una ausencia (`presentation-clock.ts`), la
+  jornada se reinicia y rehacer la vida de la villa vuelve a pasar del
+  segundo—: 3,8 s por fotograma y la vida parada. Causa probable de la tablet a
+  0 fps; arreglo propuesto en el encargo.
+
+## v5.11 · 29 sep 2026 · La mula y el jabalí, con las patas más cortas
+
+Vera: «la mula, las patas son muy largas […] el jabalí es algo similar […]
+creo que la forma es muy buena; a lo mejor los cuernos destacarlos un poco
+más». Sus modelos, sin tocar la forma: `MULE_DROP` y `BOAR_DROP` en
+`deliverables/marked-models-trial/build-models.py` bajan el cuerpo con todo lo
+de encima y acortan las patas lo mismo, con la pezuña en el suelo (0,10 y
+0,08); `BOAR_TUSK` agranda los colmillos un 50 %. A su valor neutro dan el
+modelo de Vera idéntico. El jabalí sigue cargando y embistiendo.
+
+**Lo que se probó y no entra:** una golondrina de alas en hoz y una perdiz con
+las barras tumbadas; Vera prefirió las suyas y siguen publicadas las de antes.
+
+## v5.10 · 29 sep 2026 · El ciervo, y ya no queda ningún animal de cajas
+
+El último de la receta G-23. `deer()` en
+`deliverables/marked-models-trial/build-models.py`, sobre la estructura de la
+mula de Vera: pardo rojizo con vientre claro y espejo blanco en la grupa, crin
+oscura, cuerna con luchadera, candil y corona. A Vera las patas le parecieron
+demasiado largas: `DEER_DROP` baja el cuerpo 0,11 y las acorta lo mismo.
+
+**El casco sigue plantado.** `animal-gait-axis.test.ts` —la prueba de cuando
+Vera vio que el ciervo «deslizaba»— falló con el paso genérico: girar la pata
+entera desde la cadera sube y baja el casco en el apoyo. `rigid-clips.mjs`
+aprende el paso plantado (`plantedGait`): cadera y rodilla por cinemática
+inversa, el casco plano y en línea recta a la velocidad del cuerpo, y el
+cuerpo un poco agachado al andar (la pata en reposo va casi estirada y el
+casco no llegaría adelante). Es lo que hacía `plant-gait.cjs` con el modelo
+de cajas. 94 pruebas en verde.
+
+## v5.09 · 29 sep 2026 · El pato, y el pico de la gallina
+
+- **El pato** (`duck()` en `deliverables/marked-models-trial/build-models.py`):
+  el ánade real de siempre, facetado, con casco de barca a la altura de agua
+  del juego, collar blanco, espejuelo azul, cola rizada y pico plano de pato.
+  El banco de fauna pinta ahora la lámina de agua para el pato.
+- **El pico de la gallina**, como el del cuervo: el rombo de las plumas lo
+  dejaba de perfil en punta de flecha; ahora es un cono corto que nace de la
+  cara. Queda de cajas sólo el ciervo.
+
+## v5.08 · 29 sep 2026 · El cuervo
+
+El de G-23 era de cajas. Ahora es facetado (`crow()` en
+`deliverables/marked-models-trial/build-models.py`), sobre la estructura de la
+gallina pero esbelto: negro con brillo azulado, alas largas pegadas al cuerpo,
+cola en cuña maciza y un pico macizo que se afina con una curva hacia abajo.
+Vera vio que de perfil el primero salía en punta de flecha —el rombo de las
+plumas— y se rehízo. Paso y picoteo, sin vuelo como hasta ahora. La gallina
+lleva el pico de rombo, más pequeño; queda anotado.
+
+## v5.07 · 29 sep 2026 · La gallina, y el corral en un solo estilo
+
+Vera: «mucho mejor». La última de cajas del corral, facetada sobre la
+estructura de la perdiz de Vera (`hen()` en
+`deliverables/marked-models-trial/build-models.py`): blanca, cuerpo lleno,
+cola alzada, cresta y barbillas rojas, pico y patas amarillos. Mismo tamaño;
+`rigid-clips.mjs … hen` le da el paso y el picoteo de la perdiz, sin vuelo.
+Con ella, el corral y todos los animales grandes van en el mismo estilo. Quedan
+de cajas el cuervo, el pato y el ciervo.
+
+## v5.06 · 29 sep 2026 · La vaca
+
+La de G-23 era de cajas y con el cerdo facetado el corral quedaba en dos
+estilos. Ahora es facetada sobre la estructura de la mula de Vera (`cow()` en
+`deliverables/marked-models-trial/build-models.py`): barril hondo, papada,
+cuernos, pelo rojizo con la cara y el vientre blancos. Vera la quiso más gorda:
+`COW_GIRTH` ensancha y ahonda el tronco (1,22 y 1,14). La ubre queda dentro
+de la barriga nueva; sacarla por debajo se probó y Vera prefirió seguir.
+Mismo largo que la de G-23; marcha de `rigid-clips.mjs … cow`.
+
+## v5.05 · 29 sep 2026 · El cerdo
+
+Vera: «me gusta». El de G-23 era una caja con dos losas por orejas que salían
+de lado como alas. Ahora es facetado, sobre la estructura del jabalí de Vera
+(`pig()` en `deliverables/marked-models-trial/build-models.py`): barril
+redondo, patas cortas y firmes, hocico de disco, orejas grandes caídas hacia
+delante y rabo rizado. Mismo tamaño; marcha de `rigid-clips.mjs … pig`.
+Con él, en el corral conviven los dos estilos: la vaca y la gallina siguen
+siendo de cajas, y son las siguientes.
+
+## v5.04 · 29 sep 2026 · La trucha
+
+Vera: «mucho mejor». El pez de G-23 era una cápsula con rombos pegados y se
+leía como un submarino. Ahora es una trucha facetada (`fish()` en
+`deliverables/marked-models-trial/build-models.py`): huso afinado, caudal
+ahorquillada, dorsal alta que sigue asomando del agua, lomo oscuro —es lo que
+se ve desde arriba—, costado dorado con pintas y vientre claro. Mismo tamaño.
+**Nada de verdad**: el `walk` del de G-23 estaba vacío y el pez iba rígido;
+`rigid-clips.mjs … fish` ondula la cola en tres tramos y rema con las
+pectorales. 19 mallas, juntadas por articulación y material (`merge_parts`),
+porque hay hasta cuatro peces a la vez.
+
+## v5.03 · 29 sep 2026 · El oso nuevo
+
+Vera: «el oso no termina de convencerme». El v3 se leía como un perro grande
+o un capibara: lomo de barril, patas que se afinaban hasta 6 cm y acababan en
+un disco con garras, y un marrón (`775A3E`) que con la luz del juego salía
+color arena. El v4 (`bear()` en `deliverables/marked-models-trial/build-models.py`):
+
+- **Cabeza baja** por delante de un lomo que sube apenas hacia la cruz. La
+  joroba entera del primer intento le pareció horrible a Vera; `BEAR_HUMP`
+  dice cuánto queda (0,35).
+- **Patas en columna** que casi no se afinan, con la zarpa saliendo de la pata.
+- **Pardo oscuro** (`35261B`, patas `261B14`) y sin las púas del costado ni la
+  espiral de la cola.
+- **Mismo tamaño, nodos y pose erguida** que el v3: la caza no cambia. 50
+  mallas y 3508 triángulos, contra 65 y 3560.
+
+Se probaron también las patas de delante más cortas y con pelo colgando
+(`BEAR_FORE_DROP`, `BEAR_FORE_FUR`); Vera se quedó con el normal.
+
+## v5.02 · 29 sep 2026 · El zorro de Vera, publicado, y las herramientas de modelos fuera de Windows
+
+Vera: «el zorro tiene una versión por ahí que ya se hizo que no sé por qué no
+se ha llegado a subir […] termina lo que quede pendiente del zorro».
+
+- **El zorro nuevo** (`fox.glb`): el de Astra con el hocico suavizado, que Vera
+  eligió el 26 sep, con el esqueleto de `tools/art/rig-single-mesh.py`. Se
+  quedó esperando su visto bueno y el GLB con esqueleto no llegó a guardarse
+  en ninguna rama. Mide 0,56 celdas, algo menos que el perro (0,60), y trae
+  `idle`, `walk` y `flee`, que es el clip que el juego pide cuando huye. El
+  script reparte ahora lo alto del muslo y del hombro con el cuerpo: entero a
+  la pata, al galopar arrancaba una cuña del costado. 1112 triángulos contra
+  los 2720 del zorro de cajas.
+- **Las herramientas de captura, en cualquier máquina** (`tools/graphics/browser.mjs`):
+  buscaban Chromium sólo en `~/AppData` y en la nube no arrancaban.
+  `model-sheet --ids … --sides` enseña un modelo por cuatro lados, el banco de
+  fauna abre las quince especies (`--out` para no pisar G-23) y
+  `shot.mjs --look-animal <especie>` encuadra un animal vivo.
 
 ## v5.01 · 29 sep 2026 · AN-4b y AN-4c: las tomas que faltaban, y el oso que no nacía
 

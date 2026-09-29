@@ -12,7 +12,8 @@ import { visibleBuildings } from '@derive/visible-buildings';
 
 import { swayFoliage } from '../effects/wind';
 import {
-  Box3, CylinderGeometry, InstancedMesh, Group, Matrix4, MeshStandardMaterial, Quaternion, Vector3,
+  Box3, CylinderGeometry, InstancedBufferAttribute, InstancedMesh, Group, Matrix4, MeshStandardMaterial,
+  Quaternion, Vector3,
   type BufferGeometry, type Camera, type Color, type Material, type Object3D,
 } from 'three';
 import type { Building, ValleyMap } from '@engine/state';
@@ -36,6 +37,35 @@ const PER_CELL = 1;
 
 /** Cuánto varía el tamaño de un árbol al siguiente, en tanto por uno. */
 const SIZE_SPREAD = 0.28;
+
+/**
+ * GV-2 · Lo que queda de una copa atenuada, y lo que tarda en irse o volver.
+ *
+ * TUNE visual: 0,06 es la opacidad contrastada en captura desde D.7 (varias
+ * copas superpuestas no reconstruyen una pared oscura). El fundido de 0,35 s
+ * sustituye al salto: siguiendo a alguien la copa cambia cada pocos segundos
+ * y, grabado a seis fotogramas por segundo, pasaba de fantasma a opaca de uno
+ * al siguiente (encargo GV-2, secuencia del seguido).
+ */
+const REVEAL_OPACITY = 0.06;
+const REVEAL_SECONDS = 0.35;
+
+/** La opacidad de la copa atenuada va por instancia (`instanceFade`): así se funde. */
+function fadeByInstance(material: Material): void {
+  const previous = material.onBeforeCompile;
+  material.onBeforeCompile = (shader, renderer) => {
+    previous.call(material, shader, renderer);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nattribute float instanceFade;\nvarying float vInstanceFade;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\n  vInstanceFade = instanceFade;');
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying float vInstanceFade;')
+      .replace('#include <color_fragment>', '#include <color_fragment>\n  diffuseColor.a *= vInstanceFade;');
+  };
+  const key = material.customProgramCacheKey;
+  material.customProgramCacheKey = () => `${key.call(material)}|instance-fade`;
+  material.needsUpdate = true;
+}
 
 /** Cuánto se aparta del centro de su celda, en celdas. */
 const JITTER = 0.34;
@@ -87,8 +117,10 @@ export interface Forest {
   readonly stumpCount: number;
   /** Árboles atenuados por estar entre la cámara y el asalto. */
   readonly revealedCount: number;
-  /** Actualiza la oclusión selectiva; una lista vacía restaura el bosque. */
+  /** Actualiza la oclusión selectiva; una lista vacía restaura el bosque (fundiendo, `stepReveal`). */
   reveal(camera: Camera, targets: readonly ForestRevealTarget[]): number;
+  /** GV-2 · Avanza el fundido de las copas que se atenúan o vuelven, en segundos. */
+  stepReveal(seconds: number): void;
   /** Si algún árbol tapa ese punto desde la cámara; no atenúa nada. */
   hides(camera: Camera, target: ForestRevealTarget): boolean;
   /**
@@ -337,6 +369,7 @@ export function buildForest(
     stumpCount: stumpCells.length,
     get revealedCount(): number { return scattered.revealedCount; },
     reveal(camera, targets): number { return scattered.reveal(camera, targets); },
+    stepReveal(seconds): void { scattered.stepReveal(seconds); },
     hides(camera, target): boolean { return scattered.hides(camera, target) || (conifers?.hides(camera, target) ?? false); },
     sway(cell, x, z, angle): boolean { return scattered.sway(cell, x, z, angle); },
     season(palette): void {
@@ -511,21 +544,41 @@ export function scatterCells(
     const sourceBounds = new Box3().setFromObject(tree);
     const sourceCentre = sourceBounds.getCenter(new Vector3());
     const sourceRadius = sourceBounds.getSize(new Vector3()).length() / 2;
+    // GV-2 · Y la copa sola, de las piezas de hoja: su centro y su medio ancho.
+    // El tronco no tapa a nadie a esta escala; la esfera del árbol entero
+    // (1,76 celdas de radio en el roble) sí atenuaba el árbol vecino de quien
+    // se sigue sin taparlo.
+    const leaves = new Box3();
+    let leafName: string | null = null;
+    for (const piece of pieces) {
+      if (!piece.material.name.includes('leaf')) continue;
+      piece.geometry.computeBoundingBox();
+      if (piece.geometry.boundingBox !== null) leaves.union(piece.geometry.boundingBox);
+      leafName ??= piece.material.name;
+    }
+    const leafSize = leaves.isEmpty() ? null : leaves.getSize(new Vector3());
+    const leafCentre = leaves.isEmpty() ? null : leaves.getCenter(new Vector3());
     for (const cell of cells) for (let extra = 0; extra < PER_CELL; extra += 1) {
       const scattered = scatterTransform(map.width, cell, extra);
       const visualScale = pieces.reduce((largest, piece) => Math.max(
         largest, scaleFor?.(cell, piece.material.name) ?? 1,
       ), 0);
       const scale = scattered.scale * visualScale;
+      const crown = leafName === null ? 1 : scattered.scale * (scaleFor?.(cell, leafName) ?? 1);
       occluders.push({
         x: scattered.x,
         y: sourceCentre.y * scale,
         z: scattered.z,
         radius: sourceRadius * scale,
+        ...(leafSize === null || leafCentre === null ? {} : {
+          canopy: { y: leafCentre.y * crown, radius: Math.max(leafSize.x, leafSize.z) / 2 * crown },
+        }),
       });
     }
   }
 
+  // GV-2 · La opacidad de cada copa en la malla atenuada, por hueco de esa malla.
+  const fadeAttribute = new InstancedBufferAttribute(new Float32Array(Math.max(1, total)).fill(1), 1);
   if (total > 0) {
     const matrix = new Matrix4();
     const position = new Vector3();
@@ -600,17 +653,24 @@ export function scatterCells(
       if (palette !== undefined) tinted.push(material);
       if (occludable) {
         matrices.push(pieceMatrices);
-        // TUNE visual contrastado en captura: 0,06 evita que varias copas
-        // superpuestas reconstruyan una pared oscura. Es material propio; el
-        // GLB compartido nunca se modifica.
+        // Es material propio; el GLB compartido nunca se modifica. GV-2 · La
+        // opacidad va por instancia (`REVEAL_OPACITY`, fundida), y el clon se
+        // vuelve a mecer: `clone()` copia la marca del viento pero no su
+        // parche, así que la copa atenuada se quedaba quieta de golpe.
         const fadedMaterial = material.clone();
         fadedMaterial.transparent = true;
-        fadedMaterial.opacity = 0.06;
+        fadedMaterial.opacity = 1;
         fadedMaterial.depthWrite = false;
+        fadedMaterial.userData = { ...fadedMaterial.userData, windy: false };
+        swayFoliage(fadedMaterial);
+        fadeByInstance(fadedMaterial);
+        piece.geometry.setAttribute('instanceFade', fadeAttribute);
         const revealed = new InstancedMesh(piece.geometry, fadedMaterial, total);
         revealed.name = `${instanced.name || material.name}_revealed`;
         revealed.count = 0;
-        revealed.castShadow = false;
+        // GV-2 · El árbol sigue ahí: su sombra no se va al atenuarlo (antes se
+        // iba con el siguiente mapa de sombras, un salto más en el suelo).
+        revealed.castShadow = true;
         revealed.receiveShadow = true;
         faded.push(revealed);
         fadedMaterials.push(fadedMaterial);
@@ -621,12 +681,20 @@ export function scatterCells(
   let revealedSlots = '';
   let revealedCount = 0;
   const slotOf = new Map(cells.map((cell, index) => [cell, index * PER_CELL]));
+  // Dónde está dibujado cada árbol: su hueco en la malla opaca, o −(hueco + 1)
+  // en la atenuada. Atenuar compacta los huecos de las dos, así que el hueco
+  // de un árbol deja de ser su número de ranura mientras haya copas atenuadas.
+  const placed = new Int32Array(total);
+  for (let slot = 0; slot < total; slot += 1) placed[slot] = slot;
 
   function sway(cell: number, x: number, z: number, angle: number): boolean {
-    // Con el robledal atenuado los huecos se reparten de otra manera: ese rato
-    // el árbol no se mueve, antes que mover el que no es.
+    // GV-2 · Antes, con el robledal atenuado el árbol no se movía («antes que
+    // mover el que no es»). Seguir al leñador atenúa justo las copas de su
+    // lado, así que el hachazo se quedaba quieto en el caso que más se mira:
+    // ahora se mueve el árbol en la malla y el hueco donde está (`placed`).
     const slot = slotOf.get(cell);
-    if (!occludable || slot === undefined || revealedCount > 0) return false;
+    if (!occludable || slot === undefined) return false;
+    const at = placed[slot]!;
     const base = new Vector3(), turn = new Quaternion(), size = new Vector3();
     const axis = new Vector3(z, 0, -x);
     if (axis.lengthSq() < 1e-9) axis.set(1, 0, 0);
@@ -635,33 +703,48 @@ export function scatterCells(
     for (let piece = 0; piece < owned.length; piece += 1) {
       matrices[piece]![slot]!.decompose(base, turn, size);
       matrix.compose(base, tilt.clone().multiply(turn), size);
-      owned[piece]!.setMatrixAt(slot, matrix);
-      owned[piece]!.instanceMatrix.needsUpdate = true;
+      const drawn = at >= 0 ? owned[piece]! : faded[piece]!;
+      drawn.setMatrixAt(at >= 0 ? at : -at - 1, matrix);
+      drawn.instanceMatrix.needsUpdate = true;
     }
     return true;
   }
 
-  function reveal(camera: Camera, targets: readonly ForestRevealTarget[]): number {
-    if (!occludable || total === 0) return 0;
-    const slots = forestOccluders(occluders, camera, targets);
-    const signature = slots.join(',');
-    if (signature === revealedSlots) return revealedCount;
-    revealedSlots = signature;
-    revealedCount = slots.length;
-    const selected = new Set(slots);
+  // GV-2 · Qué copa se ve cuánto. `wanted` son las que tapan algo ahora; la
+  // malla atenuada lleva ésas y las que aún se están fundiendo de vuelta, y
+  // cada una con su opacidad (`fadeAttribute`, por hueco de esa malla).
+  const opacity = new Float32Array(total).fill(1);
+  let wanted = new Set<number>();
+  let fading: number[] = [];
+
+  function writeOpacity(): void {
+    const values = fadeAttribute.array as Float32Array;
+    fading.forEach((slot, index) => { values[index] = opacity[slot]!; });
+    fadeAttribute.needsUpdate = true;
+  }
+
+  /** Reparte los árboles entre la malla opaca y la atenuada, si ha cambiado quién va en cuál. */
+  function layout(): void {
+    const next: number[] = [];
+    for (let slot = 0; slot < total; slot += 1) if (wanted.has(slot) || opacity[slot]! < 1) next.push(slot);
+    if (next.length === fading.length && next.every((slot, index) => slot === fading[index])) return;
+    fading = next;
+    const translucentSlots = new Set(next);
     for (let piece = 0; piece < owned.length; piece += 1) {
       const opaque = owned[piece]!;
       const translucent = faded[piece]!;
       const transforms = matrices[piece]!;
-      if (slots.length > 0 && translucent.parent !== group) group.add(translucent);
-      if (slots.length === 0 && translucent.parent === group) group.remove(translucent);
+      if (next.length > 0 && translucent.parent !== group) group.add(translucent);
+      if (next.length === 0 && translucent.parent === group) group.remove(translucent);
       let solidSlot = 0, fadedSlot = 0;
       for (let slot = 0; slot < transforms.length; slot += 1) {
-        if (selected.has(slot)) {
+        if (translucentSlots.has(slot)) {
           translucent.setMatrixAt(fadedSlot, transforms[slot]!);
+          placed[slot] = -(fadedSlot + 1);
           fadedSlot += 1;
         } else {
           opaque.setMatrixAt(solidSlot, transforms[slot]!);
+          placed[slot] = solidSlot;
           solidSlot += 1;
         }
       }
@@ -672,7 +755,38 @@ export function scatterCells(
       opaque.computeBoundingSphere();
       translucent.computeBoundingSphere();
     }
+    writeOpacity();
+  }
+
+  function reveal(camera: Camera, targets: readonly ForestRevealTarget[]): number {
+    if (!occludable || total === 0) return 0;
+    const slots = forestOccluders(occluders, camera, targets);
+    const signature = slots.join(',');
+    if (signature === revealedSlots) return revealedCount;
+    revealedSlots = signature;
+    revealedCount = slots.length;
+    wanted = new Set(slots);
+    layout();
     return revealedCount;
+  }
+
+  function stepReveal(seconds: number): void {
+    if (!occludable || fading.length === 0 || !(seconds > 0)) return;
+    const rate = (1 - REVEAL_OPACITY) * seconds / REVEAL_SECONDS;
+    let moved = false;
+    let whole = false;
+    for (const slot of fading) {
+      const target = wanted.has(slot) ? REVEAL_OPACITY : 1;
+      const now = opacity[slot]!;
+      if (now === target) continue;
+      const next = now > target ? Math.max(target, now - rate) : Math.min(target, now + rate);
+      opacity[slot] = next;
+      moved = true;
+      if (next === 1) whole = true;
+    }
+    // Las que ya se ven enteras vuelven a la malla opaca.
+    if (whole) layout();
+    else if (moved) writeOpacity();
   }
 
   return {
@@ -682,6 +796,7 @@ export function scatterCells(
     stumpCount: 0,
     get revealedCount(): number { return revealedCount; },
     reveal,
+    stepReveal,
     hides(camera: Camera, target: ForestRevealTarget): boolean {
       return occludable && forestOccluders(occluders, camera, [target]).length > 0;
     },

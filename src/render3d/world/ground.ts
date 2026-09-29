@@ -19,6 +19,7 @@ import type { Palette } from '@derive/palette';
 import type { Era } from '@derive/era';
 import { GROUND_BIAS } from '../visual-config';
 import { liveWater, SHARED_WATER } from './water-surface';
+import { contactShade } from './contact-shade';
 import { gorgeAt, valleyAxis, valleyShoulder } from './valley-profile';
 
 /**
@@ -57,9 +58,12 @@ function mottleAt(x: number, z: number): number {
  * variacion mas lenta.
  *
  * TUNE: siete centesimas cada seis celdas, dieciocho metros (D.6.2). Al doble
- * de amplitud se ven las manchas y no el prado.
+ * de amplitud se ven las manchas y no el prado. GV-1 (29 sep 2026): nueve
+ * centésimas, con el prado hondo de abajo. Se probó también doce cada nueve
+ * celdas («masas amplias», variante A): cambiaba la imagen 1,2 niveles de gris
+ * de media y en invierno ensuciaba la nieve con manchas grises.
  */
-const PATCH = 0.07;
+const PATCH = 0.09;
 const PATCH_CELLS = 6;
 
 /** Un valor entre cero y uno, siempre el mismo para el mismo par. */
@@ -814,7 +818,14 @@ export function groundAppearanceKey(ground: number, era: Era): string {
   return `${ground}:${era}`;
 }
 
-const MEADOW_SHADE = 0.45;
+// GV-1 (29 sep 2026): del 0,45 al 1, y el verde de debajo un 40 % más oscuro en
+// vez de un 22 %: a escala de móvil las alfombras de hierba (`meadowWeight`, un
+// tercio del prado) no se leían como masa. Es la estructura que ya había
+// —donde crece la hierba—, no una nueva, y con nieve no cuenta. Medido sobre
+// la aldea 11/21 a 390×844: a 0,70 y 28 % la imagen cambiaba de media 0,8
+// niveles de gris sobre 255 (invisible); así, 2,6, y el 10 % de los píxeles
+// más de 8. Es la variante C del encargo; el visto bueno es de Vera.
+const MEADOW_SHADE = 1;
 
 /**
  * `meadow` (28 sep 2026, la hierba): cuánto prado hay en cada esquina, de 0 a
@@ -830,9 +841,9 @@ export function buildGround(
   const cells = map.width * map.height;
   const columns = map.width + 1;
   const vertices = columns * (map.height + 1);
-  // TUNE visual: el verde de debajo de la hierba, el del prado hondo un 22 % más
-  // oscuro, y hasta un 45 % de mezcla en el centro de la mancha.
-  const deepMeadow = new Color(palette.meadowAlt).multiplyScalar(0.78);
+  // TUNE visual: el verde de debajo de la hierba, el del prado hondo un 40 % más
+  // oscuro, y la mezcla entera en el centro de la mancha (GV-1).
+  const deepMeadow = new Color(palette.meadowAlt).multiplyScalar(0.6);
   const positions = new Float32Array(vertices * 3);
   const colours = new Float32Array(vertices * 3);
   const indices = new Uint32Array(cells * 6);
@@ -896,6 +907,8 @@ export function buildGround(
   const material = new MeshStandardMaterial({ vertexColors: true, roughness: 1 });
   // El valle más vivo · las sombras de las nubes pasan por el prado.
   cloudShadows(material);
+  // GV-1 · y el pie de cada edificio oscurece el suelo que lo toca.
+  contactShade(material);
   const mesh = new Mesh(geometry, material);
   mesh.name = 'Valley_Ground';
   mesh.receiveShadow = true;

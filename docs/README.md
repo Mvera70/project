@@ -73,6 +73,7 @@ Las herramientas que las produjeron están en `tools/reports/`.
 | `medidas/letalidad-por-decision-2026-09-19.md` | **Qué decisiones acumulan la caída (G4)**, por contrafactual: lo que mata es no prepararse para el asedio, y es lo que elige la política prudente |
 | `medidas/banco-de-balance-2026-09-19.md` | **El banco remedido (G2)**: 11 rojas de 37 y 31 minutos, no 19 y 45; las cuatro rojas con su causa; y que el catálogo no tenía contenido muerto, lo tenía el banco que lo medía |
 | `medidas/rendimiento-piel-v9-2026-09-29.md` | **¿La piel v9 hunde el rendimiento?** No por fotograma; `?debug=1` no sirve para medir el 3D; la adaptativa medía un delta recortado. Lo que falta: el reparto del fotograma leído en la tablet |
+| `medidas/bucle-villa-2026-09-29.md` | **El bucle de la villa** (29 sep): un fotograma de más de un segundo se toma por una ausencia, la vida se rehace y vuelve a pasar del segundo; la villa 7/60 se queda en 3,8 s por fotograma y la vida parada. Causa probable de la tablet a 0 fps. Apuntado, sin arreglar (GV-4) |
 | `medidas/p1a-rendimiento-seed11-year21-2026-09-22.md` | P-1a: renderer y app real en semilla 11/año 21; comparación controlada de día/noche/lluvia, datos crudos y límites |
 | `medidas/auditoria-cosas-a-medias-2026-09-24.md` | **Lo que la aldea dejaba a medias** (24 sep), pedido por el dueño tras probar la demo: material tirado, herrería vacía, granero sin nadie, gente reunida sin hacer nada. Sólo observación, con `observe-life.mjs` |
 
@@ -88,6 +89,8 @@ adarve.
 | `encargos/encargo-astra-modelos.md` | **Los modelos 3D para Astra**, con el prompt listo para pegar. Entregados la sala del líder, los puestos, la cantera, las rocas y la golondrina; **quedan el roble y la casa quemada**, a la espera de que Vera decida |
 | `encargos/animacion-integral-goal.md` | **El encargo de la ronda AN de animación, de Astra** (29 sep): el bloque `/goal` completo, tal como se recibió |
 | `encargos/opciones-graficas-v10.md` | **La pantalla «Graphics» para Codex**: lámina de revisión, un estado «elegido» del botón de pergamino si hace falta, y un grabado de cabecera |
+| `encargos/profundidad-visual-movil-2026-09-29.md` | **La profundidad visual del valle en móvil** (encargo de Astra, `art/astra-modelos` `15b4f84`), **ejecutado el 29 sep 2026** con su resultado al final: el pie de los edificios, el prado hondo, el seguido a la vista bajo el bosque y el experimento de suavizado (sin cambiar el valor por omisión). Pendiente de verlo en un iPhone o iPad |
+| `encargos/profundidad-visual-movil-revision-2026-09-29.md` | **La revisión crítica del encargo de profundidad visual en móvil** (el de Astra, `art/astra-modelos` `15b4f84`) y el plan que propone en su lugar: instrumentos, línea de base en el aparato, sombra de los pies, máscara de contacto, el seguido a la vista y suavizado. Pendiente de Vera |
 | `encargos/respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos, con decisiones que el dueño dejó sin contestar |
 
 ## Histórico: se conserva por el porqué — `docs/historico/`

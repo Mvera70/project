@@ -1,0 +1,27 @@
+== aldea-none
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.457} → /home/user/project/artifacts/graphics/visual-depth/gv3/aldea-none.png
+render: {"level":"medium","scale":1,"calls":261,"triangles":445530,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-none
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.354} → /home/user/project/artifacts/graphics/visual-depth/gv3/villa-none.png
+render: {"level":"medium","scale":1,"calls":240,"triangles":485810,"coarse":true,"dpr":3}
+errores de página: ninguno
+{"follow":-1,"hiddenFrames":0,"revealedWhileHidden":0,"errors":0}
+== aldea-msaa
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.457} → /home/user/project/artifacts/graphics/visual-depth/gv3/aldea-msaa.png
+render: {"level":"medium","scale":1,"calls":261,"triangles":445530,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-msaa
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.354} → /home/user/project/artifacts/graphics/visual-depth/gv3/villa-msaa.png
+render: {"level":"medium","scale":1,"calls":240,"triangles":485810,"coarse":true,"dpr":3}
+errores de página: ninguno
+{"follow":-1,"hiddenFrames":0,"revealedWhileHidden":0,"errors":0}
+== aldea-fxaa
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.464} → /home/user/project/artifacts/graphics/visual-depth/gv3/aldea-fxaa.png
+render: {"level":"medium","scale":1,"calls":1,"triangles":1,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-fxaa
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.367} → /home/user/project/artifacts/graphics/visual-depth/gv3/villa-fxaa.png
+render: {"level":"medium","scale":1,"calls":1,"triangles":1,"coarse":true,"dpr":3}
+errores de página: ninguno
+{"follow":-1,"hiddenFrames":0,"revealedWhileHidden":0,"errors":0}

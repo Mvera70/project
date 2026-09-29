@@ -216,6 +216,25 @@ explícitos, comparaciones reproducibles a escala móvil, sincronía de contacto
 y combate conservada, coste comparado, pruebas superadas y papel al día. No se
 cierra con clips sin revisar.
 
+### GV · Profundidad visual del valle en móvil (29 sep 2026)
+
+Encargo de Astra (`art/astra-modelos`, `15b4f84`) que Vera pidió ejecutar con
+`/goal` el mismo día: «la aldea se lee poco anclada al suelo y el prado pierde
+estructura en el zoom habitual». Brief y resultado, con cifras, lo descartado
+y lo pendiente, en `docs/encargos/profundidad-visual-movil-2026-09-29.md`; la
+lectura crítica previa, en `…-revision-2026-09-29.md`; la evidencia, en
+`artifacts/graphics/visual-depth/`. **Dependencias: ninguna abierta.** Límite
+del entorno: sin aparato, se compara coste por software y no FPS.
+
+| Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
+|---|---|---|---|---|---|
+| ~~GV-0 · Línea de base reproducible~~ | **hecha el 29 sep 2026** (`89136b2`): `shot.mjs` y `gl-probe.mjs` con perfil táctil, cielo, hora y escala sujetos (dos tomas seguidas: 0 % de píxeles distintos), `follow-sequence.mjs`, y las sondas fuera de Windows; aldea 11/21 y villa 7/60 a 390×844 y 320×568, despejado, nublado y Low | — | Media | Claude | — |
+| ~~GV-1 · El pie de los edificios y el prado~~ | **hecha el 29 sep 2026**: máscara R8 del valle leída por el sombreador del suelo (`world/contact-shade.ts`): cero llamadas, 516 KB, 0,3–1,9 ms al cambiar edificios; fuerza C1 de tres, **elegida por Vera**. El prado hondo, variante C de tres (**su visto bueno, pendiente**) | — | Media | Claude | GV-0 |
+| ~~GV-2 · El seguido a la vista~~ | **hecha el 29 sep 2026**: quien se sigue se suma a `forest.reveal` contra la copa sola, fundido en 0,35 s con sombra y viento; el asalto conserva sus 28 copas; el hachazo vuelve a mover su árbol; 24 µs por fotograma | — | Media | Claude | GV-0 |
+| GV-3 · Suavizado | **Medido, sin cambiar el valor por omisión**: FXAA descartado (borra el 80–83 % del detalle, 18–55 MB, ~30 programas más); MSAA el mejor a la vista. `?aa=none\|msaa\|fxaa` vale en el sitio publicado | P2 | Baja | Vera, con un iPhone o un iPad | — |
+| GV-3b · La lectura en el aparato | En la aldea 11/21 y con el panel de taller: `?contact=off` contra el valle normal (lo que cuesta el pie) y `?aa=msaa` contra `?aa=none`. Si MSAA cabe, se propone para Medium o como opción de «Graphics» (eso ya es interfaz) | P2 | Baja | Vera → Claude | GV-4 para medir en la villa |
+| GV-4 · Romper el bucle de la villa | **Hallazgo de GV, fuera del encargo y sin tocar.** La villa 7/60 se queda en 3,8 s por fotograma con la vida parada: un hueco de más de un segundo entre fotogramas se toma por una ausencia (`presentation-clock.ts`, `SUSPEND_GAP_SECONDS = 1`), la jornada se reinicia y rehacer la vida de la villa (`createVillage`, rutas de A*) vuelve a pasar del segundo. Con el umbral a 30 s se recupera a 18–78 ms. **Causa probable de la tablet a 0 fps del año 60.** Arreglo propuesto: que el hueco descuente el trabajo del propio fotograma, y abaratar `createVillage`; con una prueba de que un fotograma lento no encadena discontinuidades. [La nota](medidas/bucle-villa-2026-09-29.md) | **P1 (propuesta)** | Media | Claude o Sol | — |
+
 ### F · Consecuencias físicas en el combate (propuesta, 29 sep 2026)
 
 Pedida por el dueño del diseño al cerrar la ronda AN: que impactos, bloqueos,
@@ -305,6 +324,10 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
    techo de la partida y cómo se juega el anillo final.
 6. **Deuda no bloqueante** — medida adicional en móvil tras P-1, reunión de
    §11.8, jornadas declaradas y F3f.
+7. **Nuevo, 29 sep — el bucle de la villa (GV-4)**, propuesto como P1 porque
+   es la causa probable de que la tablet vaya a 0 fps en el año 60: sin él, la
+   villa —las fases 3 y 4 de la meta— no se puede jugar ni medir en el aparato.
+   El orden es del dueño.
 
 ---
 

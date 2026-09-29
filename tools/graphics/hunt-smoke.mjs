@@ -1,6 +1,7 @@
 // Prueba manual reproducible de la entrada de caza y su escena 3D.
 import { chromium } from '@playwright/test';
-import { existsSync, mkdirSync } from 'node:fs';
+import { browserExe } from './browser.mjs';
+import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const mobile = process.argv.includes('--mobile');
@@ -8,10 +9,7 @@ const seed = process.argv.find(arg => arg.startsWith('--seed='))?.split('=')[1] 
 const out = resolve(mobile ? 'artifacts/graphics/hunt-smoke/mobile'
   : 'artifacts/graphics/hunt-smoke/desktop');
 mkdirSync(out, { recursive: true });
-const installed = [
-  'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-].find(existsSync);
+const installed = browserExe();
 const browser = await chromium.launch({
   ...(installed ? { executablePath: installed } : {}),
   args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],

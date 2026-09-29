@@ -1,0 +1,5 @@
+-- main-da8836f aldea
+{"frames":86,"calls":313,"tris":514527,"programs":41,"linkMs":9,"jsMedianMs":0.2,"jsP90Ms":37.1,"level":"medium","scale":0.5,"paintMs":20.3,"renderMs":6.8,"lifeMs":3.8,"restMs":9.3,"seconds":40}
+-- rama fusionada aldea
+{"frames":58,"calls":314,"tris":515546,"programs":41,"linkMs":9,"jsMedianMs":0.1,"jsP90Ms":37.4,"level":"medium","scale":1,"paintMs":19.6,"renderMs":6.5,"lifeMs":3.6,"restMs":9.4,"seconds":40}
+(main no tiene __valleyHoldScale: su adaptativa bajó a 0,5 y sus fotogramas no comparan; llamadas, programas y JS fuera del dibujo sí)

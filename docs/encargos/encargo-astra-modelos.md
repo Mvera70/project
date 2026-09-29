@@ -81,8 +81,8 @@ que ya está en el juego (caras planas, luz dura). La paleta está en
 `fountain`, `axe`, `pickaxe`, `bastion` y sus variantes, `villager-neighbor`,
 los candidatos del adarve (`e3b-*`), los once modelos de Vera del 25 sep
 (lobo, oso, perdiz, jabalí, perro, mula, azada, cubo, flecha, escudo, pico) y
-el zorro, que tiene esqueleto y **espera el visto bueno de Vera**: no es de
-esta tanda.
+el zorro, publicado el 29 sep con el esqueleto de `tools/art/rig-single-mesh.py`:
+no es de esta tanda.
 
 ---
 
