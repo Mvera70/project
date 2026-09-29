@@ -16,7 +16,9 @@ jobs:
   # Los tres trabajos tenían un tope de 10 minutos y la suite rápida sola tarda
   # más: desde el 28 sep 2026 la CI se cortaba («cancelled») antes de decir
   # nada. Topes con margen, y las jornadas en su propio trabajo para que su
-  # resultado no tape el de la compilación y el lint.
+  # resultado no tape el de la compilación y el lint. En el servidor todo va
+  # unas cinco veces más lento que en local: las jornadas (284 s en local) no
+  # cabían en 30 minutos y se cortaban igual (29 sep 2026).
   fast:
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -34,7 +36,7 @@ jobs:
 
   journeys:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -91,7 +91,12 @@ tope de 10 minutos y la suite rápida sola tarda más, así que salían
 «cancelled» sin decir nada. Topes de 45 (`fast`), 30 (`journeys`, ahora
 trabajo propio) y 30 (`browser`). Al dejar de cortarse asoma lo que ya se
 sabía: las dos jornadas rojas a propósito y las ~13 de `test:shots` que
-también fallan en `main` desde el rediseño de interfaz. Nada se sube sin su permiso final. El banco de fauna encuadra ya cada
+también fallan en `main` desde el rediseño de interfaz.
+Medido en el servidor sobre `b3f6b843`: `fast` en verde por primera vez desde
+el 28 sep (la suite rápida tarda allí 18–22 minutos), `browser` con 11 rojas de
+interfaz ya conocidas, y `journeys` sin resultado: no cabe en 30 minutos (en
+local mide 284 s; allí va unas cinco veces más lento). Tope de `journeys`
+subido a 60, con permiso de Vera. Nada se sube sin su permiso final. El banco de fauna encuadra ya cada
 especie por su caja y mira a su centro. **Pendiente:** la ubre de la vaca, que la
 barriga gorda tapa (se probó sacarla y Vera prefirió seguir). El oso no se puede fotografiar dentro de la partida sin
 cazar antes la cadena entera: no hay `?hunt=`.
