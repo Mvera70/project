@@ -210,6 +210,20 @@ explícitos, comparaciones reproducibles a escala móvil, sincronía de contacto
 y combate conservada, coste comparado, pruebas superadas y papel al día. No se
 cierra con clips sin revisar.
 
+### F · Consecuencias físicas en el combate (propuesta, 29 sep 2026)
+
+Pedida por el dueño del diseño al cerrar la ronda AN: que impactos, bloqueos,
+empujes, caídas y proyectiles respondan a posiciones y colisiones. El
+diagnóstico (`docs/diagnostico-fisica-combate-2026-09-29.md`) dice que hoy
+Rapier sólo decide por dónde vuela una flecha y si la para una almena; el
+acierto, el cuerpo a cuerpo, el portón y las caídas son distancias y relojes.
+**No está empezada**: la primera fila es un experimento en sombra, y el orden
+de lo que venga después es del dueño.
+
+| Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
+|---|---|---|---|---|---|
+| F-0 · La flecha que toca, en sombra | Cápsula cinemática por combatiente sólo en batalla, eventos de colisión en las flechas; el cilindro sigue decidiendo y cada flecha apunta qué habría dicho Rapier. Medida: tabla de acuerdo en `battle-report.ts` sobre decenas de batallas, dirección de caída en la traza, ms del paso en el teléfono. Sigue si cambia una de cada diez flechas de forma legible, se ve a 390×844 y cuesta menos de 0,5 ms por paso en el aparato | P2 | Media | Claude | AN (cerrada); decisión del dueño |
+
 ### H · Deuda medida (el cuaderno)
 
 Lo que `docs/task-log.md` §4 lleva anotado con su medida y **no bloquea la
