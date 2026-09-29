@@ -189,7 +189,9 @@ try {
     if (why !== 'started') {
       throw new Error(`La caza no empezó: ${why} (oferta: ${JSON.stringify(offered)}). Cambia semilla, año o --hunted.`);
     }
-    if (live) await tab.clock.runFor(1000); else await tab.evaluate(steps => window.__valleyAdvance(steps), 30);
+    // AN-4c · Se graba desde el paso en que arranca: antes se adelantaba un
+    // segundo para comprobarla, y una caza con lanza (el jabalí de 7/24) carga
+    // y se resuelve dentro de ese segundo; la toma empezaba con la caza hecha.
     const started = await tab.evaluate(() => window.__valleyLife?.()?.hunt ?? null);
     process.stdout.write(`Caza en marcha: ${JSON.stringify(started)}\n`);
   }
