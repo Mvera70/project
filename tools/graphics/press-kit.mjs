@@ -59,8 +59,8 @@
 // Sale en `artifacts/graphics/press/`: los PNG numerados, `index.html` con la
 // hoja de contactos y `manifest.json` con lo que cada una enseña.
 import { chromium } from '@playwright/test';
+import { browserExe } from './browser.mjs';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -77,23 +77,6 @@ const seed = opt('seed', '7');
 const year = opt('year', '50');
 const outDir = resolve(opt('out', 'artifacts/graphics/press'));
 const pageArg = opt('page', join(outDir, 'game', 'valley.html'));
-
-function browserExe() {
-  const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
-  if (existsSync(root)) {
-    try {
-      for (const dir of readdirSync(root).filter((d) => /^chromium-[0-9]+$/.test(d)).sort().reverse()) {
-        const exe = join(root, dir, 'chrome-win64', 'chrome.exe');
-        if (existsSync(exe)) return exe;
-      }
-    } catch { /* sigue con el navegador instalado fuera de la carpeta */ }
-  }
-  for (const exe of [
-    'C:/Program Files/Google/Chrome/Application/chrome.exe',
-    'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-  ]) if (existsSync(exe)) return exe;
-  return undefined;
-}
 
 mkdirSync(outDir, { recursive: true });
 const exe = browserExe();

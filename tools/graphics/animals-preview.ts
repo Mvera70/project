@@ -1,5 +1,5 @@
 // Banco G-23: GLB publicado y controlador de fauna del juego, con recorrido conocido.
-import { AmbientLight, DirectionalLight, Scene, OrthographicCamera, WebGLRenderer, Color, PlaneGeometry, Mesh, MeshStandardMaterial, ACESFilmicToneMapping, Vector3, SkinnedMesh } from 'three';
+import { AmbientLight, DirectionalLight, Scene, OrthographicCamera, WebGLRenderer, Color, PlaneGeometry, Mesh, MeshStandardMaterial, ACESFilmicToneMapping, Vector3, SkinnedMesh, Box3 } from 'three';
 import { loadAssets, type AssetManifest } from '../../src/render3d/assets';
 import { Fauna } from '../../src/render3d/effects/fauna';
 import type { AnimalKind } from '../../src/derive/animals';
@@ -17,9 +17,14 @@ const sun=new DirectionalLight(0xffeed5,3);sun.position.set(-3,5,4);scene.add(su
 const plane=new Mesh(new PlaneGeometry(20,20),new MeshStandardMaterial({color:'#7f946f',roughness:1}));plane.rotation.x=-Math.PI/2;plane.position.y=-.015;scene.add(plane);
 // En el banco se descubre el cuerpo del pez; en partida conserva su cota bajo el agua.
 if(PREVIEW_ID==='fish'){plane.position.y=-.2;plane.material.color.set('#638c91');}
-const scale=PREVIEW_ID==='cow'?1:PREVIEW_ID==='wolf'?.85:PREVIEW_ID==='pig'?.7:PREVIEW_ID==='fish'?.25:.38;
-const camera=new OrthographicCamera(-scale*.8,scale*.8,scale*.67,-scale*.67,.01,100);
 const fauna=new Fauna(k=>library.instance(k),k=>library.get(k));scene.add(fauna.group);
+// Las siete especies de G-23 conservan su encuadre; las demás se encuadran por
+// su caja tal como las pinta el juego, que es la escala que ve el jugador.
+fauna.paint([{id:71,kind:PREVIEW_ID,x:0,y:0}],0);
+const size=new Box3().setFromObject(fauna.group).getSize(new Vector3());
+const G23:Partial<Record<AnimalKind,number>>={cow:1,wolf:.85,pig:.7,fish:.25,hen:.38,crow:.38,deer:.38};
+const scale=G23[PREVIEW_ID]??Math.max(size.x,size.y,size.z)*.75;
+const camera=new OrthographicCamera(-scale*.8,scale*.8,scale*.67,-scale*.67,.01,100);
 let time=0,x=0;
 window.sample=(t,moving)=>{
   while(time<t-1e-8){const dt=Math.min(1/60,t-time);time+=dt;if(moving)x-=.09*dt;fauna.paint([{id:71,kind:PREVIEW_ID,x,y:0}],time);}

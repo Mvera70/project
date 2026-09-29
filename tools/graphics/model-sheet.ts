@@ -9,7 +9,7 @@ import { loadAssets, type AssetManifest } from '../../src/render3d/assets';
 
 declare const SHEET_BYTES: Record<string, string>;
 declare const SHEET_MANIFEST: AssetManifest;
-declare global { interface Window { sheetReady: boolean; shoot: (id: string) => { image: string; size: number[] } | null } }
+declare global { interface Window { sheetReady: boolean; shoot: (id: string, view?: number[], pixels?: number) => { image: string; size: number[] } | null } }
 
 const held = Object.fromEntries(Object.entries(SHEET_BYTES)
   .map(([id, b64]) => [id, Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)).buffer]));
@@ -29,9 +29,13 @@ sun.position.set(-3, 6, 4);
 scene.add(sun);
 const camera = new OrthographicCamera(-1, 1, 1, -1, 0.01, 1000);
 
-window.shoot = (id) => {
+// `view` es la dirección desde la que se mira (por omisión, la del juego) y
+// `pixels` el lado de la imagen; `--sides` los usa para ver un modelo por
+// sus cuatro lados, que es donde se ve si una silueta aguanta o no.
+window.shoot = (id, view = [-1, 0.9, 1.2], pixels = 360) => {
   const model = library.instance(id);
   if (model === undefined) return null;
+  renderer.setSize(pixels, pixels);
   scene.add(model);
   model.updateMatrixWorld(true);
   const box = new Box3().setFromObject(model);
@@ -42,7 +46,7 @@ window.shoot = (id) => {
   const radius = Math.max(0.05, size.length() / 2);
   camera.left = -radius; camera.right = radius; camera.top = radius; camera.bottom = -radius;
   camera.near = 0.01; camera.far = radius * 40;
-  camera.position.copy(centre).add(new Vector3(-1, 0.9, 1.2).normalize().multiplyScalar(radius * 10));
+  camera.position.copy(centre).add(new Vector3(view[0], view[1], view[2]).normalize().multiplyScalar(radius * 10));
   camera.lookAt(centre);
   camera.updateProjectionMatrix();
   renderer.render(scene, camera);

@@ -1,7 +1,7 @@
 // Juego real + reloj del navegador controlado + píxel y traza atómicos.
 import { chromium } from '@playwright/test';
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
-import { homedir } from 'node:os';
+import { withBrowser } from './browser.mjs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -32,11 +32,8 @@ if (!Number.isFinite(seconds) || seconds < 0 || !Number.isInteger(30 / fps) || f
 const out = resolve(opt('out', `artifacts/graphics/IA-10/seed-${seed}`));
 if (existsSync(join(out, 'trace.json'))) throw new Error('La toma ya existe; usa otra carpeta --out.');
 mkdirSync(join(out, 'frames'), { recursive: true });
-const root = join(homedir(), 'AppData/Local/ms-playwright');
-const executablePath = readdirSync(root).filter(x => /^chromium-\d+$/.test(x)).sort().reverse()
-  .map(x => join(root, x, 'chrome-win64/chrome.exe')).find(existsSync);
-const browser = await chromium.launch({ executablePath,
-  args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+const browser = await chromium.launch(withBrowser({
+  args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }));
 try {
   const tab = await browser.newPage({ viewport: { width: 1100, height: 850 } });
   if (live || advanceWeeks > 0) {
