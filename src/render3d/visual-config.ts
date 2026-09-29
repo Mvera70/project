@@ -110,8 +110,11 @@ export const GROUND_BIAS = 0.002;
  * `ambient` es la parte de la luz del cielo que no llega al pie de la pared y
  * `direct` la del sol, menor: al sol el pie de un muro sigue alumbrado, y
  * comerse la misma fracción lo pintaba como una mancha de barro. Se probaron
- * dos juegos (C1: 0,62 · 0,24 · 0,42; C2: 0,85 · 0,40 · 0,55) y queda C2: a
- * escala de móvil C1 casi no se ve, y con el cielo cubierto —o en Low, sin
+ * tres juegos (`ambient` · `direct` · `reach`): C1 0,62 · 0,24 · 0,42, que a
+ * escala de móvil casi no se veía al sol; C2 0,85 · 0,40 · 0,55, que en el
+ * lado de sombra dejaba el pie de la capilla casi negro (allí sólo llega luz
+ * de cielo, y se comía el 85 %); y C3, el que queda: el sol pinta el apoyo y
+ * la sombra se oscurece sin ennegrecer. Con el cielo cubierto —o en Low, sin
  * sombras— es lo único que apoya la casa en el suelo. El visto bueno es de Vera.
  *
  * `bases` es cuánto se mete la malla dentro de su huella por cada lado, en
@@ -123,8 +126,8 @@ export const GROUND_BIAS = 0.002;
 export const CONTACT_SHADE = {
   texels: 8,
   reach: 0.55,
-  ambient: 0.85,
-  direct: 0.4,
+  ambient: 0.55,
+  direct: 0.42,
   bases: {
     watchtower: { x: 0.51, z: 0.51, round: 0.12 },
     well: { x: 0.1, z: 0.1, round: 0.34 },
