@@ -627,6 +627,39 @@ def hen():
         tube('Rear_Toe_'+l,[ankle,(.014,s*.028,.004)],[.003,.0012],'yellow',f,6)
     merge_parts(); save('hen')
 
+def crow():
+    # 29 sep 2026. El cuervo de G-23 era de cajas. Sobre la estructura de la
+    # gallina, pero esbelto: negro con brillo azulado en las alas, pico grueso
+    # y oscuro, alas largas plegadas hasta la cola y cola en cuña. Mismo tamaño
+    # que el de G-23.
+    reset(); mat('coat','1C1E22'); mat('sheen','252A36'); mat('beak','26272B'); mat('legs','2E2C2A')
+    body=empty('body',(0,0,.080),ROOT)
+    ell('Sleek_Body',(.012,0,.112),(.170,.086,.092),'coat',body,12,8)
+    ell('Breast',(-.038,0,.106),(.090,.080,.088),'coat',body,12,7)
+    neck=empty('neck',(-.058,0,.130),body); ell('Neck',(-.066,0,.140),(.056,.056,.072),'coat',neck)
+    head=empty('head',(-.082,0,.162),neck); ell('Head',(-.088,0,.166),(.062,.054,.056),'coat',head,12,7)
+    leaf('Beak',(-.112,0,.166),(-.162,0,.156),.028,.020,'beak',head)
+    for s in (-1,1):
+        eye('Eye_'+str(s),-.102,s*.023,.175,.008,head)
+    wings=[]
+    for s,l in [(-1,'L'),(1,'R')]:
+        # Pegadas al cuerpo: abiertas, de frente parecían orejas.
+        w=empty('wing'+l,(-.020,s*.032,.130),body); wings.append(w)
+        ell('Folded_Wing_'+l,(.035,s*.033,.122),(.160,.020,.060),'sheen',w,12,6)
+        for j in range(2):
+            leaf('Primary_'+l+str(j),(.070+j*.014,s*.034,.126-j*.004),(.152+j*.008,s*(.028-j*.002),.118-j*.003),.034,.007,'coat',w)
+    tail=empty('tail',(.090,0,.118),body)
+    # Cola en cuña maciza: plumas anchas que se solapan, no una escoba.
+    for j in range(3):
+        y=(j-1)*.012
+        leaf('Tail_Feather_'+str(j),(.088,y*.5,.120),(.190-abs(j-1)*.010,y*1.6,.112),.056,.009,'coat' if j%2 else 'sheen',tail)
+    for s,l in [(-1,'L'),(1,'R')]:
+        hip=(.002,s*.022,.070); knee=(.010,s*.022,.040); ankle=(-.004,s*.022,.012)
+        p=empty('leg'+l,hip,body); tube('Leg_'+l,[hip,knee,ankle],[.006,.0048,.004],'legs',p,7); f=empty('foot'+l,ankle,p)
+        for j in (-1,0,1): tube('Toe_'+l+str(j),[ankle,(-.028,s*.022+j*.011,.004)],[.003,.0015],'legs',f,6)
+        tube('Rear_Toe_'+l,[ankle,(.016,s*.022,.004)],[.0028,.0012],'legs',f,6)
+    merge_parts(); save('crow')
+
 def bucket():
     reset(); mat('staveA','A07C50'); mat('staveB','927044'); mat('staveC','B18B59'); mat('inside','71573A')
     # Duela individual, hueco real y espesor visible en el canto.
@@ -707,6 +740,6 @@ def hoe():
 # `-- bear` construye sólo esos; sin nombres, todos (el oso, en su v4).
 ONLY=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 BUILDS=[('wolf',lambda: canine('wolf')),('dog',lambda: canine('dog')),('boar',boar),('bear',bear),('bear_v3',bear_v3),('mule',mule),
-        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
+        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('crow',crow),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
 for name,build in BUILDS:
     if (not ONLY and name!='bear_v3') or name in ONLY: build()

@@ -109,3 +109,14 @@ no se confunde con la perdiz ni con el zorro. Mismo tamaño que la de G-23;
 - [hen.glb](hen.glb) · [perfil](hen-profile.png) · [tres cuartos](hen-three-quarter.png) ·
   [andando](hen-walk.png)
 - `python3 build-models.py -- hen`
+
+## El cuervo (29 sep 2026) — candidato, **sin publicar**
+
+`crow()` en `build-models.py`, sobre la estructura de la gallina pero esbelto:
+negro con brillo azulado en las alas, pico grueso, alas largas pegadas al
+cuerpo y cola en cuña maciza. Mismo tamaño que el de G-23; `rigid-clips.mjs …
+crow` le da el paso y el picoteo, sin vuelo, como hoy.
+
+- [crow.glb](crow.glb) · [perfil](crow-profile.png) · [tres cuartos](crow-three-quarter.png) ·
+  [andando](crow-walk.png)
+- `python3 build-models.py -- crow`
