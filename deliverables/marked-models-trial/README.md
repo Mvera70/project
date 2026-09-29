@@ -98,7 +98,7 @@ G-23 (0,75 celdas); marcha de `rigid-clips.mjs … cow`.
   [andando](cow-walk.png)
 - `python3 build-models.py -- cow`
 
-## La gallina (29 sep 2026) — candidata, **sin publicar**
+## La gallina (29 sep 2026) — **publicada**
 
 La última de cajas del corral. `hen()` en `build-models.py`, sobre la
 estructura de la perdiz de Vera: cuerpo lleno, cola alzada hacia atrás, cresta

@@ -1,5 +1,15 @@
 # The Valley — Registro de cambios
 
+## v5.02 · 29 sep 2026 · La gallina, y el corral en un solo estilo
+
+Vera: «mucho mejor». La última de cajas del corral, facetada sobre la
+estructura de la perdiz de Vera (`hen()` en
+`deliverables/marked-models-trial/build-models.py`): blanca, cuerpo lleno,
+cola alzada, cresta y barbillas rojas, pico y patas amarillos. Mismo tamaño;
+`rigid-clips.mjs … hen` le da el paso y el picoteo de la perdiz, sin vuelo.
+Con ella, el corral y todos los animales grandes van en el mismo estilo. Quedan
+de cajas el cuervo, el pato y el ciervo.
+
 ## v5.01 · 29 sep 2026 · La vaca
 
 La de G-23 era de cajas y con el cerdo facetado el corral quedaba en dos

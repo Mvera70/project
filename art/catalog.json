@@ -2972,78 +2972,75 @@
     },
     {
       "id": "hen",
-      "artifactRound": "G-23",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/hen/hen.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T21-14-49-709Z-6100",
-        "directory": "artifacts/graphics/G-23/approved/e08f6d310277de6d"
+        "runId": "hen-faceted",
+        "directory": "artifacts/graphics/hen-faceted/approved/hen"
       },
       "bounds": {
         "min": [
-          -0.126667,
-          0.000333,
-          -0.054167
+          -0.132,
+          0.002254,
+          -0.0772
         ],
         "max": [
-          0.13,
-          0.220833,
-          0.054167
+          0.128,
+          0.2454,
+          0.0772
         ],
         "size": [
-          0.256667,
-          0.2205,
-          0.108333
+          0.26,
+          0.243146,
+          0.1544
         ]
       },
-      "recipeSha256": "B04DB6AA872A4213BE4691400F64A0705154309912BFBD10A326AD17F33422E0",
+      "recipeSha256": null,
       "materials": [
         "coat",
-        "light",
-        "dark",
-        "accent"
+        "yellow",
+        "eye",
+        "ivory",
+        "red",
+        "shade",
+        "wing"
       ],
       "clips": [
-        "idle",
-        "walk"
+        "walk",
+        "idle"
       ],
       "motion": [
         {
-          "name": "idle",
-          "seconds": 8.041666666666666,
+          "name": "walk",
+          "seconds": 0.6,
           "loop": true,
-          "strideLength": null
+          "strideLength": 0.063
         },
         {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
+          "name": "idle",
+          "seconds": 4,
           "loop": true,
-          "strideLength": 0.075
+          "strideLength": null
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 18,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 874
+        "objects": 28,
+        "meshes": 17,
+        "materials": 7,
+        "triangles": 1928
       },
       "hashes": {
-        "hen.blend": "8EE12596BAAFE9C062609273E7997F0494D34F3FAF33A90517FAB358EE73E6FA",
-        "hen.glb": "E08F6D310277DE6D4749F33CAD8EE56CBB4877A7973F0E8ED727CA393BB251F1",
-        "hen-blender.png": "4BAC2A10DB0A645FCFF2BAEA7CD9F99193A63AB2DCB18BB3B337FE26F9CFEC0B",
-        "capture-1.png": "BB30B086C86C0C6F595DBFB8E22C847143410F910B5771A9720CF09214D7C0A8",
-        "capture-1-gray.png": "B331EFE24ADD6FBF1FD5A35B0087D3AC945EC5F1322BDC09CFDF8894C6E43895",
-        "capture.json": "33495836B46F4513F361F975533A59116AEED4EA4A949AB22AF7C47E196A72EA",
-        "build.json": "6489426A61B1FD693053584DF581EAE892605166ABE1E62EE06F6D714E5012C8",
-        "validation.json": "987B857F5C073DAD45E75A4E3ACABA6AF7468E3D58D52492B9BF175E6F116B8E"
+        "hen.glb": "A17C37A414070DCD363B813FBFAF163D5AE6AF98E06F35E988C0B1F676CECDAA",
+        "hen-preview.png": "DD96E0708670F62BCE1C4763FD09E00AB00F556AE3B21B8F48587519E04D1A50"
       },
       "provenance": {
         "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
-        "license": "project-original"
+        "source": "Gallina facetada de The Valley (deliverables/marked-models-trial/build-models.py, hen(); 29 sep 2026), aprobada por Vera; paso y picoteo de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
       }
     },
     {

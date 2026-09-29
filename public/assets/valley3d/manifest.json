@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T19:13:02.531Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids cow",
+  "generatedAt": "2026-09-29T19:18:39.192Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids hen",
   "assets": [
     {
       "id": "axis-marker",
@@ -182,25 +182,6 @@
       "file": "reed.glb",
       "sha256": "3AE010539E86395BBFB41C13EC468FF48C75BE298E737255AB2DE17DEA87960D",
       "motion": []
-    },
-    {
-      "id": "hen",
-      "file": "hen.glb",
-      "sha256": "E08F6D310277DE6D4749F33CAD8EE56CBB4877A7973F0E8ED727CA393BB251F1",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.075
-        }
-      ]
     },
     {
       "id": "crow",
@@ -1568,6 +1549,30 @@
       "provenance": {
         "kind": "original",
         "source": "Vaca facetada de The Valley (deliverables/marked-models-trial/build-models.py, cow(); 29 sep 2026), aprobada por Vera; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "hen",
+      "file": "hen.glb",
+      "sha256": "A17C37A414070DCD363B813FBFAF163D5AE6AF98E06F35E988C0B1F676CECDAA",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.063
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Gallina facetada de The Valley (deliverables/marked-models-trial/build-models.py, hen(); 29 sep 2026), aprobada por Vera; paso y picoteo de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     }
