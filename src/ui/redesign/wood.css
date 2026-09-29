@@ -908,7 +908,7 @@ html.bare .ui-hud-header::before { visibility: hidden; }
 }
 /** El idioma, **de madera** con aro de latón, como en el primer diseño de
     Vera: la versión de piedra «se ve muy mal» sobre el empedrado (24 sep). El
-    botón de sonido se fue con el audio sintetizado. */
+    botón de sonido va sin placa, al final de la hoja (v9). */
 :root .title-language {
   min-width: 52px;
   min-height: 52px;
@@ -1238,6 +1238,17 @@ html:has(.valley-board-veil) .valley-compass { visibility: hidden; }
   text-transform: uppercase;
   text-align: center;
 }
+/** El altavoz, en la misma tinta crema que el idioma y sin placa, al lado:
+    encendido entero, en silencio atenuado (29 sep 2026, con los sonidos). */
+:root .title-sound {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: rgba(243, 227, 194, .8);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .8));
+}
+:root .title-sound[aria-pressed="true"] { color: #FFF3D6; }
+:root .title-sound[aria-pressed="false"] { color: rgba(243, 227, 194, .5); }
 
 
 /* ======================================================= v9 · la encrucijada

@@ -9,6 +9,7 @@ import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
 import { openTitle, type TitleChoice } from './ui/screens/title';
+import { installSound } from './ui/sound';
 import { openBattleSandbox } from './ui/sandbox';
 
 /**
@@ -45,6 +46,9 @@ async function saveFor(choice: TitleChoice, save: SaveFile | null): Promise<Save
 // worker is what lets the valley open without a network, and it is registered
 // once whether the game founds, resumes or shows a debug scene.
 registerServiceWorker();
+// El sonido, también antes de todo: la portada suena, y el primer toque de la
+// página —sea donde sea— es el que le da permiso al navegador para sonar.
+installSound();
 
 const root = document.querySelector<HTMLDivElement>('#root');
 if (root) {

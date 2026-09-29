@@ -1,14 +1,47 @@
 # Plan maestro de audio
 
 **Fecha de registro:** 18 de septiembre de 2026
-**Estado:** inventario en curso; hay una propuesta aprobada para el ambiente
-principal, pendiente de que su fichero fuente esté disponible e integrado. El
-resto de piezas sigue pendiente de producción y aprobación.
+**Estado (29 sep 2026):** **la interfaz suena** —los veinte momentos de §4.2
+y §4.7 que tienen disparador, fabricados por `tools/ui/sounds.py` e integrados
+(`design.md` §11.10)—, pendiente de que Vera escuche las variantes y elija. El
+ambiente, la economía, el mundo, los sucesos y el asedio siguen pendientes, y
+la síntesis en vivo que §1 describe **ya no existe**: se retiró el 24 sep.
 
 Este documento reúne el audio que necesita toda la aplicación: ambiente del
 mapa, respuesta de interfaz, economía, vida de la aldea, hitos, fases y el
 asedio que completa la meta de `design.md` §1b. Es una lista de producción, no
 una orden de integrar todo a la vez.
+
+## La interfaz, integrada · 29 de septiembre de 2026
+
+Vera eligió el 29 sep que los ficheros los fabrique Claude, **fuera del
+juego**, y que suene la interfaz entera: portada, navegación, reloj,
+decisiones, medios, ofertas e hitos; botón de silencio en el valle y en la
+portada; sonando por omisión. Lo que entró:
+
+- **Veinte ficheros** en `public/audio/` (MP3 mono de 32 kHz, 204 KB en
+  total): los dieciséis `ui_` de §4.2 menos `ui_chronicle_page` —la crónica
+  no pasa páginas, es una lista que se desplaza— y cuatro `stinger_` de §4.7
+  (menor, mayor, década y siglo). `stinger_new_peak` suena como un hito menor,
+  y el trueno sigue sin fichero.
+- **Cómo se hacen:** `tools/ui/sounds.py`, síntesis modelada con la paleta de
+  §8.0 —madera con fieltro (una marimba apagada), cuerda de tripa
+  (Karplus-Strong), bronce pequeño con parciales de campana, papel a granos—,
+  sin un solo oscilador pelado. La primera pasada tenía la energía entre 250
+  y 480 Hz, justo donde un altavoz de móvil no llega, que es lo que se le
+  reprochó a la toma de Mirelo («demasiado flojo»); se corrigió subiendo el
+  registro del sello y de los hitos, añadiendo presencia a 2,2 kHz y
+  **nivelando cada sonido en la banda de 350 Hz a 6 kHz**, no en la entera.
+- **Tres variantes de cada uno** para escuchar: *a* de referencia, *b* dos
+  semitonos más grave, más oscura y seca, *c* dos más aguda, algo más clara y
+  con más sala. En el juego suenan todas en *a* hasta que Vera elija; cambiar
+  es una letra en `CHOSEN` y volver a lanzar la herramienta.
+- **Cuándo suena cada uno** está en `design.md` §11.10; comprobado con clics
+  reales por `tools/ui/sound-check.mjs` (20 de 20 pasos).
+
+Lo que **no** se hizo, a propósito: ninguna capa de ambiente (§4.1), nada de
+economía por existencias (§4.3), ni sonido de medio por objeto (§4.4): no eran
+interfaz, y el ambiente es lo que resultó incómodo.
 
 ## Ambiente aprobado, pendiente de integración · 19 de septiembre de 2026
 
@@ -347,6 +380,7 @@ familia.
 | 18 sep 2026 | `ui_panel_open` | Higgsfield / Mirelo | `d3daec51-5c35-426a-8d22-84d3d0028087` | 0,5 | Prompt canónico; pendiente de escucha y prueba dentro del juego |
 | 18 sep 2026 | `ui_panel_open` | Higgsfield / Mirelo | `41230658-daff-4d8d-b93f-de731eaa790a` | 0,5 | Segundo intento: ataque y presencia de gama media reforzados; pendiente de escucha |
 | 18 sep 2026 | `amb_birds_sparse_day` | Higgsfield / Seed Audio 1.0 | `18e505fc-ba53-4a60-8b8f-86117b1f4ca9` | 2,7 | Prompt original, sin cambios; pendiente de escucha |
+| 29 sep 2026 | los 16 `ui_` con disparador y 4 `stinger_` | Síntesis propia, `tools/ui/sounds.py` | variantes a/b/c | 0 | Integradas en *a*; pendiente de que Vera escuche y elija |
 
 ## 8. Prompts canónicos de producción
 

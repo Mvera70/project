@@ -160,10 +160,11 @@ la partición se retiró.
 
 `npm run shot`, `npm run bundle`, `npm run serve:shots`, `npx tsx tools/graphics/publish-assets.ts --ids bow,spear`.
 
-## `ui/` — la piel y los iconos
+## `ui/` — la piel, los iconos y el sonido
 
 El estándar visual está en la skill `piel-del-valle`; el calco de dibujos, en
-`calcar-iconos`. Éstas son sus herramientas.
+`calcar-iconos`; el sonido, en `docs/design.md` §11.10. Éstas son sus
+herramientas.
 
 | Herramienta | Qué hace |
 |---|---|
@@ -183,6 +184,8 @@ El estándar visual está en la skill `piel-del-valle`; el calco de dibujos, en
 | `icons/variantes.py` | Las variantes escritas a mano de los dos iconos que no salen del calco |
 | `icons/aplicar.py` | Lleva una variante al sprite del juego y a la copia incrustada |
 | `import-chronicle-art.ps1` | Baja los grabados de la crónica y los normaliza a 640 × 512 en `public/ui/art/` |
+| `sounds.py` | **Los veinte sonidos de la interfaz, fabricados y no grabados** (29 sep 2026): madera con fieltro, cuerda de tripa, bronce pequeño y papel, modelados con numpy, nivelados en la banda que oye un teléfono y escritos en `public/audio/*.mp3`; sella la huella de cada uno en `src/ui/sound.ts`. Determinista byte a byte. Existe porque la síntesis en vivo de U-09 sonaba «malísima» y así cada sonido se escucha y se elige antes de entrar. `CHOSEN` dice qué variante suena. `pip install numpy scipy soundfile`, `python tools/ui/sounds.py [--audition] [--stamp]` |
+| `sound-check.mjs` | **¿Suena lo que tiene que sonar?** Recorre la interfaz con clics de verdad en Chromium —portada, hojas, ficha, reloj, silencio, oferta, encrucijada— y lee lo que el reproductor apuntó (`window.__valleySound`). Mide el *cuándo*; el *cómo* se escucha. Informe y capturas en `artifacts/audio/check/`. `node tools/ui/sound-check.mjs [--headed] [--chrome <ruta>]` |
 
 `npm run icons`.
 

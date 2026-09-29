@@ -2719,11 +2719,14 @@ export const MILESTONES = {
 } as const;
 
 // ---------------------------------------------------------------------------
-// `src/ui/sound.ts` — el hueco del audio (24 sep 2026)
+// `src/ui/sound.ts` — el sonido de la interfaz (29 sep 2026)
 //
-// El sonido sintetizado de U-09 se retiró: Vera lo oyó y lo cortó («el audio
-// es malísimo, el de fondo es hasta incómodo»). Queda sólo lo que vale para
-// cualquier audio que llegue en ficheros: el fusible entre dos acentos.
+// El sonido sintetizado en vivo de U-09 se retiró el 24 sep: Vera lo oyó y lo
+// cortó («el audio es malísimo, el de fondo es hasta incómodo»). Desde el 29
+// suenan ficheros fabricados fuera del juego (`tools/ui/sounds.py`). Aquí van
+// los números de la reproducción, no los de los sonidos: el nivel de cada uno
+// ya viene horneado en su fichero. Presentación, como BURNING y DAY: no mueve
+// una cifra del juego.
 // ---------------------------------------------------------------------------
 
 export const SOUND = {
@@ -2734,4 +2737,25 @@ export const SOUND = {
   // instant. Wall clock on purpose: it guards a playback artefact, not
   // something that happened in the game.
   ACCENT_MIN_GAP_MS: 2_500,
+  // TUNE: the minimum real time between two plays of the **same** interface
+  // sound. A thumb that taps the speed strip four times in a second should
+  // hear four ticks; the same button bounced twice in one frame by a click and
+  // its synthetic twin should hear one. 70 ms is under the ~100 ms a person
+  // can tap twice, and over a frame and a half at 60 fps.
+  TAP_MIN_GAP_MS: 70,
+  // TUNE: how late a sound may still start when its file had not finished
+  // decoding at the moment of the tap. The first tap of a session wakes the
+  // audio context and the decode runs after it; a sound that arrives a quarter
+  // of a second late still reads as the answer to that tap, and one that
+  // arrives later reads as a glitch, so it is dropped.
+  LATE_PLAY_MS: 250,
+  // TUNE: the master gain over files already levelled in the phone band
+  // (`tools/ui/sounds.py`, `LEVEL`). Under one on purpose: a background idle
+  // must never be the loudest thing on the phone.
+  MASTER_GAIN: 0.8,
+  // TUNE: the speed tick climbs a whole tone per step (×1, ×4, ×16, ×64), so
+  // four speeds are four pitches of one wooden ratchet (plan-audio §8.1,
+  // `ui_speed_change`: «designed to be pitch-shifted slightly for the four
+  // speed settings»). A playback rate, so pitch and length move together.
+  SPEED_RATES: { 1: 1, 4: 1.122, 16: 1.26, 64: 1.414 },
 } as const;

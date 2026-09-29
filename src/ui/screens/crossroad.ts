@@ -15,6 +15,7 @@ import { yearOf } from '@engine/time';
 import type { App } from '../app';
 import { recogniseGesture, type Point } from '../gestures';
 import { retireOverlay } from '../motion';
+import { sound } from '../sound';
 
 const STYLE_ID = 'valley-crossroad-style';
 const STYLE = `
@@ -304,6 +305,9 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
       // The screen simply stays open, and this listener never fires — remove
       // it rather than leave it to catch some later, unrelated decision.
       if (!accepted) { document.removeEventListener('valley:decided', onDecided); return; }
+      // El sello sobre el pergamino: suena la decisión tomada, no el toque —
+      // uno rechazado por haber otra en vuelo no dice nada.
+      sound.tap('ui_crossroad_decide', Date.now());
       if (shown?.overlay === scrim) {
         shown = null;
         document.documentElement.classList.remove('crossroad-open');

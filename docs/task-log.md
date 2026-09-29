@@ -1,5 +1,22 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · La interfaz suena (v4.97) — **a la espera de que Vera elija variantes**
+
+Veinte sonidos fabricados por `tools/ui/sounds.py` en `public/audio/`, cada
+uno en variantes *a*, *b* y *c*; en el juego suenan en *a*. Cuándo suena cada
+uno, en `design.md` §11.10: portada, hojas, ficha, pestañas, reloj (un tono
+por velocidad), encrucijada planteada y elegida, medio/corona/trato según lo
+que conteste el motor, oferta que llega e hitos (menor, mayor, década,
+siglo). Altavoz en el valle y en la portada, sonando por omisión.
+Comprobado: 32 pruebas en `sound.test.ts` (propiedades del cuándo, ficheros
+en disco, huella, presupuesto) y **20 de 20 pasos con clics reales**
+(`tools/ui/sound-check.mjs`, capturas en `artifacts/audio/check/`).
+**Abierto:** que Vera escuche la página de variantes y pegue su elección
+—cambiar es una letra en `CHOSEN` de `sounds.py` y volver a lanzarlo, que
+también resella—; el trueno sigue sin fichero; y **nada está oído en un
+teléfono de verdad**: los niveles se fijaron midiendo la banda de 350 Hz a
+6 kHz, no escuchando.
+
 ## 29 sep 2026 · Rendimiento en la tablet, «Graphics» y lo que quedaba de la v9
 
 Vera abrió el sitio en su tablet a 0 fps con fotogramas de dos segundos (año

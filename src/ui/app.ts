@@ -54,7 +54,7 @@ import { chroniclePanel, closeChronicle } from './screens/chronicle';
 import { closeCrossroad, isDeferred, openCrossroad, openDeferred } from './screens/crossroad';
 import { openEpitaph } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
-import { accentFor, createSoundEngine } from './sound';
+import { accentFor, playerAnswer, routeCue, sound, speedCue } from './sound';
 import { openWelcome } from './welcome';
 import { devPreference, startDevHud, type DevHud } from './dev-hud';
 import { mountCameraControls, type CameraControls } from './camera-controls';
@@ -355,7 +355,14 @@ export function boot(
   let trackedId: number | null = null;
 
   const actions: UiActions = {
-    navigate,
+    // El sonido de la navegación va aquí y no dentro de `navigate`: esto es
+    // lo que llama quien toca, y `navigate` también lo llama el juego —la
+    // encrucijada que cierra la hoja para abrirse— sin que nadie haya tocado.
+    navigate(route) {
+      const cue = routeCue(currentRoute.kind, route.kind);
+      if (cue !== null) sound.tap(cue, Date.now());
+      navigate(route);
+    },
     // VZ-6 · la lectura que la línea «Today» de la ficha necesitaba: lo que
     // hace ese cuerpo **en el fotograma que se está viendo**, preguntado a la
     // capa de vida y no adivinado del motor.
@@ -380,10 +387,19 @@ export function boot(
     },
     // §7.15 · mandar gente del tablón: la misma cola de actos que un medio.
     expedition(mission, count): void {
+      // El tablón sólo deja mandar a quien se puede mandar (`board.ts`), así
+      // que el envío ya es la respuesta: suena al tocar.
+      sound.tap('ui_action_success', Date.now());
       pendingActs.push({ kind: 'expedition', mission, count });
       if (speed !== 0) { runTick(); paint(lastFraction); }
     },
-    setSpeed(value): void { app.setSpeed(value); },
+    setSpeed(value): void {
+      // El jugador, y sólo él: la caza y el final también cambian la
+      // velocidad (`app.setSpeed`) y no suenan.
+      const change = speedCue(speed, value);
+      if (change !== null) sound.tap(change.cue, Date.now(), change.rate);
+      app.setSpeed(value);
+    },
     // UI-R2 · la única escritura que un panel puede hacer sobre las órdenes
     // (`contracts.ts`), y desde esta ronda el único sitio donde se aplica la
     // respuesta de §11.6: antes vivía repetida en el manejador de clic de
@@ -442,9 +458,35 @@ export function boot(
   const people = peoplePanel(actions);
   const shell = createShell(actions);
 
-  // El audio: un hueco para ficheros, hoy en silencio (`sound.ts`). Sin botón
-  // mientras no haya nada que sonar.
-  const sound = createSoundEngine();
+  /**
+   * **El botón de silencio**, de vuelta con los sonidos (29 sep 2026). El
+   * reproductor es uno para toda la página (`sound.ts`), porque la portada
+   * suena antes de que exista el valle; éste es su interruptor en el valle, y
+   * `title.ts` tiene el suyo. Es el mismo altavoz dibujado de U-09: las dos
+   * versiones —sonando y en silencio— van en el DOM y el CSS enseña una u
+   * otra según `aria-pressed`, nunca cambia el texto.
+   */
+  const soundToggle = document.createElement('button');
+  soundToggle.type = 'button';
+  soundToggle.className = 'valley-sound hud-round-btn skin-plate skin-plate--round';
+  soundToggle.innerHTML = '<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" focusable="false"'
+    + ' fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M3 6.3v3.4h2.3L8.6 12.2V3.8L5.3 6.3z"/>'
+    + '<path class="valley-sound-on" d="M10.7 5.3c1 .9 1 4.5 0 5.4"/>'
+    + '<path class="valley-sound-on" d="M12.5 3.6c2 1.8 2 6.9 0 8.7"/>'
+    + '<path class="valley-sound-off" d="M10.8 5.6 14.2 10.4M14.2 5.6 10.8 10.4"/>'
+    + '</svg>';
+  const paintSoundToggle = (): void => {
+    soundToggle.setAttribute('aria-pressed', String(sound.enabled));
+    soundToggle.setAttribute('aria-label', renderUiText(sound.enabled ? 'app.sound.on' : 'app.sound.off'));
+  };
+  soundToggle.addEventListener('click', () => {
+    sound.setEnabled(!sound.enabled);
+    // Encenderlo se oye: es la única forma de saber que ha funcionado.
+    if (sound.enabled) sound.tap('ui_resume', Date.now());
+    paintSoundToggle();
+  });
+  paintSoundToggle();
 
   /**
    * UI-V10 · **Despejar la pantalla: sólo el valle.**
@@ -584,7 +626,7 @@ export function boot(
   hudRight.className = 'valley-hud-right hud-speed-corner';
   cameraControls?.dispose();
   cameraControls = mountCameraControls(() => backend.live, () => backend.live.surface);
-  hudRight.append(bareToggle, hud.speedControls, hud.speedBadge);
+  hudRight.append(bareToggle, soundToggle, hud.speedControls, hud.speedBadge);
 
   root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, woodGains.element, shell.element);
 
@@ -929,6 +971,9 @@ export function boot(
       if (spokenOffer !== null) { voice = clearOffer(voice); spokenOffer = null; }
     } else if (spokenOffer !== waiting.postedTick) {
       say('offer', offerLine(waiting));
+      // Alguien llega por el camino: la campanilla, salvo en un letargo, que
+      // es cuando la voz tampoco lo dice.
+      if (!catchingUp) sound.accent('ui_offer_arrives', Date.now());
       spokenOffer = waiting.postedTick;
     }
     const nowMs = Date.now();
@@ -1084,9 +1129,8 @@ export function boot(
   const surface = (): HTMLCanvasElement => backend.live.surface;
 
   root.addEventListener('pointerdown', (event) => {
-    // El audio sólo se arma con el primer toque: antes el navegador no deja
-    // sonar nada.
-    sound.arm();
+    // El audio se arma con el primer toque de la página (`installSound`, en
+    // `main.ts`), no aquí: la portada suena antes de que exista este lienzo.
     if (!onValley(event)) return;
     root.setPointerCapture(event.pointerId);
     if (event.pointerType === 'mouse' && (event.button === 1 || event.button === 2)) {
@@ -1457,6 +1501,11 @@ export function boot(
     // M-0 · si la oferta no se pudo pagar, se dice y se deja en pie: es la
     // única respuesta de la aldea que el jugador no puede deducir mirando.
     if (report.offer?.refused === true) say('event', renderUiText('offer.cannot'));
+    // Y lo que el jugador hizo, contestado. Suena la respuesta del motor y no
+    // el toque, porque sólo el motor sabe si se pudo: un medio que no se puede
+    // pagar, una oferta sin con qué, una corona que la aldea no acepta.
+    const answered = playerAnswer(report);
+    if (answered !== null) sound.tap(answered, Date.now());
     // Rule 4 (§2.60): the engine hands back what changed and where; `document`
     // and not `root` because the crossroad screen mounts on `document.body`
     // (§11.2's "ocupa la pantalla entera"), outside the app's own root.
@@ -1486,8 +1535,8 @@ export function boot(
       // letargo (`catchingUp` es `false` aquí siempre, por construcción de
       // este bloque) y `sound.accent` aplica el fusible de reloj de pared de
       // §11.4 antes de sonar de verdad.
-      const kind = accentFor(report.posed, best !== undefined, catchingUp);
-      if (kind !== null) sound.accent(kind, Date.now());
+      const cue = accentFor(report.posed, best ?? null, catchingUp);
+      if (cue !== null) sound.accent(cue, Date.now());
       if (best !== undefined) {
         // **Una voz, y es la del aviso.**
         //

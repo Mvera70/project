@@ -3207,7 +3207,8 @@ porque el sonido va más despacio que la luz: el renderer **cuenta** los rayos
 (`GraphicsStats.bolts`) y `app.ts` pide el acento del trueno, así que el render
 sigue sin saber que existe el sonido. **Desde el 24 sep 2026 ese acento está
 en silencio**: el audio sintetizado se retiró y el trueno sonará cuando haya un
-fichero (`src/ui/sound.ts`, `CUE_FILES`).
+fichero (`src/ui/sound.ts`, `CUE_FILES`). La interfaz suena desde el 29 sep
+(§11.10); el trueno no es de la interfaz y sigue sin el suyo.
 
 **Y se puede mirar desde fuera:** la raíz lleva `data-sky` y `data-bolts`, la
 ruta de depuración acepta `&weather=storm`, `&weather=snow` y `&weather=wet`
@@ -3389,7 +3390,8 @@ Sobre la noche (`--night`), no sobre el valle, porque el juego no existe
 todavía: el filete y el nombre en latón arriba, y abajo el número (editable,
 con «Another» para echar otro que no repita ninguno jugado), «Found a new
 valley» en el mismo oro que «Begin again». (La preferencia de sonido se retiró
-con el audio sintetizado el 24 sep 2026.) «Continue»
+con el audio sintetizado el 24 sep 2026 y volvió el 29 con los ficheros:
+el altavoz va junto al idioma, §11.10.) «Continue»
 sólo cuando hay una partida guardada **y no ha terminado**: si terminó, lo que
 toca es fundar de nuevo sobre sus ruinas (§13.3), y eso lo hace el menú por su
 cuenta. Vive en `screens/title.ts`, se abre desde `main.ts` antes de `boot` y
@@ -4139,6 +4141,59 @@ y por tanto el estado. No es cosmético y se mide con el banco.
 salieran a la vez, que la mayoría repitiera sitio semana tras semana, que se
 apilaran en una celda, que en invierno siguiera habiendo gente en los campos, o
 que dibujar escribiera en el estado o gastara una tirada.
+
+### 11.10 El sonido de la interfaz (29 sep 2026)
+
+**La interfaz suena, y el valle no.** Vera retiró el 24 sep la síntesis en
+vivo de U-09 —«el audio es malísimo, el de fondo es hasta incómodo»— y el 29
+eligió que suene la interfaz entera con ficheros fabricados fuera del juego:
+portada, navegación, reloj, decisiones, medios, ofertas e hitos. **Sin
+ambiente**: el lecho de fondo es lo que resultó incómodo, y vuelve sólo si
+ella lo pide (`docs/plan-audio.md` §4.1).
+
+Lo normativo es **cuándo**; cómo suena cada cosa lo decide
+`tools/ui/sounds.py` y se escucha, no se prueba.
+
+| Momento | Suena | Por qué ahí |
+|---|---|---|
+| Fundar / continuar en la portada | `ui_title_begin` / `ui_title_continue` | Volver es más discreto que empezar |
+| Abrir una hoja desde el valle, y el cronicón o las opciones gráficas | `ui_panel_open` | Un cambio de contexto |
+| Volver al valle | `ui_panel_close` | La pareja, más corta y más baja |
+| De una hoja a otra | `ui_tab_change` | Lo más discreto de todo |
+| Abrir una ficha, se llegue desde donde se llegue | `ui_person_select` | Es una persona, no una hoja |
+| Pausar / seguir | `ui_pause` / `ui_resume` | También suena `ui_resume` al encender el sonido: es como se sabe que funciona |
+| Cambiar de velocidad | `ui_speed_change`, un tono más por velocidad (`SOUND.SPEED_RATES`) | Cuatro velocidades, cuatro alturas del mismo tic |
+| Se plantea una encrucijada | `ui_crossroad_opens` (acento) | Lo que pide al jugador |
+| Se elige una opción | `ui_crossroad_decide` | Sólo si la decisión se aceptó |
+| Un medio, la corona o un trato, contestados por el motor | `ui_action_success`, `ui_action_refused`, `ui_offer_accept`, `ui_offer_decline` | Suena la respuesta y no el toque: sólo el motor sabe si se pudo pagar |
+| Mandar gente del tablón | `ui_action_success` | El tablón sólo deja mandar a quien se puede |
+| Alguien llega por el camino | `ui_offer_arrives` (acento) | Cuando la voz lo dice |
+| Un hito | `stinger_milestone_minor` o `_major` por peso; `stinger_decade` y `stinger_century` por la vuelta del tiempo (acento) | El tiempo que pasa no suena como una obra |
+
+**Tres reglas.** *Los acentos del juego* —encrucijada, oferta, hito— pasan
+por el fusible de reloj de pared de §11.4 (`SOUND.ACCENT_MIN_GAP_MS`), nunca
+suenan en un letargo y, si coinciden, gana el hito. *Los toques del jugador*
+no pasan por ese fusible —quien toca espera oírlo aunque acabe de sonar un
+hito— sino por uno propio y corto por sonido (`SOUND.TAP_MIN_GAP_MS`). Y *lo
+que el juego hace solo* no suena como si lo hubiera hecho el jugador: la caza
+y el final cambian la velocidad, y la encrucijada cierra la hoja al abrirse,
+sin sonido de toque.
+
+**Un reproductor para toda la página** (`sound`), porque la portada suena
+antes de que exista el valle; Web Audio, porque en iPhone un `<audio>` separa
+el toque de su sonido. Se arma con el primer toque de la página, sea donde
+sea, y pide los ficheros antes, al cargar. **Suena por omisión**; el altavoz
+está en la portada, junto al idioma, y en el rincón del valle, junto al botón
+de despejar —con la pantalla despejada, en tenue a la derecha del todo, como
+lo pidió el dueño en UI-V10b—. La preferencia es `valley.sound` en
+`localStorage`, la misma clave de U-09. Sustituir un sonido es soltar otro
+fichero con el mismo nombre en `public/audio/`.
+
+**Qué falsaría esto:** que un toque del jugador no sonara o sonara otro
+(`tools/ui/sound-check.mjs` recorre la interfaz con clics de verdad y lo lee
+de `window.__valleySound`), que sonara algo en un letargo o a cada tick, que
+en silencio sonara algo, o que el primer toque de una sesión se quedara sin
+sonido más de `SOUND.LATE_PLAY_MS`.
 
 ### 11.7 Accesibilidad
 

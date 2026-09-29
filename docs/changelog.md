@@ -1,5 +1,35 @@
 # The Valley — Registro de cambios
 
+## v4.97 · 29 sep 2026 · La interfaz suena
+
+Vera: «implementar todo el sonido de la interfaz, preguntar en decisiones de
+diseño». Preguntadas y contestadas: los ficheros los fabrica Claude, suenan
+los cuatro grupos (portada y navegación, decisiones y medios, reloj, hitos),
+hay altavoz en el valle y en la portada, y el juego arranca con sonido.
+
+- **Veinte sonidos fabricados** por `tools/ui/sounds.py` (madera con fieltro,
+  cuerda, bronce pequeño y papel, modelados; `docs/plan-audio.md` §8.0), en
+  `public/audio/` como MP3 (204 KB), cada uno en tres variantes para elegir.
+  **Por qué fuera del juego:** la síntesis en vivo de U-09 se retiró por
+  «malísima», y así cada sonido se escucha antes de entrar. Nivelados en la
+  banda de un teléfono: la primera pasada sonaba entre 250 y 480 Hz, donde un
+  altavoz de móvil no llega.
+- **Cuándo suena cada uno** (`design.md` §11.10, nueva): los acentos del juego
+  —encrucijada, oferta que llega, hito— con el fusible de §11.4 y nunca en un
+  letargo; los toques del jugador con un fusible propio y corto; los actos
+  contestados por el motor (medio, corona, trato) suenan según la respuesta,
+  no según el toque; y lo que el juego hace solo no suena como un toque.
+- **Un reproductor para la página** (`src/ui/sound.ts`, `sound`), Web Audio,
+  armado con el primer toque en cualquier sitio y con los ficheros pedidos al
+  cargar. Cada fichero lleva su huella `?v=` porque el service worker sirve de
+  la caché primero: sin ella, cambiar de variante no llegaría a un teléfono.
+- **El altavoz vuelve** al rincón del valle y a la portada, junto al idioma;
+  con la pantalla despejada, en tenue a la derecha del todo (UI-V10b).
+  Preferencia `valley.sound`, la misma de U-09.
+- `SOUND` gana `TAP_MIN_GAP_MS`, `LATE_PLAY_MS`, `MASTER_GAIN` y
+  `SPEED_RATES` (TUNE, presentación). `tools/ui/sound-check.mjs` recorre la
+  interfaz con clics de verdad: 20 de 20.
+
 ## v4.96 · 29 sep 2026 · La piel v9 en el juego, la crónica a color, y «Graphics» en la portada
 
 Vera abrió el sitio publicado en su tablet a 0 fps con fotogramas de dos
