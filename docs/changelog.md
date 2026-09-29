@@ -1,5 +1,26 @@
 # The Valley — Registro de cambios
 
+## v4.98 · 29 sep 2026 · La interfaz suena de materiales, no de notas
+
+Vera descartó los veinte sonidos de v4.97 («no me gusta ninguna»). Se buscó
+la dirección con **un solo botón** —la placa de madera del juego— y cuatro
+tandas de candidatos, y cada una enseñó algo: madera saturada → crujía;
+chasquidos afilados → sonaban a ratón; notas afinadas agudas → «infantil, de
+niños pequeños»; **materiales → «magnífico»** (piedra sobre madera, cofre,
+cuero con hebilla, sello de cera; el tambor, no).
+
+- **`tools/ui/sounds.py` reescrito** con foley de materiales: contacto en
+  banda de 600 a 3200 Hz, cuerpo mate de 350 a 700 Hz, nada por encima de
+  4,8 kHz. **Ninguna nota afinada** salvo las campanas de los hitos, graves y
+  de bronce. Cada material con su papel: piedra → toques, cofre → abrir y
+  cerrar, cuero → ofertas, cera → decidir y aceptar, madera hueca → la
+  pregunta y la negativa, campana → el tiempo.
+- **Los mismos veinte momentos y los mismos nombres de fichero**, así que el
+  cableado (`sound.ts`, `app.ts`, portada) no cambia; sólo las huellas
+  (`?v=`), que la herramienta reescribe. 144 KB en total (eran 204).
+- Sin saturación ni realce de presencia (los dos añadían filo). Nivelados en la
+  banda del teléfono, con el techo por pico: si se pasa, baja el todo.
+
 ## v4.97 · 29 sep 2026 · La interfaz suena
 
 Vera: «implementar todo el sonido de la interfaz, preguntar en decisiones de

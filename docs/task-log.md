@@ -1,6 +1,17 @@
 # Cuaderno de tareas — el rework
 
-## 29 sep 2026 · La interfaz suena (v4.97) — **a la espera de que Vera elija variantes**
+## 29 sep 2026 · Sonidos de materiales (v4.98) — **a la espera de que Vera elija variantes**
+
+Vera descartó los veinte de v4.97 y se buscó la dirección con un solo botón en
+cuatro tandas (`Prueba del botón`, no versionada). Gustó el foley de
+materiales; el tambor no; las notas afinadas agudas sonaron «infantil».
+`tools/ui/sounds.py` está reescrito con esa dirección (`plan-audio.md`, §29
+sep) y los veinte momentos suenan de materiales, sin notas afinadas. **Abierto:**
+elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
+botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
+los momentos de §11.10.
+
+### (anterior, v4.97) La interfaz suena
 
 Veinte sonidos fabricados por `tools/ui/sounds.py` en `public/audio/`, cada
 uno en variantes *a*, *b* y *c*; en el juego suenan en *a*. Cuándo suena cada

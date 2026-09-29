@@ -24,14 +24,23 @@ portada; sonando por omisión. Lo que entró:
   no pasa páginas, es una lista que se desplaza— y cuatro `stinger_` de §4.7
   (menor, mayor, década y siglo). `stinger_new_peak` suena como un hito menor,
   y el trueno sigue sin fichero.
-- **Cómo se hacen:** `tools/ui/sounds.py`, síntesis modelada con la paleta de
-  §8.0 —madera con fieltro (una marimba apagada), cuerda de tripa
-  (Karplus-Strong), bronce pequeño con parciales de campana, papel a granos—,
-  sin un solo oscilador pelado. La primera pasada tenía la energía entre 250
-  y 480 Hz, justo donde un altavoz de móvil no llega, que es lo que se le
-  reprochó a la toma de Mirelo («demasiado flojo»); se corrigió subiendo el
-  registro del sello y de los hitos, añadiendo presencia a 2,2 kHz y
-  **nivelando cada sonido en la banda de 350 Hz a 6 kHz**, no en la entera.
+- **Cómo se hacen:** `tools/ui/sounds.py`, síntesis modelada. **La primera
+  pasada (marimba apagada, cuerda de tripa, bronce agudo) Vera la descartó
+  entera**: sonaba roma. Se probaron cuatro tandas de un solo botón y cada una
+  dejó una lección: la madera saturada crujía, los chasquidos afilados sonaban
+  a ratón, y las **notas afinadas y agudas** (gota, marimba, kalimba, laúd) le
+  sonaron «infantil, de niños pequeños» —un tono puro entre 600 y 1300 Hz con
+  cola es una caja de música—. Lo que le gustó fue el **foley de materiales**:
+  piedra sobre madera, cofre, cuero con hebilla y sello de cera; el tambor, no.
+  Así que **ningún sonido de la interfaz tiene una nota afinada** salvo las
+  campanas de los hitos, que son de bronce y graves. Cada material tiene su
+  papel, para que la interfaz se aprenda de oído: piedra sobre madera para los
+  toques (pestañas, personas, reloj), cofre para abrir y cerrar, cuero para lo
+  que llega y se contesta (ofertas), cera para lo que se decide y se acepta,
+  madera hueca para la pregunta y la negativa, campana para el tiempo que
+  pasa. Todo nivelado en la banda de 350 Hz a 6 kHz —lo que un móvil da— y
+  sin nada por encima de 4,8 kHz. Es lo que Vera reprochó a la toma de
+  Mirelo («demasiado flojo») corregido antes de oírlo.
 - **Tres variantes de cada uno** para escuchar: *a* de referencia, *b* dos
   semitonos más grave, más oscura y seca, *c* dos más aguda, algo más clara y
   con más sala. En el juego suenan todas en *a* hasta que Vera elija; cambiar
@@ -380,7 +389,9 @@ familia.
 | 18 sep 2026 | `ui_panel_open` | Higgsfield / Mirelo | `d3daec51-5c35-426a-8d22-84d3d0028087` | 0,5 | Prompt canónico; pendiente de escucha y prueba dentro del juego |
 | 18 sep 2026 | `ui_panel_open` | Higgsfield / Mirelo | `41230658-daff-4d8d-b93f-de731eaa790a` | 0,5 | Segundo intento: ataque y presencia de gama media reforzados; pendiente de escucha |
 | 18 sep 2026 | `amb_birds_sparse_day` | Higgsfield / Seed Audio 1.0 | `18e505fc-ba53-4a60-8b8f-86117b1f4ca9` | 2,7 | Prompt original, sin cambios; pendiente de escucha |
-| 29 sep 2026 | los 16 `ui_` con disparador y 4 `stinger_` | Síntesis propia, `tools/ui/sounds.py` | variantes a/b/c | 0 | Integradas en *a*; pendiente de que Vera escuche y elija |
+| 29 sep 2026 | los 16 `ui_` con disparador y 4 `stinger_` | Síntesis propia, `tools/ui/sounds.py`, primera pasada (madera con fieltro, cuerda, bronce agudo) | variantes a/b/c | 0 | **Descartada por Vera**: «no me gusta ninguna» |
+| 29 sep 2026 | un botón, cuatro tandas de prueba (seis, cinco, cinco y cinco candidatos) | Síntesis propia | — | 0 | Madera saturada, chasquidos y notas afinadas descartados («infantil»); **gustó el foley de materiales** (piedra sobre madera, cofre, cuero, cera), no el tambor |
+| 29 sep 2026 | los mismos veinte, ahora con materiales y sin notas afinadas | Síntesis propia, `tools/ui/sounds.py` | variantes a/b/c | 0 | Integrados en *a*; la dirección gustó («magnífico»), pendiente de elegir variante |
 
 ## 8. Prompts canónicos de producción
 
