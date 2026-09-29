@@ -375,10 +375,10 @@ qué se ve a 390×844 y qué observación la refutaría.
 | fish · idle/walk | banco AN-0 (bajo el plano) | no visible a escala móvil | **conservado · preview-only** (ambiental) | — |
 | fox · idle/walk | `graphics-animal-motion.test.ts`; `FOX_PACE` 0,6 | de noche, junto al gallinero | **mejorado** (4,6 Hz, rumbo) | — |
 | duck · idle/walk | `AN-0/baseline/ducks-seed11-y21` | en el agua | **conservado** | — |
-| deer · idle/walk | rumbo (AN-1b); la caza (`AN-3/hunt-*`, pendiente: cadena 3) | tapado por el bosque en reposo | **límite**: huye con `walk` a 4,1 Hz (sin clip de carrera: encargo) | — |
-| rabbit · idle/hop/flee | `graphics-animal-motion.test.ts` (flee por distancia); la caza (pendiente) | — | **mejorado** (`flee` por suelo recorrido) | un conejo que patina al huir en la caza |
-| partridge · idle/walk/takeoff/flight | fundidos (AN-1b); la caza (pendiente) | — | takeoff/flight **conservado con fundido**; walk **preview-only** (no anda en partida) | — |
-| boar · idle/walk/charge/attack | `graphics-animal-motion.test.ts` (charge por distancia); la caza (pendiente) | — | charge **mejorado**; attack **preview-only** (nadie lo emite) | un jabalí que patina al cargar |
+| deer · idle/walk | rumbo (AN-1b); la caza no se pudo filmar (sin señal tocable, §2.6) | tapado por el bosque en reposo | **límite**: huye con `walk` a 4,1 Hz (sin clip de carrera: encargo) | — |
+| rabbit · idle/hop/flee | `graphics-animal-motion.test.ts` (flee por distancia); sin toma en partida (la caza no se pudo filmar) | — | **mejorado por propiedad · sin toma en partida** (`flee` por suelo recorrido) | un conejo que patina al huir en la caza |
+| partridge · idle/walk/takeoff/flight | fundidos (AN-1b); sin toma en partida (la caza no se pudo filmar) | — | takeoff/flight **conservado con fundido · sin toma en partida**; walk **preview-only** (no anda en partida) | — |
+| boar · idle/walk/charge/attack | `graphics-animal-motion.test.ts` (charge por distancia); sin toma en partida (la caza no se pudo filmar) | — | charge **mejorado por propiedad · sin toma en partida**; attack **preview-only** (nadie lo emite) | un jabalí que patina al cargar |
 | bear · idle/walk/attack | banco `AN-0/animals/bear-gestures.png`; `bear.ts` aviso 3 s; sin toma en partida (el observatorio no provoca la visita: §2.6) | se alza entero (por la constante; no filmado en partida) | **mejorado · preview-only en esta ronda** (AN-3a) | un oso que se corta a media subida en una toma de la visita |
 | wolf · idle/walk/attack | banco AN-0; rumbo (AN-1b) | corral y sierra | walk **conservado**; attack **preview-only** | — |
 | dog · idle/walk/run/bark/play | banco AN-0; fundidos y rumbo (AN-1b); perro en los planos generales | — | **mejorado** (mira al forastero; sin cortes secos) | un perro que ladra hacia donde iba |
