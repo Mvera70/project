@@ -75,6 +75,189 @@ matriz (§2.7).
   anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
   primera jornada de una sesión (matriz §2.7).
 
+## v5.20 · 30 sep 2026 · Fase 2: el día y la noche entran; la aldea, la hoguera y la fiesta, tachadas
+
+Vera aprobó la fase 1 («sigue perfecto»). De los siete lechos de la fase 2
+**quedan tres** —pájaros de día, grillos de verano, noche fría— y **cuatro
+fuera**: el caserío, el pueblo, la hoguera y la fiesta. Escuchados en su tablet:
+«horrible, no tiene ningún sentido»; la hoguera «medianamente se salva, pero
+es un sonido muy raro de fondo». Los cuatro se retiran del juego, de la
+fábrica y de las pruebas; los datos que los alimentaban (población, plaza,
+fiesta, ventana de la hoguera) siguen llegando a `ambience.ts` para cuando
+haya ficheros que valgan. **Lección, en la skill: una multitud no se
+sintetiza, se graba** (decisión 1 de `plan-audio-mundo.md` §6). La hoguera
+se rehará sin el lecho de ruido bajo los chasquidos, que es el fondo raro.
+
+- **Ninguno tiene una garganta.** Es la decisión de fondo: una voz sintética
+  es lo que más «de dibujos» suena, así que el bullicio de una aldea se hace
+  con lo que la aldea **hace** —golpes lejanos, una puerta, pasos— más un
+  rumor de banda estrecha que el oído completa solo. Si aparecen voces de
+  verdad, sustituyen a esto sin tocar nada más.
+- **Los umbrales de población están medidos, no inventados**:
+  `founding-report.ts` sobre seis semillas da 6–13 personas el primer año,
+  20–39 el quinto y 50–80 en un valle maduro, así que el rumor entra por
+  encima de las familias fundadoras, llena hacia las veinte, y el segundo
+  lecho —el que hace que los golpes se solapen— sube desde la treintena.
+- Pájaros de día (callan con tormenta y nieve, se retiran con lluvia),
+  grillos en las noches de primavera y verano, el aire quieto el resto del
+  año, la hoguera de la plaza en su rato y la fiesta. **De noche la aldea
+  calla**: la gente duerme y ni siquiera se dibuja.
+- **El corazón de la aldea es la plaza**, no la media de los edificios.
+  Probé la media y caí en el mismo fallo que el esquema 8 ya tiene escrito:
+  se mueve sola mientras la aldea crece, y una muralla o una atalaya la
+  sacan del pueblo. Medido con el recorrido: en un valle del año 30 el
+  bullicio se apagaba entero por eso.
+- Los grillos salieron con un 40 % de energía por encima de 4 kHz —siseo,
+  y toda la noche—: bajados al 3,7 %. La ventana de la hoguera se muda a
+  `day-phases.ts`, que no importa Three, como se hizo con la tabla del
+  viento.
+- 64 pruebas de sonido. El sonido entero pesa 1043 KB.
+
+## v5.19 · 29 sep 2026 · Un día claro, como un valle de montaña
+
+> Las entradas del sonido se numeraron v4.97–v5.02 en su rama y chocaban con
+> las de animación, animales y profundidad, que llegaron a `main` a la vez con
+> esos mismos números; renumeradas dos veces al traer `main` (v5.13–v5.18 y,
+> al llegar AN-5 con su propia v5.13, v5.14–v5.20). Sin tocar contenido ni fecha.
+
+Vera, escuchando la fase 1: «lo único que cambiaría es la primera, un día
+claro; suena muy fuerte el viento y el río. Imagínate que estamos por las
+montañas, no tiene mucho sentido».
+
+- **Y el fallo era mío**: `windStrengthOf` sólo decidía si había racha, así
+  que la brisa sonaba **al máximo** hiciera el viento que hiciera. Ahora la
+  fuerza del cielo es también cuánto se oye la brisa: un cielo claro va a
+  0,30 en vez de 1,00 —diez decibelios por debajo— y sólo la tormenta llena.
+- **El río, cinco decibelios atrás** (`LOOP_LEVEL` 'water', −35 → −40). Suena
+  siempre, porque el pueblo se funda pegado al cauce, y por eso es lo que
+  antes cansa; con la cámara sobre el agua sigue subiendo y se oye de sobra.
+- **Y un fallo que esto destapó: los bucles no llevaban huella.** El sellador
+  sólo conocía la forma de un toque (`cue: 'x.mp3'`) y no la de un lecho
+  (`cue: { file: 'x.mp3', seconds }`), así que cambiar el río no habría
+  llegado nunca a un teléfono que ya tuviera el viejo — que es exactamente lo
+  que la huella existe para impedir. Sellados los once, y con prueba.
+
+## v5.18 · 29 sep 2026 · El valle suena: el motor de ambiente y la naturaleza
+
+Vera: «cuando el plan esté listo, ejecutarlo y esperar mi aprobación». Fases 0
+y 1 de `plan-audio-mundo.md`, hechas y **a la espera de que las escuche**.
+
+- **Fase 0 · el motor** (`src/ui/ambience.ts`, nuevo, y las capas en
+  `sound.ts`). La mezcla la decide una función **pura** —entra cómo está el
+  valle, sale cuánto suena cada capa—, y el reproductor sólo cruza ganancias.
+  Cuatro compuertas: pausa, letargo, pestaña escondida y avance rápido. La
+  cámara es el oyente: distancia **y zoom**, que es lo que dice si estás
+  dentro del valle o mirándolo desde arriba.
+- **Fase 1 · la naturaleza**: once lechos en bucle y cuatro sonidos de cielo.
+  Un bucle no puede latir al dar la vuelta y eso no se puede oír desde aquí,
+  así que va resuelto por construcción: la costura se pliega en la fábrica
+  (`seamless`) y el relleno que el codificador añade se recorta con `loopEnd`,
+  que viaja con cada fichero.
+- **El trueno llega por la distancia y no por `Math.random`** (§11.11). Tres
+  truenos y no uno con el volumen bajado, porque lo que cambia con la
+  distancia no es el volumen: el aire se come los agudos y estira la cola.
+- **La tabla del viento se muda a `SOUND`**: el meneo de las hojas y el lecho
+  de viento leen la misma, porque el bosque y el sonido tienen que estar de
+  acuerdo sobre si hace viento. Y `GraphicsStats.sky` deja de ser `string`
+  para ser `SkyKind`: con una cadena, un cielo mal escrito habría sido
+  silencio en vez de un fallo de compilación.
+- Lo que midiendo salió a corregir: los lechos pesaban 1,5 MB (ahora 486 KB,
+  bajando el bitrate de lo que es ruido); la lluvia y la cascada tenían un
+  10–13 % de energía por encima de 4 kHz, que en un lecho de minutos es
+  fatiga; y cuatro capas caían por debajo de la banda del móvil.
+- 53 pruebas de sonido y el recorrido del navegador con 6 escenas de ambiente.
+  **Pendiente:** la cascada está fabricada y no suena, porque nadie le dice
+  dónde está (`encargos-3d.md`).
+
+## v5.17 · 29 sep 2026 · El plan del sonido, detallado; el botón suena; y una skill que lo registra
+
+Vera: «detalla el plan… todo esto tiene que registrar una skill de cómo se
+hace para poder iterarlo en futuro».
+
+- **La skill `sonido-del-valle`**, que es el encargo: cómo se fabrica, se mide,
+  se hace escuchar, se elige y se integra un sonido. Guarda **la historia de
+  los cinco rechazos como reglas** (síntesis en vivo → «malísimo»; saturación →
+  cruje; chasquidos de 10 kHz → ratón de ordenador; **notas afinadas agudas →
+  «infantil»**; materiales → «magnífico»), la paleta que manda, los números que
+  no se negocian, las trampas y el bucle de aprobación. La regla que resume las
+  otras: **cuando algo no gusta, cambia de familia, no de variante**, y **un
+  botón antes que veinte sonidos**.
+- **El plan por fases** (`plan-audio-mundo.md` §8): las seis fases con su
+  contrato, sus ficheros, su prueba, su medida y lo que se quedará pendiente.
+  La fase 0 no suena —es el motor: bucles, capas, fundidos, compuertas, oyente
+  y un descriptor de sólo lectura— y es la que decide si el resto es posible.
+- **El botón corriente suena**: `ui_button_press` y `ui_button_release`, el
+  sello de cera de la elección de Vera («Eligo el K»). Lo llevan todos los
+  botones menos los que ya tienen voz propia, listados en **un solo sitio**
+  (`OWN_VOICE`), porque un botón que suena dos veces no se ve: se oye. Con
+  teclado también. El recorrido gana un `forbidden` por paso para comprobarlo:
+  21 de 21, incluido que una pestaña no suena además a sello.
+- Y dos cosas que salieron de medir al implementar: la cera al despegarse tenía
+  un 6 % de energía por encima de 4 kHz (se bajó a 1,6 %), y el botón de
+  silencio de la portada se quedaba sin listar en `OWN_VOICE`.
+
+## v5.16 · 29 sep 2026 · El sonido del mundo, analizado
+
+Vera pidió empezar por el sonido de la naturaleza y la vida: primero la lista de
+todo lo que se ve o se toca y no suena. **`docs/plan-audio-mundo.md`**: 80
+filas contra el código (entorno y clima; vida y animales; edificios, sucesos y
+combate), con la lectura de cada dato —hoy, descriptor o gancho—, qué se puede
+fabricar y qué no, las decisiones que son suyas y un orden en seis fases. Y el
+plan viejo (`plan-audio.md`) corregido por los dos lados: pedía espadas,
+cuerno, caballo y rueda de molino que no existen, y no pedía las cascadas, la
+caza ni los cambios de era que sí. Los huecos de imagen que destapó van a
+`encargos-3d.md`. Sin cambios de código ni de audio.
+
+## v5.15 · 29 sep 2026 · La interfaz suena de materiales, no de notas
+
+Vera descartó los veinte sonidos de v4.97 («no me gusta ninguna»). Se buscó
+la dirección con **un solo botón** —la placa de madera del juego— y cuatro
+tandas de candidatos, y cada una enseñó algo: madera saturada → crujía;
+chasquidos afilados → sonaban a ratón; notas afinadas agudas → «infantil, de
+niños pequeños»; **materiales → «magnífico»** (piedra sobre madera, cofre,
+cuero con hebilla, sello de cera; el tambor, no).
+
+- **`tools/ui/sounds.py` reescrito** con foley de materiales: contacto en
+  banda de 600 a 3200 Hz, cuerpo mate de 350 a 700 Hz, nada por encima de
+  4,8 kHz. **Ninguna nota afinada** salvo las campanas de los hitos, graves y
+  de bronce. Cada material con su papel: piedra → toques, cofre → abrir y
+  cerrar, cuero → ofertas, cera → decidir y aceptar, madera hueca → la
+  pregunta y la negativa, campana → el tiempo.
+- **Los mismos veinte momentos y los mismos nombres de fichero**, así que el
+  cableado (`sound.ts`, `app.ts`, portada) no cambia; sólo las huellas
+  (`?v=`), que la herramienta reescribe. 144 KB en total (eran 204).
+- Sin saturación ni realce de presencia (los dos añadían filo). Nivelados en la
+  banda del teléfono, con el techo por pico: si se pasa, baja el todo.
+
+## v5.14 · 29 sep 2026 · La interfaz suena
+
+Vera: «implementar todo el sonido de la interfaz, preguntar en decisiones de
+diseño». Preguntadas y contestadas: los ficheros los fabrica Claude, suenan
+los cuatro grupos (portada y navegación, decisiones y medios, reloj, hitos),
+hay altavoz en el valle y en la portada, y el juego arranca con sonido.
+
+- **Veinte sonidos fabricados** por `tools/ui/sounds.py` (madera con fieltro,
+  cuerda, bronce pequeño y papel, modelados; `docs/plan-audio.md` §8.0), en
+  `public/audio/` como MP3 (204 KB), cada uno en tres variantes para elegir.
+  **Por qué fuera del juego:** la síntesis en vivo de U-09 se retiró por
+  «malísima», y así cada sonido se escucha antes de entrar. Nivelados en la
+  banda de un teléfono: la primera pasada sonaba entre 250 y 480 Hz, donde un
+  altavoz de móvil no llega.
+- **Cuándo suena cada uno** (`design.md` §11.10, nueva): los acentos del juego
+  —encrucijada, oferta que llega, hito— con el fusible de §11.4 y nunca en un
+  letargo; los toques del jugador con un fusible propio y corto; los actos
+  contestados por el motor (medio, corona, trato) suenan según la respuesta,
+  no según el toque; y lo que el juego hace solo no suena como un toque.
+- **Un reproductor para la página** (`src/ui/sound.ts`, `sound`), Web Audio,
+  armado con el primer toque en cualquier sitio y con los ficheros pedidos al
+  cargar. Cada fichero lleva su huella `?v=` porque el service worker sirve de
+  la caché primero: sin ella, cambiar de variante no llegaría a un teléfono.
+- **El altavoz vuelve** al rincón del valle y a la portada, junto al idioma;
+  con la pantalla despejada, en tenue a la derecha del todo (UI-V10b).
+  Preferencia `valley.sound`, la misma de U-09.
+- `SOUND` gana `TAP_MIN_GAP_MS`, `LATE_PLAY_MS`, `MASTER_GAIN` y
+  `SPEED_RATES` (TUNE, presentación). `tools/ui/sound-check.mjs` recorre la
+  interfaz con clics de verdad: 20 de 20.
 ## v5.12 · 29 sep 2026 · La profundidad del valle en móvil: el pie de las casas, el prado hondo y el seguido a la vista
 
 Vera pidió ejecutar el encargo de Astra

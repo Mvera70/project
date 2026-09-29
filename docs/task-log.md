@@ -1,5 +1,107 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
+
+Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en
+cuatro tandas (`Prueba del botón`, no versionada). Gustó el foley de
+materiales; el tambor no; las notas afinadas agudas sonaron «infantil».
+`tools/ui/sounds.py` está reescrito con esa dirección (`plan-audio.md`, §29
+sep) y los veinte momentos suenan de materiales, sin notas afinadas. **Abierto:**
+elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
+botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
+los momentos de §11.10.
+
+## 30 sep 2026 · Fase 2 del sonido: día y noche sí; aldea, hoguera y fiesta, no (v5.20)
+
+**Paramos aquí por crédito** (Vera, 30 sep). Estado exacto: fases 0 y 1
+aprobadas; de la 2 entran pájaros, grillos y noche fría, y **Vera tachó** el
+caserío, el pueblo, la hoguera y la fiesta («horrible»; la hoguera «se salva
+a medias, sonido muy raro de fondo»). Retirados del juego. Al retomar: la
+hoguera se rehace sin el lecho de ruido bajo los chasquidos; el bullicio de
+la aldea espera grabaciones o voces generadas (decisión 1 de §6) — no se
+vuelve a intentar sintetizado. Siete lechos se fabricaron, ninguno con voces: Los umbrales de población salen de
+`founding-report.ts` en seis semillas. El corazón de la aldea es **la plaza**
+(la media de edificios se mueve sola: el esquema 8 ya lo tenía escrito, y el
+recorrido lo volvió a demostrar). 64 pruebas verdes.
+
+**Abierto:** que Vera escuche la fase 2; la cascada sigue sin sonar (le falta
+que el renderer diga dónde está); y las nueve decisiones de
+`plan-audio-mundo.md` §6, de las que la fase 4 depende entera.
+
+## 29 sep 2026 · El día claro, corregido (v5.19)
+
+Vera aprobó la fase 1 menos la primera escena: «un día claro suena muy fuerte
+el viento y el río». La brisa no seguía la fuerza del viento (sólo decidía la
+racha), así que sonaba entera siempre: ahora un cielo claro va a 0,30 y el río
+cinco decibelios más atrás. Y con ello salió que **los bucles no se sellaban**:
+el sellador no conocía su forma, y cambiar un lecho no habría llegado a un
+teléfono con el viejo. Arreglado y con prueba. 54 pruebas y el recorrido
+(21 toques, 6 escenas) en verde.
+
+## 29 sep 2026 · El valle suena (v5.18) — **escuchado y aprobado salvo el día claro**
+
+Fases 0 y 1 de `plan-audio-mundo.md` ejecutadas. El motor de ambiente
+(`src/ui/ambience.ts`, puro; las capas en `sound.ts`) y quince sonidos: once
+lechos de naturaleza y cuatro de cielo. El trueno por distancia real. Página
+de escucha publicada con las ocho escenas que el juego produce de verdad.
+
+**Abierto:**
+- **Que Vera escuche y apruebe** las capas. Retocar una no toca a las demás.
+- **La cascada no suena**: está fabricada y nadie le dice dónde está. Necesita
+  que el renderer publique los pies de las cascadas (`encargos-3d.md`).
+- Las **nueve decisiones** de `plan-audio-mundo.md` §6 siguen abiertas; las
+  fases 2 a 5 dependen sobre todo de la primera (voces y animales).
+- Con dos incendios a la vez, el día del fuego es el del primero y la
+  distancia la del más cercano. Escrito en `encargos-3d.md`.
+
+## 29 sep 2026 · El plan del sonido y su skill (v5.17)
+
+**La skill `sonido-del-valle`** registra cómo se hace un sonido en este
+proyecto, que es lo que Vera pidió para poder iterarlo: la historia de los
+cinco rechazos convertida en reglas, la paleta, las medidas obligatorias, el
+bucle de aprobación y las trampas. **El plan por fases** está en
+`plan-audio-mundo.md` §8 (seis fases, con contrato, prueba y medida de cada
+una). **El botón K está implementado**: sello de cera en todo botón sin voz
+propia, la lista en `OWN_VOICE`.
+
+**Abierto, y bloquea el resto:** las nueve decisiones de
+`plan-audio-mundo.md` §6. Las tres que más mandan son de dónde salen las voces
+y los animales (1), si hay sonido con posición (2) y qué suena a ×16 y ×64 (3).
+Sin la 1, la fase 4 se queda en el perro y la campana. **La fase 0 —el motor de
+ambiente— no depende de ninguna y se puede empezar ya.**
+
+**El análisis del sonido del mundo está escrito** (`docs/plan-audio-mundo.md`,
+29 sep 2026): 80 filas contra el código, tres lecturas independientes. Lo que
+cambia el plan: el reproductor no sabe hacer bucles ni capas (fase 0), no hay
+flujo de sucesos, a ×64 una jornada dura 1,9 s, y el trueno ya tiene disparador
+y no fichero. Nueve decisiones abiertas para Vera en su §6, y un orden en seis
+fases (§7). **Nada fabricado todavía.**
+
+**Decisión de Vera, 29 sep 2026: «Eligo el K para ese botón».** El sonido del
+botón genérico es el **sello de cera** (K de la prueba del botón: al apretar,
+el golpe sordo sobre la cera; al soltar, la cera que se despega). Queda
+**por implementar** —hoy sólo suenan los momentos de §11.10— y por confirmar
+si vale para todos los botones o sólo para los principales. Y pidió empezar
+después por **el sonido del mundo** (ambiente, naturaleza, vida): primero la
+lista de todo lo que se ve o se toca y no suena, y luego decide ella cómo
+procedemos.
+
+### (anterior, v5.14) La interfaz suena
+
+Veinte sonidos fabricados por `tools/ui/sounds.py` en `public/audio/`, cada
+uno en variantes *a*, *b* y *c*; en el juego suenan en *a*. Cuándo suena cada
+uno, en `design.md` §11.10: portada, hojas, ficha, pestañas, reloj (un tono
+por velocidad), encrucijada planteada y elegida, medio/corona/trato según lo
+que conteste el motor, oferta que llega e hitos (menor, mayor, década,
+siglo). Altavoz en el valle y en la portada, sonando por omisión.
+Comprobado: 32 pruebas en `sound.test.ts` (propiedades del cuándo, ficheros
+en disco, huella, presupuesto) y **20 de 20 pasos con clics reales**
+(`tools/ui/sound-check.mjs`, capturas en `artifacts/audio/check/`).
+**Abierto:** que Vera escuche la página de variantes y pegue su elección
+—cambiar es una letra en `CHOSEN` de `sounds.py` y volver a lanzarlo, que
+también resella—; el trueno sigue sin fichero; y **nada está oído en un
+teléfono de verdad**: los niveles se fijaron midiendo la banda de 350 Hz a
+6 kHz, no escuchando.
 ## 30 sep 2026 · Monetización, promoción y publicación
 
 El plan `docs/plan-monetizacion-y-publicacion-2026-09-29.md` reúne la propuesta

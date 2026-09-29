@@ -3207,7 +3207,8 @@ porque el sonido va más despacio que la luz: el renderer **cuenta** los rayos
 (`GraphicsStats.bolts`) y `app.ts` pide el acento del trueno, así que el render
 sigue sin saber que existe el sonido. **Desde el 24 sep 2026 ese acento está
 en silencio**: el audio sintetizado se retiró y el trueno sonará cuando haya un
-fichero (`src/ui/sound.ts`, `CUE_FILES`).
+fichero (`src/ui/sound.ts`, `CUE_FILES`). La interfaz suena desde el 29 sep
+(§11.10); el trueno no es de la interfaz y sigue sin el suyo.
 
 **Y se puede mirar desde fuera:** la raíz lleva `data-sky` y `data-bolts`, la
 ruta de depuración acepta `&weather=storm`, `&weather=snow` y `&weather=wet`
@@ -3389,7 +3390,8 @@ Sobre la noche (`--night`), no sobre el valle, porque el juego no existe
 todavía: el filete y el nombre en latón arriba, y abajo el número (editable,
 con «Another» para echar otro que no repita ninguno jugado), «Found a new
 valley» en el mismo oro que «Begin again». (La preferencia de sonido se retiró
-con el audio sintetizado el 24 sep 2026.) «Continue»
+con el audio sintetizado el 24 sep 2026 y volvió el 29 con los ficheros:
+el altavoz va junto al idioma, §11.10.) «Continue»
 sólo cuando hay una partida guardada **y no ha terminado**: si terminó, lo que
 toca es fundar de nuevo sobre sus ruinas (§13.3), y eso lo hace el menú por su
 cuenta. Vive en `screens/title.ts`, se abre desde `main.ts` antes de `boot` y
@@ -4139,6 +4141,106 @@ y por tanto el estado. No es cosmético y se mide con el banco.
 salieran a la vez, que la mayoría repitiera sitio semana tras semana, que se
 apilaran en una celda, que en invierno siguiera habiendo gente en los campos, o
 que dibujar escribiera en el estado o gastara una tirada.
+
+### 11.10 El sonido de la interfaz (29 sep 2026)
+
+**La interfaz suena, y el valle no.** Vera retiró el 24 sep la síntesis en
+vivo de U-09 —«el audio es malísimo, el de fondo es hasta incómodo»— y el 29
+eligió que suene la interfaz entera con ficheros fabricados fuera del juego:
+portada, navegación, reloj, decisiones, medios, ofertas e hitos. **Sin
+ambiente**: el lecho de fondo es lo que resultó incómodo, y vuelve sólo si
+ella lo pide (`docs/plan-audio.md` §4.1).
+
+Lo normativo es **cuándo**; cómo suena cada cosa lo decide
+`tools/ui/sounds.py` y se escucha, no se prueba.
+
+| Momento | Suena | Por qué ahí |
+|---|---|---|
+| **Tocar cualquier botón que no tenga voz propia** | `ui_button_press` al bajar el dedo, `ui_button_release` al levantarlo | El sello de cera que eligió Vera («Eligo el K», 29 sep 2026). Los que sí tienen voz propia están listados en `OWN_VOICE` (`sound.ts`) y no lo llevan encima. Soltar fuera del botón —arrepentirse— no suena |
+| Fundar / continuar en la portada | `ui_title_begin` / `ui_title_continue` | Volver es más discreto que empezar |
+| Abrir una hoja desde el valle, y el cronicón o las opciones gráficas | `ui_panel_open` | Un cambio de contexto |
+| Volver al valle | `ui_panel_close` | La pareja, más corta y más baja |
+| De una hoja a otra | `ui_tab_change` | Lo más discreto de todo |
+| Abrir una ficha, se llegue desde donde se llegue | `ui_person_select` | Es una persona, no una hoja |
+| Pausar / seguir | `ui_pause` / `ui_resume` | También suena `ui_resume` al encender el sonido: es como se sabe que funciona |
+| Cambiar de velocidad | `ui_speed_change`, un tono más por velocidad (`SOUND.SPEED_RATES`) | Cuatro velocidades, cuatro alturas del mismo tic |
+| Se plantea una encrucijada | `ui_crossroad_opens` (acento) | Lo que pide al jugador |
+| Se elige una opción | `ui_crossroad_decide` | Sólo si la decisión se aceptó |
+| Un medio, la corona o un trato, contestados por el motor | `ui_action_success`, `ui_action_refused`, `ui_offer_accept`, `ui_offer_decline` | Suena la respuesta y no el toque: sólo el motor sabe si se pudo pagar |
+| Mandar gente del tablón | `ui_action_success` | El tablón sólo deja mandar a quien se puede |
+| Alguien llega por el camino | `ui_offer_arrives` (acento) | Cuando la voz lo dice |
+| Un hito | `stinger_milestone_minor` o `_major` por peso; `stinger_decade` y `stinger_century` por la vuelta del tiempo (acento) | El tiempo que pasa no suena como una obra |
+
+**Tres reglas.** *Los acentos del juego* —encrucijada, oferta, hito— pasan
+por el fusible de reloj de pared de §11.4 (`SOUND.ACCENT_MIN_GAP_MS`), nunca
+suenan en un letargo y, si coinciden, gana el hito. *Los toques del jugador*
+no pasan por ese fusible —quien toca espera oírlo aunque acabe de sonar un
+hito— sino por uno propio y corto por sonido (`SOUND.TAP_MIN_GAP_MS`). Y *lo
+que el juego hace solo* no suena como si lo hubiera hecho el jugador: la caza
+y el final cambian la velocidad, y la encrucijada cierra la hoja al abrirse,
+sin sonido de toque.
+
+**Un reproductor para toda la página** (`sound`), porque la portada suena
+antes de que exista el valle; Web Audio, porque en iPhone un `<audio>` separa
+el toque de su sonido. Se arma con el primer toque de la página, sea donde
+sea, y pide los ficheros antes, al cargar. **Suena por omisión**; el altavoz
+está en la portada, junto al idioma, y en el rincón del valle, junto al botón
+de despejar —con la pantalla despejada, en tenue a la derecha del todo, como
+lo pidió el dueño en UI-V10b—. La preferencia es `valley.sound` en
+`localStorage`, la misma clave de U-09. Sustituir un sonido es soltar otro
+fichero con el mismo nombre en `public/audio/`.
+
+**Qué falsaría esto:** que un toque del jugador no sonara o sonara otro
+(`tools/ui/sound-check.mjs` recorre la interfaz con clics de verdad y lo lee
+de `window.__valleySound`), que sonara algo en un letargo o a cada tick, que
+en silencio sonara algo, o que el primer toque de una sesión se quedara sin
+sonido más de `SOUND.LATE_PLAY_MS`.
+
+### 11.11 El fondo del mundo (29 sep 2026)
+
+**El valle suena.** Fase 1 de `docs/plan-audio-mundo.md`, pedida por Vera:
+«los sonidos de ambiente de la vida, de la naturaleza». Lo que hay es un
+**lecho de capas en bucle** cuya mezcla se decide en `src/ui/ambience.ts`, que
+es **puro**: entra cómo está el valle y sale cuánto suena cada capa. Ni un
+`AudioContext`, ni una tirada, ni un reloj — así se prueba entero sin
+navegador, que es lo único que sirve cuando quien lo escribe no puede oírlo.
+
+| Capa | Cuándo suena |
+|---|---|
+| Brisa · Racha | Siempre, **a la fuerza que haga**: la da el cielo, con la misma tabla que mece las hojas (`SOUND.WIND_BY_SKY`), y esa fuerza es a la vez cuánto se oye la brisa y cuánta racha hay encima. Un día claro es casi silencio |
+| Aire frío | En invierno, en lugar de la brisa: no hay hojas que mover, y ése es justo el sonido que falta |
+| Lluvia fina · Lluvia fuerte · Tormenta · Nevada | Por el cielo del día. La tormenta trae su viento grave dentro, así que la lluvia fuerte se retira a media voz |
+| Río | Casi siempre: el pueblo se funda a tres o seis celdas del río (`mapgen.ts`). Sube con la riada |
+| Cascada | Si el valle tiene y se está cerca |
+| Casa ardiendo · Brasas | Por la marca `burnt:<id>` del motor y el día en que va el fuego |
+
+**Cuatro compuertas.** El mundo calla del todo **en pausa** —un valle quieto
+que sigue sonando es un valle roto—, **en un letargo** (§9.2) y **con la
+pestaña escondida**. Y a **×16 y ×64** no calla pero adelgaza: quedan los
+lechos al 35 %, y el fuego se va. Una jornada dura 120 s a ×1 y 1,9 s a ×64,
+así que el cielo cambia más deprisa de lo que una capa puede cruzarse; es lo
+mismo que el renderer hace con la luz (`daylight.ts`, `LIGHT_STEADY`) y por el
+mismo motivo: a esa velocidad, lo fiel parpadea.
+
+**Las fuentes están en un sitio.** El río, la cascada y el fuego se atenúan por
+dos cosas: la distancia al centro de la vista y **el zoom**, que es lo que de
+verdad dice si estás dentro del valle o mirándolo desde arriba
+(`nearness`). No hay panorámica estéreo todavía.
+
+**Y el trueno llega por la distancia, no por una tirada.** Hasta hoy el retardo
+era `Math.random` entre 0,4 y 2,2 s. Ahora el renderer deja dónde cayó el rayo
+(`data-bolt-at`) y `thunderFor` mide contra dónde se mira: **tres truenos y no
+uno con el volumen bajado**, porque lo que cambia con la distancia no es el
+volumen sino que el aire se come los agudos y estira la cola. Encima chasquea
+casi a la vez y lleva su latigazo delante; al otro lado del valle tarda dos
+segundos y llega hecho un retumbar. El reloj del retardo es de pared y no se
+escala con la velocidad: es del aire, no de la simulación, igual que el
+destello (§10.7).
+
+**Qué falsaría esto:** que el cielo y el sonido discrepen; que algo suene en
+pausa, en un letargo o con el sonido apagado; que un rayo lejano suene antes o
+más brillante que uno cerca; que el río no cambie al acercar la cámara; o que
+se oiga el latido del bucle al dar la vuelta.
 
 ### 11.7 Accesibilidad
 

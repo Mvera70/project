@@ -46,6 +46,25 @@ const ANCHORS: readonly [phase: number, hour: number][] = [
   [1, 24],
 ];
 
+/**
+ * Cuándo arde la hoguera de la plaza, en fase de jornada: un poco antes y un
+ * poco después del corro de la tarde. **Vive aquí y no en `hearth.ts`** desde
+ * el 29 sep 2026, por lo mismo que el reloj de la cabecera vive aquí: el lecho
+ * de ambiente necesita saber si hay hoguera (`ui/ambience.ts`) y `hearth.ts`
+ * importa Three, que no tiene por qué entrar en la capa de sonido.
+ */
+export const HEARTH_LIT = { from: 0.55, to: 0.7 } as const;
+
+/** Cuánto arde la hoguera ahora, de 0 a 1, con su encendido y su apagado. */
+export function hearthAt(phase: number): number {
+  if (phase < HEARTH_LIT.from || phase > HEARTH_LIT.to) return 0;
+  const ramp = 0.02;
+  return Math.min(1, (phase - HEARTH_LIT.from) / ramp, (HEARTH_LIT.to - phase) / ramp);
+}
+
+/** Los momentos que separan el día de la noche, para quien los necesite fuera. */
+export const PHASES = { DAWN, MORNING, NOON, DUSK, NIGHT } as const;
+
 /** La hora del valle, de 0 a 23, para una fase de jornada cualquiera. */
 export function hourAt(phase: number): number {
   // Restando el suelo y no con `% 1` dos veces: `((0.92 % 1) + 1) % 1` da

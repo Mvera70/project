@@ -873,6 +873,15 @@ html.bare .valley-hud-right.hud-speed-corner {
 /* Y con la pantalla despejada el botón dice que lo está: el mismo trato que
    `aria-pressed` le da al resto de los redondos. */
 .valley-bare[aria-pressed="true"] { color: var(--skin-ink); }
+/* El altavoz dibuja las dos cosas y enseña una: sonando, o en silencio con su
+   aspa, según `aria-pressed` (`app.ts`); en silencio, además, atenuado. Con la
+   pantalla despejada se queda en tenue a la derecha del todo, como lo pidió
+   el dueño del diseño en UI-V10b: sigue ahí para quien quiera callar el valle
+   sin volver a sacar la interfaz. */
+.valley-sound[aria-pressed="true"] .valley-sound-off,
+.valley-sound[aria-pressed="false"] .valley-sound-on { display: none; }
+.valley-sound[aria-pressed="false"] { color: var(--skin-ink-faded); }
+html.bare .valley-sound { opacity: .4; }
 
 /* ---------------------------------------------------- la voz, en la bandeja */
 

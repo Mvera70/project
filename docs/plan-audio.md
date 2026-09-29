@@ -1,14 +1,56 @@
 # Plan maestro de audio
 
 **Fecha de registro:** 18 de septiembre de 2026
-**Estado:** inventario en curso; hay una propuesta aprobada para el ambiente
-principal, pendiente de que su fichero fuente esté disponible e integrado. El
-resto de piezas sigue pendiente de producción y aprobación.
+**Estado (29 sep 2026):** **la interfaz suena** —los veinte momentos de §4.2
+y §4.7 que tienen disparador, fabricados por `tools/ui/sounds.py` e integrados
+(`design.md` §11.10)—, pendiente de que Vera escuche las variantes y elija. El
+ambiente, la economía, el mundo, los sucesos y el asedio siguen pendientes, y
+la síntesis en vivo que §1 describe **ya no existe**: se retiró el 24 sep.
 
 Este documento reúne el audio que necesita toda la aplicación: ambiente del
 mapa, respuesta de interfaz, economía, vida de la aldea, hitos, fases y el
 asedio que completa la meta de `design.md` §1b. Es una lista de producción, no
 una orden de integrar todo a la vez.
+
+## La interfaz, integrada · 29 de septiembre de 2026
+
+Vera eligió el 29 sep que los ficheros los fabrique Claude, **fuera del
+juego**, y que suene la interfaz entera: portada, navegación, reloj,
+decisiones, medios, ofertas e hitos; botón de silencio en el valle y en la
+portada; sonando por omisión. Lo que entró:
+
+- **Veinte ficheros** en `public/audio/` (MP3 mono de 32 kHz, 204 KB en
+  total): los dieciséis `ui_` de §4.2 menos `ui_chronicle_page` —la crónica
+  no pasa páginas, es una lista que se desplaza— y cuatro `stinger_` de §4.7
+  (menor, mayor, década y siglo). `stinger_new_peak` suena como un hito menor,
+  y el trueno sigue sin fichero.
+- **Cómo se hacen:** `tools/ui/sounds.py`, síntesis modelada. **La primera
+  pasada (marimba apagada, cuerda de tripa, bronce agudo) Vera la descartó
+  entera**: sonaba roma. Se probaron cuatro tandas de un solo botón y cada una
+  dejó una lección: la madera saturada crujía, los chasquidos afilados sonaban
+  a ratón, y las **notas afinadas y agudas** (gota, marimba, kalimba, laúd) le
+  sonaron «infantil, de niños pequeños» —un tono puro entre 600 y 1300 Hz con
+  cola es una caja de música—. Lo que le gustó fue el **foley de materiales**:
+  piedra sobre madera, cofre, cuero con hebilla y sello de cera; el tambor, no.
+  Así que **ningún sonido de la interfaz tiene una nota afinada** salvo las
+  campanas de los hitos, que son de bronce y graves. Cada material tiene su
+  papel, para que la interfaz se aprenda de oído: piedra sobre madera para los
+  toques (pestañas, personas, reloj), cofre para abrir y cerrar, cuero para lo
+  que llega y se contesta (ofertas), cera para lo que se decide y se acepta,
+  madera hueca para la pregunta y la negativa, campana para el tiempo que
+  pasa. Todo nivelado en la banda de 350 Hz a 6 kHz —lo que un móvil da— y
+  sin nada por encima de 4,8 kHz. Es lo que Vera reprochó a la toma de
+  Mirelo («demasiado flojo») corregido antes de oírlo.
+- **Tres variantes de cada uno** para escuchar: *a* de referencia, *b* dos
+  semitonos más grave, más oscura y seca, *c* dos más aguda, algo más clara y
+  con más sala. En el juego suenan todas en *a* hasta que Vera elija; cambiar
+  es una letra en `CHOSEN` y volver a lanzar la herramienta.
+- **Cuándo suena cada uno** está en `design.md` §11.10; comprobado con clics
+  reales por `tools/ui/sound-check.mjs` (20 de 20 pasos).
+
+Lo que **no** se hizo, a propósito: ninguna capa de ambiente (§4.1), nada de
+economía por existencias (§4.3), ni sonido de medio por objeto (§4.4): no eran
+interfaz, y el ambiente es lo que resultó incómodo.
 
 ## Ambiente aprobado, pendiente de integración · 19 de septiembre de 2026
 
@@ -27,6 +69,13 @@ Cuando se recupere el fichero fuente, deberá cargarse al armar el
 `AudioContext`, repetirse en bucle y cruzarse con el lecho sintético sin cortar
 los acentos. Hasta entonces `src/ui/sound.ts` conserva el ambiente Web Audio
 existente y el plan no declara una integración terminada.
+
+> **29 sep 2026 · Este apartado es historia.** La síntesis en vivo que describe se
+> retiró el 24 sep, y los cambios de era ya existen en el estado. **El análisis
+> vigente del sonido del mundo —ambiente, naturaleza, vida, sucesos, caza y
+> asedio, contrastado con el código— está en
+> [`plan-audio-mundo.md`](plan-audio-mundo.md)**, que corrige los desfases de
+> §4.1 a §4.8 (qué se pide y no existe, qué existe y no se pide).
 
 ## 1. De dónde se parte
 
@@ -347,6 +396,9 @@ familia.
 | 18 sep 2026 | `ui_panel_open` | Higgsfield / Mirelo | `d3daec51-5c35-426a-8d22-84d3d0028087` | 0,5 | Prompt canónico; pendiente de escucha y prueba dentro del juego |
 | 18 sep 2026 | `ui_panel_open` | Higgsfield / Mirelo | `41230658-daff-4d8d-b93f-de731eaa790a` | 0,5 | Segundo intento: ataque y presencia de gama media reforzados; pendiente de escucha |
 | 18 sep 2026 | `amb_birds_sparse_day` | Higgsfield / Seed Audio 1.0 | `18e505fc-ba53-4a60-8b8f-86117b1f4ca9` | 2,7 | Prompt original, sin cambios; pendiente de escucha |
+| 29 sep 2026 | los 16 `ui_` con disparador y 4 `stinger_` | Síntesis propia, `tools/ui/sounds.py`, primera pasada (madera con fieltro, cuerda, bronce agudo) | variantes a/b/c | 0 | **Descartada por Vera**: «no me gusta ninguna» |
+| 29 sep 2026 | un botón, cuatro tandas de prueba (seis, cinco, cinco y cinco candidatos) | Síntesis propia | — | 0 | Madera saturada, chasquidos y notas afinadas descartados («infantil»); **gustó el foley de materiales** (piedra sobre madera, cofre, cuero, cera), no el tambor |
+| 29 sep 2026 | los mismos veinte, ahora con materiales y sin notas afinadas | Síntesis propia, `tools/ui/sounds.py` | variantes a/b/c | 0 | Integrados en *a*; la dirección gustó («magnífico»), pendiente de elegir variante |
 
 ## 8. Prompts canónicos de producción
 

@@ -1,6 +1,7 @@
 // G-01 · Public boundary between the simulation, presentation owner and 3D renderer.
 
 import type { GraphicsSettings } from './profile';
+import type { SkyKind } from '../derive/weather';
 import type { GameState, PlayerAct, Role, VillagerId } from '../engine/state';
 import type { ClipName } from './clips';
 import type { Occupation } from './world/models';
@@ -400,7 +401,10 @@ export interface GraphicsStats {
    * el renderer sepa que existe el sonido, y lo que permite comprobar una
    * tormenta desde fuera igual que `sunPhase` permite comprobar el reloj.
    */
-  readonly sky: string;
+  // `SkyKind` y no `string` desde el 29 sep 2026: el lecho de ambiente elige
+  // capa según el cielo (`ui/ambience.ts`) y con una cadena suelta un cielo
+  // mal escrito habría sido silencio en vez de un fallo de compilación.
+  readonly sky: SkyKind;
   readonly bolts: number;
   /** Punto 3 · árboles atenuados delante del encuentro del portón. */
   readonly revealedTrees: number;

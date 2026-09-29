@@ -2719,11 +2719,14 @@ export const MILESTONES = {
 } as const;
 
 // ---------------------------------------------------------------------------
-// `src/ui/sound.ts` — el hueco del audio (24 sep 2026)
+// `src/ui/sound.ts` — el sonido de la interfaz (29 sep 2026)
 //
-// El sonido sintetizado de U-09 se retiró: Vera lo oyó y lo cortó («el audio
-// es malísimo, el de fondo es hasta incómodo»). Queda sólo lo que vale para
-// cualquier audio que llegue en ficheros: el fusible entre dos acentos.
+// El sonido sintetizado en vivo de U-09 se retiró el 24 sep: Vera lo oyó y lo
+// cortó («el audio es malísimo, el de fondo es hasta incómodo»). Desde el 29
+// suenan ficheros fabricados fuera del juego (`tools/ui/sounds.py`). Aquí van
+// los números de la reproducción, no los de los sonidos: el nivel de cada uno
+// ya viene horneado en su fichero. Presentación, como BURNING y DAY: no mueve
+// una cifra del juego.
 // ---------------------------------------------------------------------------
 
 export const SOUND = {
@@ -2734,4 +2737,87 @@ export const SOUND = {
   // instant. Wall clock on purpose: it guards a playback artefact, not
   // something that happened in the game.
   ACCENT_MIN_GAP_MS: 2_500,
+  // TUNE: the minimum real time between two plays of the **same** interface
+  // sound. A thumb that taps the speed strip four times in a second should
+  // hear four ticks; the same button bounced twice in one frame by a click and
+  // its synthetic twin should hear one. 70 ms is under the ~100 ms a person
+  // can tap twice, and over a frame and a half at 60 fps.
+  TAP_MIN_GAP_MS: 70,
+  // TUNE: how late a sound may still start when its file had not finished
+  // decoding at the moment of the tap. The first tap of a session wakes the
+  // audio context and the decode runs after it; a sound that arrives a quarter
+  // of a second late still reads as the answer to that tap, and one that
+  // arrives later reads as a glitch, so it is dropped.
+  LATE_PLAY_MS: 250,
+  // TUNE: the master gain over files already levelled in the phone band
+  // (`tools/ui/sounds.py`, `LEVEL`). Under one on purpose: a background idle
+  // must never be the loudest thing on the phone.
+  MASTER_GAIN: 0.8,
+  // TUNE: the speed tick climbs a whole tone per step (×1, ×4, ×16, ×64), so
+  // four speeds are four pitches of one wooden ratchet (plan-audio §8.1,
+  // `ui_speed_change`: «designed to be pitch-shifted slightly for the four
+  // speed settings»). A playback rate, so pitch and length move together.
+  SPEED_RATES: { 1: 1, 4: 1.122, 16: 1.26, 64: 1.414 },
+
+  // ---- el ambiente del mundo (fase 1, 29 sep 2026) ----
+
+  // TUNE: cuánto tarda una capa de ambiente en llegar a su volumen nuevo, en
+  // ganancia por segundo. Un cambio de cielo no puede ser un corte, y tampoco
+  // una nube de dos minutos: a 0,4 una capa entra o sale en dos segulos y
+  // medio, que es lo que tarda la lluvia en verse del todo en pantalla.
+  AMBIENCE_EASE: 0.4,
+  // TUNE: a partir de qué velocidad el mundo es un avance rápido. Una jornada
+  // dura 120 s a ×1 y 7,5 s a ×16: por ahí el cielo ya cambia más deprisa de
+  // lo que una capa puede cruzar, así que sólo quedan los lechos y apagados.
+  AMBIENCE_FAST_SPEED: 16,
+  // TUNE: cuánto se apaga el ambiente en ese avance rápido. No cero, porque el
+  // valle mudo a ×64 parece roto; no uno, porque parpadearía.
+  AMBIENCE_FAST_GAIN: 0.35,
+  // TUNE: a cuántas celdas de la cámara una fuente deja de oírse. Medio mapa
+  // (el corazón mide 36 × 56) para el río y el fuego: más allá, lo que se ve
+  // es un valle entero y ninguna fuente manda.
+  AMBIENCE_REACH_CELLS: 30,
+  // TUNE: la altura de vista (en celdas visibles) a la que una fuente suena de
+  // cerca y a la que ya es paisaje. Con 8 la cámara está encima de una casa y
+  // con 92 se ve el valle entero (`camera.ts`); 26 es la altura de reposo.
+  AMBIENCE_NEAR_HEIGHT: 14,
+  AMBIENCE_FAR_HEIGHT: 60,
+  // TUNE: la velocidad del sonido **del valle**, en celdas por segundo, para
+  // que el trueno llegue después del rayo por la distancia real y no por una
+  // tirada (§10.7). No son los 114 celdas/s del aire de verdad: con ésos el
+  // rayo más lejano del corazón sonaría a 0,6 s y el retardo no se sentiría.
+  // El corazón mide 36 × 56 celdas (`tiles.ts`), o sea 66,6 de esquina a
+  // esquina; con 31 ese rayo tarda 2,15 s, justo por debajo de los 2,2 s que
+  // era el tope del retardo aleatorio que esto sustituye, y uno a diez celdas
+  // ronda el tercio de segundo. Es una licencia, y es la que hace que una
+  // tormenta se sienta lejos o encima.
+  THUNDER_CELLS_PER_SECOND: 31,
+  // TUNE: a cuántas celdas deja de oírse el latigazo y el trueno pasa a ser un
+  // retumbar (cerca → medio) y luego sólo cola (medio → lejos). Un tercio y
+  // dos tercios del alcance del corazón del valle.
+  THUNDER_NEAR_CELLS: 22,
+  THUNDER_MID_CELLS: 44,
+
+  // ---- la vida del fondo (fase 2, 29 sep 2026) ----
+
+  // TUNE: **cuánta gente hace falta para que la aldea suene a aldea, y a
+  // pueblo.** Sale de medir, no de la cabeza: `founding-report.ts` sobre las
+  // semillas 7, 23, 42, 108, 999 y 2024 da 6–13 personas el primer año,
+  // 20–39 el quinto, 21–54 en la primera década y 50–80 en un valle maduro
+  // (el tope es 80: 16 casas × 5). Así que el rumor entra en cuanto hay más
+  // que las dos familias del principio, llena hacia las veinte, y el segundo
+  // lecho —el que hace que se solapen los golpes— sube desde la treintena y
+  // llena donde llegan los valles buenos.
+  MURMUR_SPARSE_FROM: 4,
+  MURMUR_SPARSE_FULL: 18,
+  MURMUR_BUSY_FROM: 28,
+  MURMUR_BUSY_FULL: 60,
+
+  // TUNE: la fuerza del viento por cielo, de 0 a 1. **Vive aquí y no en el
+  // renderer porque la leen dos capas**: el meneo de las hojas
+  // (`render3d/effects/wind.ts`) y el lecho de viento (`ui/ambience.ts`), y
+  // dos tablas iguales en dos sitios es la segunda verdad que mañana se queda
+  // atrás. Con 0 el bosque se ve de piedra; con 1 a cielo claro parece
+  // tormenta siempre.
+  WIND_BY_SKY: { clear: 0.3, overcast: 0.45, rain: 0.6, storm: 1, snow: 0.25 },
 } as const;

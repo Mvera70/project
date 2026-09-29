@@ -14,7 +14,7 @@ import './redesign/shell.css';
 // UI-W · la piel de madera, piedra y pergamino del mockup del 24 sep. Va la
 // última: es la capa que viste encima de las otras tres.
 import './redesign/wood.css';
-import { SKY, TIME } from '@engine/balance';
+import { BURNING, SKY, SOUND, TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import { burnBuilding } from '@engine/world/buildings';
@@ -39,6 +39,7 @@ import { labelPanel, type LabelPanel } from './redesign/label';
 import { peoplePanel } from './redesign/people-panel';
 import { createShell } from './redesign/shell';
 import type { SheetRoute, UiActions, UiPanel, UiSnapshot } from './redesign/contracts';
+import type { GraphicsStats } from '../render3d/contracts';
 import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom, type BackendHandle } from './backend';
 import { persistSave } from './idb';
@@ -54,7 +55,12 @@ import { chroniclePanel, closeChronicle } from './screens/chronicle';
 import { closeCrossroad, isDeferred, openCrossroad, openDeferred } from './screens/crossroad';
 import { openEpitaph } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
-import { accentFor, createSoundEngine } from './sound';
+import { accentFor, playerAnswer, routeCue, sound, speedCue } from './sound';
+import { cellsBetween, mixFor, riverCellsFrom, thunderFor, type WorldSound } from './ambience';
+import { valleyAxis } from '@engine/world/valley-road';
+import { floodOf } from '@derive/flood';
+import { festivityOf } from '@derive/festivity';
+import { population } from '@engine/people/demography';
 import { openWelcome } from './welcome';
 import { devPreference, startDevHud, type DevHud } from './dev-hud';
 import { mountCameraControls, type CameraControls } from './camera-controls';
@@ -355,7 +361,14 @@ export function boot(
   let trackedId: number | null = null;
 
   const actions: UiActions = {
-    navigate,
+    // El sonido de la navegación va aquí y no dentro de `navigate`: esto es
+    // lo que llama quien toca, y `navigate` también lo llama el juego —la
+    // encrucijada que cierra la hoja para abrirse— sin que nadie haya tocado.
+    navigate(route) {
+      const cue = routeCue(currentRoute.kind, route.kind);
+      if (cue !== null) sound.tap(cue, Date.now());
+      navigate(route);
+    },
     // VZ-6 · la lectura que la línea «Today» de la ficha necesitaba: lo que
     // hace ese cuerpo **en el fotograma que se está viendo**, preguntado a la
     // capa de vida y no adivinado del motor.
@@ -380,10 +393,19 @@ export function boot(
     },
     // §7.15 · mandar gente del tablón: la misma cola de actos que un medio.
     expedition(mission, count): void {
+      // El tablón sólo deja mandar a quien se puede mandar (`board.ts`), así
+      // que el envío ya es la respuesta: suena al tocar.
+      sound.tap('ui_action_success', Date.now());
       pendingActs.push({ kind: 'expedition', mission, count });
       if (speed !== 0) { runTick(); paint(lastFraction); }
     },
-    setSpeed(value): void { app.setSpeed(value); },
+    setSpeed(value): void {
+      // El jugador, y sólo él: la caza y el final también cambian la
+      // velocidad (`app.setSpeed`) y no suenan.
+      const change = speedCue(speed, value);
+      if (change !== null) sound.tap(change.cue, Date.now(), change.rate);
+      app.setSpeed(value);
+    },
     // UI-R2 · la única escritura que un panel puede hacer sobre las órdenes
     // (`contracts.ts`), y desde esta ronda el único sitio donde se aplica la
     // respuesta de §11.6: antes vivía repetida en el manejador de clic de
@@ -442,9 +464,35 @@ export function boot(
   const people = peoplePanel(actions);
   const shell = createShell(actions);
 
-  // El audio: un hueco para ficheros, hoy en silencio (`sound.ts`). Sin botón
-  // mientras no haya nada que sonar.
-  const sound = createSoundEngine();
+  /**
+   * **El botón de silencio**, de vuelta con los sonidos (29 sep 2026). El
+   * reproductor es uno para toda la página (`sound.ts`), porque la portada
+   * suena antes de que exista el valle; éste es su interruptor en el valle, y
+   * `title.ts` tiene el suyo. Es el mismo altavoz dibujado de U-09: las dos
+   * versiones —sonando y en silencio— van en el DOM y el CSS enseña una u
+   * otra según `aria-pressed`, nunca cambia el texto.
+   */
+  const soundToggle = document.createElement('button');
+  soundToggle.type = 'button';
+  soundToggle.className = 'valley-sound hud-round-btn skin-plate skin-plate--round';
+  soundToggle.innerHTML = '<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" focusable="false"'
+    + ' fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M3 6.3v3.4h2.3L8.6 12.2V3.8L5.3 6.3z"/>'
+    + '<path class="valley-sound-on" d="M10.7 5.3c1 .9 1 4.5 0 5.4"/>'
+    + '<path class="valley-sound-on" d="M12.5 3.6c2 1.8 2 6.9 0 8.7"/>'
+    + '<path class="valley-sound-off" d="M10.8 5.6 14.2 10.4M14.2 5.6 10.8 10.4"/>'
+    + '</svg>';
+  const paintSoundToggle = (): void => {
+    soundToggle.setAttribute('aria-pressed', String(sound.enabled));
+    soundToggle.setAttribute('aria-label', renderUiText(sound.enabled ? 'app.sound.on' : 'app.sound.off'));
+  };
+  soundToggle.addEventListener('click', () => {
+    sound.setEnabled(!sound.enabled);
+    // Encenderlo se oye: es la única forma de saber que ha funcionado.
+    if (sound.enabled) sound.tap('ui_resume', Date.now());
+    paintSoundToggle();
+  });
+  paintSoundToggle();
 
   /**
    * UI-V10 · **Despejar la pantalla: sólo el valle.**
@@ -584,7 +632,7 @@ export function boot(
   hudRight.className = 'valley-hud-right hud-speed-corner';
   cameraControls?.dispose();
   cameraControls = mountCameraControls(() => backend.live, () => backend.live.surface);
-  hudRight.append(bareToggle, hud.speedControls, hud.speedBadge);
+  hudRight.append(bareToggle, soundToggle, hud.speedControls, hud.speedBadge);
 
   root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, woodGains.element, shell.element);
 
@@ -834,15 +882,34 @@ export function boot(
       // qué—, así que lo que hace es contar los rayos; aquí se mira cuánto ha
       // subido la cuenta y se truena. Con retardo, porque el sonido va más
       // despacio que la luz y ese retardo es lo que hace que una tormenta se
-      // sienta lejos o encima. Cuánto exactamente lo decide `Math.random`, y
-      // es legítimo porque es decorado del navegador,
+      // sienta lejos o encima.
+      //
+      // **Y desde el 29 sep 2026, por la distancia y no por una tirada.** El
+      // renderer deja dónde cayó (`data-bolt-at`) y aquí se mide contra dónde
+      // se está mirando: un rayo encima chasquea casi a la vez, y uno al otro
+      // lado del valle tarda dos segundos y llega hecho un retumbar
+      // (`ambience.ts`, `thunderFor`). Sigue siendo decorado del navegador y
       // no una tirada de la partida (§4.3).
       if (stats.bolts > lastBolts) {
         lastBolts = stats.bolts;
-        const [near, far] = SKY.THUNDER_DELAY;
-        const delay = (near + Math.random() * (far - near)) * 1000;
-        window.setTimeout(() => sound.accent('thunder', Date.now()), delay);
+        const where = document.documentElement.dataset.boltAt?.split(',').map(Number);
+        const cells = where !== undefined && where.length === 2 && where.every(Number.isFinite)
+          ? cellsBetween({ x: where[0]!, z: where[1]! }, stats.viewCentre)
+          // Sin sitio, se trata como un rayo a media distancia: el aviso
+          // importa más que la precisión.
+          : SKY.THUNDER_DELAY[1] * SOUND.THUNDER_CELLS_PER_SECOND / 2;
+        const { cue, delaySeconds } = thunderFor(cells);
+        // El latigazo va con el destello y el trueno después: es lo que hace
+        // que se lean como una misma cosa lejos o encima.
+        if (cue === 'weather_thunder_near') sound.accent('weather_lightning_crack', Date.now());
+        window.setTimeout(() => sound.accent(cue, Date.now()), delaySeconds * 1000);
       }
+      // **El fondo del mundo** (fase 1): lo que suena se decide en
+      // `ambience.ts`, que es puro; aquí sólo se recoge cómo está el valle.
+      const nowMs = Date.now();
+      const dtSeconds = lastAmbienceMs === null ? 0 : (nowMs - lastAmbienceMs) / 1000;
+      lastAmbienceMs = nowMs;
+      sound.ambience(mixFor(worldSound(stats)), dtSeconds);
     }
     // UI-R2 · hora, fecha, tira, tendencias, actividad y resumen de órdenes:
     // todo lo que antes eran quince líneas sueltas por fotograma es ahora una
@@ -929,6 +996,9 @@ export function boot(
       if (spokenOffer !== null) { voice = clearOffer(voice); spokenOffer = null; }
     } else if (spokenOffer !== waiting.postedTick) {
       say('offer', offerLine(waiting));
+      // Alguien llega por el camino: la campanilla, salvo en un letargo, que
+      // es cuando la voz tampoco lo dice.
+      if (!catchingUp) sound.accent('ui_offer_arrives', Date.now());
       spokenOffer = waiting.postedTick;
     }
     const nowMs = Date.now();
@@ -1083,10 +1153,66 @@ export function boot(
   /** El lienzo que hay delante ahora mismo, para medir contra su caja. */
   const surface = (): HTMLCanvasElement => backend.live.surface;
 
+  /** El reloj de pared del último cruce de ambiente: los fundidos van en segundos reales. */
+  let lastAmbienceMs: number | null = null;
+
+  /**
+   * Cómo está el valle, para el fondo. Todo sale de sitios que ya existían —el
+   * estado del motor y lo que el renderer publica por fotograma—: **ni un
+   * gancho nuevo y ni una tirada**, que es lo que §4.3 exige de cualquier cosa
+   * que viva en esta capa.
+   *
+   * Lo que **no** sabe todavía, y por eso va a `null`: dónde caen las cascadas
+   * (hace falta la altura del terreno, que sólo tiene el renderer). Queda
+   * apuntado en `plan-audio-mundo.md`.
+   */
+  const worldSound = (stats: GraphicsStats): WorldSound => {
+    const view = stats.viewCentre;
+    // Las casas que arden: la marca del motor (`burnt:<id>`) con su sitio, que
+    // los edificios ya llevan. En qué día va el fuego lo publica el propio
+    // renderer (`data-fire-days`), así que la llama y las brasas se separan
+    // sin preguntarle nada nuevo. Con más de un incendio a la vez —raro— el
+    // día es el del primero y la distancia la del más cercano.
+    let nearest: number | null = null;
+    for (const building of state.buildings) {
+      if (building.lostTick === null) continue;
+      const until = state.flags[`burnt:${building.id}`];
+      if (until === undefined || until <= state.tick) continue;
+      const cells = cellsBetween(
+        { x: building.x + building.w / 2, z: building.y + building.h / 2 }, view,
+      );
+      if (nearest === null || cells < nearest) nearest = cells;
+    }
+    const days = Number(document.documentElement.dataset.fireDays ?? '');
+    const flaming = !Number.isFinite(days) || days < BURNING.FLAME_DAYS;
+    return {
+      sky: stats.sky,
+      season: seasonOf(state.tick),
+      speed,
+      catchingUp,
+      hidden: document.hidden,
+      flood: floodOf(state),
+      riverCells: riverCellsFrom(view, (z) => valleyAxis(state.map, z), state.map.height),
+      waterfallCells: null,
+      flameCells: flaming ? nearest : null,
+      emberCells: flaming ? null : nearest,
+      viewHeight: stats.viewHeight,
+      phase: stats.sunPhase,
+      people: population(state),
+      // **El corazón de la aldea es la plaza**, que se guarda fija desde la
+      // fundación (esquema 8). Se probó con la media de los edificios en pie y
+      // salió el mismo fallo que esa decisión ya cuenta: la media **se mueve
+      // sola** mientras la aldea crece —y con una muralla o una atalaya se va
+      // del pueblo—. Medido con el recorrido: en un valle del año 30 el
+      // bullicio se apagaba entero por eso.
+      villageCells: cellsBetween({ x: state.plaza.x, z: state.plaza.y }, view),
+      festivity: festivityOf(state) !== null,
+    };
+  };
+
   root.addEventListener('pointerdown', (event) => {
-    // El audio sólo se arma con el primer toque: antes el navegador no deja
-    // sonar nada.
-    sound.arm();
+    // El audio se arma con el primer toque de la página (`installSound`, en
+    // `main.ts`), no aquí: la portada suena antes de que exista este lienzo.
     if (!onValley(event)) return;
     root.setPointerCapture(event.pointerId);
     if (event.pointerType === 'mouse' && (event.button === 1 || event.button === 2)) {
@@ -1457,6 +1583,11 @@ export function boot(
     // M-0 · si la oferta no se pudo pagar, se dice y se deja en pie: es la
     // única respuesta de la aldea que el jugador no puede deducir mirando.
     if (report.offer?.refused === true) say('event', renderUiText('offer.cannot'));
+    // Y lo que el jugador hizo, contestado. Suena la respuesta del motor y no
+    // el toque, porque sólo el motor sabe si se pudo: un medio que no se puede
+    // pagar, una oferta sin con qué, una corona que la aldea no acepta.
+    const answered = playerAnswer(report);
+    if (answered !== null) sound.tap(answered, Date.now());
     // Rule 4 (§2.60): the engine hands back what changed and where; `document`
     // and not `root` because the crossroad screen mounts on `document.body`
     // (§11.2's "ocupa la pantalla entera"), outside the app's own root.
@@ -1486,8 +1617,8 @@ export function boot(
       // letargo (`catchingUp` es `false` aquí siempre, por construcción de
       // este bloque) y `sound.accent` aplica el fusible de reloj de pared de
       // §11.4 antes de sonar de verdad.
-      const kind = accentFor(report.posed, best !== undefined, catchingUp);
-      if (kind !== null) sound.accent(kind, Date.now());
+      const cue = accentFor(report.posed, best ?? null, catchingUp);
+      if (cue !== null) sound.accent(cue, Date.now());
       if (best !== undefined) {
         // **Una voz, y es la del aviso.**
         //

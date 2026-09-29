@@ -26,6 +26,7 @@ import { yearOf } from '@engine/time';
 import { nextUnusedSeed } from '../app';
 import { devPreference, setDevPreference } from '../dev-hud';
 import { retireOverlay } from '../motion';
+import { sound } from '../sound';
 import { ORNAMENT_VIEWBOX, YEAR_FLOURISH } from '../redesign/chronicle-ornaments';
 import { currentLocale, loadLocale, setSavedLocale } from '../locale';
 import { openAnnals } from './annals';
@@ -198,12 +199,12 @@ const STYLE = `
    para quien juega. */
 .title-bottom { display: flex; align-items: center; justify-content: space-between;
   gap: 8px; margin-top: 4px; }
-.title-dev { min-width: var(--ui-tap-min); min-height: var(--ui-tap-min); padding: 0 10px; border: 0;
+.title-sound, .title-dev { min-width: var(--ui-tap-min); min-height: var(--ui-tap-min); padding: 0 10px; border: 0;
   background: transparent; color: var(--skin-ink-faded); cursor: pointer;
   font: 400 11px/1 var(--skin-font-voice); letter-spacing: var(--skin-track-label);
   text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
-.title-dev[aria-pressed="true"] { color: var(--skin-ochre); }
-.title-dev:focus-visible {
+.title-sound[aria-pressed="true"], .title-dev[aria-pressed="true"] { color: var(--skin-ochre); }
+.title-sound:focus-visible, .title-dev:focus-visible {
   outline: 2px solid var(--skin-gold); outline-offset: 2px; }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -374,6 +375,8 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   const finish = (choice: TitleChoice, button: HTMLButtonElement): void => {
     if (done) return;
     done = true;
+    // Empezar un valle y volver a uno suenan distinto: volver es más discreto.
+    sound.tap(choice.kind === 'continue' ? 'ui_title_continue' : 'ui_title_begin', Date.now());
     const originalLabel = button.textContent;
     const preparingYear = choice.kind === 'new' && choice.year > 1;
     const close = (): void => {
@@ -582,7 +585,8 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   annals.className = 'title-annals';
   annals.textContent = renderUiText('title.annals');
   annals.addEventListener('click', () => {
-    openAnnals(save, () => { annals.focus(); });
+    sound.tap('ui_panel_open', Date.now());
+    openAnnals(save, () => { sound.tap('ui_panel_close', Date.now()); annals.focus(); });
   });
 
   // Y las opciones gráficas (29 sep 2026, Vera: «un botón para abrir un menú
@@ -593,7 +597,8 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   graphics.className = 'title-annals title-graphics';
   graphics.textContent = renderUiText('title.graphics');
   graphics.addEventListener('click', () => {
-    openGraphics(() => { graphics.focus(); });
+    sound.tap('ui_panel_open', Date.now());
+    openGraphics(() => { sound.tap('ui_panel_close', Date.now()); graphics.focus(); });
   });
   const links = document.createElement('div');
   links.className = 'title-links';
@@ -601,7 +606,31 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
 
   const bottom = document.createElement('div');
   bottom.className = 'title-bottom';
-  bottom.append(language, dev);
+  // El silencio, junto al idioma: la misma preferencia que el botón del valle
+  // (`valley.sound`) y el mismo altavoz dibujado; lo que dice va en el nombre
+  // accesible, del banco. Encenderlo suena, que es como se sabe que funciona.
+  const soundButton = document.createElement('button');
+  soundButton.type = 'button';
+  soundButton.className = 'title-sound';
+  const paintSound = (): void => {
+    const on = sound.enabled;
+    soundButton.setAttribute('aria-pressed', String(on));
+    soundButton.setAttribute('aria-label', renderUiText(on ? 'app.sound.on' : 'app.sound.off'));
+    soundButton.innerHTML = '<svg viewBox="0 0 16 16" width="22" height="22" aria-hidden="true" focusable="false"'
+      + ' fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+      + '<path d="M3 6.3v3.4h2.3L8.6 12.2V3.8L5.3 6.3z"/>'
+      + (on
+        ? '<path d="M10.7 5.3c1 .9 1 4.5 0 5.4"/><path d="M12.5 3.6c2 1.8 2 6.9 0 8.7"/>'
+        : '<path d="M10.8 5.6 14.2 10.4M14.2 5.6 10.8 10.4"/>')
+      + '</svg>';
+  };
+  soundButton.addEventListener('click', () => {
+    sound.setEnabled(!sound.enabled);
+    if (sound.enabled) sound.tap('ui_resume', Date.now());
+    paintSound();
+  });
+  paintSound();
+  bottom.append(language, soundButton, dev);
 
   actions.append(seedRow, hint, devRow, begin, links, bottom);
   const sheet = document.createElement('div');

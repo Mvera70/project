@@ -15,6 +15,7 @@
 // siempre), y a esta distancia no se nota.
 
 import type { Material } from 'three';
+import { SOUND } from '@engine/balance';
 import type { SkyKind } from '../../derive/weather';
 
 const uniforms = {
@@ -23,12 +24,12 @@ const uniforms = {
 };
 
 /**
- * TUNE: cuánto se mece según el cielo, de 0 a 1. Con 0 el bosque se ve de
- * piedra; con 1 a cielo claro parece tormenta siempre.
+ * Cuánto se mece según el cielo, de 0 a 1. **La tabla vive en `SOUND`**
+ * (`balance.ts`) desde el 29 sep 2026, porque el lecho de viento del ambiente
+ * lee la misma: el bosque y el sonido tienen que estar de acuerdo sobre si
+ * hace viento, y dos tablas iguales en dos sitios no lo garantizan.
  */
-const STRENGTH: Readonly<Record<SkyKind, number>> = {
-  clear: 0.3, overcast: 0.45, rain: 0.6, storm: 1, snow: 0.25,
-};
+const STRENGTH: Readonly<Record<SkyKind, number>> = SOUND.WIND_BY_SKY;
 /** TUNE: celdas de desplazamiento por celda² de altura, a fuerza 1. */
 const BEND = 0.05;
 

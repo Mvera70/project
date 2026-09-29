@@ -307,3 +307,27 @@ Lo que la tanda dejó a medias, y lo que se hizo después el mismo día:
   cabeza gacha y un tiritón. Nadie espera ante una puerta, de casa o de obrador.
 - **Los charcos no salpican ni reflejan de verdad**: son discos grises lisos
   (`effects/puddles.ts`). Un mapa de entorno los haría espejos.
+
+## El sonido del mundo destapó estos huecos de imagen (29 sep 2026)
+
+Al inventariar qué suena y qué no (`plan-audio-mundo.md`) aparecieron cosas que
+el motor sabe y la pantalla no enseña. Un sonido sin imagen es un fantasma, así
+que quedan apuntadas aquí, con lo que su sonido esperaría:
+
+| Falta | Qué hay hoy | Sonido que esperaría |
+|---|---|---|
+| **Forja viva** | Yunque, hogar y chimenea modelados y **estáticos**; sin humo, sin brillo, sin golpes: la herrera usa el gesto genérico `hammer`. `Building.lit` no lo lee ningún código 3D | Golpes de yunque, fuelle |
+| **Molino de viento** | Aspas, cubo y eje modelados; **no giran** | Aspas y grano |
+| **Marcador de impacto del martillo** | El gesto `hammer` (1,6 s) no tiene marca de impacto, a diferencia de `chop` y `mine` | Martillazos de obra |
+| **Campana de la capilla** | Campanario y campana modelados, **ninguna acción la toca** | Campana (§6, decisión) |
+| **Pozo con vida** | Manivela, cuerda y cubo modelados y estáticos; el aldeano bebe con un vaso | Polea y cubo |
+| **Nacer, morir, funeral** | Aparecen y desaparecen en el relevo, sin escena. `mourn` está declarado y no servido (`staging.ts:41`) | Campana única, cuna |
+| **Cuerno de aviso del asedio** | Un aldeano que corre a avisar; ningún cuerno | Cuerno lejano |
+| **Caballo y carro con ruedas** | El factor llega a pie con una mula; el carro es un prop quieto | Cascos, ruedas |
+| **Yunque en la fiesta / música del juglar** | El juglar llega y habla; no toca nada | Música (fuera del alcance) |
+| **`roof_under_snow`** | El suceso no tiene ningún efecto visible | Crujido y descarga de nieve |
+| **Charcos que salpican** | La lluvia cae sobre los charcos sin marca | Gotas |
+| **Flecha que se clava en madera o piedra** | La flecha se para y se queda 8 s; no sabe en qué | Impacto por material |
+| **Coop, pocilga, mercado** | No existen como edificios (los animales van libres, el mercado son puestos de visita) | — |
+| **Dónde caen las cascadas** | Existen (hasta tres: dos gargantas y una al lago) y **el sonido no sabe dónde están**: `waterfallSites` necesita la altura del terreno, que sólo tiene el renderer. El lecho `amb_waterfall` está fabricado y hoy nunca suena | La cascada, por proximidad |
+| **En qué día va cada fuego** | `data-fire-days` publica el del **primero**, así que con dos incendios a la vez el sonido usa el día de uno y la distancia de otro. Raro, pero escrito | Llama contra brasas, por incendio |
