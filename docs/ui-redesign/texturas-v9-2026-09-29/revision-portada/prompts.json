@@ -1,0 +1,28 @@
+[
+  {
+    "id": "title-valley",
+    "generator": "ImageGen integrado",
+    "prompt": "Create ONE production game illustration background, portrait 390:844 aspect, target 780x1688 PNG. The Valley is a grounded medieval village simulation for adults. A beautifully painted full-colour storybook frontispiece on warm pale ivory vellum, soft hand-painted outlines, believable small medieval village, not childish, no photorealism, no 3D. The TOP 23% is quiet pale blue morning sky and soft ivory clouds, ample clean negative space for an existing game logo to be overlaid later. The middle from 23% to 59% shows a wide tranquil medieval green valley: a winding blue river leads the eye past a small stone bridge to half-timbered cottages, fields, a modest stone church and wooded rolling hills. Upper-left sunlight, moss greens, muted blue, warm ochre roofs; vivid but restrained. A tiny footpath gives a sense of entering the valley. Soft painted atmospheric edges and paper fibres. Below 59%, the landscape naturally dissolves into warm clean almost blank ivory vellum: lower 35% MUST remain very quiet, bright, unmarked paper for editable UI controls. The scene and paper are one elegant continuous painting, no rectangular card boundary or artificial gradient. Extremely subtle paper grain, no large stains. NO WOODEN FRAME, no plank background, no leather border, no metallic frame. No logo, no typography, no letters, no numbers, no buttons, no UI mockup, no decorative objects, no people close-up. Full bleed opaque image.",
+    "css": [
+      390,
+      844
+    ],
+    "source": "title-valley-master.png"
+  },
+  {
+    "id": "plaque-brass",
+    "generator": "ImageGen integrado",
+    "prompt": "Generate ONE production UI asset, PNG with REAL transparent background. A medieval rectangular action plaque of OLD MATTE BRASS, shallow handcrafted bevel, softly rounded cut corners, warm amber ember light subtly rising from within the inner edge, dark aged bronze/umber inset face that will hold CREAM LETTERS added later. Front orthographic view, high quality painted colour storybook game art, soft contours and upper-left light. This is metal ONLY, absolutely NO WOOD or wood grain, no leather. Quiet completely BLANK solid dark bronze centre, no decoration there. Restrained engraving on the brass corners only, all details within 18 CSS pixels of corners. Broad landscape proportion 200:46, target400x92 PNG for200x46CSS. Designed for nine-slice stretching: uniform straight borders and uniform central colour, corners fixed18CSSpx. Not a flat modern app button, tactile worn brass hardware, understated premium hand-painted finish. No text, no symbols, no lettering, no screws outside silhouette, no extra objects. Keep the entire plaque visible with small transparent margin. One plaque only.",
+    "css": [
+      200,
+      46
+    ],
+    "sliceCSS": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "source": "plaque-brass-master.png"
+  }
+]

@@ -1,0 +1,170 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V9 · Piezas a tamaño CSS</title><style>/* V9 mockup only: images supply all surface grain, fibres, bevels and edges. */
+:root {
+  --v9-wood-header: url('assets/wood-header.png');
+  --v9-wood-board: url('assets/wood-board.png');
+  --v9-parchment-sheet: url('assets/parchment-sheet.png');
+  --v9-parchment-edge: url('assets/parchment-sheet-edge.png');
+  --v9-date: url('assets/plate-date.png');
+  --v9-well: url('assets/well-vital.png');
+  --v9-round: url('assets/btn-round.png');
+  --v9-round-on: url('assets/btn-round-on.png');
+  --v9-status: url('assets/strip-status.png');
+  --v9-button-parchment: url('assets/button-parchment.png');
+  --v9-button-parchment-off: url('assets/button-parchment-off.png');
+  --v9-title-frame: url('assets/title-frame.png');
+  --v9-title-bg: url('assets/title-bg.png');
+  --v9-title-plate: url('assets/title-plate.png');
+  --v9-paper-document: url('assets/paper-document.png');
+}
+
+/* AFTER: swap only surface materials; geometry and copy remain the V8 base. */
+.standalone .hud { height:92px; }
+.v9-after .hud {
+  left: 8px; right: 8px; top: 10px; padding: 8px 10px 9px; gap: 7px;
+  border-radius: 0; background: none; box-shadow: none; filter: drop-shadow(0 4px 5px #1b100b88);
+}
+.v9-after .hud::before { content:'';position:absolute;inset:0;z-index:0;pointer-events:none;border:0 solid transparent;border-image:var(--v9-wood-header) 48 fill stretch;border-image-width:12px; }
+.v9-after .hud > * { position:relative;z-index:1; }
+.v9-after .date {
+  background: none; border: 1px solid transparent; border-image: var(--v9-date) 20 28 fill stretch;
+  border-image-width: 10px 14px; border-radius: 0; box-shadow: none;
+}
+.v9-after .vital {
+  background: none; border: 1px solid transparent; border-image: var(--v9-well) 20 fill stretch;
+  border-image-width: 10px; border-radius: 0; box-shadow: none;
+}
+.v9-after .rbtn {
+  background: var(--v9-round) center / contain no-repeat;
+  border-radius: 0; box-shadow: none;
+}
+.v9-after .rbtn[aria-pressed="true"], .v9-after .rbtn.on {
+  background-image: var(--v9-round-on);
+}
+.v9-after .board {
+  background: var(--v9-wood-board) 0 0 / 256px 256px repeat;
+  border: 2px solid #987443; border-radius: 10px;
+  box-shadow: 0 6px 15px #100b08aa;
+}
+.v9-after .board-title, .v9-after .tag,
+.v9-after .cart-sheet, .v9-after .chronicle-sheet {
+  background-color: #f1e4c8; background-image: var(--v9-parchment-sheet);
+  background-size: 512px 512px; background-repeat: repeat;
+  background-blend-mode: normal;
+}
+.v9-after .board-title { box-shadow: 0 2px 3px #26160e80; }
+.v9-after .note { box-shadow: 0 3px 6px #100b0866; }
+.v9-after .cart-sheet, .v9-after .chronicle-sheet {
+  background-color: #f1e4c8; box-shadow: 0 0 0 1px #8d704b inset;
+}
+.v9-after .cart-sheet::before, .v9-after .chronicle-sheet::before, .v9-after .tag::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:24px;z-index:0;pointer-events:none;
+  border:1px solid transparent;border-image:var(--v9-parchment-edge) 16 32 fill stretch;border-image-width:8px 16px;
+}
+.v9-after .cart-sheet > *, .v9-after .chronicle-sheet > *, .v9-after .tag > * { position:relative;z-index:1; }
+.v9-after .status-strip {
+  border: 12px solid transparent; border-image: var(--v9-status) 20 fill stretch;
+  border-image-width: 12px; background: none;
+}
+.standalone .compass { width:46px;height:46px; }
+.standalone .compass svg { width:29px;height:29px; }
+.v9-after .compass { background:var(--v9-round) center/contain no-repeat; border-radius:50%; box-shadow:none; }
+.v9-after .rbtn { border:0;border-radius:50%;background:var(--v9-round) center/contain no-repeat;box-shadow:none; }
+.v9-after .rbtn.on { background-image:var(--v9-round-on); }
+.v9-after .rbtn { width:46px;height:46px; }
+.v9-after .ctrls { gap:6px; }
+.standalone .status-strip { display:flex;align-items:center;justify-content:center;width:358px;max-width:calc(100vw - 24px);height:40px;background:transparent;color:#392d21;font:600 12px/1 var(--display);letter-spacing:.02em; }
+.v9-after .status-strip { border:1px solid transparent;border-image:var(--v9-status) 20 32 fill stretch;border-image-width:10px 16px; }
+.v9-before .status-strip { border:1px solid #ac9064;background:#eee1c2 url('../../../src/ui/redesign/parchment.png') center/256px repeat;box-shadow:0 2px 3px #47372044; }
+.standalone .open-cart { display:flex;flex-direction:column;align-items:center;gap:4px;width:358px;max-width:calc(100vw - 24px); }
+
+/* The source screenshot is a documentary base for a reconstructed reading panel. */
+.v9-reading { position: absolute; inset: 0; background: center / cover no-repeat; }
+.v9-reading-panel { position:absolute;left:0;right:0;bottom:0;height:56dvh;max-height:473px;min-height:400px;padding:20px 24px 16px;border-radius:18px 18px 0 0;overflow-y:auto;color:#31291f; }
+.v9-after .v9-reading-panel { background-color:#f0e4ca;background-image:var(--v9-paper-document);background-size:512px; }
+.v9-before .v9-reading-panel { background:linear-gradient(180deg,#f2e7d0,#e8dcc3); }
+.v9-reading-title { display:flex;align-items:center;gap:18px;margin:0 0 14px;font:600 22px/1.15 var(--display);color:#54251c; }
+.v9-reading-copy { margin:0 0 14px;font:17px/1.4 var(--read);color:#34302b; }
+.v9-reading-option { display:flex;align-items:center;min-height:54px;margin:0 0 7px;padding:9px 13px;border-radius:8px;font:15px/1.22 var(--read);color:#413629; }
+.v9-after .v9-reading-option { border:10px solid transparent;border-image:var(--v9-button-parchment) 20 fill stretch;border-image-width:10px;background:none; }
+.v9-before .v9-reading-option { background:linear-gradient(#fffaf0,#e8dabe);border:1px solid #ac9064;box-shadow:0 3px 5px #4737203b; }
+.v9-reading-option strong { margin-right:12px;font:600 14px/1 var(--display);letter-spacing:.04em;white-space:nowrap; }
+
+/* Reconstructed title page follows the existing menu screenshot hierarchy. */
+.v9-title { position:absolute;inset:0;padding:22px 20px 12px;display:flex;flex-direction:column;align-items:center;color:#32261b; }
+.v9-title-bg { position:absolute;inset:0;background-color:#39271b;background-image:var(--v9-title-bg);background-size:256px; }
+.v9-title-frame { position:absolute;inset:12px 10px 10px;border:24px solid transparent;border-image:var(--v9-title-frame) 200 48 48 48 fill stretch;border-image-width:100px 24px 24px 24px; }
+.v9-before .v9-title-bg { background:repeating-linear-gradient(0deg,#51331e 0 22px,#5e3b23 22px 44px); }
+.v9-before .v9-title-frame { border-image:none;border-color:#a07a45;border-radius:25px;box-shadow:inset 0 0 0 5px #432d1c; }
+.v9-title-logo { position:relative;z-index:1;width:300px;height:185px;object-fit:contain;margin:12px auto 5px; }
+.v9-title-engraving { position:relative;z-index:1;width:194px;height:245px;object-fit:cover;object-position:center top;margin:0 auto 7px;border-radius:42% 42% 2px 2px;border:4px solid #a17c42; }
+.v9-title-number-wrap { position:relative;z-index:1;width:100%;margin-bottom:6px; }
+.v9-title-number-label { display:block;margin:0 auto 2px;width:300px;font:600 12px/1.15 var(--display);letter-spacing:.06em;color:#f4e9d3; }
+.v9-title-number { position:relative;z-index:1;width:300px;height:82px;margin:0 auto;padding:4px 4px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-image:var(--v9-title-plate) 44 108 fill stretch;border-image-width:22px 54px;font:700 28px/1 var(--display);letter-spacing:.04em;color:#34291f; }
+.v9-before .v9-title-number { border-image:none;border-radius:4px;background:linear-gradient(#f2e5c7,#dbc7a1); }
+.v9-title-primary,.v9-title-secondary { position:relative;z-index:1;width:100%;min-height:55px;margin:3px 0 8px;padding:16px 8px;text-align:center;border:12px solid transparent;border-image:var(--v9-button-parchment) 24 fill stretch;border-image-width:12px;color:#f2e6ce;font:600 14px/1.1 var(--display);letter-spacing:.04em; }
+.v9-title-primary { color:#f4e9d3; }
+.v9-title-secondary { width:68%;color:#33261b; }
+.v9-after .v9-title-primary { border:1px solid transparent;border-image:url('../laminas-v7-2026-09-28/assets/plaque-wood.png') 36 fill stretch;border-image-width:18px;color:#f4e9d3; }
+.v9-before .v9-title-primary { border-image:none;border-radius:9px;background:linear-gradient(#45696b,#213a3e);border:2px solid #bb9752; }
+.v9-before .v9-title-secondary { border-image:none;border-radius:9px;background:linear-gradient(#f4e6c8,#c8ae7f); }
+
+@media(max-width:370px) {
+  .v9-reading-panel { min-height:340px;height:56dvh;padding:18px 20px 14px; }
+  .v9-reading-title { font-size:21px; }
+  .v9-reading-copy { font-size:18px; }
+  .v9-title-logo { width:275px;height:182px;margin-top:12px; }
+  .v9-title-engraving { width:194px;height:250px; }
+}
+
+/* Revisión de dirección: cubierta con jerarquía y documento de decisión legible. */
+.v9-historical { display:block;width:100%;height:100%;object-fit:contain; }
+.v9-after .v9-title { padding:38px 34px 25px;gap:0;overflow:auto; }
+.v9-after .v9-title > :not(.v9-title-bg):not(.v9-title-frame) { flex-shrink:0; }
+.v9-after .v9-title-frame { inset:15px 9px 14px; }
+.v9-after .v9-title-logo { width:290px;height:190px;margin:0 auto 14px; }
+.v9-after .v9-title-engraving { width:216px;height:272px;object-fit:cover;border:0;border-radius:46% 46% 0 0;margin:0 auto 24px; }
+.v9-after .v9-title-number-wrap { width:100%;margin:0 0 18px; }
+.v9-after .v9-title-number-label { width:auto;text-align:center;font-size:11px;letter-spacing:.1em;margin-bottom:6px; }
+.v9-title-number-row { display:flex;align-items:center;gap:8px; }
+.v9-after .v9-title-number { width:auto;flex:1;height:58px;font:600 27px/1 var(--read);letter-spacing:.035em;border-image-width:16px 35px; }
+.v9-title-reroll { display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;padding:6px;border:0;background:var(--v9-round) center/contain no-repeat; }
+.v9-title-reroll svg { width:28px;height:28px; }
+.v9-after .v9-title-primary { width:100%;height:52px;min-height:52px;padding:0 10px;margin:0 0 13px;font:600 15px/1.2 var(--display); }
+.v9-after .v9-title-secondary { width:205px;height:42px;min-height:42px;padding:0 10px;margin:0 auto 15px;font-size:13px;border-width:1px;border-image-width:12px 16px;border-image-slice:24 32 fill; }
+.v9-title-language { position:relative;z-index:1;border:0;background:none;min-height:44px;padding:0 18px;color:#e6d2ac;font:500 11px/1 var(--display);letter-spacing:.09em; }
+.v9-reading-panel { top:370px;bottom:0;height:auto;max-height:none;min-height:0;padding:27px 26px 23px;border-radius:0; }
+.v9-after .v9-reading-panel::before { content:'';position:absolute;left:0;right:0;top:0;height:24px;pointer-events:none;border-image:var(--v9-parchment-edge) 16 32 fill stretch;border-image-width:8px 16px; }
+.v9-reading-title { display:block;font-size:23px;line-height:1.22;margin:0 0 18px;color:#4c2e20; }
+.v9-reading-copy { font-size:19px;line-height:1.35;margin:0 0 20px; }
+.v9-reading-option { display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;min-height:64px;margin:0 0 9px;padding:12px 17px;color:#392c20; }
+.v9-reading-option strong { font:600 13px/1.2 var(--display);margin:0;letter-spacing:.015em;white-space:normal; }
+.v9-reading-option span { font:17px/1.15 var(--read); }
+.v9-after .v9-reading-option { border:1px solid transparent;border-image-slice:24 32 fill;border-image-width:12px 16px; }
+
+/* Vera, 29 sep: la portada conserva únicamente el logo; fuera madera y taller. */
+.v9-after .v9-title { padding:27px 30px 24px; }
+.v9-after .v9-title-bg { background-image:url('revision-portada/title-valley.png');background-size:100% 100%;background-repeat:no-repeat; }
+.v9-after .v9-title-frame,.v9-after .v9-title-engraving { display:none; }
+.v9-after .v9-title-logo { width:290px;height:195px;margin:0 auto; }
+.v9-after .v9-title-number-wrap { margin-top:auto;margin-bottom:21px; }
+.v9-after .v9-title-number-label { color:#58452e;font-size:11px;margin-bottom:8px; }
+.v9-after .v9-title-number { border-image:var(--v9-date) 20 28 fill stretch;border-image-width:10px 14px;height:50px;font-size:28px; }
+.v9-after .v9-title-reroll { background:none; }
+.v9-after .v9-title-primary { height:52px;min-height:52px;border-image:url('revision-portada/plaque-brass.png') 36 fill stretch;border-image-width:18px;color:#fff0d2;margin-bottom:14px;font-size:16px; }
+.v9-after .v9-title-secondary { border:0;background:none;width:auto;min-height:44px;height:44px;padding:0 24px;margin-bottom:5px;color:#453825;font-size:14px; }
+.v9-after .v9-title-language { color:#736149;min-height:36px;font-size:10px; }
+
+/* La encrucijada es un documento, con acciones inscritas en papel sin madera. */
+.v9-after .v9-reading-panel { top:359px;padding:29px 27px 22px; }
+.v9-after .v9-reading-title { font-size:24px;line-height:1.2;margin-bottom:18px; }
+.v9-after .v9-reading-copy { font-size:19px;line-height:1.35;margin-bottom:21px; }
+.v9-after .v9-reading-option { min-height:68px;padding:13px 17px;margin-bottom:9px;border:1px solid transparent;border-image:var(--v9-status) 20 32 fill stretch;border-image-width:10px 16px; }
+
+/* Cierre solicitado por Vera: portada 04, sin modo día/noche todavía. */
+.v9-after .v9-title-bg { background-image:url('demos-portada/04-anochecer.png'); }
+.v9-after .v9-title-number-label,.v9-after .v9-title-secondary { color:#f4e9d3; }
+.v9-after .v9-title-language { color:#d9c8aa; }
+.v9-after .v9-title-primary { background-color:transparent; }
+.v9-after .rbtn { color:#f7e8ca;font:600 15px/1 var(--display); }
+
+@font-face{font-family:EB Garamond;src:url('../../../src/ui/redesign/fonts/garamond.woff2') format('woff2')}*{box-sizing:border-box}body{margin:0;background:#241c15;color:#eee3ce;font:16px/1.4 EB Garamond,Georgia,serif}.review{max-width:1200px;margin:auto;padding:32px}.grid{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}.v9-piece{margin:0;padding:12px;background:#d9cfbc;color:#322a21}.v9-piece figcaption{font:12px/1.5 monospace;margin:0 0 8px}.v9-piece .stage{width:max-content;min-width:72px;min-height:36px;background:#cfc4b0;display:flex;align-items:center;justify-content:center}.v9-piece img{display:block;max-width:none}</style></head><body><main class="review"><p>THE VALLEY · V9</p><h1>Hoja de piezas · tamaño de uso CSS</h1><p>Vista al 100 % de CSS. Las piezas mantienen el alfa; las losetas están en mosaico a su tamaño nominal y los marcos se comparan con el manifiesto.</p><p><a href="index.html">Volver a las comparativas</a></p><div class="grid"><figure class="v9-piece"><figcaption>wood-header<br>Uso 374 × 92 CSS · PNG 748 × 184 · nueve partes: [24,24,24,24]</figcaption><div class="stage"><img src="assets/wood-header.png" width="374" height="92" alt="wood-header"></div></figure><figure class="v9-piece"><figcaption>wood-board<br>Uso 256 × 256 CSS · PNG 512 × 512</figcaption><div class="stage"><img src="assets/wood-board.png" width="256" height="256" alt="wood-board"></div></figure><figure class="v9-piece"><figcaption>parchment-sheet<br>Uso 512 × 512 CSS · PNG 1024 × 1024</figcaption><div class="stage"><img src="assets/parchment-sheet.png" width="512" height="512" alt="parchment-sheet"></div></figure><figure class="v9-piece"><figcaption>parchment-sheet-edge<br>Uso 390 × 24 CSS · PNG 780 × 48 · nueve partes: [8,16,8,16]</figcaption><div class="stage"><img src="assets/parchment-sheet-edge.png" width="390" height="24" alt="parchment-sheet-edge"></div></figure><figure class="v9-piece"><figcaption>plate-date<br>Uso 358 × 34 CSS · PNG 716 × 68 · nueve partes: [10,14,10,14]</figcaption><div class="stage"><img src="assets/plate-date.png" width="358" height="34" alt="plate-date"></div></figure><figure class="v9-piece"><figcaption>well-vital<br>Uso 68 × 34 CSS · PNG 136 × 68 · nueve partes: [10,10,10,10]</figcaption><div class="stage"><img src="assets/well-vital.png" width="68" height="34" alt="well-vital"></div></figure><figure class="v9-piece"><figcaption>btn-round<br>Uso 46 × 46 CSS · PNG 92 × 92</figcaption><div class="stage"><img src="assets/btn-round.png" width="46" height="46" alt="btn-round"></div></figure><figure class="v9-piece"><figcaption>btn-round-on<br>Uso 46 × 46 CSS · PNG 92 × 92</figcaption><div class="stage"><img src="assets/btn-round-on.png" width="46" height="46" alt="btn-round-on"></div></figure><figure class="v9-piece"><figcaption>strip-status<br>Uso 358 × 40 CSS · PNG 716 × 80 · nueve partes: [10,16,10,16]</figcaption><div class="stage"><img src="assets/strip-status.png" width="358" height="40" alt="strip-status"></div></figure><figure class="v9-piece"><figcaption>button-parchment<br>Uso 200 × 40 CSS · PNG 400 × 80 · nueve partes: [12,16,12,16]</figcaption><div class="stage"><img src="assets/button-parchment.png" width="200" height="40" alt="button-parchment"></div></figure><figure class="v9-piece"><figcaption>button-parchment-off<br>Uso 200 × 40 CSS · PNG 400 × 80 · nueve partes: [12,16,12,16]</figcaption><div class="stage"><img src="assets/button-parchment-off.png" width="200" height="40" alt="button-parchment-off"></div></figure><figure class="v9-piece"><figcaption>title-frame<br>Uso 374 × 760 CSS · PNG 748 × 1520 · nueve partes: [100,24,24,24]</figcaption><div class="stage"><img src="assets/title-frame.png" width="374" height="760" alt="title-frame"></div></figure><figure class="v9-piece"><figcaption>title-bg<br>Uso 256 × 256 CSS · PNG 512 × 512</figcaption><div class="stage"><img src="assets/title-bg.png" width="256" height="256" alt="title-bg"></div></figure><figure class="v9-piece"><figcaption>title-plate<br>Uso 300 × 82 CSS · PNG 600 × 164 · nueve partes: [22,54,22,54]</figcaption><div class="stage"><img src="assets/title-plate.png" width="300" height="82" alt="title-plate"></div></figure><figure class="v9-piece"><figcaption>paper-document<br>Uso 512 × 512 CSS · PNG 1024 × 1024</figcaption><div class="stage"><img src="assets/paper-document.png" width="512" height="512" alt="paper-document"></div></figure><figure class="v9-piece"><figcaption>04-anochecer · portada elegida<br>Uso 390 × 844 CSS · PNG 780 × 1688</figcaption><div class="stage"><img src="demos-portada/04-anochecer.png" width="390" height="844" alt="04-anochecer · portada elegida"></div></figure><figure class="v9-piece"><figcaption>plaque-brass · nueva acción de portada<br>Uso 200 × 46 CSS · PNG 400 × 92 · nueve partes: [18,18,18,18]</figcaption><div class="stage"><img src="revision-portada/plaque-brass.png" width="200" height="46" alt="plaque-brass · nueva acción de portada"></div></figure></div></main></body></html>

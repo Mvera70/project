@@ -5,6 +5,70 @@ description: El estándar visual de la interfaz de The Valley: qué papel, qué 
 
 # La piel del valle: un estándar, no un catálogo de excepciones
 
+## Estándar de texturas V9 · ImageGen, exportación y revisión · 29 sep 2026
+
+**Decisión de Vera al cerrar V9:** la madera sobra como fondo recurrente.
+La portada conserva solo el logo y usa la ilustración **04 · Luces en la
+garganta**, elegida entre cinco demos. Su geografía reconoce desfiladero,
+montañas altas y lomas; se permite explorar hitos medievales plausibles que
+aún no existan en el juego. Texturas e ilustraciones nuevas se encargan a
+ImageGen; los controles permanecen separados del dibujo. Sin controles de
+desarrollo en la portada. Día/noche y transición con sol/luna quedan
+**aplazados**, aunque exista una fuente diurna. No confundir estas capturas
+documentales con UI implementada.
+
+V9 convierte los marcos y fondos recurrentes en fuentes de imagen compartidas.
+La especificación de cada recurso (prompt, medida CSS, clase y nueve partes) vive
+en `docs/ui-redesign/texturas-v9-2026-09-29/manifest.plan.json`; la propuesta
+comparativa es `docs/ui-redesign/propuesta-texturas-v9-2026-09-29.md`.
+
+### Método reutilizable
+
+1. Antes de generar, buscar una pieza que ya resuelva el mismo trabajo y abrir
+   las referencias aprobadas. La cabecera y el papel de lectura son comunes a
+   todas sus pantallas. Mantener la composición base cuando el encargo sea de
+   materiales; si el dueño pide una exploración compositiva, marcarla como tal
+   y no presentarla como una comparación equivalente de texturas.
+2. Usar ImageGen integrado. Generar una pieza por prompt del manifiesto; para
+   estados derivados (activo/apagado), editar el maestro de referencia y pedir
+   que conserve contorno, proporción, material y alfa, alterando solo el estado
+   indicado. No inventar una variante por pantalla.
+3. Pedir alfa transparente para objetos superpuestos y marcos; solicitar una
+   loseta opaca de borde a borde para `tile`. Una loseta solo es válida si sus
+   bordes opuestos continúan sin salto en ambos ejes. Los marcos deben tener
+   centro tranquilo y esquinas/adornos dentro de la región fija especificada.
+4. Guardar los originales de ImageGen en `masters/`, junto a los prompts y las
+   rutas relativas en el manifiesto generado. No depender de rutas privadas del
+   generador ni borrar el maestro al exportar.
+5. Exportar mecánicamente a PNG 2× las medidas CSS declaradas. Recortar el
+   margen exterior transparente, conservar alfa y proporción, y ajustar al
+   lienzo exacto sin redibujar materiales. Registrar fuente, recorte, tamaño y
+   SHA-256. Revisar transparencia y abrir el PNG normalizado a tamaño de uso.
+6. Aplicar el tratamiento por clase: `tile` repite sin estirar; `frame` usa
+   nueve partes (los cuatro cortes del manifiesto siguen el orden CSS:
+   arriba, derecha, abajo, izquierda, en píxeles CSS); `outline` preserva centro transparente y permite
+   estirar solo laterales y tramo inferior, con arco superior fijo; `round`
+   mantiene proporción y tamaño. Nunca estirar una pieza completa para simular
+   nueve partes. CSS solo coloca, recorta y estira los tramos autorizados: no
+   dibuja vetas, papel, clavos, biseles, bordes ni adornos con gradientes,
+   filtros o pseudo-elementos.
+7. Montar la textura bajo el DOM ya existente. En comparativas de materiales,
+   conservar textos, orden, estado y geometría. Capturar a 390×844 y rotular
+   la base con su procedencia: captura V8 o captura histórica identificada.
+   Una nueva composición no se etiqueta como reconstrucción ni como antes/después
+   equivalente. En V9, las cinco alternativas de portada solicitadas por Vera
+   siguen pendientes; la prueba de `revision-portada/` fue rechazada.
+8. Inspeccionar visualmente cada comparativa y la hoja de piezas: continuidad
+   de losetas, esquinas/cortes al tamaño real, legibilidad, alfa, recortes,
+   solapes y consistencia entre pantallas. Las medidas de DOM no sustituyen la
+   inspección de las capturas. Registrar incidencias y corregir antes de dar
+   por exportada una pieza.
+
+V9 termina como propuesta documental revisable; no autoriza por sí sola cambios
+de componentes o integración en el juego. No cambiar ubicación de controles:
+para el carro y `Open the cart`, conservar exactamente la composición del
+estado base elegido y documentar la vista capturada.
+
 ## Propuesta V8 · navegación con material propio · 29 sep 2026
 
 Encargo de Vera: la barra de madera resulta pobre y no distingue la navegación.

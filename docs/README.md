@@ -1,5 +1,8 @@
 # La documentación de The Valley — el mapa
 
+- [Texturas V9 y portada elegida](ui-redesign/propuesta-texturas-v9-2026-09-29.md):
+  piezas ImageGen, capturas de seis pantallas y decisión de anochecer; propuesta sin integrar.
+
 Se ordenó el 18 sep 2026 y **se repartió en carpetas el 19 sep 2026**, las dos
 veces a petición del dueño del diseño: «se va acumulando sin estructura y sin
 nada; ve limpiando también lo que es antiguo», y después «crear una división de

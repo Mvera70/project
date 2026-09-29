@@ -1,0 +1,313 @@
+[
+  {
+    "id": "wood-header",
+    "css": [
+      374,
+      92
+    ],
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "kind": "frame",
+    "desc": "Dark oak HEADER TABLET with thin aged brass edge, rounded corners, one small forged nail in each corner contained in24CSSpx corner region. Wide landscape374:92. Dark brown quiet wood centre with horizontal grain and UNIFORM repeated centre suitable for nine-slice fill; no vignette or bright central spot. Full silhouette, straight edges between corners, front orthographic view, blank. Transparent surroundings. Target748x184PNG.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Dark oak HEADER TABLET with thin aged brass edge, rounded corners, one small forged nail in each corner contained in24CSSpx corner region. Wide landscape374:92. Dark brown quiet wood centre with horizontal grain and UNIFORM repeated centre suitable for nine-slice fill; no vignette or bright central spot. Full silhouette, straight edges between corners, front orthographic view, blank. Transparent surroundings. Target748x184PNG.",
+    "source": "masters/wood-header.png",
+    "size": [
+      748,
+      184
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-e7bfff94-07a0-404e-85cb-51cc7d0e6b7e.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  },
+  {
+    "id": "wood-board",
+    "css": [
+      256,
+      256
+    ],
+    "kind": "tile",
+    "desc": "Perfectly seamless square repeating texture of vertical dark oak boards. Moderately lighter than the dark header, warm walnut brown. Three broad boards, fine dark vertical joins that run straight top to bottom. Very restrained grain, no metal, no nails, no frame. Flat uniform diffuse light, identical average tone on all edges, no shading gradient, no vignette. Wood grain and joints CONTINUE EXACTLY across opposite edges in BOTH axes. Full bleed opaque square, no margin. Target512x512PNG, shown256squareCSS.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Perfectly seamless square repeating texture of vertical dark oak boards. Moderately lighter than the dark header, warm walnut brown. Three broad boards, fine dark vertical joins that run straight top to bottom. Very restrained grain, no metal, no nails, no frame. Flat uniform diffuse light, identical average tone on all edges, no shading gradient, no vignette. Wood grain and joints CONTINUE EXACTLY across opposite edges in BOTH axes. Full bleed opaque square, no margin. Target512x512PNG, shown256squareCSS.",
+    "source": "masters/wood-board.png",
+    "size": [
+      512,
+      512
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-3630f97a-c3b4-4e6e-9305-71b35103e635.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  },
+  {
+    "id": "parchment-sheet",
+    "css": [
+      512,
+      512
+    ],
+    "kind": "tile",
+    "desc": "Perfectly seamless repeating clean warm pale ivory parchment paper, extremely LOW CONTRAST delicate fibres, even warm creamy tone, no stains, no creases, no border, no writing, no dark edges, no vignette, no gradient, flat uniform diffuse illumination. Quiet readable game sheet background. Opposite edges match seamlessly, full bleed opaque square. Target1024x1024PNG at512CSSsquare.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Perfectly seamless repeating clean warm pale ivory parchment paper, extremely LOW CONTRAST delicate fibres, even warm creamy tone, no stains, no creases, no border, no writing, no dark edges, no vignette, no gradient, flat uniform diffuse illumination. Quiet readable game sheet background. Opposite edges match seamlessly, full bleed opaque square. Target1024x1024PNG at512CSSsquare.",
+    "source": "masters/parchment-sheet.png",
+    "size": [
+      1024,
+      1024
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-0c2e245b-a79d-4693-a7e3-16cad8e325e4.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  },
+  {
+    "id": "parchment-sheet-edge",
+    "css": [
+      390,
+      24
+    ],
+    "slice": [
+      8,
+      16,
+      8,
+      16
+    ],
+    "kind": "frame",
+    "desc": "One very long narrow warm ivory parchment TOP EDGE STRIP390:24, subtly worn and finely torn upper edge, lower edge straight and quiet creamy paper. No wood, no metal, no ornament. Nine-slice edges16CSSpx horizontal and8vertical, central paper smooth. Flat front view, transparent surroundings above worn edge, very small margin, strip fillswidecanvas. Target780x48PNG.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. One very long narrow warm ivory parchment TOP EDGE STRIP390:24, subtly worn and finely torn upper edge, lower edge straight and quiet creamy paper. No wood, no metal, no ornament. Nine-slice edges16CSSpx horizontal and8vertical, central paper smooth. Flat front view, transparent surroundings above worn edge, very small margin, strip fillswidecanvas. Target780x48PNG.",
+    "source": "masters/parchment-sheet-edge.png",
+    "size": [
+      780,
+      48
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-5c875149-2c6c-416d-bfd9-454f07e75754.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  },
+  {
+    "id": "plate-date",
+    "css": [
+      358,
+      34
+    ],
+    "slice": [
+      10,
+      14,
+      10,
+      14
+    ],
+    "kind": "frame",
+    "desc": "Long narrow inset IVORY date plaque358:34. Clean cream inset face, fine bevel and tiny warm-brown recessed rim to sit inside wood header. No outside wood panel. Blank quiet pale centre, rectangular with softly rounded corners confined14CSSpx endregions. Nine-slice, straight stretches, shallow upper-left light, no strong gloss. Transparent surroundings. Target716x68PNG.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Long narrow inset IVORY date plaque358:34. Clean cream inset face, fine bevel and tiny warm-brown recessed rim to sit inside wood header. No outside wood panel. Blank quiet pale centre, rectangular with softly rounded corners confined14CSSpx endregions. Nine-slice, straight stretches, shallow upper-left light, no strong gloss. Transparent surroundings. Target716x68PNG.",
+    "source": "masters/plate-date.png",
+    "size": [
+      716,
+      68
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-2942d2db-438a-4dc1-96b4-6f5ae1ae4225.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  },
+  {
+    "id": "well-vital",
+    "css": [
+      68,
+      34
+    ],
+    "slice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "kind": "frame",
+    "desc": "Small2:1 rectangular dark CAVITY carved into oak for a resource number. Dark umber recessed centre, worn brown wooden lip, soft upper-left edge light, bottomedge slightly warmer. No brass, no contents. Corners rounded and confined10CSSpx region. Blank centre readable with cream glyphs later. Nine-slice no perspective, isolated actualtransparency. Target136x68PNG.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Small2:1 rectangular dark CAVITY carved into oak for a resource number. Dark umber recessed centre, worn brown wooden lip, soft upper-left edge light, bottomedge slightly warmer. No brass, no contents. Corners rounded and confined10CSSpx region. Blank centre readable with cream glyphs later. Nine-slice no perspective, isolated actualtransparency. Target136x68PNG.",
+    "source": "masters/well-vital.png",
+    "size": [
+      136,
+      68
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-28e1fe36-2214-4eb2-a8d9-e64bf34f3bd4.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  },
+  {
+    "id": "btn-round",
+    "css": [
+      46,
+      46
+    ],
+    "kind": "round",
+    "desc": "Small round game button. A worn dark oak wooden ring with blank OLD BRASS face, dark matte bronze centre. Restrained upper-leftlight. Same medieval finish as navigationmedalbutwoodrim. Empty face for game icon, no stitches, no symbols. Front orthographic perfectcircle. Inactive unlit. Real transparency around entireobject. Target92squarePNG46CSS.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Small round game button. A worn dark oak wooden ring with blank OLD BRASS face, dark matte bronze centre. Restrained upper-leftlight. Same medieval finish as navigationmedalbutwoodrim. Empty face for game icon, no stitches, no symbols. Front orthographic perfectcircle. Inactive unlit. Real transparency around entireobject. Target92squarePNG46CSS.",
+    "source": "masters/btn-round.png",
+    "size": [
+      92,
+      92
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-cb2e8e34-2d05-4bb5-84c3-2e275e804a0f.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  },
+  {
+    "id": "btn-round-on",
+    "css": [
+      46,
+      46
+    ],
+    "kind": "round",
+    "edit": "btn-round",
+    "desc": "EDIT exact button reference into ACTIVE state: preserve diameter, woodring, silhouette, proportionsandmaterial. Raise centre slightly and add internal ember AMBER illuminationinsideface, like V7 activewoodplaque. No exteriorhalo or flames. Face stays blank for icon, no text. Sameactualalpha. Target92squarePNG.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. EDIT exact button reference into ACTIVE state: preserve diameter, woodring, silhouette, proportionsandmaterial. Raise centre slightly and add internal ember AMBER illuminationinsideface, like V7 activewoodplaque. No exteriorhalo or flames. Face stays blank for icon, no text. Sameactualalpha. Target92squarePNG.",
+    "source": "masters/btn-round-on.png",
+    "size": [
+      92,
+      92
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-43c3e91e-bf63-4b56-abb2-152273307cca.png",
+    "reference": "masters/btn-round.png"
+  },
+  {
+    "id": "strip-status",
+    "css": [
+      358,
+      40
+    ],
+    "slice": [
+      10,
+      16,
+      10,
+      16
+    ],
+    "kind": "frame",
+    "desc": "Long narrow strip of clean warm parchment358:40 with finely ragged thin edges on all sides. No curls, no scrollrolls, no illustration, no ornaments. Thin dark warm edge only; quiet blank smoothcream centre for live status sentence. Nine-slice cornerregions16CSSx10CSS. Transparent surrounding, face-on. Target716x80PNG.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Long narrow strip of clean warm parchment358:40 with finely ragged thin edges on all sides. No curls, no scrollrolls, no illustration, no ornaments. Thin dark warm edge only; quiet blank smoothcream centre for live status sentence. Nine-slice cornerregions16CSSx10CSS. Transparent surrounding, face-on. Target716x80PNG.",
+    "source": "masters/strip-status.png",
+    "size": [
+      716,
+      80
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-42e3610d-e289-430d-b14a-38415df8200f.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  },
+  {
+    "id": "button-parchment",
+    "css": [
+      200,
+      40
+    ],
+    "slice": [
+      12,
+      16,
+      12,
+      16
+    ],
+    "kind": "frame",
+    "desc": "Secondary button plate200:40, pale warm parchment inset face enclosedin slim darkoak bevelled rim. Handcrafted medieval UI. Blankface, no symbolsorwords. Quiet activeavailable state, no amberglow. Rounded corners confined16CSSregions, longstraight middle for nine-slice. Slight tactile upper-leftlight. Transparent background. Target400x80PNG.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Secondary button plate200:40, pale warm parchment inset face enclosedin slim darkoak bevelled rim. Handcrafted medieval UI. Blankface, no symbolsorwords. Quiet activeavailable state, no amberglow. Rounded corners confined16CSSregions, longstraight middle for nine-slice. Slight tactile upper-leftlight. Transparent background. Target400x80PNG.",
+    "source": "masters/button-parchment.png",
+    "size": [
+      400,
+      80
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-cfa94e80-df6b-4d9d-a1cf-ed671d99c8e3.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  },
+  {
+    "id": "button-parchment-off",
+    "css": [
+      200,
+      40
+    ],
+    "slice": [
+      12,
+      16,
+      12,
+      16
+    ],
+    "kind": "frame",
+    "edit": "button-parchment",
+    "desc": "EDIT exact parchment button into disabled state. Preserve exact contour, dimensions, cornerdesign, woodrim, parchment and alpha. Only dullthe illumination and mute colourcontrast slightly. Still warm parchmentandwood, not grey plastic. No text. Same400x80PNG nine-slice.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. EDIT exact parchment button into disabled state. Preserve exact contour, dimensions, cornerdesign, woodrim, parchment and alpha. Only dullthe illumination and mute colourcontrast slightly. Still warm parchmentandwood, not grey plastic. No text. Same400x80PNG nine-slice.",
+    "source": "masters/button-parchment-off.png",
+    "size": [
+      400,
+      80
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-2837ecaa-3e20-4521-b352-9a03e7c86d43.png",
+    "reference": "masters/button-parchment.png"
+  },
+  {
+    "id": "title-frame",
+    "css": [
+      374,
+      760
+    ],
+    "slice": [
+      100,
+      24,
+      24,
+      24
+    ],
+    "kind": "outline",
+    "desc": "Tall medieval OAK FRAME374:760 with shallow arched crown across TOP. Aged thin brass lineinsidewood and tinyforgedcornernails. Frame width24CSSpx sides/bottom, completearch contained upper100CSSpx. Empty entirely TRANSPARENT centre and transparentoutside; only woodandbrass border. Straight verticals and bottomfornine-slice, symmetric shallowarchtop, no decorationprotruding, noimage,textorlogo. Warm darkoak sameasheader. Target748x1520PNG.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Tall medieval OAK FRAME374:760 with shallow arched crown across TOP. Aged thin brass lineinsidewood and tinyforgedcornernails. Frame width24CSSpx sides/bottom, completearch contained upper100CSSpx. Empty entirely TRANSPARENT centre and transparentoutside; only woodandbrass border. Straight verticals and bottomfornine-slice, symmetric shallowarchtop, no decorationprotruding, noimage,textorlogo. Warm darkoak sameasheader. Target748x1520PNG.",
+    "source": "masters/title-frame.png",
+    "size": [
+      748,
+      1520
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-5fcd86fb-a3be-4a2a-8db7-482495c2b09f.png",
+    "reference": "masters/wood-header.png"
+  },
+  {
+    "id": "title-bg",
+    "css": [
+      256,
+      256
+    ],
+    "kind": "tile",
+    "desc": "Seamless square repeating DARK OAK BACKGROUND for medieval title screenunderwoodframe. Restrained horizontal fine grain, very darkwarm brown umber, slightly darkerthan noticeboard, verylowcontrast, no broad planksorjoinlines, no nailsormetalorframe. Fullbleedopaque square. Flatuniform light no vignette no gradients. Exactlymatchingoppositeedges bothaxes. Target512squarePNG at256CSS.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Seamless square repeating DARK OAK BACKGROUND for medieval title screenunderwoodframe. Restrained horizontal fine grain, very darkwarm brown umber, slightly darkerthan noticeboard, verylowcontrast, no broad planksorjoinlines, no nailsormetalorframe. Fullbleedopaque square. Flatuniform light no vignette no gradients. Exactlymatchingoppositeedges bothaxes. Target512squarePNG at256CSS.",
+    "source": "masters/title-bg.png",
+    "size": [
+      512,
+      512
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-786edbea-e527-4da6-a14a-07d020733497.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  },
+  {
+    "id": "title-plate",
+    "css": [
+      300,
+      82
+    ],
+    "slice": [
+      22,
+      54,
+      22,
+      54
+    ],
+    "kind": "frame",
+    "desc": "Blank valley-number plaque300:82, warm ivory parchment set into a simple aged brass thinframe with narrowdarkoak backingedge. Nine-slice corners18CSS horizontal16vertical, straightmiddle, broadclean face for labelandnumber input. No textordiceiconorinsideboxes. Soft upper-leftlight, subtlewear, quiet readable. Transparent outside, flatfront. Target600x164PNG.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Blank valley-number plaque300:82, warm ivory parchment set into a simple aged brass thinframe with narrowdarkoak backingedge. Nine-slice corners18CSS horizontal16vertical, straightmiddle, broadclean face for labelandnumber input. No textordiceiconorinsideboxes. Soft upper-leftlight, subtlewear, quiet readable. Transparent outside, flatfront. Target600x164PNG.",
+    "source": "masters/title-plate.png",
+    "size": [
+      600,
+      164
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-097103dd-53df-4690-abf6-e2587b93b7ed.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  },
+  {
+    "id": "paper-document",
+    "css": [
+      512,
+      512
+    ],
+    "kind": "tile",
+    "desc": "Seamless fullbleed square repeating parchmentDOCUMENT. Warmer honeyivory than clean sheets, gently aged soft fibres and extremelysubtle diffuse wear speckles, lowcontrastforcontinuousreading. No distinct stains or folds, no borderordarkedge, no textorgraphics, no vignette. Flat even diffuse lighting, constantaveragecolour acrosscanvas, seamlesslymatching all oppositeedges. Target1024squarePNG at512CSS.",
+    "prompt": "Medieval game UI, painted colour, premium handcrafted materials, soft outlines and restrained upper-left light matching attached V6-V8 references. Reference images are STYLE ONLY. Generate ONE asset, no text, no icons, no letters, no numbers. Seamless fullbleed square repeating parchmentDOCUMENT. Warmer honeyivory than clean sheets, gently aged soft fibres and extremelysubtle diffuse wear speckles, lowcontrastforcontinuousreading. No distinct stains or folds, no borderordarkedge, no textorgraphics, no vignette. Flat even diffuse lighting, constantaveragecolour acrosscanvas, seamlesslymatching all oppositeedges. Target1024squarePNG at512CSS.",
+    "source": "masters/paper-document.png",
+    "size": [
+      1024,
+      1024
+    ],
+    "generatorSource": "C:\\Users\\mvera\\.codex\\generated_images\\01a0e8ec-50b2-7a60-b0d1-2963999a83a4\\exec-6f752467-8c89-4f48-9a63-9dceec36b943.png",
+    "reference": "V6 frame-parchment + V7 plaque-wood"
+  }
+]

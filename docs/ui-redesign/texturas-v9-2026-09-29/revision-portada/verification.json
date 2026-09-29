@@ -1,0 +1,37 @@
+[
+  {
+    "id": "title-valley",
+    "source": "title-valley-master.png",
+    "file": "title-valley.png",
+    "size": [
+      780,
+      1688
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "crop": null,
+    "sha256": "57b3aa89e30fb74f6907b9d54c49f75645693c4c0994dcf890eb4a4761510774"
+  },
+  {
+    "id": "plaque-brass",
+    "source": "plaque-brass-master.png",
+    "file": "plaque-brass.png",
+    "size": [
+      400,
+      92
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "crop": [
+      42,
+      163,
+      1959,
+      574
+    ],
+    "sha256": "c178a9c7a67524903df593e8748fadc32406201024a6f302187d1b812ed8b0d6"
+  }
+]

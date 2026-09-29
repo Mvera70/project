@@ -1,0 +1,193 @@
+[
+  {
+    "id": "wood-header",
+    "css": [
+      374,
+      92
+    ],
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "kind": "frame",
+    "desc": "Dark oak HEADER TABLET with thin aged brass edge, rounded corners, one small forged nail in each corner contained in24CSSpx corner region. Wide landscape374:92. Dark brown quiet wood centre with horizontal grain and UNIFORM repeated centre suitable for nine-slice fill; no vignette or bright central spot. Full silhouette, straight edges between corners, front orthographic view, blank. Transparent surroundings. Target748x184PNG."
+  },
+  {
+    "id": "wood-board",
+    "css": [
+      256,
+      256
+    ],
+    "kind": "tile",
+    "desc": "Perfectly seamless square repeating texture of vertical dark oak boards. Moderately lighter than the dark header, warm walnut brown. Three broad boards, fine dark vertical joins that run straight top to bottom. Very restrained grain, no metal, no nails, no frame. Flat uniform diffuse light, identical average tone on all edges, no shading gradient, no vignette. Wood grain and joints CONTINUE EXACTLY across opposite edges in BOTH axes. Full bleed opaque square, no margin. Target512x512PNG, shown256squareCSS."
+  },
+  {
+    "id": "parchment-sheet",
+    "css": [
+      512,
+      512
+    ],
+    "kind": "tile",
+    "desc": "Perfectly seamless repeating clean warm pale ivory parchment paper, extremely LOW CONTRAST delicate fibres, even warm creamy tone, no stains, no creases, no border, no writing, no dark edges, no vignette, no gradient, flat uniform diffuse illumination. Quiet readable game sheet background. Opposite edges match seamlessly, full bleed opaque square. Target1024x1024PNG at512CSSsquare."
+  },
+  {
+    "id": "parchment-sheet-edge",
+    "css": [
+      390,
+      24
+    ],
+    "slice": [
+      8,
+      16,
+      8,
+      16
+    ],
+    "kind": "frame",
+    "desc": "One very long narrow warm ivory parchment TOP EDGE STRIP390:24, subtly worn and finely torn upper edge, lower edge straight and quiet creamy paper. No wood, no metal, no ornament. Nine-slice edges16CSSpx horizontal and8vertical, central paper smooth. Flat front view, transparent surroundings above worn edge, very small margin, strip fillswidecanvas. Target780x48PNG."
+  },
+  {
+    "id": "plate-date",
+    "css": [
+      358,
+      34
+    ],
+    "slice": [
+      10,
+      14,
+      10,
+      14
+    ],
+    "kind": "frame",
+    "desc": "Long narrow inset IVORY date plaque358:34. Clean cream inset face, fine bevel and tiny warm-brown recessed rim to sit inside wood header. No outside wood panel. Blank quiet pale centre, rectangular with softly rounded corners confined14CSSpx endregions. Nine-slice, straight stretches, shallow upper-left light, no strong gloss. Transparent surroundings. Target716x68PNG."
+  },
+  {
+    "id": "well-vital",
+    "css": [
+      68,
+      34
+    ],
+    "slice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "kind": "frame",
+    "desc": "Small2:1 rectangular dark CAVITY carved into oak for a resource number. Dark umber recessed centre, worn brown wooden lip, soft upper-left edge light, bottomedge slightly warmer. No brass, no contents. Corners rounded and confined10CSSpx region. Blank centre readable with cream glyphs later. Nine-slice no perspective, isolated actualtransparency. Target136x68PNG."
+  },
+  {
+    "id": "btn-round",
+    "css": [
+      46,
+      46
+    ],
+    "kind": "round",
+    "desc": "Small round game button. A worn dark oak wooden ring with blank OLD BRASS face, dark matte bronze centre. Restrained upper-leftlight. Same medieval finish as navigationmedalbutwoodrim. Empty face for game icon, no stitches, no symbols. Front orthographic perfectcircle. Inactive unlit. Real transparency around entireobject. Target92squarePNG46CSS."
+  },
+  {
+    "id": "btn-round-on",
+    "css": [
+      46,
+      46
+    ],
+    "kind": "round",
+    "edit": "btn-round",
+    "desc": "EDIT exact button reference into ACTIVE state: preserve diameter, woodring, silhouette, proportionsandmaterial. Raise centre slightly and add internal ember AMBER illuminationinsideface, like V7 activewoodplaque. No exteriorhalo or flames. Face stays blank for icon, no text. Sameactualalpha. Target92squarePNG."
+  },
+  {
+    "id": "strip-status",
+    "css": [
+      358,
+      40
+    ],
+    "slice": [
+      10,
+      16,
+      10,
+      16
+    ],
+    "kind": "frame",
+    "desc": "Long narrow strip of clean warm parchment358:40 with finely ragged thin edges on all sides. No curls, no scrollrolls, no illustration, no ornaments. Thin dark warm edge only; quiet blank smoothcream centre for live status sentence. Nine-slice cornerregions16CSSx10CSS. Transparent surrounding, face-on. Target716x80PNG."
+  },
+  {
+    "id": "button-parchment",
+    "css": [
+      200,
+      40
+    ],
+    "slice": [
+      12,
+      16,
+      12,
+      16
+    ],
+    "kind": "frame",
+    "desc": "Secondary button plate200:40, pale warm parchment inset face enclosedin slim darkoak bevelled rim. Handcrafted medieval UI. Blankface, no symbolsorwords. Quiet activeavailable state, no amberglow. Rounded corners confined16CSSregions, longstraight middle for nine-slice. Slight tactile upper-leftlight. Transparent background. Target400x80PNG."
+  },
+  {
+    "id": "button-parchment-off",
+    "css": [
+      200,
+      40
+    ],
+    "slice": [
+      12,
+      16,
+      12,
+      16
+    ],
+    "kind": "frame",
+    "edit": "button-parchment",
+    "desc": "EDIT exact parchment button into disabled state. Preserve exact contour, dimensions, cornerdesign, woodrim, parchment and alpha. Only dullthe illumination and mute colourcontrast slightly. Still warm parchmentandwood, not grey plastic. No text. Same400x80PNG nine-slice."
+  },
+  {
+    "id": "title-frame",
+    "css": [
+      374,
+      760
+    ],
+    "slice": [
+      100,
+      24,
+      24,
+      24
+    ],
+    "kind": "outline",
+    "desc": "Tall medieval OAK FRAME374:760 with shallow arched crown across TOP. Aged thin brass lineinsidewood and tinyforgedcornernails. Frame width24CSSpx sides/bottom, completearch contained upper100CSSpx. Empty entirely TRANSPARENT centre and transparentoutside; only woodandbrass border. Straight verticals and bottomfornine-slice, symmetric shallowarchtop, no decorationprotruding, noimage,textorlogo. Warm darkoak sameasheader. Target748x1520PNG."
+  },
+  {
+    "id": "title-bg",
+    "css": [
+      256,
+      256
+    ],
+    "kind": "tile",
+    "desc": "Seamless square repeating DARK OAK BACKGROUND for medieval title screenunderwoodframe. Restrained horizontal fine grain, very darkwarm brown umber, slightly darkerthan noticeboard, verylowcontrast, no broad planksorjoinlines, no nailsormetalorframe. Fullbleedopaque square. Flatuniform light no vignette no gradients. Exactlymatchingoppositeedges bothaxes. Target512squarePNG at256CSS."
+  },
+  {
+    "id": "title-plate",
+    "css": [
+      300,
+      82
+    ],
+    "slice": [
+      22,
+      54,
+      22,
+      54
+    ],
+    "kind": "frame",
+    "desc": "Blank valley-number plaque300:82, warm ivory parchment set into a simple aged brass thinframe with narrowdarkoak backingedge. Nine-slice corners18CSS horizontal16vertical, straightmiddle, broadclean face for labelandnumber input. No textordiceiconorinsideboxes. Soft upper-leftlight, subtlewear, quiet readable. Transparent outside, flatfront. Target600x164PNG."
+  },
+  {
+    "id": "paper-document",
+    "css": [
+      512,
+      512
+    ],
+    "kind": "tile",
+    "desc": "Seamless fullbleed square repeating parchmentDOCUMENT. Warmer honeyivory than clean sheets, gently aged soft fibres and extremelysubtle diffuse wear speckles, lowcontrastforcontinuousreading. No distinct stains or folds, no borderordarkedge, no textorgraphics, no vignette. Flat even diffuse lighting, constantaveragecolour acrosscanvas, seamlesslymatching all oppositeedges. Target1024squarePNG at512CSS."
+  }
+]

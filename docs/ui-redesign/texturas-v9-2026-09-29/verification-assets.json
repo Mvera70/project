@@ -1,0 +1,396 @@
+[
+  {
+    "id": "wood-header",
+    "source": "masters/wood-header.png",
+    "path": "assets/wood-header.png",
+    "size": [
+      748,
+      184
+    ],
+    "css": [
+      374,
+      92
+    ],
+    "crop": [
+      16,
+      206,
+      1967,
+      570
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "74d9647af07c8e9df9e2bad722348209a1246bc8ec7443e60212a15e2a8f2826",
+    "slicePNG": [
+      48,
+      48,
+      48,
+      48
+    ]
+  },
+  {
+    "id": "wood-board",
+    "source": "masters/wood-board.png",
+    "path": "assets/wood-board.png",
+    "size": [
+      512,
+      512
+    ],
+    "css": [
+      256,
+      256
+    ],
+    "crop": null,
+    "alpha": [
+      255,
+      255
+    ],
+    "sha256": "8c0ce0eb1f84c7e4e3ca041ca1f2abcc69d6ed7622716143d8b96376152ad748"
+  },
+  {
+    "id": "parchment-sheet",
+    "source": "masters/parchment-sheet.png",
+    "path": "assets/parchment-sheet.png",
+    "size": [
+      1024,
+      1024
+    ],
+    "css": [
+      512,
+      512
+    ],
+    "crop": null,
+    "alpha": [
+      255,
+      255
+    ],
+    "sha256": "285645aba985f436b5560af04368a3c4a0726c43254e37f9f6331208425d0442"
+  },
+  {
+    "id": "parchment-sheet-edge",
+    "source": "masters/parchment-sheet-edge.png",
+    "path": "assets/parchment-sheet-edge.png",
+    "size": [
+      780,
+      48
+    ],
+    "css": [
+      390,
+      24
+    ],
+    "crop": [
+      0,
+      432,
+      1599,
+      567
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "4cda0268357725371d4308e4288fc95b680fa8849f6ce8ce033f73b04534761d",
+    "slicePNG": [
+      16,
+      32,
+      16,
+      32
+    ]
+  },
+  {
+    "id": "plate-date",
+    "source": "masters/plate-date.png",
+    "path": "assets/plate-date.png",
+    "size": [
+      716,
+      68
+    ],
+    "css": [
+      358,
+      34
+    ],
+    "crop": [
+      6,
+      181,
+      2168,
+      514
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "329aeef76c013754d9f58dc49154359b9810b28a94012619a00734d004030b31",
+    "slicePNG": [
+      20,
+      28,
+      20,
+      28
+    ]
+  },
+  {
+    "id": "well-vital",
+    "source": "masters/well-vital.png",
+    "path": "assets/well-vital.png",
+    "size": [
+      136,
+      68
+    ],
+    "css": [
+      68,
+      34
+    ],
+    "crop": [
+      67,
+      166,
+      1706,
+      704
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "be625eb6eb342a74034678ffde96b4e09bd7b2da5b233604a4b845233cad04c0",
+    "slicePNG": [
+      20,
+      20,
+      20,
+      20
+    ]
+  },
+  {
+    "id": "btn-round",
+    "source": "masters/btn-round.png",
+    "path": "assets/btn-round.png",
+    "size": [
+      92,
+      92
+    ],
+    "css": [
+      46,
+      46
+    ],
+    "crop": [
+      117,
+      114,
+      1137,
+      1129
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "debffd1a7fbdb52e7f3d5e97adc85905c4e2bcd85611756d6d0484e2274ad8ed"
+  },
+  {
+    "id": "btn-round-on",
+    "source": "masters/btn-round-on.png",
+    "path": "assets/btn-round-on.png",
+    "size": [
+      92,
+      92
+    ],
+    "css": [
+      46,
+      46
+    ],
+    "crop": [
+      117,
+      113,
+      1137,
+      1129
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "a5bd79936055c0d00f6e7bd216393f9354a5d8fd5741586db56d2be658fde6fa"
+  },
+  {
+    "id": "strip-status",
+    "source": "masters/strip-status.png",
+    "path": "assets/strip-status.png",
+    "size": [
+      716,
+      80
+    ],
+    "css": [
+      358,
+      40
+    ],
+    "crop": [
+      11,
+      241,
+      2055,
+      522
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "5403873e83b0357fc534a27446acd2903bd3987e629d06f01ce0680c43affd59",
+    "slicePNG": [
+      20,
+      32,
+      20,
+      32
+    ]
+  },
+  {
+    "id": "button-parchment",
+    "source": "masters/button-parchment.png",
+    "path": "assets/button-parchment.png",
+    "size": [
+      400,
+      80
+    ],
+    "css": [
+      200,
+      40
+    ],
+    "crop": [
+      29,
+      275,
+      1745,
+      607
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "babfcaa935b346f0fae2892ac6970f9c7879a1dce379b8a2dfafb2d2966a81e0",
+    "slicePNG": [
+      24,
+      32,
+      24,
+      32
+    ]
+  },
+  {
+    "id": "button-parchment-off",
+    "source": "masters/button-parchment-off.png",
+    "path": "assets/button-parchment-off.png",
+    "size": [
+      400,
+      80
+    ],
+    "css": [
+      200,
+      40
+    ],
+    "crop": [
+      30,
+      275,
+      1745,
+      606
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "34b8f40228ea43c0e59845501bdf7988571e4f34cc219279050fcfc671273e3e",
+    "slicePNG": [
+      24,
+      32,
+      24,
+      32
+    ]
+  },
+  {
+    "id": "title-frame",
+    "source": "masters/title-frame.png",
+    "path": "assets/title-frame.png",
+    "size": [
+      748,
+      1520
+    ],
+    "css": [
+      374,
+      760
+    ],
+    "crop": [
+      13,
+      14,
+      867,
+      1773
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "d43ce8feaa29f6d4051d78e2b69158c1aeaea6b48286bce275f0d611cc8e544b",
+    "slicePNG": [
+      200,
+      48,
+      48,
+      48
+    ]
+  },
+  {
+    "id": "title-bg",
+    "source": "masters/title-bg.png",
+    "path": "assets/title-bg.png",
+    "size": [
+      512,
+      512
+    ],
+    "css": [
+      256,
+      256
+    ],
+    "crop": null,
+    "alpha": [
+      255,
+      255
+    ],
+    "sha256": "47635e486b28cb8ce06b3c12cc843d93d98b69a1faa09775664655ecee8c65ae"
+  },
+  {
+    "id": "title-plate",
+    "source": "masters/title-plate.png",
+    "path": "assets/title-plate.png",
+    "size": [
+      600,
+      164
+    ],
+    "css": [
+      300,
+      82
+    ],
+    "crop": [
+      36,
+      159,
+      1947,
+      603
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "dcb838a6bfe4d5db05d605d087f7e9cacc104315fc701efcc4acab8b08580875",
+    "slicePNG": [
+      44,
+      108,
+      44,
+      108
+    ]
+  },
+  {
+    "id": "paper-document",
+    "source": "masters/paper-document.png",
+    "path": "assets/paper-document.png",
+    "size": [
+      1024,
+      1024
+    ],
+    "css": [
+      512,
+      512
+    ],
+    "crop": null,
+    "alpha": [
+      255,
+      255
+    ],
+    "sha256": "0cd01617f4cdc355e81b341b73b86cb36af34f5dc2f9cca97742def61c2c3219"
+  }
+]

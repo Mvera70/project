@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · V9: texturas y portada, cierre documental
+
+Quince piezas iniciales ImageGen a 2×, fuentes/prompts/exportadores y seis
+comparativas a 390×844 en `ui-redesign/texturas-v9-2026-09-29/`.
+Vera elige la portada 04, anochecer, entre cinco alternativas; madera de
+portada descartada. Capturas finales verificadas, controles legibles y
+encrucijada con tres opciones completas. Skill compartida actualizada.
+Modo día/noche y animación expresamente aplazados. Sin integración en
+componentes, motor ni banco. Documento: `ui-redesign/propuesta-texturas-v9-2026-09-29.md`.
+
+
 ## 29 sep 2026 · V8: barra de cuero y medallones
 
 Terminada la propuesta local iniciada el 28: correa de cuero y medallones de

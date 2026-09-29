@@ -1,5 +1,10 @@
 # Las herramientas de The Valley — el catálogo
 
+**Lote documental V9:** [README y comandos](../docs/ui-redesign/texturas-v9-2026-09-29/README.md).
+`export-assets.py`, los exportadores de `revision-portada/` y `demos-portada/`,
+`build.mjs`, `build-demos.mjs` y `capture.mjs` normalizan ImageGen y capturan
+maquetas con Edge. No integran ni ejecutan el juego.
+
 Se ordenó el 19 sep 2026, a petición del dueño del diseño: «que no haya
 herramientas sueltas sin documentar». Cada herramienta activa tiene una entrada
 aquí o en el README de su lote. Las utilidades de rondas cerradas viven en

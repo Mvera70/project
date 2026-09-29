@@ -1,0 +1,97 @@
+[
+  {
+    "id": "01-desfiladero",
+    "source": "masters/01-desfiladero.png",
+    "file": "01-desfiladero.png",
+    "css": [
+      390,
+      844
+    ],
+    "size": [
+      780,
+      1688
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "generator": "ImageGen integrado",
+    "sha256": "7c2ae51f407fcad6cfdd671e0e7b99ffd43175947709a96dd3e0642105da6af6"
+  },
+  {
+    "id": "02-atlas",
+    "source": "masters/02-atlas.png",
+    "file": "02-atlas.png",
+    "css": [
+      390,
+      844
+    ],
+    "size": [
+      780,
+      1688
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "generator": "ImageGen integrado",
+    "sha256": "211bcee68b1c172750534ef190fcbbc27a4ee9eb01a518007738c00352707dd2"
+  },
+  {
+    "id": "03-tapiz",
+    "source": "masters/03-tapiz.png",
+    "file": "03-tapiz.png",
+    "css": [
+      390,
+      844
+    ],
+    "size": [
+      780,
+      1688
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "generator": "ImageGen integrado",
+    "sha256": "48f7ae13ba198ceba5d7519b381e61cbc1a233c63e19dbd648c96d78cde9260b"
+  },
+  {
+    "id": "04-anochecer",
+    "source": "masters/04-anochecer.png",
+    "file": "04-anochecer.png",
+    "css": [
+      390,
+      844
+    ],
+    "size": [
+      780,
+      1688
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "generator": "ImageGen integrado",
+    "sha256": "093e12301994bcd437f33713b9c9c862f6e023ea87137b6f93ead2322da90fce"
+  },
+  {
+    "id": "05-paso-piedra",
+    "source": "masters/05-paso-piedra.png",
+    "file": "05-paso-piedra.png",
+    "css": [
+      390,
+      844
+    ],
+    "size": [
+      780,
+      1688
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "generator": "ImageGen integrado",
+    "sha256": "7c68851338ac49a91b91d22a37c5a11f32f995b7aa0f0d0223cdbf7c3bcfb8e1"
+  }
+]
