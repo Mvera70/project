@@ -531,7 +531,15 @@ LOOP_LEVEL = {
     # sigue subiendo seis decibelios y se oye de sobra.
     'water': -40.0,
     'fire': -31.0,     # el fuego es un suceso y se acerca la cámara
+    'life': -36.0,     # pájaros, grillos y la aldea: presencia, no protagonismo
 }
+
+# Hasta dónde llega cada lecho por arriba. Casi todos se cortan a 4,8 kHz, que
+# es donde empieza el filo; **los bichos no**, porque un pájaro y un grillo
+# viven ahí arriba y cortados ahí suenan a juguete mojado. Es la única
+# excepción del proyecto y va medida: aun así se quedan muy por debajo de los
+# 8 kHz a los que un móvil ya no da.
+LOOP_TOP = {'amb_birds_day': 6800, 'amb_night_summer': 5200}
 
 LOOP_RECIPES: dict[str, Callable[[Voice], tuple[str, float, np.ndarray]]] = {}
 
@@ -692,12 +700,159 @@ def crackles(v: Voice, seconds: float, per_second: float, level: float) -> np.nd
     return unit(out, level)
 
 
+# ---- la vida: el día, la noche y la aldea que crece --------------------------------
+# **Ninguno de éstos tiene una garganta.** Es la decisión de fondo del 29 sep
+# 2026: una voz sintética es lo que más «de dibujos» suena, así que el bullicio
+# de una aldea se hace con lo que la aldea **hace** —golpes lejanos, una puerta,
+# pasos, un cacharro— y con un rumor de banda estrecha que el oído completa
+# solo. Si Vera consigue voces de verdad, sustituyen a esto sin tocar nada más.
+
+def _far(v: Voice, x: np.ndarray, size: float = 0.35, mix: float = 0.5) -> np.ndarray:
+    """Lo pone lejos: una cola de valle y los agudos comidos, como hace el aire."""
+    n = int(size * SR)
+    ir = lp(v.noise(n), 2200) * np.exp(-v.t(size) / (size / 3.5))
+    wet = signal.fftconvolve(x, ir)[: len(x)]
+    wet = wet / (np.abs(wet).max() + 1e-9) * (np.abs(x).max() + 1e-12)
+    return lp(x * (1 - mix) + wet * mix, 3000)
+
+
+def chirps(v: Voice, seconds: float, per_second: float, level: float,
+           lo: float = 2600, hi: float = 5200, notes: int = 3) -> np.ndarray:
+    """Un pájaro: dos o tres silbidos cortos que barren de tono, no una nota tenida."""
+    n = int(seconds * SR)
+    out = np.zeros(n)
+    for _ in range(max(1, int(per_second * seconds))):
+        at = int(v.rng.uniform(0, n - int(0.5 * SR)))
+        base = v.rng.uniform(lo, hi)
+        for note in range(v.rng.integers(1, notes + 1)):
+            d = v.rng.uniform(0.035, 0.075)
+            m = int(d * SR)
+            t = np.arange(m) / SR
+            # El barrido es lo que hace que sea un pájaro y no un pitido.
+            sweep = base * (1 + v.rng.uniform(-0.35, 0.45) * (t / d))
+            ph = 2 * np.pi * np.cumsum(sweep) / SR
+            env = np.sin(np.pi * t / d) ** 1.5
+            call = (np.sin(ph) + 0.22 * np.sin(2 * ph)) * env
+            start = at + int(note * v.rng.uniform(0.07, 0.16) * SR)
+            if start + m < n:
+                out[start:start + m] += call * v.rng.uniform(0.5, 1.0)
+    return unit(out, level)
+
+
+@loop('amb_birds_day')
+def _(v: Voice):
+    # Dos o tres pájaros lejanos y silencios largos. La dirección que Vera
+    # aprobó en septiembre («escasos, lejanos y con aire»), no un bosque entero.
+    d = 14.0
+    air = bed_noise(v, d + 1.5, 400, 1600) * wobble(v, d + 1.5, 0.1, 0.3, 0.5) * 0.25
+    return 'life', d, air + _far(v, chirps(v, d + 1.5, 0.75, 1.0), 0.45, 0.45)
+
+
+@loop('amb_night_summer')
+def _(v: Voice):
+    # Grillos: un pulso rápido de ruido en banda, muchos y desacompasados. No
+    # es un tono, y por eso no cae en la trampa de la caja de música.
+    d = 12.0
+    n = int((d + 1.5) * SR)
+    out = np.zeros(n)
+    for _ in range(9):
+        rate = v.rng.uniform(22, 31)           # trinos por segundo
+        t = np.arange(n) / SR
+        pulse = np.clip(np.sin(2 * np.pi * rate * t), 0, 1) ** 3
+        # Cada grillo calla a ratos, que es lo que hace que no sea un zumbido.
+        gate = (np.sin(2 * np.pi * v.rng.uniform(0.05, 0.13) * t + v.rng.uniform(0, 6.28)) > -0.2)
+        # Medido: con la banda en 3000-5600 el lecho se iba al 40 % de energía
+        # por encima de 4 kHz, y eso toda la noche es siseo. Bajada, sigue
+        # leyéndose como grillo y cae al 12 %.
+        tone = bp(v.noise(n), v.rng.uniform(2400, 3400), v.rng.uniform(3600, 4400))
+        out += tone * pulse * gate * v.rng.uniform(0.3, 1.0)
+    quiet = bed_noise(v, d + 1.5, 220, 800) * 0.2
+    return 'life', d, quiet + unit(_far(v, out, 0.3, 0.35), 0.9)
+
+
+@loop('amb_night_cold')
+def _(v: Voice):
+    # Noche de otoño e invierno: casi nada. Un aire quieto y, muy de vez en
+    # cuando, algo lejos. El silencio también es un sonido y aquí es el tema.
+    d = 14.0
+    air = bed_noise(v, d + 1.5, 320, 1000, order=3) * wobble(v, d + 1.5, 0.06, 0.35, 0.5)
+    calls = chirps(v, d + 1.5, 0.12, 0.5, lo=700, hi=1400, notes=2)
+    return 'life', d, air + _far(v, calls, 0.6, 0.6) * 0.5
+
+
+def thuds(v: Voice, seconds: float, per_second: float, level: float,
+          lo: float = 300, hi: float = 1500) -> np.ndarray:
+    """La actividad de la aldea: golpes de madera, cacharros, una puerta."""
+    n = int(seconds * SR)
+    out = np.zeros(n)
+    for _ in range(max(1, int(per_second * seconds))):
+        at = int(v.rng.uniform(0, n - 3000))
+        f = v.rng.uniform(lo, hi)
+        d = v.rng.uniform(0.03, 0.12)
+        m = int(d * SR)
+        exc = v.noise(m) * np.exp(-np.arange(m) / (0.0008 * SR))
+        hit = bp(exc, f * 0.85, f * 1.25) * np.exp(-np.arange(m) / (m * 0.3))
+        out[at:at + m] += hit * v.rng.uniform(0.25, 1.0)
+    return unit(out, level)
+
+
+@loop('amb_village_sparse')
+def _(v: Voice):
+    # Un caserío: se oye que hay alguien, y poco más.
+    d = 14.0
+    return 'life', d, _far(v, thuds(v, d + 1.5, 1.1, 1.0), 0.45, 0.5)
+
+
+@loop('amb_village_busy')
+def _(v: Voice):
+    # Un pueblo: los golpes se solapan y debajo hay un rumor. **El rumor es
+    # ruido de banda estrecha con su respiración**, no voces: sugiere gente sin
+    # fabricar una garganta, que es el truco de toda sala llena de un juego.
+    d = 14.0
+    work = thuds(v, d + 1.5, 4.5, 1.0)
+    n = int((d + 1.5) * SR)
+    t = np.arange(n) / SR
+    swell = np.zeros(n)
+    for _ in range(5):
+        swell += np.sin(2 * np.pi * v.rng.uniform(0.3, 1.4) * t + v.rng.uniform(0, 6.28))
+    murmur = bp(v.noise(n), 320, 1000) * (0.45 + 0.55 * unit(swell, 1.0))
+    return 'life', d, _far(v, work + murmur * 0.8, 0.5, 0.55)
+
+
+@loop('amb_hearth')
+def _(v: Voice):
+    # La hoguera de la plaza: más pequeña y más lejos que una casa ardiendo.
+    d = 10.0
+    bedding = bed_noise(v, d + 1.5, 320, 1100) * wobble(v, d + 1.5, 0.35, 0.35, 0.6) * 0.4
+    return 'life', d, _far(v, bedding + crackles(v, d + 1.5, 5.5, 0.7), 0.3, 0.3)
+
+
+@loop('amb_festival')
+def _(v: Voice):
+    # Fiesta: la aldea entera fuera. Golpes, cacharros y palmas sueltas —una
+    # palma es un transitorio de banda ancha, no una voz—. **Es la capa que más
+    # pide grabaciones de verdad**, y queda apuntada como tal.
+    d = 14.0
+    n = int((d + 1.5) * SR)
+    claps = np.zeros(n)
+    for _ in range(int(2.2 * (d + 1.5))):
+        at = int(v.rng.uniform(0, n - 2000))
+        m = int(v.rng.uniform(0.01, 0.03) * SR)
+        clap = bp(v.noise(m), 900, 3000) * np.exp(-np.arange(m) / (m * 0.2))
+        claps[at:at + m] += clap * v.rng.uniform(0.4, 1.0)
+    work = thuds(v, d + 1.5, 5.5, 1.0, lo=350, hi=1800)
+    t = np.arange(n) / SR
+    swell = sum(np.sin(2 * np.pi * v.rng.uniform(0.25, 1.1) * t + v.rng.uniform(0, 6.28)) for _ in range(4))
+    murmur = bp(v.noise(n), 340, 1100) * (0.5 + 0.5 * unit(np.asarray(swell), 1.0))
+    return 'life', d, _far(v, work + unit(claps, 0.55) + murmur * 0.9, 0.5, 0.5)
+
+
 def render_loop(cue: str, variant: str) -> np.ndarray:
     """Un lecho: sin costura, sin fundidos en los bordes y nivelado en la banda del teléfono."""
     family, seconds, raw = LOOP_RECIPES[cue](Voice(cue, variant))
     x = seamless(raw, seconds)
     x = hp(x, 110)
-    x = lp(x, 4800)
+    x = lp(x, LOOP_TOP.get(cue, 4800))
     gain = 10 ** (LOOP_LEVEL[family] / 20) / (band_rms(x) + 1e-12)
     gain = min(gain, PEAK_CEILING / (np.abs(x).max() + 1e-12))
     x = x * gain

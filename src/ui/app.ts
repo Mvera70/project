@@ -59,6 +59,8 @@ import { accentFor, playerAnswer, routeCue, sound, speedCue } from './sound';
 import { cellsBetween, mixFor, riverCellsFrom, thunderFor, type WorldSound } from './ambience';
 import { valleyAxis } from '@engine/world/valley-road';
 import { floodOf } from '@derive/flood';
+import { festivityOf } from '@derive/festivity';
+import { population } from '@engine/people/demography';
 import { openWelcome } from './welcome';
 import { devPreference, startDevHud, type DevHud } from './dev-hud';
 import { mountCameraControls, type CameraControls } from './camera-controls';
@@ -1195,6 +1197,16 @@ export function boot(
       flameCells: flaming ? nearest : null,
       emberCells: flaming ? null : nearest,
       viewHeight: stats.viewHeight,
+      phase: stats.sunPhase,
+      people: population(state),
+      // **El corazón de la aldea es la plaza**, que se guarda fija desde la
+      // fundación (esquema 8). Se probó con la media de los edificios en pie y
+      // salió el mismo fallo que esa decisión ya cuenta: la media **se mueve
+      // sola** mientras la aldea crece —y con una muralla o una atalaya se va
+      // del pueblo—. Medido con el recorrido: en un valle del año 30 el
+      // bullicio se apagaba entero por eso.
+      villageCells: cellsBetween({ x: state.plaza.x, z: state.plaza.y }, view),
+      festivity: festivityOf(state) !== null,
     };
   };
 

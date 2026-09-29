@@ -2798,6 +2798,21 @@ export const SOUND = {
   THUNDER_NEAR_CELLS: 22,
   THUNDER_MID_CELLS: 44,
 
+  // ---- la vida del fondo (fase 2, 29 sep 2026) ----
+
+  // TUNE: **cuánta gente hace falta para que la aldea suene a aldea, y a
+  // pueblo.** Sale de medir, no de la cabeza: `founding-report.ts` sobre las
+  // semillas 7, 23, 42, 108, 999 y 2024 da 6–13 personas el primer año,
+  // 20–39 el quinto, 21–54 en la primera década y 50–80 en un valle maduro
+  // (el tope es 80: 16 casas × 5). Así que el rumor entra en cuanto hay más
+  // que las dos familias del principio, llena hacia las veinte, y el segundo
+  // lecho —el que hace que se solapen los golpes— sube desde la treintena y
+  // llena donde llegan los valles buenos.
+  MURMUR_SPARSE_FROM: 4,
+  MURMUR_SPARSE_FULL: 18,
+  MURMUR_BUSY_FROM: 28,
+  MURMUR_BUSY_FULL: 60,
+
   // TUNE: la fuerza del viento por cielo, de 0 a 1. **Vive aquí y no en el
   // renderer porque la leen dos capas**: el meneo de las hojas
   // (`render3d/effects/wind.ts`) y el lecho de viento (`ui/ambience.ts`), y

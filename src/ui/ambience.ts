@@ -27,6 +27,7 @@
 import { SOUND } from '@engine/balance';
 import type { Season } from '@engine/state';
 import type { SkyKind } from '@derive/weather';
+import { hearthAt, PHASES } from '../render3d/effects/day-phases';
 
 /** Cada lecho que puede estar sonando. Son los ficheros de `public/audio/`. */
 export type AmbienceLayer =
@@ -40,12 +41,22 @@ export type AmbienceLayer =
   | 'amb_river'
   | 'amb_waterfall'
   | 'amb_fire_flame'
-  | 'amb_fire_embers';
+  | 'amb_fire_embers'
+  // Fase 2: el día, la noche y la aldea que crece.
+  | 'amb_birds_day'
+  | 'amb_night_summer'
+  | 'amb_night_cold'
+  | 'amb_village_sparse'
+  | 'amb_village_busy'
+  | 'amb_hearth'
+  | 'amb_festival';
 
 export const AMBIENCE_LAYERS: readonly AmbienceLayer[] = [
   'amb_wind_calm', 'amb_wind_gust', 'amb_wind_winter',
   'amb_rain_light', 'amb_rain_heavy', 'amb_storm_bed', 'amb_snow_hush',
   'amb_river', 'amb_waterfall', 'amb_fire_flame', 'amb_fire_embers',
+  'amb_birds_day', 'amb_night_summer', 'amb_night_cold',
+  'amb_village_sparse', 'amb_village_busy', 'amb_hearth', 'amb_festival',
 ];
 
 /** Cuánto suena cada capa, de 0 a 1. Lo que no está, no suena. */
@@ -71,6 +82,14 @@ export interface WorldSound {
   readonly emberCells: number | null;
   /** Altura de vista en celdas: 8 es encima de una casa, 92 el valle entero. */
   readonly viewHeight: number;
+  /** Fase de la jornada, 0 a 1: 0 es medianoche y el juego abre en 0,28. */
+  readonly phase: number;
+  /** Cuánta gente viva hay. Dos al fundar, hasta ochenta en un valle hecho. */
+  readonly people: number;
+  /** Celdas del centro de la vista al corazón de la aldea. */
+  readonly villageCells: number;
+  /** Hay fiesta esta semana: boda, cosecha o barril. */
+  readonly festivity: boolean;
 }
 
 /** El mundo calla del todo: en pausa, en un letargo o sin nadie mirando. */
@@ -85,6 +104,28 @@ export function fastForward(speed: number): boolean {
 
 function clamp01(value: number): number {
   return value < 0 ? 0 : value > 1 ? 1 : value;
+}
+
+/** De 0 a 1 entre dos valores, para cruzar una capa según cuánto hay de algo. */
+export function ramp(value: number, from: number, full: number): number {
+  return clamp01((value - from) / (full - from));
+}
+
+/**
+ * Cuánta luz hay, de 0 a 1, **para el sonido**.
+ *
+ * No es la luz del renderer (`daylight.ts` importa Three y además la aplana a
+ * ×16 y ×64): es la misma forma con los mismos momentos, cruzada en el alba y
+ * en el anochecer para que los pájaros y los grillos se releven en vez de
+ * cortarse. La noche está comprimida a propósito y aquí se respeta.
+ */
+export function daylightish(phase: number): number {
+  const day = Number.isFinite(phase) ? phase - Math.floor(phase) : 0;
+  const { DAWN, MORNING, DUSK, NIGHT } = PHASES;
+  if (day < DAWN || day >= NIGHT) return 0;
+  if (day < MORNING) return (day - DAWN) / (MORNING - DAWN);
+  if (day <= DUSK) return 1;
+  return 1 - (day - DUSK) / (NIGHT - DUSK);
 }
 
 /**
@@ -167,6 +208,37 @@ export function mixFor(world: WorldSound): Mix {
   const surge = 1 + world.flood * 0.6;
   add(mix, 'amb_river', nearness(world.riverCells, world.viewHeight) * surge, dim);
   add(mix, 'amb_waterfall', nearness(world.waterfallCells, world.viewHeight) * surge, dim);
+
+  // **El día y la noche.** La jornada comprime la noche a propósito (§D.6.1):
+  // del alba al anochecer va el 86 % de ella, así que los pájaros tienen sitio
+  // de sobra y los grillos son un rato corto — que es justo como debe sentirse.
+  const day = daylightish(world.phase);
+  const night = 1 - day;
+  // Los pájaros callan con tormenta y con nieve, y se retiran con lluvia: la
+  // misma regla que sigue la bandada que cruza el valle (`ambience.ts` del
+  // render), para que lo que se oye y lo que se ve digan lo mismo.
+  const birdWeather = world.sky === 'storm' || world.sky === 'snow' ? 0
+    : world.sky === 'rain' ? 0.3 : 1;
+  add(mix, 'amb_birds_day', day * birdWeather, dim);
+  // Los grillos son de primavera y verano y no salen bajo la lluvia; el resto
+  // del año la noche es el aire quieto, que también es un sonido.
+  const summerNight = world.season === 'spring' || world.season === 'summer';
+  const dry = world.sky === 'clear' || world.sky === 'overcast';
+  add(mix, summerNight && dry ? 'amb_night_summer' : 'amb_night_cold', night, dim);
+
+  // **La aldea, y cuánta hay.** Dos lechos que se cruzan con la población
+  // medida (`SOUND.MURMUR_*`): el primero dice que hay alguien, el segundo que
+  // los golpes se solapan. **De noche no suena**: la gente duerme y ni
+  // siquiera se dibuja, así que un pueblo que murmura a oscuras sería mentira.
+  const crowd = nearness(world.villageCells, world.viewHeight) * day;
+  add(mix, 'amb_village_sparse',
+    ramp(world.people, SOUND.MURMUR_SPARSE_FROM, SOUND.MURMUR_SPARSE_FULL) * crowd, dim);
+  add(mix, 'amb_village_busy',
+    ramp(world.people, SOUND.MURMUR_BUSY_FROM, SOUND.MURMUR_BUSY_FULL) * crowd, dim);
+  // Y la fiesta, encima: la plaza engalanada y todo el mundo fuera.
+  if (world.festivity) add(mix, 'amb_festival', crowd, dim);
+  // La hoguera de la plaza arde en su rato de la tarde y nada más.
+  add(mix, 'amb_hearth', hearthAt(world.phase) * nearness(world.villageCells, world.viewHeight), dim);
 
   // **El fuego no suena en avance rápido.** Arde tres jornadas, que a ×64 son
   // seis segundos: encenderlo y apagarlo en ese tiempo es un parpadeo, no un

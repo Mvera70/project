@@ -10,10 +10,8 @@ import {
   AdditiveBlending, CanvasTexture, CylinderGeometry, DodecahedronGeometry, Group, Mesh,
   MeshStandardMaterial, PointLight, Sprite, SpriteMaterial, type Texture,
 } from 'three';
+import { hearthAt } from './day-phases';
 
-/** Cuándo arde, en fase de jornada: un poco antes y un poco después del corro. */
-const LIT_FROM = 0.55;
-const LIT_TO = 0.7;
 /** Cuánto se aparta del centro de la plaza, para no pisar la fuente. */
 const OFFSET = { x: 1.8, z: 1.1 };
 
@@ -46,12 +44,10 @@ export interface Hearth {
   dispose(): void;
 }
 
-/** Cuánto arde a esta hora: sube y baja en un tramo corto a cada lado. */
-export function hearthAt(phase: number): number {
-  if (phase < LIT_FROM || phase > LIT_TO) return 0;
-  const ramp = 0.02;
-  return Math.min(1, (phase - LIT_FROM) / ramp, (LIT_TO - phase) / ramp);
-}
+// Cuándo arde y cuánto viven en `day-phases.ts`, que no importa Three: lo lee
+// también el lecho de ambiente (§11.11). Se reexporta porque las pruebas de la
+// plaza y el resto del render lo piden por aquí desde G-08.
+export { hearthAt } from './day-phases';
 
 export function createHearth(): Hearth {
   const group = new Group();

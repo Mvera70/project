@@ -172,6 +172,24 @@ await bed('tormenta · lecho de tormenta y racha', (now) => {
 await bed('nieve · el aire amortiguado', (now) => has(now, 'amb_snow_hush'),
   async () => { await tab.evaluate(() => window.__valleyHoldSky?.('snow')); });
 
+// Fase 2: el día, la noche y la aldea. `__valleyHoldPhase` congela la hora.
+await bed('de día cantan los pájaros', (now) => {
+  has(now, 'amb_birds_day');
+  lacks(now, 'amb_night_summer');
+}, async () => { await tab.evaluate(() => { window.__valleyHoldSky?.('clear'); window.__valleyHoldPhase?.(0.45); }); });
+
+await bed('de noche se relevan: grillos y la aldea callada', (now) => {
+  has(now, 'amb_night_summer');
+  lacks(now, 'amb_birds_day');
+  lacks(now, 'amb_village_sparse');
+}, async () => { await tab.evaluate(() => window.__valleyHoldPhase?.(0.96)); });
+
+await bed('la hoguera de la plaza, en su rato de la tarde', (now) => has(now, 'amb_hearth'),
+  async () => { await tab.evaluate(() => window.__valleyHoldPhase?.(0.62)); });
+
+await bed('y de día la aldea se oye', (now) => has(now, 'amb_village_sparse'),
+  async () => { await tab.evaluate(() => window.__valleyHoldPhase?.(0.45)); });
+
 await bed('en pausa el mundo calla del todo', (now) => {
   if (Object.values(now).some((gain) => gain > 0.01)) throw new Error('algo sigue sonando');
 }, async () => { await tab.evaluate(() => window.__valleySpeed?.(0)); });
@@ -179,6 +197,36 @@ await bed('en pausa el mundo calla del todo', (now) => {
 await bed('y al seguir, vuelve', (now) => has(now, 'amb_wind_calm'), async () => {
   await tab.evaluate(() => { window.__valleyHoldSky?.('clear'); window.__valleySpeed?.(1); });
 });
+
+// **La aldea suena a lo grande que es.** Dos valles del mismo día y distinta
+// población tienen que sonar distinto: es lo que Vera pidió por su nombre.
+const murmurAt = async (year) => {
+  await tab.goto(`${base}?debug=1&live=1&seed=7&year=${year}&season=summer`);
+  await tab.waitForFunction(() => document.documentElement.dataset.appReady === 'true', null, { timeout: 90_000 });
+  await tab.evaluate(() => window.__valleyHoldPhase?.(0.45));
+  // El doble toque reencuadra el valle (`resetView`): sin él la cámara se
+  // queda donde el vuelo la dejó —medido, a 8 celdas y mirando fuera del
+  // pueblo—, y entonces el bullicio no se oye por sitio y no por población.
+  await tab.mouse.dblclick(195, 380);
+  // **Hay que esperar al vuelo de entrada** (9 s, `TIME.INTRO_FLIGHT_MS`) y
+  // al cruce de las capas. Mientras el vuelo dura, la cámara está muy alta y
+  // todo lo que tiene sitio —el río, la aldea— suena a cero: medir antes daba
+  // 0,00 en los dos valles y parecía que el bullicio no crecía con la aldea.
+  await tab.waitForTimeout(13_000);
+  const now = await mix();
+  const height = await tab.evaluate(() => Number(document.documentElement.dataset.viewHeight ?? '0'));
+  return { murmur: (now.amb_village_sparse ?? 0) + (now.amb_village_busy ?? 0), height };
+};
+const young = await murmurAt(3);
+const grown = await murmurAt(30);
+const grows = grown.murmur > young.murmur;
+const said = `año 3: ${young.murmur.toFixed(2)} · año 30: ${grown.murmur.toFixed(2)} `
+  + `(cámara a ${grown.height.toFixed(0)} celdas)`;
+ambience.push({
+  name: 'un valle hecho suena más que uno joven',
+  layers: [said], ok: grows, why: grows ? '' : 'el bullicio no crece con la aldea',
+});
+console.log(`${grows ? '✓' : '✗'} ${'un valle hecho suena más que uno joven'.padEnd(42)} ${said}`);
 
 // Y que la capa de verdad está sonando en el grafo de audio, no sólo pedida.
 const running = await tab.evaluate(() => {
