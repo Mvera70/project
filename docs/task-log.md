@@ -45,6 +45,14 @@ máquina cargada); índice de tomas (`docs/medidas/animacion-tomas-2026-09-29.md
 skill `animacion` para quien toque un clip, y `observe-valley-life` y
 `performance` con lo que la ronda añadió.
 
+**La puerta al cierre (29 sep, 13:30):** typecheck y lint limpios; suite
+rápida 2081 de 2082 pruebas (215 de 216 ficheros) en 37 min en esta máquina
+(cuatro núcleos lentos bajo el contenedor); la única roja es la de tiempo de
+`catchUp` (§13.2, 960 ticks en menos de 2 s): tarda 3,4–3,7 s **también en
+el commit base `d82bd84`, a solas y sin nada más corriendo**, así que es la
+máquina y no la ronda (ningún fichero del motor se ha tocado). Las jornadas
+se lanzan aparte tras la rápida.
+
 **Pendiente y dicho:** la comprobación en iPhone/iPad (nada de esto es una
 medida en el aparato); las tomas que el observatorio no pudo dar —la visita
 del oso, la caza y el asalto de la villa (sesenta personas y muralla; tiempo de carga
