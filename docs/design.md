@@ -7017,7 +7017,7 @@ el pueblo indiscriminadamente. Los objetos decorativos no interceptan la ficha.
 limita a árboles delante del portón y del frente activo, respecto de la cámara.
 Es reversible y sólo visual: no tala, no cambia colisiones ni recursos.
 El contrato y la verificación viven en `historico/encargos/encargo-visibilidad-y-huida.md`.
-**Y quien se sigue (GV-2, v5.05)**: la misma oclusión deja ver a la persona que
+**Y quien se sigue (GV-2, v5.12)**: la misma oclusión deja ver a la persona que
 sigue la ficha. Sólo se atenúan las copas que la tapan —medidas contra la copa,
 no contra el árbol entero, que atenuaba el que tala el leñador—, se funden en un
 tercio de segundo, conservan sombra y viento, y se **suman** a las del encuentro
@@ -7272,7 +7272,7 @@ de su cauce. `elevationAt` sigue devolviendo la cota de la cuadricula sin mover:
 el desplazamiento es horizontal y lo que separa la superficie dibujada de la
 calculada no llega a diez centimetros, que es menos que el grosor de una bota.
 
-**El pie de los edificios y el prado hondo (GV-1, v5.05).** El suelo pierde
+**El pie de los edificios y el prado hondo (GV-1, v5.12).** El suelo pierde
 parte de su luz de cielo —y algo menos de la del sol— al pie de cada edificio
 con tejado y en pie, con una máscara del valle entero hecha desde el plan de
 escena y rehecha sólo cuando cambian esos edificios (`world/contact-shade.ts`,

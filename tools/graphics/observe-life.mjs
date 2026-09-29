@@ -1,7 +1,7 @@
 // Juego real + reloj del navegador controlado + píxel y traza atómicos.
 import { chromium } from '@playwright/test';
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
-import { homedir } from 'node:os';
+import { withBrowser } from './browser.mjs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -45,13 +45,8 @@ if (!Number.isFinite(seconds) || seconds < 0 || !Number.isInteger(30 / fps) || f
 const out = resolve(opt('out', `artifacts/graphics/IA-10/seed-${seed}`));
 if (existsSync(join(out, 'trace.json'))) throw new Error('La toma ya existe; usa otra carpeta --out.');
 mkdirSync(join(out, 'frames'), { recursive: true });
-const root = join(homedir(), 'AppData/Local/ms-playwright');
-// AN-0 · Fuera de Windows la carpeta no existe y `readdirSync` abortaba la
-// toma; sin ejecutable explícito Playwright usa el Chromium que tenga instalado.
-const executablePath = process.env.VALLEY_CHROMIUM ?? (existsSync(root) ? readdirSync(root).filter(x => /^chromium-\d+$/.test(x)).sort().reverse()
-  .map(x => join(root, x, 'chrome-win64/chrome.exe')).find(existsSync) : undefined);
-const browser = await chromium.launch({ ...(executablePath ? { executablePath } : {}),
-  args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+const browser = await chromium.launch(withBrowser({
+  args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }));
 // AN-0 · `--viewport 390x844` mira el valle al tamaño normal de un móvil; por
 // omisión se conserva el encuadre ancho de siempre para no mover las tomas previas.
 const viewportMatch = /^(\d{2,4})x(\d{2,4})$/u.exec(opt('viewport', '1100x850'));

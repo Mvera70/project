@@ -1,6 +1,6 @@
 # Cuaderno de tareas — el rework
 
-## 29 sep 2026 · Profundidad visual en móvil: el pie de los edificios, el prado hondo y el seguido a la vista (v5.05)
+## 29 sep 2026 · Profundidad visual en móvil: el pie de los edificios, el prado hondo y el seguido a la vista (v5.12)
 
 Vera pidió ejecutar el encargo de Astra
 (`docs/encargos/profundidad-visual-movil-2026-09-29.md`) por orden, sin tocar
@@ -30,6 +30,16 @@ que no son de aquí**: las jornadas `e3b-corridor` (5) y `work-contact` (1), y
 en `main` `efafc2e`. La suite rápida entera, sobre la rama fusionada: 2102 de
 2103 verdes, y la roja es ésa.
 
+**La puerta de la PR #4**, antes de integrarla en `main` a petición de Vera
+(«puedes subir ya»): typecheck, `lint` entero y `build` limpios; `test:pwa`, 6
+de 6; `test:shots`, 12 rojas de 22 en la rama, **las mismas prueba a prueba**
+que en `main` `da8836f` en las 16 que llevaba al fusionar (las del rediseño de
+interfaz, anotadas en la puerta de la PR #2); y, tras traer la PR #3 (los
+animales, `b3f6b84`), otra vez typecheck, `lint` y las 24 pruebas afectadas
+(235 verdes). La PR #3 no toca `renderer.ts`, el bosque ni el suelo: los
+choques fueron de cuaderno y de `shot.mjs`, donde se queda su `browser.mjs`.
+Esta ronda pasa a ser la v5.12, porque la PR #3 usó de la v5.02 a la v5.11.
+
 **Y un hallazgo que pesa más que la ronda entera, sin tocar: la villa 7/60 se
 queda en bucle, y es la causa probable de la tablet a 0 fps.**
 `presentation-clock.ts` toma todo hueco de más de un segundo entre fotogramas
@@ -43,6 +53,48 @@ del bucle de la villa»), con la evidencia, cómo reproducirlo y el arreglo que 
 propone —que el hueco descuente el trabajo del propio fotograma, y abaratar
 `createVillage`—; la fila es GV-4 en `plan-meta.md`.
 
+## 29 sep 2026 · Las herramientas de modelos, el zorro publicado y el juicio de la fauna
+
+Vera preguntó qué animales flojean (el oso no la convence) y pidió capturas de
+los peores, sin tocar modelos todavía. Las herramientas de captura buscaban
+Chromium sólo en `~/AppData` y en la nube no arrancaban: `browser.mjs` lo busca
+ahora en cualquier máquina y lo usan las diez. `model-sheet` gana `--ids` y
+`--sides` (cuatro lados: de tres cuartos el oso parece un oso, de perfil es un
+barril), el banco de fauna abre las quince especies y acepta `--out` (sin él
+pisa la entrega de G-23, que está en el repositorio), y `shot.mjs` encuadra un
+animal vivo con `--look-animal`. Juicio, sin tocar nada: **oso, zorro, pez y
+cerdo**, por ese orden; y conviven dos estilos, cajas (aldeanos y la receta
+G-23) contra facetado (los de Vera). **Después, el zorro**: el de Astra con
+el hocico suavizado, esqueleto por script, **publicado** (v5.02, 0,56 celdas,
+`idle`/`walk`/`flee`). Y **el oso v4, candidato sin publicar**
+(`deliverables/marked-models-trial/bear-v4.glb`): cabeza baja, patas en
+columna, pardo oscuro; la joroba grande le pareció horrible a Vera y queda
+suave (`BEAR_HUMP` 0,35; 0,15 casi plano); mismo tamaño, nodos y pose erguida que el v3.
+**Publicado** (v5.03), el «normal»: se probaron también patas de delante más
+cortas y con pelo colgando. **Siguiente, uno a uno como pidió Vera:** el pez,
+**publicado** (v5.04, una trucha facetada que nada); y el cerdo, **publicado**
+(v5.05). Siguen, uno a uno: la vaca, **publicada** (v5.06, facetada y gorda), y
+la gallina, **publicada** (v5.07). Siguen, uno a uno: el cuervo, **publicado**
+(v5.08), el pato, **publicado** (v5.09, con
+el pico de la gallina arreglado), y el ciervo, **publicado** (v5.10,
+con el casco plantado por cinemática inversa). **Ya no queda ningún animal
+de cajas.** La golondrina se queda la de Astra: Vera la prefiere a la candidata que se
+probó y se retiró. La perdiz también se queda la de Vera: se
+probó una con las barras tumbadas y sin púas y la descartó. **La mula y el
+jabalí, publicados** (v5.11): patas más cortas y, el jabalí, colmillos mayores.
+Todo integrado sobre la animación de la PR #2 (fusión de `main`). **Pendiente:**
+la ubre de la vaca, que la barriga gorda tapa. **Regla de Vera desde hoy: no se
+sube nada sin su permiso final.**
+
+**La CI que se cortaba** (rota desde el 28 sep): los tres trabajos tenían un
+tope de 10 minutos y la suite rápida sola tarda más, así que salían
+«cancelled» sin decir nada. Topes de 45 (`fast`), 30 (`journeys`, ahora
+trabajo propio) y 30 (`browser`). Al dejar de cortarse asoma lo que ya se
+sabía: las dos jornadas rojas a propósito y las ~13 de `test:shots` que
+también fallan en `main` desde el rediseño de interfaz. Nada se sube sin su permiso final. El banco de fauna encuadra ya cada
+especie por su caja y mira a su centro. **Pendiente:** la ubre de la vaca, que la
+barriga gorda tapa (se probó sacarla y Vera prefirió seguir). El oso no se puede fotografiar dentro de la partida sin
+cazar antes la cadena entera: no hay `?hunt=`.
 ## 29 sep 2026 · AN-4b y AN-4c: las tomas que faltaban, y el oso que no nacía
 
 Vera: «termina esto: toma en partida la visita del oso, la caza y el asalto
@@ -238,7 +290,7 @@ cueste por píxel) → V-2 anclaje (disco instanciado bajo los pies, máscara de
 contacto en el sombreador del suelo, prado) → V-3 el seguido (medir antes; velo
 de tramado como el de la montaña, que no apaga el hachazo del leñador) → V-4
 suavizado. **Abierto**: las cinco decisiones de su §6. **Después, el mismo
-día**, Vera pidió ejecutar el encargo tal cual: ver la entrada de arriba (v5.05).
+día**, Vera pidió ejecutar el encargo tal cual: ver la entrada de «Profundidad visual en móvil» (v5.12).
 
 ## 29 sep 2026 · Rendimiento en la tablet, «Graphics» y lo que quedaba de la v9
 

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T10:35:07.282Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids villager",
+  "generatedAt": "2026-09-29T20:19:37.522Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids mule,boar",
   "assets": [
     {
       "id": "axis-marker",
@@ -151,101 +151,6 @@
       "file": "reed.glb",
       "sha256": "3AE010539E86395BBFB41C13EC468FF48C75BE298E737255AB2DE17DEA87960D",
       "motion": []
-    },
-    {
-      "id": "cow",
-      "file": "cow.glb",
-      "sha256": "6A922A86C1DBF645EEA0E200403147099D5B3D6EE578DA145F1ABC2DC90FC713",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.21
-        }
-      ]
-    },
-    {
-      "id": "pig",
-      "file": "pig.glb",
-      "sha256": "3D0ED448CF7F75A18783CAC8047666381E6F9C90DA1BFC44F9736DDFA40D3524",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.115
-        }
-      ]
-    },
-    {
-      "id": "hen",
-      "file": "hen.glb",
-      "sha256": "E08F6D310277DE6D4749F33CAD8EE56CBB4877A7973F0E8ED727CA393BB251F1",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.075
-        }
-      ]
-    },
-    {
-      "id": "crow",
-      "file": "crow.glb",
-      "sha256": "F9A171936F7695AFCAF975524C52E0569FB025D46F5B966FAEBE9C20ED51E16E",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.08
-        }
-      ]
-    },
-    {
-      "id": "fish",
-      "file": "fish.glb",
-      "sha256": "9E6D26667F104C3375FB7F7E0575281D1E6ABF468C082B705BB8471917A81C60",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.13
-        }
-      ]
     },
     {
       "id": "bundle",
@@ -993,54 +898,6 @@
       }
     },
     {
-      "id": "fox",
-      "file": "fox.glb",
-      "sha256": "6BD39948587E59A5A94B601C5AA7923CDE8023F6F5DAEF6995C98C7C476B9DA3",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.13
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
-        "license": "project-original"
-      }
-    },
-    {
-      "id": "duck",
-      "file": "duck.glb",
-      "sha256": "3540D24E786CFCE87CE49C6581E7297D0D55C28FCABD96C216B7849ACE2F73CE",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.075
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
-        "license": "project-original"
-      }
-    },
-    {
       "id": "hoe",
       "file": "hoe.glb",
       "sha256": "11933454050B93980F2C37E0A52CFAB5B488B8AFBB2315FBF4E34769EE5D6D8D",
@@ -1147,96 +1004,6 @@
         "kind": "original",
         "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, dog.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
         "license": "project-original"
-      }
-    },
-    {
-      "id": "mule",
-      "file": "mule.glb",
-      "sha256": "88B79BD57D0274ADAF2842B17F77E6B2CBE08AD7A92D2F9E9E7DB43F8F0B03AC",
-      "motion": [
-        {
-          "name": "walk",
-          "seconds": 1.2,
-          "loop": true,
-          "strideLength": 0.449
-        },
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, mule.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
-        "license": "project-original"
-      }
-    },
-    {
-      "id": "bear",
-      "file": "bear.glb",
-      "sha256": "B7581168250260DE7EADEA519F7950AD97473AB9C8C73A93DE9E5DC0110D2E1E",
-      "motion": [
-        {
-          "name": "attack",
-          "seconds": 3,
-          "loop": false,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 1.2,
-          "loop": true,
-          "strideLength": 0.444
-        },
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Modelo original de The Valley (deliverables/marked-models-trial/bear-v3.glb); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "boar",
-      "file": "boar.glb",
-      "sha256": "040873AABA5348C1EF1CB529B88264144D5C241256EB688C06FB9757C196C48C",
-      "motion": [
-        {
-          "name": "walk",
-          "seconds": 1.2,
-          "loop": true,
-          "strideLength": 0.342
-        },
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "charge",
-          "seconds": 0.8,
-          "loop": true,
-          "strideLength": 0.513
-        },
-        {
-          "name": "attack",
-          "seconds": 1.2,
-          "loop": false,
-          "strideLength": null
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial, boar.glb; commit 63db59c); clips idle/walk de tools/art/rigid-clips.mjs sobre sus nodos.",
-        "license": "Project original"
       }
     },
     {
@@ -1496,26 +1263,230 @@
       }
     },
     {
-      "id": "deer",
-      "file": "deer.glb",
-      "sha256": "8F8E553A93E64C81D31BE0025C1DBDA447F825A3CC9D0D06E353B4A4A538A176",
+      "id": "fox",
+      "file": "fox.glb",
+      "sha256": "0995B771C8FC6EA8A61D13954924DBB2920B6F387F457AD81B003CCE81829820",
       "motion": [
         {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true,
+          "strideLength": 0.121
+        },
+        {
           "name": "idle",
-          "seconds": 4.041666666666667,
+          "seconds": 4,
           "loop": true,
           "strideLength": null
         },
         {
-          "name": "walk",
-          "seconds": 2.0416666666666665,
+          "name": "flee",
+          "seconds": 0.6,
           "loop": true,
-          "strideLength": 0.333
+          "strideLength": 0.181
         }
       ],
       "provenance": {
         "kind": "original",
-        "source": "Original procedural stag modeled for The Valley on 23 Sep 2026; no external provider.",
+        "source": "Zorro de Astra con el hocico suavizado, elegido por Vera (deliverables/fox-model-trial, 26 sep 2026); esqueleto, pesos y clips idle/walk/flee de tools/art/rig-single-mesh.py a 0,56 celdas.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "bear",
+      "file": "bear.glb",
+      "sha256": "BF440A608C6E2DEAC65CAA186C86E0D9697EF30B7910B81AEB4EE17657E1AA1C",
+      "motion": [
+        {
+          "name": "attack",
+          "seconds": 3,
+          "loop": false,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.477
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Oso v4 de The Valley (deliverables/marked-models-trial/build-models.py, bear(); 29 sep 2026): lomo casi recto, cabeza baja, patas en columna y pardo oscuro, elegido por Vera; clips idle/walk de tools/art/rigid-clips.mjs, rear publicado como attack.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "fish",
+      "file": "fish.glb",
+      "sha256": "51EAF7FBD80AF38C1BB825D80B8DB470407EC9FA87070162233195F74EF34540",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true,
+          "strideLength": 0.1
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Trucha facetada de The Valley (deliverables/marked-models-trial/build-models.py, fish(); 29 sep 2026), aprobada por Vera; nado e idle de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "pig",
+      "file": "pig.glb",
+      "sha256": "3B6CB11523CD8B4ECB333094580EE4F9271A585C1900DDFC7C5E05F8D3B331AD",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.163
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Cerdo facetado de The Valley (deliverables/marked-models-trial/build-models.py, pig(); 29 sep 2026), aprobado por Vera; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "cow",
+      "file": "cow.glb",
+      "sha256": "6B1474C09A3DDB26C8735D8182BD6DE8FF1957EBED0A04893BDD35FA51699C21",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.43
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Vaca facetada de The Valley (deliverables/marked-models-trial/build-models.py, cow(); 29 sep 2026), aprobada por Vera; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "crow",
+      "file": "crow.glb",
+      "sha256": "02E9D80EF1D62E90480D505FD340CB936E49860AFF52E5BEC59F2A318AEB4EAE",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.073
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Cuervo facetado de The Valley (deliverables/marked-models-trial/build-models.py, crow(); 29 sep 2026), aprobado por Vera; paso y picoteo de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "hen",
+      "file": "hen.glb",
+      "sha256": "9A45C00951C0B5D8C4A471A4B2A3A9CC06680F650D1E345BE8505425F5B63319",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.063
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Gallina facetada de The Valley (deliverables/marked-models-trial/build-models.py, hen(); 29 sep 2026), aprobada por Vera, con el pico en cono; paso y picoteo de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "duck",
+      "file": "duck.glb",
+      "sha256": "0B84E0B5C32CA4FD1876E88F59F6090B78E95EC02A4A4C8AE6E11CE44A4D3D4C",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.065
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Ánade real facetado de The Valley (deliverables/marked-models-trial/build-models.py, duck(); 29 sep 2026), aprobado por Vera; clips de tools/art/rigid-clips.mjs.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "deer",
+      "file": "deer.glb",
+      "sha256": "5887CF05DC7E41703964077376BC2B69B5B190BF9A0715EA87AF9D594451BB6B",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.282
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Ciervo facetado de The Valley (deliverables/marked-models-trial/build-models.py, deer(); 29 sep 2026), aprobado por Vera con las patas acortadas; clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     },
@@ -1552,6 +1523,66 @@
       "provenance": {
         "kind": "original",
         "source": "Original villager: rediseño low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md. AN-1 (29 sep 2026): walk y carry_walk reescritos por art/recipes/villager/plant-gait.mjs y horneados en el GLB de G-17 con tools/art/bake-clips.mjs (sin Blender en la ronda); geometría, rig e idle/work_hoe intactos.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "mule",
+      "file": "mule.glb",
+      "sha256": "6544470455BA197DA6301F429E97369560C946626E49342E6C0501ED5F6973AA",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.329
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, mule()); 29 sep 2026: patas acortadas a petición suya (MULE_DROP 0,10). Clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "boar",
+      "file": "boar.glb",
+      "sha256": "5630DCFB5FEC87A07EF4A37972F3D361638F693EAEA3A6E67D5122D877C2BDE3",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.241
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "charge",
+          "seconds": 0.8,
+          "loop": true,
+          "strideLength": 0.362
+        },
+        {
+          "name": "attack",
+          "seconds": 1.2,
+          "loop": false,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, boar()); 29 sep 2026: patas acortadas y colmillos mayores a petición suya (BOAR_DROP 0,08, BOAR_TUSK 1,5). Clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     }

@@ -3,19 +3,51 @@
 // Escribe una PNG por modelo y `models-sheet.png` con todos, agrupados y con su
 // nombre y su tamaño en celdas. Lee `public/assets/valley3d/manifest.json`: lo
 // que sale es exactamente lo que el juego carga.
+//
+//   --ids bear,fox   sólo esos modelos
+//   --sides          cada modelo por cuatro lados —perfil, la vista del juego,
+//                    desde atrás y de frente—, más grande, en `sides-sheet.png`.
+//                    Desde una sola esquina un modelo puede engañar: el oso
+//                    de tres cuartos parece un oso y de perfil es un barril.
+//   --candidate bear-v4=deliverables/…/bear.glb
+//                    fotografía un GLB sin publicar junto a los publicados, con
+//                    el nombre que se le dé; se repite para varios. Se compara
+//                    antes de admitir nada en el catálogo.
 import { build } from 'esbuild';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { homedir } from 'node:os';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { chromium } from '@playwright/test';
+import { withBrowser } from './browser.mjs';
 
 const args = process.argv.slice(2);
 const out = args.includes('--out') ? args[args.indexOf('--out') + 1] : 'artifacts/graphics/models';
 mkdirSync(out, { recursive: true });
 const assets = 'public/assets/valley3d/';
 const manifest = JSON.parse(readFileSync(assets + 'manifest.json', 'utf8'));
-const bytes = Object.fromEntries(manifest.assets.map((a) => [a.id, readFileSync(assets + a.file).toString('base64')]));
+const ids = args.includes('--ids') ? args[args.indexOf('--ids') + 1].split(',') : null;
+if (ids !== null) {
+  const unknown = ids.filter((id) => !manifest.assets.some((a) => a.id === id));
+  if (unknown.length > 0) throw new Error(`--ids: no están publicados ${unknown.join(', ')}`);
+  manifest.assets = ids.map((id) => manifest.assets.find((a) => a.id === id));
+}
+const sides = args.includes('--sides');
+// Los animales miran hacia −X: de perfil se les ve desde +Z.
+const SIDES = [['perfil', [0, 0.2, 1]], ['vista del juego', [-1, 0.9, 1.2]], ['desde atrás', [1, 0.4, -1]], ['de frente', [-1, 0.15, 0]]];
+const candidates = args.flatMap((arg, i) => (arg === '--candidate' ? [args[i + 1]] : [])).map((pair) => {
+  const [id, file] = pair.split('=');
+  if (!id || !file) throw new Error(`--candidate must be id=file.glb; got '${pair}'.`);
+  if (manifest.assets.some((a) => a.id === id)) throw new Error(`--candidate '${id}' ya está publicado: usa otro nombre`);
+  return { id, file };
+});
+const bytes = Object.fromEntries([
+  ...manifest.assets.map((a) => [a.id, readFileSync(assets + a.file).toString('base64')]),
+  ...candidates.map((c) => [c.id, readFileSync(c.file).toString('base64')]),
+]);
+for (const c of candidates) {
+  manifest.assets.push({ id: c.id, file: `${c.id}.glb`, sha256: 'candidate', motion: [] });
+  if (ids !== null) ids.push(c.id);
+}
 const result = await build({
   entryPoints: ['tools/graphics/model-sheet.ts'], bundle: true, write: false, format: 'esm',
   define: { SHEET_BYTES: JSON.stringify(bytes), SHEET_MANIFEST: JSON.stringify(manifest) },
@@ -34,42 +66,65 @@ const GROUPS = [
 ];
 const groupOf = (id) => GROUPS.find(([, re]) => re.test(id))?.[0] ?? 'Otros';
 
-const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
-const exe = readdirSync(root).filter((d) => /^chromium-\d+$/u.test(d)).sort().reverse()
-  .map((d) => join(root, d, 'chrome-win64', 'chrome.exe')).find(existsSync);
-const browser = await chromium.launch({ executablePath: exe, args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+const browser = await chromium.launch(withBrowser({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }));
 try {
   const tab = await browser.newPage({ viewport: { width: 360, height: 360 } });
   const errors = [];
   tab.on('pageerror', (e) => errors.push(String(e)));
   await tab.goto(pathToFileURL(page).href);
   await tab.waitForFunction(() => window.sheetReady === true, null, { timeout: 120_000 });
-  const shots = [];
-  for (const asset of manifest.assets) {
-    const shot = await tab.evaluate((id) => window.shoot(id), asset.id);
-    if (shot === null) { console.log(`${asset.id}: no se pudo instanciar`); continue; }
-    writeFileSync(join(out, `${asset.id}.png`), Buffer.from(shot.image.split(',')[1], 'base64'));
-    shots.push({ id: asset.id, group: groupOf(asset.id), image: shot.image, size: shot.size });
+  if (sides) {
+    const rows = [];
+    for (const asset of manifest.assets) {
+      const views = [];
+      for (const [name, view] of SIDES) {
+        const shot = await tab.evaluate(([id, v]) => window.shoot(id, v, 440), [asset.id, view]);
+        if (shot === null) break;
+        writeFileSync(join(out, `${asset.id}-${name.replaceAll(' ', '-')}.png`), Buffer.from(shot.image.split(',')[1], 'base64'));
+        views.push({ name, image: shot.image });
+      }
+      if (views.length > 0) rows.push({ id: asset.id, views });
+    }
+    const html = '<html lang="es"><meta charset="utf-8"><body style="margin:0;background:#eee8dc;font:14px sans-serif;color:#2b2620">'
+      + rows.map((r) => `<div style="padding:10px 16px 2px;font-size:18px;font-weight:bold">${r.id}</div><div style="white-space:nowrap">`
+        + r.views.map((v) => `<div style="display:inline-block;width:340px;margin:2px 4px;vertical-align:top">`
+          + `<div style="color:#6b6258">${v.name}</div><img style="display:block;width:340px;height:340px" src="${v.image}"></div>`).join('')
+        + '</div>').join('') + '</body></html>';
+    writeFileSync(join(out, 'sides-sheet.html'), html);
+    await tab.setViewportSize({ width: 1400, height: 400 });
+    await tab.setContent(html);
+    await tab.evaluate(() => Promise.all([...document.images].map((img) => img.decode())));
+    await tab.screenshot({ path: join(out, 'sides-sheet.png'), fullPage: true });
+    if (errors.length > 0) console.log('Errores de página:', errors);
+    console.log(`${rows.length} modelos por cuatro lados · ${join(out, 'sides-sheet.png')}`);
+  } else {
+    const shots = [];
+    for (const asset of manifest.assets) {
+      const shot = await tab.evaluate((id) => window.shoot(id), asset.id);
+      if (shot === null) { console.log(`${asset.id}: no se pudo instanciar`); continue; }
+      writeFileSync(join(out, `${asset.id}.png`), Buffer.from(shot.image.split(',')[1], 'base64'));
+      shots.push({ id: asset.id, group: groupOf(asset.id), image: shot.image, size: shot.size });
+    }
+    const order = [...GROUPS.map(([name]) => name), 'Otros'];
+    const html = '<html lang="es"><meta charset="utf-8"><body style="margin:0;background:#eee8dc;font:14px sans-serif;color:#2b2620">'
+      + `<div style="padding:12px 16px;font-size:20px">The Valley · todos los modelos publicados (${shots.length})</div>`
+      + order.map((name) => {
+        const list = shots.filter((s) => s.group === name);
+        if (list.length === 0) return '';
+        return `<div style="padding:8px 16px 2px;font-size:17px;font-weight:bold">${name} (${list.length})</div><div>`
+          + list.map((s) => `<div style="display:inline-block;width:180px;margin:4px 6px;vertical-align:top">`
+            + `<img style="display:block;width:180px;height:180px" src="${s.image}">`
+            + `<div style="font-weight:bold">${s.id}</div><div style="color:#6b6258">${s.size.map((v) => v.toFixed(2)).join(' × ')} celdas</div></div>`).join('')
+          + '</div>';
+      }).join('') + '</body></html>';
+    writeFileSync(join(out, 'models-sheet.html'), html);
+    await tab.setViewportSize({ width: 1600, height: 900 });
+    await tab.setContent(html);
+    await tab.evaluate(() => Promise.all([...document.images].map((img) => img.decode())));
+    await tab.screenshot({ path: join(out, 'models-sheet.png'), fullPage: true });
+    if (errors.length > 0) console.log('Errores de página:', errors);
+    console.log(`${shots.length} modelos · ${join(out, 'models-sheet.png')}`);
   }
-  const order = [...GROUPS.map(([name]) => name), 'Otros'];
-  const html = '<html lang="es"><meta charset="utf-8"><body style="margin:0;background:#eee8dc;font:14px sans-serif;color:#2b2620">'
-    + `<div style="padding:12px 16px;font-size:20px">The Valley · todos los modelos publicados (${shots.length})</div>`
-    + order.map((name) => {
-      const list = shots.filter((s) => s.group === name);
-      if (list.length === 0) return '';
-      return `<div style="padding:8px 16px 2px;font-size:17px;font-weight:bold">${name} (${list.length})</div><div>`
-        + list.map((s) => `<div style="display:inline-block;width:180px;margin:4px 6px;vertical-align:top">`
-          + `<img style="display:block;width:180px;height:180px" src="${s.image}">`
-          + `<div style="font-weight:bold">${s.id}</div><div style="color:#6b6258">${s.size.map((v) => v.toFixed(2)).join(' × ')} celdas</div></div>`).join('')
-        + '</div>';
-    }).join('') + '</body></html>';
-  writeFileSync(join(out, 'models-sheet.html'), html);
-  await tab.setViewportSize({ width: 1600, height: 900 });
-  await tab.setContent(html);
-  await tab.evaluate(() => Promise.all([...document.images].map((img) => img.decode())));
-  await tab.screenshot({ path: join(out, 'models-sheet.png'), fullPage: true });
-  if (errors.length > 0) console.log('Errores de página:', errors);
-  console.log(`${shots.length} modelos · ${join(out, 'models-sheet.png')}`);
 } finally {
   await browser.close();
 }

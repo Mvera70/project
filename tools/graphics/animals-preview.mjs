@@ -1,19 +1,23 @@
 import {build} from 'esbuild';
-import {readFileSync,writeFileSync,readdirSync,existsSync,mkdirSync} from 'node:fs';
-import {join,resolve} from 'node:path';
-import {homedir} from 'node:os';
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {chromium} from '@playwright/test';
-const id=process.argv[2],dir='artifacts/graphics/G-23/delivery';mkdirSync(dir,{recursive:true});
-if(!['cow','pig','hen','wolf','crow','fish','deer'].includes(id))throw Error('Id inválido');
+import {withBrowser} from './browser.mjs';
+// `--out <carpeta>` para no pisar la entrega de G-23, que está en el repositorio.
+const id=process.argv[2],dir=process.argv.includes('--out')?process.argv[process.argv.indexOf('--out')+1]:'artifacts/graphics/G-23/delivery';mkdirSync(dir,{recursive:true});
 const assets='public/assets/valley3d/',all=JSON.parse(readFileSync(assets+'manifest.json'));
-const manifest={...all,assets:all.assets.filter(a=>a.id===id)};
-const bytes=Object.fromEntries(manifest.assets.map(a=>[a.id,readFileSync(assets+a.file).toString('base64')]));
+// Cualquier especie de `AnimalKind` que tenga GLB publicado; G-23 empezó con siete.
+const KINDS=['hen','pig','cow','crow','wolf','fish','partridge','rabbit','deer','boar','bear','dog','fox','duck','mule'];
+if(!KINDS.includes(id)||!all.assets.some(a=>a.id===id))throw Error(`Id inválido: usa ${KINDS.join(', ')}`);
+// `--glb <candidato.glb> --motion '<json>'`: un GLB sin publicar en lugar del publicado.
+const opt=(n)=>process.argv.includes('--'+n)?process.argv[process.argv.indexOf('--'+n)+1]:null;
+const glb=opt('glb'),motion=opt('motion');
+const manifest={...all,assets:all.assets.filter(a=>a.id===id).map(a=>glb===null?a:{...a,motion:motion===null?a.motion:JSON.parse(motion)})};
+const bytes=Object.fromEntries(manifest.assets.map(a=>[a.id,readFileSync(glb??assets+a.file).toString('base64')]));
 const result=await build({entryPoints:['tools/graphics/animals-preview.ts'],bundle:true,write:false,format:'esm',define:{PREVIEW_BYTES:JSON.stringify(bytes),PREVIEW_MANIFEST:JSON.stringify(manifest),PREVIEW_ID:JSON.stringify(id)}});
 writeFileSync(dir+'/'+id+'-preview.html',`<!doctype html><meta charset="utf-8"><script type="module">${result.outputFiles[0].text}</script>`);
-const root=join(homedir(),'AppData','Local','ms-playwright');
-const exe=process.env.VALLEY_CHROMIUM??(existsSync(root)?readdirSync(root).filter(d=>/^chromium-\d+$/.test(d)).sort().reverse().map(d=>join(root,d,'chrome-win64','chrome.exe')).find(existsSync):undefined);
-const browser=await chromium.launch({...(exe?{executablePath:exe}:{}),args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const browser=await chromium.launch(withBrowser({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']}));
 try{
  const page=await browser.newPage({viewport:{width:720,height:600}}),errors=[],samples=[],images=[];
  page.on('pageerror',e=>errors.push(String(e)));

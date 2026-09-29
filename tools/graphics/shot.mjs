@@ -7,17 +7,17 @@
 //   node tools/graphics/shot.mjs --out foo.png
 //   node tools/graphics/shot.mjs --scene-only --out valley.png
 //
-// Playwright pide un navegador exacto y en esta máquina no hay red para
-// bajarlo; hay otros instalados de versiones anteriores y valen igual. Se busca
-// el más reciente en ~/AppData/Local/ms-playwright. Sin WebGL de verdad se usa
-// swiftshader, que es lento pero pinta.
+// Playwright pide un navegador exacto y no siempre hay red para bajarlo; hay
+// otros instalados de versiones anteriores y valen igual. Lo busca
+// `browser.mjs`, en Windows y fuera. Sin WebGL de verdad se usa swiftshader,
+// que es lento pero pinta.
 //
 // Antes: `npx tsx tools/graphics/bundle-game.ts` para tener la página al día.
 
 import { chromium } from '@playwright/test';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { browserExe } from './browser.mjs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => {
@@ -65,6 +65,11 @@ if (hasCaptureZoom) {
 // permite degradar silenciosamente a la cámara panorámica si el hook falta.
 const lookArg = opt('look', '');
 const traceAnimal = opt('trace-animal', '');
+// `--look-animal bear` encuadra el primer animal de esa especie en el momento
+// de disparar. Un animal se mueve: su coordenada no se puede saber antes de
+// abrir el valle, y `--look` con la de otra toma encuadra hierba. Se combina
+// con `?happening=` en `--page` para los que sólo salen en un suceso.
+const lookAnimal = opt('look-animal', '');
 let lookPoint = null;
 if (lookArg !== '') {
   const parts = lookArg.split(',').map((part) => part.trim());
@@ -115,8 +120,9 @@ if (previewEra !== '' && !['hamlet', 'village', 'town'].includes(previewEra)) {
 if (sceneOnly && sequence > 0) {
   throw new Error('--scene-only captures one renderer frame; use one invocation per scene instead of --sequence.');
 }
-if (hasCaptureZoom && !sceneOnly && lookPoint === null) {
-  throw new Error('--capture-zoom requires --scene-only or --look.');
+if (lookAnimal !== '' && lookPoint !== null) throw new Error('--look-animal and --look are exclusive.');
+if (hasCaptureZoom && !sceneOnly && lookPoint === null && lookAnimal === '') {
+  throw new Error('--capture-zoom requires --scene-only, --look or --look-animal.');
 }
 // `--viewport 1024x768` conserva móvil por defecto y permite revisar tablet.
 const viewportArg = opt('viewport', '390x844');
@@ -142,36 +148,7 @@ if (gateOverride !== '' && !existsSync(gateOverride)) {
   throw new Error(`--override-gate does not exist: ${gateOverride}`);
 }
 
-function browserExe() {
-  // AN-0 · `VALLEY_CHROMIUM=/ruta/a/chrome` manda: en una máquina sin la
-  // revisión exacta que pide Playwright, es la única forma de abrir el juego.
-  if (process.env.VALLEY_CHROMIUM) return process.env.VALLEY_CHROMIUM;
-  const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
-  if (existsSync(root)) {
-    try {
-      const dirs = readdirSync(root).filter((d) => /^chromium-\d+$/.test(d)).sort();
-      for (const dir of dirs.reverse()) {
-        const exe = join(root, dir, 'chrome-win64', 'chrome.exe');
-        if (existsSync(exe)) return exe;
-      }
-    } catch {
-      // Continúa con el navegador instalado fuera de la carpeta protegida.
-    }
-  }
-  // En este equipo la carpeta de Playwright existe pero no es legible para el
-  // runner. Chrome instalado sirve igual para la captura WebGL.
-  for (const exe of [
-    'C:/Program Files/Google/Chrome/Application/chrome.exe',
-    'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-  ]) if (existsSync(exe)) return exe;
-  return undefined;
-}
-
-// GV-0 · **Una ruta explícita del navegador manda sobre todo lo demás.** En
-// una sesión en la nube el Playwright del proyecto pide su Chromium y la
-// máquina trae otro (29 sep 2026: pedía el 1243 y había el 1194), así que sin
-// esto la captura no arrancaba: `VALLEY_CHROMIUM=/opt/pw-browsers/chromium`.
-const exe = process.env.VALLEY_CHROMIUM || browserExe();
+const exe = browserExe();
 const browser = await chromium.launch({
   ...(exe ? { executablePath: exe } : {}),
   args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],
@@ -247,7 +224,7 @@ if (yearArg !== '') {
 if (open !== 'title') await tab.locator('.title-new').click().catch(() => {});
 // Las fundaciones de años avanzados pueden tardar bastante más que `--settle`.
 // Espera al renderer antes de intentar un encuadre de diagnóstico.
-if (open !== 'title' && (lookPoint !== null || sceneOnly || holding)) {
+if (open !== 'title' && (lookPoint !== null || lookAnimal !== '' || sceneOnly || holding)) {
   await tab.waitForFunction(() => typeof window.__valleyCapture === 'function', null, { timeout: 180_000 });
 }
 if (open !== 'title' && holding) {
@@ -439,6 +416,13 @@ if (open === 'board') {
 if (open) await tab.waitForTimeout(300);
 
 let sceneImage = null;
+if (lookAnimal !== '') {
+  const animal = await tab.evaluate((kind) => window.__valleyLife?.()?.renderedAnimals
+    ?.find((one) => one.kind === kind) ?? null, lookAnimal);
+  if (animal === null) throw new Error(`--look-animal: no ${lookAnimal} in the valley right now.`);
+  lookPoint = { x: animal.x, z: animal.z };
+  console.log(`--look-animal ${lookAnimal}: ${animal.x.toFixed(2)},${animal.z.toFixed(2)}`);
+}
 if (lookPoint !== null || sceneOnly) {
   sceneImage = await tab.evaluate(({ point, zoom }) => {
     if (typeof window.__valleyCapture !== 'function') {
