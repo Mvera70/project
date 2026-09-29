@@ -1,0 +1,248 @@
+-- antes aldea r1
+{"frames":53,"calls":313,"tris":513813,"programs":41,"linkMs":9,"jsMedianMs":0.2,"jsP90Ms":38.7,"level":"medium","scale":1,"seconds":40}
+Valley_Backdrop                105 sombra    28 inst   8 tris 61002
+Valley_Fauna                   102 sombra     0 inst   0 tris 22326
+Valley_Buildings/house          60 sombra    60 inst   0 tris 6868
+Valley_Cast                     48 sombra     0 inst   0 tris 48964
+Valley_Grass                    28 sombra     0 inst  28 tris 117388
+Valley_Yards                    22 sombra     0 inst   0 tris 182
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Buildings/granary        12 sombra    12 inst   0 tris 3660
+Valley_Waterfalls               12 sombra     3 inst   0 tris 2460
+Valley_Steading                 11 sombra    11 inst  11 tris 10384
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_NoticeBoard               8 sombra     5 inst   0 tris 96
+Valley_Buildings/field           6 sombra     0 inst   0 tris 1392
+TOTAL mallas 495 sombra 165
+-- después aldea r1
+{"frames":42,"calls":307,"tris":508201,"programs":41,"linkMs":6,"jsMedianMs":0.2,"jsP90Ms":100.9,"level":"medium","scale":1,"seconds":40}
+Valley_Backdrop                105 sombra    28 inst   8 tris 61002
+Valley_Fauna                   102 sombra     0 inst   0 tris 22326
+Valley_Buildings/house          60 sombra    60 inst   0 tris 6868
+Valley_Cast                     48 sombra     0 inst   0 tris 48964
+Valley_Grass                    28 sombra     0 inst  28 tris 117388
+Valley_Yards                    22 sombra     0 inst   0 tris 182
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Buildings/granary        12 sombra    12 inst   0 tris 3660
+Valley_Waterfalls               12 sombra     3 inst   0 tris 2460
+Valley_Steading                 11 sombra    11 inst  11 tris 10384
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_NoticeBoard               8 sombra     5 inst   0 tris 96
+Valley_Buildings/field           6 sombra     0 inst   0 tris 1392
+TOTAL mallas 495 sombra 165
+-- antes villa r1
+{"frames":9,"calls":310,"tris":576268,"programs":41,"linkMs":10,"jsMedianMs":0.2,"jsP90Ms":3871,"level":"medium","scale":1,"seconds":44}
+Valley_Fauna                    87 sombra     0 inst   0 tris 35558
+Valley_Buildings/stone_house    75 sombra    75 inst   0 tris 17216
+Valley_Cast                     60 sombra     0 inst   0 tris 59752
+Valley_Grass                    28 sombra     0 inst  27 tris 145948
+Valley_Buildings/granary        21 sombra    21 inst   0 tris 6036
+Valley_Buildings/gate           19 sombra    19 inst   0 tris 392
+Valley_Backdrop                 15 sombra     0 inst   8 tris 57910
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Steading                 11 sombra    11 inst  11 tris 11928
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Buildings/smithy         10 sombra    10 inst   0 tris 2478
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_Buildings/field           8 sombra     0 inst   0 tris 1856
+Valley_Buildings/watchtower      8 sombra     8 inst   0 tris 3276
+TOTAL mallas 450 sombra 209
+-- después villa r1
+{"frames":8,"calls":293,"tris":553657,"programs":41,"linkMs":7,"jsMedianMs":0.2,"jsP90Ms":4086.4,"level":"medium","scale":1,"seconds":41}
+Valley_Fauna                    87 sombra     0 inst   0 tris 35558
+Valley_Buildings/stone_house    75 sombra    75 inst   0 tris 17216
+Valley_Cast                     60 sombra     0 inst   0 tris 59752
+Valley_Grass                    28 sombra     0 inst  27 tris 145948
+Valley_Buildings/granary        21 sombra    21 inst   0 tris 6036
+Valley_Buildings/gate           19 sombra    19 inst   0 tris 392
+Valley_Backdrop                 15 sombra     0 inst   8 tris 57910
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Steading                 11 sombra    11 inst  11 tris 11928
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Buildings/smithy         10 sombra    10 inst   0 tris 2478
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_Buildings/field           8 sombra     0 inst   0 tris 1856
+Valley_Buildings/watchtower      8 sombra     8 inst   0 tris 3276
+TOTAL mallas 450 sombra 209
+-- antes aldea r2
+{"frames":53,"calls":314,"tris":514729,"programs":41,"linkMs":13,"jsMedianMs":0.2,"jsP90Ms":42.1,"level":"medium","scale":1,"seconds":40}
+Valley_Backdrop                105 sombra    28 inst   8 tris 61002
+Valley_Fauna                   102 sombra     0 inst   0 tris 22326
+Valley_Buildings/house          60 sombra    60 inst   0 tris 6868
+Valley_Cast                     48 sombra     0 inst   0 tris 48964
+Valley_Grass                    28 sombra     0 inst  28 tris 117388
+Valley_Yards                    22 sombra     0 inst   0 tris 182
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Buildings/granary        12 sombra    12 inst   0 tris 3660
+Valley_Waterfalls               12 sombra     3 inst   0 tris 2460
+Valley_Steading                 11 sombra    11 inst  11 tris 10384
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_NoticeBoard               8 sombra     5 inst   0 tris 96
+Valley_Buildings/field           6 sombra     0 inst   0 tris 1392
+TOTAL mallas 495 sombra 165
+-- después aldea r2
+{"frames":51,"calls":313,"tris":514016,"programs":41,"linkMs":6,"jsMedianMs":0.1,"jsP90Ms":46.9,"level":"medium","scale":1,"seconds":40}
+Valley_Backdrop                105 sombra    28 inst   8 tris 61002
+Valley_Fauna                   102 sombra     0 inst   0 tris 22326
+Valley_Buildings/house          60 sombra    60 inst   0 tris 6868
+Valley_Cast                     48 sombra     0 inst   0 tris 48964
+Valley_Grass                    28 sombra     0 inst  28 tris 117388
+Valley_Yards                    22 sombra     0 inst   0 tris 182
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Buildings/granary        12 sombra    12 inst   0 tris 3660
+Valley_Waterfalls               12 sombra     3 inst   0 tris 2460
+Valley_Steading                 11 sombra    11 inst  11 tris 10384
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_NoticeBoard               8 sombra     5 inst   0 tris 96
+Valley_Buildings/field           6 sombra     0 inst   0 tris 1392
+TOTAL mallas 495 sombra 165
+-- antes villa r2
+{"frames":9,"calls":310,"tris":576268,"programs":41,"linkMs":10,"jsMedianMs":0.4,"jsP90Ms":3995.7,"level":"medium","scale":1,"seconds":45}
+Valley_Fauna                    87 sombra     0 inst   0 tris 35558
+Valley_Buildings/stone_house    75 sombra    75 inst   0 tris 17216
+Valley_Cast                     60 sombra     0 inst   0 tris 59752
+Valley_Grass                    28 sombra     0 inst  27 tris 145948
+Valley_Buildings/granary        21 sombra    21 inst   0 tris 6036
+Valley_Buildings/gate           19 sombra    19 inst   0 tris 392
+Valley_Backdrop                 15 sombra     0 inst   8 tris 57910
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Steading                 11 sombra    11 inst  11 tris 11928
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Buildings/smithy         10 sombra    10 inst   0 tris 2478
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_Buildings/field           8 sombra     0 inst   0 tris 1856
+Valley_Buildings/watchtower      8 sombra     8 inst   0 tris 3276
+TOTAL mallas 450 sombra 209
+-- después villa r2
+{"frames":9,"calls":310,"tris":576268,"programs":41,"linkMs":8,"jsMedianMs":0.2,"jsP90Ms":3901,"level":"medium","scale":1,"seconds":43}
+Valley_Fauna                    87 sombra     0 inst   0 tris 35558
+Valley_Buildings/stone_house    75 sombra    75 inst   0 tris 17216
+Valley_Cast                     60 sombra     0 inst   0 tris 59752
+Valley_Grass                    28 sombra     0 inst  27 tris 145948
+Valley_Buildings/granary        21 sombra    21 inst   0 tris 6036
+Valley_Buildings/gate           19 sombra    19 inst   0 tris 392
+Valley_Backdrop                 15 sombra     0 inst   8 tris 57910
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Steading                 11 sombra    11 inst  11 tris 11928
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Buildings/smithy         10 sombra    10 inst   0 tris 2478
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_Buildings/field           8 sombra     0 inst   0 tris 1856
+Valley_Buildings/watchtower      8 sombra     8 inst   0 tris 3276
+TOTAL mallas 450 sombra 209
+-- aa=none aldea
+{"frames":55,"calls":314,"tris":515087,"programs":41,"linkMs":8,"jsMedianMs":0.2,"jsP90Ms":39.9,"level":"medium","scale":1,"seconds":41}
+Valley_Backdrop                105 sombra    28 inst   8 tris 61002
+Valley_Fauna                   102 sombra     0 inst   0 tris 22326
+Valley_Buildings/house          60 sombra    60 inst   0 tris 6868
+Valley_Cast                     48 sombra     0 inst   0 tris 48964
+Valley_Grass                    28 sombra     0 inst  28 tris 117388
+Valley_Yards                    22 sombra     0 inst   0 tris 182
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Buildings/granary        12 sombra    12 inst   0 tris 3660
+Valley_Waterfalls               12 sombra     3 inst   0 tris 2460
+Valley_Steading                 11 sombra    11 inst  11 tris 10384
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_NoticeBoard               8 sombra     5 inst   0 tris 96
+Valley_Buildings/field           6 sombra     0 inst   0 tris 1392
+TOTAL mallas 495 sombra 165
+-- aa=none villa
+{"frames":9,"calls":310,"tris":576268,"programs":41,"linkMs":13,"jsMedianMs":0.2,"jsP90Ms":3919.3,"level":"medium","scale":1,"seconds":44}
+Valley_Fauna                    87 sombra     0 inst   0 tris 35558
+Valley_Buildings/stone_house    75 sombra    75 inst   0 tris 17216
+Valley_Cast                     60 sombra     0 inst   0 tris 59752
+Valley_Grass                    28 sombra     0 inst  27 tris 145948
+Valley_Buildings/granary        21 sombra    21 inst   0 tris 6036
+Valley_Buildings/gate           19 sombra    19 inst   0 tris 392
+Valley_Backdrop                 15 sombra     0 inst   8 tris 57910
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Steading                 11 sombra    11 inst  11 tris 11928
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Buildings/smithy         10 sombra    10 inst   0 tris 2478
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_Buildings/field           8 sombra     0 inst   0 tris 1856
+Valley_Buildings/watchtower      8 sombra     8 inst   0 tris 3276
+TOTAL mallas 450 sombra 209
+-- aa=msaa aldea
+{"frames":38,"calls":303,"tris":507081,"programs":41,"linkMs":9,"jsMedianMs":0.2,"jsP90Ms":84.3,"level":"medium","scale":1,"seconds":41}
+Valley_Backdrop                105 sombra    28 inst   8 tris 61002
+Valley_Fauna                   102 sombra     0 inst   0 tris 22326
+Valley_Buildings/house          60 sombra    60 inst   0 tris 6868
+Valley_Cast                     48 sombra     0 inst   0 tris 48964
+Valley_Grass                    28 sombra     0 inst  28 tris 117388
+Valley_Yards                    22 sombra     0 inst   0 tris 182
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Buildings/granary        12 sombra    12 inst   0 tris 3660
+Valley_Waterfalls               12 sombra     3 inst   0 tris 2460
+Valley_Steading                 11 sombra    11 inst  11 tris 10384
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_NoticeBoard               8 sombra     5 inst   0 tris 96
+Valley_Buildings/field           6 sombra     0 inst   0 tris 1392
+TOTAL mallas 495 sombra 165
+-- aa=msaa villa
+{"frames":8,"calls":293,"tris":553657,"programs":41,"linkMs":9,"jsMedianMs":0.2,"jsP90Ms":3986.7,"level":"medium","scale":1,"seconds":43}
+Valley_Fauna                    87 sombra     0 inst   0 tris 35558
+Valley_Buildings/stone_house    75 sombra    75 inst   0 tris 17216
+Valley_Cast                     60 sombra     0 inst   0 tris 59752
+Valley_Grass                    28 sombra     0 inst  27 tris 145948
+Valley_Buildings/granary        21 sombra    21 inst   0 tris 6036
+Valley_Buildings/gate           19 sombra    19 inst   0 tris 392
+Valley_Backdrop                 15 sombra     0 inst   8 tris 57910
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Steading                 11 sombra    11 inst  11 tris 11928
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Buildings/smithy         10 sombra    10 inst   0 tris 2478
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_Buildings/field           8 sombra     0 inst   0 tris 1856
+Valley_Buildings/watchtower      8 sombra     8 inst   0 tris 3276
+TOTAL mallas 450 sombra 209
+-- aa=fxaa aldea
+{"frames":48,"calls":314,"tris":513354,"programs":70,"linkMs":11,"jsMedianMs":0.1,"jsP90Ms":40.5,"level":"medium","scale":1,"seconds":40}
+Valley_Backdrop                105 sombra    28 inst   8 tris 61002
+Valley_Fauna                   102 sombra     0 inst   0 tris 22326
+Valley_Buildings/house          60 sombra    60 inst   0 tris 6868
+Valley_Cast                     48 sombra     0 inst   0 tris 48964
+Valley_Grass                    28 sombra     0 inst  28 tris 117388
+Valley_Yards                    22 sombra     0 inst   0 tris 182
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Buildings/granary        12 sombra    12 inst   0 tris 3660
+Valley_Waterfalls               12 sombra     3 inst   0 tris 2460
+Valley_Steading                 11 sombra    11 inst  11 tris 10384
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_NoticeBoard               8 sombra     5 inst   0 tris 96
+Valley_Buildings/field           6 sombra     0 inst   0 tris 1392
+TOTAL mallas 495 sombra 165
+-- aa=fxaa villa
+{"frames":9,"calls":312,"tris":576270,"programs":72,"linkMs":12,"jsMedianMs":0.2,"jsP90Ms":3897.2,"level":"medium","scale":1,"seconds":44}
+Valley_Fauna                    87 sombra     0 inst   0 tris 35558
+Valley_Buildings/stone_house    75 sombra    75 inst   0 tris 17216
+Valley_Cast                     60 sombra     0 inst   0 tris 59752
+Valley_Grass                    28 sombra     0 inst  27 tris 145948
+Valley_Buildings/granary        21 sombra    21 inst   0 tris 6036
+Valley_Buildings/gate           19 sombra    19 inst   0 tris 392
+Valley_Backdrop                 15 sombra     0 inst   8 tris 57910
+Valley_Hearth                   13 sombra     0 inst   0 tris 404
+Valley_Steading                 11 sombra    11 inst  11 tris 11928
+Valley_GreatOak                 11 sombra    11 inst   0 tris 2346
+Valley_Buildings/smithy         10 sombra    10 inst   0 tris 2478
+Valley_Ambience                 10 sombra     0 inst  10 tris 1980
+Valley_Buildings/field           8 sombra     0 inst   0 tris 1856
+Valley_Buildings/watchtower      8 sombra     8 inst   0 tris 3276
+TOTAL mallas 450 sombra 209
+-- shader-churn antes (ruta debug)
+tras cargar { links: 43, linkMs: 14.799999998882413 }
+tras un rayo { links: 47, linkMs: 19.90000000037253 }
+tras la fiesta { links: 47, linkMs: 20.5 }
+tras quitarla { links: 47, linkMs: 20.90000000037253 }
+-- shader-churn después (ruta debug)
+tras cargar { links: 43, linkMs: 9.299999997019768 }
+tras un rayo { links: 47, linkMs: 11.699999993667006 }
+tras la fiesta { links: 47, linkMs: 11.99999999254942 }
+tras quitarla { links: 47, linkMs: 12.299999993294477 }

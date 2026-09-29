@@ -153,7 +153,43 @@ const browser = await chromium.launch({
   ...(exe ? { executablePath: exe } : {}),
   args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],
 });
-const tab = await browser.newPage({ viewport, deviceScaleFactor: 2 });
+// GV-0 · **Qué ve un teléfono, y no qué ve el portátil.** Sin `--touch` la
+// página se abre sin tacto y `auto` resuelve el perfil alto (MSAA, 2× y
+// sombras 2048), que no es lo que dibuja un móvil: con `--touch` el contexto
+// es táctil y móvil, `(pointer: coarse)` es cierto y `auto` resuelve como en
+// un teléfono. `--quality` fija el nivel de «Graphics» antes de cargar, como
+// si el jugador lo hubiera elegido (`valley.graphics`, `ui/graphics-settings.ts`).
+// `--dpr` es la densidad de la pantalla emulada: 2 por omisión y 3 con tacto.
+const touch = args.includes('--touch');
+const quality = opt('quality', '');
+if (quality !== '' && !['auto', 'high', 'medium', 'low'].includes(quality)) {
+  throw new Error(`--quality must be auto, high, medium or low; got '${quality}'.`);
+}
+const dpr = Number(opt('dpr', touch ? '3' : '2'));
+const tab = await browser.newPage({ viewport, deviceScaleFactor: dpr, hasTouch: touch, isMobile: touch });
+if (quality !== '') {
+  await tab.addInitScript((level) => {
+    try { localStorage.setItem('valley.graphics', JSON.stringify({ quality: level, frameRate: 60 })); } catch { /* sin almacenamiento */ }
+  }, quality);
+}
+// GV-0 · **La luz, el cielo y la escala, fijos**, con los ganchos del
+// renderer que ya existían para mirar (`__valleyHoldSky`, `__valleyHoldPhase`)
+// y el de la escala (`__valleyHoldScale`). `--year N` abre siempre en
+// primavera, día 1, con el cielo que toque, y la adaptativa baja la densidad
+// sola en un dibujo por software: sin esto dos tomas no son comparables.
+//   --sky clear|overcast|rain|storm|snow   --phase 0..1 (0,45 es el mediodía)
+//   --scale 1   la densidad de la adaptativa, fija
+//   --pause     pausa el juego en cuanto el valle está puesto: la gente, las
+//               nubes y el viento quedan quietos y dos tomas salen iguales
+const holdSky = opt('sky', '');
+const holdPhase = opt('phase', '');
+const holdScale = opt('scale', '');
+const pauseEarly = args.includes('--pause');
+//   --eval "<js>"   corre esto en la página con el valle puesto, tras fijar
+//                   luz y escala: para comparar variantes de un gancho de
+//                   taller en la misma toma (p. ej. `__valleyContactShade`)
+const evalScript = opt('eval', '');
+const holding = holdSky !== '' || holdPhase !== '' || holdScale !== '' || pauseEarly || evalScript !== '';
 let gateOverrideHits = 0;
 if (gateOverride !== '') {
   const candidate = readFileSync(gateOverride);
@@ -188,8 +224,17 @@ if (yearArg !== '') {
 if (open !== 'title') await tab.locator('.title-new').click().catch(() => {});
 // Las fundaciones de años avanzados pueden tardar bastante más que `--settle`.
 // Espera al renderer antes de intentar un encuadre de diagnóstico.
-if (open !== 'title' && (lookPoint !== null || lookAnimal !== '' || sceneOnly)) {
+if (open !== 'title' && (lookPoint !== null || lookAnimal !== '' || sceneOnly || holding)) {
   await tab.waitForFunction(() => typeof window.__valleyCapture === 'function', null, { timeout: 180_000 });
+}
+if (open !== 'title' && holding) {
+  await tab.evaluate(({ sky, phase, scale, pause }) => {
+    if (sky !== '') window.__valleyHoldSky?.(sky);
+    if (phase !== '') window.__valleyHoldPhase?.(Number(phase));
+    if (scale !== '') window.__valleyHoldScale?.(Number(scale));
+    if (pause) window.__valleySpeed?.(0);
+  }, { sky: holdSky, phase: holdPhase, scale: holdScale, pause: pauseEarly });
+  if (evalScript !== '') await tab.evaluate(evalScript);
 }
 //   --settle S   segundos que se espera tras fundar antes de hacer nada (8 por defecto;
 //                0.5 para ver el vuelo de entrada de U-11 fotograma a fotograma)
@@ -417,7 +462,7 @@ if (sequence > 0) {
       const phase = document.documentElement.dataset.sunPhase ?? '-';
       return `${time} ${date} · fase ${phase}`;
     }));
-    await tab.screenshot({ path: `${stem}-${String(n + 1).padStart(2, '0')}.png` });
+    await tab.screenshot({ path: `${stem}-${String(n + 1).padStart(2, '0')}.png`, timeout: 180_000 });
     const open = await tab.evaluate(() => document.documentElement.classList.contains('crossroad-open'));
     if (open) await swipeDown();
     await tab.waitForTimeout(every * 1000);
@@ -438,7 +483,9 @@ if (sceneOnly) {
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, shot);
 } else {
-  shot = await tab.screenshot({ path: out });
+  // GV-0 · la villa del año 60 tarda unos cuatro segundos por fotograma en un
+  // dibujo por software a 3×, y la espera por omisión (30 s) no bastaba.
+  shot = await tab.screenshot({ path: out, timeout: 180_000 });
 }
 
 // Y a qué estación corresponde lo que se acaba de fotografiar, que es la mitad
@@ -491,5 +538,15 @@ const hud = await tab.evaluate(() => ({
   vitals: [...document.querySelectorAll('.valley-vital')].map((e) => e.textContent),
 }));
 console.log(JSON.stringify({ ...hud, season, doing, ordersNow, brightness }), '→', out);
+// GV-0 · y con qué se dibujó: nivel, escala, llamadas y triángulos del último
+// fotograma, que es lo que hace falta para decir si dos tomas son comparables.
+const drawn = await tab.evaluate(() => {
+  const stats = window.__valleyRenderStats?.();
+  return stats === undefined ? null : {
+    level: stats.level, scale: stats.scale, calls: stats.calls, triangles: stats.triangles,
+    coarse: matchMedia('(pointer: coarse)').matches, dpr: devicePixelRatio,
+  };
+});
+console.log('render:', JSON.stringify(drawn));
 console.log('errores de página:', errors.length === 0 ? 'ninguno' : errors.slice(0, 5));
 await browser.close();

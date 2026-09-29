@@ -148,6 +148,18 @@ hoy y qué haría falta. Un encargo que sólo vive en un comentario del código 
 un encargo que nadie hará — y una mecánica que no se ve no existe para quien
 juega.
 
+## La profundidad del valle (GV, 29 sep 2026)
+
+Lo que la ronda de profundidad visual (`docs/encargos/profundidad-visual-movil-2026-09-29.md`)
+vio y dejó fuera de su encargo. Ninguna es una malla: son cosas del render.
+
+| Qué | Qué se ve hoy | Qué haría falta |
+|---|---|---|
+| **La gente no da sombra propia** | Los aldeanos y los animales no proyectan: con el sol alto es lo que más flota de la escena, más que las casas (revisión del encargo, §3.5) | Un disco oscuro instanciado bajo los pies, una llamada para todos, que siga la cota; o que la máscara del pie lea también los cuerpos |
+| **Las defensas no tienen pie** | Muralla, empalizada y portón quedan fuera de la máscara del pie (`contactBases`, sólo edificios con tejado): en la villa, el cerco largo es lo que más lo pediría | Añadirlas a `contactBases` con una caída más estrecha |
+| **La hierba tapa el pie** | Una mata clara puede quedar encima de la franja oscura al pie de una pared (`grass.ts` no lee la máscara) | Que la hierba lea la misma máscara y se oscurezca con el suelo |
+| **Al seguido lo tapan troncos y casas** | Sólo se atenúan las copas (GV-2): detrás de una casa, o con un tronco delante de las piernas, no se le ve; y en los 0,35 s del fundido su anillo se ve por encima de la copa | Atenuar también techos, con el mismo criterio de «sólo lo que tapa», si en el aparato se echa en falta |
+
 ## El camino del valle (28 sep 2026)
 
 | Qué | Qué se ve hoy | Qué haría falta |

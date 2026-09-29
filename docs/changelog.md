@@ -1,5 +1,47 @@
 # The Valley — Registro de cambios
 
+## v5.12 · 29 sep 2026 · La profundidad del valle en móvil: el pie de las casas, el prado hondo y el seguido a la vista
+
+Vera pidió ejecutar el encargo de Astra
+(`docs/encargos/profundidad-visual-movil-2026-09-29.md`) por orden: «las
+casas se leen poco ancladas al suelo y el prado pierde estructura en el zoom
+habitual». Numerada tras las de las ramas de animación y de animales (v4.97–v5.11). El resultado
+entero, con sus cifras, está al final del propio encargo.
+
+- **GV-0 · tomas comparables** (`89136b2`, sin cambio visible): `shot.mjs` y
+  `gl-probe.mjs` abren el valle con el perfil de un teléfono, el cielo, la hora
+  y la escala sujetos, y dos tomas seguidas salen idénticas al píxel;
+  `follow-sequence.mjs` graba la misma secuencia del seguido en dos versiones;
+  las sondas de `performance/` arrancan fuera de Windows y `gl-probe` da el
+  reparto del fotograma que mide el propio renderer.
+- **GV-1 · el pie de los edificios** (`world/contact-shade.ts`): una máscara
+  R8 para todo el valle, hecha en lote desde el plan y leída por el
+  sombreador del suelo donde three aplica su oclusión. Cero llamadas, sin
+  halos ni z-fighting, vale en Low y con el cielo cubierto, y se rehace sólo
+  cuando cambian los edificios con tejado. Fuerza C1 de tres probadas, la más clara:
+  la eligió Vera (C2 ennegrecía la sombra de la capilla; C3 le pareció más
+  marcada de lo que quería). `?contact=off` la apaga para medirla en
+  el aparato.
+- **GV-1 · el prado hondo** (`world/ground.ts`): el verde de debajo de la
+  hierba, un 40 % más oscuro y mezclado entero, y las manchas lentas a 0,09.
+  Variante C de tres (A ensuciaba la nieve; B no se veía).
+- **GV-2 · quien se sigue, a la vista**: se suma a `forest.reveal` (la caza y
+  el asalto se conservan) y se mide contra la copa sola; las copas se funden en
+  0,35 s, conservan su sombra y se mecen. Y el hachazo vuelve a mover su
+  árbol con copas atenuadas: seguir al leñador lo dejaba quieto.
+- **GV-3 · suavizado, sólo experimento** (`effects/screen-aa.ts`,
+  `?aa=none|msaa|fxaa`, también en el sitio publicado). FXAA descartado;
+  MSAA pendiente de medirse en un iPhone o iPad. **El valor por omisión no
+  cambia.**
+- Coste medido por software (comparativo, no FPS de móvil): las mismas
+  llamadas, triángulos, programas y recompilaciones; 516 KB de máscara; 24 µs
+  por fotograma siguiendo a alguien.
+- **Hallazgo, sin tocar**: la villa 7/60 se queda en bucle —un fotograma de
+  más de un segundo se toma por una ausencia (`presentation-clock.ts`), la
+  jornada se reinicia y rehacer la vida de la villa vuelve a pasar del
+  segundo—: 3,8 s por fotograma y la vida parada. Causa probable de la tablet a
+  0 fps; arreglo propuesto en el encargo.
+
 ## v5.11 · 29 sep 2026 · La mula y el jabalí, con las patas más cortas
 
 Vera: «la mula, las patas son muy largas […] el jabalí es algo similar […]

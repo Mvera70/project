@@ -1,0 +1,8 @@
+== aldea-390x844-nublado-escena
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.311} → /home/user/project/artifacts/graphics/visual-depth/c1/aldea-390x844-nublado-escena.png
+render: {"level":"medium","scale":1,"calls":261,"triangles":445530,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-390x844-despejado-escena
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.354} → /home/user/project/artifacts/graphics/visual-depth/c1/villa-390x844-despejado-escena.png
+render: {"level":"medium","scale":1,"calls":240,"triangles":485810,"coarse":true,"dpr":3}
+errores de página: ninguno

@@ -5,13 +5,16 @@
 // materiales (de 33 a 86 programas), que es lo que arregla `LightPool`.
 //   node tools/graphics/performance/shader-churn.mjs <valley.html> "<query>"
 import { chromium } from '@playwright/test';
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 const [file, query] = process.argv.slice(2);
 const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
-const dir = readdirSync(root).filter((d) => /^chromium-\d+$/.test(d)).sort().reverse()[0];
-const browser = await chromium.launch({ executablePath: join(root, dir, 'chrome-win64', 'chrome.exe'), args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
+// GV-0 · la ruta explícita (`VALLEY_CHROMIUM`), la de Windows si existe, o la
+// que traiga Playwright: sin respaldo esta sonda sólo arrancaba en Windows.
+const dir = existsSync(root) ? readdirSync(root).filter((d) => /^chromium-\d+$/.test(d)).sort().reverse()[0] : undefined;
+const exe = process.env.VALLEY_CHROMIUM || (dir === undefined ? undefined : join(root, dir, 'chrome-win64', 'chrome.exe'));
+const browser = await chromium.launch({ ...(exe ? { executablePath: exe } : {}), args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
 const tab = await browser.newPage({ viewport: { width: 900, height: 700 } });
 await tab.addInitScript(() => {
   const p = { links: 0, linkMs: 0 }; window.__p = p;

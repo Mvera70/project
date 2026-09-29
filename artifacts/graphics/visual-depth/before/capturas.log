@@ -1,0 +1,136 @@
+== aldea-390x844-despejado-escena
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.468} → /home/user/project/artifacts/graphics/visual-depth/before/aldea-390x844-despejado-escena.png
+render: {"level":"medium","scale":1,"calls":261,"triangles":445530,"coarse":true,"dpr":3}
+errores de página: ninguno
+== aldea-390x844-despejado-ui
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.473} → /home/user/project/artifacts/graphics/visual-depth/before/aldea-390x844-despejado-ui.png
+render: {"level":"medium","scale":1,"calls":261,"triangles":445530,"coarse":true,"dpr":3}
+errores de página: ninguno
+== aldea-390x844-nublado-escena
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.32} → /home/user/project/artifacts/graphics/visual-depth/before/aldea-390x844-nublado-escena.png
+render: {"level":"medium","scale":1,"calls":261,"triangles":445530,"coarse":true,"dpr":3}
+errores de página: ninguno
+== aldea-390x844-nublado-ui
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.396} → /home/user/project/artifacts/graphics/visual-depth/before/aldea-390x844-nublado-ui.png
+render: {"level":"medium","scale":1,"calls":261,"triangles":445530,"coarse":true,"dpr":3}
+errores de página: ninguno
+== aldea-320x568-despejado-escena
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.459} → /home/user/project/artifacts/graphics/visual-depth/before/aldea-320x568-despejado-escena.png
+render: {"level":"medium","scale":1,"calls":442,"triangles":699852,"coarse":true,"dpr":2}
+errores de página: ninguno
+== aldea-320x568-despejado-ui
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.484} → /home/user/project/artifacts/graphics/visual-depth/before/aldea-320x568-despejado-ui.png
+render: {"level":"medium","scale":1,"calls":442,"triangles":699852,"coarse":true,"dpr":2}
+errores de página: ninguno
+== aldea-320x568-nublado-escena
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.313} → /home/user/project/artifacts/graphics/visual-depth/before/aldea-320x568-nublado-escena.png
+render: {"level":"medium","scale":1,"calls":442,"triangles":699852,"coarse":true,"dpr":2}
+errores de página: ninguno
+== aldea-320x568-nublado-ui
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.442} → /home/user/project/artifacts/graphics/visual-depth/before/aldea-320x568-nublado-ui.png
+render: {"level":"medium","scale":1,"calls":442,"triangles":699852,"coarse":true,"dpr":2}
+errores de página: ninguno
+== aldea-390x844-despejado-low-escena
+{"year":"08:00","vitals":["48","57","566","210","9"],"season":"Year 21 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.486} → /home/user/project/artifacts/graphics/visual-depth/before/aldea-390x844-despejado-low-escena.png
+render: {"level":"low","scale":1,"calls":261,"triangles":445530,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-390x844-despejado-escena
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.365} → /home/user/project/artifacts/graphics/visual-depth/before/villa-390x844-despejado-escena.png
+render: {"level":"medium","scale":1,"calls":240,"triangles":485810,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-390x844-despejado-ui
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+page.screenshot: Timeout 30000ms exceeded.
+Call log:
+[2m  - taking page screenshot[22m
+[2m  - waiting for fonts to load...[22m
+[2m  - fonts loaded[22m
+
+    at /home/user/project/tools/graphics/shot.mjs:494:20 {
+  log: [
+    '  - taking page screenshot',
+    '  - waiting for fonts to load...',
+    '  - fonts loaded'
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v22.22.2
+== villa-390x844-nublado-escena
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.243} → /home/user/project/artifacts/graphics/visual-depth/before/villa-390x844-nublado-escena.png
+render: {"level":"medium","scale":1,"calls":240,"triangles":485810,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-390x844-nublado-ui
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+page.screenshot: Timeout 30000ms exceeded.
+Call log:
+[2m  - taking page screenshot[22m
+[2m  - waiting for fonts to load...[22m
+[2m  - fonts loaded[22m
+
+    at /home/user/project/tools/graphics/shot.mjs:499:20 {
+  log: [
+    '  - taking page screenshot',
+    '  - waiting for fonts to load...',
+    '  - fonts loaded'
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v22.22.2
+== villa-320x568-despejado-escena
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.371} → /home/user/project/artifacts/graphics/visual-depth/before/villa-320x568-despejado-escena.png
+render: {"level":"medium","scale":1,"calls":284,"triangles":495880,"coarse":true,"dpr":2}
+errores de página: ninguno
+== villa-320x568-despejado-ui
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+page.screenshot: Timeout 30000ms exceeded.
+Call log:
+[2m  - taking page screenshot[22m
+[2m  - waiting for fonts to load...[22m
+[2m  - fonts loaded[22m
+
+    at /home/user/project/tools/graphics/shot.mjs:499:20 {
+  log: [
+    '  - taking page screenshot',
+    '  - waiting for fonts to load...',
+    '  - fonts loaded'
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v22.22.2
+== villa-320x568-nublado-escena
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.248} → /home/user/project/artifacts/graphics/visual-depth/before/villa-320x568-nublado-escena.png
+render: {"level":"medium","scale":1,"calls":284,"triangles":495880,"coarse":true,"dpr":2}
+errores de página: ninguno
+== villa-320x568-nublado-ui
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.407} → /home/user/project/artifacts/graphics/visual-depth/before/villa-320x568-nublado-ui.png
+render: {"level":"medium","scale":1,"calls":493,"triangles":767226,"coarse":true,"dpr":2}
+errores de página: ninguno
+== villa-390x844-despejado-low-escena
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.387} → /home/user/project/artifacts/graphics/visual-depth/before/villa-390x844-despejado-low-escena.png
+render: {"level":"low","scale":1,"calls":240,"triangles":485810,"coarse":true,"dpr":3}
+errores de página: ninguno
+== sondas
+== villa-390x844-despejado-ui
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.406} → /home/user/project/artifacts/graphics/visual-depth/before/villa-390x844-despejado-ui.png
+render: {"level":"medium","scale":1,"calls":449,"triangles":757156,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-390x844-nublado-ui
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.346} → /home/user/project/artifacts/graphics/visual-depth/before/villa-390x844-nublado-ui.png
+render: {"level":"medium","scale":1,"calls":449,"triangles":757156,"coarse":true,"dpr":3}
+errores de página: ninguno
+== villa-320x568-despejado-ui
+{"year":"08:00","vitals":["60","35","374","210","5"],"season":"Year 60 · Spring, day 1","doing":null,"ordersNow":"Open the cart","brightness":0.436} → /home/user/project/artifacts/graphics/visual-depth/before/villa-320x568-despejado-ui.png
+render: {"level":"medium","scale":1,"calls":493,"triangles":767226,"coarse":true,"dpr":2}
+errores de página: ninguno

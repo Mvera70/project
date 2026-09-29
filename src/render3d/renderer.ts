@@ -44,6 +44,10 @@ import { buildBackdrop, type Backdrop } from './world/backdrop';
 import { stepWind, windFor } from './effects/wind';
 import { updateMountainVeil } from './effects/mountain-veil';
 import { createGrass, meadowWeight } from './world/grass';
+import {
+  contactShadeAsked, createContactShade, enableContactShade, tuneContactShade, type ContactShade,
+} from './world/contact-shade';
+import { aaTrialOf, createScreenAa, type ScreenAa } from './effects/screen-aa';
 import { buildRoadStones, buildSignposts, valleyRoad } from './world/road';
 import { createTrampleMap, setTramplers, snowTracks, SNOW_FROM, type TrampleMap, type Trampler } from './effects/trample';
 import { cloudsFor, stepClouds } from './effects/clouds';
@@ -305,7 +309,16 @@ export async function createGraphicsRenderer(
   const profile = resolveProfile(options.graphics ?? DEFAULT_GRAPHICS, handheld);
   const shadowsOn = options.quality !== 'low' && profile.shadows;
   const pixelCap = profile.pixelRatioCap;
-  const renderer = new WebGLRenderer({ canvas: options.canvas, antialias: options.quality !== 'low' && profile.antialias });
+  // GV-3 · `?aa=` en la dirección sustituye sólo el suavizado, para el
+  // experimento comparativo (`effects/screen-aa.ts`); sin él, el del perfil.
+  // Vale también en el sitio publicado: la medida que decide es la del aparato.
+  const aaTrial = typeof window === 'undefined' ? null : aaTrialOf(window.location);
+  // GV-1 · y `?contact=off` monta el suelo sin el pie de los edificios, ni su
+  // máscara, para leer en el aparato lo que cuesta (`world/contact-shade.ts`).
+  const contactOn = typeof window === 'undefined' || contactShadeAsked(window.location);
+  enableContactShade(contactOn);
+  const antialias = aaTrial === 'msaa' ? true : aaTrial !== null ? false : options.quality !== 'low' && profile.antialias;
+  const renderer = new WebGLRenderer({ canvas: options.canvas, antialias });
   renderer.outputColorSpace = SRGBColorSpace;
   // **El valle estaba sobreexpuesto, y era la causa de que se viera lavado.**
   //
@@ -337,6 +350,19 @@ export async function createGraphicsRenderer(
   scene.background = new Color(VALLEY_COLOURS.sky);
   const view = createValleyCamera();
   const camera = view.camera;
+  /** GV-3 · la cadena de FXAA del experimento; `null` en el juego. */
+  const screenAa: ScreenAa | null = aaTrial === 'fxaa' ? await createScreenAa(renderer, scene, camera) : null;
+  /** El fotograma al lienzo: directo, o por el filtro del experimento. */
+  const drawFrame = (): void => {
+    if (screenAa !== null) screenAa.render();
+    else renderer.render(scene, camera);
+  };
+  /** La densidad y el tamaño del lienzo (y del filtro del experimento, si lo hay). */
+  function sizeCanvas(): void {
+    renderer.setPixelRatio(Math.min(viewport.pixelRatio, pixelCap) * renderScale);
+    renderer.setSize(viewport.widthCss, viewport.heightCss, false);
+    screenAa?.setSize(viewport.widthCss, viewport.heightCss, renderer.getPixelRatio());
+  }
   const world = new Group();
   world.name = 'Valley';
   scene.add(world);
@@ -526,6 +552,9 @@ export async function createGraphicsRenderer(
   // menos matas en táctil. Se replanta cuando cambia la semana y se recolorea
   // con la estación (`world/grass.ts`).
   const grass = createGrass(profile.lightGrass);
+  // GV-1 · la máscara del pie de los edificios, una para el valle; se hace
+  // al llegar el primer plan, cuando se sabe el tamaño del mapa.
+  let contact: ContactShade | null = null;
   world.add(grass.group);
   let grassTick = -1;
   // Las pisadas (`effects/trample.ts`): un mapa por valle, que sobrevive a los
@@ -827,8 +856,25 @@ export async function createGraphicsRenderer(
     }
   }
 
+  /**
+   * Lo que el bosque tiene que dejar ver: el encuentro —la caza o el frente
+   * del asalto— y, desde GV-2, **quien se sigue**. Sólo se atenúan las copas
+   * que se interponen entre la cámara y alguno de ellos (`forestOccluders`).
+   */
   function revealAssault(): number {
     if (forest === null || life === null) return 0;
+    const targets = encounterTargets(life);
+    // GV-2 · Quien se sigue se suma al encuentro, no lo sustituye: seguir a
+    // alguien durante un asalto no puede volver a tapar la puerta. Al dejar
+    // de seguir, `trackedNow` es `null` y el próximo fotograma devuelve las
+    // copas que sólo tapaban a esa persona.
+    const followed = trackedTarget();
+    if (followed !== null) targets.push(followed);
+    return forest.reveal(camera, targets);
+  }
+
+  /** La caza o el frente del asalto, como volúmenes a dejar ver; nada si no hay encuentro. */
+  function encounterTargets(scene: NonNullable<typeof life>): ForestRevealTarget[] {
     if (huntScene !== null) {
       const hunter = huntScene.hunter;
       const targets: ForestRevealTarget[] = [{
@@ -839,15 +885,15 @@ export async function createGraphicsRenderer(
         x: animal.x, y: groundFloor(animal.x, animal.y) + ACTOR_VISUAL_HEIGHT / 2,
         z: animal.y, radius: ACTOR_VISUAL_HEIGHT,
       });
-      return forest.reveal(camera, targets);
+      return targets;
     }
-    const gate = life.defence.gate;
-    if (gate === null) return forest.reveal(camera, []);
-    const active = life.raiders.filter(raider => raider.phase !== 'down'
+    const gate = scene.defence.gate;
+    if (gate === null) return [];
+    const active = scene.raiders.filter(raider => raider.phase !== 'down'
       && raider.phase !== 'gone' && raider.phase !== 'leaving');
     // El portón puede conservar su parte después de caer el último atacante.
     // Sin un cuerpo hostil activo ya no hay encuentro que revelar.
-    if (active.length === 0) return forest.reveal(camera, []);
+    if (active.length === 0) return [];
     const targets: ForestRevealTarget[] = [{
       x: gate.at.x,
       y: groundFloor(gate.at.x, gate.at.z) + GATE_REVEAL_RADIUS / 2,
@@ -871,7 +917,7 @@ export async function createGraphicsRenderer(
       z,
       radius,
     });
-    return forest.reveal(camera, targets);
+    return targets;
   }
 
   /**
@@ -1514,7 +1560,7 @@ export async function createGraphicsRenderer(
     revealAssault();
     poolLights();
     renderer.shadowMap.needsUpdate = true;
-    renderer.render(scene, camera);
+    drawFrame();
     return { image: options.canvas.toDataURL('image/png'), life: window.__valleyLife?.() ?? null };
   };
   let observingLive = false;
@@ -1754,6 +1800,16 @@ export async function createGraphicsRenderer(
     lifeMs: lastLifeMs,
     lifeSteps: lastLifeSteps,
     paintMs: lastPaintMs,
+    // GV-3 · qué suavizado se está usando y lo que ocupa su filtro.
+    aa: aaTrial ?? 'profile',
+    aaBytes: screenAa?.memoryBytes() ?? 0,
+    // GV-0 · cuántas copas están atenuadas, y si quien se sigue queda detrás
+    // de alguna desde esta cámara (`null`: nadie seguido a la vista).
+    revealed: forest?.revealedCount ?? 0,
+    trackedHidden: (() => {
+      const target = trackedTarget();
+      return target === null || forest === null ? null : forest.hides(camera, target);
+    })(),
   });
   let frameAverage = 1 / 60;
   let sinceAdapt = 0;
@@ -1766,10 +1822,65 @@ export async function createGraphicsRenderer(
   // necesitaba (la tablet de Vera, 29 sep 2026: 0 fps y «resolución 100 %»).
   // Se acota a un segundo para que una pestaña que vuelve de dormir no cuente
   // como un aparato lento.
+  // GV-0 · Gancho de observación: seguir a alguien como lo hace el dedo
+  // (mantener pulsado, «Follow»), sin pasar por la interfaz: la herramienta
+  // no sabe dónde cae cada aldeano en la pantalla. `null` deja de seguir.
+  let observedTrack: number | null = null;
+  window.__valleyTrack = (id: number | null) => {
+    observedTrack = id;
+    if (id === null) graphics.track(null);
+  };
+  /** A quién se sigue ahora, por la ficha o por la herramienta. */
+  let trackedNow: number | null = null;
+  // GV-2 · Gancho de observación: quién está ahora detrás de alguna copa desde
+  // esta cámara. Es ortográfica, así que no depende de a quién mire: sirve
+  // para buscar a alguien que pase bajo el bosque y grabarlo. No lo usa el juego.
+  window.__valleyCanopyHidden = () => forest === null ? [] : lastActors
+    .filter((actor) => actor.id >= 0 && forest!.hides(camera, {
+      x: actor.x, y: groundFloor(actor.x, actor.z) + ACTOR_VISUAL_HEIGHT / 2,
+      z: actor.z, radius: ACTOR_VISUAL_HEIGHT / 2, canopyOnly: true,
+    }))
+    .map((actor) => actor.id);
+  /**
+   * El cuerpo de quien se sigue, para el bosque; `null` si no está a la vista.
+   * GV-2 · Ajustado y contra la copa sola: con el volumen de la presa (radio
+   * de un cuerpo entero) y la esfera del árbol completo se atenuaba el árbol
+   * que el leñador estaba talando, que no lo tapaba.
+   */
+  function trackedTarget(): ForestRevealTarget | null {
+    if (trackedNow === null) return null;
+    const followed = lastActors.find((actor) => actor.id === trackedNow);
+    if (followed === undefined) return null;
+    return {
+      x: followed.x, y: groundFloor(followed.x, followed.z) + ACTOR_VISUAL_HEIGHT / 2,
+      z: followed.z, radius: ACTOR_VISUAL_HEIGHT / 2, canopyOnly: true,
+    };
+  }
+  // GV-1 · Gancho de taller: la fuerza y el alcance del pie de los edificios,
+  // para comparar variantes en la misma toma. El juego no lo llama.
+  window.__valleyContactShade = (tune: { ambient?: number; direct?: number; reach?: number }) => {
+    tuneContactShade(tune);
+    if (tune.reach !== undefined && plan !== null) contact?.update(plan.buildings);
+  };
+  // GV-0 · Gancho de observación: fija la escala de la adaptativa para las
+  // tomas comparadas; `null` la suelta. En un dibujo por software todo
+  // fotograma es lento y la adaptativa baja sola: cinco tomas del 29 sep 2026
+  // salieron a cuatro escalas distintas (0,55 a 1,0), y un «antes/después» así
+  // compara resoluciones, no técnicas. El juego no lo llama.
+  let heldScale: number | null = null;
+  window.__valleyHoldScale = (scale: number | null) => {
+    heldScale = scale === null || !Number.isFinite(scale) ? null : Math.max(0.25, Math.min(1, scale));
+    if (heldScale === null || disposed) return;
+    renderScale = heldScale;
+    sinceAdapt = 0;
+    easySeconds = 0;
+    sizeCanvas();
+  };
   const adaptResolution = (): void => {
     const now = performance.now();
     const realDelta = lastAdaptAt === 0 ? 0 : Math.min(1, (now - lastAdaptAt) / 1000);
     lastAdaptAt = now;
+    if (heldScale !== null) return;
     if (!(realDelta > 0)) return;
     frameAverage = frameAverage * 0.9 + realDelta * 0.1;
     sinceAdapt += realDelta;
@@ -1782,8 +1893,7 @@ export async function createGraphicsRenderer(
     renderScale = next;
     sinceAdapt = 0;
     easySeconds = 0;
-    renderer.setPixelRatio(Math.min(viewport.pixelRatio, pixelCap) * renderScale);
-    renderer.setSize(viewport.widthCss, viewport.heightCss, false);
+    sizeCanvas();
   };
   /** La presa de la ocasión, ya en el valle: la suelta se crea; ciervo y oso ya están. */
   function sightingFor(state: Readonly<GameState>, species: HuntSpecies): typeof huntSighting {
@@ -1818,8 +1928,7 @@ export async function createGraphicsRenderer(
     resize(next: GraphicsViewport): void {
       if (disposed) return;
       viewport = next;
-      renderer.setPixelRatio(Math.min(next.pixelRatio, pixelCap) * renderScale);
-      renderer.setSize(next.widthCss, next.heightCss, false);
+      sizeCanvas();
       // Girar el movil cambia cuanto valle cabe, pero no tiene por que
       // devolver al jugador al encuadre de partida si se habia acercado.
       view.resize({ width: next.widthCss, height: next.heightCss });
@@ -1829,6 +1938,9 @@ export async function createGraphicsRenderer(
       if (observing && !sampling) return;
       observedState = state; observedFrame = frame;
       if (disposed) return;
+      // GV-0 · el seguimiento de la herramienta, repetido como lo repite
+      // `app.ts` antes de cada `paint` (VZ-4).
+      if (observedTrack !== null) graphics.track(observedTrack);
       const paintStarted = performance.now();
       const firstPaint = traceStages && !firstPaintTraced;
       if (firstPaint) markStage('paint:first-start');
@@ -1926,6 +2038,16 @@ export async function createGraphicsRenderer(
       if (change.rampart) village.rampart(next.rampart);
       // La muralla, en lote: una llamada por material en vez de una por tramo.
       if (change.removed.length > 0 || change.added.length > 0 || change.changed.length > 0) village.batchWalls();
+      // GV-1 · y el suelo al pie de cada uno, en lote: se rehace con los
+      // edificios, no con el fotograma.
+      if (contactOn && (change.cleared || contact === null
+        || change.removed.length > 0 || change.added.length > 0 || change.changed.length > 0)) {
+        if (change.cleared || contact === null) {
+          contact?.dispose();
+          contact = createContactShade(shown.map.width, shown.map.height);
+        }
+        contact.update(next.buildings);
+      }
       for (const id of change.works.removed) works.remove(id);
       for (const work of [...change.works.added, ...change.works.changed]) works.add(work);
       plan = next;
@@ -2292,8 +2414,9 @@ export async function createGraphicsRenderer(
       stepShakes(frame.deltaSeconds);
       // D.7 · sólo el robledal realmente interpuesto ante el encuentro pierde
       // opacidad. Se calcula después de mover los cuerpos; no toca mapa,
-      // obstáculos ni geometría física.
+      // obstáculos ni geometría física. GV-2 · y se funde, no salta.
       revealAssault();
+      forest?.stepReveal(frame.realDeltaSeconds);
 
       // §11.1.1 · la nube sobre la cabeza de quien esta viviendo algo. Lo que
       // lleva sale del estado; que este parado hablando lo dice el actor.
@@ -2472,7 +2595,7 @@ export async function createGraphicsRenderer(
         }
         if (warmUp === 'done') {
           const renderStarted = performance.now();
-          renderer.render(scene, camera);
+          drawFrame();
           lastRenderMs = performance.now() - renderStarted;
         } else renderer.shadowMap.needsUpdate = true;
         if (firstPaint) { markStage('paint:submit-end'); firstPaintTraced = true; }
@@ -2675,6 +2798,7 @@ export async function createGraphicsRenderer(
       // a cada uno— así que no toca a nadie más. Idempotente: `app.ts` llama a
       // esto en cada fotograma desde VZ-4 para que la cámara vaya detrás.
       cast.highlight(id);
+      trackedNow = id;
       if (id === null) return;
       focusFlight = null;
       // Seguir a alguien es mirarle, no acercarse a el: la distancia la elige
@@ -2801,6 +2925,8 @@ export async function createGraphicsRenderer(
       steading.dispose();
       grass.dispose();
       trample?.dispose();
+      contact?.dispose();
+      screenAa?.dispose();
       if (ground !== null) {
         world.remove(ground.mesh);
         ground.dispose();
@@ -2877,6 +3003,7 @@ declare global {
     __valleyHoldPhase?: (value: number | null) => void;
     __valleyFestoon?: (on: boolean) => void;
     __valleyHoldSky?: (kind: SkyKind | null) => void;
+    __valleyHoldScale?: (scale: number | null) => void;
     __valleyHoldFlood?: (level: number | null) => void;
     __valleyVisit?: (kind?: HappeningId, dealt?: boolean) => void;
     __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm; shadow?: number } | null) => void;
@@ -2884,7 +3011,11 @@ declare global {
     __valleyRenderStats?: () => {
       calls: number; triangles: number; scale: number; level: string; targetFps: number;
       renderMs: number; lifeMs: number; lifeSteps: number; paintMs: number;
+      aa: string; aaBytes: number; revealed: number; trackedHidden: boolean | null;
     };
+    __valleyTrack?: (id: number | null) => void;
+    __valleyCanopyHidden?: () => number[];
+    __valleyContactShade?: (tune: { ambient?: number; direct?: number; reach?: number }) => void;
     __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];
     __valleyTrampleAt?: (x: number, z: number) => { grass: number; snow: number } | null;
     __valleyBoardScreen?: () => { x: number; y: number } | null;

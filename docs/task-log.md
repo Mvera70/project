@@ -1,5 +1,58 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · Profundidad visual en móvil: el pie de los edificios, el prado hondo y el seguido a la vista (v5.12)
+
+Vera pidió ejecutar el encargo de Astra
+(`docs/encargos/profundidad-visual-movil-2026-09-29.md`) por orden, sin tocar
+motor, guardados, UI ni modelos. Hecho en `ccr-81589d5f-v4dxsy`; **el resultado,
+las cifras, lo descartado y lo pendiente están al final del propio encargo
+(«Resultado»)**, con las hojas y las cifras en
+`artifacts/graphics/visual-depth/{hojas,metricas}/`. **GV-0**: tomas
+reproducibles —perfil táctil, cielo, hora y escala sujetos: 0 % de píxeles
+distintos entre dos tomas— y las sondas fuera de Windows (`89136b2`, el
+«antes»). **GV-1**: `world/contact-shade.ts`, una máscara R8 para todo el
+valle leída por el sombreador del suelo: cero llamadas, 516 KB, se rehace al
+cambiar los edificios con tejado (0,3 ms la aldea, 1,9 una villa de 140 casas);
+**C1** entre tres fuerzas —la más clara, la eligió Vera—, y el **prado hondo** (variante C de tres) en las
+capas que ya había. **GV-2**: quien se sigue se suma a `forest.reveal` contra
+la copa sola, fundido en 0,35 s, con sombra y viento; el asalto conserva sus 28
+copas y el hachazo vuelve a mover su árbol; 24 µs por fotograma siguiendo a
+alguien. **GV-3**: `?aa=none|msaa|fxaa`; FXAA descartado (borra el 80–83 % del
+detalle, 18–55 MB, ~30 programas más); MSAA el mejor a la vista y **el valor
+por omisión no cambia** hasta medirlo en un iPhone o iPad. **Coste**: mismas
+llamadas, triángulos, programas y recompilaciones en el mismo fotograma; el
+reparto del fotograma, igual dentro del ruido. **Abierto**: la lectura en el
+aparato (`?contact=off` y `?aa=msaa`, con el panel de taller), el visto bueno
+de Vera al prado C (el pie C1 ya es suyo). Fusionada con `main` tras la PR #2 (AN) el mismo
+día; en las sondas se quedó la versión que hace lo de las dos tandas. **Y dos rojas
+que no son de aquí**: las jornadas `e3b-corridor` (5) y `work-contact` (1), y
+`catchUp · §13.2` en la suite rápida (2,2 s en este contenedor), fallan igual
+en `main` `efafc2e`. La suite rápida entera, sobre la rama fusionada: 2102 de
+2103 verdes, y la roja es ésa.
+
+**La puerta de la PR #4**, antes de integrarla en `main` a petición de Vera
+(«puedes subir ya»): typecheck, `lint` entero y `build` limpios; `test:pwa`, 6
+de 6; `test:shots`, 12 rojas de 22 en la rama, **las mismas prueba a prueba**
+que en `main` `da8836f` en las 16 que llevaba al fusionar (las del rediseño de
+interfaz, anotadas en la puerta de la PR #2); y, tras traer la PR #3 (los
+animales, `b3f6b84`), otra vez typecheck, `lint` y las 24 pruebas afectadas
+(235 verdes). La PR #3 no toca `renderer.ts`, el bosque ni el suelo: los
+choques fueron de cuaderno y de `shot.mjs`, donde se queda su `browser.mjs`.
+Esta ronda pasa a ser la v5.12, porque la PR #3 usó de la v5.02 a la v5.11.
+
+**Y un hallazgo que pesa más que la ronda entera, sin tocar: la villa 7/60 se
+queda en bucle, y es la causa probable de la tablet a 0 fps.**
+`presentation-clock.ts` toma todo hueco de más de un segundo entre fotogramas
+por una ausencia (`SUSPEND_GAP_SECONDS = 1`); la discontinuidad rehace la capa
+de vida; en la villa eso (`createVillage`, rutas de A* del común y la orilla)
+tarda más de un segundo, y el fotograma siguiente vuelve a ser «ausencia».
+Medido: 3,8 s por `paint`, la vida en cero pasos y la fecha quieta, antes y
+después de GV; con el umbral a 30 s el mismo `main` se recupera a 18–78 ms.
+**Apuntado en `docs/medidas/bucle-villa-2026-09-29.md`** (Vera: «apunta lo
+del bucle de la villa»), con la evidencia, cómo reproducirlo y el arreglo que se
+propone —que el hueco descuente el trabajo del propio fotograma, y abaratar
+`createVillage`—; la fila es GV-4 en `plan-meta.md`.
+
 ## 29 sep 2026 · Las herramientas de modelos, el zorro publicado y el juicio de la fauna
 
 Vera preguntó qué animales flojean (el oso no la convence) y pidió capturas de
@@ -216,6 +269,28 @@ paso de la vida o un clip de trote que cambia el carácter del aldeano
 (`docs/encargos-3d.md`). **Límites dichos en la matriz §2.4:** gallina 7,3 Hz,
 niño 4,5–7,1 Hz, `walk` de la perdiz y `attack` de lobo y jabalí
 `preview-only`, el ciervo huye con `walk`.
+
+## 29 sep 2026 · Revisión del encargo de profundidad visual en móvil — **propuesta, sin código**
+
+Vera pidió leer con ojo crítico el encargo de Astra (`art/astra-modelos`,
+`15b4f84`, `docs/encargos/profundidad-visual-movil-2026-09-29.md`) y sacar un
+plan. Revisión y plan en
+`docs/encargos/profundidad-visual-movil-revision-2026-09-29.md` (rama
+`ccr-81589d5f-v4dxsy`). **Vale** el objetivo, el contacto en lote, los límites
+de capa y no tocar la sombra solar. **No se puede ejecutar tal cual**: no
+cuenta con la tablet a 0 fps; parte de un `main` sin «Graphics» (en Low no hay
+sombras); sus capturas no están en ninguna rama; GV-0 no se puede tomar
+(`gl-probe`, `scene-report`, `shader-churn` y `cpu-profile` sólo arrancan en
+Windows, `shot.mjs` fotografía el perfil High, y la adaptativa dejó cinco tomas
+a cuatro escalas, de 0,55 a 1,0); falta la sombra de la gente (los aldeanos
+nunca la han dado); y GV-3 descansa en un MSAA que no se midió aislado, cuando
+con three r185 FXAA son dos pases de pantalla completa más. **Plan**: V-0
+instrumentos → V-1 línea de base y lectura en el aparato (la puerta de lo que
+cueste por píxel) → V-2 anclaje (disco instanciado bajo los pies, máscara de
+contacto en el sombreador del suelo, prado) → V-3 el seguido (medir antes; velo
+de tramado como el de la montaña, que no apaga el hachazo del leñador) → V-4
+suavizado. **Abierto**: las cinco decisiones de su §6. **Después, el mismo
+día**, Vera pidió ejecutar el encargo tal cual: ver la entrada de «Profundidad visual en móvil» (v5.12).
 
 ## 29 sep 2026 · Rendimiento en la tablet, «Graphics» y lo que quedaba de la v9
 
