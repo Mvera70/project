@@ -318,4 +318,76 @@ flee, charge, flight) entra y sale a peso 1 de golpe. Coste S: AN-1/AN-2.
 
 ## 5 · Veredictos (AN-4)
 
-Se rellena al cerrar: fila, evidencia del después, veredicto.
+Una fila por clip y por especie, cerrada con la evidencia del después y un
+veredicto: **mejorado** (se cambió y se ve), **conservado** (ya cumplía y se
+muestra por qué), **límite** (se mide, no se arregla en esta ronda, y se dice
+por qué) o **preview-only** (sólo se ha visto en hoja o banco; no cuenta como
+integrado). Las comparaciones a escala nativa están en
+`artifacts/graphics/AN-4/compare/` (GIF «antes | después» a 1:1 y ×3, y tira
+estática) y el índice de todas las tomas en
+`docs/medidas/animacion-tomas-2026-09-29.md`. **Regla del encargo:** una
+mejora que sólo se aprecia en primer plano no pasa; por eso cada fila dice
+qué se ve a 390×844 y qué observación la refutaría.
+
+### 5.1 Clips humanos
+
+| Clip | Evidencia del después | A escala de móvil | Veredicto | Lo que lo refutaría |
+|---|---|---|---|---|
+| idle | plano general 11/21 antes y después (`AN-0/baseline/wide-seed11-y21`, `AN-2/after/wide-seed11-y21`); parada en `cast-stops.test.ts` | respira y gira la cabeza; al parar, el pie baja | **conservado**, con la parada mejorada (AN-1c) | un pie colgado a media zancada al pararse en `walk-seed7-y60-follow208/after` |
+| walk | pares 11/13, 7/242 y 7/208 (`AN-1/before`, `AN-1/after`); GIF nativo `AN-4/compare/walk-*-native.gif`; `gait-report-after.txt` | a 12–14 px la diferencia es de **ritmo** (2,5–3,9 Hz contra 3,3–5,2: menos aleteo de piernas); la zancada abierta y el pie plantado se ven con zoom | **mejorado**; si en el GIF a escala nativa no se distingue, la mejora de forma queda para el trote (decisión de Vera) | que el GIF nativo «antes/después» no se distinga en ciego |
+| carry_walk | hoja `AN-1/gestures/carry_walk-villager-sheet.png`; acarreos en el plano general 11/21 | mismo ritmo que `walk`; el haz cuelga bien | **mejorado** (0,339, 3,1–4,9 Hz) | ídem `walk` |
+| work_hoe | plano general 11/21 (campo); hoja AN-0 | azadona con la espalda, la azada al suelo | **conservado** | — |
+| flee | `AN-3/assault-seed11-y21/strip-flee.png` (43 huyendo; el 72 a 1,7 celdas/s); hoja AN-3 (pendiente: cadena 5) | corre con las piernas abiertas y la cadera baja; 2,4 Hz | **mejorado** (zancada 0,7, pisa) | pies flotando en la tira del asalto; cadencia > 4 Hz |
+| sit | `AN-2/after/sit-seed11-y21-follow60/` (niño 60 a la comida), hoja `AN-2/gestures/sit-villager-sheet.png`, pies medidos en el rig del niño | sentado en el suelo, más bajo que antes (era un banco de aire) | **mejorado**; el banco es encargo | alguien sentado con los pies bajo el suelo o flotando |
+| talk | hoja `AN-2/gestures/talk-villager-sheet.png`; charlas en el plano general 11/21 | la mano al pecho se ve; la cabeza, con zoom | **mejorado** (silueta) — a escala nativa manda la burbuja | que a 390×844 dos que hablan no se distingan de dos que esperan |
+| pray | hoja `AN-2/gestures/pray-villager-sheet.png`; capilla en el plano general 11/21 (58, 71, 39, 32) | la inclinación se ve como silueta que se dobla | **mejorado** | un rezo que se lea como estar de pie |
+| hammer | `AN-2/after/hammer-seed11-y21-follow27/strip-30-53.png` (carga, golpe, chispas); hoja | carga sobre la cabeza y chispas; a escala nativa se ven las chispas | **mejorado** (AN-2b) | chispas antes del golpe; golpe sin bajar el brazo |
+| chop | plano general 11/21 (tala); hojas AN-0; `work-contact` de IA-anim | carga y astillas | **conservado** | — |
+| mine | hoja AN-0; filmado en IA-anim (semilla 23) | ídem | **conservado** (sin cantera en las tomas de esta ronda) | — |
+| sow | hoja AN-0 | voleo con bolsa | **conservado · preview-only esta ronda** (sin toma en siembra) | — |
+| spread | plano general 11/21 (434 muestras); hoja AN-0 | horca a dos manos | **conservado** | — |
+| douse | hoja AN-0 (sin cubo en el banco) | — | **conservado · preview-only** (sin fuego en las tomas) | — |
+| play | hoja `AN-3/gestures/play-villager-sheet.png` (pendiente: cadena 5); niños en su sitio de juego en el plano general 7/60 «después» (`AN-4/after/wide-seed7-y60`, pendiente: cadena 4) | brinca: cadera +0,12 m y rodilla alta, se lee como salto a escala nativa | **mejorado** (era un balanceo que parecía estar de pie) | niños de pie en sus sitios de juego en el plano general 7/60 |
+| throw | hoja `AN-3/gestures/throw-villager-sheet.png` (pendiente: cadena 5); `life-play-throw.test.ts`, `work-gestures.test.ts` | — | **preview-only**: en las semillas de las tomas no hay pelota; queda la toma de integración pendiente | — |
+| drink | hoja `AN-2/gestures/drink-villager-sheet.png`; pozo y vado en el plano general 11/21 (51, 56, 10, 46) | la cabeza atrás se ve como silueta | **mejorado** | — |
+| sort | hoja `AN-2/gestures/sort-villager-sheet.png`; granero en el plano general 11/21 (16) | doblarse a por la cosa se ve | **mejorado** | — |
+| shelter | plano general 11/21 con lluvia (117 muestras) | brazos cruzados bajo el alero | **conservado** | — |
+| bow_draw | hoja AN-0; asalto en la villa 7/60 (pendiente: cadena 6) | — | **conservado** (pendiente la toma) | flechas sin brazo tensado |
+| bow_loose | ídem | — | **conservado** (pendiente la toma) | suelta después de la flecha |
+| gate_strike | hoja `AN-3/gestures/gate_strike-villager-sheet.png`; portón en 11/21 y 7/60 (pendiente: cadena 6) | — | **mejorado** (carga el golpe siguiente) | brazos caídos entre golpes en la toma del portón |
+| spear_thrust | hoja AN-0; cuerpo a cuerpo en 7/60 (pendiente: cadena 6) | — | **conservado** (pendiente la toma) | contacto fuera de t=0 (`melee.test.ts` lo guarda) |
+| hit_take | ídem | — | **conservado** (pendiente la toma) | — |
+| fall | hoja AN-0; `combat-clips` («termina tendida»); caídas en 7/60 (pendiente: cadena 6) | — | **conservado** | un caído que no queda tendido |
+
+### 5.2 Especies
+
+| Especie · clip | Evidencia del después | A escala de móvil | Veredicto | Lo que lo refutaría |
+|---|---|---|---|---|
+| hen · idle/walk | `AN-0/baseline/hens-seed11-y21` (15 fps); rumbo por `Animal.facing` (AN-1b) | 4–6 px: se ve la velocidad de suelo, no las patas | **límite** (7,3 Hz; `PACE.hen` es un TUNE de una línea) | gallinas que oscilan de cara contra la valla |
+| pig · idle/walk | banco AN-0; corral en los planos generales | — | **conservado** (3,5 Hz, plantado 0,94–0,98×) | — |
+| cow · idle/walk | banco AN-0; corral y vado en los planos generales | — | **conservado** (1,5 Hz, 0,95–0,99×) | — |
+| crow · idle/walk | banco AN-0 | ambiental, lejos | **conservado** | — |
+| fish · idle/walk | banco AN-0 (bajo el plano) | no visible a escala móvil | **conservado · preview-only** (ambiental) | — |
+| fox · idle/walk | `graphics-animal-motion.test.ts`; `FOX_PACE` 0,6 | de noche, junto al gallinero | **mejorado** (4,6 Hz, rumbo) | — |
+| duck · idle/walk | `AN-0/baseline/ducks-seed11-y21` | en el agua | **conservado** | — |
+| deer · idle/walk | rumbo (AN-1b); la caza (`AN-3/hunt-*`, pendiente: cadena 3) | tapado por el bosque en reposo | **límite**: huye con `walk` a 4,1 Hz (sin clip de carrera: encargo) | — |
+| rabbit · idle/hop/flee | `graphics-animal-motion.test.ts` (flee por distancia); la caza (pendiente) | — | **mejorado** (`flee` por suelo recorrido) | un conejo que patina al huir en la caza |
+| partridge · idle/walk/takeoff/flight | fundidos (AN-1b); la caza (pendiente) | — | takeoff/flight **conservado con fundido**; walk **preview-only** (no anda en partida) | — |
+| boar · idle/walk/charge/attack | `graphics-animal-motion.test.ts` (charge por distancia); la caza (pendiente) | — | charge **mejorado**; attack **preview-only** (nadie lo emite) | un jabalí que patina al cargar |
+| bear · idle/walk/attack | `AN-3/bear-seed11-y21` (pendiente: cadena 3); `bear.ts` aviso 3 s | se alza entero | **mejorado** (AN-3a) | un oso que se corta a media subida |
+| wolf · idle/walk/attack | banco AN-0; rumbo (AN-1b) | corral y sierra | walk **conservado**; attack **preview-only** | — |
+| dog · idle/walk/run/bark/play | banco AN-0; fundidos y rumbo (AN-1b); perro en los planos generales | — | **mejorado** (mira al forastero; sin cortes secos) | un perro que ladra hacia donde iba |
+| mule · idle/walk | banco AN-0; buhonero en partida (IA-5) | — | **conservado** (3,2 Hz) | — |
+| golondrina | plano general 11/21 (cielo) | bate y planea | **conservado** (la fila de AN-0 estaba mal) | — |
+
+### 5.3 Coste (pendiente: cadena 4)
+
+Se rellena con `AN-4/perf/`: `gl-probe` villa 7/60 y aldea 11/21 (llamadas,
+triángulos, programas) contra `AN-0/perf/`, y `animation-cost.ts` antes
+(worktree en `d82bd84`) y después, dos pasadas cada uno.
+
+### 5.4 Pendiente en dispositivo real
+
+**iPhone/iPad: pendiente.** Nada de esta página es una medida en el aparato;
+las tomas son de SwiftShader a 390×844 y 320×568 y el coste es JS de posar y
+llamadas de dibujo, no fotogramas por segundo de un teléfono.
