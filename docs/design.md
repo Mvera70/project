@@ -4207,7 +4207,7 @@ navegador, que es lo único que sirve cuando quien lo escribe no puede oírlo.
 
 | Capa | Cuándo suena |
 |---|---|
-| Brisa · Racha | Siempre. La fuerza la da el cielo, con **la misma tabla que mece las hojas** (`SOUND.WIND_BY_SKY`) |
+| Brisa · Racha | Siempre, **a la fuerza que haga**: la da el cielo, con la misma tabla que mece las hojas (`SOUND.WIND_BY_SKY`), y esa fuerza es a la vez cuánto se oye la brisa y cuánta racha hay encima. Un día claro es casi silencio |
 | Aire frío | En invierno, en lugar de la brisa: no hay hojas que mover, y ése es justo el sonido que falta |
 | Lluvia fina · Lluvia fuerte · Tormenta · Nevada | Por el cielo del día. La tormenta trae su viento grave dentro, así que la lluvia fuerte se retira a media voz |
 | Río | Casi siempre: el pueblo se funda a tres o seis celdas del río (`mapgen.ts`). Sube con la riada |

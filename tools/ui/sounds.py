@@ -524,7 +524,12 @@ def _(v: Voice):
 LOOP_LEVEL = {
     'bed': -38.0,      # viento en calma, nieve: lo que casi no se oye
     'weather': -33.0,  # lluvia, tormenta: presente pero detrás de todo
-    'water': -35.0,    # río y cascada: constantes, así que discretos
+    # El río y la cascada están sonando **siempre** —el pueblo se funda pegado
+    # al cauce—, así que son lo que antes cansa. A −40 el río de un día claro
+    # es un fondo y no una presencia (Vera, 29 sep 2026: «suena muy fuerte…
+    # imagínate que estamos por las montañas»); con la cámara encima del agua
+    # sigue subiendo seis decibelios y se oye de sobra.
+    'water': -40.0,
     'fire': -31.0,     # el fuego es un suceso y se acerca la cámara
 }
 
@@ -742,7 +747,13 @@ def stamp() -> int:
         changed += new != match.group(0)
         return new
 
-    source = re.sub(r"(^  [a-z_]+: )'([a-z_]+\.mp3)(?:\?v=[0-9a-f]+)?'", restamp, source, flags=re.M)
+    # Dos formas: la de un toque (`ui_panel_open: '...'`) y la de un lecho
+    # (`amb_river: { file: '...', seconds: 12 }`). Las dos llevan huella, y
+    # olvidar la segunda fue el fallo del 29 sep: los bucles se cambiaron y no
+    # habrían llegado a un teléfono que ya tuviera los viejos.
+    for pattern in (r"(^  [a-z_]+: )'([a-z_]+\.mp3)(?:\?v=[0-9a-f]+)?'",
+                    r"(^  [a-z_]+: \{ file: )'([a-z_]+\.mp3)(?:\?v=[0-9a-f]+)?'"):
+        source = re.sub(pattern, restamp, source, flags=re.M)
     with open(SOUND_TS, 'w', encoding='utf-8') as fh:
         fh.write(source)
     return changed

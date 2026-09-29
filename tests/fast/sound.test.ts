@@ -341,6 +341,18 @@ describe('el fondo del mundo · el cielo manda sobre el viento y sobre la lluvia
     expect(windStrengthOf('storm')).toBe(SOUND.WIND_BY_SKY.storm);
   });
 
+  it('un día claro es casi silencio: la brisa sigue a la fuerza que hace, no suena entera', () => {
+    // La corrección de Vera del 29 sep 2026: «un día claro suena muy fuerte,
+    // el viento y el río; imagínate que estamos por las montañas». La brisa
+    // de un cielo claro no puede sonar como la de uno encapotado.
+    const breeze = (sky: SkyKind): number => mixFor({ ...CALM, sky }).amb_wind_calm ?? 0;
+    expect(breeze('clear')).toBeLessThan(breeze('overcast'));
+    expect(breeze('clear')).toBeLessThan(0.4);
+    // Y el día claro entero tiene que ser el más callado de todos los cielos.
+    const loudest = Math.max(...SKIES.filter((s) => s !== 'snow').map((sky) => total(mixFor({ ...CALM, sky }))));
+    expect(total(mixFor({ ...CALM, sky: 'clear' }))).toBeLessThan(loudest);
+  });
+
   it('sólo llueve cuando llueve, y sólo nieva cuando nieva', () => {
     expect(mixFor({ ...CALM, sky: 'rain' }).amb_rain_light ?? 0).toBeGreaterThan(0);
     expect(mixFor({ ...CALM, sky: 'clear' }).amb_rain_light).toBeUndefined();
@@ -416,11 +428,17 @@ describe('el trueno llega por la distancia, no por una tirada', () => {
 describe('los lechos · lo que se registra, existe y no se nota que da la vuelta', () => {
   const AUDIO = resolve(__dirname, '../../public/audio');
 
-  it('cada capa tiene su fichero, con su huella', () => {
+  it('cada capa tiene su fichero, y la huella es la de ese fichero', () => {
+    // Un lecho **también** lleva huella. Olvidarlo fue el fallo del 29 sep:
+    // los bucles se cambiaron y el sellador sólo conocía la forma de un
+    // toque, así que un teléfono con los viejos se habría quedado con ellos.
     for (const layer of AMBIENCE_LAYERS) {
       const { file } = LOOP_FILES[layer];
-      const path = resolve(AUDIO, file.split('?')[0]!);
+      const name = file.split('?')[0]!;
+      const path = resolve(AUDIO, name);
       expect(existsSync(path), layer).toBe(true);
+      const digest = createHash('sha256').update(readFileSync(path)).digest('hex').slice(0, 8);
+      expect(file, layer).toBe(`${name}?v=${digest}`);
     }
   });
 

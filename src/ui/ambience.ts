@@ -130,13 +130,22 @@ export function mixFor(world: WorldSound): Mix {
   const dim = fast ? SOUND.AMBIENCE_FAST_GAIN : 1;
   const mix: Mix = {};
 
-  // **El viento, siempre.** La fuerza la da el cielo (la misma tabla que mece
-  // las hojas), y decide qué lecho se oye: en calma la brisa, arreciando la
-  // racha, y en invierno el aire frío en lugar de la brisa —no hay hojas que
-  // mover, y ése es justo el sonido que falta—.
+  // **El viento, siempre, pero a la fuerza que haga.** La da el cielo (la
+  // misma tabla que mece las hojas) y hace dos cosas: cuánto se oye la brisa
+  // **y** cuánta racha hay encima. En invierno el aire frío sustituye a la
+  // brisa: no hay hojas que mover, y ése es justo el sonido que falta.
+  //
+  // Que la brisa siga a la fuerza y no suene siempre al máximo es la
+  // corrección de Vera del 29 sep 2026: «un día claro suena muy fuerte, el
+  // viento y el río; imagínate que estamos por las montañas, no tiene mucho
+  // sentido». Tenía razón y el fallo era mío: `windStrengthOf` sólo decidía
+  // la racha, así que un día en calma se oía con la brisa entera. Ahora un
+  // cielo claro suena a 0,3 —diez decibelios por debajo— y sólo la tormenta
+  // llena.
   const wind = windStrengthOf(world.sky);
-  const gust = clamp01((wind - 0.3) / 0.7);
-  const calm = 1 - gust * 0.75;
+  const gust = clamp01((wind - 0.45) / 0.55);
+  // Con racha, la brisa se retira: lo que se oye entonces es la racha.
+  const calm = wind * (1 - gust * 0.6);
   add(mix, world.season === 'winter' ? 'amb_wind_winter' : 'amb_wind_calm', calm, dim);
   add(mix, 'amb_wind_gust', gust, dim);
 

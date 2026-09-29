@@ -250,6 +250,21 @@ así que se resuelve por construcción y no escuchando:
 - cada capa arranca **por un punto distinto** del bucle, o dos partidas con el
   mismo cielo suenan sincronizadas.
 
+**Y una mezcla se equivoca de otra manera que un sonido.** Un lecho puede estar
+bien fabricado y sonar mal porque se pide demasiado alto. La corrección de Vera
+a la fase 1 fue exactamente eso: «un día claro suena muy fuerte el viento y el
+río; imagínate que estamos por las montañas». El fallo no estaba en el fichero
+sino en la función pura: la fuerza del viento decidía **si había racha** y no
+**cuánto se oía la brisa**, así que un día en calma sonaba con la brisa entera.
+De ahí dos reglas:
+
+- **Lo que suena siempre es lo que antes cansa.** El viento y el río están ahí
+  el 80 % del tiempo: van más bajos que todo lo demás, y se juzgan por cómo
+  quedan tras diez minutos, no por cómo suenan aislados.
+- **Si un estado tiene una intensidad, esa intensidad tiene que llegar hasta la
+  ganancia.** Usarla sólo para elegir capa deja la capa elegida a todo volumen,
+  que es el mismo error con otra cara.
+
 Y tres números más, medidos el 29 sep 2026 al hacer la fase 1:
 
 - **un lecho pesa.** Once bucles a la calidad de un toque daban 1,5 MB. Son

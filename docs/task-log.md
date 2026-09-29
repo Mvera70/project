@@ -11,7 +11,17 @@ elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
 botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
 los momentos de §11.10.
 
-## 29 sep 2026 · El valle suena (v5.01) — **a la espera de que Vera lo escuche**
+## 29 sep 2026 · El día claro, corregido (v5.02)
+
+Vera aprobó la fase 1 menos la primera escena: «un día claro suena muy fuerte
+el viento y el río». La brisa no seguía la fuerza del viento (sólo decidía la
+racha), así que sonaba entera siempre: ahora un cielo claro va a 0,30 y el río
+cinco decibelios más atrás. Y con ello salió que **los bucles no se sellaban**:
+el sellador no conocía su forma, y cambiar un lecho no habría llegado a un
+teléfono con el viejo. Arreglado y con prueba. 54 pruebas y el recorrido
+(21 toques, 6 escenas) en verde.
+
+## 29 sep 2026 · El valle suena (v5.01) — **escuchado y aprobado salvo el día claro**
 
 Fases 0 y 1 de `plan-audio-mundo.md` ejecutadas. El motor de ambiente
 (`src/ui/ambience.ts`, puro; las capas en `sound.ts`) y quince sonidos: once

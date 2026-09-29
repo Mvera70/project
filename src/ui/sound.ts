@@ -208,17 +208,17 @@ function storeSoundPreference(on: boolean): void {
  * se reproduce nunca. Lo escribe `tools/ui/sounds.py`.
  */
 export const LOOP_FILES: Readonly<Record<AmbienceLayer, { file: string; seconds: number }>> = {
-  amb_wind_calm: { file: 'amb_wind_calm.mp3', seconds: 12 },
-  amb_wind_gust: { file: 'amb_wind_gust.mp3', seconds: 12 },
-  amb_wind_winter: { file: 'amb_wind_winter.mp3', seconds: 12 },
-  amb_rain_light: { file: 'amb_rain_light.mp3', seconds: 10 },
-  amb_rain_heavy: { file: 'amb_rain_heavy.mp3', seconds: 10 },
-  amb_storm_bed: { file: 'amb_storm_bed.mp3', seconds: 12 },
-  amb_snow_hush: { file: 'amb_snow_hush.mp3', seconds: 12 },
-  amb_river: { file: 'amb_river.mp3', seconds: 12 },
-  amb_waterfall: { file: 'amb_waterfall.mp3', seconds: 10 },
-  amb_fire_flame: { file: 'amb_fire_flame.mp3', seconds: 8 },
-  amb_fire_embers: { file: 'amb_fire_embers.mp3', seconds: 10 },
+  amb_wind_calm: { file: 'amb_wind_calm.mp3?v=dee93647', seconds: 12 },
+  amb_wind_gust: { file: 'amb_wind_gust.mp3?v=14acdeb9', seconds: 12 },
+  amb_wind_winter: { file: 'amb_wind_winter.mp3?v=93d2d039', seconds: 12 },
+  amb_rain_light: { file: 'amb_rain_light.mp3?v=05cb21d3', seconds: 10 },
+  amb_rain_heavy: { file: 'amb_rain_heavy.mp3?v=43379d6b', seconds: 10 },
+  amb_storm_bed: { file: 'amb_storm_bed.mp3?v=9fde8a19', seconds: 12 },
+  amb_snow_hush: { file: 'amb_snow_hush.mp3?v=c23fe5a5', seconds: 12 },
+  amb_river: { file: 'amb_river.mp3?v=dbc2b61a', seconds: 12 },
+  amb_waterfall: { file: 'amb_waterfall.mp3?v=22323461', seconds: 10 },
+  amb_fire_flame: { file: 'amb_fire_flame.mp3?v=b36efd39', seconds: 8 },
+  amb_fire_embers: { file: 'amb_fire_embers.mp3?v=ea930d6b', seconds: 10 },
 };
 
 /** Lo que se ha oído, para que una herramienta de fuera lo compruebe. */

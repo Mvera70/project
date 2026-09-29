@@ -1,5 +1,24 @@
 # The Valley — Registro de cambios
 
+## v5.02 · 29 sep 2026 · Un día claro, como un valle de montaña
+
+Vera, escuchando la fase 1: «lo único que cambiaría es la primera, un día
+claro; suena muy fuerte el viento y el río. Imagínate que estamos por las
+montañas, no tiene mucho sentido».
+
+- **Y el fallo era mío**: `windStrengthOf` sólo decidía si había racha, así
+  que la brisa sonaba **al máximo** hiciera el viento que hiciera. Ahora la
+  fuerza del cielo es también cuánto se oye la brisa: un cielo claro va a
+  0,30 en vez de 1,00 —diez decibelios por debajo— y sólo la tormenta llena.
+- **El río, cinco decibelios atrás** (`LOOP_LEVEL` 'water', −35 → −40). Suena
+  siempre, porque el pueblo se funda pegado al cauce, y por eso es lo que
+  antes cansa; con la cámara sobre el agua sigue subiendo y se oye de sobra.
+- **Y un fallo que esto destapó: los bucles no llevaban huella.** El sellador
+  sólo conocía la forma de un toque (`cue: 'x.mp3'`) y no la de un lecho
+  (`cue: { file: 'x.mp3', seconds }`), así que cambiar el río no habría
+  llegado nunca a un teléfono que ya tuviera el viejo — que es exactamente lo
+  que la huella existe para impedir. Sellados los once, y con prueba.
+
 ## v5.01 · 29 sep 2026 · El valle suena: el motor de ambiente y la naturaleza
 
 Vera: «cuando el plan esté listo, ejecutarlo y esperar mi aprobación». Fases 0
