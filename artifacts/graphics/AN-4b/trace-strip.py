@@ -12,8 +12,9 @@
       fotograma (persona por defecto; `--animal` para un animal pintado),
       rotulada con el fotograma y el clip o la acción.
 
-Sólo lee `trace.json` y `frames/`; no inventa nada: un fotograma sin el actor
-se salta y se dice.
+Sólo lee `trace.json` y `frames/`; no inventa nada: un fotograma sin el actor,
+o con el actor fuera de cuadro, se salta y se dice. Las coordenadas se escalan
+al tamaño real del PNG (la resolución adaptativa puede bajarlo).
 """
 import argparse
 import json
@@ -95,12 +96,16 @@ def strip(trace, take, args):
                 at = person['screen']
             clip = next((p.get('clip') for p in life.get('renderedPeople', []) if p['id'] == args.id), None)
             label = str(clip)
-        if at is None:
+        view = life.get('viewport') or {'width': 1, 'height': 1}
+        if at is None or not (0 <= at['x'] <= view['width'] and 0 <= at['y'] <= view['height']):
             skipped.append(i)
             continue
         image = Image.open(os.path.join(take, frames[i]['file'])).convert('RGB')
+        # La traza da la pantalla en píxeles CSS del viewport; la captura puede
+        # salir más pequeña si la resolución adaptativa la bajó (SwiftShader).
+        k = image.width / view['width']
         half = args.size // 2
-        cx, cy = int(at['x']), int(at['y'] - args.size * 0.15)
+        cx, cy = int(at['x'] * k), int(at['y'] * k - args.size * 0.15)
         tile = image.crop((cx - half, cy - half, cx + half, cy + half))
         tile = tile.resize((args.size * args.scale, args.size * args.scale), Image.NEAREST)
         draw = ImageDraw.Draw(tile)

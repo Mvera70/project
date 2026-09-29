@@ -178,31 +178,20 @@ try {
   // `view.look(hunter)`). Si el valle no ofrece caza en ese instante se dice y
   // se para: la caza no se inventa desde fuera.
   if (args.includes('--hunt')) {
-    // AN-4b · Sin depender de que la señal esté en cuadro: la señal sólo se
-    // coloca con la presa a la vista (`huntSign()`), y desde el encuadre de
-    // reposo casi nunca lo está. Se lee la oferta de la traza (`hunt`), se
-    // toca la señal con un clic del DOM —su manejador valida la oferta del
-    // motor igual que un toque: semana, especie, arma, presa entre árboles— y
-    // se comprueba que la caza empezó. La cámara la lleva el juego, detrás
-    // del cazador.
+    // AN-4b · La caza se arranca con el gancho del renderer (`__valleyHunt`):
+    // lo mismo que tocar la señal —la especie de la oferta del motor y el arma
+    // por el hash de la semana— pero sin depender de que la señal esté en
+    // cuadro (sólo se coloca con la presa a la vista) y con el motivo si no
+    // empieza. La cámara la lleva el juego, detrás del cazador.
     const offered = await tab.evaluate(() => window.__valleyLife?.()?.hunt ?? null);
-    if (offered === null || offered.stage !== 'offered') {
-      throw new Error(`El motor no ofrece caza esta semana (${JSON.stringify(offered)}): cambia semilla, año o --hunted.`);
+    process.stdout.write(`Caza antes de empezar: ${JSON.stringify(offered)}\n`);
+    const why = await tab.evaluate(() => window.__valleyHunt?.() ?? 'sin-gancho');
+    if (why !== 'started') {
+      throw new Error(`La caza no empezó: ${why} (oferta: ${JSON.stringify(offered)}). Cambia semilla, año o --hunted.`);
     }
-    process.stdout.write(`Caza ofrecida: ${offered.species}, presa en ${JSON.stringify(offered.prey)}\n`);
-    const clicked = await tab.evaluate(() => {
-      const sign = document.querySelector('.hunt-sign');
-      if (!(sign instanceof HTMLElement)) return false;
-      sign.click();
-      return true;
-    });
-    if (!clicked) throw new Error('No hay señal de caza en la página.');
     if (live) await tab.clock.runFor(1000); else await tab.evaluate(steps => window.__valleyAdvance(steps), 30);
     const started = await tab.evaluate(() => window.__valleyLife?.()?.hunt ?? null);
-    if (started === null || started.stage === 'offered') {
-      throw new Error(`La caza no empezó al tocar la señal (${JSON.stringify(started)}): presa entre árboles o semana pasada.`);
-    }
-    process.stdout.write(`Caza en marcha: ${started.species} con ${started.weapon}\n`);
+    process.stdout.write(`Caza en marcha: ${JSON.stringify(started)}\n`);
   }
   const frames = [];
   let basePhase = null;

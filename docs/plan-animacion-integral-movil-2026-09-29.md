@@ -417,9 +417,15 @@ estado que se quiere mirar— y no toca el motor ni la partida normal.
 `src/render3d/renderer.ts`: un campo `hunt` en la instantánea del
 observatorio (ofrecida, en marcha o hecha; especie, arma, presa), sin
 cambiar nada de lo que se pinta. `tools/graphics/observe-life.mjs`:
-`page.goto` con 240 s, `--hunted`, y `--hunt` que mira el campo `hunt`, toca
-la señal con un clic del DOM (su manejador valida la oferta del motor igual
-que un toque, esté o no la señal en pantalla) y comprueba que la caza empezó.
+`page.goto` con 240 s, `--hunted`, y `--hunt` que arranca la caza con un
+gancho del renderer, `__valleyHunt` (la especie de la oferta del motor y el
+arma por el hash de la semana, como el toque de la señal) y devuelve el
+motivo si no empieza; `startHunt` pasa a apoyarse en `beginHunt`, que dice
+el motivo, sin cambiar lo que responde al juego. **Ejecutado así el mismo
+día:** la primera versión tocaba la señal con un clic del DOM y la caza no
+empezaba en tres valles con oferta (la señal se valida en la interfaz, que
+en modo de observación no se refresca); con el gancho empezó a la primera
+(perdiz con honda en 11/24: el cazador tensa y la presa despega).
 `src/render3d/life/cast.ts`: `throw` sólo con un trasto en la mano.
 
 **Prueba.** Una propiedad nueva: con las especies anteriores cazadas, la
