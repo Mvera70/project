@@ -437,11 +437,17 @@ Todo con el panel de taller abierto (el reparto del fotograma: dibujo, vida,
   de verdad, y `?contact=off`), `tests/fast/forest-occlusion.test.ts` (+4: la
   copa sola, la unión con el asalto, el fundido, el hachazo con copas
   atenuadas) y `tests/fast/screen-aa.test.ts` (2).
-- **Las 23 de la suite rápida que tocan suelo, bosque, efectos o render:
-  ‹T1› verdes.**
+- **Las 24 de la suite rápida que tocan suelo, bosque, efectos o render: 235
+  verdes**, sobre la rama ya fusionada con `main`.
+- **Tras la fusión con la PR #2**, sobre `main` `da8836f` y la rama fusionada
+  (`metricas/tras-la-fusion.txt`): 41 programas en los dos, 313 contra 314
+  llamadas y el JS fuera del dibujo en 9,3 contra 9,4 ms; y la toma de la
+  aldea nublada de la rama fusionada es idéntica al píxel a la de «después».
 - **Jornadas: `e3b-corridor` (5) y `work-contact` (1) rojas, y lo mismo en
   `main` `efafc2e`**, comprobado en un checkout aparte: no son de esta ronda.
-- **Suite rápida entera**: ‹T2› La roja `catchUp · §13.2` («960 ticks en
+- **Suite rápida entera**: la primera pasada, con las sondas corriendo a la
+  vez, se cortó a los 30 min con 558 verdes y una roja; la pasada limpia sobre
+  la rama fusionada está en marcha al escribir esto. La roja `catchUp · §13.2` («960 ticks en
   menos de 2 s») tarda en este contenedor 2,2 s **también en `main`** (2,13 y
   2,15 s, sola y sin carga): es la velocidad de la máquina, no el motor, que no
   se tocó.
