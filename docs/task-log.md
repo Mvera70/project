@@ -11,6 +11,15 @@ elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
 botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
 los momentos de §11.10.
 
+**Decisión de Vera, 29 sep 2026: «Eligo el K para ese botón».** El sonido del
+botón genérico es el **sello de cera** (K de la prueba del botón: al apretar,
+el golpe sordo sobre la cera; al soltar, la cera que se despega). Queda
+**por implementar** —hoy sólo suenan los momentos de §11.10— y por confirmar
+si vale para todos los botones o sólo para los principales. Y pidió empezar
+después por **el sonido del mundo** (ambiente, naturaleza, vida): primero la
+lista de todo lo que se ve o se toca y no suena, y luego decide ella cómo
+procedemos.
+
 ### (anterior, v4.97) La interfaz suena
 
 Veinte sonidos fabricados por `tools/ui/sounds.py` en `public/audio/`, cada
