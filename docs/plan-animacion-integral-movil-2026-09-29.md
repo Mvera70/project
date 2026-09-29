@@ -271,6 +271,73 @@ el talón. **Lo que no arregla, y es decisión del dueño:** a 3–5 m/s reales 
 gente sigue yendo deprisa; un clip de trote (dos pies en el aire) bajaría la
 cadencia a 1,8–2,8 Hz con el mismo paso, pero cambia el carácter del valle.
 
+### AN-2a · La pelota sale de la mano (brief, 29 sep 2026)
+
+**Defecto medido.** `play` es un balanceo de brazos abiertos sobre `idle`
+(2,4 s, en bucle, por reloj con desfase por persona): no hay gesto de lanzar
+ni de coger, y la pelota sale de la nada. La vida sí sabe cuándo sale: al
+acabar la oferta `play` (`village.ts`, `fling` en `doing.until`, fijado al
+llegar), desde 0,4 celdas por delante y a 0,53 de alto (`props.ts`,
+`THROW_FORWARD`, `THROW_HEIGHT`).
+
+**Módulos fuera de la lista de AN-2, y por qué.** `src/render3d/life/cast.ts`
+(el productor del `Actor`): `play` pasa a ser un clip **fechado por el hecho
+que viene**, como los de combate lo son por el hecho que fue —`clipSeconds =
+D − (until − steps) · LIFE_STEP`, acotado a `[0, D]`—, de modo que la suelta
+del clip cae en el paso en que `fling` pone la pelota en el aire; y un niño en
+la plaza de `play` sin pelota en la mano (`holding === null`, porque otro se
+la llevó) enseña `idle` y no un lanzamiento al aire. No se toca `village.ts`
+ni `props.ts`: el hecho y su instante ya existen.
+
+**Vía.** `action-clips.ts`: `play` deja de ser bucle (`clips.ts`: 1,0 s,
+`loop: false`) y es carga atrás y arriba (0–0,55), giro del tronco y barrido
+del brazo hasta la suelta en 0,85, y el resto hacia abajo; la pose 0 es la
+pelota sujeta con las dos manos delante, que es lo que se ve mientras la
+oferta dura y aún no toca lanzar. **Lo que no hace:** la pelota sigue
+pintándose 0,38 celdas por delante del cuerpo a 0,45 de alto mientras se
+lleva (`world/props.ts`), no en la mano que carga; colgarla del hueso es un
+cambio de `world/props.ts` que se anota en `encargos-3d.md`.
+
+**Prueba.** En `tests/fast/work-gestures.test.ts`: la mano derecha en la
+suelta (t = 0,85) está por delante y por encima de donde estaba en la carga
+(t = 0,55), a menos de 0,25 celdas del punto de salida de la pelota para un
+adulto; y `life/cast.ts` fecha el clip: con `until − steps` pasos por delante,
+`clipSeconds = max(0, D − pasos · LIFE_STEP)`.
+
+### AN-2b · El golpe del martillo y las chispas de la fragua (brief, 29 sep 2026)
+
+**Defecto medido.** `hammer` es un seno del brazo derecho (1,6 s) sin
+instante de golpe: `STRIKE_AT` no lo cubre, el render no suelta nada y a
+veinte píxeles el herrero y el que levanta una casa parecen saludar.
+
+**Módulos fuera de la lista.** `src/render3d/effects/work-chips.ts`: una clase
+de viruta nueva, `spark` (clara, corta, sube y se apaga), para la fragua; la
+obra suelta `wood`. `world/cast.ts` ya está en la lista (`strike`).
+
+**Vía.** `STRIKE_AT.hammer = 0,55`; el clip toma las tres poses del hacha a
+una mano —carga sobre el hombro, golpe acelerado, rebote— con la izquierda
+sujetando delante; `Cast.strike` suelta desde la mano derecha `spark` si el
+actor es el herrero (`role === 'smith'`) y `wood` en la obra.
+
+**Prueba.** En `work-gestures.test.ts`: la mano en `STRIKE_AT − 0,15` está
+por encima del hombro y en `STRIKE_AT` por debajo de la cintura, y el golpe
+baja más deprisa de lo que sube (mismo criterio que hacha y pico).
+
+### AN-3a · El aviso del oso dura lo que su clip (brief, 29 sep 2026)
+
+**Defecto medido.** El clip `attack` del oso de Vera dura 3 s (catálogo): se
+alza sobre las patas traseras en el primer segundo y medio y amenaza el
+resto. El aviso de la vida (`life/bear.ts`, `WARNING_STEPS`) duraba 1,55 s:
+el oso se cortaba a media subida y se iba andando, y con el fundido de AN-1b
+lo que se veía era un oso que empieza a alzarse y se lo piensa.
+
+**Módulo fuera de la lista de AN-3, y por qué.** `src/render3d/life/bear.ts`,
+una constante: el aviso pasa a 3 s. No decide daño ni resultado —la visita
+del oso no hiere a nadie— y no toca el motor.
+
+**Prueba.** `tests/fast/life-bear.test.ts` sigue en verde (no fija la
+duración); la matriz recoge la toma `--beast` con el oso alzado entero.
+
 ## 7 · AN-4 · Aceptación conjunta
 
 **Alcance (literal).** Repetir tomas antes/después del mismo estado. Cubrir

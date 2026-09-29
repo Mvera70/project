@@ -166,6 +166,18 @@ try {
       await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(lead * 30) - warmup);
     }
   }
+  // AN-3 · `--hunt` toca la señal de caza (`.hunt-sign`) al acabar el lead y
+  // rueda la escena: el juego sigue al cazador por su cuenta (`renderer.ts`,
+  // `view.look(hunter)`). Si el valle no ofrece caza en ese instante se dice y
+  // se para: la caza no se inventa desde fuera.
+  if (args.includes('--hunt')) {
+    const sign = tab.locator('.hunt-sign');
+    const covered = ((await sign.getAttribute('class').catch(() => '')) ?? '').includes('covered');
+    if (!(await sign.isVisible()) || covered) throw new Error('No hay señal de caza tocable ahora: cambia semilla, año o --lead.');
+    process.stdout.write(`Caza: ${await sign.getAttribute('aria-label')}\n`);
+    await sign.click({ force: true });
+    if (live) await tab.clock.runFor(2500); else await tab.evaluate(steps => window.__valleyAdvance(steps), 75);
+  }
   const frames = [];
   let basePhase = null;
   for (let n = 0; n <= seconds * fps; n += 1) {

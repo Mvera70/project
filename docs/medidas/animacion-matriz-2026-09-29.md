@@ -150,7 +150,59 @@ compara en AN-4.
 | Niño andando | 11 · 21 · 20 s, 15 fps × 6 s | `--follow 54 --zoom 0.18` | La marcha a talla 0,55 | `…/walk-seed11-y21-child54/` |
 | Villa, plano general | 7 · 60 · 20 s, 2 fps × 20 s | 390×844 | Cien personas, mayores, guarnición | `…/wide-seed7-y60/` |
 | Gallinas, patos | 11 · 21 · 20 s, 15 fps × 6 s | `--look 31.5,48.6` / `--look 36.5,54`, `--zoom 0.18` | Reposo y picoteo del corral; los patos a la deriva en el agua | `…/hens-seed11-y21/`, `…/ducks-seed11-y21/` (`strip-0-16.png`) |
+| Niño andando, villa (AN-1) | 7 · 60 · 20 s, 15 fps × 6 s | `--follow 242 --zoom 0.18` | La marcha a talla 0,64 antes (GLB de G-17, `--page artifacts/graphics/AN-1/game-before/valley.html`) y después (AN-1a), mismo estado | `artifacts/graphics/AN-1/before/walk-seed7-y60-child242/`, `…/after/walk-seed7-y60-child242/` (`strip-30-45.png`) |
+| Adulto andando, villa (AN-1) | 7 · 60 · 20 s, 15 fps × 6 s | `--follow 114` → **bajo la copa del bosque, no sirve**; se repite con `--follow 208` | El par antes/después del adulto en la villa | `…/AN-1/before/walk-seed7-y60-follow208/`, `…/after/walk-seed7-y60-follow208/` |
 | Ciervo | 11 · 21 · 20 s, 15 fps × 6 s | `--look 21.4,37.7` | **Tapado por la copa del bosque desde la cámara del juego**: el ciervo vive en la linde y el encuadre de reposo lo pierde; su evidencia en partida se toma en la caza (AN-3), donde el bosque se atenúa | `…/deer-seed11-y21/` |
+
+**La traza (AN-1).** En las seis tomas de seguimiento a 15 fps —semillas 11 y
+7, antes y después— ningún cuerpo salta de sitio: **0 saltos en 30 240
+muestras**, desplazamiento máximo por fotograma 0,143 celdas (menos de un
+paso), medido sobre `trace.json` de cada toma. `film.mjs` + `film-sheet.py`
+no sirve para esta medida bajo SwiftShader: rueda en tiempo real y aquí tarda
+8 s por fotograma, así que su informe cuenta el reloj como saltos (38 «saltos»
+y 37 «giros» en la semilla 11 que la traza del observatorio no tiene).
+
+### 2.4 Después de AN-1 (29 sep 2026, mismas herramientas)
+
+Lo que AN-1 cambió y cómo se midió. Las cifras de cadencia salen del mismo
+`gait-report` sobre el GLB publicado
+(`artifacts/graphics/AN-1/gait-report-after.txt`); las de orientación, mezcla
+y parada, de propiedades sobre el controlador real
+(`tests/fast/graphics-animal-motion.test.ts`, `tests/fast/cast-stops.test.ts`).
+
+| Cuerpo · clip | Antes | Después | Cómo |
+|---|---|---|---|
+| villager · walk | zancada 0,317; **3,3–5,2 Hz**; apoyo 26–32 %; plantado 0,79–0,90× | zancada 0,423; **2,5–3,9 Hz**; apoyo 44–48 %; plantado 0,97–1,03× | `art/recipes/villager/plant-gait.mjs` + `tools/art/bake-clips.mjs` (brief §6 del plan, AN-1a). En partida: `artifacts/graphics/AN-1/after/walk-seed11-y21-follow13/strip-30-45.png` contra la misma tira de AN-0, y el par de la semilla 7 (§2.3) |
+| villager · carry_walk | 0,260; 3,2–5,1 Hz; 23–27 %; 0,80–0,95× | 0,339; 3,1–4,9 Hz; 45–49 %; 0,97–1,02× | ídem; hoja `artifacts/graphics/AN-1/gestures/carry_walk-villager-sheet.png` |
+| niño (talla 0,55) · walk | 6,0–9,5 Hz | 4,5–7,1 Hz | cálculo: la misma zancada escalada por talla; el par del niño 242 en la semilla 7 (§2.3). Sigue alto: ver «lo que queda» |
+| clan vecino · walk | 4,4 Hz | 3,3 Hz | cálculo (paso 1,40) |
+| villager · parada | fundido de 0,22 s con la zancada congelada donde el suelo la dejó: un pie colgado que se derretía en diagonal hacia el reposo | el clip que se apaga sigue su ciclo mientras se funde: el pie en vuelo adelanta y baja, y el fundido acaba en `idle` igual que antes | `world/cast.ts` (AN-1c), propiedad en `tests/fast/cast-stops.test.ts` |
+| fox · walk | 7,3 Hz (paso 0,95) | 4,6 Hz (paso 0,60, `FOX_PACE`) | cálculo sobre la zancada medida 0,13; la huida (2,2) no cambia |
+| boar · charge | por reloj: 1,25 Hz, patinaba 0,96 celdas por ciclo | por suelo recorrido con la zancada del catálogo (0,513): 2,3 Hz a 1,2 celdas/s | propiedad: la pata no se mueve quieto y se mueve al avanzar |
+| rabbit · flee | por reloj: 1,1 Hz, patinaba 2,1 celdas por ciclo | por suelo recorrido: 0,26 × 2,2 (`FLEE_HOP`, TUNE: cuánto vuela cada brinco) = 0,57 celdas por brinco, 4,2 Hz a 2,4 celdas/s | ídem |
+| todas · orientación | giro hacia el desplazamiento de píxel entre fotogramas (umbral 0,00001): oscilaba contra vallas y vecinos; el perro ladraba hacia donde iba | el rumbo de la vida (`Animal.facing`, con la histéresis de `body.ts`); sin rumbo, el avance neto ≥ 0,05 celdas; giro suavizado a 12 s⁻¹ | propiedades: un ruido de ±0,0005 no mueve la cara; `facing` π/2 → rotación π |
+| dog · bark/play, bear · attack, partridge · takeoff/flight, boar · charge, rabbit · flee | entraban y salían a peso 1 de golpe | fundido de 0,08 s (gesto), 0,10 s (marcha), 0,14 s (caer) | propiedad: el primer fotograma de `bark` pesa < 0,6 |
+| boar/rabbit/bear · down | tumbado en un fotograma (rotación −π/2 de golpe) | cae con constante de 0,14 s | propiedad: tras un fotograma > −π/4, tras 1 s ≈ −π/2 |
+
+**Lo que AN-1 deja escrito y no toca.**
+
+- **La gallina a 7,3 Hz.** `PACE.hen` (0,55 celdas/s, `life/beasts.ts`) es una
+  decisión del corral («picotea a saltos y por eso es la más rápida»); a
+  390×844 la gallina mide 4–6 px y el ritmo de las patas no se lee, sólo su
+  velocidad de suelo. Se conserva con el límite dicho; bajarla a 0,4 daría
+  5,3 Hz y es un TUNE de una línea si de cerca molesta.
+- **El niño a 4,5–7,1 Hz.** La zancada se escala por talla y el paso de la
+  vida no: un niño da más pasos por la misma distancia, que es lo que hace un
+  niño. Un paso propio para la talla es un cambio de `village.ts` que AN-1 no
+  hace porque a 6 px el niño se lee bien en la toma (`walk-seed11-y21-child54`).
+- **Un trote humano (1,8–2,8 Hz) es decisión de Vera:** exige o bajar el paso
+  de la vida (la jornada de D.6.1 deja de caber en sus segundos) o un clip de
+  trote que cambia el carácter del aldeano. Anotado en `docs/encargos-3d.md`.
+- **La perdiz anda a 23 Hz, pero no anda:** en la caza se queda en casa hasta
+  huir (`wild-prey.ts`, `target = home`), así que `walk` es `preview-only`.
+- **El ciervo huye con `walk` a 4,1 Hz:** su GLB no trae carrera. Anotado.
+- **`attack` del lobo y del jabalí no lo emite nadie** (cabeza 4°, cuello 9°):
+  `preview-only`, anotado en `docs/encargos-3d.md`.
 
 ---
 
@@ -158,9 +210,9 @@ compara en AN-4.
 
 | Clip | Origen | Situación en partida | Evidencia | Defecto concreto | Gravedad | Coste | Decisión |
 |---|---|---|---|---|---|---|---|
-| idle | GLB | parado sin oferta; visitantes | partida (wide-11), preview | Respira y gira la cabeza cada 4 s con desfase por persona: correcto. Al parar, la mezcla de 0,22 s desde `walk` corta la zancada a media pierna | baja | S | AN-1: parada con la pierna que baja |
-| walk | GLB | todo trayecto; 669 de 1 968 muestras de actor en wide-11 | partida (follow13), preview | **Cadencia 3,3–5,2 Hz** (§2.1): «hormigas». Plantado 0,79–0,90× | **alta** | L (receta + GLB) | AN-1: zancada más larga por brief §6 del plan |
-| carry_walk | GLB | acarreo de leña, piedra, grano, fardos | partida (wide-11), preview | Misma cadencia; el haz cuelga bien de `hand_l` | alta (igual que walk) | L | AN-1: con `walk` |
+| idle | GLB | parado sin oferta; visitantes | partida (wide-11), preview | Respira y gira la cabeza cada 4 s con desfase por persona: correcto. Al parar, la mezcla de 0,22 s desde `walk` corta la zancada a media pierna | baja | S | **AN-1c hecho**: la parada con la pierna que baja (§2.4) |
+| walk | GLB | todo trayecto; 669 de 1 968 muestras de actor en wide-11 | partida (follow13), preview | **Cadencia 3,3–5,2 Hz** (§2.1): «hormigas». Plantado 0,79–0,90× | **alta** | L (receta + GLB) | **AN-1a hecho**: zancada 0,423, plantado 0,97–1,03×, 2,5–3,9 Hz (§2.4) |
+| carry_walk | GLB | acarreo de leña, piedra, grano, fardos | partida (wide-11), preview | Misma cadencia; el haz cuelga bien de `hand_l` | alta (igual que walk) | L | **AN-1a hecho**: 0,339, 3,1–4,9 Hz (§2.4) |
 | work_hoe | GLB | campo, fase de azada | partida (wide-11), preview | Azadona con la espalda y la azada llega al suelo. Sin defecto visto | — | — | conservar |
 | flee | fabricado | huida civil (asalto, oso); `carry_walk` no | preview | Carrera legible: torso adelante, brazos doblados; 3,7–5,8 Hz | media | S | AN-3: comprobar en asalto |
 | sit | fabricado | comer, hoguera, banco | partida (wide-11: 275 muestras), preview | Cadera baja 0,55 m y muslos en ángulo recto; sin banco se sienta en el aire a la altura de un banco | media | S | AN-2: revisar la altura sin asiento |
@@ -187,31 +239,31 @@ compara en AN-4.
 
 | Especie · clip | Origen | Situación en partida | Evidencia | Defecto concreto | Gravedad | Coste | Decisión |
 |---|---|---|---|---|---|---|---|
-| hen · idle/walk | receta G-23 | corral, todo el día | partida (wide-11, hens-11 a 15 fps), preview | Cadencia 7,3 Hz y plantado 0,68× (§2.1) | media (de cerca) | L (receta) o S (ritmo) | AN-1 |
+| hen · idle/walk | receta G-23 | corral, todo el día | partida (wide-11, hens-11 a 15 fps), preview | Cadencia 7,3 Hz y plantado 0,68× (§2.1) | media (de cerca) | L (receta) o S (ritmo) | conservar con límite dicho (§2.4): a 4–6 px no se lee; `PACE.hen` es un TUNE de una línea |
 | pig · idle/walk | receta G-23 | corral | preview | 3,5 Hz, plantado 0,94–0,98×: correcto | baja | — | conservar |
 | cow · idle/walk | receta G-23 | corral, vado | preview | 1,5 Hz, plantado 0,95–0,99×: correcto | — | — | conservar |
 | crow · idle/walk | receta G-23 | campos (ambiental) | preview | 3,8 Hz, plantado 0,74× | baja | — | conservar (ambiental, lejos) |
-| fish · idle/walk | receta G-23 | río (ambiental) | preview (bajo el suelo del banco) | No medible en el banco; nado a 1,5 Hz | baja | — | AN-1: mirar en partida |
-| fox · idle/walk | receta G-23 | noche, gallinero; huye sin clip | preview | 7,3 Hz al paso 0,95; `flee` cae a `walk` | media | S | AN-1: ritmo; huida por velocidad |
+| fish · idle/walk | receta G-23 | río (ambiental) | preview (bajo el suelo del banco) | No medible en el banco; nado a 1,5 Hz | baja | — | AN-4: mirar en la toma del vado |
+| fox · idle/walk | receta G-23 | noche, gallinero; huye sin clip | preview | 7,3 Hz al paso 0,95; `flee` cae a `walk` | media | S | **AN-1b hecho**: paso 0,6 (4,6 Hz); la huida sigue con `walk` por velocidad (sin clip) |
 | duck · idle/walk | receta G-23 | agua junto al pueblo | partida (ducks-11 a 15 fps), preview | 4,7 Hz, plantado 0,68× (bajo el agua no se ve) | baja | — | conservar |
-| deer · idle/walk | receta propia (`plant-gait`) | linde del bosque; huye a 1,35 | preview; en partida tapado por el bosque (ver §2.3) | 2,2 Hz, plantado 0,93×: correcto; al huir 4,1 Hz con el mismo clip | baja | S | AN-1: huida |
-| rabbit · idle/hop/flee | receta propia | linde; huye | preview | `hop` 5,3 Hz; **`flee` va por reloj y patina** (§2.1) | media | S | AN-1: `flee` por distancia con zancada real |
-| partridge · idle/walk/takeoff/flight | Vera + `rigid-clips` | sólo en la caza | preview | `walk` a **23 Hz** (zancada 0,064 con paso 1,5); `takeoff` y `flight` legibles | media | S | AN-1: ritmo del `walk` |
-| boar · idle/walk/charge/attack | Vera + `rigid-clips` | caza: roam, charge, down | preview | **`charge` por reloj, patina** (§2.1); `attack` sólo mueve el cuello 9° y **nadie lo emite** | media / — | S / — | AN-1 `charge`; `attack` = preview-only |
+| deer · idle/walk | receta propia (`plant-gait`) | linde del bosque; huye a 1,35 | preview; en partida tapado por el bosque (ver §2.3) | 2,2 Hz, plantado 0,93×: correcto; al huir 4,1 Hz con el mismo clip | baja | S | **AN-1b**: rumbo de la vida; la huida sigue con `walk` (sin clip de carrera: límite, en `encargos-3d.md`) |
+| rabbit · idle/hop/flee | receta propia | linde; huye | preview | `hop` 5,3 Hz; **`flee` va por reloj y patina** (§2.1) | media | S | **AN-1b hecho**: `flee` por suelo recorrido, 0,57 celdas por brinco (§2.4) |
+| partridge · idle/walk/takeoff/flight | Vera + `rigid-clips` | sólo en la caza | preview | `walk` a **23 Hz** (zancada 0,064 con paso 1,5); `takeoff` y `flight` legibles | media | S | `walk` = `preview-only`: en la caza no anda (§2.4); `takeoff`/`flight` con fundido (AN-1b) |
+| boar · idle/walk/charge/attack | Vera + `rigid-clips` | caza: roam, charge, down | preview | **`charge` por reloj, patina** (§2.1); `attack` sólo mueve el cuello 9° y **nadie lo emite** | media / — | S / — | **AN-1b hecho** `charge` por suelo recorrido; `attack` = `preview-only` |
 | bear · idle/walk/attack | Vera + `rigid-clips` | visita del oso (aviso), caza | preview | `attack` (se alza) legible; después del clip queda alzado hasta que acaba el aviso | media | S | AN-3: revisar el final del aviso |
 | wolf · idle/walk/attack | Vera + `rigid-clips` | corral (semana del suceso), manada de la sierra | preview | `walk` bien; **`attack` sólo mueve cabeza 4° y orejas** y nadie lo emite | — | — | `attack` = preview-only; anotar en `encargos-3d.md` |
-| dog · idle/walk/run/bark/play | Vera + `rigid-clips` + fabricados | casa, niños, pelota, forastero, zorro | preview | Los cinco legibles en el banco; `bark`/`play` con corte seco al cambiar (sin mezcla) | baja | S | AN-2: mezcla corta |
+| dog · idle/walk/run/bark/play | Vera + `rigid-clips` + fabricados | casa, niños, pelota, forastero, zorro | preview | Los cinco legibles en el banco; `bark`/`play` con corte seco al cambiar (sin mezcla) | baja | S | **AN-1b hecho**: fundido de 0,08 s; AN-2 revisa el gesto |
 | mule · idle/walk | Vera + `rigid-clips` | detrás del buhonero | preview | Trote a 3,2 Hz | baja | — | conservar |
 | golondrina · batir | Astra + `ambience.ts` | cielo de día | partida (wide-11) | Batir de −55° a +35° a ritmo fijo; no hay planeo | baja | S | AN-2: planeo |
 
-**Orientación de los animales (todas las especies).** `AnimalMotion.place`
+**Orientación de los animales (todas las especies) — hecho en AN-1b, ver §2.4.** `AnimalMotion.place`
 gira el cuerpo hacia el desplazamiento de píxeles entre dos fotogramas con un
 umbral de 0,00001 celdas, e ignora el `facing` que la vida ya calcula con
 histéresis (`body.ts`, `TURN_MIN_SPEED`, `TURN_MIN_PROGRESS`). Un animal
 apretado contra un muro o entre vecinos oscila de cara. Gravedad media, coste
 S: AN-1, pasando el rumbo de la vida en `Animal`.
 
-**Mezclas.** Personas: fundido lineal de 0,22 s entre clips, salvo los
+**Mezclas — animales hechos en AN-1b, la parada humana en AN-1c (§2.4).** Personas: fundido lineal de 0,22 s entre clips, salvo los
 fechados (sin mezcla, por contrato de E1). Animales: `special` (bark, play,
 flee, charge, flight) entra y sale a peso 1 de golpe. Coste S: AN-1/AN-2.
 

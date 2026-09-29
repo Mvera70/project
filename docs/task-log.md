@@ -1,5 +1,39 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · Animación integral para móvil (AN): AN-0 y AN-1 entregadas, AN-2 en vuelo
+
+Vera lo pidió con `/goal` («mejorar de forma visible todas las animaciones de
+aldeanos y animales; el juego se evalúa principalmente en móvil; trabajar
+hasta completar AN-0 a AN-4»). Fila AN en `docs/plan-meta.md`; plan y briefs
+en `docs/plan-animacion-integral-movil-2026-09-29.md` —**reconstruido del
+encargo**: el fichero que el encargo citaba no existía en el árbol, en `main`
+ni en las veinte ramas del remoto—; la matriz con la evidencia en
+`docs/medidas/animacion-matriz-2026-09-29.md`. Rama `ccr-48790acc-ibi65c`.
+Dos límites del entorno, no bloqueos: **sin Blender** (las recetas se hornean
+con `tools/art/bake-clips.mjs`, que reproduce el exportado a 0,03° en las
+claves) y **sin dispositivo** (se compara coste, no FPS; la comprobación en
+iPhone/iPad queda pendiente y dicha así).
+
+**Hecho.** AN-0 (`d82bd84`): 24 clips, 15 especies, matriz y línea de base;
+`tools/reports/gait-report.ts`. AN-1a (`c8834ff`): la zancada del aldeano,
+0,317 → 0,423 andando y 0,260 → 0,339 cargando, plantado 0,97–1,03×, cadencia
+3,3–5,2 → 2,5–3,9 Hz. AN-1b (`c7755bf`): rumbo de la vida en `Animal.facing`,
+`charge`/`flee` por suelo recorrido, fundidos, caída en 0,14 s, zorro a 0,6.
+AN-1c: la parada con la pierna que baja (`world/cast.ts`,
+`tests/fast/cast-stops.test.ts`); segundo par antes/después en la semilla 7 y
+el informe de la traza en dos semillas.
+
+**En vuelo: AN-2, vida y oficios** (`action-clips.ts`: `talk`, `play`, `sort`,
+`pray`, `drink`, `hammer` con instante de golpe, `sit`; el planeo de la
+golondrina; hojas y tomas de cada gesto cambiado). Después AN-3 (combate) y
+AN-4 (aceptación, veredictos fila a fila, coste contra la línea de base).
+
+**Abierto, decisión de Vera:** un trote humano (1,8–2,8 Hz) exige bajar el
+paso de la vida o un clip de trote que cambia el carácter del aldeano
+(`docs/encargos-3d.md`). **Límites dichos en la matriz §2.4:** gallina 7,3 Hz,
+niño 4,5–7,1 Hz, `walk` de la perdiz y `attack` de lobo y jabalí
+`preview-only`, el ciervo huye con `walk`.
+
 ## 29 sep 2026 · Rendimiento en la tablet, «Graphics» y lo que quedaba de la v9
 
 Vera abrió el sitio en su tablet a 0 fps con fotogramas de dos segundos (año

@@ -18,7 +18,7 @@ import { AnimationMixer, Bone, Mesh, Vector3, type Object3D } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 const catalog = JSON.parse(readFileSync('art/catalog.json', 'utf8')) as { assets: { id: string; motion?: { name: string; seconds: number; strideLength: number | null }[] }[] };
-const PACE: Record<string, number[]> = { villager: [1.05, 1.65], hen: [0.55], pig: [0.4], cow: [0.32], dog: [1.25], fox: [0.95], duck: [0.35], deer: [0.72, 1.35], bear: [0.56], wolf: [0.75], rabbit: [0.8, 2.4], boar: [0.85, 1.2], mule: [1.43], partridge: [1.5], crow: [0.3], fish: [0.2] };
+const PACE: Record<string, number[]> = { villager: [1.05, 1.65], hen: [0.55], pig: [0.4], cow: [0.32], dog: [1.25], fox: [0.6], duck: [0.35], deer: [0.72, 1.35], bear: [0.56], wolf: [0.75], rabbit: [0.8, 2.4], boar: [0.85, 1.2], mule: [1.43], partridge: [1.5], crow: [0.3], fish: [0.2] };
 // `--only villager --glb ruta.glb` mide un candidato sin publicarlo.
 const args = process.argv.slice(2);
 const only = args.includes('--only') ? args[args.indexOf('--only') + 1] : undefined;

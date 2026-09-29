@@ -1,5 +1,56 @@
 # The Valley — Registro de cambios
 
+## v4.97 · 29 sep 2026 · Animación integral para móvil, AN-0 y AN-1: la zancada del aldeano y el rumbo de los animales
+
+Vera pidió con `/goal` «mejorar de forma visible todas las animaciones de
+aldeanos y animales; el juego se evalúa principalmente en móvil», en cinco
+fases (AN-0 a AN-4: fila AN de `docs/plan-meta.md`; plan y briefs en
+`docs/plan-animacion-integral-movil-2026-09-29.md`, reconstruido del encargo
+porque el fichero que citaba no existía en ninguna rama).
+
+- **AN-0, el inventario y la línea de base** (`d82bd84`): 24 clips humanos
+  (4 del GLB, 20 fabricados), 15 especies, los tres gestos del perro y la
+  golondrina, verificados en código y catálogo; una matriz por clip y especie
+  (`docs/medidas/animacion-matriz-2026-09-29.md`) con origen, situación en
+  partida, evidencia, defecto, gravedad, coste y decisión; tomas a 390×844
+  con semilla, año, actor, cámara y zoom guardados; y
+  `tools/reports/gait-report.ts`, que mide cadencia, apoyo y plantado de cada
+  clip de marcha sobre el GLB publicado, sin navegador. Lo que dijo: los
+  clips están bien plantados y lo que falla es el **ritmo** —el aldeano a
+  3,3–5,2 ciclos de pierna por segundo («hormigas»), el niño a 6–9, la
+  gallina y el zorro a 7, la perdiz a 23— y dos carreras (`charge` del
+  jabalí, `flee` del conejo) iban por reloj y patinaban de lleno.
+- **AN-1a, la zancada del aldeano** (`c8834ff`): sin Blender en la máquina,
+  `tools/art/bake-clips.mjs` hornea las pistas de una receta directamente en
+  el GLB (`--check` reproduce el exportado de Blender a 0,03° en las claves) y
+  `art/recipes/villager/plant-gait.mjs` reescribe `walk` y `carry_walk` con
+  las piernas por cinemática inversa y el pie plantado. Medido sobre el
+  publicado: zancada 0,423 y 0,339 (eran 0,317 y 0,260), pie apoyado a
+  0,97–1,03× de lo que avanza el cuerpo (era 0,79–0,90×), cadencia 2,5–3,9 Hz
+  (era 3,3–5,2). Catálogo y manifiesto llevan el hash nuevo y la procedencia;
+  `graphics-clock` sigue vigilando que `clips.ts` diga lo mismo.
+- **AN-1b, los animales** (`c7755bf`): `Animal` gana `facing` y lo emiten
+  ganado, perro, zorro, patos, ciervo, oso, conejos, presas y lobo: la cara es
+  la que la vida decidió, con su histéresis, y no una derivada del
+  desplazamiento de píxeles entre fotogramas, que oscilaba contra una valla y
+  hacía ladrar al perro hacia donde iba y no hacia el forastero. `charge` y
+  `flee` van por suelo recorrido con la zancada del catálogo; los gestos
+  entran y salen con fundido (0,08 s) y caer se tumba en 0,14 s, no de golpe;
+  el zorro se acerca al gallinero a 0,6 celdas/s (7,3 → 4,6 ciclos por
+  segundo). Cinco propiedades nuevas sobre el controlador real.
+- **AN-1c, la parada:** el clip de marcha que se apaga sigue su ciclo mientras
+  se funde, así que el pie que iba en el aire adelanta y baja en vez de
+  quedarse colgado y derretirse hacia el reposo (`world/cast.ts`,
+  `tests/fast/cast-stops.test.ts`). Y el segundo par antes/después, en la
+  villa de la semilla 7 (año 60, niño 242 y adulto 208; el 114 quedó bajo la
+  copa del bosque), y la traza de las seis tomas de seguimiento: 0 saltos en
+  30 240 muestras.
+- **Lo que AN-1 deja dicho y no toca** (matriz §2.4): la gallina a 7,3 Hz (no
+  se lee a 6 px; `PACE.hen` es un TUNE de una línea), el niño a 4,5–7,1 Hz
+  (más pasos por la misma distancia), un trote humano de 1,8–2,8 Hz como
+  decisión de Vera, y `walk` de la perdiz y `attack` de lobo y jabalí como
+  `preview-only` porque nadie los emite (`docs/encargos-3d.md`).
+
 ## v4.96 · 29 sep 2026 · La piel v9 en el juego, la crónica a color, y «Graphics» en la portada
 
 Vera abrió el sitio publicado en su tablet a 0 fps con fotogramas de dos
