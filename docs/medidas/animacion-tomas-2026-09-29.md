@@ -127,7 +127,7 @@ toma: va en «Hojas de gestos».
 | Toma (carpeta) | Semilla · año | lead · fps × s | Viewport | Cámara (follow / look / zoom) | Escenario (raid, assault, beast, hunt, página «antes») | Fotogramas | Errores de página | Ficheros derivados |
 |---|---|---|---|---|---|---|---|---|
 | `AN-3/assault-seed11-y21/` | 11 · 21 | 20 s · 10 fps × 12 s | 390×844 | — / — / — | `--raid 12 --assault` | 121 | ninguno | `middle.png`, `strip-flee.png` |
-| `AN-3/bear-seed11-y21/` | 11 · 21 | 30 s · 10 fps × 10 s | 390×844 | — / — / — | `--beast` | 101 | ninguno | `middle.png` |
+| `AN-3/gate-seed11-y21/` | 11 · 21 | 8 s · 10 fps × 14 s | 390×844 | — / — / — | `--raid 12 --assault` | 141 | ninguno | `middle.png`, `strip-gate.png` |
 
 - `hunt-seed11-y21` y `hunt-seed7-y30` no llegaron a grabarse: véase
   «Carpetas incompletas».
@@ -259,7 +259,7 @@ y las de especie con
 
 ## Carpetas incompletas
 
-Estado al generar este índice (29 sep 2026, 12:23 UTC). Una carpeta está
+Estado al generar este índice (29 sep 2026, 12:29 UTC). Una carpeta está
 incompleta si no tiene `trace.json`.
 
 - `AN-3/hunt-seed11-y21/` y `AN-3/hunt-seed7-y30/` — a las dos les faltan
@@ -272,10 +272,15 @@ incompleta si no tiene `trace.json`.
   - `node tools/graphics/observe-life.mjs --seed 11 --year 21 --hunt --lead 20 --seconds 10 --fps 10 --viewport 390x844 --out artifacts/graphics/AN-3/hunt-seed11-y21`
   - `node tools/graphics/observe-life.mjs --seed 7 --year 30 --hunt --lead 20 --seconds 10 --fps 10 --viewport 390x844 --out artifacts/graphics/AN-3/hunt-seed7-y30`
 
-- `AN-3/gate-seed11-y21/` — le faltan `trace.json`, `summary.json`,
-  `index.html`, `middle.png`, `after.png`; su `frames/` tiene 48 fotogramas. No
-  había terminado al generar el índice. Comando:
-  `node tools/graphics/observe-life.mjs --seed 11 --year 21 --raid 12 --assault --lead 8 --seconds 14 --fps 10 --viewport 390x844 --out artifacts/graphics/AN-3/gate-seed11-y21`.
+- `AN-3/bear-seed11-y21/` — le faltan `trace.json`, `summary.json`,
+  `index.html`, `before.png`, `middle.png`, `after.png`; su `frames/` está
+  vacía. No había terminado al generar el índice. Comando:
+  `node tools/graphics/observe-life.mjs --seed 11 --year 21 --beast --lead 30 --seconds 10 --fps 10 --viewport 390x844 --out artifacts/graphics/AN-3/bear-seed11-y21`.
+
+- `AN-3/hunt-seed5-y21/` — le faltan `trace.json`, `summary.json`, `index.html`,
+  `before.png`, `middle.png`, `after.png`; su `frames/` está vacía. No había
+  terminado al generar el índice. Comando:
+  `node tools/graphics/observe-life.mjs --seed 5 --year 21 --hunt --lead 20 --seconds 12 --fps 10 --viewport 390x844 --out artifacts/graphics/AN-3/hunt-seed5-y21`.
 
 - `AN-1/film/seed7-y60/` (fuera de las tablas: es de `film.mjs`, no del
   observatorio) — sólo `frames/` con 25 fotogramas; le faltan `trace.json`,
