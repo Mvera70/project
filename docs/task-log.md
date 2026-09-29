@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · Monetización, promoción y publicación
+
+El plan `docs/plan-monetizacion-y-publicacion-2026-09-29.md` reúne la propuesta
+de compra única con demo web, precio asequible por validar, posibles ofertas
+cercanas a 2,50 €, y Switch como candidata portátil que también podría entrar
+en las ofertas de eShop. Se distingue la publicidad para descubrir el juego
+de los anuncios dentro de la partida. Las fichas, la demo, el material de
+prensa y las campañas pagadas pequeñas quedan como canales a probar y medir.
+El plan enumera además las pruebas técnicas y los requisitos de tiendas,
+privacidad, derechos, clasificación y fiscalidad antes de vender. La skill
+`monetizacion-marketing-valley` conservará futuras decisiones y resultados en
+el registro del plan. Precio, presupuesto y orden de lanzamiento siguen abiertos.
+
 ## 29 sep 2026 · AN-5: la caza física, y la visita del oso que dura
 
 Vera, al leer el brief AN-5a: «que la caza enseñe el golpe… cuanto más física
@@ -71,6 +84,7 @@ semillas y falla sin el arreglo (comprobado).
 - **El coste en el teléfono, sin medir**: crear el mundo de contacto cuesta 12–22 ms
   en esta máquina (el WASM se calienta al avistar la presa) y un paso de caza,
   0,13–0,2 ms; en un iPhone está por medir, como todo lo demás.
+
 
 ## 29 sep 2026 · Profundidad visual en móvil: el pie de los edificios, el prado hondo y el seguido a la vista (v5.12)
 

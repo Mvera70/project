@@ -1,5 +1,10 @@
 # La documentación de The Valley — el mapa
 
+- [Monetización, marketing y publicación](plan-monetizacion-y-publicacion-2026-09-29.md):
+  propuesta comercial, dudas por resolver y registro de aprendizaje; la
+  [skill del proyecto](../.agents/skills/monetizacion-marketing-valley/SKILL.md)
+  indica cómo mantenerlo.
+
 Se ordenó el 18 sep 2026 y **se repartió en carpetas el 19 sep 2026**, las dos
 veces a petición del dueño del diseño: «se va acumulando sin estructura y sin
 nada; ve limpiando también lo que es antiguo», y después «crear una división de
@@ -44,6 +49,7 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `changelog.md` | **El porqué de cada revisión.** Antes de deshacer una decisión, se busca aquí |
 | `task-log.md` | **El cuaderno de tareas.** El punto exacto: en vuelo, cifras, abierto |
 | `plan-meta.md` | **El plan hacia la meta** (§1b), con prioridad, dificultad y agente |
+| `plan-monetizacion-y-publicacion-2026-09-29.md` | **Plan comercial vivo**: precio, ofertas, canales, promoción y requisitos de publicación; decisiones pendientes y aprendizaje registrado |
 | `encargos-3d.md` | **Todo lo que el juego no enseña todavía**: mallas, animaciones y mecánicas sin representación, apuntado en la misma ronda en que se descubre |
 | `interfaz/` | **La interfaz, versión a versión**: una carpeta por fecha con todas las pantallas y estados del juego (skill `press-kit`), para comparar qué cambió |
 | `plan-animacion-integral-movil-2026-09-29.md` | **La ronda AN de animación** (29 sep): fases AN-0 a AN-4, brief y ficheros permitidos por fase, y los briefs de las correcciones que salieron (AN-1a zancada, AN-1b rumbo, AN-2a pelota, AN-2b martillo, AN-3a oso); al final, el encargo original de Astra tal cual |
