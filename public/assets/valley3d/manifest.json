@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-27T18:16:30.614Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids deer",
+  "generatedAt": "2026-09-29T18:27:34.866Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids fox",
   "assets": [
     {
       "id": "axis-marker",
@@ -1024,30 +1024,6 @@
       }
     },
     {
-      "id": "fox",
-      "file": "fox.glb",
-      "sha256": "6BD39948587E59A5A94B601C5AA7923CDE8023F6F5DAEF6995C98C7C476B9DA3",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 8.041666666666666,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
-          "loop": true,
-          "strideLength": 0.13
-        }
-      ],
-      "provenance": {
-        "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
-        "license": "project-original"
-      }
-    },
-    {
       "id": "duck",
       "file": "duck.glb",
       "sha256": "3540D24E786CFCE87CE49C6581E7297D0D55C28FCABD96C216B7849ACE2F73CE",
@@ -1548,6 +1524,36 @@
         "kind": "original",
         "source": "Original procedural stag modeled for The Valley on 23 Sep 2026; no external provider.",
         "license": "Project original"
+      }
+    },
+    {
+      "id": "fox",
+      "file": "fox.glb",
+      "sha256": "0995B771C8FC6EA8A61D13954924DBB2920B6F387F457AD81B003CCE81829820",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true,
+          "strideLength": 0.121
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "flee",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.181
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Zorro de Astra con el hocico suavizado, elegido por Vera (deliverables/fox-model-trial, 26 sep 2026); esqueleto, pesos y clips idle/walk/flee de tools/art/rig-single-mesh.py a 0,56 celdas.",
+        "license": "project-original"
       }
     }
   ]

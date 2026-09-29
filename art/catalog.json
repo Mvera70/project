@@ -5620,77 +5620,81 @@
     },
     {
       "id": "fox",
-      "artifactRound": "G-23",
+      "artifactRound": "G-40",
       "status": "study",
-      "recipe": "art/recipes/fox/fox.json",
-      "generator": "tools/art/blender-build.py",
+      "recipe": "deliverables/fox-model-trial/fox-astra-softened-muzzle.glb · tools/art/rig-single-mesh.py",
+      "generator": "deliverables/fox-model-trial/fox-astra-softened-muzzle.glb · tools/art/rig-single-mesh.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-25T10-47-17-102Z-15440",
-        "directory": "artifacts/graphics/G-23/approved/6bd39948587e59a5"
+        "runId": "fox-rig",
+        "directory": "artifacts/graphics/fox-rig/approved/fox"
       },
       "bounds": {
         "min": [
-          -0.306167,
+          -0.273744,
           0,
-          -0.053633
+          -0.050897
         ],
         "max": [
-          0.246933,
-          0.2594,
-          0.053633
+          0.286256,
+          0.282863,
+          0.050897
         ],
         "size": [
-          0.5531,
-          0.2594,
-          0.107267
+          0.56,
+          0.282863,
+          0.101794
         ]
       },
-      "recipeSha256": "B0B388561C952A918DA0ABB660E692B8F58DEAC51A4A2B0A6A2F4B48E2FC501A",
+      "recipeSha256": null,
       "materials": [
-        "coat",
-        "light",
-        "dark",
-        "accent"
+        "Fox_-_warm_russet",
+        "Fox_-_copper_coat",
+        "Fox_-_ivory_fur",
+        "Fox_-_charcoal_stockings",
+        "Fox_-_inner_ear",
+        "Fox_-_eyes_and_nose",
+        "Fox_-_amber_eyes"
       ],
       "clips": [
+        "walk",
         "idle",
-        "walk"
+        "flee"
       ],
       "motion": [
         {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true,
+          "strideLength": 0.121
+        },
+        {
           "name": "idle",
-          "seconds": 8.041666666666666,
+          "seconds": 4,
           "loop": true,
           "strideLength": null
         },
         {
-          "name": "walk",
-          "seconds": 2.7083333333333335,
+          "name": "flee",
+          "seconds": 0.6,
           "loop": true,
-          "strideLength": 0.13
+          "strideLength": 0.181
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 24,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 2720
+        "objects": 19,
+        "meshes": 1,
+        "materials": 7,
+        "triangles": 1112
       },
       "hashes": {
-        "fox.blend": "9CD61C19446B01D93BA8CBFEA9BA0B25DA901AE5618BDA6F9D2E4E868E760A04",
-        "fox.glb": "6BD39948587E59A5A94B601C5AA7923CDE8023F6F5DAEF6995C98C7C476B9DA3",
-        "fox-blender.png": "70B6FEED3E5E0101AFA288729C1676FA945F8329586529A8AEAAE9BD982C87C5",
-        "capture-1.png": "EA006E279053B5F51CB9599753A40686589480A5542CE55DBF6EABBFE0F54217",
-        "capture-1-gray.png": "72541C2DBF355C761184162A161CB7ED83EE81530B5A50505F0C8402940614E1",
-        "capture.json": "6AE432A07A4565839A592A2E3D779656947941E8861FB31A4794E74172E9565E",
-        "build.json": "BAEFA6C1C75F261E4F46948FFA54C9297BB75B62BB29D813360515106759E927",
-        "validation.json": "0B594EABD4A5A01B6647E32A9E3D8BF3C01ACD9BF8ABC3366A8D0F7CA1EE3821"
+        "fox.glb": "0995B771C8FC6EA8A61D13954924DBB2920B6F387F457AD81B003CCE81829820",
+        "fox-preview.png": "75131C9D2753F09F27BD7BDA42347A2DF65810F3907FB12A1BFDFDBFA46F54CD"
       },
       "provenance": {
         "kind": "original",
-        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "source": "Zorro de Astra con el hocico suavizado, elegido por Vera (deliverables/fox-model-trial, 26 sep 2026); esqueleto, pesos y clips idle/walk/flee de tools/art/rig-single-mesh.py a 0,56 celdas.",
         "license": "project-original"
       }
     },

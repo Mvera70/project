@@ -1,6 +1,6 @@
 # Cuaderno de tareas — el rework
 
-## 29 sep 2026 · Las herramientas de modelos, fuera de Windows — y el juicio de la fauna
+## 29 sep 2026 · Las herramientas de modelos, el zorro publicado y el juicio de la fauna
 
 Vera preguntó qué animales flojean (el oso no la convence) y pidió capturas de
 los peores, sin tocar modelos todavía. Las herramientas de captura buscaban
@@ -11,8 +11,10 @@ barril), el banco de fauna abre las quince especies y acepta `--out` (sin él
 pisa la entrega de G-23, que está en el repositorio), y `shot.mjs` encuadra un
 animal vivo con `--look-animal`. Juicio, sin tocar nada: **oso, zorro, pez y
 cerdo**, por ese orden; y conviven dos estilos, cajas (aldeanos y la receta
-G-23) contra facetado (los de Vera). **Abierto:** en qué estilo se rehace el
-oso, decisión de Vera. El oso no se puede fotografiar dentro de la partida sin
+G-23) contra facetado (los de Vera). **Después, el zorro**: el de Astra con
+el hocico suavizado, esqueleto por script, **publicado** (v4.97, 0,56 celdas,
+`idle`/`walk`/`flee`). Lo siguiente, por orden de Vera: el oso, y enseñárselo
+antes de seguir con el resto. El oso no se puede fotografiar dentro de la partida sin
 cazar antes la cadena entera: no hay `?hunt=`.
 
 ## 29 sep 2026 · Rendimiento en la tablet, «Graphics» y lo que quedaba de la v9

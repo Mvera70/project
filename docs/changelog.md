@@ -1,5 +1,24 @@
 # The Valley — Registro de cambios
 
+## v4.97 · 29 sep 2026 · El zorro de Vera, publicado, y las herramientas de modelos fuera de Windows
+
+Vera: «el zorro tiene una versión por ahí que ya se hizo que no sé por qué no
+se ha llegado a subir […] termina lo que quede pendiente del zorro».
+
+- **El zorro nuevo** (`fox.glb`): el de Astra con el hocico suavizado, que Vera
+  eligió el 26 sep, con el esqueleto de `tools/art/rig-single-mesh.py`. Se
+  quedó esperando su visto bueno y el GLB con esqueleto no llegó a guardarse
+  en ninguna rama. Mide 0,56 celdas, algo menos que el perro (0,60), y trae
+  `idle`, `walk` y `flee`, que es el clip que el juego pide cuando huye. El
+  script reparte ahora lo alto del muslo y del hombro con el cuerpo: entero a
+  la pata, al galopar arrancaba una cuña del costado. 1112 triángulos contra
+  los 2720 del zorro de cajas.
+- **Las herramientas de captura, en cualquier máquina** (`tools/graphics/browser.mjs`):
+  buscaban Chromium sólo en `~/AppData` y en la nube no arrancaban.
+  `model-sheet --ids … --sides` enseña un modelo por cuatro lados, el banco de
+  fauna abre las quince especies (`--out` para no pisar G-23) y
+  `shot.mjs --look-animal <especie>` encuadra un animal vivo.
+
 ## v4.96 · 29 sep 2026 · La piel v9 en el juego, la crónica a color, y «Graphics» en la portada
 
 Vera abrió el sitio publicado en su tablet a 0 fps con fotogramas de dos

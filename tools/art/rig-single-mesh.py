@@ -15,7 +15,8 @@
 # 4. **Pesa por regiones**, no con pesos automáticos: cada vértice va entero a
 #    un hueso, y una pata sólo a su cuarto del cuerpo, para que al andar no
 #    arrastre a la de al lado. Es el mismo aspecto articulado que los animales
-#    de piezas rígidas.
+#    de piezas rígidas. Sólo lo alto del muslo y del hombro se reparte con el
+#    cuerpo, para que el costado no se rasgue al galopar.
 # 5. Hace `idle`, `walk` (apoyo en línea recta el 62 % del ciclo, como
 #    `animals-g23.mjs`) y `flee` (galope), y lo exporta con los clips.
 #
@@ -123,8 +124,18 @@ def region(v):
     if v.x < neckBase: return 'neck'
     return 'body'
 
+HIP = 0.25 * legTop   # la franja de la cadera y el hombro que se reparte
 for v in mesh.data.vertices:
-    mesh.vertex_groups[region(v.co)].add([v.index], 1.0, 'REPLACE')
+    name = region(v.co)
+    # Lo alto del muslo va a medias con el cuerpo: entero a la pata, al
+    # galopar arrancaba una cuña del costado (29 sep 2026).
+    share = (legTop * 1.02 - v.co.z) / HIP if name in legs else 1.0
+    if share < 1.0:
+        share = max(0.3, share)
+        mesh.vertex_groups[name].add([v.index], share, 'REPLACE')
+        mesh.vertex_groups['body'].add([v.index], 1.0 - share, 'REPLACE')
+    else:
+        mesh.vertex_groups[name].add([v.index], 1.0, 'REPLACE')
 mesh.parent = rig
 modifier = mesh.modifiers.new('Rig', 'ARMATURE')
 modifier.object = rig
