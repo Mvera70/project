@@ -27,7 +27,8 @@ de Vera al prado C (el pie C1 ya es suyo). Fusionada con `main` tras la PR #2 (A
 día; en las sondas se quedó la versión que hace lo de las dos tandas. **Y dos rojas
 que no son de aquí**: las jornadas `e3b-corridor` (5) y `work-contact` (1), y
 `catchUp · §13.2` en la suite rápida (2,2 s en este contenedor), fallan igual
-en `main` `efafc2e`.
+en `main` `efafc2e`. La suite rápida entera, sobre la rama fusionada: 2102 de
+2103 verdes, y la roja es ésa.
 
 **Y un hallazgo que pesa más que la ronda entera, sin tocar: la villa 7/60 se
 queda en bucle, y es la causa probable de la tablet a 0 fps.**
