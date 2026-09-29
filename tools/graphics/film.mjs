@@ -68,6 +68,9 @@ const answer = Number(opt('answer', '0'));
 // El mismo truco que `shot.mjs`: el navegador de Playwright está instalado
 // pero su «headless shell» no, así que hay que señalarle el chrome.exe.
 function browserExe() {
+  // AN-0 · `VALLEY_CHROMIUM=/ruta/a/chrome` manda: en una máquina sin la
+  // revisión exacta que pide Playwright, es la única forma de abrir el juego.
+  if (process.env.VALLEY_CHROMIUM) return process.env.VALLEY_CHROMIUM;
   const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
   if (!existsSync(root)) return undefined;
   const dirs = readdirSync(root).filter((d) => /^chromium-\d+$/.test(d)).sort();

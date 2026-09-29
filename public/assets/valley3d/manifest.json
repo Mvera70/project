@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-27T18:16:30.614Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids deer",
+  "generatedAt": "2026-09-29T10:35:07.282Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids villager",
   "assets": [
     {
       "id": "axis-marker",
@@ -20,37 +20,6 @@
       "file": "village-corner-b.glb",
       "sha256": "445D8579E62204D8262260E480F7105E264FDA3F14471BE8F254D3979563E82D",
       "motion": []
-    },
-    {
-      "id": "villager",
-      "file": "villager.glb",
-      "sha256": "3E77C2FA1E6349696B828DAA2AB2FE01848531274FA0B2D31435B0D09BA02D33",
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.317
-        },
-        {
-          "name": "work_hoe",
-          "seconds": 2,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "carry_walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.26
-        }
-      ]
     },
     {
       "id": "tree",
@@ -1547,6 +1516,42 @@
       "provenance": {
         "kind": "original",
         "source": "Original procedural stag modeled for The Valley on 23 Sep 2026; no external provider.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager",
+      "file": "villager.glb",
+      "sha256": "CBC336551F462700A5BA04E94B76504718EE42A6A4B90864EEBBECA6A6EF6D66",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.423
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.339
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Original villager: rediseño low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md. AN-1 (29 sep 2026): walk y carry_walk reescritos por art/recipes/villager/plant-gait.mjs y horneados en el GLB de G-17 con tools/art/bake-clips.mjs (sin Blender en la ronda); geometría, rig e idle/work_hoe intactos.",
         "license": "Project original"
       }
     }

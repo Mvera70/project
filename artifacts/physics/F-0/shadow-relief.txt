@@ -1,0 +1,62 @@
+semilla 7 sin sombra: 76 flechas, 24 aciertos, 24 asaltantes y 0 defensores caídos; portón 32/60; acabó en el paso 1083 (36 s de escena)
+semilla 7 sombra 0.12: mismo resultado que sin sombra
+semilla 7 sombra 0.17: mismo resultado que sin sombra
+semilla 7 sombra 0.37: mismo resultado que sin sombra
+semilla 11 sin sombra: 198 flechas, 24 aciertos, 24 asaltantes y 0 defensores caídos; portón 60/60, roto; acabó en el paso 2973 (99 s de escena)
+semilla 11 sombra 0.12: mismo resultado que sin sombra
+semilla 11 sombra 0.17: mismo resultado que sin sombra
+semilla 11 sombra 0.37: mismo resultado que sin sombra
+semilla 21 sin sombra: 92 flechas, 22 aciertos, 16 asaltantes y 3 defensores caídos; portón 60/60, roto, entraron; acabó en el paso 2456 (82 s de escena)
+semilla 21 sombra 0.12: mismo resultado que sin sombra
+semilla 21 sombra 0.17: mismo resultado que sin sombra
+semilla 21 sombra 0.37: mismo resultado que sin sombra
+semilla 42 sin sombra: 194 flechas, 27 aciertos, 24 asaltantes y 1 defensores caídos; portón 60/60, roto; acabó en el paso 2431 (81 s de escena)
+semilla 42 sombra 0.12: mismo resultado que sin sombra
+semilla 42 sombra 0.17: mismo resultado que sin sombra
+semilla 42 sombra 0.37: mismo resultado que sin sombra
+semilla 3 sin sombra: 86 flechas, 24 aciertos, 24 asaltantes y 0 defensores caídos; portón 60/60, roto; acabó en el paso 1046 (35 s de escena)
+semilla 3 sombra 0.12: mismo resultado que sin sombra
+semilla 3 sombra 0.17: mismo resultado que sin sombra
+semilla 3 sombra 0.37: mismo resultado que sin sombra
+semilla 5 sin sombra: 94 flechas, 29 aciertos, 22 asaltantes y 3 defensores caídos; portón 60/60, roto, entraron; acabó en el paso 2370 (79 s de escena)
+semilla 5 sombra 0.12: mismo resultado que sin sombra
+semilla 5 sombra 0.17: mismo resultado que sin sombra
+semilla 5 sombra 0.37: mismo resultado que sin sombra
+semilla 13 sin sombra: 83 flechas, 26 aciertos, 23 asaltantes y 1 defensores caídos; portón 60/60, roto, entraron; acabó en el paso 2047 (68 s de escena)
+semilla 13 sombra 0.12: mismo resultado que sin sombra
+semilla 13 sombra 0.17: mismo resultado que sin sombra
+semilla 13 sombra 0.37: mismo resultado que sin sombra
+semilla 23 sin sombra: 103 flechas, 1 aciertos, 1 asaltantes y 0 defensores caídos; portón 0/60; acabó en el paso — (— s de escena)
+semilla 23 sombra 0.12: mismo resultado que sin sombra
+semilla 23 sombra 0.17: mismo resultado que sin sombra
+semilla 23 sombra 0.37: mismo resultado que sin sombra
+
+F-0 · la flecha que toca, en sombra: 8 batallas por radio, 10 en el cerco (bow) contra 24, año 60, cápsula de 0.65 de alto, suelo con el relieve del juego
+sin sombra: paso de Rapier 0.221 ms de media en 18209 pasos
+
+cápsula de radio 0.12: paso de Rapier 0.199 ms y sondas 0.090 ms de media por paso (hasta 24 sondas a la vez)
+  flechas acabadas 922: aciertos del cilindro 158, de Rapier 96
+  ambos al mismo 95 · a otro 1 · sólo cilindro 62 (58 con muro o suelo delante) · sólo Rapier 0 · ninguno 764
+  cambiaría el resultado en 63 flechas: 7 % de las flechas, 40 % de los aciertos
+  los de sólo cilindro iban a 0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.09, 0.09, 0.09, 0.10, 0.10, 0.11, 0.18, 0.22, 0.27, 0.27, 0.37, 0.38, 0.43, 0.49, 0.50, 0.50, 0.52, 0.52, 0.53, 0.55, 0.57, 0.57, 0.57, 0.59, 0.61, 0.62, 0.62, 0.63, 0.64, 0.66, 0.67, 0.67, 0.71 sobre los pies y a 0.23, 0.27, 0.28, 0.30, 0.30, 0.30, 0.32, 0.33, 0.34, 0.34, 0.35, 0.36, 0.36, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.39, 0.39, 0.39, 0.40, 0.40, 0.41, 0.41, 0.42, 0.42, 0.42, 0.42, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45 del eje del cuerpo
+  altura del contacto de Rapier: piernas 3 · tronco 21 · cabeza 72
+  el cilindro da antes de llegar al cuerpo: mediana 0.11 celdas (51 flechas)
+  la flecha que acierta sigue volando: se para a 2.30 celdas del impacto (p90 6.04, 154 flechas)
+
+cápsula de radio 0.17: paso de Rapier 0.209 ms y sondas 0.091 ms de media por paso (hasta 24 sondas a la vez)
+  flechas acabadas 922: aciertos del cilindro 158, de Rapier 99
+  ambos al mismo 97 · a otro 2 · sólo cilindro 59 (56 con muro o suelo delante) · sólo Rapier 0 · ninguno 764
+  cambiaría el resultado en 61 flechas: 7 % de las flechas, 39 % de los aciertos
+  los de sólo cilindro iban a 0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.09, 0.09, 0.09, 0.10, 0.10, 0.11, 0.18, 0.22, 0.27, 0.27, 0.37, 0.38, 0.43, 0.49, 0.50, 0.50, 0.52, 0.52, 0.53, 0.55, 0.57, 0.57, 0.61, 0.62, 0.62, 0.64, 0.66, 0.67, 0.67, 0.71 sobre los pies y a 0.27, 0.30, 0.30, 0.32, 0.33, 0.34, 0.34, 0.35, 0.36, 0.36, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.39, 0.39, 0.39, 0.40, 0.40, 0.41, 0.41, 0.42, 0.42, 0.42, 0.42, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.43, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45 del eje del cuerpo
+  altura del contacto de Rapier: piernas 2 · tronco 16 · cabeza 81
+  el cilindro da antes de llegar al cuerpo: mediana 0.10 celdas (42 flechas)
+  la flecha que acierta sigue volando: se para a 2.30 celdas del impacto (p90 6.04, 154 flechas)
+
+cápsula de radio 0.37: paso de Rapier 0.201 ms y sondas 0.086 ms de media por paso (hasta 24 sondas a la vez)
+  flechas acabadas 922: aciertos del cilindro 158, de Rapier 155
+  ambos al mismo 151 · a otro 3 · sólo cilindro 4 (4 con muro o suelo delante) · sólo Rapier 1 · ninguno 763
+  cambiaría el resultado en 8 flechas: 1 % de las flechas, 5 % de los aciertos
+  los de sólo cilindro iban a 0.55, 0.66, 0.67, 0.71 sobre los pies y a 0.30, 0.34, 0.41, 0.45 del eje del cuerpo
+  altura del contacto de Rapier: piernas 35 · tronco 26 · cabeza 94
+  el cilindro da antes de llegar al cuerpo: mediana 0.05 celdas (32 flechas)
+  la flecha que acierta sigue volando: se para a 2.30 celdas del impacto (p90 6.04, 154 flechas)

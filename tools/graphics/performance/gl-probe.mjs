@@ -12,14 +12,16 @@
 // **En una máquina sin GPU (SwiftShader) los tiempos no representan una
 // tablet**: compara llamadas, triángulos y JS entre versiones, no FPS.
 import { chromium } from '@playwright/test';
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 
 const [file, query, seconds = '40'] = process.argv.slice(2);
 const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
-const dir = readdirSync(root).filter((d) => /^chromium-\d+$/.test(d)).sort().reverse()[0];
-const browser = await chromium.launch({ executablePath: join(root, dir, 'chrome-win64', 'chrome.exe'),
+// AN-0 · `VALLEY_CHROMIUM` manda; sin la carpeta de Windows, el Chromium de Playwright.
+const dir = existsSync(root) ? readdirSync(root).filter((d) => /^chromium-\d+$/.test(d)).sort().reverse()[0] : undefined;
+const executablePath = process.env.VALLEY_CHROMIUM ?? (dir === undefined ? undefined : join(root, dir, 'chrome-win64', 'chrome.exe'));
+const browser = await chromium.launch({ ...(executablePath ? { executablePath } : {}),
   args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
 const tab = await browser.newPage({ viewport: { width: 1180, height: 820 } });
 tab.on('pageerror', (e) => console.log('ERROR', e.message));
@@ -46,7 +48,9 @@ await tab.addInitScript(() => {
   const tick = () => { if (probe.frame.calls > 0) probe.frames.push(probe.frame); probe.frame = { calls: 0, tris: 0 }; requestAnimationFrame(tick); };
   requestAnimationFrame(tick);
 });
-await tab.goto('file:///' + resolve(file).split(String.fromCharCode(92)).join('/') + '?' + query);
+// AN-0 · La página empaquetada lleva los GLB dentro y con la sonda puesta
+// tarda más de los 30 s por omisión en cargar bajo SwiftShader.
+await tab.goto('file:///' + resolve(file).split(String.fromCharCode(92)).join('/') + '?' + query, { timeout: 240_000 });
 const t0 = Date.now();
 await tab.waitForTimeout(Number(seconds) * 1000);
 const r = await tab.evaluate(() => {

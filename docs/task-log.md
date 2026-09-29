@@ -1,5 +1,180 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · AN-4b y AN-4c: las tomas que faltaban, y el oso que no nacía
+
+Vera: «termina esto: toma en partida la visita del oso, la caza y el asalto
+de la villa». Rodado con dos agentes Sonnet con órdenes cerradas y revisado
+tira a tira; filas de la matriz al día.
+
+**Vistas en partida:** el asalto de la villa 7/60 con arqueros; el conejo que
+huye y cae (7/22); la perdiz que despega de la hierba y vuela (11/24, cámara en
+la presa); el jabalí que carga a galope (7/24, 30 fps). El observatorio graba
+ahora la caza desde el paso en que arranca (se saltaba un segundo, y ahí cabía
+la carga entera con su desenlace).
+
+**AN-4c (`6337c46`):** la visita del oso **no nacía nunca en partida** —con los
+troncos que `solidTerrain` mete en cada celda de bosque no cabía en ninguna
+guarida— y la prueba no lo veía porque usaba el terreno a secas. Al rodarlo
+salió la segunda mitad: nacía en el centro del modelo de la cueva y la roca lo
+tapaba; ahora nace en la boca que marca la receta. **AN-4d, pedido de Vera
+(«la cueva del oso debe salir en la montaña»):** la cueva va al pie de la
+montaña, contra una ladera que sube (tres celdas de roca y +0,5 a la espalda
+del modelo; el oso cabe en la boca, no en el centro de la roca). Cinco valles
+medidos con el terreno real: +0,52 a +0,80 detrás, el vecino más cercano a
+8–12 celdas de la boca, y el oso sale a hozar. En partida (7/30): sale, se
+alza y se mete (`AN-4b/bear-seed7-y30-montana-ancha`).
+7/30 agota la carga del observatorio (240 s) con el empaquetado nuevo, dos
+veces; 11/21 y 23/30 cargan bien.
+
+**Abierto, decisión de Vera:** la visita del oso dura 3 s (el leñador está en
+la guarida); la lanza de la caza atraviesa empalizadas. **Propuesto sin
+ejecutar:** AN-5a, que la caza enseñe el golpe que la decide (hoy la estocada
+final no se dibuja, los gestos no van fechados por el tiro y la presa espantada
+desaparece en el sitio), y el gesto propio de la honda.
+
+**La puerta de la tanda** (29 sep, 16:40): typecheck y lint limpios; suite
+rápida 216 de 218 ficheros y 2089 de 2091 pruebas en 44 min con la máquina
+compartida con Chromium. Rojas: la de tiempo de `catchUp` (8,2 s bajo carga;
+la de siempre, también en `d82bd84`) y `life-bear` en la pasada completa, que
+corrió justo en los segundos en que se retiró el arreglo a propósito para ver
+fallar su prueba —el mensaje es el del fallo sin arreglo—; a solas, 4 de 4.
+Jornadas de combate y fauna: asalto, bestias, arquería y guarnición en verde;
+`threat` no terminó dentro de los 50 min del tope; **`life-wildlife` tiene
+tres rojas que ya estaban en `d82bd84`** (comprobado en un árbol aparte): la
+prueba quiere la lista de fauna vacía en una semana sin lobo y la lista trae
+ciervos, perro y patos desde el valle más vivo. No son de esta ronda y no
+están entre las dos rojas declaradas: quedan anotadas aquí.
+
+**La puerta de la PR #2** (29 sep, 19:20–20:05), antes de integrarla en
+`main`: la CI se corta a los 10 minutos en `fast` y en `browser`, igual que
+las siete últimas ejecuciones de `main` (la CI rota del 28 sep, más abajo).
+`test:pwa`, 6 de 6. `test:shots` en local, con el Chromium del contenedor:
+**14 rojas de 22 en la rama y 13 en `main` (`efafc2e`)**, las mismas prueba a
+prueba salvo una. Son las del rediseño de interfaz que el 28 sep contaba en
+12. La que cambia es «alguien sube por el camino… (M-0)», y a solas
+**también falla en `main`**. Espera 20 s a que el lienzo 3D pase de 300 px, y
+aquí el relevo tarda de 18 a 30 s desde `data-app-ready` en las dos ramas por
+igual: tres cargas en cada una y ningún error de página. El umbral está en el
+filo en una máquina sin GPU, y la rama no lo mueve.
+
+## 29 sep 2026 · ¿Decide la física las batallas? F-0, la flecha que toca, en sombra
+
+Vera, con `/goal` al cerrar la animación: «me preocupa que tener Rapier para
+flechas y ragdolls dé apariencia de física mientras el resultado siga
+dependiendo de distancias y temporizadores». Diagnóstico, experimento y
+lectura crítica de la nota de Astra (`ideas-fisica-y-app-nativa-2026-09-29.md`,
+`24ef5e1`) en `docs/diagnostico-fisica-combate-2026-09-29.md`; fila F en
+`docs/plan-meta.md`. **Sin reescribir el combate**: nada de lo hecho cambia un
+resultado, y está comprobado.
+
+**Lo que decide Rapier hoy** (§1): el vuelo de la flecha, si la para una
+almena, cómo caen los muertos y los cascotes. **Rapier sólo ve a los muertos**:
+los ragdolls son colisionadores, los vivos no. El acierto es un cilindro de
+0,45 × 0,7 medido **desde y=0**, el cuerpo a cuerpo y el portón son distancia y
+reloj, y la flecha que acierta sigue volando.
+
+**F-0 hecho** (`eb845ea`): sondas de Rapier del tamaño del aldeano que se pinta
+(0,65 de alto; 0,12 el tronco, 0,17 con brazos, medido sobre el GLB), en un
+mundo de consulta aparte, y la bitácora de a quién habría dado cada flecha
+(`physics.ts` `probes`/`sweep`, `archery.ts` `archeryShadow`, opción `shadow`
+de la jornada, `battle-report.ts --shadow --seeds --relief`,
+`?sandbox=battle&shadow=0.12`, `physics-probes.test.ts`). **En llano, ocho
+villas del año 60 (10 contra 24): 24 de 24 batallas con sondas acaban igual
+que sin ellas; con el cuerpo que se pinta cambiaría el 35 % de las bajas por
+flecha** (31 % con brazos; el control del tamaño del cilindro, 7 %), siempre a
+menos: flechas que se clavan a medio metro o más de los pies y flechas que pasan a más
+de un metro del pecho —el cilindro gordo tapa un apuntado que no cuenta con el
+aire—; 81 de 100 contactos en cabeza y hombros; la flecha que acierta sigue
+**7 m** (mediana; 19 m el p90); las sondas cuestan 0,08 ms por paso sobre los
+0,21 de Rapier en este contenedor. **Con el relieve del juego** (`--relief`)
+cambia el 40 % (control 5 %), y en seis contra doce el 31 %: 56 pasadas con
+sondas en veinte batallas, todas iguales a su batalla sin ellas. Bajo el portón
+de las villas medidas el suelo está a cota 0, así que la regla «desde y=0» no
+muerde ahí; pero el informe en llano no es la batalla del juego (la 7/60 dura
+36 s con relieve y 96 en llano): para medir combate, `--relief`.
+
+**Skill `fisica-combate`** para quien abra F-1 o toque la física del combate:
+el método de esta entrada y sus trampas en una página.
+
+**La trampa que costó una pasada:** con las sondas en el mismo mundo y los
+grupos de colisión a cero, la semilla 42 acababa con uno o dos aciertos
+distintos —añadir colisionadores cambia ranuras y orden de contactos—. Se
+mudaron a un mundo aparte; para F-1 quiere decir que con y sin contacto sólo
+se compara con distribuciones, nunca batalla a batalla.
+
+**Abierto, decisión de Vera:** si sigue F-1 («la flecha que se clava»), con
+cuál de las tres salidas al balance —aceptar la muralla un tercio menos letal,
+apuntar con el aire, o separar lo que se ve de lo que decide—; y **F-0b**, la
+línea de base en su iPhone y su iPad con el banco (sin y con `&shadow=0.12`),
+que es lo único de esta línea que no se mide aquí.
+
+## 29 sep 2026 · Animación integral para móvil (AN): las cinco fases entregadas; pendiente el aparato
+
+Vera lo pidió con `/goal` («mejorar de forma visible todas las animaciones de
+aldeanos y animales; el juego se evalúa principalmente en móvil; trabajar
+hasta completar AN-0 a AN-4»). Fila AN en `docs/plan-meta.md`; plan y briefs
+en `docs/plan-animacion-integral-movil-2026-09-29.md` —**reconstruido del
+encargo**: el fichero que el encargo citaba no existía en el árbol, en `main`
+ni en las veinte ramas del remoto—; la matriz con la evidencia en
+`docs/medidas/animacion-matriz-2026-09-29.md`. Rama `ccr-48790acc-ibi65c`.
+Dos límites del entorno, no bloqueos: **sin Blender** (las recetas se hornean
+con `tools/art/bake-clips.mjs`, que reproduce el exportado a 0,03° en las
+claves) y **sin dispositivo** (se compara coste, no FPS; la comprobación en
+iPhone/iPad queda pendiente y dicha así).
+
+**Hecho.** AN-0 (`d82bd84`): 24 clips, 15 especies, matriz y línea de base;
+`tools/reports/gait-report.ts`. AN-1a (`c8834ff`): la zancada del aldeano,
+0,317 → 0,423 andando y 0,260 → 0,339 cargando, plantado 0,97–1,03×, cadencia
+3,3–5,2 → 2,5–3,9 Hz. AN-1b (`c7755bf`): rumbo de la vida en `Animal.facing`,
+`charge`/`flee` por suelo recorrido, fundidos, caída en 0,14 s, zorro a 0,6.
+AN-1c: la parada con la pierna que baja (`world/cast.ts`,
+`tests/fast/cast-stops.test.ts`); segundo par antes/después en la semilla 7 y
+el informe de la traza en dos semillas.
+
+**AN-2 hecha** (v4.98): siete gestos con tres tiempos y su propiedad de
+silueta (`work-gestures.test.ts`), sentarse en el suelo, la pelota fechada
+con `fling` (brief AN-2a, `playSeconds`), chispas y astillas del martillo
+(brief AN-2b, `spark`); hojas en `artifacts/graphics/AN-2/gestures/`, tomas
+en `artifacts/graphics/AN-2/after/`; matriz §2.5.
+
+**AN-3 hecha** (v4.99): `gate_strike` dura el segundo del golpe y carga el
+siguiente (visto en el portón de la semilla 11: golpes en los fotogramas 41
+y 51 y los brazos sobre la cabeza entre ambos); `flee` es un esprint que
+pisa (zancada 0,7, la cadera sigue a la pierna; 43 vecinos huyendo a 2,4 Hz
+en el asalto); el aviso del oso dura lo que su clip (brief AN-3a); arco,
+lanza, impacto y caída se conservan con sus pruebas. **AN-4 hecha**: la
+matriz cierra fila a fila con evidencia, veredicto y la observación que lo
+refutaría (§5); comparaciones antes/después a escala nativa del mismo
+instante (`artifacts/graphics/AN-4/compare/`, GIF y tira; agente con
+instrucciones cerradas); la aldea a 320×568; coste comparado (llamadas y
+triángulos iguales en la aldea; `animation-cost.ts` 4,0–4,2 → 4,2–4,7 ms
+por fotograma con 100 personas y 40 animales, dentro del ruido de una
+máquina cargada); índice de tomas (`docs/medidas/animacion-tomas-2026-09-29.md`);
+skill `animacion` para quien toque un clip, y `observe-valley-life` y
+`performance` con lo que la ronda añadió.
+
+**La puerta al cierre (29 sep, 13:30):** typecheck y lint limpios; suite
+rápida 2081 de 2082 pruebas (215 de 216 ficheros) en 37 min en esta máquina
+(cuatro núcleos lentos bajo el contenedor); la única roja es la de tiempo de
+`catchUp` (§13.2, 960 ticks en menos de 2 s): tarda 3,4–3,7 s **también en
+el commit base `d82bd84`, a solas y sin nada más corriendo**, así que es la
+máquina y no la ronda (ningún fichero del motor se ha tocado). Las jornadas
+se lanzan aparte tras la rápida.
+
+**Pendiente y dicho:** la comprobación en iPhone/iPad (nada de esto es una
+medida en el aparato); las tomas que el observatorio no pudo dar —la visita
+del oso, la caza y el asalto de la villa (sesenta personas y muralla; tiempo de carga
+agotado bajo SwiftShader)—, con su ruta en `docs/encargos-3d.md`; el
+lanzamiento (`throw`) sólo en hoja porque la pelota suelta va apagada en la
+partida desde el 15 sep por decisión del dueño (hoy nadie lanza; Vera decidió
+conservar `throw` para cuando vuelvan); y remedir `animation-cost.ts` con la máquina sola.
+
+**Abierto, decisión de Vera:** un trote humano (1,8–2,8 Hz) exige bajar el
+paso de la vida o un clip de trote que cambia el carácter del aldeano
+(`docs/encargos-3d.md`). **Límites dichos en la matriz §2.4:** gallina 7,3 Hz,
+niño 4,5–7,1 Hz, `walk` de la perdiz y `attack` de lobo y jabalí
+`preview-only`, el ciervo huye con `walk`.
+
 ## 29 sep 2026 · Rendimiento en la tablet, «Graphics» y lo que quedaba de la v9
 
 Vera abrió el sitio en su tablet a 0 fps con fotogramas de dos segundos (año

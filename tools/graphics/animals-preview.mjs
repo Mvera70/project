@@ -12,8 +12,8 @@ const bytes=Object.fromEntries(manifest.assets.map(a=>[a.id,readFileSync(assets+
 const result=await build({entryPoints:['tools/graphics/animals-preview.ts'],bundle:true,write:false,format:'esm',define:{PREVIEW_BYTES:JSON.stringify(bytes),PREVIEW_MANIFEST:JSON.stringify(manifest),PREVIEW_ID:JSON.stringify(id)}});
 writeFileSync(dir+'/'+id+'-preview.html',`<!doctype html><meta charset="utf-8"><script type="module">${result.outputFiles[0].text}</script>`);
 const root=join(homedir(),'AppData','Local','ms-playwright');
-const exe=readdirSync(root).filter(d=>/^chromium-\d+$/.test(d)).sort().reverse().map(d=>join(root,d,'chrome-win64','chrome.exe')).find(existsSync);
-const browser=await chromium.launch({executablePath:exe,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const exe=process.env.VALLEY_CHROMIUM??(existsSync(root)?readdirSync(root).filter(d=>/^chromium-\d+$/.test(d)).sort().reverse().map(d=>join(root,d,'chrome-win64','chrome.exe')).find(existsSync):undefined);
+const browser=await chromium.launch({...(exe?{executablePath:exe}:{}),args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 try{
  const page=await browser.newPage({viewport:{width:720,height:600}}),errors=[],samples=[],images=[];
  page.on('pageerror',e=>errors.push(String(e)));

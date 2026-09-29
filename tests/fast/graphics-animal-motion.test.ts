@@ -98,3 +98,64 @@ describe('G-23 · animales publicados, articulados en el camino vivo',()=>{
     const a=run(30),b=run(60);a.forEach((v,i)=>expect(v).toBeCloseTo(b[i]!,5));lib.dispose();
   });
 });
+
+// AN-1 (29 sep 2026) · Lo que el controlador de animales garantiza desde esta
+// ronda: la cara es la que dice la vida, toda carrera va por suelo recorrido,
+// los gestos entran con mezcla y caer no es un giro de un fotograma.
+describe('AN-1 · rumbo, carreras, mezclas y caída de los animales',()=>{
+  const angle=(a:number[],b:number[])=>2*Math.acos(Math.min(1,Math.abs(a[0]!*b[0]!+a[1]!*b[1]!+a[2]!*b[2]!+a[3]!*b[3]!)));
+  it('la cara sigue al rumbo que trae la vida, sin moverse del sitio',async()=>{
+    const lib=await library('dog'),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
+    // Un rumbo de la vida de π/2 (+x) es, para el modelo (frente -x), una vuelta de π.
+    for(let i=0;i<=120;i++)fauna.paint([{id:5,kind:'dog',x:3,y:3,facing:Math.PI/2}],i/60);
+    const body=fauna.group.children[0]!;
+    expect(Math.abs(Math.atan2(Math.sin(body.rotation.y-Math.PI),Math.cos(body.rotation.y-Math.PI)))).toBeLessThan(0.05);
+    fauna.dispose();lib.dispose();
+  });
+  it('sin rumbo de la vida, un temblor de medio milímetro no gira a nadie',async()=>{
+    const lib=await library('hen'),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
+    fauna.paint([{id:6,kind:'hen',x:2,y:2}],0);
+    const body=fauna.group.children[0]!;const before=body.rotation.y;
+    for(let i=1;i<=120;i++)fauna.paint([{id:6,kind:'hen',x:2+(i%2?0.0005:-0.0005),y:2}],i/60);
+    expect(body.rotation.y).toBeCloseTo(before,6);
+    fauna.dispose();lib.dispose();
+  });
+  it.each([['boar','charge'],['rabbit','flee']] as const)('%s: %s va por suelo recorrido, no por reloj',async(kind,action)=>{
+    const lib=await library(kind),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
+    let t=0;const at=(x:number)=>{t+=1/60;fauna.paint([{id:7,kind,x,y:0,action}],t);};
+    for(let i=1;i<=120;i++)at(-i*0.02);
+    const body=fauna.group.children[0]!;const leg=body.getObjectByName(kind==='boar'?'foreL':'foreL')!;
+    const moving=leg.quaternion.toArray();
+    // Parado con el mismo gesto: el reloj avanza un segundo y la pata no se mueve
+    // (2e-3 rad es el ruido de los cuaterniones en float32 de los clips, 0,1°).
+    for(let i=0;i<60;i++)at(-120*0.02);
+    expect(angle(leg.quaternion.toArray(),moving)).toBeLessThan(2e-3);
+    // Y avanzar media zancada más cambia la pata.
+    for(let i=1;i<=10;i++)at(-120*0.02-i*0.03);
+    expect(angle(leg.quaternion.toArray(),moving)).toBeGreaterThan(0.01);
+    fauna.dispose();lib.dispose();
+  });
+  it('ladrar entra con mezcla: el primer fotograma está a medio camino',async()=>{
+    const lib=await library('dog'),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
+    for(let i=0;i<=60;i++)fauna.paint([{id:8,kind:'dog',x:1,y:1,facing:0}],i/60);
+    const neck=fauna.group.children[0]!.getObjectByName('neck')!;const idle=neck.quaternion.toArray();
+    fauna.paint([{id:8,kind:'dog',x:1,y:1,facing:0,action:'bark'}],61/60);
+    const first=neck.quaternion.toArray();
+    for(let i=2;i<=60;i++)fauna.paint([{id:8,kind:'dog',x:1,y:1,facing:0,action:'bark'}],(60+i)/60);
+    const full=neck.quaternion.toArray();
+    expect(angle(idle,full)).toBeGreaterThan(0.1);
+    expect(angle(idle,first)).toBeGreaterThan(0.001);
+    expect(angle(idle,first)).toBeLessThan(angle(idle,full)*0.6);
+    fauna.dispose();lib.dispose();
+  });
+  it('caer tumba el cuerpo en un tercio de segundo, no en un fotograma',async()=>{
+    const lib=await library('boar'),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
+    fauna.paint([{id:9,kind:'boar',x:1,y:1}],0);
+    fauna.paint([{id:9,kind:'boar',x:1,y:1,action:'down'}],1/60);
+    const body=fauna.group.children[0]!;
+    expect(body.rotation.z).toBeGreaterThan(-Math.PI/2*0.5);
+    for(let i=2;i<=60;i++)fauna.paint([{id:9,kind:'boar',x:1,y:1,action:'down'}],i/60);
+    expect(body.rotation.z).toBeCloseTo(-Math.PI/2,2);
+    fauna.dispose();lib.dispose();
+  });
+});

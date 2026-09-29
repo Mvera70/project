@@ -147,11 +147,14 @@ describe('E1 · el hecho decide la pose', () => {
   it('flee es una carrera cíclica de 0,8 s gobernada por suelo recorrido', () => {
     const cast = makeCast();
     try {
+      // La zancada es la del catálogo de clips (AN-3 la subió de 0,44 a 0,7):
+      // lo que se guarda es el ciclo por suelo recorrido, no el número.
+      const stride = VILLAGER_CLIPS.flee.strideLength!;
       cast.show([actor('flee', 0)]); const start = pose(cast);
-      cast.show([{ ...actor('flee', 0), travelled: 0.11 }]); expect(pose(cast)).not.toEqual(start);
-      cast.show([{ ...actor('flee', 0), travelled: 0.44 }]); expect(pose(cast)).toEqual(start);
-      expect(clipTime('flee', 0.22, 999, 0.7)).toBeCloseTo(0.4);
-      expect(clipTime('flee', 0.44, 999, 0.7)).toBeCloseTo(0);
+      cast.show([{ ...actor('flee', 0), travelled: stride / 4 }]); expect(pose(cast)).not.toEqual(start);
+      cast.show([{ ...actor('flee', 0), travelled: stride }]); expect(pose(cast)).toEqual(start);
+      expect(clipTime('flee', stride / 2, 999, 0.7)).toBeCloseTo(0.4);
+      expect(clipTime('flee', stride, 999, 0.7)).toBeCloseTo(0);
     } finally { cast.dispose(); }
   });
 
@@ -227,5 +230,58 @@ describe('E1 · el hecho decide la pose', () => {
     expect(castOf(life, 999, new Map(), new Set())[0]).toMatchObject({ clip: 'fall', clipSeconds: 0 });
     const later = { ...life, steps: 400 };
     expect(castOf(later, 999, new Map(), new Set())[0]).toMatchObject({ clip: 'fall', clipSeconds: 1.2 });
+  });
+});
+
+// AN-3 · El golpe al portón trae el golpe siguiente.
+//
+// Los golpes van a paso fijo (`raiders.ts`, `BLOW_STEPS`), así que el clip
+// dura el segundo entero: contacto en t=0 —donde está el daño— y después la
+// retirada y la carga con los brazos por encima de la cabeza, que se sostiene
+// hasta que el hecho siguiente lo devuelve al contacto. Un asaltante que
+// golpea sin levantar el arma era lo que había.
+describe('AN-3 · el golpe al portón carga el siguiente', () => {
+  const hand = (cast: Cast, name: string): Vector3 => {
+    cast.group.updateMatrixWorld(true);
+    return cast.group.getObjectByName(name)!.getWorldPosition(new Vector3());
+  };
+  it('contacto delante en t=0, brazos por encima de la cabeza antes del golpe siguiente', () => {
+    const cast = makeCast();
+    try {
+      cast.show([actor('gate_strike', 0)]);
+      const contact = hand(cast, 'hand_r'), head = hand(cast, 'head');
+      expect(contact.z, 'delante').toBeGreaterThan(0.18);
+      expect(contact.y, 'a la altura del pecho').toBeLessThan(head.y);
+      cast.show([actor('gate_strike', VILLAGER_CLIPS.gate_strike.seconds * 0.85)]);
+      const loaded = hand(cast, 'hand_r');
+      expect(loaded.y, 'cargado arriba').toBeGreaterThan(head.y + 0.1);
+      cast.show([actor('gate_strike', VILLAGER_CLIPS.gate_strike.seconds)]);
+      expect(hand(cast, 'hand_r').y, 'y se sostiene').toBeGreaterThan(head.y + 0.1);
+      // Un golpe por segundo: el clip dura lo que tarda el siguiente.
+      expect(VILLAGER_CLIPS.gate_strike.seconds).toBe(1);
+    } finally { cast.dispose(); }
+  });
+
+  // AN-3 · La huida es un esprint que pisa: con las piernas abiertas la de
+  // delante toca el suelo, la de atrás va en el aire y la cadera baja; en el
+  // cruce, los dos pies cerca del suelo. La versión de E1 flotaba diez
+  // centímetros en cada apoyo porque la cadera no seguía a la pierna.
+  it('la huida pisa con la pierna de delante, levanta la de atrás y baja la cadera al abrirse', () => {
+    const cast = makeCast();
+    try {
+      const stride = VILLAGER_CLIPS.flee.strideLength!;
+      const at = (travelled: number, name: string): Vector3 => {
+        cast.show([{ ...actor('flee', 0), travelled, activity: 'walking' }]);
+        cast.group.updateMatrixWorld(true);
+        return cast.group.getObjectByName(name)!.getWorldPosition(new Vector3());
+      };
+      const restHips = at(0, 'hips').y;
+      const open = { hips: at(stride * 0.25, 'hips'), L: at(stride * 0.25, 'footL'), R: at(stride * 0.25, 'footR') };
+      expect(open.hips.y, 'la cadera baja').toBeLessThan(restHips - 0.02);
+      const low = Math.min(open.L.y, open.R.y), high = Math.max(open.L.y, open.R.y);
+      expect(low, 'la pierna de delante pisa').toBeLessThan(0.075);
+      expect(high - low, 'la de atrás va en el aire').toBeGreaterThan(0.04);
+      expect(VILLAGER_CLIPS.flee.strideLength, 'zancada de esprint').toBeGreaterThanOrEqual(0.7);
+    } finally { cast.dispose(); }
   });
 });

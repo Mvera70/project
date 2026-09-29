@@ -143,6 +143,9 @@ if (gateOverride !== '' && !existsSync(gateOverride)) {
 }
 
 function browserExe() {
+  // AN-0 · `VALLEY_CHROMIUM=/ruta/a/chrome` manda: en una máquina sin la
+  // revisión exacta que pide Playwright, es la única forma de abrir el juego.
+  if (process.env.VALLEY_CHROMIUM) return process.env.VALLEY_CHROMIUM;
   const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
   if (existsSync(root)) {
     try {

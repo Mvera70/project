@@ -243,7 +243,7 @@ export function createHuntEncounter(
         }
         const x = externalTarget.x + dx / gap * LIFE_STEP * 0.9;
         const z = externalTarget.y + dz / gap * LIFE_STEP * 0.9;
-        if (fitsCircle(land, x, z, 0.52)) externalTarget = { ...externalTarget, x, y: z };
+        if (fitsCircle(land, x, z, 0.52)) externalTarget = { ...externalTarget, x, y: z, facing: Math.atan2(dx, dz) };
         bearAction = 'flee';
         clip = 'fall';
         stepNumber += 1;
@@ -268,7 +268,7 @@ export function createHuntEncounter(
         if (gap > 1.2 && gap < 7) {
           const x = externalTarget.x + dx / gap * LIFE_STEP * 0.72;
           const z = externalTarget.y + dz / gap * LIFE_STEP * 0.72;
-          if (fitsCircle(land, x, z, 0.52)) externalTarget = { ...externalTarget, x, y: z };
+          if (fitsCircle(land, x, z, 0.52)) externalTarget = { ...externalTarget, x, y: z, facing: Math.atan2(dx, dz) };
           bearAction = 'charge';
         }
       }

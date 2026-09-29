@@ -195,3 +195,15 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
 - Un personaje nuevo con esqueleto se funde solo si es de colores lisos; con textura,
   cuenta una llamada por pieza.
 - Tras un cambio que pueda pesar, pasa `gl-probe` en las dos escenas y apunta la cifra.
+
+## El coste de animar (ronda AN, 29 sep 2026)
+
+`npx tsx tools/reports/animation-cost.ts [--people N] [--animals N] [--frames N]`
+mide el JS de `cast.show` y `fauna.paint` por fotograma sin navegador (mediana
+y p90, µs por cuerpo): la medida controlada para comparar dos commits en la
+misma máquina, uno detrás de otro y con la máquina sola (con Chromium
+corriendo hay 0,2–0,5 ms de ruido entre pasadas iguales). Referencia del 29
+sep: 4,0–4,7 ms por fotograma con 100 personas y 40 animales, 27–32 µs por
+persona. `gl-probe` sigue valiendo para llamadas y triángulos; su cuenta de
+programas depende de lo que entró en cuadro con el reloj vivo y no compara.
+Nada de esto son FPS de un teléfono.

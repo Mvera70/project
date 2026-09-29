@@ -17,7 +17,9 @@ const GRAVITY = 3.3;
 
 const COLOURS = { wood: new Color('#c9a26a'), stone: new Color('#a39d92'), leaf: new Color('#5d7a3a'),
   seed: new Color('#d8b25e'), muck: new Color('#4a3524'), blood: new Color('#6a130e'),
-  water: new Color('#cfe4ee') } as const;
+  water: new Color('#cfe4ee'),
+  // AN-2b · las chispas de la fragua: claras y de vida corta.
+  spark: new Color('#ffd86a') } as const;
 export type ChipKind = keyof typeof COLOURS;
 /**
  * Las hojas que suelta la copa al acusar el hachazo caen despacio y duran más:
@@ -36,6 +38,8 @@ const PHYSICS: Readonly<Record<ChipKind, { gravity: number; life: number; lift: 
   blood: { gravity: GRAVITY * 1.2, life: 0.55, lift: 0.5, spread: 0.8 },
   // E4 · el agua del cubo: sale en abanico hacia el fuego y cae.
   water: { gravity: GRAVITY, life: 0.6, lift: 1.1, spread: 1.3 },
+  // AN-2b · una chispa sube poco, vuela corto y se apaga en un tercio de segundo.
+  spark: { gravity: GRAVITY * 0.6, life: 0.35, lift: 1.2, spread: 1.1 },
 };
 
 interface Chip { x: number; y: number; z: number; vx: number; vy: number; vz: number; age: number; spin: number; kind: ChipKind }

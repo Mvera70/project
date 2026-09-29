@@ -135,7 +135,7 @@ export function stepWildPrey(
 
 export function wildPreyPosition(prey: WildPrey | null): Animal[] {
   if (prey === null || prey.phase === 'gone') return [];
-  return [{ id: prey.body.id, kind: prey.kind, x: prey.body.x, y: prey.body.z,
+  return [{ id: prey.body.id, kind: prey.kind, x: prey.body.x, y: prey.body.z, facing: prey.body.facing,
     altitude: prey.altitude,
     action: prey.phase === 'down' ? 'down'
       : prey.kind === 'partridge' && prey.phase === 'flee' ? prey.takingOff === true ? 'takeoff' : 'flight'
