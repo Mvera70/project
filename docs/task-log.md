@@ -57,8 +57,9 @@ se lanzan aparte tras la rápida.
 medida en el aparato); las tomas que el observatorio no pudo dar —la visita
 del oso, la caza y el asalto de la villa (sesenta personas y muralla; tiempo de carga
 agotado bajo SwiftShader)—, con su ruta en `docs/encargos-3d.md`; el
-lanzamiento (`throw`) sólo en hoja porque en los valles de las tomas no hay
-pelota; y remedir `animation-cost.ts` con la máquina sola.
+lanzamiento (`throw`) sólo en hoja porque la pelota suelta va apagada en la
+partida desde el 15 sep por decisión del dueño (hoy nadie lanza; decisión
+para Vera: conservar `throw` o retirarlo); y remedir `animation-cost.ts` con la máquina sola.
 
 **Abierto, decisión de Vera:** un trote humano (1,8–2,8 Hz) exige bajar el
 paso de la vida o un clip de trote que cambia el carácter del aldeano

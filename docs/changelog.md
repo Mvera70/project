@@ -75,7 +75,8 @@ salía de la nada.
   `Cast` real.
 - **La pelota sale de la mano** (brief AN-2a), y son dos clips: `play` sin
   pelota **brinca** —es el día de juego de un niño (`day.ts`), casi siempre
-  sin trasto: en las tomas de las semillas 7 y 11 no hay pelota— y `throw`
+  sin trasto; y la pelota suelta va apagada desde el 15 sep por decisión del
+  dueño, así que hoy nadie lanza— y `throw`
   con pelota es un gesto de una vez (1 s) **fechado por el hecho que viene**:
   `life/cast.ts` (`throwSeconds`) lo hace correr hacia su final desde
   `doing.until`, que es el paso en que `fling` pone la pelota en el aire, así

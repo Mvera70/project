@@ -219,10 +219,9 @@ veinte píxeles») y en las hojas de `artifacts/graphics/AN-2/gestures/`. En
 partida: `artifacts/graphics/AN-2/after/` (plano general de la semilla 11,
 el herrero 27 con sus chispas —`hammer-seed11-y21-follow27/strip-30-53.png`—,
 el niño 60 sentado a la comida —`sit-seed11-y21-follow60/`—). La toma que
-buscaba un lanzamiento (niño 224, semilla 7) no lo encontró: en ese valle no
-hay pelota y los niños brincan en su sitio de juego; `throw` queda con la
-hoja y la propiedad, y una toma de integración pendiente de un valle con
-pelota.
+buscaba un lanzamiento (niño 224, semilla 7) no lo encontró, y no por la
+semilla: los trastos sueltos (la pelota) van apagados en la partida desde el 15 sep 2026 por decisión del dueño del diseño —«eran el descarte de físicas»—: `createVillage` no recibe `props: true` en el juego, y `tests/journeys/life-props.test.ts` los prueba encendidos por si vuelven. Ningún niño lanza hoy en ningún valle; los niños
+brincan en su sitio de juego y `throw` queda con la hoja y la propiedad.
 
 | Gesto | Antes | Después | Medida |
 |---|---|---|---|
@@ -233,7 +232,7 @@ pelota.
 | sort | vaivén de manos delante del pecho | coger (tronco a 72°, manos a la cintura), levantar al pecho, dejar a la derecha (giro 31°) | cabeza baja 0,048 celdas al coger |
 | drink | la taza a la boca con un vaivén de 0,12 rad | la taza sube (0–0,3), la cabeza atrás 23° con la taza en la boca (0,45–0,6), todo baja | mano a 0,515 de alto, 0,12 delante de la boca |
 | play (sin pelota) | balanceo de brazos abiertos por reloj, que a veinte píxeles era estar de pie | brinca: dos saltos por ciclo (cadera +0,12 m) con la rodilla que sube alterna, brazos abiertos, tronco que se vuelve. Es lo que un niño hace casi todo su día de juego: el `play` de `day.ts` se ofrece sin trasto, y en las tomas de las semillas 7 y 11 **no hay pelota** (`props: []`) | cadera +0,04 celdas y rodilla 0,07 más alta que la otra en lo alto del brinco |
-| throw (con pelota) | no existía: la pelota salía de la nada | de una vez, 1,0 s, fechado por el final de la oferta (`throwSeconds`): pelota sujeta con las dos manos, carga atrás y arriba (0,6), giro y barrido hasta la suelta al final; `world/cast.ts` funde a `idle` después | mano en la suelta a 0,22 celdas del punto de salida de `fling` (0, 0,53, 0,4); **sin toma en partida**: en las dos semillas de las tomas no hay pelota, la evidencia es la hoja y la propiedad |
+| throw (con pelota) | no existía: la pelota salía de la nada | de una vez, 1,0 s, fechado por el final de la oferta (`throwSeconds`): pelota sujeta con las dos manos, carga atrás y arriba (0,6), giro y barrido hasta la suelta al final; `world/cast.ts` funde a `idle` después | mano en la suelta a 0,22 celdas del punto de salida de `fling` (0, 0,53, 0,4); **sin toma en partida, por decisión**: los trastos sueltos (la pelota) van apagados en la partida desde el 15 sep 2026 por decisión del dueño del diseño —«eran el descarte de físicas»—: `createVillage` no recibe `props: true` en el juego, y `tests/journeys/life-props.test.ts` los prueba encendidos por si vuelven; la evidencia es la hoja y la propiedad |
 | dog · bark/play | entraban de golpe | fundido de 0,08 s (AN-1b); los gestos (dos tirones de cabeza; la reverencia) se conservan | banco de AN-0 |
 | golondrina | «sin planeo» en AN-0 | la fila estaba mal: bate y planea a ratos; se conserva | `ambience.ts`, `gliding` |
 | shelter, chop, mine, work_hoe, spread | correctos en AN-0 | se conservan | — |
@@ -353,7 +352,7 @@ qué se ve a 390×844 y qué observación la refutaría.
 | spread | plano general 11/21 (434 muestras); hoja AN-0 | horca a dos manos | **conservado** | — |
 | douse | hoja AN-0 (sin cubo en el banco) | — | **conservado · preview-only** (sin fuego en las tomas) | — |
 | play | hoja `AN-3/gestures/play-villager-sheet.png` (el giro del tronco y la rodilla se ven; el salto de 0,12 m son 7 px en la hoja y lo guarda la propiedad: cadera 0,287 → 0,321 a 0,2 s, medido también sobre el GLB con el mezclador a secas); plano general 7/60 «después» (`AN-4/after/wide-seed7-y60`): los niños 224, 243 y 240 en `play` 29, 26 y 23 de 41 fotogramas, `strip-play.png` (el 224 en la linde, tapado a medias por las copas) | brinca: cadera +0,12 m y rodilla alta; en el plano general el niño mide 10 px y el brinco es un salto de 2 px: se ve que se mueve, no la rodilla | **mejorado** (era un balanceo que parecía estar de pie); la lectura fina es con zoom | niños quietos de pie en sus sitios de juego en el plano general 7/60 |
-| throw | hoja `AN-3/gestures/throw-villager-sheet.png` (pelota sujeta, carga atrás con giro, barrido adelante); `life-play-throw.test.ts`, `work-gestures.test.ts` | — | **preview-only**: en las semillas de las tomas no hay pelota; queda la toma de integración pendiente | — |
+| throw | hoja `AN-3/gestures/throw-villager-sheet.png` (pelota sujeta, carga atrás con giro, barrido adelante); `life-play-throw.test.ts`, `work-gestures.test.ts` | — | **preview-only por decisión del dueño**: los trastos sueltos (la pelota) van apagados en la partida desde el 15 sep 2026 por decisión del dueño del diseño —«eran el descarte de físicas»—: `createVillage` no recibe `props: true` en el juego, y `tests/journeys/life-props.test.ts` los prueba encendidos por si vuelven. La rama sólo se activa con un trasto de verdad en la mano (`holding >= 0`, AN-4b). **Decisión para Vera:** conservar `throw` para cuando vuelvan los trastos, o retirarlo | — |
 | drink | hoja `AN-2/gestures/drink-villager-sheet.png`; pozo y vado en el plano general 11/21 (51, 56, 10, 46) | la cabeza atrás se ve como silueta | **mejorado** | — |
 | sort | hoja `AN-2/gestures/sort-villager-sheet.png`; granero en el plano general 11/21 (16) | doblarse a por la cosa se ve | **mejorado** | — |
 | shelter | plano general 11/21 con lluvia (117 muestras) | brazos cruzados bajo el alero | **conservado** | — |
