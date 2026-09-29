@@ -30,6 +30,13 @@ export interface Animal {
   action?: 'walk' | 'attack' | 'charge' | 'flight' | 'flee' | 'down' | 'run' | 'bark' | 'play' | 'takeoff' | undefined;
   /** Elevación escénica sobre el relieve; sólo la perdiz al huir la usa. */
   altitude?: number;
+  /**
+   * AN-1 · Hacia dónde mira, en radianes como `Body.facing` (cero mira a +z).
+   * Lo pone la vida cuando el cuerpo lo tiene —con la histéresis de
+   * `body.ts`, y el perro encarado al forastero al que ladra—; sin él, el
+   * render lo deduce del desplazamiento, como hacía con todos hasta esta ronda.
+   */
+  facing?: number;
 }
 
 /**

@@ -133,6 +133,6 @@ export function stepBear(bear: Bear, land: Terrain, seed: number, step: number,
 
 export function bearPosition(bear: Bear | null): Animal[] {
   if (bear === null || bear.phase === 'gone') return [];
-  return [{ id: bear.body.id, kind: 'bear', x: bear.body.x, y: bear.body.z,
+  return [{ id: bear.body.id, kind: 'bear', x: bear.body.x, y: bear.body.z, facing: bear.body.facing,
     action: bear.phase === 'warning' ? 'attack' : undefined }];
 }

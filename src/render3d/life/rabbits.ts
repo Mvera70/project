@@ -177,7 +177,7 @@ export function stepRabbits(
 
 export function rabbitPositions(rabbits: readonly Rabbit[], step: number): Animal[] {
   return rabbits.filter(rabbit => rabbit.out).map(rabbit => ({
-    id: rabbit.body.id, kind: 'rabbit' as const, x: rabbit.body.x, y: rabbit.body.z,
+    id: rabbit.body.id, kind: 'rabbit' as const, x: rabbit.body.x, y: rabbit.body.z, facing: rabbit.body.facing,
     action: step < rabbit.fleeingUntil && Math.hypot(rabbit.body.vx, rabbit.body.vz) > 0.01 ? 'flee' as const
       : Math.hypot(rabbit.body.vx, rabbit.body.vz) > 0.01 ? 'walk' as const : undefined,
   }));

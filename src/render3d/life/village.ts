@@ -1598,7 +1598,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     get wildlife(): readonly Animal[] {
       return [...deerPositions(deer), ...rabbitPositions(rabbits, steps), ...dogPosition(dog),
         ...foxPosition(fox), ...duckPositions(ducks), ...visitors.flatMap(beastOf), ...bearPosition(bear), ...(wolf !== null && wolf.phase !== 'gone'
-        ? [{ id: wolf.body.id, kind: 'wolf' as const, x: wolf.body.x, y: wolf.body.z }]
+        ? [{ id: wolf.body.id, kind: 'wolf' as const, x: wolf.body.x, y: wolf.body.z, facing: wolf.body.facing }]
         : [])];
     },
     get bearDen() {

@@ -2267,6 +2267,7 @@ export async function createGraphicsRenderer(
         ...mountainWolves(shown.map, shown.terrainSeed, frame.presentationSeconds),
         ...life.beasts.map(beast => ({
         id: beast.dweller.body.id, kind: beast.kind, x: beast.dweller.body.x, y: beast.dweller.body.z,
+        facing: beast.dweller.body.facing,
       }))], frame.presentationSeconds);
       // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
       // no depende de nada de ello: solo de la hora.

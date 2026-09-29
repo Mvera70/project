@@ -67,14 +67,16 @@ for (const asset of catalog.assets) {
       for (let k = 1; k < track.length; k += 1) if (track[k]!.y < ground + lift && track[k - 1]!.y < ground + lift) planted.push(track[k]!.clone().sub(track[k - 1]!).dot(forward) / dt);
       const mean = planted.length === 0 ? NaN : planted.reduce((s, v) => s + v, 0) / planted.length;
       // Apoyado, el pie retrocede a la velocidad del cuerpo: −bodySpeed. slip = 1 − (−mean / bodySpeed).
-      // La zancada medida: lo que el pie apoyado retrocede en un ciclo entero es lo que el cuerpo avanza.
-      measured.push(-mean * clip.duration);
+      // La zancada medida: lo que el pie apoyado retrocede en un ciclo entero es lo
+      // que el cuerpo avanza. Sólo con pies que son huesos: en un modelo de nodos
+      // rígidos el vértice más bajo de la pata cambia al girar y la cifra no vale.
+      if (node instanceof Bone) measured.push(-mean * clip.duration);
       report.push(`${name}: plant ${(planted.length / samples * 100).toFixed(0)}% footBack ${(-mean / bodySpeed).toFixed(2)}×`);
     }
     const cad = PACE[asset.id]!.map(p => `${p}→${(p / stride).toFixed(1)}Hz`).join(' ');
     const avg = measured.filter(Number.isFinite);
     const measuredStride = avg.length === 0 ? NaN : avg.reduce((s, v) => s + v, 0) / avg.length;
-    console.log(`${asset.id.padEnd(18)} ${m.name.padEnd(10)} stride ${stride.toFixed(3)} (medida ${measuredStride.toFixed(3)}) dur ${clip.duration.toFixed(2)} natural ${bodySpeed.toFixed(3)} c/s | ${cad} | lift ${heightRange.toFixed(3)} | ${report.join(' · ')}`);
+    console.log(`${asset.id.padEnd(18)} ${m.name.padEnd(10)} stride ${stride.toFixed(3)} (medida ${Number.isFinite(measuredStride) ? measuredStride.toFixed(3) : 'no fiable: nodos rígidos'}) dur ${clip.duration.toFixed(2)} natural ${bodySpeed.toFixed(3)} c/s | ${cad} | lift ${heightRange.toFixed(3)} | ${report.join(' · ')}`);
     action.stop(); mixer.uncacheRoot(scene);
   }
 }
