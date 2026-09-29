@@ -1,5 +1,22 @@
 # Animación integral de aldeanos y animales para móvil — el plan (AN)
 
+> **El encargo original apareció a media tanda (rama `art/astra-modelos`,
+> commit `ae444f7`, 29 sep 2026): `docs/encargos/animacion-integral-goal.md` y
+> la primera versión de este plan.** Este fichero se reconstruyó del bloque
+> `/goal` antes de tenerlos, y al cruzarlos coinciden en alcance y fases. Lo
+> que el original añade y aquí queda incorporado: la lista de ficheros de
+> producción de AN-1 (`clips.ts`, `world/cast.ts`, `animal-motion.ts`,
+> `animal-gestures.ts`; `action-clips.ts` sólo para `flee`; **todo lo demás,
+> `life/` incluido, con brief** — de ahí el brief AN-1b de §6, retroactivo),
+> los instrumentos por nombre (`gesture-sheet`, `animals-preview`,
+> `observe-life` a 15 fps durante 4–8 s), la lectura en **390×844 y 320×568**,
+> la regla de que **una mejora que sólo se aprecia en primer plano no pasa**
+> (por eso AN-4 entrega comparaciones a escala nativa además de las de zoom),
+> el índice de tomas finales, y decir en el informe **qué falló y qué
+> observación refutaría cada mejora**. Su sección «Qué significa mejor» y su
+> «Regla de cierre» van al final de este fichero tal cual.
+
+
 **Fecha:** 29 sep 2026. **Estado:** ronda abierta con `/goal`; el punto exacto
 va en `docs/task-log.md`. **Fila del plan:** `docs/plan-meta.md`, sección AN.
 
@@ -271,6 +288,36 @@ el talón. **Lo que no arregla, y es decisión del dueño:** a 3–5 m/s reales 
 gente sigue yendo deprisa; un clip de trote (dos pies en el aire) bajaría la
 cadencia a 1,8–2,8 Hz con el mismo paso, pero cambia el carácter del valle.
 
+### AN-1b · El rumbo de la vida y las carreras por suelo recorrido (brief retroactivo, ejecutado el 29 sep 2026)
+
+**Defecto medido (AN-0).** `AnimalMotion.place` giraba el cuerpo hacia el
+desplazamiento de píxel entre dos fotogramas con un umbral de 0,00001 celdas
+e ignoraba el `facing` que la vida ya calcula con histéresis: un animal
+apretado contra una valla o entre vecinos oscilaba de cara, y el perro ladraba
+hacia donde iba y no hacia el forastero. `charge` del jabalí y `flee` del
+conejo iban por reloj (patinaban 0,96 y 2,1 celdas por ciclo); los gestos
+entraban a peso 1 de golpe; el zorro se acercaba al gallinero a 7,3 ciclos de
+pata por segundo.
+
+**Módulos fuera de la lista de AN-1 del encargo, y por qué.**
+`src/derive/animals.ts` (un campo de presentación, `facing?: number`, del
+mismo tipo que `Body.facing`) y la línea que emite `Animal` en `life/village.ts`,
+`companions.ts`, `deer.ts`, `bear.ts`, `rabbits.ts`, `wild-prey.ts`,
+`hunt-encounter.ts` y `renderer.ts`: la vida **ya sabía** hacia dónde miraba
+cada cuerpo y no lo contaba; no se cambia conducta, sólo se publica un dato
+que existía. Y `companions.ts`, `FOX_PACE` 0,95 → 0,6 (TUNE, medido: la
+zancada del zorro es 0,13 y el clip no se puede alargar sin receta).
+
+**Vía.** `effects/animal-motion.ts` (en la lista): rumbo de la vida si llega,
+si no el avance neto ≥ 0,05 celdas; giro suavizado a 12 s⁻¹; `charge`/`flee`
+por distancia con la zancada del catálogo (`FLEE_HOP` ×2,2 para el brinco);
+fundidos de 0,08/0,10/0,14 s; caer con constante de 0,14 s.
+
+**Prueba.** Cinco propiedades en `tests/fast/graphics-animal-motion.test.ts`
+(la cara sigue al rumbo; el ruido no la mueve; la pata no se mueve quieto y
+se mueve al avanzar en `charge` y `flee`; el primer fotograma de un gesto
+pesa < 0,6; caer tarda). Ejecutado en `c7755bf`.
+
 ### AN-2a · La pelota sale de la mano (brief, 29 sep 2026)
 
 **Defecto medido.** `play` es un balanceo de brazos abiertos sobre `idle`
@@ -371,3 +418,24 @@ conservar con motivo / `preview-only` / encargo).
 
 Está en `docs/medidas/animacion-matriz-2026-09-29.md` para que las tomas y las
 cifras vivan con la evidencia y este plan se quede con el porqué.
+
+---
+
+## 9 · Del encargo original (ae444f7), tal cual
+
+### Qué significa «mejor»
+
+La [guía de animación de Atlas](https://github.com/MonumentalSystems/Atlas-Agent-Teams/blob/main/teams/3d-design/skills/animation/SKILL.md) propone revisar poses, anticipación, peso, continuidad y mezclas. En The Valley esas preguntas se convierten en observaciones a tamaño de juego, no en una lista de efectos nuevos:
+
+- **Movimiento:** patas y pies alternan apoyos; al apoyar, no resbalan; la orientación acompaña la trayectoria sin giro brusco; parar y reanudar conserva continuidad.
+- **Acción:** se distingue preparación, acto y recuperación cuando el gesto lo necesita; herramienta, presa, suelo u objeto reaccionan en el mismo instante; el cuerpo comunica peso sin gesticular fuera de escala.
+- **Especie y edad:** vaca, gallina, pez, perro y aldeano no comparten el mismo ritmo por accidente; niño y mayor conservan una marcha plausible con sus tallas reales.
+- **Lectura móvil:** se entiende en cámara normal a 390×844 y en pantalla estrecha de 320×568. Un primer plano puede diagnosticar, pero no basta para aprobar.
+- **Coste:** no se cambia una animación por más draw calls, huesos, clips o trabajo de CPU sin comparar la base. La skill local `.claude/skills/performance/SKILL.md` deja claro que los FPS de SwiftShader no representan un teléfono; la última aceptación es en un aparato real.
+
+Un clip que ya cumple estos criterios puede conservarse, con evidencia. «Todas» exige **revisar cada fila y cada gesto**, corregir los defectos detectados y documentar por qué se mantienen los que ya funcionan; no exige introducir cambios arbitrarios en cada archivo.
+
+### Regla de cierre del programa
+
+No se declara «animaciones terminadas» por tener clips conectados o pruebas verdes. Se cierra AN-4 cuando la matriz cubra los 24 clips humanos, las quince especies y las aves ambientales; las acciones con contacto coincidan con sus hechos; las secuencias reales se lean en móvil; y el coste esté comparado con la base. Los casos que no puedan provocarse en una partida se identifican como límite y reciben una toma de integración en cuanto exista ruta para verla.
+

@@ -151,7 +151,7 @@ compara en AN-4.
 | Villa, plano general | 7 · 60 · 20 s, 2 fps × 20 s | 390×844 | Cien personas, mayores, guarnición | `…/wide-seed7-y60/` |
 | Gallinas, patos | 11 · 21 · 20 s, 15 fps × 6 s | `--look 31.5,48.6` / `--look 36.5,54`, `--zoom 0.18` | Reposo y picoteo del corral; los patos a la deriva en el agua | `…/hens-seed11-y21/`, `…/ducks-seed11-y21/` (`strip-0-16.png`) |
 | Niño andando, villa (AN-1) | 7 · 60 · 20 s, 15 fps × 6 s | `--follow 242 --zoom 0.18` | La marcha a talla 0,64 antes (GLB de G-17, `--page artifacts/graphics/AN-1/game-before/valley.html`) y después (AN-1a), mismo estado | `artifacts/graphics/AN-1/before/walk-seed7-y60-child242/`, `…/after/walk-seed7-y60-child242/` (`strip-30-45.png`) |
-| Adulto andando, villa (AN-1) | 7 · 60 · 20 s, 15 fps × 6 s | `--follow 114` → **bajo la copa del bosque, no sirve**; se repite con `--follow 208` | El par antes/después del adulto en la villa | `…/AN-1/before/walk-seed7-y60-follow208/`, `…/after/walk-seed7-y60-follow208/` |
+| Adulto andando, villa (AN-1) | 7 · 60 · 20 s, 15 fps × 6 s | `--follow 114` → **bajo la copa del bosque, no sirve**; se repite con `--follow 208 --zoom 0.18` | El par antes/después del adulto en la villa: en los mismos 16 fotogramas (1,07 s) el «después» abre la pierna adelante y da menos pasos; el «antes» va con las piernas juntas | `…/AN-1/before/walk-seed7-y60-follow208/strip-30-45.png`, `…/after/walk-seed7-y60-follow208/strip-30-45.png` |
 | Ciervo | 11 · 21 · 20 s, 15 fps × 6 s | `--look 21.4,37.7` | **Tapado por la copa del bosque desde la cámara del juego**: el ciervo vive en la linde y el encuadre de reposo lo pierde; su evidencia en partida se toma en la caza (AN-3), donde el bosque se atenúa | `…/deer-seed11-y21/` |
 
 **La traza (AN-1).** En las seis tomas de seguimiento a 15 fps —semillas 11 y
@@ -212,7 +212,12 @@ Los gestos cotidianos, medidos sobre el rig publicado con el `Cast` real
 (`tests/fast/work-gestures.test.ts`, «AN-2 · los gestos cotidianos se leen a
 veinte píxeles») y en las hojas de `artifacts/graphics/AN-2/gestures/`. En
 partida: `artifacts/graphics/AN-2/after/` (plano general de la semilla 11,
-el herrero 27, el niño 60 sentado, el niño 224 de la semilla 7 lanzando).
+el herrero 27 con sus chispas —`hammer-seed11-y21-follow27/strip-30-53.png`—,
+el niño 60 sentado a la comida —`sit-seed11-y21-follow60/`—). La toma que
+buscaba un lanzamiento (niño 224, semilla 7) no lo encontró: en ese valle no
+hay pelota y los niños brincan en su sitio de juego; `throw` queda con la
+hoja y la propiedad, y una toma de integración pendiente de un valle con
+pelota.
 
 | Gesto | Antes | Después | Medida |
 |---|---|---|---|
