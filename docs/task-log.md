@@ -45,6 +45,18 @@ prueba quiere la lista de fauna vacía en una semana sin lobo y la lista trae
 ciervos, perro y patos desde el valle más vivo. No son de esta ronda y no
 están entre las dos rojas declaradas: quedan anotadas aquí.
 
+**La puerta de la PR #2** (29 sep, 19:20–20:05), antes de integrarla en
+`main`: la CI se corta a los 10 minutos en `fast` y en `browser`, igual que
+las siete últimas ejecuciones de `main` (la CI rota del 28 sep, más abajo).
+`test:pwa`, 6 de 6. `test:shots` en local, con el Chromium del contenedor:
+**14 rojas de 22 en la rama y 13 en `main` (`efafc2e`)**, las mismas prueba a
+prueba salvo una. Son las del rediseño de interfaz que el 28 sep contaba en
+12. La que cambia es «alguien sube por el camino… (M-0)», y a solas
+**también falla en `main`**. Espera 20 s a que el lienzo 3D pase de 300 px, y
+aquí el relevo tarda de 18 a 30 s desde `data-app-ready` en las dos ramas por
+igual: tres cargas en cada una y ningún error de página. El umbral está en el
+filo en una máquina sin GPU, y la rama no lo mueve.
+
 ## 29 sep 2026 · ¿Decide la física las batallas? F-0, la flecha que toca, en sombra
 
 Vera, con `/goal` al cerrar la animación: «me preocupa que tener Rapier para
