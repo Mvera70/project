@@ -1,5 +1,5 @@
 {
-  "note": "Ilustraciones de cronica aprobadas y normalizadas a 640x512. Lo que no figure aqui cae al respaldo visual.",
+  "note": "44 escenas de crónica a color, normalizadas a 640x512; los nombres sustituyen exactamente al sepia. Las siete piezas adicionales de la carpeta raíz no son escenas indexadas.",
   "art": [
     { "name": "founding", "file": "founding.png" },
     { "name": "season-spring", "file": "season-spring.png" },

@@ -3357,3 +3357,15 @@ comprobado en `qa-compass.json`; no conectada a la cámara real en esta maqueta.
 Tres acabados ImageGen para mandos (marfil, pizarra, hierro); Vera eligió marfil
 para la fila de vista/pausa/velocidad/caza. Su petición de conservar todas las alternativas queda en
 README y skill `piel-del-valle`. No se ejecutaron pruebas del juego.
+# 29 sep 2026 · V9 publicada y crónica a color
+
+Capturadas en el juego desplegado seis pantallas a 390×844 y 320×568, junto a
+las maquetas. El tablón pierde seis texturas por URLs que apuntan a la raíz
+en vez de `/assets/`; a 320 el mando de vista intercepta el toque del tablón.
+Portada con placa de madera y encrucijada sin canto superior, ambas piezas
+existentes. Evidencia en `ui-redesign/auditoria-v9-juego-2026-09-29/`.
+Las 44 escenas indexadas de crónica están a color, 37 ImageGen nuevas y siete
+V6 aprobadas, con sus nombres intactos en `public/ui/art/index.json`. La cifra
+51 era el total de PNG de la carpeta, que incluye siete piezas no indexadas.
+Sepia original, maestros, prompts y prueba en la UI real conservados en
+`ui-redesign/cronica-color-v9-2026-09-29/`.

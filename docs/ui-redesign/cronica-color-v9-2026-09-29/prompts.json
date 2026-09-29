@@ -1,0 +1,237 @@
+{
+  "generator": "built-in ImageGen",
+  "approved_style_reference": "docs/ui-redesign/laminas-v6-2026-09-28/colour/birth.png",
+  "generated": [
+    {
+      "id": "founding",
+      "prompt": "Edit target: sepia founding.png. Style reference: approved colour birth.png. Repaint the sepia image into the same approved richly painted medieval storybook style: warm daylight, natural vivid colour, soft outlines and detailed but gentle brushwork. Preserve the exact landscape 5:4 composition and subjects: a medieval man carrying a sack on the left, a woman with a basket beside him, both seen from behind walking toward the river and distant small valley village; tree framing upper left, winding river through green hills. Do not add or remove characters or change their pose, framing, or horizon. No text, no border. Opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/founding.png",
+      "source": "public/ui/art/founding.png"
+    },
+    {
+      "id": "season-spring",
+      "prompt": "Edit target: sepia season-spring.png. Style reference: approved colour birth.png. Repaint the target into the same richly painted medieval storybook style, natural warm colors, soft outlines and gentle brushwork. Preserve the target's 5:4 landscape composition exactly: two medieval villagers planting or tending the spring field in the foreground, tree and river valley with village in the distance; same number of figures, their positions, poses and perspective. No text, no border, opaque full-bleed image. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/season-spring.png",
+      "source": "public/ui/art/season-spring.png"
+    },
+    {
+      "id": "season-summer",
+      "prompt": "Edit target: sepia season-summer.png. Style reference: approved colour birth.png. Repaint to match that approved rich medieval storybook painting, natural season-appropriate colours, warm top-left light, gentle brushwork and soft outlines. The scene is four villagers working together in a sunlit summer meadow by the river, tree left and village far behind. Preserve the target image's exact 5:4 landscape composition, figure count, positions, poses, perspective, tree framing, river and distant village; change colour and surface finish only. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/season-summer.png",
+      "source": "public/ui/art/season-summer.png"
+    },
+    {
+      "id": "season-autumn",
+      "prompt": "Edit target: sepia season-autumn.png. Style reference: approved colour birth.png. Repaint to match that approved rich medieval storybook painting, natural season-appropriate colours, warm top-left light, gentle brushwork and soft outlines. The scene is villagers carrying the autumn harvest along a river path with trees and village behind. Preserve the target image's exact 5:4 landscape composition, figure count, positions, poses, perspective, tree framing, river and distant village; change colour and surface finish only. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/season-autumn.png",
+      "source": "public/ui/art/season-autumn.png"
+    },
+    {
+      "id": "season-winter",
+      "prompt": "Edit target: sepia season-winter.png. Style reference: approved colour birth.png. Repaint to match that approved rich medieval storybook painting, natural season-appropriate colours, warm top-left light, gentle brushwork and soft outlines. The scene is two villagers in cloaks walking beside the cold river toward the snow-covered village. Preserve the target image's exact 5:4 landscape composition, figure count, positions, poses, perspective, tree framing, river and distant village; change colour and surface finish only. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/season-winter.png",
+      "source": "public/ui/art/season-winter.png"
+    },
+    {
+      "id": "famine",
+      "prompt": "Edit target: sepia famine.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a worried man and woman seated at a wooden table in a sparse cottage, little food, a river valley visible through the window. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic setting. Accurate medieval materials and clothing. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/famine.png",
+      "source": "public/ui/art/famine.png"
+    },
+    {
+      "id": "plague",
+      "prompt": "Edit target: sepia plague.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a woman tending a feverish person in a cottage bed, distant river valley through the doorway. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic setting. Accurate medieval materials and clothing. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/plague.png",
+      "source": "public/ui/art/plague.png"
+    },
+    {
+      "id": "lost",
+      "prompt": "Edit target: sepia lost.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two villagers facing the remains of a damaged small house in the village, river hills behind. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic setting. Accurate medieval materials and clothing. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/lost.png",
+      "source": "public/ui/art/lost.png"
+    },
+    {
+      "id": "road",
+      "prompt": "Edit target: sepia road.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a man and a woman carrying travel bags walking along the river road with village across the water. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic setting. Accurate medieval materials and clothing. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/road.png",
+      "source": "public/ui/art/road.png"
+    },
+    {
+      "id": "grudge",
+      "prompt": "Edit target: sepia grudge.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a man and a woman turned away from one another after a quarrel on a village path by the river. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic setting. Accurate medieval materials and clothing. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/grudge.png",
+      "source": "public/ui/art/grudge.png"
+    },
+    {
+      "id": "succession",
+      "prompt": "Edit target: sepia succession.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two medieval men passing a wooden staff of leadership on the river road. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic river valley. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/succession.png",
+      "source": "public/ui/art/succession.png"
+    },
+    {
+      "id": "flood",
+      "prompt": "Edit target: sepia flood.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two villagers watching the swollen river and a third figure struggling near its bank. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic river valley. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/flood.png",
+      "source": "public/ui/art/flood.png"
+    },
+    {
+      "id": "wolf",
+      "prompt": "Edit target: sepia wolf.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a lone villager with a staff facing wolves at the forest edge. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic river valley. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/wolf.png",
+      "source": "public/ui/art/wolf.png"
+    },
+    {
+      "id": "fish",
+      "prompt": "Edit target: sepia fish.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a standing villager fishing with a rod and another sitting by the river. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic river valley. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/fish.png",
+      "source": "public/ui/art/fish.png"
+    },
+    {
+      "id": "bear",
+      "prompt": "Edit target: sepia bear.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a lone man with a staff confronted by a brown bear on the meadow path. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic river valley. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/bear.png",
+      "source": "public/ui/art/bear.png"
+    },
+    {
+      "id": "child",
+      "prompt": "Edit target: sepia child.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two villagers searching the river path for a small child visible in the distance. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic river valley. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/child.png",
+      "source": "public/ui/art/child.png"
+    },
+    {
+      "id": "means-plough",
+      "prompt": "Edit target: sepia means-plough.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two medieval villagers working a simple wooden plough together beside a field. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic river valley. Show historically plausible medieval tools and materials. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-plough.png",
+      "source": "public/ui/art/means-plough.png"
+    },
+    {
+      "id": "means-pigs",
+      "prompt": "Edit target: sepia means-pigs.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two realistic stocky medieval domestic pigs in a pen, tended by two villagers; natural animals, never cute or cartoonish. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic river valley. Show historically plausible medieval tools and materials. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-pigs.png",
+      "source": "public/ui/art/means-pigs.png"
+    },
+    {
+      "id": "means-axe",
+      "prompt": "Edit target: sepia means-axe.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two villagers exchanging a practical woodcutting axe beside a stack of logs. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic river valley. Show historically plausible medieval tools and materials. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-axe.png",
+      "source": "public/ui/art/means-axe.png"
+    },
+    {
+      "id": "means-relic",
+      "prompt": "Edit target: sepia means-relic.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a villager receiving a small relic from a cleric outside a stone chapel. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic river valley. Show historically plausible medieval tools and materials. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-relic.png",
+      "source": "public/ui/art/means-relic.png"
+    },
+    {
+      "id": "means-arms",
+      "prompt": "Edit target: sepia means-arms.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two villagers examining spears and a round shield by a wooden watchtower. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and historic river valley. Show historically plausible medieval tools and materials. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-arms.png",
+      "source": "public/ui/art/means-arms.png"
+    },
+    {
+      "id": "means-bows",
+      "prompt": "Edit target: sepia means-bows.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two medieval villagers inspecting simple longbows and arrows beside a wooden fence. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and medieval buildings and river valley. Historically plausible materials, no fantasy elements. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-bows.png",
+      "source": "public/ui/art/means-bows.png"
+    },
+    {
+      "id": "means-tower",
+      "prompt": "Edit target: sepia means-tower.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a family and builders gathered beside a newly built timber watchtower. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and medieval buildings and river valley. Historically plausible materials, no fantasy elements. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-tower.png",
+      "source": "public/ui/art/means-tower.png"
+    },
+    {
+      "id": "means-gate",
+      "prompt": "Edit target: sepia means-gate.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two carpenters raising a heavy wooden gate inside a palisade. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and medieval buildings and river valley. Historically plausible materials, no fantasy elements. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-gate.png",
+      "source": "public/ui/art/means-gate.png"
+    },
+    {
+      "id": "means-hand",
+      "prompt": "Edit target: sepia means-hand.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a weary traveller with a cloth bundle welcomed by a villager beside newly built houses. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and medieval buildings and river valley. Historically plausible materials, no fantasy elements. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-hand.png",
+      "source": "public/ui/art/means-hand.png"
+    },
+    {
+      "id": "means-ale",
+      "prompt": "Edit target: sepia means-ale.png. Style reference: approved colour birth.png. Repaint to match that approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: villagers rolling a wooden ale barrel into the village while others prepare a small table. Preserve the target's specific 5:4 landscape composition, figure count, poses, spatial arrangement and medieval buildings and river valley. Historically plausible materials, no fantasy elements. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-ale.png",
+      "source": "public/ui/art/means-ale.png"
+    },
+    {
+      "id": "raid-coming",
+      "prompt": "Edit target: sepia raid-coming.png. Style reference: approved colour birth.png. Repaint into the same richly painted medieval storybook style, with restrained natural colours appropriate to a tense raid, soft outlines and visible brushwork. Scene: a mounted messenger on a hillside pointing toward distant smoke and the village below. Preserve the sepia target's exact 5:4 landscape composition, viewpoint, number and placement of figures, poses, gate and village geography. Historically plausible weapons and clothing; no graphic gore or fantasy. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-coming.png",
+      "source": "public/ui/art/raid-coming.png"
+    },
+    {
+      "id": "raid-paid",
+      "prompt": "Edit target: sepia raid-paid.png. Style reference: approved colour birth.png. Repaint into the same richly painted medieval storybook style, with restrained natural colours appropriate to a tense raid, soft outlines and visible brushwork. Scene: villagers handing a heavy chest and goods to armed riders on the road to avert a raid. Preserve the sepia target's exact 5:4 landscape composition, viewpoint, number and placement of figures, poses, gate and village geography. Historically plausible weapons and clothing; no graphic gore or fantasy. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-paid.png",
+      "source": "public/ui/art/raid-paid.png"
+    },
+    {
+      "id": "raid-sack",
+      "prompt": "Edit target: sepia raid-sack.png. Style reference: approved colour birth.png. Repaint into the same richly painted medieval storybook style, with restrained natural colours appropriate to a tense raid, soft outlines and visible brushwork. Scene: raiders carrying sacks of goods out of an unwalled village while frightened villagers stand aside. Preserve the sepia target's exact 5:4 landscape composition, viewpoint, number and placement of figures, poses, gate and village geography. Historically plausible weapons and clothing; no graphic gore or fantasy. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-sack.png",
+      "source": "public/ui/art/raid-sack.png"
+    },
+    {
+      "id": "raid-walled",
+      "prompt": "Edit target: sepia raid-walled.png. Style reference: approved colour birth.png. Repaint into the same richly painted medieval storybook style, with restrained natural colours appropriate to a tense raid, soft outlines and visible brushwork. Scene: armed defenders outside a newly enclosed wooden palisade, watching raiders approach. Preserve the sepia target's exact 5:4 landscape composition, viewpoint, number and placement of figures, poses, gate and village geography. Historically plausible weapons and clothing; no graphic gore or fantasy. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-walled.png",
+      "source": "public/ui/art/raid-walled.png"
+    },
+    {
+      "id": "raid-assault",
+      "prompt": "Edit target: sepia raid-assault.png. Style reference: approved colour birth.png. Repaint into the same richly painted medieval storybook style, with restrained natural colours appropriate to a tense raid, soft outlines and visible brushwork. Scene: armoured medieval attackers pressing against a high timber gate while defenders stand above. Preserve the sepia target's exact 5:4 landscape composition, viewpoint, number and placement of figures, poses, gate and village geography. Historically plausible weapons and clothing; no graphic gore or fantasy. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-assault.png",
+      "source": "public/ui/art/raid-assault.png"
+    },
+    {
+      "id": "raid-held",
+      "prompt": "Edit target: sepia raid-held.png. Style reference: approved colour birth.png. Repaint into the same richly painted medieval storybook style, with restrained natural colours appropriate to a tense raid, soft outlines and visible brushwork. Scene: an intact closed timber gate after the assault, with raiders withdrawing in the distance. Preserve the sepia target's exact 5:4 landscape composition, viewpoint, number and placement of figures, poses, gate and village geography. Historically plausible weapons and clothing; no graphic gore or fantasy. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-held.png",
+      "source": "public/ui/art/raid-held.png"
+    },
+    {
+      "id": "raid-stormed",
+      "prompt": "Edit target: sepia raid-stormed.png. Style reference: approved colour birth.png. Repaint into the same richly painted medieval storybook style, with restrained natural colours appropriate to a tense raid, soft outlines and visible brushwork. Scene: a timber village gate broken open and raiders entering through it. Preserve the sepia target's exact 5:4 landscape composition, viewpoint, number and placement of figures, poses, gate and village geography. Historically plausible weapons and clothing; no graphic gore or fantasy. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-stormed.png",
+      "source": "public/ui/art/raid-stormed.png"
+    },
+    {
+      "id": "wall-closed",
+      "prompt": "Edit target: sepia wall-closed.png. Style reference: approved colour birth.png. Repaint to match the approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a complete timber palisade enclosing the entire medieval village, seen from a rise across the river. Preserve the target's specific 5:4 landscape composition, viewpoint, structure size and placement, number and pose of figures, river valley and village geography. Historically plausible construction and materials. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/wall-closed.png",
+      "source": "public/ui/art/wall-closed.png"
+    },
+    {
+      "id": "built-gate",
+      "prompt": "Edit target: sepia built-gate.png. Style reference: approved colour birth.png. Repaint to match the approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two medieval carpenters fitting a massive timber gate between tall palisade posts. Preserve the target's specific 5:4 landscape composition, viewpoint, structure size and placement, number and pose of figures, river valley and village geography. Historically plausible construction and materials. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/built-gate.png",
+      "source": "public/ui/art/built-gate.png"
+    },
+    {
+      "id": "built-wall",
+      "prompt": "Edit target: sepia built-wall.png. Style reference: approved colour birth.png. Repaint to match the approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: two medieval builders placing stone blocks against a section of sturdy village wall. Preserve the target's specific 5:4 landscape composition, viewpoint, structure size and placement, number and pose of figures, river valley and village geography. Historically plausible construction and materials. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/built-wall.png",
+      "source": "public/ui/art/built-wall.png"
+    },
+    {
+      "id": "built-watchtower",
+      "prompt": "Edit target: sepia built-watchtower.png. Style reference: approved colour birth.png. Repaint to match the approved richly painted medieval storybook style, natural warm colours, soft outlines, gentle brushwork and top-left light. Scene: a finished timber watchtower over the village gate with a dirt road leading to it. Preserve the target's specific 5:4 landscape composition, viewpoint, structure size and placement, number and pose of figures, river valley and village geography. Historically plausible construction and materials. No text, no border, opaque full-bleed illustration. Intended final export 640x512.",
+      "master": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/built-watchtower.png",
+      "source": "public/ui/art/built-watchtower.png"
+    }
+  ],
+  "previously_approved": [
+    "birth",
+    "death",
+    "harvest",
+    "built",
+    "pedlar",
+    "wedding",
+    "fire"
+  ]
+}

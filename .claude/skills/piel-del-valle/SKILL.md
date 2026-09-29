@@ -5,6 +5,27 @@ description: El estándar visual de la interfaz de The Valley: qué papel, qué 
 
 # La piel del valle: un estándar, no un catálogo de excepciones
 
+## Estado V9 desplegado y auditado · 29 sep 2026
+
+V9 está integrada en `main` (`d9f0fb9`, `c0b94a0`) y publicada. Antes de
+atribuir una diferencia visual al diseño, capturar el juego real a 390×844 y
+320×568 y compararlo con la maqueta del mismo estado. La auditoría está en
+`docs/ui-redesign/auditoria-v9-juego-2026-09-29/README.md`.
+
+En el tablón publicado, seis PNG de ImageGen existen en `/assets/`, pero la
+hoja de estilos inyectada solicita sus URLs relativas desde la raíz y obtiene
+404. Al faltar `frame-parchment`, el texto oscuro queda sobre madera: es una
+incidencia de ruta, no un encargo de textura. A 320 px el mando de vista tapa
+el punto tocable del tablón; comprobar prioridades de toque en esa resolución.
+La portada usa `plaque-wood` donde la maqueta eligió la placa fina de latón;
+la encrucijada omite el `parchment-sheet-edge.png` que ya existe. Reutilizar
+esas piezas antes de pedir otras al generador.
+
+El inventario real de crónica es de **44 archivos indexados**, no 51: siete
+PNG de la carpeta son soporte visual, adornos o portada. El lote completo
+de las 44 escenas a color, con sepia recuperable y claves idénticas, está en
+`docs/ui-redesign/cronica-color-v9-2026-09-29/README.md`.
+
 ## Revisión V9 · cinco correcciones de Vera · 29 sep 2026
 
 - Conservar la brújula como esfera hueca giratoria de 360°, con anillas de
@@ -87,8 +108,8 @@ comparativa es `docs/ui-redesign/propuesta-texturas-v9-2026-09-29.md`.
    inspección de las capturas. Registrar incidencias y corregir antes de dar
    por exportada una pieza.
 
-V9 termina como propuesta documental revisable; no autoriza por sí sola cambios
-de componentes o integración en el juego. No cambiar ubicación de controles:
+Las maquetas V9 son documentación revisable; la integración actual está en
+`main` y se juzga con capturas del juego. No cambiar ubicación de controles:
 para el carro y `Open the cart`, conservar exactamente la composición del
 estado base elegido y documentar la vista capturada.
 

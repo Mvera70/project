@@ -1,0 +1,486 @@
+[
+  {
+    "file": "founding.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/founding.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/founding.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "ef004318d5ae15412cc8a3d93737e1ea3c2c4dec7700332f8fa2a4a4ad439f7a"
+  },
+  {
+    "file": "season-spring.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/season-spring.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/season-spring.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "0e9a54a17d2d80e1bda5f95563e0b64eeb64a54aad97dc193439fbb2aacfac12"
+  },
+  {
+    "file": "season-summer.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/season-summer.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/season-summer.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "7b82061099e9cff27647ed1207203b55ac5a56202efdf585e70fbcca54d03aca"
+  },
+  {
+    "file": "season-autumn.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/season-autumn.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/season-autumn.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "950669585a82c9840c6bbf6711ed42f996d212ea5b79c7cff38da7b071a6dcc6"
+  },
+  {
+    "file": "season-winter.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/season-winter.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/season-winter.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "0e3a0323c8f1ec0a24334a4b04a2dfbff5b7d76f222f3356ce03c3fe9c7c9d77"
+  },
+  {
+    "file": "birth.png",
+    "source": "docs/ui-redesign/laminas-v6-2026-09-28/colour/birth.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/birth.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGBA",
+    "sha256": "cd4c616531233cc847afb81449e4cf7c3218d6ec6bceb79cdde37772f099a9bf"
+  },
+  {
+    "file": "death.png",
+    "source": "docs/ui-redesign/laminas-v6-2026-09-28/colour/death.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/death.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGBA",
+    "sha256": "43539003b7c6fc8053db18cf0771679f9b21c9151ecb39d34d518fad92b320c6"
+  },
+  {
+    "file": "harvest.png",
+    "source": "docs/ui-redesign/laminas-v6-2026-09-28/colour/harvest.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/harvest.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGBA",
+    "sha256": "1b3994e9788e41d62317c818ccddabb44e409649838b47112f3d486181c7767e"
+  },
+  {
+    "file": "famine.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/famine.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/famine.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "5f108c574eb7fa3d924f8d05cd40f08d09463a51fcc050fe6147c25308715150"
+  },
+  {
+    "file": "plague.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/plague.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/plague.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "b224f8406e2937da5c6ee03a1b8751581e6e41cac3478c35781bb4454a7d4552"
+  },
+  {
+    "file": "fire.png",
+    "source": "docs/ui-redesign/laminas-v6-2026-09-28/colour/fire.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/fire.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGBA",
+    "sha256": "c581303a3f3992159bb0309d4a88c94dbdcb404b51cd9f9edd5297449e494306"
+  },
+  {
+    "file": "built.png",
+    "source": "docs/ui-redesign/laminas-v6-2026-09-28/colour/built.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/built.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGBA",
+    "sha256": "c2a6576bfe9f81d2f138a9c34cec9188c4036a05a1879fa377230f6299bfb7d3"
+  },
+  {
+    "file": "lost.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/lost.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/lost.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "a6b005aa6229e6eae68bb512a1634aeaba4094c1c1ff71c59835d6c0a6b3b4a8"
+  },
+  {
+    "file": "road.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/road.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/road.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "b90e5c06a4bc83b8ff16988cbe528d07eb5bd794bc237a969db83ba2ad2d204d"
+  },
+  {
+    "file": "grudge.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/grudge.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/grudge.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "28a26744c3a5307c44491fb9d01737de202f2b0e6432c5d39b481b3bdcf8eeac"
+  },
+  {
+    "file": "succession.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/succession.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/succession.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "901e1ffa3aebb527f1d732e58c0359259b557f6d85f44787483e34b8d602b468"
+  },
+  {
+    "file": "flood.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/flood.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/flood.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "e13d03b745963c3ad3f268759ad6d219721d17f71510d75e8e68cd62d3d297fe"
+  },
+  {
+    "file": "wolf.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/wolf.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/wolf.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "e8d6821f251bcb6ae7aa7302221f2b11897bc66a415c5141847df2aa7be3a6a5"
+  },
+  {
+    "file": "wedding.png",
+    "source": "docs/ui-redesign/laminas-v6-2026-09-28/colour/wedding.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/wedding.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGBA",
+    "sha256": "488444a642098ae58533c75dae000553d68bfc7f744075b88551cd03652136a0"
+  },
+  {
+    "file": "pedlar.png",
+    "source": "docs/ui-redesign/laminas-v6-2026-09-28/colour/pedlar.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/pedlar.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGBA",
+    "sha256": "45390585cc45278ef810ba0c838fde078289aed261281f92fb8f731313d88a1c"
+  },
+  {
+    "file": "fish.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/fish.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/fish.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "d1a19a306c114d3e4a85c22a19057ede8eeccb3f13dc7c51c4a19bea63af9dfd"
+  },
+  {
+    "file": "bear.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/bear.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/bear.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "3604625b67449e489cbb2ca7a1e07d2b58602b4bb5ed24a90ed9014610e87c89"
+  },
+  {
+    "file": "child.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/child.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/child.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "03c2e04be74ff99f8ebe6272397c51336a28d44ff1e20f96f0e0c452cd1fec08"
+  },
+  {
+    "file": "means-plough.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-plough.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/means-plough.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "6db28e38f1ce788436fcbbd0da77d55dbc28b3e63c1cecf9944ce6415ad9b0b0"
+  },
+  {
+    "file": "means-pigs.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-pigs.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/means-pigs.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "338ff38b44ecadab57f0e88723f13c8a58d14bc0eae1c0a3748eade206eaa227"
+  },
+  {
+    "file": "means-axe.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-axe.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/means-axe.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "97cb765169f6a3d7b38b7dc99b05281375142806b881835e6a7ceda39facd828"
+  },
+  {
+    "file": "means-relic.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-relic.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/means-relic.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "7ae5f85fd6c2af9d225a91013d6b17bc321e1bb133c1f5812f6ad285087ff0ac"
+  },
+  {
+    "file": "means-arms.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-arms.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/means-arms.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "6ad0c9f24a5e6033ff363ef7052978c349c3289395a188dd74f07f475e2eca9c"
+  },
+  {
+    "file": "means-bows.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-bows.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/means-bows.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "556cb532ddb21a38092a7c293d7041723ee4ff56a477d3d787020d5b3bbcc6f0"
+  },
+  {
+    "file": "means-tower.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-tower.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/means-tower.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "424c6d5eb48c688ace93355bc2e90790879dc36633899b25db8a3b9ca65c4901"
+  },
+  {
+    "file": "means-gate.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-gate.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/means-gate.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "b4411527a3a95be34d7bc26cd41d9079c76c98e6e4506cbc8663043e02c1a3fb"
+  },
+  {
+    "file": "means-hand.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-hand.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/means-hand.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "c4cfa0af5cf8f589584c5fc4ed53a20958caa729283e30dfd6bd1714a2edc57b"
+  },
+  {
+    "file": "means-ale.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/means-ale.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/means-ale.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "e2f008883e2a593bd460e05162a7439d43820e1d4fe80fba2cc9f0627b334faa"
+  },
+  {
+    "file": "raid-coming.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-coming.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/raid-coming.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "66518c279845fcd952e5d12efd385acd9d8ff689704562c38b217470f6cf2554"
+  },
+  {
+    "file": "raid-paid.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-paid.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/raid-paid.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "f7fd8bfe1328d99b6bd707a74477aaf3228e52a9089dde84aab8bf761380d240"
+  },
+  {
+    "file": "raid-sack.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-sack.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/raid-sack.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "c6f0e9df577bf1ded6ae3bf49a7390b49410d4a176ae0041b962379dac3f8846"
+  },
+  {
+    "file": "raid-walled.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-walled.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/raid-walled.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "16567d5ed02c09f4b6dc9e90a78c347986a00c97b2040d99c7a480e06b61e2a6"
+  },
+  {
+    "file": "raid-assault.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-assault.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/raid-assault.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "c4dfec85b834747c6d446212f1319005961737f1b033112b8595677f23a630ac"
+  },
+  {
+    "file": "raid-held.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-held.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/raid-held.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "d1d67a04cdf88c10514932f89799ae32e553c5ea95ef58794163bdb0fad3ea1d"
+  },
+  {
+    "file": "raid-stormed.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/raid-stormed.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/raid-stormed.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "526fdd9682e1edad59b4a3e81c2e885f706e64e61dac2a987ebb448382b51f5f"
+  },
+  {
+    "file": "wall-closed.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/wall-closed.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/wall-closed.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "0acf39ef42ffa4da24aaba1335cd76247e103ce1919d7bb1fc21c134e7901447"
+  },
+  {
+    "file": "built-gate.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/built-gate.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/built-gate.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "cdb095eeb02ee9701693eccee52fc268705821e509ed1e1666dc1c5b6738dfdc"
+  },
+  {
+    "file": "built-wall.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/built-wall.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/built-wall.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "47737ae53bd61e28e192b1026d6bc7e0a7e4241ff19ddf594be1293e0204a651"
+  },
+  {
+    "file": "built-watchtower.png",
+    "source": "docs/ui-redesign/cronica-color-v9-2026-09-29/masters/built-watchtower.png",
+    "sepia_original": "docs/ui-redesign/cronica-color-v9-2026-09-29/sepia-originals/built-watchtower.png",
+    "size": [
+      640,
+      512
+    ],
+    "mode": "RGB",
+    "sha256": "30f70de6b9449ae76d88b8047bb6682157a65fa0e9119efa48007b95af84dda6"
+  }
+]

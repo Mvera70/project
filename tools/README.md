@@ -1,5 +1,11 @@
 # Las herramientas de The Valley — el catálogo
 
+**Auditoría V9 desplegada:** [capturas y comparación](../docs/ui-redesign/auditoria-v9-juego-2026-09-29/README.md).
+`capture-live.mjs` fotografía doce vistas del sitio publicado; `compare.py`
+pone cada una junto a la maqueta V9. En el [lote de crónica a color](../docs/ui-redesign/cronica-color-v9-2026-09-29/README.md),
+`export.py` conserva sepia y exporta los PNG 640×512; `preview-live.mjs` los
+prueba sobre la UI publicada sin desplegarlos.
+
 **Revisión V9:** [README y comandos](../docs/ui-redesign/revision-v9-2026-09-29/README.md).
 `export.py` normaliza cuatro materiales ImageGen; `build.mjs` compone la maqueta;
 `capture.mjs` fotografía seis vistas y verifica oclusión; `review.mjs` produce

@@ -1,5 +1,10 @@
 # La documentación de The Valley — el mapa
 
+- [V9 desplegada: capturas y diferencias](ui-redesign/auditoria-v9-juego-2026-09-29/README.md):
+  doce capturas reales, comparativas y diagnóstico del tablón.
+- [Crónica a color completa](ui-redesign/cronica-color-v9-2026-09-29/README.md):
+  44 escenas indexadas, originales sepia conservados y prueba en la UI real.
+
 - [Revisión V9: cinco correcciones y alternativas conservadas](ui-redesign/revision-v9-2026-09-29/README.md):
   brújula, cabeceras, tres acabados y protección de navegación; solo maqueta.
 

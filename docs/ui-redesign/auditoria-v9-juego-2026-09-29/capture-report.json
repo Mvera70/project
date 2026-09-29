@@ -1,0 +1,124 @@
+[
+  {
+    "scene": "portada",
+    "width": 390,
+    "height": 844,
+    "file": "portada-390x844.png",
+    "url": "https://mvera70.github.io/project/",
+    "title": "The Valley",
+    "errors": []
+  },
+  {
+    "scene": "valle",
+    "width": 390,
+    "height": 844,
+    "file": "valle-390x844.png",
+    "url": "https://mvera70.github.io/project/?debug=1&live=1&seed=11&year=20&season=summer",
+    "title": "The Valley",
+    "errors": []
+  },
+  {
+    "scene": "tablon",
+    "width": 390,
+    "height": 844,
+    "file": "tablon-390x844.png",
+    "url": "https://mvera70.github.io/project/?debug=1&live=1&seed=11&year=20&season=summer",
+    "title": "The Valley",
+    "errors": [
+      "404 https://mvera70.github.io/project/res-silver-Cg1qP6GI.png",
+      "404 https://mvera70.github.io/project/chip-cost-CDArojAH.png",
+      "404 https://mvera70.github.io/project/btn-close-Cjb5XZo7.png",
+      "404 https://mvera70.github.io/project/wood-board-B0MJexJm.png",
+      "404 https://mvera70.github.io/project/frame-parchment-zisyWGyF.png",
+      "404 https://mvera70.github.io/project/nail-bent-6laDjA8m.png"
+    ]
+  },
+  {
+    "scene": "carro",
+    "width": 390,
+    "height": 844,
+    "file": "carro-390x844.png",
+    "url": "https://mvera70.github.io/project/?debug=1&live=1&seed=11&year=20&season=summer",
+    "title": "The Valley",
+    "errors": []
+  },
+  {
+    "scene": "cronica",
+    "width": 390,
+    "height": 844,
+    "file": "cronica-390x844.png",
+    "url": "https://mvera70.github.io/project/?debug=1&live=1&seed=11&year=20&season=summer",
+    "title": "The Valley",
+    "errors": []
+  },
+  {
+    "scene": "encrucijada",
+    "width": 390,
+    "height": 844,
+    "file": "encrucijada-390x844.png",
+    "url": "https://mvera70.github.io/project/?debug=1&live=1&seed=11&year=20&season=summer&crossroad=1",
+    "title": "The Valley",
+    "errors": []
+  },
+  {
+    "scene": "portada",
+    "width": 320,
+    "height": 568,
+    "file": "portada-320x568.png",
+    "url": "https://mvera70.github.io/project/",
+    "title": "The Valley",
+    "errors": []
+  },
+  {
+    "scene": "valle",
+    "width": 320,
+    "height": 568,
+    "file": "valle-320x568.png",
+    "url": "https://mvera70.github.io/project/?debug=1&live=1&seed=11&year=20&season=summer",
+    "title": "The Valley",
+    "errors": []
+  },
+  {
+    "scene": "tablon",
+    "width": 320,
+    "height": 568,
+    "file": "tablon-320x568.png",
+    "url": "https://mvera70.github.io/project/?debug=1&live=1&seed=11&year=20&season=summer",
+    "title": "The Valley",
+    "errors": [
+      "404 https://mvera70.github.io/project/btn-close-Cjb5XZo7.png",
+      "404 https://mvera70.github.io/project/chip-cost-CDArojAH.png",
+      "404 https://mvera70.github.io/project/frame-parchment-zisyWGyF.png",
+      "404 https://mvera70.github.io/project/res-silver-Cg1qP6GI.png",
+      "404 https://mvera70.github.io/project/wood-board-B0MJexJm.png",
+      "404 https://mvera70.github.io/project/nail-bent-6laDjA8m.png"
+    ]
+  },
+  {
+    "scene": "carro",
+    "width": 320,
+    "height": 568,
+    "file": "carro-320x568.png",
+    "url": "https://mvera70.github.io/project/?debug=1&live=1&seed=11&year=20&season=summer",
+    "title": "The Valley",
+    "errors": []
+  },
+  {
+    "scene": "cronica",
+    "width": 320,
+    "height": 568,
+    "file": "cronica-320x568.png",
+    "url": "https://mvera70.github.io/project/?debug=1&live=1&seed=11&year=20&season=summer",
+    "title": "The Valley",
+    "errors": []
+  },
+  {
+    "scene": "encrucijada",
+    "width": 320,
+    "height": 568,
+    "file": "encrucijada-320x568.png",
+    "url": "https://mvera70.github.io/project/?debug=1&live=1&seed=11&year=20&season=summer&crossroad=1",
+    "title": "The Valley",
+    "errors": []
+  }
+]
