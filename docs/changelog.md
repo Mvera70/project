@@ -1,5 +1,55 @@
 # The Valley — Registro de cambios
 
+## v5.00 · 29 sep 2026 · ¿Decide la física las batallas? F-0, la flecha que toca, en sombra
+
+Vera, al cerrar la animación: «me preocupa que tener Rapier para flechas y
+ragdolls dé apariencia de física mientras el resultado siga dependiendo de
+distancias y temporizadores». La respuesta está en
+`docs/diagnostico-fisica-combate-2026-09-29.md`, conciliada con la nota de
+Astra (`ideas-fisica-y-app-nativa-2026-09-29.md`, `24ef5e1`), y **no cambia
+ningún resultado del combate**.
+
+- **El diagnóstico**: Rapier decide el vuelo de la flecha, si la para una
+  almena y cómo caen los muertos; el acierto es un cilindro de 0,45 × 0,7
+  medido desde y=0, el cuerpo a cuerpo y el portón son distancia y reloj, y
+  la flecha que acierta sigue volando. **Rapier sólo ve a los muertos**: los
+  ragdolls son colisionadores y los vivos no.
+- **F-0, en sombra** (`physics.ts` `probes`/`sweep`, `archery.ts`
+  `archeryShadow` y `DRAWN_BODY`, opción `shadow` de la jornada): una cápsula
+  de Rapier del tamaño del aldeano que se pinta (0,65 de alto, medido sobre el
+  GLB) por asaltante, **en un mundo de consulta aparte**, y a quién habría dado
+  cada flecha. En el mismo mundo, aun con los grupos de colisión a cero, la
+  semilla 42 cambiaba en uno o dos aciertos: añadir colisionadores reordena
+  Rapier por dentro.
+- **Medido** (`battle-report.ts --shadow --seeds --relief`, veinte batallas):
+  las 56 pasadas con sondas acaban igual que sin ellas; con el cuerpo que se
+  pinta cambiaría **el 31–40 % de las bajas por flecha** (5–7 % es el ruido
+  del método), siempre a menos: flechas que se clavan a medio metro o más de
+  los pies y flechas que pasan a más de un metro del pecho —el cilindro gordo
+  tapa un apuntado que no cuenta con el aire—; 81 de 100 contactos en cabeza y
+  hombros; la flecha que acierta sigue **7 m** tras el cuerpo; las sondas,
+  0,05–0,09 ms por paso aquí. **Merece la pena seguir, con una decisión del
+  dueño delante**: con el apuntado de hoy, el contacto deja la muralla un
+  tercio menos letal (F-1 y sus tres salidas, en el diagnóstico §3).
+- **El aparato**: `?sandbox=battle&shadow=0.12` enciende las sondas en el
+  banco, con la fila «Sondas F-0» y el bloque `probes` en «Copiar métricas»:
+  la línea de base sin y con sondas en el iPhone y el iPad es F-0b, de Vera.
+- **La nota de Astra, leída con lupa** (§5): de acuerdo con ampliar Rapier sin
+  llevar la aldea entera a la física, con Capacitor como contenedor y con no
+  migrar antes de una prueba; en contra de esperar al aparato para saber si el
+  contacto cambia algo (se midió aquí), del controlador de personajes ahora
+  (dos autoridades del movimiento) y de los colisionadores de armas sin su
+  trayectoria como dato; y dos cosas que no decía: la partida vive en
+  IndexedDB del origen y no se exporta (un contenedor es otro origen), y el
+  motor podría viajar tal cual a un port —`node --jitless`: veinte años en
+  25,8 s contra 5,8 s con JIT, la crónica idéntica byte a byte—, con la
+  recuperación de ausencias largas como límite.
+- Pruebas: `tests/fast/physics-probes.test.ts` (la cápsula a la altura justa
+  y con pies, el muro que tapa, una flecha que vuela igual al bit con sondas,
+  la arquería con bitácora que da lo mismo) y el caso `&shadow=` del banco.
+  Apuntado en `encargos-3d.md`: la flecha que no se para y la caída sin el
+  impulso del golpe.
+
 ## v4.99 · 29 sep 2026 · Animación integral, AN-3 y AN-4: el golpe que carga el siguiente, el esprint que pisa, y la matriz cerrada con su coste
 
 Tercera fase del `/goal` de animación (AN-0 y AN-1 en v4.97, AN-2 en v4.98).

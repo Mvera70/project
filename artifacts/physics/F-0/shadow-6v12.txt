@@ -1,0 +1,33 @@
+semilla 7 sin sombra: 40 flechas, 13 aciertos, 12 asaltantes y 0 defensores caídos; portón 60/60, roto; acabó en el paso 1527 (51 s de escena)
+semilla 7 sombra 0.12: mismo resultado que sin sombra
+semilla 7 sombra 0.17: mismo resultado que sin sombra
+semilla 11 sin sombra: 35 flechas, 12 aciertos, 12 asaltantes y 0 defensores caídos; portón 0/60; acabó en el paso 1144 (38 s de escena)
+semilla 11 sombra 0.12: mismo resultado que sin sombra
+semilla 11 sombra 0.17: mismo resultado que sin sombra
+semilla 21 sin sombra: 64 flechas, 3 aciertos, 3 asaltantes y 0 defensores caídos; portón 60/60, roto, entraron; acabó en el paso 2605 (87 s de escena)
+semilla 21 sombra 0.12: mismo resultado que sin sombra
+semilla 21 sombra 0.17: mismo resultado que sin sombra
+semilla 42 sin sombra: 44 flechas, 12 aciertos, 10 asaltantes y 1 defensores caídos; portón 60/60, roto, entraron; acabó en el paso 2685 (90 s de escena)
+semilla 42 sombra 0.12: mismo resultado que sin sombra
+semilla 42 sombra 0.17: mismo resultado que sin sombra
+
+F-0 · la flecha que toca, en sombra: 4 batallas por radio, 6 en el cerco (bow) contra 12, año 60, cápsula de 0.65 de alto, suelo plano
+sin sombra: paso de Rapier 0.123 ms de media en 8653 pasos
+
+cápsula de radio 0.12: paso de Rapier 0.102 ms y sondas 0.058 ms de media por paso (hasta 12 sondas a la vez)
+  flechas acabadas 183: aciertos del cilindro 36, de Rapier 25
+  ambos al mismo 25 · a otro 0 · sólo cilindro 11 (10 con muro o suelo delante) · sólo Rapier 0 · ninguno 147
+  cambiaría el resultado en 11 flechas: 6 % de las flechas, 31 % de los aciertos
+  los de sólo cilindro iban a 0.07, 0.08, 0.08, 0.08, 0.08, 0.09, 0.34, 0.54, 0.64, 0.66, 0.68 sobre los pies y a 0.34, 0.37, 0.38, 0.41, 0.42, 0.43, 0.43, 0.43, 0.44, 0.44, 0.45 del eje del cuerpo
+  altura del contacto de Rapier: piernas 0 · tronco 9 · cabeza 16
+  el cilindro da antes de llegar al cuerpo: mediana 0.10 celdas (12 flechas)
+  la flecha que acierta sigue volando: se para a 2.32 celdas del impacto (p90 6.98, 36 flechas)
+
+cápsula de radio 0.17: paso de Rapier 0.099 ms y sondas 0.052 ms de media por paso (hasta 12 sondas a la vez)
+  flechas acabadas 183: aciertos del cilindro 36, de Rapier 25
+  ambos al mismo 25 · a otro 0 · sólo cilindro 11 (10 con muro o suelo delante) · sólo Rapier 0 · ninguno 147
+  cambiaría el resultado en 11 flechas: 6 % de las flechas, 31 % de los aciertos
+  los de sólo cilindro iban a 0.07, 0.08, 0.08, 0.08, 0.08, 0.09, 0.34, 0.54, 0.64, 0.66, 0.68 sobre los pies y a 0.34, 0.37, 0.38, 0.41, 0.42, 0.43, 0.43, 0.43, 0.44, 0.44, 0.45 del eje del cuerpo
+  altura del contacto de Rapier: piernas 0 · tronco 6 · cabeza 19
+  el cilindro da antes de llegar al cuerpo: mediana 0.04 celdas (11 flechas)
+  la flecha que acierta sigue volando: se para a 2.32 celdas del impacto (p90 6.98, 36 flechas)

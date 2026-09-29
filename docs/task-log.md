@@ -1,5 +1,53 @@
 # Cuaderno de tareas — el rework
 
+## 29 sep 2026 · ¿Decide la física las batallas? F-0, la flecha que toca, en sombra
+
+Vera, con `/goal` al cerrar la animación: «me preocupa que tener Rapier para
+flechas y ragdolls dé apariencia de física mientras el resultado siga
+dependiendo de distancias y temporizadores». Diagnóstico, experimento y
+lectura crítica de la nota de Astra (`ideas-fisica-y-app-nativa-2026-09-29.md`,
+`24ef5e1`) en `docs/diagnostico-fisica-combate-2026-09-29.md`; fila F en
+`docs/plan-meta.md`. **Sin reescribir el combate**: nada de lo hecho cambia un
+resultado, y está comprobado.
+
+**Lo que decide Rapier hoy** (§1): el vuelo de la flecha, si la para una
+almena, cómo caen los muertos y los cascotes. **Rapier sólo ve a los muertos**:
+los ragdolls son colisionadores, los vivos no. El acierto es un cilindro de
+0,45 × 0,7 medido **desde y=0**, el cuerpo a cuerpo y el portón son distancia y
+reloj, y la flecha que acierta sigue volando.
+
+**F-0 hecho** (`eb845ea`): sondas de Rapier del tamaño del aldeano que se pinta
+(0,65 de alto; 0,12 el tronco, 0,17 con brazos, medido sobre el GLB), en un
+mundo de consulta aparte, y la bitácora de a quién habría dado cada flecha
+(`physics.ts` `probes`/`sweep`, `archery.ts` `archeryShadow`, opción `shadow`
+de la jornada, `battle-report.ts --shadow --seeds --relief`,
+`?sandbox=battle&shadow=0.12`, `physics-probes.test.ts`). **En llano, ocho
+villas del año 60 (10 contra 24): 24 de 24 batallas con sondas acaban igual
+que sin ellas; con el cuerpo que se pinta cambiaría el 35 % de las bajas por
+flecha** (31 % con brazos; el control del tamaño del cilindro, 7 %), siempre a
+menos: flechas que se clavan a medio metro o más de los pies y flechas que pasan a más
+de un metro del pecho —el cilindro gordo tapa un apuntado que no cuenta con el
+aire—; 81 de 100 contactos en cabeza y hombros; la flecha que acierta sigue
+**7 m** (mediana; 19 m el p90); las sondas cuestan 0,08 ms por paso sobre los
+0,21 de Rapier en este contenedor. **Con el relieve del juego** (`--relief`)
+cambia el 40 % (control 5 %), y en seis contra doce el 31 %: 56 pasadas con
+sondas en veinte batallas, todas iguales a su batalla sin ellas. Bajo el portón
+de las villas medidas el suelo está a cota 0, así que la regla «desde y=0» no
+muerde ahí; pero el informe en llano no es la batalla del juego (la 7/60 dura
+36 s con relieve y 96 en llano): para medir combate, `--relief`.
+
+**La trampa que costó una pasada:** con las sondas en el mismo mundo y los
+grupos de colisión a cero, la semilla 42 acababa con uno o dos aciertos
+distintos —añadir colisionadores cambia ranuras y orden de contactos—. Se
+mudaron a un mundo aparte; para F-1 quiere decir que con y sin contacto sólo
+se compara con distribuciones, nunca batalla a batalla.
+
+**Abierto, decisión de Vera:** si sigue F-1 («la flecha que se clava»), con
+cuál de las tres salidas al balance —aceptar la muralla un tercio menos letal,
+apuntar con el aire, o separar lo que se ve de lo que decide—; y **F-0b**, la
+línea de base en su iPhone y su iPad con el banco (sin y con `&shadow=0.12`),
+que es lo único de esta línea que no se mide aquí.
+
 ## 29 sep 2026 · Animación integral para móvil (AN): las cinco fases entregadas; pendiente el aparato
 
 Vera lo pidió con `/goal` («mejorar de forma visible todas las animaciones de

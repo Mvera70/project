@@ -217,12 +217,14 @@ empujes, caídas y proyectiles respondan a posiciones y colisiones. El
 diagnóstico (`docs/diagnostico-fisica-combate-2026-09-29.md`) dice que hoy
 Rapier sólo decide por dónde vuela una flecha y si la para una almena; el
 acierto, el cuerpo a cuerpo, el portón y las caídas son distancias y relojes.
-**No está empezada**: la primera fila es un experimento en sombra, y el orden
-de lo que venga después es del dueño.
+**F-0 está hecho, en sombra y sin cambiar nada**; lo demás no está empezado, y
+el orden es del dueño.
 
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
-| F-0 · La flecha que toca, en sombra | Cápsula cinemática por combatiente sólo en batalla, eventos de colisión en las flechas; el cilindro sigue decidiendo y cada flecha apunta qué habría dicho Rapier. Medida: tabla de acuerdo en `battle-report.ts` sobre decenas de batallas, dirección de caída en la traza, ms del paso en el teléfono. Sigue si cambia una de cada diez flechas de forma legible, se ve a 390×844 y cuesta menos de 0,5 ms por paso en el aparato | P2 | Media | Claude | AN (cerrada); decisión del dueño |
+| ~~F-0 · La flecha que toca, en sombra~~ | **hecha el 29 sep 2026** (`eb845ea`): una cápsula de Rapier del tamaño del aldeano que se pinta por asaltante, en un mundo de consulta aparte, y la bitácora de a quién habría dado cada flecha; `battle-report.ts --shadow`, `?sandbox=battle&shadow=0.12`, `physics-probes.test.ts`. Medido en veinte batallas del año 60 (ocho villas 10 contra 24 en llano y con relieve, cuatro 6 contra 12): **las 56 pasadas con sondas acaban igual que su batalla sin ellas**; con el cuerpo que se pinta cambiaría **entre el 31 y el 40 % de las bajas por flecha** (5–7 % es el ruido del método), siempre a menos —flechas que se clavan a medio metro o más de los pies o pasan a más de un metro del pecho—; la flecha que acierta **sigue volando 7 m** (mediana); las sondas, 0,08 ms por paso sobre 0,21 de Rapier en este contenedor. Veredicto y salidas en el diagnóstico §3 | Hecho | Media | Claude | AN (cerrada) |
+| F-0b · La línea de base en el aparato | En el iPhone y el iPad: `?sandbox=battle&defenders=10&raiders=24` y «Copiar métricas» en el pico de la pelea; después lo mismo con `&shadow=0.12`. Fotogramas, peor fotograma y lo que añaden las sondas como fracción del fotograma. Es lo único de esta línea que no se puede medir aquí | P2 | Baja | Vera (con el aparato) | F-0 |
+| F-1 · La flecha que se clava | **Propuesta, no empezada.** Detrás de una opción `contact` (y `&contact=1` en el banco): decide el barrido de F-0; la altura desde el suelo del blanco; la flecha se para donde toca y se cuelga del segmento del ragdoll; el ragdoll recibe su velocidad y `hit_take`/la caída miran en contra de ella. Medida: veinte batallas o más con y sin contacto como distribuciones (la cifra de balance para Vera), una tira a 390×844 con la caída en la dirección de la flecha en 9 de 10, y el coste de F-0b. **Antes, una decisión del dueño**: aceptar la muralla un tercio menos letal, apuntar con el aire, o separar lo que se ve de lo que decide (diagnóstico §3) | P2 | Media | Claude | F-0, F-0b; decisión del dueño |
 
 ### H · Deuda medida (el cuaderno)
 
