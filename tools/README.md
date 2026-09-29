@@ -1,5 +1,10 @@
 # Las herramientas de The Valley — el catálogo
 
+**Revisión V9:** [README y comandos](../docs/ui-redesign/revision-v9-2026-09-29/README.md).
+`export.py` normaliza cuatro materiales ImageGen; `build.mjs` compone la maqueta;
+`capture.mjs` fotografía seis vistas y verifica oclusión; `review.mjs` produce
+la comparativa de tres acabados y comprueba el giro de la brújula. Solo docs.
+
 **Lote documental V9:** [README y comandos](../docs/ui-redesign/texturas-v9-2026-09-29/README.md).
 `export-assets.py`, los exportadores de `revision-portada/` y `demos-portada/`,
 `build.mjs`, `build-demos.mjs` y `capture.mjs` normalizan ImageGen y capturan

@@ -1,0 +1,20 @@
+{
+  "initial": {
+    "yaw": 2.65,
+    "pitch": 0.5
+  },
+  "rotated": {
+    "yaw": 8.933185307179592,
+    "pitch": 0.5
+  },
+  "north": {
+    "yaw": 0,
+    "pitch": 0.5
+  },
+  "dragged": {
+    "yaw": -0.9773843811168246,
+    "pitch": 0.5
+  },
+  "errors": [],
+  "scope": "Solo esfera de la maqueta; sin cámara del juego."
+}

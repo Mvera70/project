@@ -1,0 +1,85 @@
+[
+  {
+    "id": "control-ivory",
+    "size": [
+      128,
+      96
+    ],
+    "css": [
+      64,
+      48
+    ],
+    "crop": [
+      130,
+      102,
+      1319,
+      971
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "d485f87f0e81e79bdb55a5d0df5be749e7ddc645af72921ef6bf017a370608b3"
+  },
+  {
+    "id": "control-slate",
+    "size": [
+      128,
+      96
+    ],
+    "css": [
+      64,
+      48
+    ],
+    "crop": [
+      68,
+      74,
+      1383,
+      1012
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "b826a2000ddf465344e167c0bc01062b78edfd836fdd2e8d1adb3337574e8e0c"
+  },
+  {
+    "id": "control-iron",
+    "size": [
+      128,
+      96
+    ],
+    "css": [
+      64,
+      48
+    ],
+    "crop": [
+      80,
+      134,
+      1369,
+      949
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "032b3dc8ea15b53e350ebd610020ab4ab16617ca06acbd07ad1a2a3f8d1fc4c8"
+  },
+  {
+    "id": "ring-metal",
+    "size": [
+      256,
+      256
+    ],
+    "css": [
+      128,
+      128
+    ],
+    "crop": null,
+    "alpha": [
+      255,
+      255
+    ],
+    "sha256": "8bf90a0bb65707a75e95ebf7d4f299bc739d5b18d9f49a191061bc257e876542"
+  }
+]

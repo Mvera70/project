@@ -5,6 +5,29 @@ description: El estándar visual de la interfaz de The Valley: qué papel, qué 
 
 # La piel del valle: un estándar, no un catálogo de excepciones
 
+## Revisión V9 · cinco correcciones de Vera · 29 sep 2026
+
+- Conservar la brújula como esfera hueca giratoria de 360°, con anillas de
+  cartografía antigua y N/S. Adaptar la geometría original de
+  `src/ui/camera-controls.ts`; no sustituirla por un medallón plano. ImageGen
+  aporta el material; el código mantiene proyección y movimiento.
+- Crónica y carro: un solo canto superior; reservar espacio real para título
+  y cierre de 44 px. Ningún borde ornamental puede invadirlos.
+- Diferenciar los mandos de vista/pausa/velocidad/caza de los medallones de
+  navegación. Marfil, pizarra azul e hierro son alternativas pendientes de
+  elección; la recomendación azul no equivale a aprobación. Confirmar con
+  Vera si el cambio se extiende a GIVE, SEND y OPEN THE CART.
+- Bajo navegación y medallones: franja translúcida localizada; menú nítido
+  y prioritario. Desactivar también por teclado los controles parcialmente
+  ocultos y restaurarlos al salir de esa zona mediante scroll.
+- **Conservar todas las alternativas aunque se elija otra** (petición expresa
+  de Vera): maestros ImageGen, prompts, PNG preparados, fuentes y capturas.
+  Documentar por separado «elegida», «provisional» y «alternativa»; nunca borrar
+  una variante por no estar activa. Lote y evidencia:
+  `docs/ui-redesign/revision-v9-2026-09-29/README.md`.
+
+Estos ajustes se entregan en maqueta documental; no implican integración.
+
 ## Estándar de texturas V9 · ImageGen, exportación y revisión · 29 sep 2026
 
 **Decisión de Vera al cerrar V9:** la madera sobra como fondo recurrente.
@@ -56,8 +79,8 @@ comparativa es `docs/ui-redesign/propuesta-texturas-v9-2026-09-29.md`.
    conservar textos, orden, estado y geometría. Capturar a 390×844 y rotular
    la base con su procedencia: captura V8 o captura histórica identificada.
    Una nueva composición no se etiqueta como reconstrucción ni como antes/después
-   equivalente. En V9, las cinco alternativas de portada solicitadas por Vera
-   siguen pendientes; la prueba de `revision-portada/` fue rechazada.
+   equivalente. En V9 se conservan las cinco alternativas de portada; Vera
+   eligió la 04 de anochecer. La prueba previa de `revision-portada/` fue rechazada.
 8. Inspeccionar visualmente cada comparativa y la hoja de piezas: continuidad
    de losetas, esquinas/cortes al tamaño real, legibilidad, alfa, recortes,
    solapes y consistencia entre pantallas. Las medidas de DOM no sustituyen la

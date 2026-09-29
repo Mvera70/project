@@ -3341,3 +3341,19 @@ De diseño, y son las que más valen:
 - El parpadeo de sombras de día sigue abierto por indicación del dueño. La mejora a 2048 lo atenúa, pero no lo resuelve.
 - Transiciones de estación y de era, con posible presentación por capítulos y crónica: idea anotada; no implementada.
 - Fauna con función jugable (ciervos, jabalíes, castores y lobos nocturnos): idea pendiente. El fondo al alejar la cámara recibió una prueba de silueta y color de la sierra el 23 sep; sigue pendiente la aprobación visual del dueño, pues el macizo lejano todavía puede sentirse demasiado plano.
+
+## 29 sep 2026 · Revisión de encabezados y navegación V9
+
+Maqueta nueva en `ui-redesign/revision-v9-2026-09-29/`, derivada de V9 y sin
+cambios de componentes, motor o banco. Crónica y carro comparten una sola
+superficie de papel; se separa el cierre de 44 px del encabezado con 24 px de
+margen superior y mínimo 60 px de alto. La franja translúcida se limita al área
+de navegación y medallones. Los controles parcialmente cubiertos pasan a
+`inert` y vuelven al desplazarlos fuera de la franja. Capturas de valle, crónica
+y carro a 390×844 y 320×568; QA DOM de toque bloqueado, navegación activa y
+recuperación por scroll en `qa-point-5.json`. Brújula hueca con la proyección
+original, anillas con material ImageGen, N/S y giro por arrastre/teclado,
+comprobado en `qa-compass.json`; no conectada a la cámara real en esta maqueta.
+Tres acabados ImageGen para mandos (marfil, pizarra, hierro), pendientes de
+elección de Vera. Su petición de conservar todas las alternativas queda en
+README y skill `piel-del-valle`. No se ejecutaron pruebas del juego.

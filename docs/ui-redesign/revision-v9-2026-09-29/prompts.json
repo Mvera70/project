@@ -1,0 +1,38 @@
+[
+  {
+    "id": "control-ivory",
+    "css": [
+      64,
+      48
+    ],
+    "slice": 10,
+    "prompt": "Create ONE production medieval game UI blank control plate, REAL transparent PNG. Front orthographic view. 64x48 CSS, target128x96 PNG, nine-slice with10CSSpx fixed corners. Almost square rectangle, clearly NOT a circular medallion. Mature painted-colour storybook style, soft contours, subtle upper-left light, tactile premium material. Shallow edges, calm BLANK centre for a cream or dark game sprite added later. Straight sides, soft clipped corners, all ornament within corner regions. No letters, icons, symbols, numbers, wood, glowing amber, gold medallion, extra objects or mockup. Entire silhouette with small transparent outside margin. Very pale warm ivory vellum laminated tablet, restrained irregular fine paper edge, thin silver-grey bound rim. Matte luminous clean pale centre. Low contrast fibres. No scroll curls or heavy ornament. Sprite will be dark brown."
+  },
+  {
+    "id": "control-slate",
+    "css": [
+      64,
+      48
+    ],
+    "slice": 10,
+    "prompt": "Create ONE production medieval game UI blank control plate, REAL transparent PNG. Front orthographic view. 64x48 CSS, target128x96 PNG, nine-slice with10CSSpx fixed corners. Almost square rectangle, clearly NOT a circular medallion. Mature painted-colour storybook style, soft contours, subtle upper-left light, tactile premium material. Shallow edges, calm BLANK centre for a cream or dark game sprite added later. Straight sides, soft clipped corners, all ornament within corner regions. No letters, icons, symbols, numbers, wood, glowing amber, gold medallion, extra objects or mockup. Entire silhouette with small transparent outside margin. Deep blue-grey SLATE ENAMEL plaque with a thin aged pewter silver rim. Dark muted petrol blue centre with almost imperceptible ceramic grain. Restrained hand-finished edge, no heavy bevel, no gilding. Sprite will be warm cream. This is our recommended distinct alternative to round brass navigation."
+  },
+  {
+    "id": "control-iron",
+    "css": [
+      64,
+      48
+    ],
+    "slice": 10,
+    "prompt": "Create ONE production medieval game UI blank control plate, REAL transparent PNG. Front orthographic view. 64x48 CSS, target128x96 PNG, nine-slice with10CSSpx fixed corners. Almost square rectangle, clearly NOT a circular medallion. Mature painted-colour storybook style, soft contours, subtle upper-left light, tactile premium material. Shallow edges, calm BLANK centre for a cream or dark game sprite added later. Straight sides, soft clipped corners, all ornament within corner regions. No letters, icons, symbols, numbers, wood, glowing amber, gold medallion, extra objects or mockup. Entire silhouette with small transparent outside margin. Matte wrought IRON plaque in medium charcoal grey, cool desaturated metal, softly chamfered edge with subtle silver wear. Calm neutral charcoal centre, not shiny chrome, not plastic, tiny restrained hammer marks along margin only. No large rivets or screws, no gilding. Sprite will be warm cream."
+  },
+  {
+    "id": "ring-metal",
+    "css": [
+      128,
+      128
+    ],
+    "tile": true,
+    "prompt": "ONE full-bleed square seamless material texture, target256x256PNG. Aged cartographer's warm brass surface for the thin rotating rings of a medieval ARMILLARY SPHERE, high-quality softly painted metal, tiny patina flecks and hairline brushed marks, mostly muted pale brass, restrained upper-left light but overall even illumination so it repeats seamlessly, uniform low contrast, no vignette. NO object, ring silhouette, frames, text, letters, compass marks, circles, rivets or symbols. Material sample only, opaque edge-to-edge, perfectly seamless in both axes. Not wood grain, not photoreal chrome."
+  }
+]

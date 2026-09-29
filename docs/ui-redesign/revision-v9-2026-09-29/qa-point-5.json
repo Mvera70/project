@@ -1,0 +1,52 @@
+{
+  "geometry": {
+    "targetRect": {
+      "x": 265,
+      "y": 739.296875,
+      "width": 92,
+      "height": 40,
+      "top": 739.296875,
+      "right": 357,
+      "bottom": 779.296875,
+      "left": 265
+    },
+    "inert": true,
+    "count": 10,
+    "listScrollHeight": 2180,
+    "listClientHeight": 596,
+    "navRect": {
+      "x": 0,
+      "y": 772,
+      "width": 390,
+      "height": 72,
+      "top": 772,
+      "right": 390,
+      "bottom": 844,
+      "left": 0
+    },
+    "bandRect": {
+      "x": 0,
+      "y": 756,
+      "width": 390,
+      "height": 88,
+      "top": 756,
+      "right": 390,
+      "bottom": 844,
+      "left": 0
+    }
+  },
+  "clickResult": {
+    "stateBefore": 10,
+    "stateAfter": 10,
+    "at": {
+      "x": 311,
+      "y": 754
+    }
+  },
+  "navWorked": true,
+  "restored": {
+    "inert": false,
+    "bottom": 656.65625,
+    "bandTop": 756
+  }
+}
