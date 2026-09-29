@@ -34,3 +34,20 @@ Los GLB de esta carpeta están articulados con nodos rígidos y no incorporan
 `idle`/`walk`; `rigid-clips.mjs` añade esos movimientos a los archivos
 publicados. El `rear` del oso se publica como `attack`. La revisión v3 cambia
 solo la anatomía del oso; los otros diez modelos permanecen intactos.
+
+## El oso v4 (29 sep 2026) — candidato, **sin publicar**
+
+Vera: «el oso no termina de convencerme». El v3 tenía el lomo plano, patas que
+se afinaban hasta 6 cm en el tobillo y acababan en un disco de 15 cm, y un
+marrón (`775A3E`) que con la luz del juego se leía color arena. El v4
+(`bear()` en `build-models.py`; el v3 sigue en `bear_v3()`) pone la joroba de
+la cruz como punto más alto, la cabeza baja por delante de ella, patas en
+columna con la zarpa saliendo de la pata y un pardo oscuro. Mismo tamaño que
+el v3, mismos nodos y la misma pose erguida.
+
+- [bear-v4.glb](bear-v4.glb) · [perfil](bear-v4-profile.png) ·
+  [tres cuartos](bear-v4-three-quarter.png) · [quieto, andando y erguido](bear-v4-gestures.png)
+- `python3 build-models.py -- bear` (con `pip install bpy==5.0.1`) sólo
+  construye el oso; sin nombres, todos.
+- Para publicarlo: `rigid-clips.mjs bear-v4.glb <salida> bear`,
+  `adopt-models.mjs` y `publish-assets.ts --ids bear`.

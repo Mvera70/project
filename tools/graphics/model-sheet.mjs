@@ -9,6 +9,10 @@
 //                    desde atrás y de frente—, más grande, en `sides-sheet.png`.
 //                    Desde una sola esquina un modelo puede engañar: el oso
 //                    de tres cuartos parece un oso y de perfil es un barril.
+//   --candidate bear-v4=deliverables/…/bear.glb
+//                    fotografía un GLB sin publicar junto a los publicados, con
+//                    el nombre que se le dé; se repite para varios. Se compara
+//                    antes de admitir nada en el catálogo.
 import { build } from 'esbuild';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -30,7 +34,20 @@ if (ids !== null) {
 const sides = args.includes('--sides');
 // Los animales miran hacia −X: de perfil se les ve desde +Z.
 const SIDES = [['perfil', [0, 0.2, 1]], ['vista del juego', [-1, 0.9, 1.2]], ['desde atrás', [1, 0.4, -1]], ['de frente', [-1, 0.15, 0]]];
-const bytes = Object.fromEntries(manifest.assets.map((a) => [a.id, readFileSync(assets + a.file).toString('base64')]));
+const candidates = args.flatMap((arg, i) => (arg === '--candidate' ? [args[i + 1]] : [])).map((pair) => {
+  const [id, file] = pair.split('=');
+  if (!id || !file) throw new Error(`--candidate must be id=file.glb; got '${pair}'.`);
+  if (manifest.assets.some((a) => a.id === id)) throw new Error(`--candidate '${id}' ya está publicado: usa otro nombre`);
+  return { id, file };
+});
+const bytes = Object.fromEntries([
+  ...manifest.assets.map((a) => [a.id, readFileSync(assets + a.file).toString('base64')]),
+  ...candidates.map((c) => [c.id, readFileSync(c.file).toString('base64')]),
+]);
+for (const c of candidates) {
+  manifest.assets.push({ id: c.id, file: `${c.id}.glb`, sha256: 'candidate', motion: [] });
+  if (ids !== null) ids.push(c.id);
+}
 const result = await build({
   entryPoints: ['tools/graphics/model-sheet.ts'], bundle: true, write: false, format: 'esm',
   define: { SHEET_BYTES: JSON.stringify(bytes), SHEET_MANIFEST: JSON.stringify(manifest) },

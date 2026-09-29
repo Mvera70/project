@@ -199,7 +199,7 @@ def boar():
     leaf('Tail_Tuft',(.271,0,.20),(.283,0,.152),.018,.012,'coatTop',tail)
     save('boar')
 
-def bear():
+def bear_v3():
     reset(); mat('coat','775A3E'); mat('coatTop','5C4834'); mat('light','A28559'); mat('earInner','483B2E'); mat('claw','B2A07E')
     body=empty('body',(.235,0,.385),ROOT)
     # Perfil dorsal y ventral independientes: cruz amplia, costillas profundas,
@@ -276,6 +276,91 @@ def bear():
     for p in hinds: tracks.append((p,'rotation_euler',[(0,0,0),(0,-1.16,0),(0,-1.16,0),(0,0,0)]))
     for i,p in enumerate(fronts): tracks.append((p,'rotation_euler',[(0,0,0),((-.18 if i==0 else .18),-.40,0),((-.23 if i==0 else .23),-.65,0),(0,0,0)]))
     clip('rear',tracks,[1,25,48,72]); save('bear-v3')
+
+def bear():
+    # v4 · 29 sep 2026. Lo que el v3 no tenía: la joroba de la cruz como punto
+    # más alto, la cabeza baja por delante de ella, patas en columna que no se
+    # afinan y zarpas que salen de la pata, y un marrón que con la luz del juego
+    # siga siendo marrón (el 775A3E del v3 se leía arena). Mismo tamaño que el
+    # v3 —la escena de caza y el radio del cuerpo cuentan con él—, los mismos
+    # nodos y la misma pose erguida (`rear`, que el juego llama `attack`).
+    reset(); mat('coat','35261B'); mat('coatTop','2A1E15'); mat('legs','261B14'); mat('light','6E5540')
+    mat('earInner','1E1712'); mat('claw','CFC2A6')
+    body=empty('body',(.24,0,.42),ROOT)
+    # (x, lomo, vientre, semiancho, cintura): la cruz sube sobre las patas de
+    # delante, el lomo baja hasta la grupa y el pecho cuelga hondo.
+    sections=[
+        (-.360,.540,.370,.090,.460),
+        (-.310,.660,.300,.160,.470),
+        (-.240,.765,.260,.215,.500),
+        (-.160,.805,.240,.245,.510),
+        (-.070,.780,.235,.255,.500),
+        (.030,.725,.238,.255,.480),
+        (.120,.685,.246,.250,.465),
+        (.210,.664,.262,.240,.460),
+        (.290,.648,.282,.224,.460),
+        (.350,.610,.312,.190,.460),
+        (.400,.550,.352,.130,.450),
+        (.425,.490,.400,.050,.445),
+    ]
+    vertices=[]; faces=[]; sides=16
+    for x,top,bottom,width,waist in sections:
+        for j in range(sides):
+            angle=2*pi*j/sides; vertical=sin(angle)
+            z=waist+vertical*((top-waist) if vertical>=0 else (waist-bottom))
+            y=cos(angle)*width*(1-.11*abs(vertical))
+            vertices.append((x,y,z))
+    faces.append(tuple(range(sides-1,-1,-1)))
+    for i in range(len(sections)-1):
+        for j in range(sides):
+            a=i*sides+j; b=i*sides+(j+1)%sides
+            c=(i+1)*sides+(j+1)%sides; d=(i+1)*sides+j
+            faces.extend([(a,b,c),(a,c,d)] if (i+j)%2 else [(a,b,d),(b,c,d)])
+    faces.append(tuple((len(sections)-1)*sides+j for j in range(sides)))
+    mesh('Massive_Torso',vertices,faces,'coat',body)
+    # Cuello grueso que baja hacia delante: la cabeza va por debajo de la cruz.
+    neck=empty('neck',(-.33,0,.51),body); ell('Neck',(-.400,0,.470),(.22,.27,.25),'coat',neck)
+    head=empty('head',(-.46,0,.46),neck); ell('Head',(-.500,0,.455),(.22,.24,.21),'coat',head)
+    ell('Brow',(-.540,0,.505),(.11,.17,.07),'coat',head,10,5)
+    loft('Muzzle',[(-.570,.440,.076,.066),(-.630,.425,.062,.054),(-.680,.415,.046,.043)],'light',head)
+    ell('Nose',(-.690,0,.418),(.032,.072,.046),'nose',head,10,6)
+    ell('Lower_Jaw',(-.600,0,.385),(.13,.105,.05),'coatTop',head)
+    for s in (-1,1):
+        earP=empty('ear'+str(s),(-.470,s*.090,.555),head)
+        ell('Round_Ear_'+str(s),(-.468,s*.098,.572),(.052,.040,.062),'coat',earP,10,6)
+        ell('Ear_Inner_'+str(s),(-.478,s*.100,.572),(.024,.030,.036),'earInner',earP,8,5)
+        eye('Eye_'+str(s),-.585,s*.078,.482,.016,head)
+        tube('Mouth_'+str(s),[(-.575,s*.060,.398),(-.630,s*.050,.394),(-.665,s*.034,.402)],[.005,.004,.003],'nose',head,6)
+    fronts=[]; hinds=[]
+    for pre,x in [('fore',-.195),('hind',.265)]:
+        for s,l in [(-1,'L'),(1,'R')]:
+            y=s*.140
+            if pre=='fore':
+                hip=(x,y,.500); knee=(x+.010,y,.255); ankle=(x-.010,y,.070); paw=(x-.030,y,.034); pawSize=(.150,.120,.068)
+            else:
+                # Plantígrado: el corvejón atrás y un pie largo apoyado entero.
+                hip=(x,y,.480); knee=(x-.030,y,.265); ankle=(x+.012,y,.075); paw=(x-.018,y,.034); pawSize=(.175,.118,.068)
+            p=empty(pre+l,hip,body)
+            # Columnas: el ancho se queda casi entero hasta el pie.
+            tube(pre+l+'_Upper',[hip,knee],[(.092,.080),(.074,.066)],'legs',p,10)
+            q=empty(pre+l+'Lower',knee,p); tube(pre+l+'_Shin',[knee,ankle],[(.072,.064),(.064,.058)],'legs',q,10)
+            f=empty(pre+l+'Foot',ankle,q); ell(pre+l+'_Paw',paw,pawSize,'legs',f,10,5)
+            if pre=='fore':
+                ell('Shoulder_'+l,(x+.010,y*.93,.450),(.215,.165,.300),'coat',p,12,7)
+            else:
+                # Muslo ligado al pivote existente; sostiene también la pose erguida.
+                ell('Haunch_'+l,(x+.010,y*.90,.395),(.255,.190,.320),'coat',p,12,7)
+            (fronts if pre=='fore' else hinds).append(p)
+            tip=paw[0]-pawSize[0]/2
+            for j in range(4):
+                yy=y+(j-1.5)*.027
+                tube(pre+l+'_Claw_'+str(j),[(tip+.022,yy,.040),(tip-.006,yy,.030),(tip-.018,yy,.012)],[.009,.006,.0015],'claw',f,7)
+    tail=empty('tail',(.410,0,.500),body); ell('Tail',(.430,0,.500),(.060,.060,.060),'coat',tail,8,5)
+    # La pose erguida del v3, sobre el pivote de la cadera.
+    tracks=[(body,'rotation_euler',[(0,0,0),(0,1.16,0),(0,1.16,0),(0,0,0)]),(body,'location',[(.24,0,.42),(.24,0,.49),(.24,0,.49),(.24,0,.42)]),(head,'rotation_euler',[(0,0,0),(0,-.64,0),(0,-.56,0),(0,0,0)])]
+    for p in hinds: tracks.append((p,'rotation_euler',[(0,0,0),(0,-1.16,0),(0,-1.16,0),(0,0,0)]))
+    for i,p in enumerate(fronts): tracks.append((p,'rotation_euler',[(0,0,0),((-.18 if i==0 else .18),-.40,0),((-.23 if i==0 else .23),-.65,0),(0,0,0)]))
+    clip('rear',tracks,[1,25,48,72]); save('bear-v4')
 
 def mule():
     reset(); mat('coat','978772'); mat('coatTop','514B40'); mat('light','C9C1A5'); mat('earInner','706658'); mat('pack','B19A6C'); mat('cloth','A28F63')
@@ -429,6 +514,9 @@ def hoe():
     ell('Socket_Rivet',(0,-.910,-1.102),(.018,.010,.018),'ironEdge',seg=8,rings=4)
     save('hoe')
 
-for id in ['wolf','dog']:
-    canine(id)
-boar(); bear(); mule(); partridge(); bucket(); arrow(); shield(); pickaxe(); hoe()
+# `-- bear` construye sólo esos; sin nombres, todos (el oso, en su v4).
+ONLY=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
+BUILDS=[('wolf',lambda: canine('wolf')),('dog',lambda: canine('dog')),('boar',boar),('bear',bear),('bear_v3',bear_v3),('mule',mule),
+        ('partridge',partridge),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
+for name,build in BUILDS:
+    if (not ONLY and name!='bear_v3') or name in ONLY: build()
