@@ -5915,10 +5915,18 @@ Cuatro reglas, y las cuatro son contrato:
    una decisión encolada, `decide` devuelve `false` y **no sustituye** a la
    anterior. Decidido es decidido: un doble toque no puede cambiar algo que ya va
    camino de `history`.
-2. **Encolar fuerza el tick siguiente de inmediato**, sea cual sea la velocidad.
-   Sin esto, el jugador toca y no pasa nada hasta quince segundos después a ×1, y
-   la decisión más pesada del juego se siente rota. Con esto, el efecto aparece
-   en el acto y sigue habiendo un solo camino de mutación.
+2. **La decisión espera a que cierre su semana** (RD-1, Vera, 30 sep 2026).
+   Hasta ese día encolar forzaba el tick siguiente al momento; con la semana en
+   catorce minutos y ×1 como velocidad normal, cada respuesta hacía saltar el
+   calendario y el sol hasta siete jornadas. Ahora la tarjeta se cierra, no se
+   vuelve a abrir y lo que la opción enseña llega con el tick natural de la
+   semana. Lo mismo vale para todo acto del jugador —dar un medio, la corona,
+   una expedición, contestar una oferta, cobrar una pieza—: se ve al momento lo
+   que la escena enseña (la oferta se retira de la voz, la pieza cae con su
+   «+N» encima del cazador) y el motor lo apunta al cerrar la semana. Si se
+   oculta o se cierra la app con algo en cola, la semana se cierra entonces,
+   con nadie mirando, y la ausencia se cuenta desde su final. Sigue habiendo
+   un solo camino de mutación.
 3. **En pausa la decisión espera.** §8.7 dice que la simulación no se detiene por
    una encrucijada pendiente, no que el jugador no pueda pausar el juego.
 4. **El motor informa; la interfaz enfoca.** `TickReport` devuelve los

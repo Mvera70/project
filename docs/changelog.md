@@ -1,5 +1,21 @@
 # The Valley — Registro de cambios
 
+## v5.43 · 30 sep 2026 · RD-1: a ×1 nada salta — los actos esperan a su semana
+
+Decisión de Vera tras RD-0: **×1 es la velocidad normal** y «la aldea debe
+moverse a un ritmo normal, que se vea todo normal». Hasta hoy cada acto del
+jugador —contestar una encrucijada, dar un medio, la corona, mandar una
+expedición, contestar una oferta, cobrar una pieza— forzaba el tick al
+momento, y a ×1 eso adelantaba el calendario y el sol hasta siete jornadas
+(RD-0, D4). Ahora todos esperan a que cierre su semana (§2.60, regla 2
+reescrita). Lo que se ve, se ve ya: la oferta se retira de la voz, la
+encrucijada contestada no se vuelve a abrir y **la pieza cobrada deja un «+N»
+de grano encima del cazador** (el mismo aviso que la leña, D5). Si se oculta o
+se cierra la app con algo en cola, la semana se cierra entonces y la ausencia
+se cuenta desde su final (`flushQueued`). `attemptDecision` ya no devuelve
+`forceTick`. Recorridos de la oferta (M-0) y del enfoque de la encrucijada
+adaptados: esperan una semana antes de mirar la plata y el enfoque.
+
 ## v5.37 · 30 sep 2026 · Las 21 jornadas rojas viejas, una a una
 
 `test:journeys` tenía **21 rojas en 13 ficheros**, las mismas en `main` y en

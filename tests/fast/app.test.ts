@@ -10,27 +10,24 @@ import { attemptDecision, nextUnusedSeed, resumeAfterHidden } from '@ui/app';
 describe('attemptDecision · §2.60', () => {
   it('sin encrucijada pendiente, no se acepta a ninguna velocidad', () => {
     for (const speed of TIME.SPEEDS) {
-      expect(attemptDecision(false, false, speed)).toEqual({ accepted: false, forceTick: false });
+      expect(attemptDecision(false, false, speed)).toEqual({ accepted: false });
     }
   });
 
   it('con una decisión ya encolada, no sustituye a la anterior', () => {
     // Regla 1: decidido es decidido. Un doble toque no puede cambiar algo que
     // ya va camino de `history`.
-    expect(attemptDecision(true, true, 1)).toEqual({ accepted: false, forceTick: false });
+    expect(attemptDecision(true, true, 1)).toEqual({ accepted: false });
   });
 
-  it('encolar fuerza el tick siguiente a cualquier velocidad en marcha', () => {
-    // Regla 2, sea cual sea la velocidad — 1×, 4× o 16×.
-    for (const speed of [1, 4, 16] as const) {
-      expect(attemptDecision(true, false, speed)).toEqual({ accepted: true, forceTick: true });
+  it('la decisión espera a su semana a cualquier velocidad, también en pausa', () => {
+    // Regla 2, desde RD-1 (Vera, 30 sep 2026): a ×1, la velocidad normal,
+    // forzar el tick hacía saltar el calendario y el sol hasta siete jornadas
+    // con cada respuesta. Se acepta y se queda en la cola hasta que la semana
+    // cierre sola; en pausa, igual (regla 3).
+    for (const speed of TIME.SPEEDS) {
+      expect(attemptDecision(true, false, speed)).toEqual({ accepted: true });
     }
-  });
-
-  it('en pausa la decisión se conserva pero no fuerza nada', () => {
-    // Regla 3: §8.7 dice que la simulación no se detiene por una encrucijada
-    // pendiente, no que el jugador no pueda pausarla él mismo.
-    expect(attemptDecision(true, false, 0)).toEqual({ accepted: true, forceTick: false });
   });
 });
 

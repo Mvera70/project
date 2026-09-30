@@ -1,5 +1,12 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · RD-1a: a ×1 nada salta (v5.43)
+
+Los actos del jugador esperan a su semana (Vera). La pieza cobrada deja su
+«+N» en el acto. **Abierto:** el enfoque de la encrucijada llega al cerrar la
+semana, hasta 14 min después a ×1; si se siente tarde, la escena de la opción
+tendría que empezar en el toque (lo hace el forastero del vado, RD-1b).
+
 ## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
 
 La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60

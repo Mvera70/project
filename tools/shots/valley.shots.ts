@@ -631,6 +631,10 @@ test('alguien sube por el camino y el trato se cierra con un toque (M-0)', async
   await page.getByRole('button', { name: 'Take it' }).click();
   // Y la oferta se va de la voz: ya no hay nadie esperando.
   await test.expect(voice).toHaveCount(0);
+  // RD-1 (Vera, 30 sep 2026): el trato espera a que cierre su semana —a ×1
+  // cerrarla al momento hacía saltar el calendario y el sol—, así que la plata
+  // sube cuando la semana acaba, no en el toque.
+  await advanceWeeks(page, 1, 1);
   await test.expect.poll(async () => Number((await plata.innerText()).replace(/[^\d]/gu, '')))
     .toBeGreaterThan(antes);
   await page.screenshot({ path: 'artifacts/m0-offer-taken.png', fullPage: true });
@@ -835,6 +839,9 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
   const centroAntes = await page.evaluate(() => document.documentElement.dataset.viewCentre ?? '');
   await page.locator('.crossroad-options button').first().click();
   await test.expect(scrim).toBeHidden();
+  // RD-1 (Vera, 30 sep 2026): la decisión espera a que cierre su semana, y
+  // con ella lo que enseña; el enfoque llega entonces, sin saltar el reloj.
+  await advanceWeeks(page, 1, 1);
   await test.expect
     .poll(async () => {
       await page.clock.runFor(100);

@@ -29,7 +29,7 @@ import type { Palette } from '@derive/palette';
 import { moodsFor } from '@derive/moods';
 import { createValleyCamera, BASE_YAW } from './camera';
 import { TERRAIN_CODE, type GameState, type HappeningId, type VillagerId } from '@engine/state';
-import { BUILDINGS, TIME } from '@engine/balance';
+import { BUILDINGS, HUNT, TIME } from '@engine/balance';
 import { woodCostOf } from '@engine/world/works';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
@@ -135,6 +135,8 @@ const HUNT_SIGN_COVER = 0.2;
 const WEEK_SECONDS = TIME.REAL_MS_PER_TICK / 1000;
 /** Lo que vive un «+1» sobre la leñera, en segundos de reloj real. */
 const WOOD_GAIN_LIFE = 2.6;
+/** El dibujo del aviso que sube: la leña de la leñera o el grano de una pieza cobrada (RD-1). */
+type GainIcon = 'logs' | 'wheat';
 /** Dos entradas más juntas que esto se cuentan en el mismo aviso (×16, ×64). */
 const WOOD_GAIN_MERGE = 0.7;
 /** Altura del aviso sobre el suelo de la leñera, en celdas. */
@@ -770,7 +772,7 @@ export async function createGraphicsRenderer(
   // Esquema 12 · lo que el motor ha apuntado de la madera de la semana, visto
   // desde aquí, y los avisos «+1» / «−40» que eso deja sobre la leñera.
   let woodSeen: { tick: number; credited: number; total: number; wood: number; work: number | null } | null = null;
-  let woodGains: { id: number; count: number; x: number; z: number; age: number }[] = [];
+  let woodGains: { id: number; count: number; x: number; z: number; age: number; icon: GainIcon }[] = [];
   let woodGainId = 0;
   /** Quién caza ahora, para seguirlo y devolverlo a su día al acabar. */
   let huntHunter: Dweller | null = null;
@@ -837,13 +839,13 @@ export async function createGraphicsRenderer(
     const z = Math.floor(store / width) + 0.5;
     const shout = (count: number): void => {
       const last = woodGains[woodGains.length - 1];
-      if (last !== undefined && Math.sign(last.count) === Math.sign(count) && last.age < WOOD_GAIN_MERGE) {
+      if (last !== undefined && last.icon === 'logs' && Math.sign(last.count) === Math.sign(count) && last.age < WOOD_GAIN_MERGE) {
         last.count += count;
         last.age = 0;
         return;
       }
       woodGainId += 1;
-      woodGains.push({ id: woodGainId, count, x, z, age: 0 });
+      woodGains.push({ id: woodGainId, count, x, z, age: 0, icon: 'logs' });
     };
     if (now.tick === seen.tick) {
       if (now.credited > seen.credited) shout(now.credited - seen.credited);
@@ -2281,7 +2283,20 @@ export async function createGraphicsRenderer(
           huntScene.step(life.wildlife);
           // AN-5a · El parte espera a que la escena acabe de verse: la pieza
           // cae y se queda, o la que se escapa se va.
-          if (huntScene.completed !== null && huntScene.settled && huntReport === null) huntReport = huntScene.completed;
+          if (huntScene.completed !== null && huntScene.settled && huntReport === null) {
+            huntReport = huntScene.completed;
+            // RD-1 (30 sep 2026) · **La pieza se ve en el acto.** Desde que los
+            // actos esperan a su semana (Vera: a ×1 nada salta), el motor la
+            // apunta al cerrarla, hasta catorce minutos después; lo que el
+            // jugador ve ya es la pieza en el suelo y su «+N» encima del cazador,
+            // con el mismo aviso que la leña. Lo que vale es lo que el motor
+            // pagará (`HUNT.meat`), no una cifra de aquí.
+            if (huntReport.killed) {
+              const hunter = huntScene.hunter;
+              woodGainId += 1;
+              woodGains.push({ id: woodGainId, count: HUNT.meat[huntReport.species], x: hunter.x, z: hunter.z, age: 0, icon: 'wheat' });
+            }
+          }
         } else if (huntSighting !== null && huntSighting.prey !== null) {
           // Esperando: pace a su aire; con el paso congelado en 0 no caduca.
           stepWildPrey(huntSighting.prey, life.land, state.seed ^ huntSighting.tick, 0, []);
@@ -2738,12 +2753,12 @@ export async function createGraphicsRenderer(
       return beginHunt(state, species, weapon) === 'started';
     },
     /** Esquema 12 · los avisos de la leñera en la pantalla: cuánto, dónde y cuánto llevan. */
-    woodGains(): readonly { id: number; count: number; x: number; y: number; age: number }[] {
-      const shown: { id: number; count: number; x: number; y: number; age: number }[] = [];
+    woodGains(): readonly { id: number; count: number; x: number; y: number; age: number; icon: GainIcon }[] {
+      const shown: { id: number; count: number; x: number; y: number; age: number; icon: GainIcon }[] = [];
       for (const gain of woodGains) {
         const point = new Vector3(gain.x, groundFloor(gain.x, gain.z) + WOOD_GAIN_LIFT, gain.z).project(camera);
         if (point.z > 1 || Math.abs(point.x) > 1.05 || Math.abs(point.y) > 1.05) continue;
-        shown.push({ id: gain.id, count: gain.count, age: gain.age / WOOD_GAIN_LIFE,
+        shown.push({ id: gain.id, count: gain.count, age: gain.age / WOOD_GAIN_LIFE, icon: gain.icon,
           x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2 });
       }
       return shown;

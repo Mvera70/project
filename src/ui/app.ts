@@ -96,7 +96,6 @@ export interface App {
 
 export interface DecisionAttempt {
   accepted: boolean;
-  forceTick: boolean;
 }
 
 /**
@@ -108,16 +107,18 @@ export interface DecisionAttempt {
  *
  * Rule 1: an option is accepted only if a crossroad is pending and nothing is
  * already queued — decided is decided, a second tap cannot replace it.
- * Rules 2–3: accepting forces a tick unless the game is paused; paused, §8.7
- * still lets the decision wait rather than making the player unable to pause.
+ * Rule 2 (RD-1, 30 sep 2026, Vera): **the decision waits for its week.** It
+ * used to force the next tick at once, and at ×1 —the normal speed since that
+ * day— every answer jumped the calendar and the sun up to seven days. What the
+ * choice shows happens now; the engine writes it down when the week closes.
  */
 export function attemptDecision(
   hasPendingCrossroad: boolean,
   alreadyQueued: boolean,
   speed: Speed,
 ): DecisionAttempt {
-  const accepted = hasPendingCrossroad && !alreadyQueued;
-  return { accepted, forceTick: accepted && speed !== 0 };
+  void speed;
+  return { accepted: hasPendingCrossroad && !alreadyQueued };
 }
 
 export interface Resumption {
@@ -383,15 +384,15 @@ export function boot(
      * hacía que las palancas no se entendieran.
      */
     give(means): void {
+      // RD-1 · como todo acto, espera a que cierre su semana (Vera, 30 sep
+      // 2026): a ×1 cerrarla ya hacía saltar el calendario y el sol.
       pendingActs.push({ kind: 'means', means });
-      if (speed !== 0) { runTick(); paint(lastFraction); }
     },
     // K-5 · la corona. Va por el mismo conducto que un medio —la cola de actos
     // que el paso 1b consume— porque es el mismo verbo: el jugador da algo y la
     // aldea decide qué hacer con ello. Aquí lo que da es **a alguien**.
     crown(who): void {
       pendingActs.push({ kind: 'crown', who });
-      if (speed !== 0) { runTick(); paint(lastFraction); }
     },
     // §7.15 · mandar gente del tablón: la misma cola de actos que un medio.
     expedition(mission, count): void {
@@ -399,7 +400,6 @@ export function boot(
       // que el envío ya es la respuesta: suena al tocar.
       sound.tap('ui_action_success', Date.now());
       pendingActs.push({ kind: 'expedition', mission, count });
-      if (speed !== 0) { runTick(); paint(lastFraction); }
     },
     setSpeed(value): void {
       // El jugador, y sólo él: la caza y el final también cambian la
@@ -610,7 +610,7 @@ export function boot(
   });
   /** La señal sigue a su presa: se coloca después de pintar, con la cámara de ese fotograma. */
   const placeHuntSign = (): void => {
-    const at = huntInProgress || currentRoute.kind !== 'valley' || state.crossroad !== null
+    const at = huntInProgress || currentHuntOffer === null || currentRoute.kind !== 'valley' || state.crossroad !== null
       || state.ended !== null || backend.live.kind !== 'pilot3d' ? null : backend.live.huntSign();
     huntSign.hidden = at === null;
     if (at === null) return;
@@ -1018,7 +1018,11 @@ export function boot(
     // le da—, así que se ofrece mientras esté en el estado y se retira cuando el
     // motor la quita: aceptada, dejada pasar o ida. Un suceso la tapa sus cinco
     // segundos y vuelve sola (`voice.ts`).
-    const waiting = state.offer;
+    // RD-1 · contestada, la oferta se retira ya aunque el motor la apunte al
+    // cerrar la semana: quien la aceptó no tiene que ver al tratante esperando
+    // catorce minutos más.
+    const answeredOffer = pendingActs.some((act) => act.kind === 'offer');
+    const waiting = answeredOffer ? null : state.offer;
     if (waiting === null) {
       if (spokenOffer !== null) { voice = clearOffer(voice); spokenOffer = null; }
     } else if (spokenOffer !== waiting.postedTick) {
@@ -1049,11 +1053,9 @@ export function boot(
     // Los dos toques sólo cuando lo que se lee **es** la oferta: si un suceso la
     // está tapando, contestar a ciegas sería contestar a otra cosa.
     shell.setOffer(now?.role === 'offer', (accept) => {
+      // Como una decisión (§2.60, regla 2): espera a que cierre su semana
+      // (RD-1, Vera, 30 sep 2026: a ×1 nada salta).
       pendingActs.push({ kind: 'offer', accept });
-      // Como una decisión (§2.60, regla 2): se contesta ahora, no en catorce
-      // minutos. En pausa se queda en la cola, que es lo que §8.7 hace con una
-      // decisión tomada con el reloj parado.
-      if (speed !== 0) { runTick(); paint(lastFraction); }
     });
     // VZ-4 · la cámara va detrás de quien se sigue, fotograma a fotograma.
     if (trackedId !== null) renderer.track(trackedId);
@@ -1063,14 +1065,17 @@ export function boot(
       currentRoute.kind === 'valley' && backend.live.kind === 'pilot3d' ? backend.live.woodGains() : [],
       backend.live.kind === 'pilot3d' ? backend.live.surface.getBoundingClientRect() : null,
     );
-    // El resultado físico llega en un fotograma, no al cabo de otra semana
-    // de reloj real. Se entrega al motor justo después de pintar el impacto.
+    // El resultado físico queda en la cola en cuanto la escena acaba, y el
+    // motor lo apunta al cerrar la semana (RD-1, Vera, 30 sep 2026: a ×1
+    // forzar el tick adelantaba el calendario hasta catorce minutos). Lo que
+    // el jugador ve ya es la pieza y su «+N» (`woodGains`). Y la ocasión de
+    // esta semana está gastada: la señal no vuelve hasta la siguiente.
     if (huntInProgress) {
       const completed = backend.live.hunt();
       if (completed !== null) {
         pendingActs.push({ kind: 'hunt', ...completed });
         endHunt();
-        queueMicrotask(() => { runTick(); paint(lastFraction); });
+        currentHuntOffer = null;
       }
     }
     // §11.2's third screen opens itself the moment there is something to
@@ -1093,7 +1098,10 @@ export function boot(
     // texto asomando por debajo del panel, opciones y precio incluidos.
     // Volver al valle es lo mismo que ya hace deslizar hacia abajo para
     // aplazarla (S-05, U-14): la decisión se queda pendiente, no se pierde.
-    if (state.crossroad !== null && state.ended === null) {
+    // RD-1 · con la decisión ya en cola (espera a que cierre su semana), la
+    // encrucijada sigue en el estado pero está contestada: ni se vuelve a abrir
+    // ni sella la bandeja.
+    if (state.crossroad !== null && state.ended === null && pendingDecision === undefined) {
       const pending = state.crossroad;
       // VZ-03 · si el jugador la aplazó, **la marca es el sello del ornamento**
       // y no se le vuelve a plantear hasta que lo toque (§8.6: espera, no
@@ -1434,7 +1442,16 @@ export function boot(
   // ordinary thing a player does. Hiding notes the hour; coming back owes it.
   let hiddenAtMs: number | null = null;
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { hiddenAtMs = Date.now(); persist(); return; }
+    if (document.hidden) {
+      // RD-1 · lo que el jugador dejó en cola se apunta antes de irse: la
+      // semana se cierra ahora, con nadie mirando, y la ausencia se cuenta
+      // desde donde habría acabado esa semana para no regalar el resto.
+      const ahead = flushQueued();
+      hiddenAtMs = Date.now() + ahead;
+      persist();
+      if (ahead > 0) savedAtOverride = null;
+      return;
+    }
     const since = hiddenAtMs;
     hiddenAtMs = null;
     if (since === null || catchingUp || state.ended !== null) return;
@@ -1446,6 +1463,7 @@ export function boot(
     if (resumption.ticks > 0) catchUpFor(Date.now() - since, resumption.welcome, speed);
   });
   window.addEventListener('pagehide', () => {
+    flushQueued();
     persist();
     loop?.stop();
     endingTransition?.cancel();
@@ -1468,6 +1486,24 @@ export function boot(
    * un acto, aunque hoy sólo haya una clase de acto.
    */
   let pendingActs: PlayerAct[] = [];
+  /**
+   * RD-1 (30 sep 2026) · **Lo que espera a su semana no se pierde al irse.**
+   * Desde que los actos y las decisiones esperan al cierre de la semana (Vera:
+   * a ×1 nada salta), la cola vive en memoria hasta catorce minutos; cerrar u
+   * ocultar la app en ese rato la perdía. Aquí se cierra la semana con nadie
+   * mirando y el guardado se fecha en el fin de esa semana, así que la ausencia
+   * no regala lo que quedaba de ella. Devuelve cuántos ms de semana se
+   * adelantaron (0 si no había nada en cola o el juego está en pausa: en pausa
+   * la decisión espera, §2.60 regla 3).
+   */
+  const flushQueued = (): number => {
+    if (speed === 0 || state.ended !== null || catchingUp) return 0;
+    if (pendingDecision === undefined && pendingActs.length === 0 && !huntInProgress) return 0;
+    const ahead = Math.max(0, (1 - lastFraction) * TIME.REAL_MS_PER_TICK / speed);
+    runTick();
+    savedAtOverride = Date.now() + ahead;
+    return ahead;
+  };
   const finish = (): void => {
     if (state.ended === null || finishing) return;
     finishing = true;
@@ -1783,7 +1819,6 @@ export function boot(
       const attempt = attemptDecision(state.crossroad !== null, pendingDecision !== undefined, speed);
       if (!attempt.accepted || state.crossroad === null) return false;
       pendingDecision = { templateId: state.crossroad.templateId, optionId };
-      if (attempt.forceTick) { runTick(); paint(lastFraction); }
       return true;
     },
     look(x: number, y: number): void {
