@@ -1578,13 +1578,25 @@ export function boot(
     // Con `look`, la cámara se vuelve antes hacia ella: en una villa de ochenta
     // años la casa del centro puede caer fuera del encuadre.
     if (look) backend.live.look(target.x + target.w / 2, target.y + target.h / 2);
-    const seen = backend.live.screenOf({ kind: 'building', id: target.id });
-    if (seen !== null) return seen;
     const box = backend.live.surface.getBoundingClientRect();
-    return {
+    const guess = backend.live.screenOf({ kind: 'building', id: target.id }) ?? {
       x: ((target.x + target.w / 2) * box.width) / state.map.width,
       y: ((target.y + target.h / 2) * box.height) / state.map.height,
     };
+    // **Y el punto se comprueba con el mismo `pick` que usa el dedo** (30 sep
+    // 2026): la proyección del tejado podía caer en la hierba de al lado y el
+    // recorrido acababa barriendo a ciegas, a segundos por toque. Se busca en
+    // espiral, de cuatro en cuatro píxeles, el primero que el juego reconoce
+    // como un edificio; sólo si no hay ninguno se devuelve la proyección.
+    for (let r = 0; r <= 160; r += 4) {
+      for (let a = 0; a < (r === 0 ? 1 : 16); a++) {
+        const x = guess.x + r * Math.cos((a * Math.PI) / 8);
+        const y = guess.y + r * Math.sin((a * Math.PI) / 8);
+        if (x < 1 || y < 1 || x > box.width - 1 || y > box.height - 1) continue;
+        if (backend.live.pick(state, x, y, lastFraction)?.kind === 'building') return { x, y };
+      }
+    }
+    return guess;
   };
 
   window.__valleyBurn = (): { x: number; y: number } | null => {

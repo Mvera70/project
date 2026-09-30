@@ -228,14 +228,11 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
 });
 
 test('tocar un edificio abre su ficha y «Valley» la cierra (S-05, Canvas)', async ({ page }) => {
-  // **Separado de U-14 y declarado roto el 30 sep 2026.** En la reserva 2D
-  // (`?render=canvas`) tocar la casa —justo donde `__valleyHouseOnScreen` dice
-  // que está, y el toque cae en `#valley`— no abre ninguna ficha: medido a
-  // mano, `data-screen` sigue en `valley` y no hay `.valley-panel`. En el 3D,
-  // que es el juego, sí abre (lo guarda «la ruta viva»). La propiedad se queda
-  // intacta y el recorrido, como fallo esperado hasta que alguien arregle el
-  // toque de la reserva: `docs/task-log.md`, tanda del 30 sep.
-  test.fail();
+  // **Separado de U-14 el 30 sep 2026**, y dado por roto una hora: en la
+  // reserva 2D (`?render=canvas`) tocar la casa no montaba `.valley-panel`.
+  // No estaba roto: desde A1 el toque abre la etiqueta de pergamino
+  // (`.valley-label`), en Canvas igual que en 3D, y la prueba miraba la ficha
+  // vieja.
   await page.goto(CANVAS);
   await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor();
@@ -277,7 +274,12 @@ test('tocar un edificio abre su ficha y «Valley» la cierra (S-05, Canvas)', as
   // que valga. Así que se barre el encuadre de veinte en veinte píxeles desde
   // el centro hacia fuera y se para en el primer toque que abre algo, que es
   // exactamente lo que hace un dedo que busca una casa.
-  const panel = page.locator('.valley-panel:not(.valley-orders)');
+  // **Lo que abre un toque en el valle es la etiqueta de pergamino** (A1,
+  // `redesign/label.ts`): desde la piel v8 el toque no monta ya la ficha
+  // `.valley-panel`, que queda para la gente y la crónica. La prueba buscaba
+  // la ficha vieja y barría hasta agotar el tiempo con la etiqueta abierta
+  // delante (medido el 30 sep 2026, a mano, en 3D y en Canvas).
+  const panel = page.locator('.valley-label, .valley-panel:not(.valley-orders)').first();
   const ancho = box?.width ?? 390;
   const alto = box?.height ?? 844;
   const cx = ancho / 2;
@@ -445,7 +447,12 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // que valga. Así que se barre el encuadre de veinte en veinte píxeles desde
   // el centro hacia fuera y se para en el primer toque que abre algo, que es
   // exactamente lo que hace un dedo que busca una casa.
-  const panel = page.locator('.valley-panel:not(.valley-orders)');
+  // **Lo que abre un toque en el valle es la etiqueta de pergamino** (A1,
+  // `redesign/label.ts`): desde la piel v8 el toque no monta ya la ficha
+  // `.valley-panel`, que queda para la gente y la crónica. La prueba buscaba
+  // la ficha vieja y barría hasta agotar el tiempo con la etiqueta abierta
+  // delante (medido el 30 sep 2026, a mano, en 3D y en Canvas).
+  const panel = page.locator('.valley-label, .valley-panel:not(.valley-orders)').first();
   const ancho = box?.width ?? 390;
   const alto = box?.height ?? 844;
   const cx = ancho / 2;
@@ -477,7 +484,7 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
     if (await panel.isVisible()) break;
   }
   await test.expect(panel).toBeVisible();
-  await test.expect(page.locator('.valley-panel:not(.valley-orders) h2')).not.toBeEmpty();
+  await test.expect(panel.locator('h2, h3').first()).not.toBeEmpty();
   await page.screenshot({ path: 'artifacts/m21-panel.png', fullPage: true });
 });
 

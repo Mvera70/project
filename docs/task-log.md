@@ -25,11 +25,13 @@ Tras cada fusión, las que quedan traen `main` (merge, no rebase) y vuelven a
 pasar su puerta. **Una sesión nueva pide su bloque de versiones al director:
 el siguiente libre es la v5.38.**
 
-**Abierto, hallado al poner la reja en verde:** en la reserva 2D
-(`?render=canvas`) tocar un edificio no abre su ficha —medido: el toque cae en
-`#valley` sobre la casa y `data-screen` sigue en `valley`—; en el 3D sí. Su
-recorrido queda como fallo esperado (`test.fail`, «S-05, Canvas») hasta que
-alguien arregle el toque de la reserva. Es de interfaz.
+**Cerrado el mismo día, y no era del juego:** el recorrido de «tocar un
+edificio» en Canvas y el de «la ruta viva» en 3D fallaban porque buscaban la
+ficha `.valley-panel`, y desde A1 (piel v8) el toque en el valle abre la
+etiqueta de pergamino `.valley-label`. Con la etiqueta abierta delante, la ruta
+viva seguía barriendo hasta agotar los 300 s. Las dos pasan en local; el
+gancho `__valleyHouseOnScreen` comprueba ahora su punto con el mismo `pick` que
+usa el dedo.
 
 **Abierto para Vera:** fusionar en ese orden; decidir el reparto de lo que la
 revisión de rendimiento dejó sin dueño; y, con #8 dentro, abrir la villa 7/60
