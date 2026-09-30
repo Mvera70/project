@@ -106,10 +106,22 @@ suena nada**: cambia qué llega a sonar y lo que cuesta.
 - **Medido.** Los acentos de la interfaz salen en el 0,7–1,2 % de las semanas
   (cinco semillas, sesenta años), con una semana como mínimo entre dos —13 s a
   ×64—, así que no necesitan compuerta de velocidad: el fusible basta.
+- **Un tope de voces para el mundo** (`SOUND.MAX_WORLD_VOICES`, 8): el
+  fusible por sonido no impide que siete golpes **distintos** se apilen en la
+  salva de un asalto. Los toques del jugador no cuentan ni se descartan. Sin
+  medir contra un asalto real.
+- **Fuera del sonido: el tablón no recibía toques.** Su velo cuelga de
+  `.ui-shell`, que deja pasar los toques al valle, y no lo reactivaba: el
+  lienzo 3D se comía el aspa, los avisos y el velo, así que no se podía
+  cerrar ni mandar a nadie tocando. Lo encontró el recorrido al cerrar el
+  tablón; una línea en `board.ts`.
 - **Probado.** `tests/fast/sound-player.test.ts` ejercita por fin el
-  reproductor con un `AudioContext` simulado (seis de sus nueve pruebas fallan
+  reproductor con un `AudioContext` simulado (seis de sus pruebas fallan
   contra el de antes); el recorrido `sound-check.mjs` exige «una vez» en cada
-  cierre y vuelta: **34/34 toques y 8/8 ambiente** en Chromium.
+  cierre y vuelta, cierra el tablón (gancho `__valleyOpenBoard`), deja
+  decodificar tras armar y reintenta el ambiente en vez de esperar a ciegas:
+  **35/35 toques y 8/8 ambiente** en Chromium, tres pasadas seguidas. Y
+  `valley.pwa.ts` comprueba el sonido sin red tras una sola visita.
 
 ## v5.24 · 30 sep 2026 · Siete sonidos de caza y asedio, rehechos de ruido y elegidos «a mi criterio»
 

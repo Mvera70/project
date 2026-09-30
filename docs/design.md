@@ -4206,7 +4206,8 @@ uno (30,7 MB los catorce) y **se sueltan** cuando llevan
 `SOUND.AMBIENCE_RELEASE_SECONDS` callados, y todos al apagar. Un fichero que no
 llegó se vuelve a pedir pasado `SOUND.FETCH_RETRY_MS`, y el service worker
 precachea los 47 en la instalación (`public/audio/manifest.json`, que escribe
-`sounds.py` al sellar).
+`sounds.py` al sellar). Los sucesos del mundo no suenan más de
+`SOUND.MAX_WORLD_VOICES` a la vez; los toques del jugador no tienen tope.
 
 ### 11.11 El fondo del mundo (29 sep 2026)
 

@@ -248,8 +248,10 @@ dentro de `navigate` (que también llama el juego).
 Lo de arriba vale para un sonido de un solo disparo. **Un ambiente no es eso.**
 El reproductor lo sabe hacer desde la fase 0 de `docs/plan-audio-mundo.md`:
 bucles (`LOOP_FILES`), una ganancia por capa que cruza (`ambience`) y la
-cercanía de la cámara. Lo que **no** tiene es panorámica estéreo, tope de
-voces ni `duck`.
+cercanía de la cámara, y un tope de voces para los sucesos del mundo
+(`SOUND.MAX_WORLD_VOICES`; los toques del jugador no cuentan). Lo que **no**
+tiene es panorámica estéreo ni `duck`: bajar el mundo bajo un hito es
+mezcla, y la decide Vera escuchando.
 
 **Y un bucle pesa mientras vive.** Un lecho de doce segundos decodificado son
 2,3 MB, y los catorce 30,7 MB a 48 kHz. Por eso el reproductor **suelta** el

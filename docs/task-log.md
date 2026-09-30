@@ -6,11 +6,14 @@ Hecho lo que la revisión encontró en el sonido: el trueno cercano suena
 (`sound.sky`), nueve botones dejan de sonar dos o tres veces (`OWN_VOICE`), los
 lechos callados se sueltan y apagado no se paga nada, el audio entra en el
 precaché y un fallo de descarga se reintenta. Nada cambia de carácter.
-**Abierto:** que Vera lo oiga en el aparato; el cierre del tablón no está en
-el recorrido (sólo se abre tocándolo en el mundo); el paso «de noche se
-relevan» del recorrido salió rojo una vez de cinco y verde en las otras
-cuatro —la mezcla es de `ambience.ts`, que esta ronda no toca—; y sigue sin
-cifra de coste en un aparato, sin tope de voces y sin `duck` (revisión §7).
+Y un tope de voces para el mundo (`SOUND.MAX_WORLD_VOICES`). El recorrido
+cierra ya el tablón, y al hacerlo destapó que **el tablón no recibía toques**
+(su velo heredaba `pointer-events: none`): arreglado en `board.ts`. Recorrido
+35/35 · 8/8 en tres pasadas; `test:pwa` 7/7.
+**Abierto:** que Vera lo oiga en el aparato; la cifra de coste en un aparato
+(no hay aparato aquí); el `duck` —bajar el mundo bajo un hito— es mezcla y la
+decide Vera escuchando; y `MAX_WORLD_VOICES` sin medir contra un asalto real
+(`?sandbox=battle`).
 
 ## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
 

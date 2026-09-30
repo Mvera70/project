@@ -144,7 +144,10 @@ async function openArmed(query) {
   await tab.waitForFunction(() => document.documentElement.dataset.appReady === 'true', null, { timeout: 90_000 });
   await tab.waitForTimeout(1200);
   await tab.mouse.click(4, 300);
-  await tab.waitForTimeout(300);
+  // Armar decodifica los 33 toques, y con swiftshader y el valle cargando eso
+  // pasa del cuarto de segundo: un toque pedido antes llega tarde y
+  // `SOUND.LATE_PLAY_MS` lo tira. Salió mudo una vez de cada dos con 300 ms.
+  await tab.waitForTimeout(2000);
 }
 await openArmed('offer=1');
 await step('oferta · aceptarla (responde el motor)', 'ui_offer_accept', async () => {
