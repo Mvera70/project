@@ -965,7 +965,24 @@ def stamp() -> int:
         source = re.sub(pattern, restamp, source, flags=re.M)
     with open(SOUND_TS, 'w', encoding='utf-8') as fh:
         fh.write(source)
+    write_manifest(source)
     return changed
+
+
+def write_manifest(source: str) -> None:
+    """
+    La lista de lo que suena, con su huella, en `public/audio/manifest.json`.
+
+    **Para el service worker**, que no puede leer `sound.ts` y precachea con
+    esto en la instalación, igual que los modelos: sin ella, quien abría el
+    juego una vez y se quedaba sin red se quedaba también sin sonido (revisión
+    del 30 sep 2026, §6). Sale de lo ya sellado, así que no puede decir otra
+    cosa que `CUE_FILES` y `LOOP_FILES`; lo vigila `sound.test.ts`.
+    """
+    files = sorted(set(re.findall(r"'([a-z_]+\.mp3\?v=[0-9a-f]+)'", source)))
+    with open(os.path.join(OUT_GAME, 'manifest.json'), 'w', encoding='utf-8') as fh:
+        json.dump({'files': files}, fh, indent=2)
+        fh.write('\n')
 
 
 def main() -> None:

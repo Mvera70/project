@@ -1,5 +1,20 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · El sonido tras la revisión (v5.31) — **fusionada (PR #14)**
+
+Hecho lo que la revisión encontró en el sonido: el trueno cercano suena
+(`sound.sky`), nueve botones dejan de sonar dos o tres veces (`OWN_VOICE`), los
+lechos callados se sueltan y apagado no se paga nada, el audio entra en el
+precaché y un fallo de descarga se reintenta. Nada cambia de carácter.
+Y un tope de voces para el mundo (`SOUND.MAX_WORLD_VOICES`). El recorrido
+cierra ya el tablón, y al hacerlo destapó que **el tablón no recibía toques**
+(su velo heredaba `pointer-events: none`): arreglado en `board.ts`. Recorrido
+35/35 · 8/8 en tres pasadas; `test:pwa` 7/7.
+**Abierto:** que Vera lo oiga en el aparato; la cifra de coste en un aparato
+(no hay aparato aquí); el `duck` —bajar el mundo bajo un hito— es mezcla y la
+decide Vera escuchando; y `MAX_WORLD_VOICES` sin medir contra un asalto real
+(`?sandbox=battle`).
+
 ## 30 sep 2026 · La caza tras la revisión: el jabalí en la linde, el cazador que sale andando, la caza sin picos (v5.30)
 
 Encargo de la revisión del 30 sep (sesión «Cambios recientes revisión», por
