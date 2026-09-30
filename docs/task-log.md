@@ -11,6 +11,16 @@ elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
 botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
 los momentos de §11.10.
 
+## 30 sep 2026 · Fase 5 del sonido: contrato y siete sonidos, a la espera de oído (v5.22)
+
+Hecho en la rama, **sin fusionar a main hasta que Vera los oiga** (skill
+`sonido-del-valle`, §9): `GraphicsStats.moments` + `ui/moments.ts` + siete
+`combat_*`. El oso no suena (voz de animal). **Abierto:** que Vera elija
+variante o descarte (página de escucha «Sonidos de caza y asedio»); comprobar
+en navegador con un cerco real (`?sandbox=battle` a ×4 tarda más de tres
+minutos en swiftshader); el cuerno de aviso y el material de la flecha
+(`encargos-3d.md`).
+
 ## 30 sep 2026 · Sonido: pestaña oculta y prueba lenta (v5.21)
 
 Integración pidió cuatro cosas. Hechas: el `AudioContext` se suspende al

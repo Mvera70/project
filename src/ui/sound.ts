@@ -68,7 +68,15 @@ export type Cue =
   | 'weather_lightning_crack'
   | 'weather_thunder_near'
   | 'weather_thunder_mid'
-  | 'weather_thunder_far';
+  | 'weather_thunder_far'
+  // La caza y el asedio (fase 5): los dispara `moments.ts`, con su distancia.
+  | 'combat_arrow_loose'
+  | 'combat_arrow_hit'
+  | 'combat_arrow_miss'
+  | 'combat_melee'
+  | 'combat_fall'
+  | 'combat_gate_hit'
+  | 'combat_gate_break';
 
 /**
  * Qué fichero suena en cada momento, relativo a la página
@@ -106,6 +114,13 @@ export const CUE_FILES: Readonly<Partial<Record<Cue, string>>> = {
   weather_thunder_near: 'weather_thunder_near.mp3?v=9f478873',
   weather_thunder_mid: 'weather_thunder_mid.mp3?v=017d246e',
   weather_thunder_far: 'weather_thunder_far.mp3?v=2d10980b',
+  combat_arrow_loose: 'combat_arrow_loose.mp3?v=bb1be14c',
+  combat_arrow_hit: 'combat_arrow_hit.mp3?v=0e2cceac',
+  combat_arrow_miss: 'combat_arrow_miss.mp3?v=b3302990',
+  combat_melee: 'combat_melee.mp3?v=72ef9c34',
+  combat_fall: 'combat_fall.mp3?v=15154ed7',
+  combat_gate_hit: 'combat_gate_hit.mp3?v=05727cd4',
+  combat_gate_break: 'combat_gate_break.mp3?v=5105b807',
 };
 
 /**
@@ -153,6 +168,17 @@ export function accentAllowed(nowMs: number, lastPlayedMs: number | null): boole
 export function contextAction(state: string, hidden: boolean): 'suspend' | 'resume' | null {
   if (hidden) return state === 'running' ? 'suspend' : null;
   return state === 'suspended' || state === 'interrupted' ? 'resume' : null;
+}
+
+/**
+ * El fusible de un suceso del mundo: el mismo golpe no se apila sobre sí mismo
+ * dentro de `SOUND.MOMENT_MIN_GAP_MS`, y uno que no llega a `MOMENT_MIN_GAIN`
+ * no se programa. Una salva de siete arcos en el mismo fotograma suena como
+ * una y no como una ametralladora.
+ */
+export function momentAllowed(nowMs: number, lastPlayedMs: number | undefined, gain: number): boolean {
+  if (gain < SOUND.MOMENT_MIN_GAIN) return false;
+  return lastPlayedMs === undefined || nowMs - lastPlayedMs >= SOUND.MOMENT_MIN_GAP_MS;
 }
 
 /** El fusible de un toque: el mismo sonido no se apila sobre sí mismo. */
@@ -269,6 +295,11 @@ export interface SoundEngine {
   /** La respuesta a un toque del jugador. `rate` sube o baja el tono. */
   tap(cue: Cue, nowMs: number, rate?: number): void;
   /**
+   * Un suceso del mundo (caza, asedio) con la cercanía de la cámara (0 a 1).
+   * Pasa por `momentAllowed` y varía el tono un poco cada vez.
+   */
+  moment(cue: Cue, nowMs: number, gain: number): void;
+  /**
    * El fondo del mundo: cada capa a su volumen, cruzando desde el que tenía.
    * Se llama en cada pintado con la mezcla entera; lo que no venga, se apaga.
    */
@@ -281,6 +312,7 @@ export function createSoundEngine(): SoundEngine {
   let master: GainNode | null = null;
   let lastAccentMs: number | null = null;
   const lastTapMs: Partial<Record<Cue, number>> = {};
+  const lastMomentMs: Partial<Record<Cue, number>> = {};
   const bytes = new Map<string, Promise<ArrayBuffer | null>>();
   const buffers = new Map<string, Promise<AudioBuffer | null>>();
   /** Una capa viva: su bucle, su ganancia y a qué volumen va. */
@@ -323,7 +355,7 @@ export function createSoundEngine(): SoundEngine {
     return pending;
   };
 
-  const start = (cue: Cue, rate: number, requestedMs: number): void => {
+  const start = (cue: Cue, rate: number, requestedMs: number, level = 1): void => {
     if (!isEnabled() || ctx === null || master === null) return;
     // Con la pestaña oculta no suena nada, y menos aún se reanuda el contexto:
     // un temporizador de trueno que vence de fondo soltaría todo de golpe al volver.
@@ -339,7 +371,14 @@ export function createSoundEngine(): SoundEngine {
       const source = context.createBufferSource();
       source.buffer = buffer;
       source.playbackRate.value = rate;
-      source.connect(out);
+      if (level === 1) {
+        source.connect(out);
+      } else {
+        const near = context.createGain();
+        near.gain.value = level;
+        source.connect(near);
+        near.connect(out);
+      }
       source.start();
       if (typeof window !== 'undefined') {
         const log = window.__valleySound ?? { played: [] };
@@ -441,6 +480,12 @@ export function createSoundEngine(): SoundEngine {
       if (CUE_FILES[cue] === undefined || !tapAllowed(nowMs, lastTapMs[cue])) return;
       lastTapMs[cue] = nowMs;
       start(cue, rate, Date.now());
+    },
+    moment(cue: Cue, nowMs: number, gain: number): void {
+      if (CUE_FILES[cue] === undefined || !momentAllowed(nowMs, lastMomentMs[cue], gain)) return;
+      lastMomentMs[cue] = nowMs;
+      const jitter = 1 + (Math.random() - 0.5) * SOUND.MOMENT_PITCH_JITTER;
+      start(cue, jitter, Date.now(), Math.min(1, gain));
     },
   };
 }

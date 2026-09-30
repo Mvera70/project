@@ -309,7 +309,11 @@ Lo que hay que tener en la cabeza antes de tocar el ambiente:
   `scenic-state.ts`). Un sonido atado al tick llega **antes que la imagen** para
   edificios, nacimientos y muertes. Lo que se pinta del estado vivo (fuegos,
   árboles que caen, el «+1» de la madera) no tiene desfase.
-- **No hay un flujo de sucesos**: hay estado que se puede leer. Las tres formas
+- **Ya hay un contrato para la caza y el asedio** (30 sep 2026):
+  `GraphicsStats.moments` + `ui/moments.ts`. Un suceso nuevo añade su cuenta
+  al renderer, su `MomentKind` y su fila en `MOMENT_CUE`; nunca un `sound.*`
+  suelto en la capa de vida. Una cuenta que baja es una jornada nueva.
+- **No hay un flujo de sucesos general**: hay estado que se puede leer. Las tres formas
   de saber *cuándo*, en orden de coste: lo que ya sale por `stats()` y el
   `TickReport`; lo que existe dentro del renderer y hay que exponer con un
   descriptor pequeño; y lo que no existe y necesita un gancho. Todos de **sólo

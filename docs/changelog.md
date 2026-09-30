@@ -75,6 +75,39 @@ matriz (§2.7).
   anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
   primera jornada de una sesión (matriz §2.7).
 
+## v5.22 · 30 sep 2026 · Fase 5 del sonido: el contrato de sucesos y siete sonidos de caza y asedio
+
+Lo que integración pidió y quedaba abierto: que la caza y el combate publiquen
+sus sucesos, y que suenen. **Los sonidos esperan a que Vera los oiga**
+(página de escucha publicada aparte): por eso van en la rama y no en main.
+
+- **El contrato.** `GraphicsStats.moments` (`render3d/contracts.ts`): cuentas
+  que sólo suben —flechas soltadas y aciertos, golpes, caídos de los dos
+  bandos, golpes y rotura del portón, el último tiro o estocada de la caza, las
+  veces que el oso se alza—. El renderer las copia de lo que la capa de vida ya
+  contaba (`momentsOf`, y un getter `bearAlert` en `village.ts`): **sólo
+  lectura, ni un dato nuevo del motor ni una tirada**. `ui/moments.ts` (puro)
+  saca de dos fotogramas qué acaba de pasar: sin anterior no suena nada, una
+  cuenta que baja es una jornada nueva, tope de tres por clase y fotograma,
+  y una jornada que abre con el portón ya roto no lo rompe otra vez.
+- **Siete sonidos**, foley de materiales sin voces ni notas (`sounds.py`):
+  soltar la flecha, flecha en carne, flecha en madera o tierra, choque,
+  cuerpo que cae, golpe al portón, portón que cede. **Medidos:** 94–100 % de la
+  energía en la banda del teléfono, < 1,3 % sobre 4 kHz, primera y última
+  muestra a cero. La primera tanda salía con el 6–20 % en banda (cuerpos de
+  200–300 Hz: la trampa número uno de la skill) y se subió antes de nada.
+- **Suenan en su sitio.** `app.ts` los sirve con la cercanía de la cámara
+  (`nearness`), por un fusible por sonido (`SOUND.MOMENT_MIN_GAP_MS`, TUNE), con
+  ±3 % de tono, y callan en pausa, en un letargo, con la pestaña oculta y a
+  ×16 o más.
+- **El oso se alza y no suena.** Es un suceso del contrato con su sitio, pero su
+  gruñido sería una voz de animal sintética, descartada en U-09; queda sin
+  fichero hasta que haya voces (decisión 1 de §6).
+- Pruebas: `tests/fast/moments.test.ts` (16, propiedades del contrato y de las
+  compuertas). **No comprobado en navegador:** el banco de batallas en el
+  Chromium de la nube (swiftshader) no llegó al combate en tres minutos; el
+  cableado se apoya en tipos, lint y las pruebas puras.
+
 ## v5.21 · 30 sep 2026 · El sonido calla con la pestaña oculta; una prueba de 25 s se muda a las jornadas
 
 Dos de los cuatro puntos que integración trajo sobre el sonido. Los otros dos

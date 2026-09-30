@@ -4250,6 +4250,19 @@ se oiga el latido del bucle al dar la vuelta.
 - Respeta `prefers-reduced-motion`: sin nieve animada, sin aspas girando, la
   multitud se dibuja quieta en su tramo.
 
+### 11.12 La caza y el asedio suenan (30 sep 2026)
+
+El renderer publica **cuentas que sólo suben** (`GraphicsStats.moments`:
+flechas, golpes, caídos, portón, último tiro de la caza, oso alzado) y
+`ui/moments.ts` saca de la diferencia entre dos fotogramas qué acaba de pasar.
+Es el contrato de sucesos de la caza y el combate: de sólo lectura, sin datos
+nuevos del motor ni azar (§4.3), y quien añada un suceso añade su cuenta, su
+`MomentKind` y su fila en `MOMENT_CUE`. Cada suceso suena con la cercanía de la
+cámara (`nearness`), por un fusible por sonido (`SOUND.MOMENT_MIN_GAP_MS`), y
+calla en pausa, en un letargo, con la pestaña oculta y a ×16 o más. Siete
+sonidos de materiales, sin voces; **el oso se alza y no suena** hasta que haya
+voces. Los sonidos entran en el juego principal con el visto bueno de Vera.
+
 ---
 
 ## 12. Balance
