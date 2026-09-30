@@ -11,15 +11,16 @@ elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
 botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
 los momentos de §11.10.
 
-## 30 sep 2026 · Fase 5 del sonido: contrato y siete sonidos, a la espera de oído (v5.22)
+## 30 sep 2026 · Fase 5 del sonido: el contrato sí, los siete sonidos no (v5.22, v5.23)
 
-Hecho en la rama, **sin fusionar a main hasta que Vera los oiga** (skill
-`sonido-del-valle`, §9): `GraphicsStats.moments` + `ui/moments.ts` + siete
-`combat_*`. El oso no suena (voz de animal). **Abierto:** que Vera elija
-variante o descarte (página de escucha «Sonidos de caza y asedio»); comprobar
-en navegador con un cerco real (`?sandbox=battle` a ×4 tarda más de tres
-minutos en swiftshader); el cuerno de aviso y el material de la flecha
-(`encargos-3d.md`).
+Vera descartó los siete `combat_*` («juguetes, timbales»): tenían una resonancia
+de 200–260 ms, medida con `tools/ui/tonality.py`. **En main irá el contrato**
+(`GraphicsStats.moments` + `ui/moments.ts`, todo `MOMENT_CUE` a `null`) y ningún
+sonido. **Abierto:** que elija familia en la segunda tanda (golpe al portón, cinco
+familias de ruido, misma página de escucha) y con esa dirección rehacer los
+otros seis; comprobar el cableado en navegador con un cerco real; el cuerno de
+aviso y el material de la flecha (`encargos-3d.md`). Si el ruido tampoco
+convence: grabaciones libres de derechos (decisión de Vera).
 
 ## 30 sep 2026 · Sonido: pestaña oculta y prueba lenta (v5.21)
 

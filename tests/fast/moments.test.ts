@@ -106,9 +106,8 @@ describe('el contrato, contra los ficheros', () => {
     }
   });
 
-  it('la caza y el asedio no se quedan mudos: sólo el oso está sin voz', () => {
-    const mute = (Object.keys(MOMENT_CUE) as MomentKind[]).filter((kind) => MOMENT_CUE[kind] === null);
-    expect(mute).toEqual(['bear_rises']);
+  it('el oso no suena: un gruñido es una voz de animal y una voz sintética está descartada', () => {
+    expect(MOMENT_CUE.bear_rises).toBeNull();
   });
 });
 

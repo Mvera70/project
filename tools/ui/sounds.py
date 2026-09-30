@@ -211,10 +211,7 @@ class Voice:
 # 6 kHz): dos sonidos igual de fuertes con auriculares pueden sonar uno el doble
 # que el otro en un iPhone, y el iPhone es donde se juega.
 LEVEL = {'tick': -24.0, 'nav': -21.0, 'confirm': -19.0, 'call': -18.0, 'stinger': -18.0,
-         'thunder': -17.0, 'thunder_far': -23.0,
-         # La caza y el asedio (fase 5): un golpe suelto va como un toque fuerte;
-         # el portón, que es lo que más pesa en el juego, va un poco por encima.
-         'strike': -20.0, 'blow': -18.0, 'heavy': -16.0}
+         'thunder': -17.0, 'thunder_far': -23.0}
 PEAK_CEILING = 0.9
 
 
@@ -503,101 +500,6 @@ def _(v: Voice):
     x = place((0, _rumble(v, 3.2, 230, 720, 0.9, 1.0, roll=0.6)),
               (0.9, _rumble(v, 2.2, 210, 600, 0.8, 0.5)), dur=3.4)
     return 'thunder_far', 3.4, v.room(x, 0.4, 0.18)
-
-
-# ---- la caza y el asedio (fase 5 · `docs/plan-audio-mundo.md`) --------------------
-# **Materiales, como todo lo demás: madera, cuero, carne y hierro apagado.**
-# Ni una voz —ni el gruñido del oso, ni el grito de quien cae—: una voz
-# sintética se descartó en U-09 y sigue descartada (decisión 1 de §6). Lo que
-# se oye es lo que se golpea. Y ninguna nota afinada: una cuerda de arco que
-# suena a nota es una caja de música, así que la suelta es un chasquido de
-# cuero y una madera hueca, y la flecha un soplo que sube.
-
-def _whoosh(v: Voice, d: float, lo: float, hi: float, level: float, rise: float = 0.5) -> np.ndarray:
-    """El aire de algo que pasa: ruido en banda cuya fuerza sube y cae, sin altura."""
-    n = int(d * SR)
-    t = np.arange(n) / n
-    swell = np.sin(np.pi * t ** rise) ** 2
-    return unit(bp(v.noise(n), lo, hi) * swell, level)
-
-
-@recipe('combat_arrow_loose')
-def _(v: Voice):
-    # El arco al soltar: el cuero de la cuerda que restalla, la madera hueca del
-    # brazo que vuelve, y la flecha que se lleva el aire.
-    x = place((0, v.contact(0.028, 500, 2200, 0.007, 0.5, 1.0)),
-              (0.002, v.knock(560, 0.09, 0.03, 0.55)),
-              (0.012, _whoosh(v, 0.16, 900, 2800, 0.32, 0.6)), dur=0.24)
-    return 'strike', 0.24, v.room(x, 0.04, 0.05)
-
-
-@recipe('combat_arrow_hit')
-def _(v: Voice):
-    # La flecha en carne: un golpe mate y húmedo, sin resonancia de madera.
-    x = place((0, v.drop(520, 0.12, 0.028, 1.3, 0.008, 1.0)),
-              (0, v.contact(0.05, 500, 1800, 0.014, 0.6, 0.8)),
-              (0.03, v.grains(0.07, 500, 1600, 2, 0.25)), dur=0.18)
-    return 'strike', 0.18, v.room(x, 0.03, 0.04)
-
-
-@recipe('combat_arrow_miss')
-def _(v: Voice):
-    # La flecha que se clava en madera o en tierra: un tarascazo seco, y el
-    # astil que aún tiembla dentro (ruido en banda estrecha, no una nota).
-    x = place((0, v.knock(520, 0.1, 0.03, 1.0)),
-              (0, v.contact(0.02, 700, 2600, 0.005, 0.5, 0.6)),
-              (0.02, v.grains(0.09, 800, 2200, 4, 0.22)), dur=0.16)
-    return 'strike', 0.16, v.room(x, 0.03, 0.04)
-
-
-@recipe('combat_melee')
-def _(v: Voice):
-    # Un choque de palo contra escudo de madera y cuero, con una hebilla que suena.
-    x = place((0, v.knock(640, 0.13, 0.04, 1.0)),
-              (0.006, v.knock(410, 0.14, 0.05, 0.7)),
-              (0, v.contact(0.03, 500, 2400, 0.007, 0.5, 0.65)),
-              (0.02, v.iron(880, 0.05, 0.25)), dur=0.24)
-    return 'blow', 0.24, v.room(x, 0.05, 0.07)
-
-
-@recipe('combat_fall')
-def _(v: Voice):
-    # Un cuerpo que se desploma: el golpe grave contra el suelo, y el cuero y
-    # la tela que llegan un instante después.
-    x = place((0, v.drop(470, 0.26, 0.07, 1.25, 0.02, 1.0)),
-              (0, v.contact(0.08, 450, 1600, 0.02, 0.8, 0.6)),
-              (0.05, v.grains(0.16, 500, 2000, 3, 0.3)), dur=0.36)
-    return 'blow', 0.36, v.room(x, 0.05, 0.08)
-
-
-@recipe('combat_gate_hit')
-def _(v: Voice):
-    # Un golpe de ariete en un portón de tablones: el hueco de la madera
-    # gruesa, el hierro de los herrajes que se sacude, y la sala que lo estira.
-    x = place((0, v.knock(480, 0.4, 0.11, 1.0)),
-              (0, v.drop(430, 0.4, 0.09, 1.2, 0.03, 0.8)),
-              (0, v.contact(0.06, 500, 2200, 0.016, 0.8, 0.6)),
-              (0.03, v.iron(760, 0.09, 0.35)),
-              (0.07, v.iron(520, 0.08, 0.22)), dur=0.62)
-    return 'heavy', 0.62, v.room(x, 0.09, 0.16)
-
-
-@recipe('combat_gate_break')
-def _(v: Voice):
-    # El portón que cede: el crujido de las fibras, los tablones que se
-    # abren uno tras otro, y el desplome con su polvo. Es lo más largo y lo
-    # más grave de la fase, porque es el final de una defensa.
-    cracks = [(0.0, 0.05), (0.06, 0.04), (0.13, 0.05), (0.21, 0.03)]
-    parts = [(at, v.contact(d, 600, 3000, 0.012, 0.5, 0.75)) for at, d in cracks]
-    parts += [(0.02, v.knock(450, 0.5, 0.14, 0.9)),
-              (0.17, v.knock(520, 0.4, 0.1, 0.6)),
-              (0.30, v.drop(410, 0.6, 0.16, 1.25, 0.04, 1.0)),
-              (0.30, v.contact(0.10, 450, 1800, 0.03, 1.0, 0.7)),
-              (0.42, v.grains(0.5, 600, 2400, 7, 0.3)),
-              (0.55, v.knock(470, 0.2, 0.05, 0.4)),
-              (0.78, v.knock(390, 0.16, 0.05, 0.3))]
-    x = place(*parts, dur=1.5)
-    return 'heavy', 1.5, v.room(x, 0.14, 0.2)
 
 
 # ===========================================================================

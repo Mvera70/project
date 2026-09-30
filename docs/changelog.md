@@ -75,6 +75,30 @@ matriz (§2.7).
   anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
   primera jornada de una sesión (matriz §2.7).
 
+## v5.23 · 30 sep 2026 · Los siete sonidos de caza y asedio, descartados; queda el contrato
+
+Vera los oyó y descartó los siete: «suenan como juguetes de niño pequeño,
+timbales… parece que está roto por completo». **Tenía razón y ahora está
+medido:** el golpe al portón sostenía una resonancia de 264 ms a 458 Hz (un
+timbal de referencia da 336 ms), la caída 210 ms, la rotura del portón 222 ms y
+la flecha en carne 84 ms. Salió de subir los cuerpos por encima de 350 Hz para
+llenar la banda del móvil con `drop` y `knock`, que son tonos: la corrección
+de la trampa número uno de la skill creó la trampa de «infantil».
+
+- **Fuera de la rama:** los siete `combat_*` (ficheros, recetas y entradas de
+  `CUE_FILES`). `MOMENT_CUE` queda con todo a `null`: el contrato, las cuentas
+  del renderer y el cableado de `app.ts` siguen, y un sonido entrará en su fila
+  cuando ella lo apruebe.
+- **La medida nueva:** `tools/ui/tonality.py`, cuánto aguanta un componente
+  estrecho por encima de su entorno. Regla: **un golpe no puede sostener más
+  de ~30 ms de resonancia** (un golpe de ruido da 0 a 6 ms). Se mide antes de
+  enseñar nada, junto a los números de siempre.
+- **Segunda tanda, un solo sonido** (el golpe al portón) **con cinco familias
+  distintas hechas sólo de ruido** —astillas, saco contra madera, ariete con
+  herrajes, grava, crujido con sala—: 95–100 % en banda de teléfono, < 1 % sobre
+  4 kHz, resonancia 0–6 ms. A la espera de su elección en la misma página de
+  escucha.
+
 ## v5.22 · 30 sep 2026 · Fase 5 del sonido: el contrato de sucesos y siete sonidos de caza y asedio
 
 Lo que integración pidió y quedaba abierto: que la caza y el combate publiquen
@@ -90,7 +114,7 @@ sus sucesos, y que suenen. **Los sonidos esperan a que Vera los oiga**
   saca de dos fotogramas qué acaba de pasar: sin anterior no suena nada, una
   cuenta que baja es una jornada nueva, tope de tres por clase y fotograma,
   y una jornada que abre con el portón ya roto no lo rompe otra vez.
-- **Siete sonidos**, foley de materiales sin voces ni notas (`sounds.py`):
+- **Siete sonidos** (descartados después, ver v5.23), foley de materiales (`sounds.py`):
   soltar la flecha, flecha en carne, flecha en madera o tierra, choque,
   cuerpo que cae, golpe al portón, portón que cede. **Medidos:** 94–100 % de la
   energía en la banda del teléfono, < 1,3 % sobre 4 kHz, primera y última

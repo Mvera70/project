@@ -15,7 +15,7 @@
 // su fila es `null`. Un gruñido es una voz de animal, y una voz sintética se
 // descartó en U-09 (decisión 1 de §6): hasta que haya voces grabadas o
 // generadas, calla. Está publicado para que el día que existan sólo falte el
-// fichero.
+// fichero. **Y hoy calla todo lo demás** hasta que Vera apruebe un sonido.
 
 import type { WorldMoments } from '../render3d/contracts';
 import type { Cue } from './sound';
@@ -32,17 +32,26 @@ export type MomentKind =
   | 'hunt_missed'
   | 'bear_rises';
 
-/** Qué suena por cada suceso. `null` es «existe y todavía no tiene voz». */
+/**
+ * Qué suena por cada suceso. `null` es «existe y todavía no tiene voz».
+ *
+ * **Hoy todos son `null`.** Los siete sonidos de la primera tanda (30 sep 2026)
+ * los descartó Vera entera —«suenan a juguetes de niño pequeño, timbales»— y
+ * la causa está medida: cuerpos de golpe con una resonancia que aguantaba
+ * 200–260 ms a 420–460 Hz, que es un timbal (`tools/ui/tonality.py`). Los
+ * sonidos nuevos entran aquí, uno a uno, cuando ella los apruebe; el contrato,
+ * las cuentas y el cableado del juego ya están.
+ */
 export const MOMENT_CUE: Readonly<Record<MomentKind, Cue | null>> = {
-  arrow_loosed: 'combat_arrow_loose',
-  arrow_struck: 'combat_arrow_hit',
-  blow: 'combat_melee',
-  raider_down: 'combat_fall',
-  defender_down: 'combat_fall',
-  gate_struck: 'combat_gate_hit',
-  gate_broken: 'combat_gate_break',
-  hunt_struck: 'combat_arrow_hit',
-  hunt_missed: 'combat_arrow_miss',
+  arrow_loosed: null,
+  arrow_struck: null,
+  blow: null,
+  raider_down: null,
+  defender_down: null,
+  gate_struck: null,
+  gate_broken: null,
+  hunt_struck: null,
+  hunt_missed: null,
   bear_rises: null,
 };
 

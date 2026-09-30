@@ -465,12 +465,11 @@ las espadas (no hay) y el sonido de sangre (decisión 7).
 
 ## 9 · Lo que ya quedó hecho de este plan
 
-- **Fase 5, primera vuelta** (30 sep 2026, a la espera de que Vera los oiga):
-  el contrato de sucesos (`GraphicsStats.moments`, `ui/moments.ts`) y siete
-  sonidos —soltar, flecha en carne, flecha en madera o tierra, choque, caída,
-  golpe al portón, portón que cede—. Sin nada del cuerno, del material del
-  muro ni de sangre, y **el oso sin gruñido** (decisión 1). Falta la
-  comprobación en navegador con un cerco real.
+- **Fase 5, primera vuelta** (30 sep 2026): el contrato de sucesos
+  (`GraphicsStats.moments`, `ui/moments.ts`) está hecho. **Los siete sonidos
+  se descartaron** («juguetes, timbales»): resonancia sostenida de 200–260 ms.
+  Segunda tanda en curso, un solo sonido y cinco familias de ruido. Sin nada
+  del cuerno, del material del muro ni de sangre, y el oso sin gruñido.
 - **Pestaña oculta** (30 sep 2026): el contexto se suspende al ocultarla y se
   reanuda al volver; con la pestaña oculta `start()` no suena. La fase 5
   sigue abierta, y por ahí pasa el contrato de sucesos de caza y combate.
