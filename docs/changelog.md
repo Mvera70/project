@@ -1,6 +1,6 @@
 # The Valley — Registro de cambios
 
-## v5.28 · 30 sep 2026 · GV-4b: el relevo de jornada, de segundos a décimas — lo que una búsqueda fallida ya demostró
+## v5.29 · 30 sep 2026 · GV-4b: el relevo de jornada, de segundos a décimas — lo que una búsqueda fallida ya demostró
 
 La segunda mitad del bucle de la villa (`docs/medidas/bucle-villa-2026-09-29.md`).
 GV-4a (PR #8) deja de tomar un fotograma lento por una ausencia, pero la vida
@@ -39,12 +39,12 @@ búsquedas A* finas de ese montaje fallaban y se llevaban el 99 % del tiempo.**
   a 84 ms de mediana a ×16 (revisión §3). Lo que queda por relevo en la villa,
   0,5–0,8 s en el contenedor, y medirlo en la tablet.
 
-## v5.27 · 30 sep 2026 · «Graphics»: la adaptativa ya no salta con un fotograma, y el tope de 60 da 60 a 90 Hz
+## v5.28 · 30 sep 2026 · «Graphics»: la adaptativa ya no salta con un fotograma, y el tope de 60 da 60 a 90 Hz
 
 La revisión de rendimiento del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md`
 §4, fila RV-3, en la rama `claude/revision-rendimiento-2026-09-30`) encontró dos
-defectos de «Graphics» (v4.96) y unos menores. Numerada tras la PR #8, que
-reserva la v5.25 y la v5.26.
+defectos de «Graphics» (v4.96) y unos menores. Numerada tras las dos PR
+abiertas: la #8 reserva la v5.25 y la v5.26, y la #11 (RV-1) la v5.27.
 
 - **La resolución adaptativa**, a `render3d/adaptive-scale.ts`, pura y probada:
   decide **una vez por ventana de 2 s**, cambie o no (antes, pasados los dos

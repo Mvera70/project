@@ -1,6 +1,6 @@
 # Cuaderno de tareas — el rework
 
-## 30 sep 2026 · GV-4b: el relevo de jornada, con las regiones cerradas (v5.28)
+## 30 sep 2026 · GV-4b: el relevo de jornada, con las regiones cerradas (v5.29)
 
 La segunda mitad del bucle de la villa, que la revisión del 30 sep (§3) pasó a
 gráficos con un prototipo para revisar con ojo crítico. **Revisado y dado por
@@ -14,7 +14,7 @@ de crearse, que es lo que la caché supone y hoy se cumple. En el navegador
 parada a 78–86 fotogramas y 169–182 ms de mediana, con relevos de 0,5–1,6 s.
 **Abierto**: medirlo en la tablet con GV-4a dentro (la villa 7/60 a ×16).
 
-## 30 sep 2026 · «Graphics»: la adaptativa y el tope, arreglados (v5.27)
+## 30 sep 2026 · «Graphics»: la adaptativa y el tope, arreglados (v5.28)
 
 Lo que la revisión de rendimiento del 30 sep (§4, RV-3) le pasó a gráficos. La
 adaptativa decidía en cada fotograma, y un solo fotograma de 100 ms bajaba la
