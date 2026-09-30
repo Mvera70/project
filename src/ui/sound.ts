@@ -14,8 +14,18 @@
 //   · **Los momentos** (`Cue`) con su fichero (`CUE_FILES`, en
 //     `public/audio/`). Los fabrica `tools/ui/sounds.py`, que es donde se
 //     cambia cómo suena algo; aquí sólo se decide **cuándo**. Sustituir uno es
-//     soltar otro fichero con el mismo nombre. Sin ambiente, a propósito: el
-//     lecho de fondo es lo que resultó incómodo, y vuelve sólo si Vera lo pide.
+//     soltar otro fichero con el mismo nombre y volver a sellar.
+//   · **Los lechos de ambiente** (`LOOP_FILES`, fase 1 de
+//     `docs/plan-audio-mundo.md`): bucles que cruzan su volumen en vez de
+//     encenderse. Cuánto suena cada uno lo decide `ambience.ts`, que es puro;
+//     aquí se reproducen, y **un lecho callado un rato se suelta**
+//     (`SOUND.AMBIENCE_RELEASE_SECONDS`): antes se quedaban todos girando a
+//     volumen cero con sus megas decodificados dentro.
+//   · **El cielo** (`sky`): el latigazo y el trueno, con su propio fusible
+//     por sonido. Iban por el de los acentos y el trueno cercano, que llega a
+//     menos de un segundo de su latigazo, no sonaba nunca.
+//   · **Los sucesos del mundo** (`moment`): caza y asedio, con su distancia
+//     (`moments.ts`).
 //   · **Cuándo suena un acento del juego** (`accentFor`, `accentAllowed`):
 //     puro y con sus pruebas. Un hito o una encrucijada planteada; nunca
 //     durante un letargo y nunca dos más cerca que `SOUND.ACCENT_MIN_GAP_MS`
@@ -28,7 +38,10 @@
 //     `<audio>` tarda en arrancar lo bastante para que el toque y su sonido se
 //     separen. Sólo se arma con el primer toque —los navegadores no dejan sonar
 //     antes—, y los ficheros se piden antes, en cuanto se instala, para que el
-//     primer botón ya los tenga.
+//     primer botón ya los tenga. **Con el sonido apagado no se paga nada**: ni
+//     se descarga, ni se crea el contexto, ni se decodifica; lo que hubiera se
+//     suelta al apagar. Los ficheros también los precachea el service worker
+//     (`public/audio/manifest.json`), para que sin red el juego no calle.
 //   · **La preferencia** (`valley.sound` en `localStorage`), la misma clave que
 //     usaba U-09: quien lo silenció entonces sigue en silencio.
 
@@ -292,6 +305,13 @@ export interface SoundEngine {
   visibility(hidden: boolean): void;
   /** Un acento del juego: pasa por el fusible de §11.4. */
   accent(cue: Cue, nowMs: number): void;
+  /**
+   * El cielo: el latigazo del rayo y su trueno. **No pasa por el fusible de
+   * los acentos**, que es de la interfaz: el trueno cercano llega a menos de
+   * un segundo de su latigazo y ese fusible lo tiraba siempre (revisión del
+   * 30 sep 2026). Sólo el suyo por sonido, como un suceso.
+   */
+  sky(cue: Cue, nowMs: number): void;
   /** La respuesta a un toque del jugador. `rate` sube o baja el tono. */
   tap(cue: Cue, nowMs: number, rate?: number): void;
   /**
@@ -313,19 +333,38 @@ export function createSoundEngine(): SoundEngine {
   let lastAccentMs: number | null = null;
   const lastTapMs: Partial<Record<Cue, number>> = {};
   const lastMomentMs: Partial<Record<Cue, number>> = {};
+  const lastSkyMs: Partial<Record<Cue, number>> = {};
+  /**
+   * Los ficheros tal como llegan, comprimidos: 0,9 MB entre todos. Se quedan,
+   * porque son lo que deja volver a decodificar un lecho soltado sin red.
+   */
   const bytes = new Map<string, Promise<ArrayBuffer | null>>();
+  /** Lo decodificado, que es lo que pesa: un lecho son megas y se suelta. */
   const buffers = new Map<string, Promise<AudioBuffer | null>>();
-  /** Una capa viva: su bucle, su ganancia y a qué volumen va. */
-  const loops = new Map<AmbienceLayer, { gain: GainNode; at: number; want: number }>();
+  /** Cuándo falló por última vez cada fichero, para no pedirlo en ráfaga. */
+  const failedAt = new Map<string, number>();
+  /** Una capa viva: su bucle, su ganancia, a qué volumen va y cuánto lleva callada. */
+  const loops = new Map<AmbienceLayer, {
+    gain: GainNode; source: AudioBufferSourceNode | null; at: number; want: number; quiet: number;
+  }>();
 
   const isEnabled = (): boolean => {
     if (enabled === null) enabled = soundPreference();
     return enabled;
   };
 
-  /** Pide los ficheros. No necesita el `AudioContext`, así que va antes del toque. */
+  const failedRecently = (key: string): boolean => {
+    const at = failedAt.get(key);
+    return at !== undefined && Date.now() - at < SOUND.FETCH_RETRY_MS;
+  };
+
+  /**
+   * Pide los ficheros. No necesita el `AudioContext`, así que va antes del
+   * toque; con el sonido apagado no pide nada. Uno que no llegó no se guarda
+   * como perdido: se olvida, y se vuelve a pedir pasado `SOUND.FETCH_RETRY_MS`.
+   */
   const prefetch = (): void => {
-    if (typeof fetch !== 'function') return;
+    if (typeof fetch !== 'function' || !isEnabled()) return;
     const all: [string, string][] = [
       ...(Object.entries(CUE_FILES) as [Cue, string][]),
       // Los lechos van detrás a propósito: pesan diez veces más que un toque y
@@ -333,10 +372,18 @@ export function createSoundEngine(): SoundEngine {
       ...AMBIENCE_LAYERS.map((layer) => [layer, LOOP_FILES[layer].file] as [string, string]),
     ];
     for (const [cue, file] of all) {
-      if (bytes.has(cue)) continue;
-      bytes.set(cue, fetch(`./audio/${file}`)
+      if (bytes.has(cue) || failedRecently(cue)) continue;
+      const pending: Promise<ArrayBuffer | null> = fetch(`./audio/${file}`)
         .then((response) => (response.ok ? response.arrayBuffer() : null))
-        .catch(() => null));
+        .catch(() => null)
+        .then((data) => {
+          if (data === null && bytes.get(cue) === pending) {
+            bytes.delete(cue);
+            failedAt.set(cue, Date.now());
+          }
+          return data;
+        });
+      bytes.set(cue, pending);
     }
   };
 
@@ -346,16 +393,34 @@ export function createSoundEngine(): SoundEngine {
     prefetch();
     const raw = bytes.get(cue);
     const context = ctx;
-    const pending = raw === undefined || context === null
+    const pending: Promise<AudioBuffer | null> = raw === undefined || context === null
       ? Promise.resolve(null)
       // `slice`: `decodeAudioData` se queda con el búfer, y así el original
-      // sigue sirviendo si alguna vez hay que volver a decodificar.
+      // sigue sirviendo si hay que volver a decodificar (un lecho soltado).
       : raw.then((data) => (data === null ? null : context.decodeAudioData(data.slice(0)).catch(() => null)));
     buffers.set(cue, pending);
+    // Un `null` no se queda guardado: la próxima vez se vuelve a intentar.
+    void pending.then((buffer) => { if (buffer === null && buffers.get(cue) === pending) buffers.delete(cue); });
     return pending;
   };
 
-  const start = (cue: Cue, rate: number, requestedMs: number, level = 1): void => {
+  /** Suelta un lecho: para su bucle, lo desengancha y tira lo decodificado. */
+  const release = (layer: AmbienceLayer): void => {
+    const live = loops.get(layer);
+    if (live === undefined) return;
+    loops.delete(layer);
+    if (live.source !== null) {
+      try { live.source.stop(); } catch { /* ya parado */ }
+      live.source.disconnect();
+    }
+    live.gain.disconnect();
+    buffers.delete(layer);
+  };
+
+  /** Los sucesos del mundo que suenan ahora mismo (`SOUND.MAX_WORLD_VOICES`). */
+  let worldVoices = 0;
+
+  const start = (cue: Cue, rate: number, requestedMs: number, level = 1, world = false): void => {
     if (!isEnabled() || ctx === null || master === null) return;
     // Con la pestaña oculta no suena nada, y menos aún se reanuda el contexto:
     // un temporizador de trueno que vence de fondo soltaría todo de golpe al volver.
@@ -368,6 +433,10 @@ export function createSoundEngine(): SoundEngine {
       // Un sonido que llega tarde a su toque se lee como un fallo, no como
       // una respuesta (`SOUND.LATE_PLAY_MS`).
       if (Date.now() - requestedMs > SOUND.LATE_PLAY_MS) return;
+      // **El tope de voces**, sólo para el mundo: una salva no puede apilar
+      // más de `SOUND.MAX_WORLD_VOICES` golpes. Se mira aquí, al empezar de
+      // verdad, y no al pedirlo: lo que se descartó por tarde no ocupa sitio.
+      if (world && worldVoices >= SOUND.MAX_WORLD_VOICES) return;
       const source = context.createBufferSource();
       source.buffer = buffer;
       source.playbackRate.value = rate;
@@ -379,6 +448,10 @@ export function createSoundEngine(): SoundEngine {
         source.connect(near);
         near.connect(out);
       }
+      if (world) {
+        worldVoices += 1;
+        source.onended = () => { worldVoices -= 1; };
+      }
       source.start();
       if (typeof window !== 'undefined') {
         const log = window.__valleySound ?? { played: [] };
@@ -389,41 +462,66 @@ export function createSoundEngine(): SoundEngine {
     });
   };
 
+  const arm = (): void => {
+    // **Apagado no se paga nada**: ni descarga, ni contexto, ni decodificar.
+    // Encenderlo es un toque, y `setEnabled` vuelve a pasar por aquí dentro
+    // de ese mismo gesto, que es lo que el navegador exige para sonar.
+    if (!isEnabled()) return;
+    prefetch();
+    if (typeof window === 'undefined') return;
+    if (ctx === null) {
+      const Context = window.AudioContext ?? window.webkitAudioContext;
+      if (Context === undefined) return;
+      try { ctx = new Context(); } catch { return; }
+      master = ctx.createGain();
+      master.gain.value = SOUND.MASTER_GAIN;
+      master.connect(ctx.destination);
+    }
+    // Todos los toques, decodificados ya: uno que se decodifica al tocarlo
+    // llega tarde con el valle cargando y `LATE_PLAY_MS` lo tira. También al
+    // encender por primera vez tras arrancar apagado; lo que ya está no se
+    // repite (`decoded` guarda la promesa).
+    for (const cue of Object.keys(CUE_FILES) as Cue[]) void decoded(cue);
+    if (ctx.state === 'running') return;
+    void ctx.resume().catch(() => undefined);
+    // iOS sólo abre el audio si algo suena **dentro** del gesto: un búfer
+    // vacío de una muestra basta.
+    const silence = ctx.createBufferSource();
+    silence.buffer = ctx.createBuffer(1, 1, 22_050);
+    silence.connect(ctx.destination);
+    silence.start();
+  };
+
   return {
     get enabled(): boolean { return isEnabled(); },
     setEnabled(on: boolean): void {
       enabled = on;
       storeSoundPreference(on);
       if (master !== null && ctx !== null) master.gain.setValueAtTime(on ? SOUND.MASTER_GAIN : 0, ctx.currentTime);
+      if (on) {
+        // Explícito y no sólo por `arm`: si el `suspend` de apagarlo aún no ha
+        // terminado, el contexto se lee «running» y se quedaría dormido.
+        if (ctx !== null) void ctx.resume().catch(() => undefined);
+        arm();
+        return;
+      }
+      // Apagado: fuera los bucles, que son lo que pesa (30,7 MB los catorce a
+      // 48 kHz), y el contexto dormido. Callar a ganancia cero los dejaba
+      // girando con sus megas dentro. Los toques ya decodificados (4,2 MB
+      // todos) se quedan: son lo que hace que encenderlo suene en el acto y no
+      // llegue tarde. Quien arranca apagado no los paga nunca (`arm`).
+      for (const layer of [...loops.keys()]) release(layer);
+      if (ctx !== null && ctx.state === 'running') void ctx.suspend().catch(() => undefined);
     },
     prefetch,
     visibility(hidden: boolean): void {
       if (ctx === null) return;
-      const action = contextAction(ctx.state, hidden);
+      // Apagado se queda dormido aunque la pestaña vuelva a verse.
+      const action = contextAction(ctx.state, hidden || !isEnabled());
       if (action === 'suspend') void ctx.suspend().catch(() => undefined);
       else if (action === 'resume') void ctx.resume().catch(() => undefined);
     },
-    arm(): void {
-      prefetch();
-      if (typeof window === 'undefined') return;
-      if (ctx === null) {
-        const Context = window.AudioContext ?? window.webkitAudioContext;
-        if (Context === undefined) return;
-        try { ctx = new Context(); } catch { return; }
-        master = ctx.createGain();
-        master.gain.value = isEnabled() ? SOUND.MASTER_GAIN : 0;
-        master.connect(ctx.destination);
-        for (const cue of Object.keys(CUE_FILES) as Cue[]) void decoded(cue);
-      }
-      if (ctx.state === 'running') return;
-      void ctx.resume().catch(() => undefined);
-      // iOS sólo abre el audio si algo suena **dentro** del gesto: un búfer
-      // vacío de una muestra basta.
-      const silence = ctx.createBufferSource();
-      silence.buffer = ctx.createBuffer(1, 1, 22_050);
-      silence.connect(ctx.destination);
-      silence.start();
-    },
+    arm,
     ambience(mix: Mix, dtSeconds: number): void {
       if (typeof window !== 'undefined') {
         const log = window.__valleySound ?? { played: [] };
@@ -441,16 +539,22 @@ export function createSoundEngine(): SoundEngine {
         const want = isEnabled() ? (mix[layer] ?? 0) : 0;
         const live = loops.get(layer);
         if (live === undefined) {
-          if (want <= 0) continue;
+          if (want <= 0 || failedRecently(layer)) continue;
           // Nace en silencio y sube sola: así una capa nueva nunca entra de golpe.
           const gain = context.createGain();
           gain.gain.value = 0;
           gain.connect(out);
-          loops.set(layer, { gain, at: 0, want });
+          const born = { gain, source: null as AudioBufferSourceNode | null, at: 0, want, quiet: 0 };
+          loops.set(layer, born);
           const { seconds } = LOOP_FILES[layer];
           void decoded(layer).then((buffer) => {
-            const started = loops.get(layer);
-            if (buffer === null || started === undefined || started.gain !== gain) return;
+            if (loops.get(layer) !== born) return;
+            if (buffer === null) {
+              // No llegó: fuera la capa, y se vuelve a intentar pasado el plazo.
+              failedAt.set(layer, Date.now());
+              release(layer);
+              return;
+            }
             const source = context.createBufferSource();
             source.buffer = buffer;
             source.loop = true;
@@ -462,6 +566,7 @@ export function createSoundEngine(): SoundEngine {
             // Cada capa empieza por un sitio distinto del bucle: dos partidas
             // con el mismo cielo no suenan sincronizadas.
             source.start(0, Math.random() * source.loopEnd);
+            born.source = source;
           });
           continue;
         }
@@ -469,11 +574,21 @@ export function createSoundEngine(): SoundEngine {
         const delta = live.want - live.at;
         live.at += Math.sign(delta) * Math.min(Math.abs(delta), step);
         live.gain.gain.setTargetAtTime(live.at, context.currentTime, 0.02);
+        // **Un lecho callado un rato se suelta** (`SOUND.AMBIENCE_RELEASE_SECONDS`).
+        // Antes se quedaba girando a ganancia cero con sus megas dentro, y al
+        // cabo de una hora estaban todos los cielos vistos.
+        live.quiet = live.at <= 0 && live.want <= 0 ? live.quiet + dtSeconds : 0;
+        if (live.quiet >= SOUND.AMBIENCE_RELEASE_SECONDS) release(layer);
       }
     },
     accent(cue: Cue, nowMs: number): void {
       if (CUE_FILES[cue] === undefined || !accentAllowed(nowMs, lastAccentMs)) return;
       lastAccentMs = nowMs;
+      start(cue, 1, Date.now());
+    },
+    sky(cue: Cue, nowMs: number): void {
+      if (CUE_FILES[cue] === undefined || !momentAllowed(nowMs, lastSkyMs[cue], 1)) return;
+      lastSkyMs[cue] = nowMs;
       start(cue, 1, Date.now());
     },
     tap(cue: Cue, nowMs: number, rate = 1): void {
@@ -485,7 +600,7 @@ export function createSoundEngine(): SoundEngine {
       if (CUE_FILES[cue] === undefined || !momentAllowed(nowMs, lastMomentMs[cue], gain)) return;
       lastMomentMs[cue] = nowMs;
       const jitter = 1 + (Math.random() - 0.5) * SOUND.MOMENT_PITCH_JITTER;
-      start(cue, jitter, Date.now(), Math.min(1, gain));
+      start(cue, jitter, Date.now(), Math.min(1, gain), true);
     },
   };
 }
@@ -500,10 +615,17 @@ export const sound: SoundEngine = createSoundEngine();
  * repartido por siete ficheros, para que se vea de un vistazo quién suena por
  * su cuenta; `data-sfx="off"` queda como escape para un caso suelto.
  *
+ * **Todo botón que navega por `actions.navigate` tiene voz propia**, porque
+ * ahí suena `routeCue`: un cierre o una vuelta que se quede fuera suena dos o
+ * tres veces —sello al bajar, sello al subir y cofre—. Pasaba con nueve el
+ * 30 sep 2026; lo vigila el recorrido (`tools/ui/sound-check.mjs`, «una vez»).
+ * Lo mismo los cierres de la portada, que suenan en su `onClose` (`title.ts`).
+ *
  * Lo que **no** está aquí y es deliberado: el badge de la velocidad (sólo
- * despliega la regleta), el botón de despejar, la señal de caza, los cierres,
- * el dado de la semilla, el taller, los mandos del carro y del tablón y los de
- * las opciones gráficas. Ésos son botones corrientes y suenan a sello.
+ * despliega la regleta), el botón de despejar, la señal de caza, el dado de la
+ * semilla, el taller, los mandos del carro y del tablón que no cierran, los de
+ * las opciones gráficas y el cierre de la crónica del epitafio (no pasa por
+ * `routeCue`). Ésos son botones corrientes y suenan a sello.
  */
 const OWN_VOICE = [
   '.skin-nav-tab',                                        // las pestañas · routeCue
@@ -511,10 +633,18 @@ const OWN_VOICE = [
   '.hud-speed-cluster .hud-round-btn:not(.valley-speed-badge)', // parar y seguir · speedCue
   '.valley-sound, .title-sound',                          // el silencio · se oye al encenderlo
   '.title-new, .title-continue, .title-preset',           // fundar y continuar
-  '.title-annals, .title-graphics',                       // abren y cierran hoja
+  '.title-annals, .title-graphics',                       // abren hoja
+  '.annals-close, .graphics-done',                        // y la cierran · su onClose
   '.crossroad-options button',                            // el sello de la decisión
   '.valley-voice-answer',                                 // aceptar o dejar pasar un trato
-  '.people-row',                                          // abre una ficha
+  '.people-row, .chronicle-name-link',                    // abren una ficha · routeCue
+  '.valley-orders-now',                                   // abre y cierra el carro · routeCue
+  // Cierran la hoja · routeCue. El de la bandeja es el que se toca en la
+  // crónica, el carro, la gente y la ficha; el propio de la crónica y el del
+  // carro están ocultos dentro de ella (`wood.css`), y se quedan por si vuelven.
+  '.ui-shell-content-close, .valley-board-close, .cart-close',
+  '.ui-shell-content .chronicle-close, .chronicle-sealed', // la crónica del valle · routeCue
+  '.valley-panel-back',                                   // de la ficha a la gente · routeCue
   '[data-sfx="off"]',                                     // el escape puntual
 ].join(', ');
 

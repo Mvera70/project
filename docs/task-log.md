@@ -11,16 +11,16 @@ conflictos entre ramas»**, rama `ccr-16705aa8-9x5ofm`.
 | Carril | Rama · PR | Versiones | Tuyo | No es tuyo |
 |---|---|---|---|---|
 | CI en verde (director) | `claude/ci-verde` · #15 | v5.32 | `.github/workflows/ci.yml`, `playwright.config.ts`, `tests/helpers/timing.ts`, `tools/shots/**`, la skill `director` | el juego: sólo pruebas y configuración |
-| Sonido | `claude/sonido-arreglos-revision` · #14 | v5.31 | `src/ui/sound.ts`, `ambience.ts`, `moments.ts`, `public/audio/`, `tools/ui/` | la reja de interfaz y los cronómetros: van en #15 |
+| Sonido | `claude/sonido-arreglos-revision` · #14, **fusionada** (12:58, antes de la #15) | v5.31 | `src/ui/sound.ts`, `ambience.ts`, `moments.ts`, `public/audio/`, `tools/ui/` | la reja de interfaz y los cronómetros: van en #15 |
 | Informe y GV-4a (director) | `ccr-16705aa8-9x5ofm` · #8 | v5.33–v5.34 (renumera sus v5.25–v5.26 al traer `main`) | `docs/medidas/fusion-*`, `presentation-clock.ts`, `backend.ts` (sólo `clock.painted`) | GV-4b, ya en `main` (v5.29) |
 | Las 21 jornadas viejas (agente del director) | rama propia · PR por abrir | v5.35–v5.36 | `tests/journeys/**`; código sólo si la causa está ahí, **y si es del motor lo dice antes** | la reja y los cronómetros |
 | Revisión de rendimiento | `claude/revision-rendimiento-2026-09-30` | — | nada hasta que Vera le asigne el resto de su lista | — |
 
 **Orden de integración**, de una en una y con `main` en verde (director §3.3):
-1. **#15**, porque sin ella ninguna PR puede salir verde;
-2. **#14**, que ya va al día con `main`;
-3. **#8**, que trae `main` y renumera;
-4. **las jornadas**.
+1. **#15**, porque sin ella ninguna PR puede salir verde (la #14 entró antes,
+   con sus pruebas limpias y sólo los rojos heredados);
+2. **#8**, que trae `main` y renumera;
+3. **las jornadas**.
 Tras cada fusión, las que quedan traen `main` (merge, no rebase) y vuelven a
 pasar su puerta. **Una sesión nueva pide su bloque de versiones al director:
 el siguiente libre es la v5.37.**
@@ -28,6 +28,20 @@ el siguiente libre es la v5.37.**
 **Abierto para Vera:** fusionar en ese orden; decidir el reparto de lo que la
 revisión de rendimiento dejó sin dueño; y, con #8 dentro, abrir la villa 7/60
 en la tablet —es la medida combinada que cierra la tanda (director §3.4)—.
+## 30 sep 2026 · El sonido tras la revisión (v5.31) — **fusionada (PR #14)**
+
+Hecho lo que la revisión encontró en el sonido: el trueno cercano suena
+(`sound.sky`), nueve botones dejan de sonar dos o tres veces (`OWN_VOICE`), los
+lechos callados se sueltan y apagado no se paga nada, el audio entra en el
+precaché y un fallo de descarga se reintenta. Nada cambia de carácter.
+Y un tope de voces para el mundo (`SOUND.MAX_WORLD_VOICES`). El recorrido
+cierra ya el tablón, y al hacerlo destapó que **el tablón no recibía toques**
+(su velo heredaba `pointer-events: none`): arreglado en `board.ts`. Recorrido
+35/35 · 8/8 en tres pasadas; `test:pwa` 7/7.
+**Abierto:** que Vera lo oiga en el aparato; la cifra de coste en un aparato
+(no hay aparato aquí); el `duck` —bajar el mundo bajo un hito— es mezcla y la
+decide Vera escuchando; y `MAX_WORLD_VOICES` sin medir contra un asalto real
+(`?sandbox=battle`).
 
 ## 30 sep 2026 · La caza tras la revisión: el jabalí en la linde, el cazador que sale andando, la caza sin picos (v5.30)
 

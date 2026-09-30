@@ -53,19 +53,25 @@ const steps = [];
  * **no** puede sonar además, que es como se comprueba que el sello genérico no
  * se pone encima de un botón con voz propia. `expect` es lo que
  * debería haber sonado —`null`, que nada—; el informe dice si coincidió.
+ * `ONCE` en lugar de `forbidden` exige que suene **eso y sólo eso**, una vez:
+ * un botón con voz propia que suena dos o tres veces es el fallo que la
+ * revisión del 30 sep 2026 encontró en nueve botones.
  */
-async function step(name, expect, act, forbidden) {
+const ONCE = Symbol('once');
+async function step(name, expect, act, forbidden, waitMs = 500) {
   const before = (await played()).length;
   await act();
   // El sonido se decodifica después del toque (`SOUND.LATE_PLAY_MS`): se da
-  // medio segundo antes de leer.
-  await tab.waitForTimeout(500);
+  // medio segundo antes de leer. Lo que contesta el motor llega en un tick, y
+  // con swiftshader eso ronda ya el medio segundo: esos pasos esperan más.
+  await tab.waitForTimeout(waitMs);
   const after = await played();
   const heard = after.slice(before).map((p) => (p.rate === 1 ? p.cue : `${p.cue}@${p.rate}`));
   const matches = (want) => heard.some((cue) => cue === want || cue.startsWith(`${want}@`));
+  const once = forbidden === ONCE;
   const ok = (expect === null ? heard.length === 0 : matches(expect))
-    && (forbidden === undefined || !matches(forbidden));
-  steps.push({ name, expect, forbidden, heard, ok });
+    && (once ? heard.length === 1 : forbidden === undefined || !matches(forbidden));
+  steps.push({ name, expect, forbidden: once ? 'once' : forbidden, heard, ok });
   console.log(`${ok ? '✓' : '✗'} ${name.padEnd(42)} ${heard.join(', ') || '—'}`);
 }
 const tabButton = (label) => tab.locator(`.skin-nav-tab[aria-label="${label}"]`);
@@ -77,6 +83,12 @@ await tab.screenshot({ path: `${OUT}/title.png` });
 await step('portada · el dado de la semilla suena a sello', 'ui_button_press', () => tab.locator('.title-reroll').click());
 await step('portada · abrir opciones gráficas', 'ui_panel_open', () => tab.locator('.title-graphics').click());
 await step('portada · cerrarlas', 'ui_panel_close', () => tab.keyboard.press('Escape'));
+// Los cierres de la portada suenan en su `onClose` (`title.ts`): con el sello
+// encima sonaban tres veces.
+await step('portada · abrir opciones gráficas otra vez', 'ui_panel_open', () => tab.locator('.title-graphics').click());
+await step('portada · cerrarlas con «Done» (una vez)', 'ui_panel_close', () => tab.locator('.graphics-done').click(), ONCE);
+await step('portada · abrir el cronicón', 'ui_panel_open', () => tab.locator('.title-annals:not(.title-graphics)').click());
+await step('portada · cerrarlo (una vez)', 'ui_panel_close', () => tab.locator('.annals-close').click(), ONCE);
 await step('portada · silenciar (el propio botón calla)', null, () => tab.locator('.title-sound').click());
 await step('portada · volver a encender (se oye)', 'ui_resume', async () => {
   await tab.waitForTimeout(100);
@@ -92,6 +104,21 @@ await step('valle · abrir la crónica (y sin sello encima)', 'ui_panel_open',
   () => tabButton('Chronicle').click(), 'ui_button_press');
 await step('crónica → gente', 'ui_tab_change', () => tabButton('People').click());
 await step('gente · tocar una persona', 'ui_person_select', () => tab.locator('.people-row').first().click());
+await step('ficha · volver a la gente (una vez)', 'ui_tab_change', () => tab.locator('.valley-panel-back').click(), ONCE);
+await step('gente · cerrar la bandeja (una vez)', 'ui_panel_close', () => tab.locator('.ui-shell-content-close').click(), ONCE);
+await step('abrir la crónica', 'ui_panel_open', () => tabButton('Chronicle').click());
+// En el juego el cierre propio de la crónica y el del carro están ocultos
+// (`wood.css`): el que se toca es el de la bandeja, en las cuatro hojas.
+await step('crónica · cerrarla (una vez)', 'ui_panel_close',
+  () => tab.locator('.ui-shell-content-close').click(), ONCE);
+await step('cabecera · abrir el carro (una vez)', 'ui_panel_open', () => tab.locator('.valley-orders-now').click(), ONCE);
+await step('carro · cerrarlo (una vez)', 'ui_panel_close', () => tab.locator('.ui-shell-content-close').click(), ONCE);
+// El tablón sólo se abre tocándolo en el mundo: se abre por el gancho, que no
+// suena, y lo que se mide es su cierre.
+await tab.evaluate(() => window.__valleyOpenBoard?.());
+await tab.locator('.valley-board-close').waitFor();
+await step('tablón · cerrarlo (una vez)', 'ui_panel_close', () => tab.locator('.valley-board-close').click(), ONCE);
+await step('abrir la gente', 'ui_panel_open', () => tabButton('People').click());
 await step('volver al valle', 'ui_panel_close', () => tabButton('Valley').click());
 await tab.waitForTimeout(400);
 await step('pausar', 'ui_pause', () => tab.locator('.hud-speed-cluster .hud-round-btn').first().click());
@@ -117,16 +144,25 @@ async function openArmed(query) {
   await tab.waitForFunction(() => document.documentElement.dataset.appReady === 'true', null, { timeout: 90_000 });
   await tab.waitForTimeout(1200);
   await tab.mouse.click(4, 300);
-  await tab.waitForTimeout(300);
+  // Armar decodifica los 33 toques, y con swiftshader y el valle cargando eso
+  // pasa del cuarto de segundo: un toque pedido antes llega tarde y
+  // `SOUND.LATE_PLAY_MS` lo tira. Salió mudo una vez de cada dos con 300 ms.
+  await tab.waitForTimeout(2000);
 }
 await openArmed('offer=1');
 await step('oferta · aceptarla (responde el motor)', 'ui_offer_accept', async () => {
   await tab.locator('.valley-voice-answer').first().click();
-});
+}, undefined, 1500);
 await openArmed('crossroad=1');
 await step('encrucijada · elegir una opción (el sello)', 'ui_crossroad_decide', async () => {
   await tab.locator('.crossroad-options button').first().click();
 });
+// Un nombre en la crónica abre su ficha: hace falta un valle con historia,
+// porque la de uno recién fundado todavía no nombra a nadie.
+await openArmed('');
+await step('valle hecho · abrir la crónica', 'ui_panel_open', () => tabButton('Chronicle').click());
+await step('crónica · un nombre abre su ficha (una vez)', 'ui_person_select',
+  () => tab.locator('.chronicle-name-link').first().click(), ONCE);
 
 // ---------------------------------------------------------------------------
 // **El fondo del mundo** (fase 1). Aquí no se mira qué empezó a sonar sino qué
@@ -138,14 +174,22 @@ const ambience = [];
 async function bed(name, check, act) {
   await act();
   // Un cruce entero tarda 1/`AMBIENCE_EASE` = 2,5 s: con menos espera se mide
-  // una capa a medio entrar y parece que falta.
+  // una capa a medio entrar y parece que falta. Y luego **se reintenta hasta
+  // ocho segundos**: con swiftshader el fotograma que recoge la hora retenida
+  // puede tardar, y una espera fija dejó el paso de la noche rojo una vez de
+  // cinco midiendo el cielo de antes (30 sep 2026).
   await tab.waitForTimeout(3200);
-  const now = await mix();
-  const layers = Object.entries(now).filter(([, gain]) => gain > 0.01)
-    .map(([layer, gain]) => `${layer.replace('amb_', '')} ${gain.toFixed(2)}`);
+  let now = await mix();
   let ok = true;
   let why = '';
-  try { check(now); } catch (error) { ok = false; why = String(error.message ?? error); }
+  for (let tries = 0; ; tries += 1) {
+    try { check(now); ok = true; why = ''; break; } catch (error) { ok = false; why = String(error.message ?? error); }
+    if (tries >= 16) break;
+    await tab.waitForTimeout(500);
+    now = await mix();
+  }
+  const layers = Object.entries(now).filter(([, gain]) => gain > 0.01)
+    .map(([layer, gain]) => `${layer.replace('amb_', '')} ${gain.toFixed(2)}`);
   ambience.push({ name, layers, ok, why });
   console.log(`${ok ? '✓' : '✗'} ${name.padEnd(42)} ${layers.join(' · ') || '—'}${why ? `  ← ${why}` : ''}`);
 }

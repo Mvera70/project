@@ -26,6 +26,53 @@ demás para no volver a pisarse.
   sobre `main` en verde, informe de fusión—, con lo que costó cada regla el
   29 sep. `CLAUDE.md` la manda cargar antes que nada. La primera hoja de
   reparto está en `docs/task-log.md`.
+## v5.31 · 30 sep 2026 · El sonido, arreglado tras la revisión: el trueno cercano, los botones que sonaban dos veces y la memoria
+
+Encargo de Vera sobre lo que la revisión del 30 sep encontró en el sonido
+(`docs/medidas/revision-rendimiento-2026-09-30.md` §6 y §7). **No cambia cómo
+suena nada**: cambia qué llega a sonar y lo que cuesta.
+
+- **El trueno cercano suena.** Latigazo y trueno iban por `sound.accent` y su
+  fusible de 2,5 s tiraba el trueno, que llega ≤ 0,71 s después: con la
+  cámara en el corazón del valle, el 60–70 % de los rayos. Ahora van por
+  `sound.sky`, con su fusible por sonido, y pasan por la compuerta de
+  velocidad del mundo: a ×16 y ×64 no suenan, como la caza y el asedio.
+- **Cada botón suena una vez.** Nueve botones que navegan por
+  `actions.navigate` sonaban a sello y además a `routeCue`: los cinco de la
+  revisión y cuatro más —el cierre de la bandeja, que es el que de verdad se
+  toca en la crónica, el carro, la gente y la ficha (el de la crónica y el del
+  carro están ocultos), el nombre enlazado, la carta sellada y los dos cierres
+  de la portada—. Entran en `OWN_VOICE`.
+- **La memoria.** Un lecho decodificado son 2,3 MB (30,7 MB los catorce a
+  48 kHz) y no se soltaba ninguno. Ahora se suelta el que lleva 30 s callado
+  (`SOUND.AMBIENCE_RELEASE_SECONDS`) y todos al apagar; con el sonido apagado
+  no se descarga, no se crea el contexto y no se decodifica nada.
+- **Sin red.** El service worker precachea los 47 ficheros
+  (`public/audio/manifest.json`, que escribe `sounds.py --stamp`), y un fallo
+  de descarga se vuelve a pedir pasados 30 s (`SOUND.FETCH_RETRY_MS`) en vez
+  de quedarse como `null` para siempre.
+- **Lo muerto y lo viejo.** `SOUND.MURMUR_*` sale del código (los umbrales,
+  apuntados en `plan-audio-mundo.md`); la cabecera de `sound.ts`, la SKILL §2,
+  §6 y §8 y design §10.7, §11.10 y §11.11 dicen lo que hay.
+- **Medido.** Los acentos de la interfaz salen en el 0,7–1,2 % de las semanas
+  (cinco semillas, sesenta años), con una semana como mínimo entre dos —13 s a
+  ×64—, así que no necesitan compuerta de velocidad: el fusible basta.
+- **Un tope de voces para el mundo** (`SOUND.MAX_WORLD_VOICES`, 8): el
+  fusible por sonido no impide que siete golpes **distintos** se apilen en la
+  salva de un asalto. Los toques del jugador no cuentan ni se descartan. Sin
+  medir contra un asalto real.
+- **Fuera del sonido: el tablón no recibía toques.** Su velo cuelga de
+  `.ui-shell`, que deja pasar los toques al valle, y no lo reactivaba: el
+  lienzo 3D se comía el aspa, los avisos y el velo, así que no se podía
+  cerrar ni mandar a nadie tocando. Lo encontró el recorrido al cerrar el
+  tablón; una línea en `board.ts`.
+- **Probado.** `tests/fast/sound-player.test.ts` ejercita por fin el
+  reproductor con un `AudioContext` simulado (seis de sus pruebas fallan
+  contra el de antes); el recorrido `sound-check.mjs` exige «una vez» en cada
+  cierre y vuelta, cierra el tablón (gancho `__valleyOpenBoard`), deja
+  decodificar tras armar y reintenta el ambiente en vez de esperar a ciegas:
+  **35/35 toques y 8/8 ambiente** en Chromium, tres pasadas seguidas. Y
+  `valley.pwa.ts` comprueba el sonido sin red tras una sola visita.
 
 ## v5.30 · 30 sep 2026 · La caza, tras la revisión: el jabalí en la linde, el cazador que sale andando y la caza sin picos
 

@@ -100,6 +100,17 @@ async function advanceWeeks(page: Page, weeks: number, speed: 1 | 4 | 16 | 64): 
  * que se empuja a tramos cortos; y en el servidor el 3D es por software
  * (SwiftShader): lento pero cierto, de ahí los márgenes (30 sep 2026).
  */
+/**
+ * El 3D de estas pruebas va en el perfil bajo de «Graphics» y a 30 fps: lo que
+ * miden —el cielo, la frase del aldeano, la cámara— no depende de la calidad,
+ * y en el servidor sin tarjeta cada fotograma en alto cuesta segundos.
+ */
+async function lowGraphics(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    try { localStorage.setItem('valley.graphics', JSON.stringify({ quality: 'low', frameRate: 30 })); } catch { /* sin almacenamiento */ }
+  });
+}
+
 async function await3d(page: Page, clock: boolean): Promise<void> {
   await test.expect.poll(async () => {
     if (clock) await page.clock.runFor(100);
@@ -226,7 +237,10 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
   // mide **300 × 150**: el tamaño por defecto de un `<canvas>` antes de que
   // `size()` lo estire. Medido así, el «centro» caía en (150, 75), o sea la
   // esquina de arriba, y ningún toque abría nada.
-  await await3d(page, false);
+  await test.expect.poll(
+    async () => (await canvas.boundingBox())?.width ?? 0,
+    { timeout: 20_000 },
+  ).toBeGreaterThan(300);
   const box = await canvas.boundingBox();
   // **VZ-02 · y se barre la pantalla, no cuarenta píxeles alrededor del centro.**
   //
@@ -346,6 +360,7 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // Toca el valle en 3D, que es el que el jugador toca: todo lo de abajo habla
   // del lienzo 3D y de su cámara.
   test.setTimeout(300_000);
+  await lowGraphics(page);
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   await answerAnyCrossroad(page);
@@ -372,10 +387,7 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // mide **300 × 150**: el tamaño por defecto de un `<canvas>` antes de que
   // `size()` lo estire. Medido así, el «centro» caía en (150, 75), o sea la
   // esquina de arriba, y ningún toque abría nada.
-  await test.expect.poll(
-    async () => (await canvas.boundingBox())?.width ?? 0,
-    { timeout: 20_000 },
-  ).toBeGreaterThan(300);
+  await await3d(page, false);
   const box = await canvas.boundingBox();
   // `force`, y con razón: contestar la encrucijada de arriba hace que el mapa
   // enfoque y **siga** a alguien de su reparto, y en Canvas eso es cambiar la
@@ -443,6 +455,7 @@ test('la ficha de un aldeano dice qué está haciendo ahora mismo (prototipo 03)
   // a quien está presente y tiene nombre, o sea exactamente a quien tiene
   // cuerpo en la escena.
   test.setTimeout(300_000);
+  await lowGraphics(page);
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   await await3d(page, false);
@@ -693,6 +706,7 @@ test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ p
   // probarla.
   test.setTimeout(300_000);
   await page.clock.install();
+  await lowGraphics(page);
   await page.goto('/?debug=1&live=1&weather=storm&seed=7&year=20&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   await await3d(page, true);
@@ -746,6 +760,7 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
   // enfoca el mapa.
   test.setTimeout(300_000);
   await page.clock.install();
+  await lowGraphics(page);
   await page.goto('/?debug=1&live=1&crossroad=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   // Enfocar mueve la cámara del 3D: sin él no hay centro de vista que mirar.
