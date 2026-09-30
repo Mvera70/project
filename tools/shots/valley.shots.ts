@@ -169,7 +169,10 @@ test('el juego abre con el menú de inicio: un valle nuevo con su número, y con
   test.expect(first).not.toMatch(/\[intro\./u);
   await voice.click();
   await test.expect(hint).toBeVisible();
-  test.expect(await voice.innerText()).not.toBe(first);
+  // Se espera al texto nuevo: el toque cambia la pista en el fotograma
+  // siguiente, y leerla en el mismo instante era una carrera que el servidor,
+  // más lento, perdía (30 sep 2026).
+  await test.expect.poll(() => voice.innerText()).not.toBe(first);
   await voice.click();
   // Retirada la pista, el hueco no se queda vacío: lo ocupa el fondo, que es lo
   // que la aldea está haciendo. Lo que desaparece es el papel de pista.
