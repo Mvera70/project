@@ -160,7 +160,11 @@ pidió. El ladrido del perro es decisión de Vera.
     determinista, las jornadas que sólo dependen de él (`works`, `wall-rings`,
     `e3b-corridor`, `fate-chaos`, `founding`, `notices`, `engine-long`,
     `title-cooperative`) salen igual que antes por construcción.
-  - `work-contact` es la única que depende de la capa de vida que animación
-    tocó; su pasada sobre `efafc2e` estaba pendiente al escribir esto.
+  - Terminada la comparación (30 sep, 01:40): **las 21 pruebas rojas son las
+    mismas, una a una, en `efafc2e` y en `7d027bb`**, `work-contact` incluida.
+    Ninguna rama de hoy rompió ni arregló ninguna.
+  - La suite rápida entera sobre `main`, en local: 2 191 de 2 192; la roja es
+    el cronómetro de `save.test.ts` (960 ticks en menos de 2 s: aquí 3,6 s, en
+    la CI 3,0), que no es de ninguna rama y ya la había visto GV.
   - Por qué nadie lo vio: la CI se cortaba siempre en el tope de 60 minutos
     antes de llegar. Es deuda de rondas anteriores que sale a la luz ahora.
