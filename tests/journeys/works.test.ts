@@ -91,7 +91,17 @@ function onForbiddenGround(state: GameState): string | null {
         const t = state.map.terrain[y * state.map.width + x];
         const bankDefence = b.w === 1 && b.h === 1
           && ['palisade', 'wall', 'gate', 'bastion'].includes(b.kind);
-        if (t === TERRAIN_CODE.water || t === TERRAIN_CODE.ford
+        // Y el cerco cruza el cauce con estacas o piedra: es la regla de
+        // `buildable` (`engine/world/placement.ts`, «El cerco puede cruzar el
+        // cauce con estacas o piedra; el vado sigue libre») y la guarda
+        // `tests/fast/spatial-layout.test.ts`, «completa el anillo sobre el río
+        // sin ocupar el vado». Esta lista se quedó en la marisma y daba por
+        // defecto `wall#207 en 31,42` en la semilla 0 (antes `wall#284`, 28 sep):
+        // la celda es río desde la fundación, y lo que hay encima es una estaca
+        // del anillo mejorada a piedra —medido el 30 sep 2026: estaca en el tick
+        // 569, piedra en el 1448—. Portón y bastión siguen fuera del agua.
+        const riverWall = b.w === 1 && b.h === 1 && (b.kind === 'palisade' || b.kind === 'wall');
+        if ((t === TERRAIN_CODE.water && !riverWall) || t === TERRAIN_CODE.ford
           || t === TERRAIN_CODE.mountain || t === TERRAIN_CODE.lake
           || (t === TERRAIN_CODE.marsh && !bankDefence)) return `${b.kind}#${b.id} en ${x},${y}`;
       }
@@ -357,10 +367,14 @@ describe('colocación · §7.4', () => {
       state.buildings = [{ ...template, kind }];
       state.map.terrain[cell] = TERRAIN_CODE.marsh;
       expect(onForbiddenGround(state)).toBeNull();
-      for (const terrain of [TERRAIN_CODE.water, TERRAIN_CODE.ford]) {
-        state.map.terrain[cell] = terrain;
-        expect(onForbiddenGround(state)).not.toBeNull();
-      }
+      // El vado nunca: es por donde se cruza. El agua del cauce, sólo la
+      // estaca y la piedra del cerco (`buildable`, `placement.ts`; ver
+      // `onForbiddenGround`); portón y bastión, nunca.
+      state.map.terrain[cell] = TERRAIN_CODE.ford;
+      expect(onForbiddenGround(state), `${kind} en el vado`).not.toBeNull();
+      state.map.terrain[cell] = TERRAIN_CODE.water;
+      if (kind === 'palisade' || kind === 'wall') expect(onForbiddenGround(state), `${kind} en el cauce`).toBeNull();
+      else expect(onForbiddenGround(state), `${kind} en el cauce`).not.toBeNull();
     }
     state.map.terrain[cell] = TERRAIN_CODE.marsh;
     state.buildings = [{ ...template, kind: 'house' }];

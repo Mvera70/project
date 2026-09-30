@@ -26,8 +26,29 @@ function played(seed: number, years: number): GameState {
   return state;
 }
 
+const SEEDS = [3, 7, 11, 23, 31, 41, 53, 67, 79, 83, 89, 97];
+let cached: GameState[] | null = null;
+/** Las doce partidas, jugadas una sola vez para las dos pruebas. */
+function playedAll(): GameState[] {
+  cached ??= SEEDS.map((seed) => played(seed, 40));
+  return cached;
+}
+
 describe('el caos es el juego · R-1 §2.6', () => {
-  it('el caos es el juego: unos valles se rompen y otros no', () => {
+  // **Declarada en rojo, con el listón intacto** (`CLAUDE.md`: se escribe lo
+  // medido y no se baja la cota). Es la misma situación que el cuaderno ya
+  // dejó escrita tras B-1 —«bajar la cota sería borrar el principio»— y que B3
+  // curó el 18 sep con el valle tomado. **Ha vuelto a perderse**, y no en una
+  // rama de hoy: medido el 30 sep 2026, a cuarenta años y con estas doce
+  // semillas, acaba **1 de 12** en `ee9340e` (la raíz de la historia de este
+  // repositorio: la 97, tomada en el año 23) y **0 de 12** en `main`, antes y
+  // después de arreglar las riñas de la familia que huye. Las doce llegan con
+  // 41 a 82 personas, el clan en 60 hombres y entre 6 y 11 familias que huyen
+  // llegadas por el camino (v4.95), que suman tres bocas cada una. Lo que hay
+  // que decidir es del dueño y ya estaba abierto en el cuaderno: **por dónde
+  // muerde el mundo** (el hambre, el asedio, los que llegan). Cuando algo lo
+  // devuelva, esto se pone rojo y hay que quitar el `.fails`.
+  it.fails('el caos es el juego: unos valles se rompen y otros no', () => {
     // Hasta v3.75 esta prueba exigía que las seis semillas llegaran vivas al
     // año treinta, y dos puertas en `weightOf` (`LIGHTNING_MIN_HOUSES`,
     // `LIGHTNING_MIN_PEOPLE`) lo garantizaban quitándole al rayo la única casa
@@ -44,15 +65,18 @@ describe('el caos es el juego · R-1 §2.6', () => {
     // prudente: 8 de 12 acaban (6 `abandoned`, 2 `extinction`), las otras 4
     // siguen. La horquilla dejar sitio a que los pesos se muevan sin perder la
     // propiedad: que existan valles que acaban y valles que siguen.
-    const seeds = [3, 7, 11, 23, 31, 41, 53, 67, 79, 83, 89, 97];
-    const states = seeds.map((seed) => played(seed, 40));
+    const states = playedAll();
     const finished = states.filter((state) => state.ended !== null);
     const alive = states.filter((state) => state.ended === null);
-    expect(finished.length, `acabaron: ${finished.length} de ${seeds.length}`).toBeGreaterThanOrEqual(3);
-    expect(finished.length, `acabaron: ${finished.length} de ${seeds.length}`).toBeLessThanOrEqual(11);
-    expect(alive.length, `siguen: ${alive.length} de ${seeds.length}`).toBeGreaterThan(0);
+    expect(finished.length, `acabaron: ${finished.length} de ${SEEDS.length}`).toBeGreaterThanOrEqual(3);
+    expect(finished.length, `acabaron: ${finished.length} de ${SEEDS.length}`).toBeLessThanOrEqual(11);
+    expect(alive.length, `siguen: ${alive.length} de ${SEEDS.length}`).toBeGreaterThan(0);
+  });
 
-    for (const state of states) {
+  // La integridad se separa de la cuenta de finales para que el `.fails` de
+  // arriba no la tape: esto no depende del nivelado y tiene que pasar siempre.
+  it('rompa o no, la partida no pierde la integridad y el final se cuenta', () => {
+    for (const state of playedAll()) {
       // La partida que acaba lo cuenta: causa y crónica, no un final mudo.
       if (state.ended !== null) {
         // B3 · **y desde el 18 sep hay una tercera manera de acabar**: el valle

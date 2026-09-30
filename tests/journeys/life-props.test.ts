@@ -90,7 +90,15 @@ describe('V-09 · trastos', () => {
         // Y al revés: quien dice llevar algo, lo lleva de verdad — el trasto
         // que `dweller.holding` señala existe y su `held` apunta de vuelta.
         for (const dweller of life.dwellers) {
-          if (dweller.holding === null) continue;
+          // Un `holding` negativo no es un trasto: es la carga del oficio —el
+          // haz de leña, el saco, el pago— y se pinta como fardo
+          // (`cast.ts`, `holding < 0 ? 'bundle'`). La convención ya estaba en
+          // el porteador del pago y en la tala, y el haz que se entrega unidad
+          // a unidad (esquema 12, 28 sep 2026) la hizo diaria: medido el 30 sep
+          // en la semilla 3, 71 muestras de 71 «trastos que no existen» eran
+          // `deliver` a la leñera con `holding` −2. Esta mitad de la prueba
+          // habla de trastos; la carga no tiene `Prop` al que apuntar.
+          if (dweller.holding === null || dweller.holding < 0) continue;
           const prop = life.props.find((p) => p.id === dweller.holding);
           expect(prop, `semilla ${seed}, paso ${n}: sostiene un trasto que no existe`)
             .toBeDefined();
@@ -426,7 +434,13 @@ describe('V-09 · trastos', () => {
       .toBeGreaterThan(4);
   });
 
-  it('y tres veces seguidas, que es un peloteo largo', () => {
+  // **Y vuelve a estar declarada** (`CLAUDE.md`: se escribe lo medido y se
+  // deja `it.fails` con la propiedad). Medido el 30 sep 2026 con las aldeas de
+  // hoy —la riña de la familia que huye arreglada—: en las 36 jornadas (seis
+  // semillas × seis días) la cadena más larga es de **dos**, un pase y su
+  // vuelta; la prueba de arriba, que pide dos, pasa. No se toca `PLAYED_OUT`
+  // ni la cota: cuando el peloteo vuelva a llegar a tres, esto se pone rojo.
+  it.fails('y tres veces seguidas, que es un peloteo largo', () => {
     // **Esto estaba declarado en rojo y con el mapa grande sale verde.** La
     // medida anterior, en los valles de 36 × 56, era de setenta y dos muestras
     // sin una sola cadena de tres, y quedó escrita con `it.fails` en vez de
