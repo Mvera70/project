@@ -75,6 +75,38 @@ matriz (§2.7).
   anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
   primera jornada de una sesión (matriz §2.7).
 
+## v5.25 · 30 sep 2026 · Un animal, una llamada de dibujo (RV-1)
+
+La revisión del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md` §2,
+en su rama) encontró la regresión que dejó la PR #3: los animales facetados son
+nodos rígidos con una malla por pieza, y la villa 7/60 pasó de 500 a 964
+llamadas sin que nada avisara. **Arreglado al cargar, sin tocar ningún GLB**:
+`skinRigidBody` (`src/render3d/assets.ts`) vuelve un cuerpo de piezas rígidas
+animado en una malla con esqueleto —cada vértice entero al nodo de su pieza,
+color y rugosidad en el vértice— y deja en el sitio de cada malla un nodo vacío
+con su nombre, su postura y sus hijos, que hace de hueso. Los clips de
+`rigid-clips.mjs`, los gestos y cualquier `getObjectByName` encuentran lo mismo.
+Sirve a los trece animales animados: los siete facetados y los de piezas de
+Vera (oso, jabalí, mula, lobo, perdiz, perro). La golondrina, que no trae
+clips, no cambia. `prepareModel` es el paso único que comparten el cargador y
+`tools/reports/model-draws.ts`.
+
+**Medido** (`gl-probe`, las rutas de la revisión, antes → después sobre el
+mismo `main`): villa 7/60 **950 → 506** llamadas (la de `da8836f`, con un
+cuerpo por animal, era 500); aldea 11/21 **650 → 413** (mejor que antes de la
+PR #3, 440, porque lobo, mula y compañía también bajan); por la portada en
+táctil, villa **564 → 310**, con las mallas de fauna de **583 a 31**. Los
+triángulos no cambian y el JS de animación tampoco (`animation-cost`, 0,28 →
+0,30 ms, dentro del ruido). Se ve igual: fotos antes y después en
+`artifacts/graphics/rv1/`.
+
+**La prueba de presupuesto** (`tests/fast/animal-draws.test.ts`): todo modelo
+publicado que se anima deja **una** malla al cargar, por el camino del juego,
+con la misma caja en reposo y en mitad de cada clip y sin perder ningún nodo
+con nombre. `pieced-assets.test.ts` pasa a cargar por `prepareModel`, y la
+marcha de `graphics-animal-motion.test.ts` mide la geometría de cada pata a
+través de la piel.
+
 ## v5.24 · 30 sep 2026 · Siete sonidos de caza y asedio, rehechos de ruido y elegidos «a mi criterio»
 
 Vera, ante la segunda tanda de cinco familias: «hazlo tú». Se eligió la C

@@ -69,7 +69,16 @@ todo lo de arriba es comparativo. El banco del proyecto para eso es
 
 Pasos de la segunda tanda en la villa: cuerpos fundidos 796 → 598 (aldeanos 187 → 70
 mallas, animales 177 → 43); recorte de animales → 585; humo → 546; sombras cada dos
-fotogramas → 447 (en táctil, cada cuatro: menos aún). Recompilaciones (`shader-churn`,
+fotogramas → 447 (en táctil, cada cuatro: menos aún).
+
+**Y el 30 sep (RV-1) los animales volvieron a pesar, y ya no**: los facetados de
+la PR #3 son nodos rígidos con una malla por pieza (16–27 por animal) y la villa
+subió de 500 a 964. Hoy `skinRigidBody` (`assets.ts`) deja **una malla por
+animal**: mallas de fauna en la villa por la portada **583 → 31**, villa
+(`debug=1&seed=7&year=60&season=summer&live=1`) **950 → 506**, aldea 11/21
+**650 → 413**. La cifra de «animales 177 → 43» de arriba es del 27 sep y ya no
+describe nada. Lo guarda `tests/fast/animal-draws.test.ts`, y lo que deja cada
+GLB al cargar se lee con `npx tsx tools/reports/model-draws.ts`. Recompilaciones (`shader-churn`,
 aldea): **antes, un rayo 27 programas y la fiesta 26 más; ahora 4 y 2**.
 
 Lo que hay que retener: **las rondas de arte del 26–27 sep sumaron un 1–4 %; el peso
@@ -215,6 +224,18 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
     30 s se recupera a 18–78 ms. **Mientras no se arregle, la villa no sirve
     para medir el dibujo**: mide el bucle. La nota entera, con cómo
     reproducirlo: `docs/medidas/bucle-villa-2026-09-29.md`.
+23. **Un animal de piezas rígidas se vuelve una piel al cargar** (RV-1, 30 sep
+    2026, `skinRigidBody` en `assets.ts`). Los nodos que mueven los clips son
+    articulaciones con piezas colgando, y `fuseRigidPieces` sólo funde dentro de
+    una articulación: la vaca se quedaba en 26 mallas. Ahora todas las piezas
+    pasan a una malla con esqueleto, un hueso por pieza (el nodo vacío que queda
+    en su sitio, con su nombre y sus hijos), color y rugosidad en el vértice: una
+    llamada por animal, la misma forma en cada clip y los mismos nombres para
+    gestos y clips. **Un modelo nuevo no se da por bueno sin medir sus
+    llamadas**: `npx tsx tools/reports/model-draws.ts --ids <id>` dice cuántas
+    mallas deja al cargar, y `animal-draws.test.ts` falla si un animal pasa de
+    una. Es lo que la PR #3 no hizo: sus modelos pesaban la mitad y tenían
+    menos triángulos, y aun así casi doblaron las llamadas de la villa.
 
 ## Lo que queda (por lo que pesa)
 

@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · RV-1: un animal, una llamada de dibujo (v5.25) — **PR abierta, sin fusionar**
+
+La revisión del 30 sep (su rama, `docs/medidas/revision-rendimiento-2026-09-30.md`
+§2) me devolvió la regresión de la PR #3: los animales facetados costaban 16–27
+llamadas cada uno. Arreglado al cargar y sin tocar ningún GLB
+(`skinRigidBody` en `assets.ts`): los trece animales animados dejan una malla.
+Villa 7/60 950 → 506 llamadas, aldea 11/21 650 → 413, mallas de fauna por la
+portada 583 → 31; se ve igual (`artifacts/graphics/rv1/`). Prueba de
+presupuesto en `tests/fast/animal-draws.test.ts`. **Abierto:** que Vera dé el
+visto bueno para fusionar; y `tools/reports/model-draws.ts` viene de la rama de
+la revisión con el cargador compartido (`prepareModel`): al fusionar las dos,
+se queda esta versión.
+
 ## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
 
 Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en
