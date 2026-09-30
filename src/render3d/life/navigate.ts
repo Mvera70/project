@@ -243,6 +243,60 @@ function coarsePathTo(land: Terrain, from: Point, to: Point): Waypoint[] | null 
   return route;
 }
 
+/**
+ * GV-4b · **Lo que una búsqueda fallida ya demostró.** Cuando el A* fino no
+ * encuentra el destino ha recorrido entera la región a la que se llega desde
+ * su salida, y esa región es cerrada: ningún paso permitido sale de ella. Se
+ * guarda, por terreno, radio y resolución, y la siguiente pregunta que salga
+ * de dentro y cuyo destino no se alcance desde ninguno de sus nodos se contesta
+ * «no» sin volver a recorrer la rejilla dos veces.
+ *
+ * Es exacto, no una aproximación: sólo se contesta «no» cuando el A* también
+ * lo haría —la salida y todo vecino que se ve desde ella están dentro, y
+ * ningún nodo de dentro cumple la condición de llegada—; en cualquier otro
+ * caso se busca como siempre. Medido en la villa 7/60: el 93 % de las
+ * búsquedas finas de un relevo de jornada fallaban y se comían el 99 % de su
+ * tiempo (`docs/medidas/revision-rendimiento-2026-09-30.md`).
+ *
+ * Por objeto de terreno: la vida lo rehace al cambiar el mundo y no lo toca
+ * después, así que una región guardada no se queda vieja.
+ */
+const CLOSED = new WeakMap<Terrain, Map<string, Uint8Array[]>>();
+
+/** Si alguna región cerrada ya demuestra que de `from` no se llega a `to`. */
+function provedUnreachable(
+  land: Terrain, regions: readonly Uint8Array[], from: Point, to: Point, radius: number,
+  resolution: number, start: number, width: number, height: number, point: (cell: number) => Point,
+): boolean {
+  // La salida se prueba con el punto exacto, como hace el A* al sacarla.
+  if (Math.hypot(from.x - to.x, from.z - to.z) <= 0.8 && clearBetween(land, from, to, radius)) return false;
+  const sx = start % width, sz = Math.floor(start / width);
+  const gx = Math.round(to.x * resolution) - 1, gz = Math.round(to.z * resolution) - 1;
+  const reach = Math.ceil(0.8 * resolution) + 1;
+  for (const region of regions) {
+    let inside = true;
+    for (const [dx, dz] of WAYS) {
+      const x = sx + dx, z = sz + dz;
+      if (x < 0 || z < 0 || x >= width || z >= height) continue;
+      const next = z * width + x;
+      if (region[next] === 1) continue;
+      if (clearBetween(land, from, point(next), radius)) { inside = false; break; }
+    }
+    if (!inside) continue;
+    let arrives = false;
+    for (let z = Math.max(0, gz - reach); z <= Math.min(height - 1, gz + reach) && !arrives; z += 1) {
+      for (let x = Math.max(0, gx - reach); x <= Math.min(width - 1, gx + reach); x += 1) {
+        const cell = z * width + x;
+        if (region[cell] !== 1 || cell === start) continue;
+        const here = point(cell);
+        if (Math.hypot(here.x - to.x, here.z - to.z) <= 0.8 && clearBetween(land, here, to, radius)) { arrives = true; break; }
+      }
+    }
+    if (!arrives) return true;
+  }
+  return false;
+}
+
 /** Sólo cuando los troncos o lápidas cortan la ruta gruesa: medias celdas,
  * con cada segmento comprobado contra los sólidos reales. */
 function finePathTo(land: Terrain, from: Point, to: Point, radius: number, resolution = 2): Waypoint[] | null {
@@ -251,6 +305,11 @@ function finePathTo(land: Terrain, from: Point, to: Point, radius: number, resol
   const point = (cell: number): Point => ({ x: (cell % width + 1) / resolution, z: (Math.floor(cell / width) + 1) / resolution });
   const start = Math.max(0, Math.min(height - 1, Math.round(from.z * resolution) - 1)) * width
     + Math.max(0, Math.min(width - 1, Math.round(from.x * resolution) - 1));
+  const key = `${radius}:${resolution}`;
+  const known = land.traffic === undefined && land.trafficBodies === undefined ? CLOSED.get(land)?.get(key) : undefined;
+  if (known !== undefined && provedUnreachable(land, known, from, to, radius, resolution, start, width, height, point)) {
+    return resolution === 2 ? finePathTo(land, from, to, radius, 4) : null;
+  }
   const heuristic = (cell: number): number => { const p = point(cell); return Math.floor(Math.hypot(to.x - p.x, to.z - p.z) * 4.5 * resolution); };
   const cost = new Int32Array(width * height).fill(-1), came = new Int32Array(width * height).fill(-1);
   const open = new Frontier(); cost[start] = 0; open.push(start, heuristic(start));
@@ -266,6 +325,30 @@ function finePathTo(land: Terrain, from: Point, to: Point, radius: number, resol
       if (cost[next]! >= 0 && cost[next]! <= spent) continue;
       if (!clearBetween(land, here, point(next), radius)) continue;
       cost[next] = spent; came[next] = cell; open.push(next, spent + heuristic(next));
+    }
+  }
+  // GV-4b · La región recorrida es cerrada salvo quizá en la salida, que se
+  // expandió desde el punto exacto y no desde su nodo: sólo se guarda si
+  // desde el nodo tampoco se sale.
+  if (goal < 0 && land.traffic === undefined && land.trafficBodies === undefined) {
+    const region = new Uint8Array(width * height);
+    for (let cell = 0; cell < cost.length; cell += 1) if (cost[cell]! >= 0) region[cell] = 1;
+    const home = point(start);
+    let closed = true;
+    for (const [dx, dz] of WAYS) {
+      const x = start % width + dx, z = Math.floor(start / width) + dz;
+      if (x < 0 || z < 0 || x >= width || z >= height) continue;
+      const next = z * width + x;
+      if (region[next] !== 1 && clearBetween(land, home, point(next), radius)) { closed = false; break; }
+    }
+    if (closed) {
+      const byKey = CLOSED.get(land) ?? new Map<string, Uint8Array[]>();
+      const list = byKey.get(key) ?? [];
+      // Unas pocas regiones bastan (la del valle y las de algún rincón); un
+      // tope evita que un terreno raro las acumule sin fin.
+      if (list.length < 8) list.push(region);
+      byKey.set(key, list);
+      CLOSED.set(land, byKey);
     }
   }
   // Algunos huecos junto a postes no contienen ningún nodo de media celda.
