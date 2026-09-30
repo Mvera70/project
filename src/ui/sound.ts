@@ -140,6 +140,21 @@ export function accentAllowed(nowMs: number, lastPlayedMs: number | null): boole
   return lastPlayedMs === null || nowMs - lastPlayedMs >= SOUND.ACCENT_MIN_GAP_MS;
 }
 
+/**
+ * Qué hacer con el `AudioContext` según se vea o no la página. **Pura**, para
+ * poder probarla sin navegador.
+ *
+ * Ocultar la pestaña ya apagaba el ambiente por ganancia (`ambienceAllowed`),
+ * pero el contexto seguía corriendo: once bucles decodificados girando a
+ * volumen cero, gastando batería para nada. Con la página oculta se suspende;
+ * al volver se reanuda. `interrupted` es el estado con el que iOS deja un
+ * contexto tras una llamada o un cambio de aplicación, y también se reanuda.
+ */
+export function contextAction(state: string, hidden: boolean): 'suspend' | 'resume' | null {
+  if (hidden) return state === 'running' ? 'suspend' : null;
+  return state === 'suspended' || state === 'interrupted' ? 'resume' : null;
+}
+
 /** El fusible de un toque: el mismo sonido no se apila sobre sí mismo. */
 export function tapAllowed(nowMs: number, lastPlayedMs: number | undefined): boolean {
   return lastPlayedMs === undefined || nowMs - lastPlayedMs >= SOUND.TAP_MIN_GAP_MS;
@@ -247,6 +262,8 @@ export interface SoundEngine {
   prefetch(): void;
   /** El primer toque: a partir de aquí el navegador deja sonar. */
   arm(): void;
+  /** La página se oculta o se vuelve a ver: el contexto se suspende o se reanuda. */
+  visibility(hidden: boolean): void;
   /** Un acento del juego: pasa por el fusible de §11.4. */
   accent(cue: Cue, nowMs: number): void;
   /** La respuesta a un toque del jugador. `rate` sube o baja el tono. */
@@ -308,6 +325,9 @@ export function createSoundEngine(): SoundEngine {
 
   const start = (cue: Cue, rate: number, requestedMs: number): void => {
     if (!isEnabled() || ctx === null || master === null) return;
+    // Con la pestaña oculta no suena nada, y menos aún se reanuda el contexto:
+    // un temporizador de trueno que vence de fondo soltaría todo de golpe al volver.
+    if (typeof document !== 'undefined' && document.hidden) return;
     if (ctx.state !== 'running') void ctx.resume().catch(() => undefined);
     const context = ctx;
     const out = master;
@@ -338,6 +358,12 @@ export function createSoundEngine(): SoundEngine {
       if (master !== null && ctx !== null) master.gain.setValueAtTime(on ? SOUND.MASTER_GAIN : 0, ctx.currentTime);
     },
     prefetch,
+    visibility(hidden: boolean): void {
+      if (ctx === null) return;
+      const action = contextAction(ctx.state, hidden);
+      if (action === 'suspend') void ctx.suspend().catch(() => undefined);
+      else if (action === 'resume') void ctx.resume().catch(() => undefined);
+    },
     arm(): void {
       prefetch();
       if (typeof window === 'undefined') return;
@@ -494,6 +520,9 @@ export function installSound(): void {
     if (event.key !== ' ' && event.key !== 'Enter') return;
     if (plainButton(event.target) !== null) sound.tap('ui_button_release', Date.now());
   }, { capture: true });
+  // Al ocultar la pestaña el contexto se suspende (batería y sonido de fondo
+  // en un móvil con la pantalla apagada); al volver, se reanuda.
+  document.addEventListener('visibilitychange', () => { sound.visibility(document.hidden); });
   // Pedir los ficheros no necesita permiso: así el primer botón ya los tiene.
   if (document.readyState === 'complete') sound.prefetch();
   else window.addEventListener('load', () => { sound.prefetch(); }, { once: true });

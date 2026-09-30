@@ -465,6 +465,9 @@ las espadas (no hay) y el sonido de sangre (decisión 7).
 
 ## 9 · Lo que ya quedó hecho de este plan
 
+- **Pestaña oculta** (30 sep 2026): el contexto se suspende al ocultarla y se
+  reanuda al volver; con la pestaña oculta `start()` no suena. La fase 5
+  sigue abierta, y por ahí pasa el contrato de sucesos de caza y combate.
 - **Fase 0 · el motor de ambiente, hecho** (29 sep 2026). Capas en bucle con
   su ganancia, cruces, las cuatro compuertas, la cámara como oyente y la
   mezcla decidida por una función **pura** (`src/ui/ambience.ts`). El bucle no

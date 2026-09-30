@@ -11,6 +11,15 @@ elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
 botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
 los momentos de §11.10.
 
+## 30 sep 2026 · Sonido: pestaña oculta y prueba lenta (v5.21)
+
+Integración pidió cuatro cosas. Hechas: el `AudioContext` se suspende al
+ocultar la pestaña (`contextAction`, `sound.visibility`) y el acento de sesenta
+años se mudó a `tests/journeys/sound-long.test.ts`. **Abiertas: que caza, oso y
+combate suenen, y el contrato para que publiquen sus sucesos** — es la fase 5
+del plan de audio; el contrato es de sólo lectura (nunca consume azar del
+motor) y cada sonido pasa por la página de escucha de Vera antes de entrar.
+
 ## 30 sep 2026 · Fase 2 del sonido: día y noche sí; aldea, hoguera y fiesta, no (v5.20)
 
 **Paramos aquí por crédito** (Vera, 30 sep). Estado exacto: fases 0 y 1
