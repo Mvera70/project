@@ -56,7 +56,9 @@ import { closeCrossroad, isDeferred, openCrossroad, openDeferred } from './scree
 import { openEpitaph } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
 import { accentFor, playerAnswer, routeCue, sound, speedCue } from './sound';
-import { cellsBetween, mixFor, riverCellsFrom, thunderFor, type WorldSound } from './ambience';
+import { cellsBetween, mixFor, nearness, riverCellsFrom, thunderFor, type WorldSound } from './ambience';
+import { MOMENT_CUE, momentsAudible, momentsFrom } from './moments';
+import type { WorldMoments } from '../render3d/contracts';
 import { valleyAxis } from '@engine/world/valley-road';
 import { floodOf } from '@derive/flood';
 import { festivityOf } from '@derive/festivity';
@@ -848,6 +850,8 @@ export function boot(
   const renderer = { paint: (s2: GameState, f: number): void => backend.live.paint(s2, f, speed),
     track: (id: number | null): void => { backend.live.track(id); } };
   let lastBolts = 0;
+  /** El fotograma anterior de las cuentas del mundo: de su diferencia salen los sucesos que suenan. */
+  let lastMoments: WorldMoments | null = null;
   // Lo último que se ofreció como fondo, para no ofrecer lo mismo cada fotograma.
   let spokenState: string | null = null;
   /** M-0 · el `postedTick` de la oferta que ya está dicha, para no repetirla. */
@@ -909,7 +913,23 @@ export function boot(
       const nowMs = Date.now();
       const dtSeconds = lastAmbienceMs === null ? 0 : (nowMs - lastAmbienceMs) / 1000;
       lastAmbienceMs = nowMs;
-      sound.ambience(mixFor(worldSound(stats)), dtSeconds);
+      const world = worldSound(stats);
+      sound.ambience(mixFor(world), dtSeconds);
+      // **La caza y el asedio** (fase 5): lo que acaba de pasar sale de la
+      // diferencia entre dos fotogramas de `stats.moments` (`moments.ts`, puro),
+      // y cada suceso suena con la cercanía de la cámara. La cuenta se avanza
+      // siempre, se oiga o no: si no, al salir de un ×64 llegaría toda de golpe.
+      const happened = momentsFrom(lastMoments, stats.moments);
+      lastMoments = stats.moments;
+      if (momentsAudible(world, SOUND.AMBIENCE_FAST_SPEED)) {
+        for (const moment of happened) {
+          const cue = MOMENT_CUE[moment.kind];
+          if (cue === null) continue;
+          // Sin sitio se trata como el corazón de la aldea, que es donde se cierra un cerco.
+          const cells = cellsBetween(moment.at ?? { x: state.plaza.x, z: state.plaza.y }, stats.viewCentre);
+          sound.moment(cue, nowMs, nearness(cells, stats.viewHeight));
+        }
+      }
     }
     // UI-R2 · hora, fecha, tira, tendencias, actividad y resumen de órdenes:
     // todo lo que antes eran quince líneas sueltas por fotograma es ahora una

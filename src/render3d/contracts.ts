@@ -408,6 +408,45 @@ export interface GraphicsStats {
   readonly bolts: number;
   /** Punto 3 · árboles atenuados delante del encuentro del portón. */
   readonly revealedTrees: number;
+  /**
+   * **Lo que pasó en la muralla, en el monte y en la cueva**, como cuentas que
+   * sólo suben, para que `ui/moments.ts` saque de la diferencia entre dos
+   * fotogramas qué acaba de ocurrir. Hermano de `bolts`, y por lo mismo: el
+   * renderer no sabe que existe el sonido ni tiene por qué; publica lo que ya
+   * cuenta y se lee, **sin consumir azar del motor** (CLAUDE.md). Es el
+   * contrato que la caza y el combate dan a quien quiera oírlos.
+   */
+  readonly moments: WorldMoments;
+}
+
+/**
+ * Las cuentas de la jornada de vida. Cada bloque es `null` cuando no hay nada
+ * en marcha (sin asalto, sin caza, sin oso), y **una cuenta que baja es una
+ * jornada nueva**: la capa de vida se rehace cada día y sus contadores
+ * vuelven a cero, así que quien las lee trata un descenso como un reinicio.
+ */
+export interface WorldMoments {
+  /** El asalto: flechas, choques, caídos y el portón. Vacío fuera de un cerco. */
+  readonly battle: {
+    readonly loosed: number;
+    /** Lo que dio de lo soltado y de lo lanzado; `arrowHits` es sólo de flecha. */
+    readonly hits: number;
+    readonly arrowHits: number;
+    /** Del clan en el suelo, y de la aldea caídos defendiendo. */
+    readonly fallen: number;
+    readonly lost: number;
+    readonly gate: { readonly at: { readonly x: number; readonly z: number };
+      readonly hits: number; readonly broken: boolean } | null;
+  } | null;
+  /** La caza en pantalla: cuántos tiros o estocadas van y cuál fue el último. */
+  readonly hunt: {
+    readonly strokes: number;
+    readonly last: { readonly kind: 'shot' | 'thrust';
+      readonly outcome: 'hit' | 'wound' | 'graze' | 'standing' | 'ground' | 'miss' } | null;
+    readonly at: { readonly x: number; readonly z: number };
+  } | null;
+  /** El oso visible: cuántas veces se ha alzado a avisar, y dónde. */
+  readonly bear: { readonly warnings: number; readonly at: { readonly x: number; readonly z: number } } | null;
 }
 
 export interface GraphicsRendererOptions {

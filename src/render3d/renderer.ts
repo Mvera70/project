@@ -33,7 +33,7 @@ import { BUILDINGS, TIME } from '@engine/balance';
 import { woodCostOf } from '@engine/world/works';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
-  Actor, ActorDoing, BattleReport, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats,
+  Actor, ActorDoing, BattleReport, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats, WorldMoments,
   GraphicsTarget, GraphicsViewport,
 } from './contracts';
 import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
@@ -1700,6 +1700,32 @@ export async function createGraphicsRenderer(
    * toque de la señal) responde sí o no; el observatorio (`__valleyHunt`)
    * necesita saber por qué no, para no adivinarlo (AN-4b).
    */
+  /**
+   * Las cuentas que `ui/moments.ts` lee para oír la muralla, el monte y la
+   * cueva (`GraphicsStats.moments`). Sólo lectura: copia lo que la capa de
+   * vida ya cuenta y no toca nada ni gasta azar.
+   */
+  function momentsOf(): WorldMoments {
+    if (life === null) return { battle: null, hunt: null, bear: null };
+    const { loosed, hits, arrowHits, fallen, lost, gate } = life.defence;
+    const fought = loosed > 0 || hits > 0 || fallen > 0 || lost > 0 || (gate !== null && gate.hits > 0);
+    const strokes = huntScene?.strokes ?? [];
+    const alert = life.bearAlert;
+    return {
+      battle: fought || gate !== null
+        ? { loosed, hits, arrowHits, fallen, lost,
+          gate: gate === null ? null : { at: { x: gate.at.x, z: gate.at.z }, hits: gate.hits, broken: gate.broken } }
+        : null,
+      hunt: huntScene === null ? null : {
+        strokes: strokes.length,
+        last: strokes.length === 0 ? null
+          : { kind: strokes[strokes.length - 1]!.kind, outcome: strokes[strokes.length - 1]!.outcome },
+        at: { x: huntScene.hunter.x, z: huntScene.hunter.z },
+      },
+      bear: alert === null ? null : { warnings: alert.warnings, at: { x: alert.x, z: alert.z } },
+    };
+  }
+
   function beginHunt(state: Readonly<GameState>, species: HuntSpecies, weapon: HuntWeapon):
     'started' | 'busy' | 'other-valley' | 'no-offer' | 'no-prey' | 'no-hunter' | 'no-scene' {
     if (life === null || lifeState === null || huntScene !== null || huntReport !== null) return 'busy';
@@ -2920,6 +2946,7 @@ export async function createGraphicsRenderer(
         sky: paintedSky,
         bolts,
         revealedTrees: forest?.revealedCount ?? 0,
+        moments: momentsOf(),
       };
     },
 

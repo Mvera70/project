@@ -28,6 +28,7 @@ que esta skill obliga a medir.
 | 29 sep, botón tanda 3 | 5 candidatos blandos con **notas afinadas** (gota, marimba, kalimba, tecla) | «Sigue sonando como muy infantiles… como de juego de niños pequeños» | **Un tono puro afinado entre 600 y 1300 Hz con cola es una caja de música.** Es la trampa que más veces cayó |
 | 29 sep, botón tanda 4 | 5 candidatos de **foley de materiales**: cera, cofre, cuero, tambor, piedra | «Menos el N [tambor]. Conserva todos, me gustan mucho, sigue por ahí» · y luego «magnífico» | **La paleta.** Ver §1 |
 | 29 sep | Los 20 rehechos con esa paleta; el botón genérico | «Eligo el K» (sello de cera) | El bucle de §3 funciona: probar **un** botón sale mucho más barato que rehacer veinte |
+| 30 sep | Siete sonidos de caza y asedio con `drop` y `knock` subidos a 420–600 Hz para llenar la banda del móvil | «Juguetes de niño pequeño, timbales… parece roto por completo» | **Subir un cuerpo a la banda del móvil con un tono lo convierte en timbal.** Un golpe es **ruido que se apaga**; se mide con `tools/ui/tonality.py` y no puede sostener más de ~30 ms de resonancia (un timbal: 336 ms, los siete: 84–264) |
 
 **La lección que resume las otras:** cuando algo no gusta, no hagas otra
 variante de lo mismo. **Cambia de familia** y pon cinco familias distintas en la
@@ -69,6 +70,7 @@ Cada material tiene su papel, para que la interfaz se aprenda de oído:
 - **Realce de presencia** a 2–3 kHz. Se probó y añade filo.
 - **Ataques de 0,2 ms con ruido hasta 10 kHz.** Suena a interfaz de sistema
   operativo. El contacto va entre 600 y 3200 Hz con 0,5–1,5 ms de ataque.
+- **Un golpe con cuerpo tonal** (`drop`, `knock` como cuerpo, un seno que cae): a 400–600 Hz es un timbal y a 1 kHz una caja de música. Los golpes de combate se hacen de **ruido en banda que se apaga rápido** y de crujidos minúsculos, nunca de una resonancia.
 - **Voces sintéticas** (personas o animales), y **también el bullicio hecho de
   actividad**: se probó (golpes, pasos, cacharros, rumor) y fue «horrible».
   Una aldea que se oye es gente grabada o generada; hasta entonces, calla.
@@ -81,6 +83,7 @@ Cada material tiene su papel, para que la interfaz se aprenda de oído:
 |---|---|---|
 | `tools/ui/sounds.py` | **Fabrica los sonidos.** Materiales modelados con numpy, nivelados en la banda del teléfono, a `public/audio/*.mp3`. Determinista byte a byte. Sella la huella de cada fichero en `sound.ts` | `python tools/ui/sounds.py [--audition] [--stamp] [--only <ids>]` |
 | `tools/ui/sound-check.mjs` | **Comprueba que suena lo que toca, cuando toca.** Recorre la interfaz con clics de verdad en Chromium y lee `window.__valleySound` | `node tools/ui/sound-check.mjs --chrome /opt/pw-browsers/chromium [--headed]` |
+| `tools/ui/tonality.py` | **Cuánto suena a nota** (resonancia sostenida en ms). Un golpe: ≤ 30 ms. Se mide con el resto en §4 | `python tools/ui/tonality.py a.wav` |
 | `tests/fast/sound.test.ts` | Las propiedades puras del *cuándo*, que los ficheros existen, su huella y el presupuesto de peso | `npx vitest run tests/fast/sound.test.ts` |
 | `tests/journeys/sound-long.test.ts` | El acento en sesenta años de motor (25 s: no cabe en la rápida) | `npx vitest run -c vitest.journeys.config.ts tests/journeys/sound-long.test.ts` |
 | La hoja de análisis | Espectrograma, forma de onda, centroide, % por encima de 4 kHz y **% en la banda del teléfono**. No está versionada: se escribe en el cuaderno de la sesión | ver §4 |
@@ -122,6 +125,7 @@ enseñar nada.**
 | **% de energía entre 350 Hz y 6 kHz** | **≥ 90 %** | En un móvil suena mudo. Cuatro sonidos de la primera tanda tenían 33–72 % |
 | % por encima de 4 kHz | < 1 % en un cuerpo · **< 2 % en un roce** (cera que se despega, pergamino) | Filo, fatiga, «ratón de ordenador» |
 | Centroide espectral | 350–1300 Hz | Por debajo, se pierde en el móvil; por encima, chilla |
+| **Resonancia sostenida** (`tonality.py`) | **≤ 30 ms** en un golpe | Suena a timbal o a juguete. Los siete de caza: 84–264 ms |
 | Pico | ≤ −1 dBFS | Recorte |
 | Primera y última muestra | 0,0000 | Un clic al empezar o al cortar |
 | Duración | Toque 0,05–0,12 s · navegación 0,1–0,3 s · confirmación 0,15–0,5 s · llamada 0,3–0,9 s · hito 1–2,6 s | Un toque largo cansa; un hito corto no se oye |
@@ -309,7 +313,11 @@ Lo que hay que tener en la cabeza antes de tocar el ambiente:
   `scenic-state.ts`). Un sonido atado al tick llega **antes que la imagen** para
   edificios, nacimientos y muertes. Lo que se pinta del estado vivo (fuegos,
   árboles que caen, el «+1» de la madera) no tiene desfase.
-- **No hay un flujo de sucesos**: hay estado que se puede leer. Las tres formas
+- **Ya hay un contrato para la caza y el asedio** (30 sep 2026):
+  `GraphicsStats.moments` + `ui/moments.ts`. Un suceso nuevo añade su cuenta
+  al renderer, su `MomentKind` y su fila en `MOMENT_CUE`; nunca un `sound.*`
+  suelto en la capa de vida. Una cuenta que baja es una jornada nueva.
+- **No hay un flujo de sucesos general**: hay estado que se puede leer. Las tres formas
   de saber *cuándo*, en orden de coste: lo que ya sale por `stats()` y el
   `TickReport`; lo que existe dentro del renderer y hay que exponer con un
   descriptor pequeño; y lo que no existe y necesita un gancho. Todos de **sólo
