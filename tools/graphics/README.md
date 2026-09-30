@@ -35,6 +35,7 @@ explica cada una; este índice sirve para escoger la entrada correcta.
 | Contar llamadas WebGL | `performance/gl-probe.mjs` | `performance/scene-report.mjs` para localizar su origen |
 | Localizar recompilación de shaders | `performance/shader-churn.mjs` | — |
 | Ver en qué función se va la CPU | `performance/cpu-profile.mjs` | — |
+| Ver los relevos de jornada y el bucle de la villa a una velocidad | `performance/relay-probe.mjs` | `../reports/model-draws.ts` para lo que cuesta cada modelo |
 | Comprobar el entorno gráfico | `doctor.ts` | — |
 
 Los scripts de rondas cerradas G-19 y G-20 están en

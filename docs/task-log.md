@@ -1,5 +1,43 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · La revisión: lo propuesto contra lo hecho, y el rendimiento a fondo
+
+Vera, con `/goal`: «revisarlo todo y ver que cumplimos con lo que se ha
+intentado proponer; el rendimiento de los gráficos, a fondo». Cuatro revisores
+en paralelo y cinco versiones medidas igual (27 sep, tras AN, tras los
+animales, tras GV y hoy). El informe entero, con cómo reproducir cada cifra:
+`docs/medidas/revision-rendimiento-2026-09-30.md`; las fases que salen, RV-1 a
+RV-8 en `plan-meta.md`. **No cambia el juego**: papel, la skill `performance`
+(lecciones 23–28) y dos sondas nuevas con su fila (`relay-probe.mjs`,
+`model-draws.ts`).
+
+Lo que más pesa: **los siete animales facetados de la PR #3 dejan 16–27 mallas
+por animal** donde había una (la villa 7/60 de 500 a 964 llamadas, la aldea
+11/21 de 440 a 649, con la misma escena), y nadie lo midió al publicarlos.
+**GV-4a (PR #8) es correcto pero no basta**: a ×16 la villa se sigue congelando
+5–7 s en cada relevo de jornada, porque montar la vida es A* que falla (93 % de
+las búsquedas finas, 99 % del tiempo) y la propuesta de GV-4b de la PR #8 no
+toca `dayPlans`, que es la mitad. Un prototipo exacto —guardar la región que
+recorre una búsqueda fallida— baja `createVillage` de 3,2 s a 0,15–0,22 s en
+7/60 y de 8,3 s a 1,1 s en 3/40, con la misma vida byte a byte en cuatro
+valles; está en la rama `claude/gv-4b-regiones-cerradas`, con su prueba de
+equivalencia, **sin fusionar, pendiente de Vera**.
+Además: la adaptativa baja la escala con un solo fotograma largo y el tope de
+60 pinta a 45 fps en pantallas de 90 Hz; la cabecera consulta el carro al motor
+en cada fotograma (11 % del JS); el camino rehace dos A* por semana (el motor
+un 12–17 % más lento, la roja de `catchUp`); **la caza del jabalí —y con ella
+el oso— no sale en la mayoría de valles** (el jabalí sólo nace entre troncos
+donde no cabe); el trueno cercano no suena nunca;
+los refugiados cuentan como nombrados (la roja de `engine-long`); un guardado
+ilegible se pisa sin aviso. La CI de `main` está roja en los tres trabajos y la
+suite rápida tarda 30 min.
+
+**Abierto, y el orden es de Vera:** RV-1 (un animal, una llamada) y RV-2
+(GV-4b por regiones cerradas, detrás de GV-4a) antes de medir la villa en el
+aparato; RV-3 (adaptativa y tope); y en la PR #8, antes de fusionarla,
+renumerar sus v5.22/v5.23 (chocan con las del sonido), decir la regresión de
+los animales y cambiar su GV-4b.
+
 ## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
 
 Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en

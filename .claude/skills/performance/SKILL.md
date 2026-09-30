@@ -27,6 +27,8 @@ no representan una tablet.** Lo que sí es comparable entre versiones:
 | Recompilaciones | `node tools/graphics/performance/shader-churn.mjs <valley.html> "<query>"` | Programas enlazados tras cargar, tras un rayo y con la fiesta. **Cada uno de más es un tirón en una tablet** |
 | CPU por función | `node tools/graphics/performance/cpu-profile.mjs <valley.html> "<query>" <espera> <perfil> <función>` sobre `bundle-game.ts --no-minify` | Tiempo inclusivo y quién llama a una función |
 | Fotogramas con dibujo por software | contar fotogramas en 40 s, mismo navegador, dos versiones | **Sí sirve para comparar el coste por píxel**: SwiftShader, como una tablet, va limitado por píxeles (así se vio lo que cuesta cada luz) |
+| Llamadas que deja cada modelo | `npx tsx tools/reports/model-draws.ts [--ids …] [--dir <glb de otro commit>]` | Mallas tras la fusión del cargador: una llamada por malla **y por copia**. Antes de publicar un modelo (lección 23) |
+| Relevos de jornada y bucle | `node tools/graphics/performance/relay-probe.mjs <valley.html> --seed 7 --year 60 --speed 16` | El `paint` fotograma a fotograma a una velocidad, los de más de 500 ms y los pasos de vida: lo que se paga en cada amanecer (lecciones 24 y 25) |
 
 Escenas de referencia (siempre las dos, nunca una):
 
@@ -244,6 +246,9 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
   (lección 12). Tras tocar luces o materiales, `shader-churn.mjs`.
 - Un personaje nuevo con esqueleto se funde solo si es de colores lisos; con textura,
   cuenta una llamada por pieza.
+- **Un animal hecho de nodos rígidos no se funde**: cada pieza cuelga de su
+  articulación. Antes de publicar un modelo, `model-draws.ts`; más de una malla por
+  animal es una llamada más por cada copia en escena (lección 23).
 - Tras un cambio que pueda pesar, pasa `gl-probe` en las dos escenas y apunta la cifra.
 
 ## El coste de animar (ronda AN, 29 sep 2026)
@@ -257,3 +262,58 @@ sep: 4,0–4,7 ms por fotograma con 100 personas y 40 animales, 27–32 µs por
 persona. `gl-probe` sigue valiendo para llamadas y triángulos; su cuenta de
 programas depende de lo que entró en cuadro con el reloj vivo y no compara.
 Nada de esto son FPS de un teléfono.
+
+## La revisión del 30 sep 2026: cifras y lecciones
+
+Medido sobre `main` `c611198` y cuatro versiones anteriores montadas en árboles
+aparte; el informe entero, con cómo reproducir cada cifra, en
+`docs/medidas/revision-rendimiento-2026-09-30.md`.
+
+| Versión (ruta `?debug=1…&live=1`, 1180×820) | Villa 7/60: llamadas · triángulos · programas · mallas de fauna | Aldea 11/21 |
+|---|---|---|
+| `a599b4c`, 27 sep (la fila v4.71 de arriba, otro estado del valle) | 429 · 602 mil · 38 · 43 | 352 · 494 mil · 39 · 51 |
+| `da8836f`, tras AN | 500 · 827 mil · 42 · 27 | 440 · 695 mil · 43 · 43 |
+| `b3f6b84`, tras los animales de la PR #3 | **964** · 847 mil · 42 · **491** | **649** · 705 mil · 43 · **277** |
+| `c611198`, 30 sep | 969 · 847 mil · 42 · 491 | 654 · 711 mil · 43 · 277 |
+
+Por la portada (táctil, escala 1): villa 559 llamadas y aldea 441. Recompilaciones
+en la aldea: 43, +4 con un rayo y +0 con la fiesta.
+
+23. **Un animal de nodos rígidos cuesta una llamada por pieza, y ninguna fusión
+    del cargador lo arregla.** Los siete facetados de la PR #3 (vaca 26 mallas,
+    ciervo 27, cerdo 23, pato 19, trucha 19, gallina 17, cuervo 16) sustituyeron a
+    cuerpos con esqueleto que `fuseSkinnedParts` dejaba en una. Pesan la mitad y
+    tienen menos triángulos, y aun así la villa pasó de 500 a 964 llamadas: 21
+    gallinas × 17. `fuseRigidPieces` sólo funde piezas con el mismo material
+    **dentro de la misma articulación** (la vaca: 26 → 26). Lo que da una llamada
+    es una malla con esqueleto y el color en los vértices, como el zorro
+    (`rig-single-mesh.py`), o convertir los nodos en huesos al cargar.
+24. **Un relevo de jornada cuesta un `createVillage` entero, cada día escénico**:
+    cada 120 s a ×1, 7,5 s a ×16 y 1,9 s a ×64. Por eso el arreglo del reloj de
+    GV-4a no basta solo: a ×16 la villa se sigue congelando 5–7 s en cada relevo, y
+    si montar tarda más que una jornada el bucle vuelve. Se ve con
+    `relay-probe.mjs`; la aldea paga 200–300 ms por relevo en el contenedor.
+25. **Demostrar que no hay camino es lo caro.** En un relevo de la villa, el 93 %
+    de las búsquedas A* finas falla y se lleva el 99 % del tiempo: cada una
+    recorre la rejilla a media celda y vuelve a recorrerla a cuarto de celda. Una
+    búsqueda fallida ha recorrido una región cerrada; guardarla y contestar «no»
+    a las siguientes que salgan de dentro es exacto y baja `createVillage` de
+    3,2 s a 0,15–0,22 s en 7/60 y de 8,3 s a 1,1 s en 3/40, con la misma vida byte
+    a byte (prototipo, sin fusionar). Antes de cachear rutas por plan, mirar
+    cuántas fallan.
+26. **Lo que sólo cambia con el estado no se calcula en cada fotograma.** La
+    cabecera pregunta al motor si hay algo que dar (`refusalFor` y, con él,
+    `placeBuilding`) en cada `paint`: el 11 % del JS del fotograma en la aldea,
+    para una respuesta que cambia una vez por semana de juego.
+27. **La adaptativa no puede decidir con un solo fotograma, y el tope tiene que
+    medir contra la pantalla.** `sinceAdapt` sólo se reinicia si la escala
+    cambia, así que un fotograma de ~100 ms (un relevo, una recolección) baja la
+    escala un 15 % durante 6 s. Y `frameDue` con margen 0,75 pinta a 45 fps en una
+    pantalla de 90 Hz con el tope de 60, un hueco que la adaptativa ya llama
+    lento: la escala al mínimo y para siempre.
+28. **Descargas que nadie volvió a contar**: el precaché del service worker son
+    11,75 MB de modelos (el comentario dice 2,7), el juego los pide uno detrás de
+    otro, los 17 aldeanos llevan cada uno los mismos 128 KB de clips, y Rapier
+    (1,08 MB comprimido) se descarga al **ofrecerse** una caza, que para la perdiz
+    es el 70 % de las semanas. Cada cifra de peso que se escriba en un comentario
+    se remide al añadir contenido.

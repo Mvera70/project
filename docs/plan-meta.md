@@ -251,6 +251,25 @@ el orden es del dueño.
 | F-0b · La línea de base en el aparato | En el iPhone y el iPad: `?sandbox=battle&defenders=10&raiders=24` y «Copiar métricas» en el pico de la pelea; después lo mismo con `&shadow=0.12`. Fotogramas, peor fotograma y lo que añaden las sondas como fracción del fotograma. Es lo único de esta línea que no se puede medir aquí | P2 | Baja | Vera (con el aparato) | F-0 |
 | F-1 · La flecha que se clava | **Propuesta, no empezada.** Detrás de una opción `contact` (y `&contact=1` en el banco): decide el barrido de F-0; la altura desde el suelo del blanco; la flecha se para donde toca y se cuelga del segmento del ragdoll; el ragdoll recibe su velocidad y `hit_take`/la caída miran en contra de ella. Medida: veinte batallas o más con y sin contacto como distribuciones (la cifra de balance para Vera), una tira a 390×844 con la caída en la dirección de la flecha en 9 de 10, y el coste de F-0b. **Antes, una decisión del dueño**: aceptar la muralla un tercio menos letal, apuntar con el aire, o separar lo que se ve de lo que decide (diagnóstico §3) | P2 | Media | Claude | F-0, F-0b; decisión del dueño |
 
+### RV · Lo que dejó la revisión del 30 sep 2026 (rendimiento y cumplimiento)
+
+Pedida por Vera con `/goal`: «revisarlo todo y ver que cumplimos con lo que se
+ha intentado proponer; el rendimiento de los gráficos, a fondo». Medidas,
+método y reproducción en `docs/medidas/revision-rendimiento-2026-09-30.md`.
+**Las prioridades son una propuesta: el orden es del dueño.**
+
+| Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
+|---|---|---|---|---|---|
+| RV-1 · Un animal, una llamada | Los siete facetados de la PR #3 dejan 16–27 mallas por animal (antes 1): la villa 7/60 pasa de 500 a 964 llamadas y la aldea 11/21 de 440 a 649 con la misma escena. Pasarlos a una malla con esqueleto y color en los vértices (en el modelo, como el zorro, o al cargar), y una prueba de presupuesto por modelo (`tools/reports/model-draws.ts`). Si se hace al cargar, sirve también para oso, jabalí, mula, lobo y perdiz (22–40 cada uno) | **P1 (propuesta)** | Media | Claude (al cargar) o sesión de arte (en el modelo), con permiso de Vera | — |
+| RV-2 · GV-4b por regiones cerradas | El relevo de jornada es `createVillage` entero y el 99 % de su A* fino son búsquedas que fallan. Prototipo exacto (misma vida byte a byte en 7/60, 3/40, 23/60 y 11/21): 7/60 de 3,2 s a 0,15–0,22 s; 3/40 de 8,3 s a 1,1 s; a ×16, con GV-4a, la villa pasa de congelarse 5–7 s por relevo a 0,5–0,8 s. Sustituye a la propuesta de «rutas por plan de escena», que no toca `dayPlans` (la mitad del coste). Rama `claude/gv-4b-regiones-cerradas`, sin fusionar, con su prueba de equivalencia | **P1 (propuesta)** | Media | Claude | GV-4a (PR #8) |
+| RV-3 · La adaptativa y el tope | Un solo fotograma de ~100 ms baja la escala un 15 % durante 6 s; a 90 Hz el tope de 60 pinta a 45 fps y hunde la escala para siempre. Descartar huecos largos, reiniciar `sinceAdapt`, acumular el tope y ligar «lento» al periodo de pantalla, con pruebas puras | P1 (propuesta) | Baja | Claude o Sol | — |
+| RV-3b · El jabalí donde se pueda cazar | `createWildPrey('boar')` sólo acepta el centro de una celda de bosque donde quepa su cuerpo, y `solidTerrain` pone un tronco en cada una: medido, 0 de 60 en 11, 23 y 5 al año 30, y 4 de 17 valles lo admiten. Sin jabalí cazado no hay oso (AN-4b/c/d y AN-5d sólo se ven con `--hunted`). Colocarlo en la linde como el oso de AN-4c, prueba con `solidTerrain` real en varias semillas, y que `hunt-report` diga los valles que se salta | P2 (propuesta) | Baja-media | Claude | — |
+| RV-4 · La cabecera, una vez por semana | `hud.ts` llama a `refusalFor` (y a `placeBuilding`) para cada medio en cada fotograma: el 11 % del JS del fotograma en la aldea. Recordarlo por tick y actos | P2 | Baja | Luna, Terra | — |
+| RV-5 · El camino sin A* semanal | `wearValleyRoad` rehace dos rutas cada tick (18 % del tick); el motor va un 12–17 % más lento que el 27 sep y la roja de `catchUp` en la CI es esto. Recalcular sólo si cambia el mapa | P2 | Baja-media | Sol | — |
+| RV-6 · La suite rápida, rápida | 30 min en la CI; 92 ficheros de más de 5 s son el 98 %. Una fixture compartida de valles crecidos y mudar a las jornadas lo que no quepa | P2 | Media | Sol | — |
+| RV-7 · Lo que el revisor de sonido y el de reglas encontraron | El trueno cercano no suena; cinco botones suenan dos o tres veces; los lechos decodificados no se sueltan; los refugiados cuentan como nombrados (la roja de `engine-long`); un guardado ilegible se pisa sin aviso (**decisión del dueño**); ESLint no vigila `render3d` en el motor; 33 claves de crónica sin dibujo y sin caso `expedition` | P2 | Baja | Luna, Terra; el guardado, el dueño | — |
+| RV-8 · La primera visita | 103 modelos pedidos uno a uno (11,3 MB), clips repetidos en los 17 aldeanos (2,2 MB), PNG de 0,7–1,5 MB en crónica, logotipo y losetas, Rapier al ofrecerse una caza | P3 | Media | Sol | — |
+
 ### H · Deuda medida (el cuaderno)
 
 Lo que `docs/task-log.md` §4 lleva anotado con su medida y **no bloquea la
@@ -328,6 +347,10 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
    es la causa probable de que la tablet vaya a 0 fps en el año 60: sin él, la
    villa —las fases 3 y 4 de la meta— no se puede jugar ni medir en el aparato.
    El orden es del dueño.
+8. **Nuevo, 30 sep — la revisión (RV)**: el arreglo del reloj (GV-4a, PR #8) no
+   basta sin abaratar el relevo (RV-2), y los animales nuevos casi duplicaron las
+   llamadas de la villa (RV-1). Las dos van antes de medir la villa en el aparato,
+   que es lo que GV-3b y F-0b esperan. El orden es del dueño.
 
 ---
 
