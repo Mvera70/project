@@ -1,14 +1,14 @@
-// La mitad lenta de `tests/fast/sound.test.ts`: sesenta años de partida en
-// cinco semillas para medir cuántos acentos suenan. Tardaba 28 s y la suite
-// rápida tiene que serlo (CLAUDE.md, regla del 16 sep 2026), así que vive en
-// las jornadas con el mismo cuerpo y el mismo umbral.
+// El acento, en una partida real. Vivía en `tests/fast/sound.test.ts` y tardaba
+// de 20 a 28 s: sesenta años de motor en cinco semillas. Por la regla de
+// CLAUDE.md, una prueba que no cabe en la suite rápida se muda aquí, con el mismo
+// cuerpo y el mismo umbral.
 
-import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { tick } from '@engine/sim';
 import { milestonesAt } from '@ui/milestones';
 import { accentFor } from '@ui/sound';
+import { foundTwenty } from '../helpers/founding';
 
 const SEEDS = [7, 42, 108, 999, 2024];
 

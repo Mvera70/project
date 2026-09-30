@@ -12,7 +12,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { SKY, SOUND, TIME } from '@engine/balance';
 import {
-  accentAllowed, accentFor, createSoundEngine, CUE_FILES, LOOP_FILES, milestoneCue, playerAnswer,
+  accentAllowed, accentFor, contextAction, createSoundEngine, CUE_FILES, LOOP_FILES, milestoneCue, playerAnswer,
   routeCue, soundPreference, speedCue, tapAllowed, type Cue,
 } from '@ui/sound';
 import { AMBIENCE_LAYERS, mixFor, thunderFor, windStrengthOf, type Mix, type WorldSound } from '@ui/ambience';
@@ -244,9 +244,23 @@ describe('el reproductor, sin navegador', () => {
     }).not.toThrow();
   });
 
-  it('esconder y volver a enseñar la página antes del primer toque no falla', () => {
+  it('ocultar y mostrar la pestaña antes del primer toque tampoco falla', () => {
     const engine = createSoundEngine();
-    expect(() => { engine.setHidden(true); engine.setHidden(false); }).not.toThrow();
+    expect(() => { engine.visibility(true); engine.visibility(false); }).not.toThrow();
+  });
+});
+
+describe('contextAction · una pestaña oculta no suena ni gasta batería', () => {
+  it('al ocultarla, el contexto que corre se suspende; el que ya no corre, se deja', () => {
+    expect(contextAction('running', true)).toBe('suspend');
+    expect(contextAction('suspended', true)).toBeNull();
+    expect(contextAction('closed', true)).toBeNull();
+  });
+
+  it('al volver se reanuda, también el «interrupted» de Safari tras una llamada', () => {
+    expect(contextAction('suspended', false)).toBe('resume');
+    expect(contextAction('interrupted', false)).toBe('resume');
+    expect(contextAction('running', false)).toBeNull();
   });
 });
 

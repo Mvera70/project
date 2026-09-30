@@ -1,23 +1,40 @@
 # The Valley — Registro de cambios
 
-## v5.21 · 30 sep 2026 · La fusión de las cuatro ramas, revisada, y lo fácil arreglado
+## v5.22 · 30 sep 2026 · La fusión de las cuatro ramas, revisada, y lo fácil arreglado
 
 Vera pidió revisar cómo quedaron juntas animación, modelos de animales,
 gráficos GV y sonido después de entrar las cuatro en una noche. El esquema y
 los huecos, por dueño, están en `docs/medidas/fusion-cuatro-ramas-2026-09-29.md`.
-Lo fácil, arreglado aquí:
+Los dos arreglos de sonido que salieron de esta revisión (el audio suspendido
+con la pestaña oculta y la prueba lenta a las jornadas) los hizo la propia rama
+del sonido en v5.21. Lo demás fácil, aquí:
 
-- `src/ui/sound.ts`: `setHidden` suspende el `AudioContext` con la página
-  escondida y lo reanuda al volver. Los lechos ya se fundían a cero, pero un
-  contexto vivo gasta batería en el móvil sin sonar.
-- La prueba de sesenta años de acentos, que tardaba 28 s en la suite rápida,
-  se muda con el mismo cuerpo a `tests/journeys/sound-accents.test.ts`
-  (CLAUDE.md, regla del 16 sep): `sound.test.ts` baja a un segundo.
 - `tools/art/bake-clips.mjs` tiene fila en `tools/README.md`.
 - Los enlaces a dos capturas que nunca se versionaron, en el encargo GV,
   apuntan a la revisión que lo explica.
 - El changelog y el cuaderno, en orden: AN-5 (v5.13) quedó encima de todo el
   sonido y la v5.15 encima de la v5.20.
+- Las 21 jornadas rojas que la CI enseñó al terminar por primera vez **ya
+  fallaban antes** de las cuatro ramas: medido en local sobre `efafc2e`.
+
+## v5.21 · 30 sep 2026 · El sonido calla con la pestaña oculta; una prueba de 25 s se muda a las jornadas
+
+Dos de los cuatro puntos que integración trajo sobre el sonido. Los otros dos
+(que caza, oso y combate suenen, y el contrato para que publiquen sus sucesos)
+son la fase 5 de `docs/plan-audio-mundo.md` y necesitan que Vera oiga cada
+sonido antes de integrarlo; siguen abiertos.
+
+- **El `AudioContext` se suspende al ocultar la pestaña** y se reanuda al
+  volver (`contextAction`, pura; `sound.visibility`, cableada a
+  `visibilitychange` en `installSound`). Cubre también el `interrupted` de
+  Safari tras una llamada. Antes sólo callaba la mezcla: el contexto seguía
+  vivo y gastando batería con la pantalla apagada. Y `start()` no suena ni
+  reanuda con la pestaña oculta: un temporizador de trueno que vence de fondo
+  soltaba todo de golpe al volver.
+- **«Un puñado de acentos en sesenta años»** (24 s: cinco semillas de motor)
+  se muda de `tests/fast/sound.test.ts` a `tests/journeys/sound-long.test.ts`,
+  con el mismo cuerpo y el mismo umbral, como manda CLAUDE.md. La suite de
+  sonido rápida baja a 0,9 s (61 pruebas).
 
 ## v5.20 · 30 sep 2026 · Fase 2: el día y la noche entran; la aldea, la hoguera y la fiesta, tachadas
 

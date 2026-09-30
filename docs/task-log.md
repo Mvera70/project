@@ -6,17 +6,25 @@ Animación (PR #2 y #6), modelos de animales (#3), gráficos GV (#4) y sonido
 (#7) entraron en `main` en una noche. **El código combina bien** —typecheck,
 lint y suite rápida limpios; la caza se hizo sobre los modelos nuevos y el
 sonido no toca el renderer— y los huecos entre ellas, repartidos por dueño,
-están en `docs/medidas/fusion-cuatro-ramas-2026-09-29.md`. Arreglado aquí lo
-fácil: el audio se suspende con la pestaña escondida, la prueba de sesenta años
-de acentos (28 s) se muda a `tests/journeys/sound-accents.test.ts`, la fila de
-`tools/art/bake-clips.mjs`, los enlaces rotos del encargo GV y el orden de este
-cuaderno y del changelog. **Abierto:** que suenen caza, oso y combate (sonido
+están en `docs/medidas/fusion-cuatro-ramas-2026-09-29.md`. Arreglado lo
+fácil (v5.22): la fila de `tools/art/bake-clips.mjs`, los enlaces rotos del
+encargo GV y el orden de este cuaderno y del changelog; lo del sonido (pestaña
+oculta, prueba lenta) lo cerró su rama en v5.21. **Abierto:** que suenen caza, oso y combate (sonido
 con animación: primero el contrato de qué publica la vida para que el sonido lo
 oiga); una medida de rendimiento con todo junto en iPhone o iPad; y **las 21
 jornadas rojas** que la CI enseñó al terminar por primera vez. **No son de estas
 ramas**: en local, el `main` de antes de ellas (`efafc2e`) falla igual, y el
 motor no cambió. Es deuda de rondas anteriores, por repartir aparte (el
 detalle, en el papel de la fusión §5).
+
+## 30 sep 2026 · Sonido: pestaña oculta y prueba lenta (v5.21)
+
+Integración pidió cuatro cosas. Hechas: el `AudioContext` se suspende al
+ocultar la pestaña (`contextAction`, `sound.visibility`) y el acento de sesenta
+años se mudó a `tests/journeys/sound-long.test.ts`. **Abiertas: que caza, oso y
+combate suenen, y el contrato para que publiquen sus sucesos** — es la fase 5
+del plan de audio; el contrato es de sólo lectura (nunca consume azar del
+motor) y cada sonido pasa por la página de escucha de Vera antes de entrar.
 
 ## 30 sep 2026 · Fase 2 del sonido: día y noche sí; aldea, hoguera y fiesta, no (v5.20)
 
