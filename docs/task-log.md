@@ -4008,3 +4008,34 @@ De diseño, y son las que más valen:
 - El parpadeo de sombras de día sigue abierto por indicación del dueño. La mejora a 2048 lo atenúa, pero no lo resuelve.
 - Transiciones de estación y de era, con posible presentación por capítulos y crónica: idea anotada; no implementada.
 - Fauna con función jugable (ciervos, jabalíes, castores y lobos nocturnos): idea pendiente. El fondo al alejar la cámara recibió una prueba de silueta y color de la sierra el 23 sep; sigue pendiente la aprobación visual del dueño, pues el macizo lejano todavía puede sentirse demasiado plano.
+
+## 30 sep 2026 · Las 21 jornadas rojas viejas (v5.36–v5.37) — carril de la tanda «CI verde»
+
+Rama del agente de jornadas, sin push. `test:journeys` tenía 21 rojas en 13
+ficheros, las mismas en `main` y en `efafc2e`; **casi todas ya fallaban en
+`ee9340e`**, la raíz de la historia del repositorio. Revisadas una a una:
+
+- **Arreglado en el motor (v5.36, mueve partidas)**: quien llega sin hueco de
+  personaje (familia que huye, brazo del carro con la lista llena) ya no es
+  `named`. Riñas en tres siglos de tres semillas: 132 (`ee9340e`) → 1 610 →
+  **244** (cota 259,2). Y en la vida, el pago al salinero espera la huella del
+  puesto (`life-trade`, semilla 7, que la trayectoria nueva destapó).
+- **Prueba que medía mal, corregida**: `founding` (G3, población al plantear),
+  `works` (cerco sobre el cauce, dos pruebas), `life-props` (carga negativa),
+  `life-wildlife` ×3 (el lobo, no `wildlife[0]`), `title-cooperative` (final
+  provocado con B3), `wall-rings` (la 41 nunca paga la segunda puerta).
+- **Villas remedidas**: `e3b-corridor` → semillas 9, 2 y 23 (60 semillas
+  barridas a 3 846 ticks).
+- **Declaradas con `it.fails` y la medida** (quedan rojas de verdad, la suite
+  verde): avisos 14,7/año (la roja a propósito de `CLAUDE.md`, ahora escrita);
+  `fate-chaos` 0 de 12; la villa libre sin intervención de E3b (0 de 60); el
+  contacto del hacha; la semilla 37 de `life-places`; el peloteo de tres.
+- **Fuera de este carril**: `life-decide` (cronómetro, PR #15) y el
+  cronómetro de `save.test.ts` en la suite rápida.
+
+**Abierto, con tarea sugerida**: (1) `placeBuilding` no comprueba que el
+portón siga alcanzable desde la plaza: en la semilla 37 una obra de iglesia en
+(31,61) encierra la aldea en el tick 1067; arreglarlo mueve las villas fijadas
+en las jornadas. (2) El leñador que se queda a 0,5 de su plaza de contacto con
+`there` en verdadero (semilla 11, tick 1008). (3) **Del dueño**: por dónde
+muerde el mundo, que `fate-chaos` vuelve a pedir.

@@ -1,5 +1,65 @@
 # The Valley — Registro de cambios
 
+## v5.37 · 30 sep 2026 · Las 21 jornadas rojas viejas, una a una
+
+`test:journeys` tenía **21 rojas en 13 ficheros**, las mismas en `main` y en
+`efafc2e`, y la CI no las enseñaba porque se cortaba a los 60 minutos
+(`docs/medidas/fusion-cuatro-ramas-2026-09-29.md` §5). **Casi todas ya fallaban
+en `ee9340e`**, la raíz de la historia del repositorio, así que no hay commit
+que las rompiera: se revisaron una a una y cada listón lleva su causa escrita.
+Ninguna cota se ha bajado.
+
+- **La prueba medía mal** (se corrige la prueba): `founding` contaba la gente
+  al contestar la encrucijada del caserío y no al plantearla (semilla 31: se
+  plantea con 6 y llegan 4 por el camino antes de contestar); `works` no
+  admitía la estaca y la piedra del cerco sobre el cauce, que es regla
+  (`buildable`; `spatial-layout.test.ts` lo guarda); `life-props` tomaba el
+  `holding` negativo —la carga del oficio— por un trasto; `life-wildlife` ×3
+  leía `wildlife[0]` y `toEqual([])` cuando `wildlife` es ya toda la fauna, con
+  el lobo el último; `title-cooperative` esperaba que la semilla 31 se rompiera
+  sola y ahora el final se provoca con un asalto de mil (B3); `wall-rings`
+  medía la segunda puerta en la semilla 41, que nunca junta las 10 monedas que
+  cuesta (0–9 en sesenta años).
+- **Villas remedidas** (`docs/historico/rework.md` §2.7): `e3b-corridor`, en 60
+  semillas a 3 846 ticks, pasa a la 9 (la iglesia anterior a la reserva y su
+  traslado), la 2 (los árboles del retorno 66) y la 23 (el guardia del anillo).
+- **Declaradas en rojo con la propiedad intacta** (`it.fails` y la medida al
+  lado): los avisos (14,7 al año en la semilla 7; la roja a propósito de
+  `CLAUDE.md`, que hasta hoy era `it`); `fate-chaos` (0 de 12 valles acaban a
+  los 40 años, 1 de 12 en `ee9340e`; la integridad pasa a prueba propia); la
+  villa que el motor deja libre sola (ninguna de 60); el contacto del hacha (2
+  muestras donde pide 4, y un leñador a 0,5 de su plaza con `there`); la
+  semilla 37 de `life-places`, **encerrada por una obra** (abajo); y el peloteo
+  de tres (la cadena más larga es dos en 36 jornadas).
+- **Dos defectos de verdad quedan escritos y sin arreglar**: en la semilla 37
+  la obra de la iglesia en (31,61) corta el único portón de la plaza en el
+  tick 1067 (de 3 650 celdas alcanzables a 299): `placeBuilding` mira que lo
+  nuevo se alcance, no que el portón se siga alcanzando. Y el leñador que se
+  queda a medio paso de su plaza de contacto.
+
+## v5.36 · 30 sep 2026 · La familia que huye ya no riñe cada dos semanas
+
+**Cambia el motor y mueve partidas.** `arriveToStay` (`world/means.ts`) daba
+`named: true` a quien llega sin hueco de personaje —la familia que huye de
+v4.95, y el brazo del carro con la lista llena— sin meterlo en `namedIds`.
+§6.1: nombrado es personaje, y la lista es quien lo es. Fuera de ella,
+`quarrelOf` lo veía y `decayMemories`/`driftOpinions` no: sus rencores no se
+curaban, su memoria llena de hambres de peso 4–5 expulsaba al momento el
+recuerdo de peso 2 de la riña —el freno de `QUARREL.REPEAT_TICKS`— y los mismos
+dos reñían a dos semanas. **Medido** en la jornada de las riñas (semillas 3, 7
+y 11, 120 años, cota 259,2): 132 en `ee9340e`, **1 610** antes del arreglo,
+**244** después. El nombre se queda: la crónica lo cita al llegar.
+
+- **Y en la capa de vida, el pago al salinero**: el vecino que va a pagar se
+  elegía el mismo paso en que se monta el puesto, antes de que su huella
+  entrara en el terreno, y su ruta lo atravesaba; en la semilla 7 al año ocho
+  (la trayectoria nueva) empujó contra el puesto mil pasos y nadie pagó. Ahora
+  espera a que la huella esté en el suelo (`village.ts`).
+- `tests/fast/quarrels.test.ts` cambia la semilla 11 por la 31: con la aldea
+  nueva, su primera tirada de `quarrels` cae bajo la probabilidad del manso y
+  los dos riñen en la semana 0 (0 contra 0), que mide la tirada y no el
+  carácter.
+
 ## v5.32 · 30 sep 2026 · La respuesta a una oferta vuelve a sonar
 
 Tras la #14, el recorrido del sonido encontró muda la respuesta a una oferta
