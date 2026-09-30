@@ -1,5 +1,14 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · RD-0: el sol vuelve a decir la hora a ×16 y ×64 (v5.38)
+
+Primer paso del rework de ritmo, descanso y progresión (goal del 30 sep; plan
+en `docs/plan-ritmo-descanso-y-progresion-2026-09-29.md`). La luz ya no se
+aplana hacia la media mañana a ×16/×64: se suaviza la amplitud y el sol sigue
+la hora (`LIGHT_SWING`). Evidencia: `docs/medidas/sol-sincronia-2026-09-30.md`.
+**Versiones reservadas para este rework: v5.38–v5.49.** **Abierto:** la
+comodidad a ×64 en la tablet.
+
 ## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
 
 La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60

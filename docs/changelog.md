@@ -1,5 +1,21 @@
 # The Valley — Registro de cambios
 
+## v5.38 · 30 sep 2026 · El sol vuelve a decir la hora a ×16 y ×64
+
+Primer arreglo del rework de ritmo (`plan-ritmo-descanso-y-progresion` §6,
+«bloqueo de coherencia»). `LIGHT_STEADY` aplanaba la luz hacia la media mañana
+(55 % a ×16, 95 % a ×64): a ×64 el valle estaba a pleno sol con la cabecera
+diciendo las dos de la madrugada. Vera decidió el 29 sep que sol, hora y
+calendario van juntos a cualquier velocidad. Ahora se suaviza la **amplitud**
+(`LIGHT_SWING`, 0,7 y 0,45 hacia un gris neutro) y el sol sigue la hora: misma
+dirección, apagado de noche, ventanas encendidas de noche a cualquier
+velocidad (`tells.ts` lee la hora entera). La duración del tick no cambia.
+Pruebas nuevas en `graphics-effects.test.ts` (dirección y encendido del sol
+iguales a ×1 en 240 fases; orden de claridad; a ×64 al menos el 40 % de la
+jornada). Evidencia: `docs/medidas/sol-sincronia-2026-09-30.md`. D.6.5, §10.7 y
+§10.8 de `design.md`, al día. **Abierto:** que Vera juzgue la comodidad a ×64
+en la tablet.
+
 ## v5.37 · 30 sep 2026 · Las 21 jornadas rojas viejas, una a una
 
 `test:journeys` tenía **21 rojas en 13 ficheros**, las mismas en `main` y en

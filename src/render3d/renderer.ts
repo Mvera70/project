@@ -503,8 +503,8 @@ export async function createGraphicsRenderer(
    * De que color es la luz a esta hora del dia escenico, a esta velocidad.
    *
    * La velocidad entra porque desde D.6.1 la jornada la sigue entera: a x64 el
-   * dia dura menos de dos segundos, y una jornada de luz de dos segundos es un
-   * parpadeo. `daylightAt` la aplana; aqui solo se le pasa el dato.
+   * dia dura menos de dos segundos. `daylightAt` suaviza el contraste pero el
+   * sol sigue la hora (RD-0, 30 sep 2026); aqui solo se le pasa el dato.
    */
   function light(phase: number, speed: GraphicsFrame['speed'], overcast = 0): void {
     const day = daylightAt(phase, speed, overcast);

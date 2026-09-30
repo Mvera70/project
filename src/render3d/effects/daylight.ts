@@ -208,26 +208,35 @@ function lightAt(phase: number): Daylight {
 }
 
 /**
- * Cuánto se aplana la jornada de luz a cada velocidad. D.6.1.
+ * Cuánto contraste conserva la jornada de luz a cada velocidad. D.6.1, RD-0.
  *
- * TUNE. Desde que la jornada sigue la velocidad entera, a ×64 el día escénico
- * dura **1,9 segundos reales**: el sol sale y se pone dos veces cada cuatro
- * segundos y las sombras dan la vuelta al valle en ese tiempo. No es una noche,
- * es un parpadeo, y un parpadeo de media pantalla tapa justo lo que uno va a
- * mirar a ×64 —que el valle crece, que aparecen tejados, que llega el invierno—.
+ * TUNE. A ×64 el día escénico dura **1,9 segundos reales** y a ×16 siete y
+ * medio: una jornada con todo su contraste es un parpadeo que tapa lo que uno
+ * mira a esas velocidades, que el valle crece.
  *
- * Así que a velocidades altas la luz **se queda quieta** en la de media mañana y
- * deja de contar la hora. No es una concesión al realismo: §10.3 pide que el
- * valle se lea como un instrumento, y a ×64 la hora del día ya no es
- * información que nadie pueda seguir. A ×1 y a ×4, donde una jornada dura dos
- * minutos y medio minuto, la luz cuenta la hora entera como siempre.
+ * Hasta el 30 sep 2026 eso se arreglaba **aplanando la hora**: la luz se iba a
+ * la de media mañana (el 55 % a ×16 y el 95 % a ×64) y a ×64 el valle estaba a
+ * pleno sol con la cabecera diciendo las tres de la madrugada. Vera lo prohibió
+ * el 29 sep —el sol, la hora y el calendario van juntos a cualquier velocidad
+ * (`docs/plan-ritmo-descanso-y-progresion-2026-09-29.md` §1)—, así que lo que se
+ * aplana ya no es la hora sino **la amplitud**: el sol sigue exactamente la
+ * hora (dirección, puesta, sombras apagadas de noche) y lo que se acerca a un
+ * gris neutro es el contraste entre el mediodía y la noche. A ×64 la noche es
+ * menos honda y el mediodía menos blanco, pero la noche sigue siendo noche.
+ *
+ * 1 es la jornada entera. Por debajo de 0,4 la noche a ×64 dejaba de leerse
+ * como noche en la captura (el valle se quedaba en una tarde nublada).
  */
-const LIGHT_STEADY: Readonly<Record<0 | 1 | 4 | 16 | 64, number>> = {
-  0: 0, 1: 0, 4: 0, 16: 0.55, 64: 0.95,
+const LIGHT_SWING: Readonly<Record<0 | 1 | 4 | 16 | 64, number>> = {
+  0: 1, 1: 1, 4: 1, 16: 0.7, 64: 0.45,
 };
 
-/** La hora en la que se queda la luz cuando deja de contar la hora. */
-const STEADY_PHASE = 0.3;
+/**
+ * Cuánto de su intensidad conserva el sol de día a la velocidad más rápida,
+ * con la misma interpolación que `LIGHT_SWING`. La noche sigue a cero: un sol
+ * bajo el horizonte que alumbra es un sol que miente sobre la hora.
+ */
+const SUN_KEEP_AT_REST = 0.6;
 
 function mixNumber(from: number, to: number, amount: number): number {
   return from + (to - from) * amount;
@@ -243,9 +252,9 @@ function mixColour(from: string, to: string, amount: number): string {
  * La misma luz con el cielo cerrado encima. U-13, §10.8.
  *
  * `overcast` va de 0 (cielo limpio) a 1, y lo decide `derive/weather.ts`. Se
- * aplica **antes** del aplanado por velocidad, para que una tormenta a ×64 siga
- * siendo una tormenta: lo que `LIGHT_STEADY` aplana es la hora del día, no el
- * tiempo que hace.
+ * aplica **antes** del suavizado por velocidad, para que una tormenta a ×64 siga
+ * siendo una tormenta: lo que `LIGHT_SWING` suaviza es el contraste de la
+ * jornada, no el tiempo que hace.
  *
  * Tres cosas y en este orden: el sol pierde intensidad —es lo que quita las
  * sombras duras y hace que una tormenta se lea como tormenta—, el ambiente
@@ -271,13 +280,33 @@ function clouded(day: Daylight, overcast: number): Daylight {
   };
 }
 
+/** El punto medio entre el mediodía y la medianoche, hacia el que se acerca el contraste. */
+let neutralLight: Daylight | null = null;
+function neutral(): Daylight {
+  if (neutralLight !== null) return neutralLight;
+  const noon = lightAt(NOON);
+  const midnight = lightAt(0);
+  neutralLight = {
+    ...noon,
+    sunColour: mixColour(noon.sunColour, midnight.sunColour, 0.5),
+    skyColour: mixColour(noon.skyColour, midnight.skyColour, 0.5),
+    groundBounce: mixColour(noon.groundBounce, midnight.groundBounce, 0.5),
+    ambientIntensity: mixNumber(noon.ambientIntensity, midnight.ambientIntensity, 0.5),
+    background: mixColour(noon.background, midnight.background, 0.5),
+    daylight: mixNumber(noon.daylight, midnight.daylight, 0.5),
+  };
+  return neutralLight;
+}
+
 /**
  * La luz que hace a esta hora del día escénico, a esta velocidad.
  *
- * `phase` es la fracción del día, la misma que decide quién está en la calle.
- * El sol sale por el este, cruza y se pone por el oeste; de noche no se apaga,
- * se queda bajo y azul, que es la luna de §10.3 puesta en práctica. Y a ×16 y
- * ×64 la jornada de luz se aplana hacia la de media mañana: ver `LIGHT_STEADY`.
+ * `phase` es la fracción del día, la misma que decide quién está en la calle y
+ * la misma que lee el reloj de la cabecera (`hourAt`). El sol sale por el este,
+ * cruza y se pone por el oeste; de noche no se apaga, se queda bajo y azul, que
+ * es la luna de §10.3 puesta en práctica. **A cualquier velocidad el sol está
+ * donde dice la hora**: a ×16 y ×64 sólo se suaviza el contraste de la
+ * jornada, ver `LIGHT_SWING`.
  *
  * Sigue siendo pura: la misma hora y la misma velocidad dan la misma luz, que es
  * lo que §4.3 exige de todo lo que se dibuja.
@@ -286,29 +315,25 @@ export function daylightAt(
   phase: number, speed: 0 | 1 | 4 | 16 | 64 = 1, overcast = 0,
 ): Daylight {
   const live = clouded(lightAt(phase), overcast);
-  const steady = LIGHT_STEADY[speed];
-  if (steady <= 0) return live;
+  const swing = LIGHT_SWING[speed];
+  if (swing >= 1) return live;
 
-  const calm = clouded(lightAt(STEADY_PHASE), overcast);
-  const sun = {
-    x: mixNumber(live.sun.x, calm.sun.x, steady),
-    y: mixNumber(live.sun.y, calm.sun.y, steady),
-    z: mixNumber(live.sun.z, calm.sun.z, steady),
-  };
-  // Normalizado a mano: una direccional con un vector corto alumbra igual, pero
-  // `sun` es un contrato de dirección (`contracts.ts`) y devolverlo sin norma
-  // es dejar que cada consumidor decida si lo normaliza.
-  const length = Math.hypot(sun.x, sun.y, sun.z) || 1;
-  const background = mixColour(live.background, calm.background, steady);
+  // Lo que se acerca al gris es el contraste, no la hora: una mezcla lineal
+  // hacia una constante conserva el orden, así que lo más claro del día sigue
+  // siendo el mediodía y lo más oscuro la medianoche, a cualquier velocidad.
+  const calm = clouded(neutral(), overcast);
+  const toward = 1 - swing;
+  const keep = 1 - (1 - SUN_KEEP_AT_REST) * toward / (1 - LIGHT_SWING[64]);
+  const background = mixColour(live.background, calm.background, toward);
   return {
-    sun: { x: sun.x / length, y: sun.y / length, z: sun.z / length },
-    sunColour: mixColour(live.sunColour, calm.sunColour, steady),
-    sunIntensity: mixNumber(live.sunIntensity, calm.sunIntensity, steady),
-    skyColour: background,
-    groundBounce: mixColour(live.groundBounce, calm.groundBounce, steady),
-    ambientIntensity: mixNumber(live.ambientIntensity, calm.ambientIntensity, steady),
+    sun: live.sun,
+    sunColour: live.sunColour,
+    sunIntensity: live.sunIntensity * keep,
+    skyColour: mixColour(live.skyColour, calm.skyColour, toward),
+    groundBounce: mixColour(live.groundBounce, calm.groundBounce, toward),
+    ambientIntensity: mixNumber(live.ambientIntensity, calm.ambientIntensity, toward),
     background,
-    daylight: mixNumber(live.daylight, calm.daylight, steady),
+    daylight: mixNumber(live.daylight, calm.daylight, toward),
   };
 }
 

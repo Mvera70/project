@@ -3175,8 +3175,9 @@ que el cielo cuenta lo mismo que la cosecha y dos valles del mismo año se ven
 distintos — que es la esencia del juego según su dueño.
 
 **La luz.** `daylightAt(phase, speed, overcast)` aplica el cielo **antes** del
-aplanado por velocidad, para que una tormenta a ×64 siga siendo una tormenta: lo
-que `LIGHT_STEADY` aplana es la hora, no el tiempo que hace. El sol pierde toda
+suavizado por velocidad, para que una tormenta a ×64 siga siendo una tormenta:
+lo que `LIGHT_SWING` suaviza es el contraste de la jornada, no el tiempo que
+hace (D.6.5; hasta v5.38 aplanaba la hora). El sol pierde toda
 su intensidad a tope de tormenta —es lo que quita las sombras duras—, el
 ambiente pierde mucho menos (un valle bajo la lluvia se sigue viendo) y el cielo
 se va al plomo un 25 % más deprisa que el resto, porque es lo primero que se ve
@@ -4232,8 +4233,9 @@ que sigue sonando es un valle roto—, **en un letargo** (§9.2) y **con la
 pestaña escondida**. Y a **×16 y ×64** no calla pero adelgaza: quedan los
 lechos al 35 %, y el fuego se va. Una jornada dura 120 s a ×1 y 1,9 s a ×64,
 así que el cielo cambia más deprisa de lo que una capa puede cruzarse; es lo
-mismo que el renderer hace con la luz (`daylight.ts`, `LIGHT_STEADY`) y por el
-mismo motivo: a esa velocidad, lo fiel parpadea.
+mismo que el renderer hace con la luz (`daylight.ts`, `LIGHT_SWING`): se baja la
+amplitud, y lo que suena sigue siendo lo de esa hora (pájaros de día, grillos
+de noche).
 
 **Las fuentes están en un sitio.** El río, la cascada y el fuego se atenúan por
 dos cosas: la distancia al centro de la vista y **el zoom**, que es lo que de
@@ -7368,12 +7370,21 @@ calendario.
 **El coste, con su arreglo.** A ×64 la jornada dura 1,9 s reales: el sol saldría
 y se pondría dos veces cada cuatro segundos y las sombras darían la vuelta al
 valle en ese tiempo. No es una noche, es un parpadeo, y tapa justo lo que uno
-mira a ×64 —que el valle crece, que llega el invierno—. Así que a ×16 y ×64 la
-jornada de **luz** se aplana hacia la de media mañana (`LIGHT_STEADY`, 0,55 y
-0,95): a ×64 la luz deja de contar la hora, porque a ×64 la hora del día no es
-información que nadie pueda seguir (§10.3). A ×1 y ×4 la cuenta entera. Las
-ventanas encendidas van con la misma regla, o serían un render que no sabe qué
-hora es.
+mira a ×64 —que el valle crece, que llega el invierno—. Así que a ×16 y ×64 se
+**suaviza el contraste** de la jornada hacia un gris neutro (`LIGHT_SWING`, 0,7
+y 0,45 de la amplitud de ×1), **y el sol sigue la hora**: la misma dirección,
+la misma puesta, apagado de noche, y las ventanas encendidas cuando es de noche
+a cualquier velocidad. A ×1 y ×4 la jornada va entera.
+
+> **Revisado el 30 sep 2026 (v5.38, RD-0).** Hasta aquí la luz se *aplanaba
+> hacia la media mañana* (`LIGHT_STEADY`, 0,55 a ×16 y 0,95 a ×64): a ×64 el
+> valle estaba a pleno sol con la cabecera diciendo las tres de la madrugada.
+> Vera decidió el 29 sep que el sol, la hora y el calendario van juntos a
+> cualquier velocidad (`plan-ritmo-descanso-y-progresion-2026-09-29.md` §1), y
+> la regla pasa a ser ésta: **lo que se suaviza es la amplitud, nunca la
+> hora**. Lo guarda `tests/fast/graphics-effects.test.ts`: la dirección y el
+> encendido del sol idénticos a los de ×1 en 240 fases y cinco velocidades, el
+> orden de claridad conservado, y a ×64 al menos el 40 % de la jornada.
 
 #### D.6.6 · El suelo no es una cuadricula (v3.58)
 

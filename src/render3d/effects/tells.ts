@@ -490,11 +490,13 @@ export class Tells {
     // §10.3 dice **luz al caer el día**, y una ventana encendida a mediodía no
     // dice que haya alguien en casa: dice que el render no sabe qué hora es.
     //
-    // Con la velocidad, y no sólo con la hora: a ×64 la jornada de luz se queda
-    // quieta (D.6.1) y unas ventanas encendiéndose dos veces por segundo sobre
-    // un valle a pleno sol serían exactamente eso, un render que no sabe qué
-    // hora es.
-    const dusk = 1 - daylightAt(dayPhase, speed).daylight;
+    // Con la hora entera, a cualquier velocidad: desde RD-0 (30 sep 2026) el
+    // sol sigue la hora también a ×16 y ×64, y lo que se suaviza allí es el
+    // contraste del cielo, no si es de noche. Una ventana apagada a las tres de
+    // la madrugada porque se va deprisa sería otro render que no sabe qué hora
+    // es. `speed` se queda en la firma por quien la llama.
+    void speed;
+    const dusk = 1 - daylightAt(dayPhase).daylight;
     for (const lamp of this.lamps) {
       const material = (lamp.mesh as Object3D & { material?: { opacity: number; transparent: boolean } }).material;
       lamp.mesh.visible = dusk > 0.02;
