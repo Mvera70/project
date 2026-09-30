@@ -13,8 +13,9 @@ como apoyo, y en la aldea y la villa.
 
 ## Punto de partida
 
-- [Captura móvil reciente](../ui-redesign/opciones-graficas-v10-2026-09-29/capturas/valle-390x844.png)
-  y [vista amplia](../../artifacts/graphics/env/after9-overview.png): el estilo
+- Captura móvil reciente (`valle-390x844.png`) y vista amplia
+  (`after9-overview.png`) —**no se versionaron nunca**, ver la revisión §3.3;
+  las tomas reproducibles de GV-0 están en `artifacts/graphics/visual-depth/`—: el estilo
   low poly y la paleta están decididos, pero la aldea se lee poco anclada al
   suelo y el prado pierde estructura en el zoom habitual.
 - `renderer.ts` ya usa ACES, sombra PCF, niebla, ciclo de luz y resolución

@@ -60,6 +60,11 @@ se monta con `?aa=fxaa`. El sonido compila contra `day-phases.ts` y
 
 ## 4 · Huecos, por dueño
 
+**Arreglado en v5.21**, en la misma PR que este papel: Sonido 3 y 7, Animación 2,
+Gráficos 1 (los enlaces del encargo; los de la revisión estaban bien, porque
+ella misma explica que no existen y `foot-shadows.ts` es un módulo propuesto) y
+el orden del changelog y del cuaderno. Lo demás sigue abierto.
+
 ### Sonido
 1. **Nada de lo que trajeron las otras ramas suena**: caza (honda, arco,
    lanza, acierto, pieza caída), oso, combate (flecha, golpe al portón,

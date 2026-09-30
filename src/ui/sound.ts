@@ -256,6 +256,12 @@ export interface SoundEngine {
    * Se llama en cada pintado con la mezcla entera; lo que no venga, se apaga.
    */
   ambience(mix: Mix, dtSeconds: number): void;
+  /**
+   * La página se esconde o vuelve. Escondida, el contexto se **suspende**:
+   * los lechos ya se funden a cero por `hidden`, pero un contexto vivo sigue
+   * gastando batería en el móvil aunque no suene nada.
+   */
+  setHidden(hidden: boolean): void;
 }
 
 export function createSoundEngine(): SoundEngine {
@@ -406,6 +412,11 @@ export function createSoundEngine(): SoundEngine {
         live.gain.gain.setTargetAtTime(live.at, context.currentTime, 0.02);
       }
     },
+    setHidden(hidden: boolean): void {
+      if (ctx === null) return;
+      if (hidden) { if (ctx.state === 'running') void ctx.suspend().catch(() => undefined); return; }
+      if (ctx.state === 'suspended') void ctx.resume().catch(() => undefined);
+    },
     accent(cue: Cue, nowMs: number): void {
       if (CUE_FILES[cue] === undefined || !accentAllowed(nowMs, lastAccentMs)) return;
       lastAccentMs = nowMs;
@@ -494,6 +505,8 @@ export function installSound(): void {
     if (event.key !== ' ' && event.key !== 'Enter') return;
     if (plainButton(event.target) !== null) sound.tap('ui_button_release', Date.now());
   }, { capture: true });
+  // Con la pestaña escondida o el móvil bloqueado, el audio se suspende.
+  document.addEventListener('visibilitychange', () => { sound.setHidden(document.hidden); });
   // Pedir los ficheros no necesita permiso: así el primer botón ya los tiene.
   if (document.readyState === 'complete') sound.prefetch();
   else window.addEventListener('load', () => { sound.prefetch(); }, { once: true });

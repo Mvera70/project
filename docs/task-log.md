@@ -1,15 +1,20 @@
 # Cuaderno de tareas — el rework
 
-## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
+## 30 sep 2026 · La fusión de las cuatro ramas del 29 sep: cómo quedaron juntas
 
-Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en
-cuatro tandas (`Prueba del botón`, no versionada). Gustó el foley de
-materiales; el tambor no; las notas afinadas agudas sonaron «infantil».
-`tools/ui/sounds.py` está reescrito con esa dirección (`plan-audio.md`, §29
-sep) y los veinte momentos suenan de materiales, sin notas afinadas. **Abierto:**
-elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
-botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
-los momentos de §11.10.
+Animación (PR #2 y #6), modelos de animales (#3), gráficos GV (#4) y sonido
+(#7) entraron en `main` en una noche. **El código combina bien** —typecheck,
+lint y suite rápida limpios; la caza se hizo sobre los modelos nuevos y el
+sonido no toca el renderer— y los huecos entre ellas, repartidos por dueño,
+están en `docs/medidas/fusion-cuatro-ramas-2026-09-29.md`. Arreglado aquí lo
+fácil: el audio se suspende con la pestaña escondida, la prueba de sesenta años
+de acentos (28 s) se muda a `tests/journeys/sound-accents.test.ts`, la fila de
+`tools/art/bake-clips.mjs`, los enlaces rotos del encargo GV y el orden de este
+cuaderno y del changelog. **Abierto:** que suenen caza, oso y combate (sonido
+con animación: primero el contrato de qué publica la vida para que el sonido lo
+oiga); una medida de rendimiento con todo junto en iPhone o iPad; y **las 21
+jornadas rojas** que la CI enseñó al terminar por primera vez, sin línea de base
+todavía.
 
 ## 30 sep 2026 · Fase 2 del sonido: día y noche sí; aldea, hoguera y fiesta, no (v5.20)
 
@@ -102,6 +107,17 @@ en disco, huella, presupuesto) y **20 de 20 pasos con clics reales**
 también resella—; el trueno sigue sin fichero; y **nada está oído en un
 teléfono de verdad**: los niveles se fijaron midiendo la banda de 350 Hz a
 6 kHz, no escuchando.
+## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
+
+Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en
+cuatro tandas (`Prueba del botón`, no versionada). Gustó el foley de
+materiales; el tambor no; las notas afinadas agudas sonaron «infantil».
+`tools/ui/sounds.py` está reescrito con esa dirección (`plan-audio.md`, §29
+sep) y los veinte momentos suenan de materiales, sin notas afinadas. **Abierto:**
+elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
+botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
+los momentos de §11.10.
+
 ## 30 sep 2026 · Monetización, promoción y publicación
 
 El plan `docs/plan-monetizacion-y-publicacion-2026-09-29.md` reúne la propuesta
