@@ -1,5 +1,14 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · RD-0: una encrucijada retirada pendiente vuelve a ser una pregunta (v5.39)
+
+Prerrequisito de RD-3, que va a retirar plantillas vivas: `templateOf` resuelve
+lo ya planteado contra el catálogo vivo y las retiradas. Hallado por la
+auditoría del catálogo (`docs/medidas/rd0-encrucijadas-2026-09-30.md` §6, en
+la rama `claude/ritmo-rd0`). **Abierto:** la migración anterior a M-0 sigue
+borrando una pendiente retirada (`save.ts:519-531`); es inalcanzable hoy y no
+se toca.
+
 ## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
 
 La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60
