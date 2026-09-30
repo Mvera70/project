@@ -1,5 +1,191 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
+
+La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60
+a 0 fps con la vida en «0/0p», que es el bucle que GV dejó apuntado. Arreglo:
+el hueco que cuenta como ausencia en `presentation-clock.ts` es el ocioso, desde
+que acabó el pintado anterior (`clock.painted`), no el entero. Medido en el
+contenedor: la villa pasa de 4 595 ms por `paint` con la vida a cero a 142 ms
+con la vida dando pasos; la aldea no cambia. **Abierto:** el primer montaje de
+la villa sigue costando 4–5 s y se paga en cada relevo de jornada —Vera vio
+bajar los fotogramas de la aldea pequeña **justo al anochecer**—; con GV-4a
+solo, a ×16 la villa 7/60 se congela 5–7 s en cada relevo. Abaratar
+`createVillage` es la segunda parte de GV-4, y **no** va por guardar rutas por
+plan de escena (no toca `dayPlans`, la mitad del coste): va por las regiones
+cerradas —el 93 % de las búsquedas A* finas fallan y son el 99 % del tiempo—,
+con el prototipo exacto de `claude/gv-4b-regiones-cerradas` (7/60 de 3,2 s a
+0,15–0,22 s, misma vida byte a byte en cuatro valles;
+`docs/medidas/revision-rendimiento-2026-09-30.md` §3, fila RV-2, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar). Y que Vera vuelva a abrir la villa 7/60 en la
+tablet con esto dentro.
+
+## 30 sep 2026 · La fusión de las cuatro ramas del 29 sep: cómo quedaron juntas
+
+Animación (PR #2 y #6), modelos de animales (#3), gráficos GV (#4) y sonido
+(#7) entraron en `main` en una noche. **El código combina bien** —typecheck,
+lint y suite rápida limpios; la caza se hizo sobre los modelos nuevos y el
+sonido no toca el renderer— y los huecos entre ellas, repartidos por dueño,
+están en `docs/medidas/fusion-cuatro-ramas-2026-09-29.md`. Arreglado lo
+fácil (v5.34): la fila de `tools/art/bake-clips.mjs`, los enlaces rotos del
+encargo GV y el orden de este cuaderno y del changelog; lo del sonido (pestaña
+oculta, prueba lenta) lo cerró su rama en v5.21. **Lo que esta auditoría no
+vio** (la revisión del 30 sep, fila RV-1, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar): los siete animales facetados de la
+PR #3 dejan 16–27 mallas por animal, antes 1; con la misma escena, la villa 7/60
+va de 500 a 964 llamadas y la aldea 11/21 de 440 a 649. **Abierto:** que suenen caza, oso y combate (sonido
+con animación: primero el contrato de qué publica la vida para que el sonido lo
+oiga); una medida de rendimiento con todo junto en iPhone o iPad; y **las 21
+jornadas rojas** que la CI enseñó al terminar por primera vez. **No son de estas
+ramas**: en local, el `main` de antes de ellas (`efafc2e`) falla igual, y el
+motor no cambió. Es deuda de rondas anteriores, por repartir aparte (el
+detalle, en el papel de la fusión §5).
+
+## 30 sep 2026 · Tanda del 30 sep: la hoja de reparto (skill `director`, v5.33)
+
+Vera pidió una dirección que mande sobre las demás: la skill `director`
+(`.claude/skills/director/SKILL.md`) es el índice de las direcciones, sus
+skills y sus fronteras, y el protocolo de una tanda de varias sesiones. Esta
+es la primera hoja escrita con ella. **El director es la sesión «Análisis de
+conflictos entre ramas»**, rama `ccr-16705aa8-9x5ofm`.
+
+| Carril | Rama · PR | Versiones | Tuyo | No es tuyo |
+|---|---|---|---|---|
+| CI en verde (director) | `claude/ci-verde` · #15 | v5.33 (la v5.32 la tomó la #16 del sonido antes de que esta hoja llegara a `main`) | `.github/workflows/ci.yml`, `playwright.config.ts`, `tests/helpers/timing.ts`, `tools/shots/**`, la skill `director` | el juego: sólo pruebas y configuración |
+| Sonido | `claude/sonido-arreglos-revision` · #14, **fusionada** (12:58, antes de la #15) | v5.31 | `src/ui/sound.ts`, `ambience.ts`, `moments.ts`, `public/audio/`, `tools/ui/` | la reja de interfaz y los cronómetros: van en #15 |
+| Informe y GV-4a (director) | `ccr-16705aa8-9x5ofm` · #8 | v5.34–v5.35 (renumera sus v5.25–v5.26 al traer `main`) | `docs/medidas/fusion-*`, `presentation-clock.ts`, `backend.ts` (sólo `clock.painted`) | GV-4b, ya en `main` (v5.29) |
+| Las 21 jornadas viejas (agente del director) | rama propia · PR por abrir | v5.36–v5.37 | `tests/journeys/**`; código sólo si la causa está ahí, **y si es del motor lo dice antes** | la reja y los cronómetros |
+| Revisión de rendimiento | `claude/revision-rendimiento-2026-09-30` | — | nada hasta que Vera le asigne el resto de su lista | — |
+
+**Orden de integración**, de una en una y con `main` en verde (director §3.3):
+1. **#15**, porque sin ella ninguna PR puede salir verde (la #14 entró antes,
+   con sus pruebas limpias y sólo los rojos heredados);
+2. **#8**, que trae `main` y renumera;
+3. **las jornadas**.
+Tras cada fusión, las que quedan traen `main` (merge, no rebase) y vuelven a
+pasar su puerta. **Una sesión nueva pide su bloque de versiones al director:
+el siguiente libre es la v5.38.**
+
+**Cerrado el mismo día, y no era del juego:** el recorrido de «tocar un
+edificio» en Canvas y el de «la ruta viva» en 3D fallaban porque buscaban la
+ficha `.valley-panel`, y desde A1 (piel v8) el toque en el valle abre la
+etiqueta de pergamino `.valley-label`. Con la etiqueta abierta delante, la ruta
+viva seguía barriendo hasta agotar los 300 s. Las dos pasan en local; el
+gancho `__valleyHouseOnScreen` comprueba ahora su punto con el mismo `pick` que
+usa el dedo.
+
+**Abierto para Vera:** fusionar en ese orden; decidir el reparto de lo que la
+revisión de rendimiento dejó sin dueño; y, con #8 dentro, abrir la villa 7/60
+en la tablet —es la medida combinada que cierra la tanda (director §3.4)—.
+## 30 sep 2026 · La respuesta a una oferta vuelve a sonar (v5.32)
+
+El sonido ya decodificado suena en el acto y no al acabar el tick: la
+respuesta a una oferta se tiraba siempre por tardía. El recorrido del sonido
+sólo cuenta la interfaz. 35/35 · 8/8.
+
+## 30 sep 2026 · El sonido tras la revisión (v5.31) — **fusionada (PR #14)**
+
+Hecho lo que la revisión encontró en el sonido: el trueno cercano suena
+(`sound.sky`), nueve botones dejan de sonar dos o tres veces (`OWN_VOICE`), los
+lechos callados se sueltan y apagado no se paga nada, el audio entra en el
+precaché y un fallo de descarga se reintenta. Nada cambia de carácter.
+Y un tope de voces para el mundo (`SOUND.MAX_WORLD_VOICES`). El recorrido
+cierra ya el tablón, y al hacerlo destapó que **el tablón no recibía toques**
+(su velo heredaba `pointer-events: none`): arreglado en `board.ts`. Recorrido
+35/35 · 8/8 en tres pasadas; `test:pwa` 7/7.
+**Abierto:** que Vera lo oiga en el aparato; la cifra de coste en un aparato
+(no hay aparato aquí); el `duck` —bajar el mundo bajo un hito— es mezcla y la
+decide Vera escuchando; y `MAX_WORLD_VOICES` sin medir contra un asalto real
+(`?sandbox=battle`).
+
+## 30 sep 2026 · La caza tras la revisión: el jabalí en la linde, el cazador que sale andando, la caza sin picos (v5.30)
+
+Encargo de la revisión del 30 sep (sesión «Cambios recientes revisión», por
+orden de Vera): `docs/medidas/revision-rendimiento-2026-09-30.md` §7 y la fila
+RV-3b de `plan-meta.md`, las dos en la rama
+`claude/revision-rendimiento-2026-09-30`, sin fusionar. **PR sin fusionar,
+esperando a Vera.** El motor no cambia.
+
+**Hecho, con su prueba** (todas fallan sin el arreglo, comprobado):
+
+- **RV-3b · el jabalí nace en la linde.** Con los troncos del juego no nacía en
+  ningún valle de fundación ni en 11, 23 y 5 al año 30; ahora nace en todos, y
+  la caza del jabalí se ofrece donde antes daba «no-prey» (toma 33/22,
+  `artifacts/graphics/RV-3b/`). `hunt-report.ts` dice los valles sin presa y el
+  ciervo sale de `createDeer`.
+- **El cazador sale andando a donde cabe** al acabar (`exitRoute`, sin atravesar
+  muros) y el parte lo espera; `releaseHunter` lo coloca si no llega. En la caza
+  sola de cinco valles (cazador desde la aldea), de 1 de 198 cazas que acababan
+  sin sitio a 0 de 198.
+- **La caza sin picos**: puestos descartados por celdas y un solo camino con
+  tope por replanteo (`pathTo`, `budget`). Presa encerrada: el peor paso, de
+  2,4 s a 18 ms (celdas) y de 2,6 s a 77 ms (tablas).
+- **La escena que se pierde entrega su parte** (`abandon()`). Sin él, la semana
+  no avanzaba hasta recargar: `runTick` espera a la caza.
+- **El zarpazo del oso dura su clip**, y la caída tiene sus números en un solo
+  sitio (`hunt-bodies.ts`) con una prueba que ata el render a esa curva.
+- **Papel**: filas de herramientas, 27 clips en la skill, la vía del
+  observatorio tachada, `createBear` medido.
+
+**Las cifras, y el reparto es de Vera** (`artifacts/physics/AN-5/rv-2026-09-30-caza.txt`,
+`rv-2026-09-30-oso.txt`): el jabalí se caza ahora en los cinco valles y, en la
+linde, más a menudo (arco 65 %, lanza 83 %; antes 46 y 50 en dos valles). El
+ciervo, medido donde lo pone el juego, cae mucho menos que medido donde
+nacería un jabalí (arco 27 %, lanza 40 %; se medía 67 y 79): está más lejos.
+El oso, igual en el valle (15 %). **Si la caza del jabalí queda demasiado
+fácil o la del ciervo demasiado difícil**, las palancas son `RANGE`,
+`AIM_SIGMA` y, para el ciervo, su recelo (`WARY`), todas en `hunt-encounter.ts`.
+
+**No cuadra con la revisión, y va en la PR:** la revisión leyó que con la
+escena descartada `huntInProgress` se quedaba en verdadero (la señal no volvía
+y la velocidad quedaba a ×1); además, la semana no avanzaba. El cazador sin
+sitio: la revisión midió 32 de 184 cazas y aquí, con el cazador saliendo de la
+aldea en cinco valles, salió 1 de 198 (el escenario de la revisión no está
+escrito). Y los picos: en ese mismo escenario el peor paso ya era de 41 ms
+antes del arreglo; los segundos salen con la presa donde no se llega, que se
+reprodujo aparte (un cercado en un bosque de troncos).
+
+**Abierto:** el coste de `createBear` (se paga en cada relevo de jornada
+mientras dura la visita) queda medido y no abaratado; la toma del ciervo en su
+sitio nuevo no se ha rodado.
+
+## 30 sep 2026 · GV-4b: el relevo de jornada, con las regiones cerradas (v5.29)
+
+La segunda mitad del bucle de la villa, que la revisión del 30 sep (§3) pasó a
+gráficos con un prototipo para revisar con ojo crítico. **Revisado y dado por
+bueno**: una búsqueda A* fina que falla ha recorrido entera una región de la
+que no se sale, y la caché sólo contesta «no» cuando el A* también lo haría.
+Comprobado leyendo la búsqueda y **midiendo la misma vida byte a byte en diez
+valles** con los troncos de verdad (los cuatro de la revisión y seis más). La
+única salvedad, escrita en `life/body.ts`: un `Terrain` no se modifica después
+de crearse, que es lo que la caché supone y hoy se cumple. En el navegador
+(`relay-probe.mjs`, villa 7/60 a ×16): de 7–8 fotogramas por minuto y la vida
+parada a 78–86 fotogramas y 169–182 ms de mediana, con relevos de 0,5–1,6 s.
+**Abierto**: medirlo en la tablet con GV-4a dentro (la villa 7/60 a ×16).
+
+## 30 sep 2026 · «Graphics»: la adaptativa y el tope, arreglados (v5.28)
+
+Lo que la revisión de rendimiento del 30 sep (§4, RV-3) le pasó a gráficos. La
+adaptativa decidía en cada fotograma, y un solo fotograma de 100 ms bajaba la
+resolución 6 s; ahora decide una vez por ventana de 2 s, sin los largos sueltos
+(`render3d/adaptive-scale.ts`, puro). El tope de 60 pintaba a 45 en una
+pantalla de 90 Hz y hundía la resolución; ahora acumula citas y da 60 de 72 a
+144 Hz (`ui/loop.ts`). Y los menores: el tope leído una vez, `track()` sin el
+segundo revelado, la sombra de la copa atenuada y la cifra de la máscara en la
+skill. **Abierto**: verlo en un aparato de 90 Hz (el panel de taller debería
+decir 60 y resolución 100 %). El detalle, en el registro.
+
+## 30 sep 2026 · RV-1: un animal, una llamada de dibujo (v5.27) — **fusionada con el permiso de Vera**
+
+La revisión del 30 sep (su rama, `docs/medidas/revision-rendimiento-2026-09-30.md`
+§2) me devolvió la regresión de la PR #3: los animales facetados costaban 16–27
+llamadas cada uno. Arreglado al cargar y sin tocar ningún GLB
+(`skinRigidBody` en `assets.ts`): los trece animales animados dejan una malla.
+Villa 7/60 950 → 506 llamadas, aldea 11/21 650 → 413, mallas de fauna por la
+portada 583 → 31; se ve igual (`artifacts/graphics/rv1/`). Prueba de
+presupuesto en `tests/fast/animal-draws.test.ts`. **Abierto:** si la rama de la
+revisión entra después, `tools/reports/model-draws.ts` se queda con esta versión
+(la que mide por `prepareModel`, el cargador del juego).
+
+
 ## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
 
 Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en
@@ -10,6 +196,16 @@ sep) y los veinte momentos suenan de materiales, sin notas afinadas. **Abierto:*
 elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
 botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
 los momentos de §11.10.
+
+## 30 sep 2026 · Fase 5 del sonido: contrato y siete sonidos de ruido (v5.22–v5.24)
+
+Los siete de la primera tanda se descartaron por timbales (resonancia de
+84–264 ms, `tools/ui/tonality.py`). Vera delegó la elección de la segunda
+(«hazlo tú») y se rehicieron de ruido, con 0–12 ms de resonancia. **Abierto:**
+que Vera los oiga en el juego y diga cuáles sobran (su fila de `MOMENT_CUE` a
+`null`); comprobar el cableado con un cerco real en navegador; el cuerno de
+aviso y el material de la flecha (`encargos-3d.md`); si el ruido tampoco
+convence, grabaciones libres de derechos.
 
 ## 30 sep 2026 · Sonido: pestaña oculta y prueba lenta (v5.21)
 
@@ -3887,3 +4083,34 @@ De diseño, y son las que más valen:
 - El parpadeo de sombras de día sigue abierto por indicación del dueño. La mejora a 2048 lo atenúa, pero no lo resuelve.
 - Transiciones de estación y de era, con posible presentación por capítulos y crónica: idea anotada; no implementada.
 - Fauna con función jugable (ciervos, jabalíes, castores y lobos nocturnos): idea pendiente. El fondo al alejar la cámara recibió una prueba de silueta y color de la sierra el 23 sep; sigue pendiente la aprobación visual del dueño, pues el macizo lejano todavía puede sentirse demasiado plano.
+
+## 30 sep 2026 · Las 21 jornadas rojas viejas (v5.36–v5.37) — carril de la tanda «CI verde»
+
+Rama del agente de jornadas, sin push. `test:journeys` tenía 21 rojas en 13
+ficheros, las mismas en `main` y en `efafc2e`; **casi todas ya fallaban en
+`ee9340e`**, la raíz de la historia del repositorio. Revisadas una a una:
+
+- **Arreglado en el motor (v5.36, mueve partidas)**: quien llega sin hueco de
+  personaje (familia que huye, brazo del carro con la lista llena) ya no es
+  `named`. Riñas en tres siglos de tres semillas: 132 (`ee9340e`) → 1 610 →
+  **244** (cota 259,2). Y en la vida, el pago al salinero espera la huella del
+  puesto (`life-trade`, semilla 7, que la trayectoria nueva destapó).
+- **Prueba que medía mal, corregida**: `founding` (G3, población al plantear),
+  `works` (cerco sobre el cauce, dos pruebas), `life-props` (carga negativa),
+  `life-wildlife` ×3 (el lobo, no `wildlife[0]`), `title-cooperative` (final
+  provocado con B3), `wall-rings` (la 41 nunca paga la segunda puerta).
+- **Villas remedidas**: `e3b-corridor` → semillas 9, 2 y 23 (60 semillas
+  barridas a 3 846 ticks).
+- **Declaradas con `it.fails` y la medida** (quedan rojas de verdad, la suite
+  verde): avisos 14,7/año (la roja a propósito de `CLAUDE.md`, ahora escrita);
+  `fate-chaos` 0 de 12; la villa libre sin intervención de E3b (0 de 60); el
+  contacto del hacha; la semilla 37 de `life-places`; el peloteo de tres.
+- **Fuera de este carril**: `life-decide` (cronómetro, PR #15) y el
+  cronómetro de `save.test.ts` en la suite rápida.
+
+**Abierto, con tarea sugerida**: (1) `placeBuilding` no comprueba que el
+portón siga alcanzable desde la plaza: en la semilla 37 una obra de iglesia en
+(31,61) encierra la aldea en el tick 1067; arreglarlo mueve las villas fijadas
+en las jornadas. (2) El leñador que se queda a 0,5 de su plaza de contacto con
+`there` en verdadero (semilla 11, tick 1008). (3) **Del dueño**: por dónde
+muerde el mundo, que `fate-chaos` vuelve a pedir.

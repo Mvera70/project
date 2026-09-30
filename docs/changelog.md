@@ -1,5 +1,340 @@
 # The Valley — Registro de cambios
 
+## v5.37 · 30 sep 2026 · Las 21 jornadas rojas viejas, una a una
+
+`test:journeys` tenía **21 rojas en 13 ficheros**, las mismas en `main` y en
+`efafc2e`, y la CI no las enseñaba porque se cortaba a los 60 minutos
+(`docs/medidas/fusion-cuatro-ramas-2026-09-29.md` §5). **Casi todas ya fallaban
+en `ee9340e`**, la raíz de la historia del repositorio, así que no hay commit
+que las rompiera: se revisaron una a una y cada listón lleva su causa escrita.
+Ninguna cota se ha bajado.
+
+- **La prueba medía mal** (se corrige la prueba): `founding` contaba la gente
+  al contestar la encrucijada del caserío y no al plantearla (semilla 31: se
+  plantea con 6 y llegan 4 por el camino antes de contestar); `works` no
+  admitía la estaca y la piedra del cerco sobre el cauce, que es regla
+  (`buildable`; `spatial-layout.test.ts` lo guarda); `life-props` tomaba el
+  `holding` negativo —la carga del oficio— por un trasto; `life-wildlife` ×3
+  leía `wildlife[0]` y `toEqual([])` cuando `wildlife` es ya toda la fauna, con
+  el lobo el último; `title-cooperative` esperaba que la semilla 31 se rompiera
+  sola y ahora el final se provoca con un asalto de mil (B3); `wall-rings`
+  medía la segunda puerta en la semilla 41, que nunca junta las 10 monedas que
+  cuesta (0–9 en sesenta años).
+- **Villas remedidas** (`docs/historico/rework.md` §2.7): `e3b-corridor`, en 60
+  semillas a 3 846 ticks, pasa a la 9 (la iglesia anterior a la reserva y su
+  traslado), la 2 (los árboles del retorno 66) y la 23 (el guardia del anillo).
+- **Declaradas en rojo con la propiedad intacta** (`it.fails` y la medida al
+  lado): los avisos (14,7 al año en la semilla 7; la roja a propósito de
+  `CLAUDE.md`, que hasta hoy era `it`); `fate-chaos` (0 de 12 valles acaban a
+  los 40 años, 1 de 12 en `ee9340e`; la integridad pasa a prueba propia); la
+  villa que el motor deja libre sola (ninguna de 60); el contacto del hacha (2
+  muestras donde pide 4, y un leñador a 0,5 de su plaza con `there`); la
+  semilla 37 de `life-places`, **encerrada por una obra** (abajo); y el peloteo
+  de tres (la cadena más larga es dos en 36 jornadas).
+- **Dos defectos de verdad quedan escritos y sin arreglar**: en la semilla 37
+  la obra de la iglesia en (31,61) corta el único portón de la plaza en el
+  tick 1067 (de 3 650 celdas alcanzables a 299): `placeBuilding` mira que lo
+  nuevo se alcance, no que el portón se siga alcanzando. Y el leñador que se
+  queda a medio paso de su plaza de contacto.
+
+## v5.36 · 30 sep 2026 · La familia que huye ya no riñe cada dos semanas
+
+**Cambia el motor y mueve partidas.** `arriveToStay` (`world/means.ts`) daba
+`named: true` a quien llega sin hueco de personaje —la familia que huye de
+v4.95, y el brazo del carro con la lista llena— sin meterlo en `namedIds`.
+§6.1: nombrado es personaje, y la lista es quien lo es. Fuera de ella,
+`quarrelOf` lo veía y `decayMemories`/`driftOpinions` no: sus rencores no se
+curaban, su memoria llena de hambres de peso 4–5 expulsaba al momento el
+recuerdo de peso 2 de la riña —el freno de `QUARREL.REPEAT_TICKS`— y los mismos
+dos reñían a dos semanas. **Medido** en la jornada de las riñas (semillas 3, 7
+y 11, 120 años, cota 259,2): 132 en `ee9340e`, **1 610** antes del arreglo,
+**244** después. El nombre se queda: la crónica lo cita al llegar.
+
+- **Y en la capa de vida, el pago al salinero**: el vecino que va a pagar se
+  elegía el mismo paso en que se monta el puesto, antes de que su huella
+  entrara en el terreno, y su ruta lo atravesaba; en la semilla 7 al año ocho
+  (la trayectoria nueva) empujó contra el puesto mil pasos y nadie pagó. Ahora
+  espera a que la huella esté en el suelo (`village.ts`).
+- `tests/fast/quarrels.test.ts` cambia la semilla 11 por la 31: con la aldea
+  nueva, su primera tirada de `quarrels` cae bajo la probabilidad del manso y
+  los dos riñen en la semana 0 (0 contra 0), que mide la tirada y no el
+  carácter.
+
+## v5.35 · 30 sep 2026 · GV-4: el bucle de la villa, roto — un fotograma lento ya no es una ausencia
+
+Vera abrió el sitio con las cuatro ramas dentro en su tablet: la aldea 11/21 a
+57 fps y 11 ms por fotograma, y la villa 7/60 a 0 fps, 2 264 ms por fotograma y
+la vida en «0/0p». La primera medida en un aparato real, y la confirmación de lo
+que GV había dejado apuntado sin tocar (`docs/medidas/bucle-villa-2026-09-29.md`):
+el reloj de presentación tomaba cualquier hueco de más de un segundo entre
+fotogramas por una ausencia, la ausencia rehacía la vida, y rehacer la vida de
+una villa tarda más de un segundo en una tablet. Sin salida.
+
+- `presentation-clock.ts`: el hueco que decide si hubo ausencia es **el ocioso**,
+  desde que el fotograma anterior terminó de pintarse (`clock.painted(ms)`,
+  que `backend.ts` llama tras cada `paint`). El hueco entero sigue explicando
+  los ticks y moviendo la animación; `hidden` sigue cubriendo la pestaña
+  escondida. Sin `painted` el reloj se comporta como antes.
+- Medido en el contenedor (Chromium con SwiftShader, `gl-probe`, villa 7/60,
+  perfil táctil a escala 0,25): **antes**, 4 595 ms por `paint`, vida 0 ms, 8
+  fotogramas en 43 s; **después**, 142 ms por `paint` (mediana de 80 s, con el
+  primer montaje dentro), vida 13 ms, 33 fotogramas. La aldea 11/21, igual que
+  antes: 32 ms.
+- La prueba, en `graphics-clock.test.ts`: cinco fotogramas de 1,5 s de trabajo
+  seguidos no encadenan discontinuidades, y dos segundos sin pintar sí lo son.
+- **Abierto (segunda parte de GV-4):** el primer montaje sigue costando 4–5 s
+  (`createVillage`), y se paga también en cada relevo de jornada: Vera vio
+  bajar los fotogramas de la aldea pequeña justo al anochecer. **GV-4a solo no
+  basta**: a ×16 la villa 7/60 se sigue congelando 5–7 s en cada relevo (uno
+  cada 7,5 s), y a ×64 la jornada dura menos que su montaje. Dónde se va, medido
+  por la revisión del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md` §3, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar): el relevo es
+  `dayPlans`→`choose` en un 50 % en 7/60 (99 % en 3/40), y el 93 % de las
+  búsquedas A* finas **fallan** y se llevan el 99 % del tiempo. La propuesta que
+  se escribió aquí primero —guardar las rutas del común, la orilla y el vado por
+  plan de escena— no toca `dayPlans` y queda **sustituida** por la de las
+  regiones cerradas: una búsqueda fallida ya recorrió una región de la que no se
+  sale, y la siguiente que salga de dentro hacia un destino que no está en ella
+  se contesta «no» sin buscar. Es exacta por construcción; el prototipo, en la
+  rama `claude/gv-4b-regiones-cerradas` (sin fusionar, con su prueba de
+  equivalencia), baja `createVillage` 7/60 de 3,2 s a 0,15–0,22 s con la misma
+  vida byte a byte en cuatro valles.
+
+## v5.34 · 30 sep 2026 · La fusión de las cuatro ramas, revisada, y lo fácil arreglado
+
+Vera pidió revisar cómo quedaron juntas animación, modelos de animales,
+gráficos GV y sonido después de entrar las cuatro en una noche. El esquema y
+los huecos, por dueño, están en `docs/medidas/fusion-cuatro-ramas-2026-09-29.md`.
+Los dos arreglos de sonido que salieron de esta revisión (el audio suspendido
+con la pestaña oculta y la prueba lenta a las jornadas) los hizo la propia rama
+del sonido en v5.21. Lo demás fácil, aquí:
+
+- `tools/art/bake-clips.mjs` tiene fila en `tools/README.md`.
+- Los enlaces a dos capturas que nunca se versionaron, en el encargo GV,
+  apuntan a la revisión que lo explica.
+- El changelog y el cuaderno, en orden: AN-5 (v5.13) quedó encima de todo el
+  sonido y la v5.15 encima de la v5.20.
+- Las 21 jornadas rojas que la CI enseñó al terminar por primera vez **ya
+  fallaban antes** de las cuatro ramas: medido en local sobre `efafc2e`.
+- **Lo que esta revisión no vio**, corregido tras la del 30 sep
+  (`docs/medidas/revision-rendimiento-2026-09-30.md` §2, fila RV-1): los siete animales facetados de la PR #3
+  dejan **16–27 mallas por animal** (antes 1). Con la misma escena, la villa 7/60
+  pasa de 500 a 964 llamadas de dibujo y la aldea 11/21 de 440 a 649. El papel
+  decía «Modelos 3D: nada urgente»; ya no.
+
+## v5.33 · 30 sep 2026 · La CI en verde de una vez, y un director para las tandas
+
+Vera, harta de leer «ya estaba rojo» en cada PR: «¿por qué no lo arreglamos ya
+de una maldita vez?». Y a continuación pidió una dirección que mande sobre las
+demás para no volver a pisarse.
+
+- **Los cronómetros del jugador, a la escala del servidor.** §13.2 (960 ticks
+  en 2 s) y V-13 (una jornada en 2,5 s) se fijaron en un portátil y la CI los
+  mide unas tres veces más lentos: salían rojos siempre (`catchUp` 3,0–3,6 s,
+  la jornada 4,2 s). El número del diseño no cambia: `tests/helpers/timing.ts`
+  lo lee a `VALLEY_TIMING_SCALE`, que la CI fija en 3.
+- **Las jornadas, en tres trozos.** Enteras pasaban del tope de 60 min y se
+  cortaban sin decir nada.
+- **La reja de interfaz, al día.** Las rutas de depuración iban al 3D sin
+  decirlo y con el reloj falso de Playwright el relevo no llega nunca: van en
+  Canvas, como dice la cabecera del fichero, y las cuatro que miden el 3D lo
+  esperan (`await3d`). Lo que la piel v9 cambió —«Valley» exacto, el sello de
+  cerrar de la carcasa, aplazar desde la cabecera, el ajuste de cuentas del
+  epitafio, 64 dibujos y no un 52 congelado— y la bienvenida, que medía un
+  cronómetro en vez de si se guarda.
+- **La skill `director`**: el índice de las direcciones con su skill y su
+  documento, las fronteras con su contrato y su prueba, y cómo se orquesta
+  una tanda —hoja de reparto, versiones reservadas, integrar de una en una
+  sobre `main` en verde, informe de fusión—, con lo que costó cada regla el
+  29 sep. `CLAUDE.md` la manda cargar antes que nada. La primera hoja de
+  reparto está en `docs/task-log.md`.
+## v5.32 · 30 sep 2026 · La respuesta a una oferta vuelve a sonar
+
+Tras la #14, el recorrido del sonido encontró muda la respuesta a una oferta
+aceptada, también en el `main` de antes de la #14. La oferta **sí** se
+aceptaba; lo que se perdía era su sonido. Se pide dentro del tick, y el
+reproductor, aun con el fichero ya decodificado, lo hacía sonar en una
+promesa, es decir, **después** de todo el trabajo síncrono del tick y del
+repintado. Con el relevo de jornada detrás eso pasa de `SOUND.LATE_PLAY_MS` y
+se tiraba siempre. Ahora lo ya decodificado suena en el acto
+(`sound-player.test.ts`, «en el acto», falla con el reproductor de antes).
+
+Y el recorrido cuenta sólo la interfaz en cada paso: desde que el trueno
+cercano suena, un rayo que caía en mitad de «silenciar el valle» lo ponía rojo.
+Recorrido 35/35 · 8/8, dos pasadas.
+
+## v5.31 · 30 sep 2026 · El sonido, arreglado tras la revisión: el trueno cercano, los botones que sonaban dos veces y la memoria
+
+Encargo de Vera sobre lo que la revisión del 30 sep encontró en el sonido
+(`docs/medidas/revision-rendimiento-2026-09-30.md` §6 y §7). **No cambia cómo
+suena nada**: cambia qué llega a sonar y lo que cuesta.
+
+- **El trueno cercano suena.** Latigazo y trueno iban por `sound.accent` y su
+  fusible de 2,5 s tiraba el trueno, que llega ≤ 0,71 s después: con la
+  cámara en el corazón del valle, el 60–70 % de los rayos. Ahora van por
+  `sound.sky`, con su fusible por sonido, y pasan por la compuerta de
+  velocidad del mundo: a ×16 y ×64 no suenan, como la caza y el asedio.
+- **Cada botón suena una vez.** Nueve botones que navegan por
+  `actions.navigate` sonaban a sello y además a `routeCue`: los cinco de la
+  revisión y cuatro más —el cierre de la bandeja, que es el que de verdad se
+  toca en la crónica, el carro, la gente y la ficha (el de la crónica y el del
+  carro están ocultos), el nombre enlazado, la carta sellada y los dos cierres
+  de la portada—. Entran en `OWN_VOICE`.
+- **La memoria.** Un lecho decodificado son 2,3 MB (30,7 MB los catorce a
+  48 kHz) y no se soltaba ninguno. Ahora se suelta el que lleva 30 s callado
+  (`SOUND.AMBIENCE_RELEASE_SECONDS`) y todos al apagar; con el sonido apagado
+  no se descarga, no se crea el contexto y no se decodifica nada.
+- **Sin red.** El service worker precachea los 47 ficheros
+  (`public/audio/manifest.json`, que escribe `sounds.py --stamp`), y un fallo
+  de descarga se vuelve a pedir pasados 30 s (`SOUND.FETCH_RETRY_MS`) en vez
+  de quedarse como `null` para siempre.
+- **Lo muerto y lo viejo.** `SOUND.MURMUR_*` sale del código (los umbrales,
+  apuntados en `plan-audio-mundo.md`); la cabecera de `sound.ts`, la SKILL §2,
+  §6 y §8 y design §10.7, §11.10 y §11.11 dicen lo que hay.
+- **Medido.** Los acentos de la interfaz salen en el 0,7–1,2 % de las semanas
+  (cinco semillas, sesenta años), con una semana como mínimo entre dos —13 s a
+  ×64—, así que no necesitan compuerta de velocidad: el fusible basta.
+- **Un tope de voces para el mundo** (`SOUND.MAX_WORLD_VOICES`, 8): el
+  fusible por sonido no impide que siete golpes **distintos** se apilen en la
+  salva de un asalto. Los toques del jugador no cuentan ni se descartan. Sin
+  medir contra un asalto real.
+- **Fuera del sonido: el tablón no recibía toques.** Su velo cuelga de
+  `.ui-shell`, que deja pasar los toques al valle, y no lo reactivaba: el
+  lienzo 3D se comía el aspa, los avisos y el velo, así que no se podía
+  cerrar ni mandar a nadie tocando. Lo encontró el recorrido al cerrar el
+  tablón; una línea en `board.ts`.
+- **Probado.** `tests/fast/sound-player.test.ts` ejercita por fin el
+  reproductor con un `AudioContext` simulado (seis de sus pruebas fallan
+  contra el de antes); el recorrido `sound-check.mjs` exige «una vez» en cada
+  cierre y vuelta, cierra el tablón (gancho `__valleyOpenBoard`), deja
+  decodificar tras armar y reintenta el ambiente en vez de esperar a ciegas:
+  **35/35 toques y 8/8 ambiente** en Chromium, tres pasadas seguidas. Y
+  `valley.pwa.ts` comprueba el sonido sin red tras una sola visita.
+
+## v5.30 · 30 sep 2026 · La caza, tras la revisión: el jabalí en la linde, el cazador que sale andando y la caza sin picos
+
+La revisión del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md` §7,
+en la rama `claude/revision-rendimiento-2026-09-30`; fila RV-3b) encontró
+cuatro cosas de AN-5 y se encargaron por orden de Vera. Todo en la capa de
+vida y el render: **el motor no cambia**.
+
+- **RV-3b · el jabalí nace en la linde** (`life/wild-prey.ts`). Sólo valía el
+  bosque, y el juego pone un tronco en cada celda de bosque: con los troncos
+  del juego no nacía en ningún valle de fundación ni en 11, 23 y 5 al año 30
+  (0 de 20), y sin jabalí cazado no hay oso. Vale también la pradera pegada al
+  bosque, como la guarida de AN-4c: ahora nace en todos (20 de 20). **Y la caza
+  del jabalí se ofrece en la partida donde antes no**: la toma 33/22 de AN-5
+  daba «no-prey» y ahora arranca (`artifacts/graphics/RV-3b/`). Prueba con
+  `solidTerrain` y los GLB publicados en cuatro semillas; falla sin el arreglo.
+- **El informe dice los valles que se salta** (`hunt-report.ts`, «sin presa en
+  …»), y el ciervo sale donde lo pone el juego (`createDeer`), no donde nacería
+  un jabalí.
+- **El cazador sale andando a donde cabe** (`life/hunt-encounter.ts`,
+  `exitRoute` en `life/body.ts`): se cuela entre troncos con 0,22 y vuelve a su
+  vida con la holgura del aldeano (0,32). Si acaba donde no cabe, sale por el
+  camino más corto a donde sí —sin atravesar muros: el sitio libre más cercano
+  en línea recta podía estar detrás de uno— y el parte lo espera; si no llega,
+  `releaseHunter` lo pone al lado al soltarlo.
+- **La caza sin picos.** Cada replanteo descarta por celdas los puestos a los
+  que no se llega y prueba un solo camino, con tope de 12.000 nodos
+  (`pathTo` admite ahora un tope; sin él, como siempre). Con la presa
+  encerrada, el peor paso de caza baja de 2,4 s a 18 ms (cercado de celdas) y
+  de 2,6 s a 77 ms (cercado de tablas); medido sin reloj, de 9,8 a 0,52
+  millones de consultas de sólidos. Los caminos buenos abren como mucho unos
+  8.200 nodos, así que el tope no corta ninguno.
+- **La escena que se pierde entrega su parte.** Con un fotograma de más de un
+  segundo, una carga u otro valle, el renderer descartaba la caza sin parte y
+  `runTick`, que espera a la caza, **no volvía a avanzar la semana hasta
+  recargar**: más grave de lo que la revisión leyó en el código (la señal y la
+  velocidad). Ahora `abandon()` da un parte sin pieza.
+- **El zarpazo del oso se ve entero**: dura lo que su clip `attack` (3 s) y la
+  embestida no lo corta; antes, al paso siguiente ya estaba en `charge`.
+- **La caída, en un solo sitio**: `DOWN_ROLL`, `DOWN_EASE` y `downSettleAfter`
+  en `life/hunt-bodies.ts`; el render y lo que la presa lleva clavado los leen
+  de ahí, y una prueba compara el render con esa curva.
+- **Papel**: filas en `tools/README.md` para `bake-clips.mjs`,
+  `plant-gait.mjs`, `trace-strip.py`, `build-compare.py` y `take.sh`; la
+  skill `animacion` cuenta 27 clips humanos; `encargos-3d.md` tacha la vía del
+  observatorio (hecha en AN-4b); `bear-visit-report.ts` mide `createBear`.
+- **Lo que cambia en el reparto, y es de Vera** (caza sola, cinco valles al año
+  30, `artifacts/physics/AN-5/rv-2026-09-30-caza.txt`): el jabalí nace ahora en
+  los cinco valles y no en dos, y en la linde es más fácil —con arco, del 46 al
+  65 % cobrado; con lanza, del 50 al 83 %—; el ciervo, medido donde lo pone
+  el juego y en cuatro valles (en 23/30 no hay ciervo), cae mucho menos que
+  medido donde nacería un jabalí —con arco, 27 % donde se medía 67; con lanza,
+  40 % donde se medía 79—: está más lejos (33–37 s por caza, antes 16–22); el oso, igual en el
+  valle (15 %) y un poco más cazable en el llano (de 20 a 27 %) porque ya no
+  embiste en mitad de su zarpazo. Perdiz y conejo, igual.
+
+## v5.29 · 30 sep 2026 · GV-4b: el relevo de jornada, de segundos a décimas — lo que una búsqueda fallida ya demostró
+
+La segunda mitad del bucle de la villa (`docs/medidas/bucle-villa-2026-09-29.md`).
+GV-4a (PR #8) deja de tomar un fotograma lento por una ausencia, pero la vida
+se sigue montando en cada relevo de jornada, y en la villa eso eran segundos:
+a ×16, 5–7 s congelada cada 7,5 s (revisión del 30 sep, §3). **El 93 % de las
+búsquedas A* finas de ese montaje fallaban y se llevaban el 99 % del tiempo.**
+
+- `life/navigate.ts`: cuando la búsqueda fina falla ha recorrido entera una
+  región de la que no se sale; se guarda —por objeto de terreno, radio y
+  resolución— y la siguiente que salga de dentro hacia un destino que ningún
+  nodo de la región alcanza se contesta «no» sin buscar. **Exacto por
+  construcción**: sólo contesta «no» cuando el A* también lo haría; si no,
+  busca como siempre. El prototipo es de la revisión (`claude/gv-4b-regiones-cerradas`);
+  aquí, revisado y medido.
+- **La misma vida byte a byte en diez valles** con el terreno de verdad
+  (troncos, enseres y cementerios de los GLB publicados): 7/60, 3/40, 23/60,
+  11/21, 1/30, 5/45, 13/50, 17/35, 29/55 y 41/25 —sitios, planes, cuerpos y
+  bestias, al montar y tras 600 pasos—. El montaje, en Node: 7/60 de 7,2 s a
+  0,53; 3/40 de 27,3 a 2,8; 23/60 de 16,2 a 0,5; 1/30 de 12,3 a 0,37 (con dos
+  pasadas a la vez: comparativo). En la aldea 11/21 no cambia nada: ahí no falla
+  ninguna búsqueda.
+- **En el navegador** (`relay-probe.mjs`, villa 7/60 a ×16 durante 60 s, escala
+  0,25, dos pasadas por versión, `artifacts/graphics/gv4b/relevos.txt`): `main`,
+  7–8 fotogramas de 7,7–8,1 s y la vida en cero pasos —el bucle—; con GV-4b,
+  **78–86 fotogramas, 169–182 ms de mediana y 3.200–3.600 pasos de vida**, con
+  relevos de 0,5 a 1,6 s cada 7 s. Rompe el bucle en el contenedor aun sin
+  GV-4a; en un aparato más lento un relevo aún puede pasar del segundo, y por
+  eso hacen falta los dos.
+- **El invariante que lo hace posible, escrito** (`life/body.ts`): un
+  `Terrain` no se modifica después de crearse. Hoy es así —quien lo cambia
+  copia—, pero nada lo protegía: escribir en uno ya en uso haría que la caché
+  contestara «no hay ruta» a una que ya existe.
+- La prueba, `navigate-closed-regions.test.ts`: cada pregunta contra el
+  terreno que acumula regiones y contra uno sin ninguna, con la misma respuesta.
+- **Independiente de GV-4a**: con los dos, la villa del contenedor pasó de 471
+  a 84 ms de mediana a ×16 (revisión §3). Lo que queda por relevo en la villa,
+  0,5–0,8 s en el contenedor, y medirlo en la tablet.
+
+## v5.28 · 30 sep 2026 · «Graphics»: la adaptativa ya no salta con un fotograma, y el tope de 60 da 60 a 90 Hz
+
+La revisión de rendimiento del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md`
+§4, fila RV-3, en la rama `claude/revision-rendimiento-2026-09-30`) encontró dos
+defectos de «Graphics» (v4.96) y unos menores. Numerada tras las dos PR
+abiertas: la #8 reserva la v5.25 y la v5.26, y la #11 (RV-1) la v5.27.
+
+- **La resolución adaptativa**, a `render3d/adaptive-scale.ts`, pura y probada:
+  decide **una vez por ventana de 2 s**, cambie o no (antes, pasados los dos
+  primeros segundos, en cada fotograma), con **la media de los huecos sin los
+  largos sueltos**. Un fotograma de 100 ms —un relevo de jornada, una
+  recolección, volver de otra pestaña— ya no baja la resolución durante 6 s; un
+  aparato lento de verdad sigue bajando.
+- **El tope de fotogramas acumula citas** (`ui/loop.ts`, `frameDue`): con 60 se
+  dibujan 60 por segundo a 72, 75, 90, 120 y 144 Hz. Antes, 45 a 90 Hz —y la
+  adaptativa hundía la resolución al suelo para siempre—, sin tope a 72–75 y 72
+  a 144.
+- **Menores**: el tope se lee al arrancar el bucle y no en cada fotograma (era
+  leer y descifrar el almacenamiento del navegador sesenta veces por segundo);
+  `track()` ya no repite la oclusión del bosque que `paint` hace después de
+  mover los cuerpos; la copa atenuada recibe sombra como la opaca, que no la
+  recibe; y la skill `performance` dice lo que cuesta la máscara del pie
+  (0,27–0,48 ms, no «unos 4»).
+- **Pruebas**: `adaptive-scale.test.ts` (6: «un fotograma largo suelto no
+  cambia la escala», una decisión por ventana, el aparato lento que sí baja, la
+  recuperación y las dos correcciones juntas de 60 a 144 Hz) y el tope en
+  `graphics-profile.test.ts` con cadencias de pantalla reales.
+- **Lo que no se mide aquí**: fotogramas de ningún aparato. En uno de 90 Hz, el
+  panel de taller debería decir 60 y la resolución al 100 %.
+
+
 ## v5.13 · 29 sep 2026 · AN-5: la caza física, y la visita del oso que dura
 
 Vera, al leer el brief AN-5a: «que la caza enseñe el golpe; tiene que ser
@@ -74,6 +409,110 @@ matriz (§2.7).
   honda sigue con los gestos del arco, y su piedra desaparece donde da. Y de la toma del oso: el relevo del
   anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
   primera jornada de una sesión (matriz §2.7).
+
+## v5.27 · 30 sep 2026 · Un animal, una llamada de dibujo (RV-1)
+
+La revisión del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md` §2,
+en su rama) encontró la regresión que dejó la PR #3: los animales facetados son
+nodos rígidos con una malla por pieza, y la villa 7/60 pasó de 500 a 964
+llamadas sin que nada avisara. **Arreglado al cargar, sin tocar ningún GLB**:
+`skinRigidBody` (`src/render3d/assets.ts`) vuelve un cuerpo de piezas rígidas
+animado en una malla con esqueleto —cada vértice entero al nodo de su pieza,
+color y rugosidad en el vértice— y deja en el sitio de cada malla un nodo vacío
+con su nombre, su postura y sus hijos, que hace de hueso. Los clips de
+`rigid-clips.mjs`, los gestos y cualquier `getObjectByName` encuentran lo mismo.
+Sirve a los trece animales animados: los siete facetados y los de piezas de
+Vera (oso, jabalí, mula, lobo, perdiz, perro). La golondrina, que no trae
+clips, no cambia. `prepareModel` es el paso único que comparten el cargador y
+`tools/reports/model-draws.ts`.
+
+**Medido** (`gl-probe`, las rutas de la revisión, antes → después sobre el
+mismo `main`): villa 7/60 **950 → 506** llamadas (la de `da8836f`, con un
+cuerpo por animal, era 500); aldea 11/21 **650 → 413** (mejor que antes de la
+PR #3, 440, porque lobo, mula y compañía también bajan); por la portada en
+táctil, villa **564 → 310**, con las mallas de fauna de **583 a 31**. Los
+triángulos no cambian y el JS de animación tampoco (`animation-cost`, 0,28 →
+0,30 ms, dentro del ruido). Se ve igual: fotos antes y después en
+`artifacts/graphics/rv1/`.
+
+**La prueba de presupuesto** (`tests/fast/animal-draws.test.ts`): todo modelo
+publicado que se anima deja **una** malla al cargar, por el camino del juego,
+con la misma caja en reposo y en mitad de cada clip y sin perder ningún nodo
+con nombre. `pieced-assets.test.ts` pasa a cargar por `prepareModel`, y la
+marcha de `graphics-animal-motion.test.ts` mide la geometría de cada pata a
+través de la piel.
+
+## v5.24 · 30 sep 2026 · Siete sonidos de caza y asedio, rehechos de ruido y elegidos «a mi criterio»
+
+Vera, ante la segunda tanda de cinco familias: «hazlo tú». Se eligió la C
+(ariete con herrajes) como lenguaje y se rehicieron los siete con la misma
+idea: **ruido en banda que se apaga, crujidos minúsculos y golpecitos de
+hierro, sin ninguna resonancia** (`_thump`, `_splinters`, `_rattle` en
+`sounds.py`). Medido con `tools/ui/tonality.py`: **0 a 12 ms de resonancia
+sostenida** (los descartados: 84–264; un timbal: 336), 93–100 % de la energía
+en la banda del teléfono, < 1,3 % sobre 4 kHz, primera y última muestra a cero.
+Vuelven a `CUE_FILES` y a `MOMENT_CUE`; el oso sigue sin voz.
+
+**Sin oír por quien los hizo, y sin comprobar en un cerco real del
+navegador.** Si alguno suena mal, su fila de `MOMENT_CUE` vuelve a `null` y
+calla; los ficheros pesan 48 KB en total.
+
+## v5.23 · 30 sep 2026 · Los siete sonidos de caza y asedio, descartados; queda el contrato
+
+Vera los oyó y descartó los siete: «suenan como juguetes de niño pequeño,
+timbales… parece que está roto por completo». **Tenía razón y ahora está
+medido:** el golpe al portón sostenía una resonancia de 264 ms a 458 Hz (un
+timbal de referencia da 336 ms), la caída 210 ms, la rotura del portón 222 ms y
+la flecha en carne 84 ms. Salió de subir los cuerpos por encima de 350 Hz para
+llenar la banda del móvil con `drop` y `knock`, que son tonos: la corrección
+de la trampa número uno de la skill creó la trampa de «infantil».
+
+- **Fuera de la rama:** los siete `combat_*` (ficheros, recetas y entradas de
+  `CUE_FILES`). `MOMENT_CUE` queda con todo a `null`: el contrato, las cuentas
+  del renderer y el cableado de `app.ts` siguen, y un sonido entrará en su fila
+  cuando ella lo apruebe.
+- **La medida nueva:** `tools/ui/tonality.py`, cuánto aguanta un componente
+  estrecho por encima de su entorno. Regla: **un golpe no puede sostener más
+  de ~30 ms de resonancia** (un golpe de ruido da 0 a 6 ms). Se mide antes de
+  enseñar nada, junto a los números de siempre.
+- **Segunda tanda, un solo sonido** (el golpe al portón) **con cinco familias
+  distintas hechas sólo de ruido** —astillas, saco contra madera, ariete con
+  herrajes, grava, crujido con sala—: 95–100 % en banda de teléfono, < 1 % sobre
+  4 kHz, resonancia 0–6 ms. A la espera de su elección en la misma página de
+  escucha.
+
+## v5.22 · 30 sep 2026 · Fase 5 del sonido: el contrato de sucesos y siete sonidos de caza y asedio
+
+Lo que integración pidió y quedaba abierto: que la caza y el combate publiquen
+sus sucesos, y que suenen. **Los sonidos esperan a que Vera los oiga**
+(página de escucha publicada aparte): por eso van en la rama y no en main.
+
+- **El contrato.** `GraphicsStats.moments` (`render3d/contracts.ts`): cuentas
+  que sólo suben —flechas soltadas y aciertos, golpes, caídos de los dos
+  bandos, golpes y rotura del portón, el último tiro o estocada de la caza, las
+  veces que el oso se alza—. El renderer las copia de lo que la capa de vida ya
+  contaba (`momentsOf`, y un getter `bearAlert` en `village.ts`): **sólo
+  lectura, ni un dato nuevo del motor ni una tirada**. `ui/moments.ts` (puro)
+  saca de dos fotogramas qué acaba de pasar: sin anterior no suena nada, una
+  cuenta que baja es una jornada nueva, tope de tres por clase y fotograma,
+  y una jornada que abre con el portón ya roto no lo rompe otra vez.
+- **Siete sonidos** (descartados después, ver v5.23), foley de materiales (`sounds.py`):
+  soltar la flecha, flecha en carne, flecha en madera o tierra, choque,
+  cuerpo que cae, golpe al portón, portón que cede. **Medidos:** 94–100 % de la
+  energía en la banda del teléfono, < 1,3 % sobre 4 kHz, primera y última
+  muestra a cero. La primera tanda salía con el 6–20 % en banda (cuerpos de
+  200–300 Hz: la trampa número uno de la skill) y se subió antes de nada.
+- **Suenan en su sitio.** `app.ts` los sirve con la cercanía de la cámara
+  (`nearness`), por un fusible por sonido (`SOUND.MOMENT_MIN_GAP_MS`, TUNE), con
+  ±3 % de tono, y callan en pausa, en un letargo, con la pestaña oculta y a
+  ×16 o más.
+- **El oso se alza y no suena.** Es un suceso del contrato con su sitio, pero su
+  gruñido sería una voz de animal sintética, descartada en U-09; queda sin
+  fichero hasta que haya voces (decisión 1 de §6).
+- Pruebas: `tests/fast/moments.test.ts` (16, propiedades del contrato y de las
+  compuertas). **No comprobado en navegador:** el banco de batallas en el
+  Chromium de la nube (swiftshader) no llegó al combate en tres minutos; el
+  cableado se apoya en tipos, lint y las pruebas puras.
 
 ## v5.21 · 30 sep 2026 · El sonido calla con la pestaña oculta; una prueba de 25 s se muda a las jornadas
 

@@ -211,7 +211,10 @@ class Voice:
 # 6 kHz): dos sonidos igual de fuertes con auriculares pueden sonar uno el doble
 # que el otro en un iPhone, y el iPhone es donde se juega.
 LEVEL = {'tick': -24.0, 'nav': -21.0, 'confirm': -19.0, 'call': -18.0, 'stinger': -18.0,
-         'thunder': -17.0, 'thunder_far': -23.0}
+         'thunder': -17.0, 'thunder_far': -23.0,
+         # La caza y el asedio (fase 5): un golpe suelto va como un toque fuerte;
+         # el portón, que es lo que más pesa en el juego, va un poco por encima.
+         'strike': -21.0, 'blow': -19.0, 'heavy': -17.0}
 PEAK_CEILING = 0.9
 
 
@@ -500,6 +503,118 @@ def _(v: Voice):
     x = place((0, _rumble(v, 3.2, 230, 720, 0.9, 1.0, roll=0.6)),
               (0.9, _rumble(v, 2.2, 210, 600, 0.8, 0.5)), dur=3.4)
     return 'thunder_far', 3.4, v.room(x, 0.4, 0.18)
+
+
+# ---- la caza y el asedio (fase 5 · `docs/plan-audio-mundo.md`) --------------------
+# **Ruido que se apaga, y ninguna resonancia.** La primera tanda (30 sep 2026) se
+# hizo con `drop` y `knock` subidos a 420–600 Hz para llenar la banda del móvil, y
+# Vera los descartó los siete: «juguetes de niño pequeño, timbales». Medido con
+# `tools/ui/tonality.py`, sostenían 84–264 ms de resonancia; un timbal de
+# referencia, 336. Un golpe de verdad no tiene altura: es ruido en banda que
+# muere en decenas de milisegundos, más crujidos minúsculos, más —si hay hierro—
+# golpecitos sueltos. **Lo que se ha de cumplir es una resonancia de ≤ 30 ms.**
+#
+# La familia es la «C» de la segunda tanda (el ariete con herrajes), la que
+# Vera delegó en elegir: un golpe sordo sin altura y, detrás, el hierro y la
+# madera que se sacuden. Sin voces (decisión 1 de §6) ni notas.
+
+def _thump(v: Voice, d: float, lo: float, hi: float, tau: float, att_ms: float = 3.0) -> np.ndarray:
+    """El cuerpo de un golpe, sin altura: ruido en banda que se apaga rápido."""
+    return bp(v.noise(int(d * SR)), lo, hi, order=3) * v.env(d, tau * v.v['decay'], att_ms)
+
+
+def _splinters(v: Voice, dur: float, n: int, lo: float = 420, hi: float = 2300,
+               decay: float = 0.35) -> np.ndarray:
+    """Crujidos minúsculos, más juntos al principio: madera que se astilla."""
+    parts = []
+    for _ in range(n):
+        at = (v.rng.random() ** 1.7) * dur
+        d = v.rng.uniform(0.002, 0.008) * 5
+        m = int(d * SR) + 8
+        e = np.exp(-(np.arange(m) / SR) / (d / 4))
+        a = max(1, int(SR * 0.0003))
+        e[:a] *= np.linspace(0, 1, a)
+        f0 = v.rng.uniform(lo, hi * 0.6)
+        amp = np.exp(-at / (dur * decay)) * v.rng.uniform(0.4, 1.0)
+        parts.append((at, bp(v.noise(m), f0, min(hi, f0 * 2.2)) * e * amp))
+    return place(*parts, dur=dur + 0.05)
+
+
+def _rattle(v: Voice, dur: float, n: int, level: float = 0.5) -> np.ndarray:
+    """Herrajes y cadenas que se sacuden: golpecitos de hierro sueltos, sin nota."""
+    parts = []
+    for _ in range(n):
+        at = 0.02 + (v.rng.random() ** 1.4) * dur
+        lo = v.rng.uniform(1300, 2600)
+        m = int(0.02 * SR)
+        parts.append((at, bp(v.noise(m), lo, min(lo + v.rng.uniform(1200, 1500), 3800))
+                      * v.env(0.02, 0.004, 0.3) * v.rng.uniform(0.15, 1.0) * level))
+    return place(*parts, dur=dur + 0.1)
+
+
+@recipe('combat_arrow_loose')
+def _(v: Voice):
+    # La cuerda que restalla (cuero) y el aire de la flecha que se va.
+    x = place((0, v.contact(0.03, 450, 1800, 0.006, 0.5, 1.0)),
+              (0, _thump(v, 0.05, 400, 1200, 0.01, 1.0) * 0.4),
+              (0.012, bp(v.noise(int(0.16 * SR)), 700, 2000)
+               * np.sin(np.pi * np.linspace(0, 1, int(0.16 * SR)) ** 0.6) ** 2 * 0.3), dur=0.24)
+    return 'strike', 0.24, v.room(x, 0.04, 0.05)
+
+
+@recipe('combat_arrow_hit')
+def _(v: Voice):
+    # La flecha en carne: golpe blando y húmedo, sin resonancia ni madera.
+    x = place((0, _thump(v, 0.12, 350, 1300, 0.024, 4.0)),
+              (0, v.contact(0.03, 700, 2200, 0.007, 0.8, 0.3)),
+              (0.03, v.grains(0.07, 500, 1600, 2, 0.2)), dur=0.18)
+    return 'strike', 0.18, v.room(x, 0.03, 0.04)
+
+
+@recipe('combat_arrow_miss')
+def _(v: Voice):
+    # Un tarascazo seco en madera o en tierra: pocos crujidos y un golpe corto.
+    x = place((0, _splinters(v, 0.1, 7, 500, 2600)), (0, _thump(v, 0.07, 400, 1400, 0.012) * 0.7), dur=0.16)
+    return 'strike', 0.16, v.room(x, 0.03, 0.04)
+
+
+@recipe('combat_melee')
+def _(v: Voice):
+    # Palo contra escudo de madera y cuero: dos golpes secos y el hierro que tintinea.
+    x = place((0, _thump(v, 0.09, 380, 1500, 0.014) * 1.0),
+              (0, v.contact(0.025, 600, 2500, 0.005, 0.5, 0.6)),
+              (0.07, _thump(v, 0.08, 350, 1300, 0.012) * 0.6),
+              (0.02, _rattle(v, 0.16, 5, 0.35)), dur=0.26)
+    return 'blow', 0.26, v.room(x, 0.05, 0.07)
+
+
+@recipe('combat_fall')
+def _(v: Voice):
+    # Un cuerpo que se desploma: golpe sordo y, después, cuero y tela que se asientan.
+    n = int(0.2 * SR)
+    cloth = bp(v.noise(n), 500, 2000) * np.sin(np.pi * np.linspace(0, 1, n)) ** 2 * 0.3
+    x = place((0, _thump(v, 0.2, 300, 1200, 0.04, 6.0)), (0.05, cloth), (0.06, v.grains(0.12, 500, 1800, 3, 0.2)), dur=0.36)
+    return 'blow', 0.36, v.room(x, 0.05, 0.08)
+
+
+@recipe('combat_gate_hit')
+def _(v: Voice):
+    # El ariete contra el portón: un golpe sordo y, detrás, los herrajes que se sacuden.
+    x = place((0, _thump(v, 0.16, 360, 1400, 0.026) * 1.0), (0, _rattle(v, 0.36, 12, 0.5)), dur=0.5)
+    return 'heavy', 0.5, v.room(x, 0.08, 0.14)
+
+
+@recipe('combat_gate_break')
+def _(v: Voice):
+    # El portón que cede: las fibras que revientan, el golpe grande, los tablones
+    # que caen y los herrajes por el suelo. Lo más largo de la fase.
+    x = place((0, _splinters(v, 0.7, 34, 420, 2400, 0.5)),
+              (0.0, _thump(v, 0.22, 340, 1400, 0.05) * 0.9),
+              (0.25, _thump(v, 0.3, 320, 1300, 0.07, 6.0) * 1.0),
+              (0.3, _splinters(v, 0.7, 22, 450, 2200, 0.6)),
+              (0.32, _rattle(v, 0.8, 18, 0.6)),
+              (0.4, v.grains(0.5, 500, 2200, 8, 0.3)), dur=1.3)
+    return 'heavy', 1.3, v.room(x, 0.12, 0.18)
 
 
 # ===========================================================================
@@ -850,7 +965,24 @@ def stamp() -> int:
         source = re.sub(pattern, restamp, source, flags=re.M)
     with open(SOUND_TS, 'w', encoding='utf-8') as fh:
         fh.write(source)
+    write_manifest(source)
     return changed
+
+
+def write_manifest(source: str) -> None:
+    """
+    La lista de lo que suena, con su huella, en `public/audio/manifest.json`.
+
+    **Para el service worker**, que no puede leer `sound.ts` y precachea con
+    esto en la instalación, igual que los modelos: sin ella, quien abría el
+    juego una vez y se quedaba sin red se quedaba también sin sonido (revisión
+    del 30 sep 2026, §6). Sale de lo ya sellado, así que no puede decir otra
+    cosa que `CUE_FILES` y `LOOP_FILES`; lo vigila `sound.test.ts`.
+    """
+    files = sorted(set(re.findall(r"'([a-z_]+\.mp3\?v=[0-9a-f]+)'", source)))
+    with open(os.path.join(OUT_GAME, 'manifest.json'), 'w', encoding='utf-8') as fh:
+        json.dump({'files': files}, fh, indent=2)
+        fh.write('\n')
 
 
 def main() -> None:

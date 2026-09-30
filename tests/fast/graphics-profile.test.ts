@@ -53,35 +53,57 @@ describe('el perfil de render', () => {
 });
 
 describe('el tope de fotogramas del bucle', () => {
+  /** Cuántos fotogramas se dibujan en `seconds` con rAF a `hz` y un tope de `cap`, y sus huecos. */
+  function paints(hz: number, cap: number, seconds = 4, jitter: (frame: number) => number = () => 0): { count: number; gaps: number[] } {
+    let dueAt: number | null = null;
+    let last: number | null = null;
+    const gaps: number[] = [];
+    let count = 0;
+    for (let i = 0; i < hz * seconds; i += 1) {
+      const now = i * (1000 / hz) + jitter(i);
+      const due = frameDue(now, dueAt, cap > 0 ? 1000 / cap : 0);
+      if (due === null) continue;
+      dueAt = due;
+      if (last !== null) gaps.push(now - last);
+      last = now;
+      count += 1;
+    }
+    return { count, gaps };
+  }
+
   it('sin tope, o antes del primer dibujo, siempre toca', () => {
-    expect(frameDue(100, null, 1000 / 60)).toBe(true);
-    expect(frameDue(100, 99, 0)).toBe(true);
+    expect(frameDue(100, null, 1000 / 60)).not.toBeNull();
+    expect(frameDue(100, 99, 0)).not.toBeNull();
+    expect(paints(90, 0).count).toBe(360);
   });
 
   it('a 60 en una pantalla de 60 Hz no se pierde ninguno, aunque el fotograma llegue unas décimas antes', () => {
     // El navegador entrega los fotogramas a 16,67 ms con un poco de ruido; sin
     // margen, la mitad de ellos llegaría «pronto» y se saltarían.
-    let last: number | null = null;
-    let painted = 0;
-    for (let i = 0; i < 120; i += 1) {
-      const now = i * (1000 / 60) - (i % 2 === 0 ? 0.4 : 0);
-      if (frameDue(now, last, 1000 / 60)) { painted += 1; last = now; }
-    }
-    expect(painted).toBe(120);
+    expect(paints(60, 60, 2, (i) => (i % 2 === 0 ? -0.4 : 0)).count).toBe(120);
   });
 
   it('a 30 en una pantalla de 60 Hz se dibuja uno de cada dos, y a 60 en una de 120 igual', () => {
-    const count = (hz: number, cap: number): number => {
-      let last: number | null = null;
-      let painted = 0;
-      for (let i = 0; i < 240; i += 1) {
-        const now = i * (1000 / hz);
-        if (frameDue(now, last, 1000 / cap)) { painted += 1; last = now; }
-      }
-      return painted;
-    };
-    expect(count(60, 30)).toBe(120);
-    expect(count(120, 60)).toBe(120);
-    expect(count(60, 60)).toBe(240);
+    expect(paints(60, 30).count).toBe(120);
+    expect(paints(120, 60).count).toBe(240);
+    expect(paints(60, 60).count).toBe(240);
+  });
+
+  it('con un tope de 60 se dibujan 60 por segundo en cualquier pantalla más rápida, también a 90 Hz', () => {
+    // La revisión del 30 sep: contando desde el último dibujo, 90 Hz pintaba a
+    // 45 y 144 a 72, y 72–75 Hz no topaba. Con las citas acumuladas, la media
+    // es la del tope: en cuatro segundos, 240 fotogramas, uno arriba o abajo.
+    for (const hz of [72, 75, 90, 120, 144]) {
+      const { count, gaps } = paints(hz, 60);
+      expect(Math.abs(count - 240), `${hz} Hz`).toBeLessThanOrEqual(1);
+      const mean = gaps.reduce((sum, gap) => sum + gap, 0) / gaps.length;
+      expect(mean, `${hz} Hz`).toBeCloseTo(1000 / 60, 0);
+    }
+  });
+
+  it('tras un tirón no dibuja en ráfaga para recuperar lo perdido', () => {
+    const dueAt = frameDue(0, null, 1000 / 60)!;
+    // Medio segundo sin fotogramas: la cita siguiente sale de ahora, no de la vieja.
+    expect(frameDue(500, dueAt, 1000 / 60)).toBeCloseTo(500 + 1000 / 60);
   });
 });

@@ -14,7 +14,10 @@
 import type { AnimationClip, Object3D } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
-import { BufferAttribute, Color, Mesh, SkinnedMesh, type Material, type MeshStandardMaterial, type Texture } from 'three';
+import {
+  BufferAttribute, Color, Mesh, Object3D as Node, Skeleton, SkinnedMesh,
+  type Bone, type BufferGeometry, type Material, type MeshStandardMaterial, type Texture,
+} from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 interface AssetMotion {
@@ -268,6 +271,134 @@ export function fuseRigidPieces(root: Object3D, clips: readonly AnimationClip[])
   }
 }
 
+/** Lo que distingue a dos materiales salvo el color y la rugosidad. */
+const lookOf = (material: MeshStandardMaterial): string => [
+  material.type, material.metalness, material.emissive?.getHex(), material.transparent, material.opacity,
+  material.side, material.flatShading, material.vertexColors, material.alphaTest, material.depthWrite,
+].join('/');
+
+/**
+ * **Un animal de piezas rígidas, en una llamada de dibujo** (revisión del 30
+ * sep 2026, RV-1). Los animales facetados de la PR #3 —y los de piezas de Vera:
+ * oso, jabalí, mula, lobo, perdiz, perro— son nodos rígidos que los clips de
+ * `tools/art/rigid-clips.mjs` giran por su nombre, con cada pieza en su malla:
+ * 16 a 40 llamadas por animal, y la villa 7/60 pasó de 500 a 964.
+ * `fuseRigidPieces` no los arreglaba porque cada pieza cuelga de su
+ * articulación.
+ *
+ * Aquí todas las piezas se vuelven **una malla con esqueleto**: cada vértice va
+ * entero al nodo de su pieza, y el color del material viaja en el vértice, como
+ * en `fuseSkinnedParts`. Cada malla deja en su sitio un nodo vacío con su
+ * nombre, su postura y sus hijos, que hace de hueso: los clips, los gestos
+ * (`animal-gestures.ts`, que mide un giro contra el primer hijo de un hueso) y
+ * cualquier `getObjectByName` encuentran lo mismo que antes. La rugosidad
+ * (pelo 0,85, pezuña 0,65, ojo y pico 0,35) también va en el vértice, para que
+ * los ojos sigan brillando.
+ *
+ * Sólo si ninguna pieza tiene textura ni lleva ya esqueleto, y los materiales
+ * no difieren más que en color y rugosidad. Devuelve si lo hizo.
+ */
+export function skinRigidBody(root: Object3D): boolean {
+  const meshes: Mesh[] = [];
+  let skinned = false;
+  root.traverse((node) => {
+    if (node instanceof SkinnedMesh) skinned = true;
+    else if (node instanceof Mesh) meshes.push(node);
+  });
+  if (skinned || meshes.length < 2) return false;
+  const materials = meshes.map((mesh) => mesh.material as MeshStandardMaterial);
+  if (materials.some((material) => Array.isArray(material) || (material.map !== null && material.map !== undefined))) return false;
+  const look = lookOf(materials[0]!);
+  if (!materials.every((material) => lookOf(material) === look)) return false;
+
+  root.updateMatrixWorld(true);
+  const toRoot = root.matrixWorld.clone().invert();
+  const indexed = meshes.every((mesh) => mesh.geometry.index !== null);
+  const bones: Node[] = [];
+  const pieces: BufferGeometry[] = [];
+  meshes.forEach((mesh, bone) => {
+    const joint = new Node();
+    joint.name = mesh.name;
+    joint.position.copy(mesh.position);
+    joint.quaternion.copy(mesh.quaternion);
+    joint.scale.copy(mesh.scale);
+    joint.visible = mesh.visible;
+    joint.userData = mesh.userData;
+    for (const child of [...mesh.children]) joint.add(child);
+    const parent = mesh.parent!;
+    parent.children[parent.children.indexOf(mesh)] = joint;
+    joint.parent = parent;
+    mesh.parent = null;
+    bones.push(joint);
+
+    const geometry = (indexed ? mesh.geometry : mesh.geometry.toNonIndexed()).clone();
+    for (const name of Object.keys(geometry.attributes)) {
+      if (name !== 'position' && name !== 'normal') geometry.deleteAttribute(name);
+    }
+    geometry.applyMatrix4(toRoot.clone().multiply(mesh.matrixWorld));
+    const count = geometry.getAttribute('position').count;
+    const material = mesh.material as MeshStandardMaterial;
+    const colour = material.color ?? new Color(1, 1, 1);
+    const colours = new Float32Array(count * 3);
+    const rough = new Float32Array(count).fill(material.roughness);
+    const index = new Uint16Array(count * 4);
+    const weight = new Float32Array(count * 4);
+    for (let i = 0; i < count; i += 1) {
+      colours[i * 3] = colour.r; colours[i * 3 + 1] = colour.g; colours[i * 3 + 2] = colour.b;
+      index[i * 4] = bone;
+      weight[i * 4] = 1;
+    }
+    geometry.setAttribute('color', new BufferAttribute(colours, 3));
+    geometry.setAttribute('roughnessOf', new BufferAttribute(rough, 1));
+    geometry.setAttribute('skinIndex', new BufferAttribute(index, 4));
+    geometry.setAttribute('skinWeight', new BufferAttribute(weight, 4));
+    pieces.push(geometry);
+  });
+  const merged = mergeGeometries(pieces, false);
+  for (const piece of pieces) piece.dispose();
+  if (merged === null) throw new Error(`skinRigidBody: the pieces of '${root.name}' did not merge`);
+
+  const material = materials[0]!.clone();
+  material.vertexColors = true;
+  material.color.set(1, 1, 1);
+  material.name = `${materials[0]!.name}_skinned`;
+  if (new Set(materials.map((one) => one.roughness)).size > 1) {
+    material.onBeforeCompile = (shader) => {
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\nattribute float roughnessOf;\nvarying float vRoughnessOf;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvRoughnessOf = roughnessOf;');
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>', '#include <common>\nvarying float vRoughnessOf;')
+        .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = vRoughnessOf;');
+    };
+    material.customProgramCacheKey = () => 'rigid-roughness';
+  }
+  const body = new SkinnedMesh(merged, material);
+  body.name = `${root.name || 'body'}_skinned`;
+  body.castShadow = meshes.some((mesh) => mesh.castShadow);
+  body.receiveShadow = meshes.some((mesh) => mesh.receiveShadow);
+  body.frustumCulled = meshes[0]!.frustumCulled;
+  root.add(body);
+  root.updateMatrixWorld(true);
+  body.bind(new Skeleton(bones as Bone[]));
+  for (const mesh of meshes) mesh.geometry.dispose();
+  for (const one of new Set(materials)) one.dispose();
+  return true;
+}
+
+/**
+ * Lo que el cargador hace con cada modelo antes de repartirlo, y lo mismo que
+ * mide `tools/reports/model-draws.ts`: un cuerpo de piezas rígidas que sus
+ * clips mueven se vuelve una malla con esqueleto (`skinRigidBody`); lo que está
+ * hecho de piezas y no se anima se funde por articulación; y las piezas con
+ * esqueleto de un mismo cuerpo, en una.
+ */
+export function prepareModel(id: string, scene: Object3D, clips: readonly AnimationClip[]): void {
+  const skinned = clips.length > 0 && skinRigidBody(scene);
+  if (!skinned && PIECED.has(id)) fuseRigidPieces(scene, clips);
+  fuseSkinnedParts(scene);
+}
+
 export async function loadAssets(options: AssetOptions): Promise<AssetLibrary> {
   const base = options.baseUrl.endsWith('/') ? options.baseUrl : `${options.baseUrl}/`;
   const get = options.fetcher ?? fetch;
@@ -300,8 +431,7 @@ export async function loadAssets(options: AssetOptions): Promise<AssetLibrary> {
           fail(new Error(`Could not parse '${asset.id}': ${error.message}`));
         });
       });
-    if (PIECED.has(asset.id)) fuseRigidPieces(gltf.scene, gltf.animations);
-    fuseSkinnedParts(gltf.scene);
+    prepareModel(asset.id, gltf.scene, gltf.animations);
     loaded.set(asset.id, {
       id: asset.id,
       original: gltf.scene,

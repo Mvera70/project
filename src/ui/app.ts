@@ -56,7 +56,9 @@ import { closeCrossroad, isDeferred, openCrossroad, openDeferred } from './scree
 import { openEpitaph } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
 import { accentFor, playerAnswer, routeCue, sound, speedCue } from './sound';
-import { cellsBetween, mixFor, riverCellsFrom, thunderFor, type WorldSound } from './ambience';
+import { cellsBetween, mixFor, nearness, riverCellsFrom, thunderFor, type WorldSound } from './ambience';
+import { MOMENT_CUE, momentsAudible, momentsFrom } from './moments';
+import type { WorldMoments } from '../render3d/contracts';
 import { valleyAxis } from '@engine/world/valley-road';
 import { floodOf } from '@derive/flood';
 import { festivityOf } from '@derive/festivity';
@@ -848,6 +850,8 @@ export function boot(
   const renderer = { paint: (s2: GameState, f: number): void => backend.live.paint(s2, f, speed),
     track: (id: number | null): void => { backend.live.track(id); } };
   let lastBolts = 0;
+  /** El fotograma anterior de las cuentas del mundo: de su diferencia salen los sucesos que suenan. */
+  let lastMoments: WorldMoments | null = null;
   // Lo último que se ofreció como fondo, para no ofrecer lo mismo cada fotograma.
   let spokenState: string | null = null;
   /** M-0 · el `postedTick` de la oferta que ya está dicha, para no repetirla. */
@@ -890,6 +894,7 @@ export function boot(
       // lado del valle tarda dos segundos y llega hecho un retumbar
       // (`ambience.ts`, `thunderFor`). Sigue siendo decorado del navegador y
       // no una tirada de la partida (§4.3).
+      const world = worldSound(stats);
       if (stats.bolts > lastBolts) {
         lastBolts = stats.bolts;
         const where = document.documentElement.dataset.boltAt?.split(',').map(Number);
@@ -900,16 +905,38 @@ export function boot(
           : SKY.THUNDER_DELAY[1] * SOUND.THUNDER_CELLS_PER_SECOND / 2;
         const { cue, delaySeconds } = thunderFor(cells);
         // El latigazo va con el destello y el trueno después: es lo que hace
-        // que se lean como una misma cosa lejos o encima.
-        if (cue === 'weather_thunder_near') sound.accent('weather_lightning_crack', Date.now());
-        window.setTimeout(() => sound.accent(cue, Date.now()), delaySeconds * 1000);
+        // que se lean como una misma cosa lejos o encima. **Por `sky`, no por
+        // `accent`**: el fusible de los acentos (2,5 s) tiraba siempre el
+        // trueno cercano, que llega a menos de un segundo de su latigazo
+        // (revisión del 30 sep 2026). Y con la misma compuerta que la caza y
+        // el asedio: a ×16 y ×64 una tormenta dura segundos y el trueno sería
+        // un traqueteo, así que el mundo sólo deja sus lechos.
+        if (momentsAudible(world, SOUND.AMBIENCE_FAST_SPEED)) {
+          if (cue === 'weather_thunder_near') sound.sky('weather_lightning_crack', Date.now());
+          window.setTimeout(() => sound.sky(cue, Date.now()), delaySeconds * 1000);
+        }
       }
       // **El fondo del mundo** (fase 1): lo que suena se decide en
       // `ambience.ts`, que es puro; aquí sólo se recoge cómo está el valle.
       const nowMs = Date.now();
       const dtSeconds = lastAmbienceMs === null ? 0 : (nowMs - lastAmbienceMs) / 1000;
       lastAmbienceMs = nowMs;
-      sound.ambience(mixFor(worldSound(stats)), dtSeconds);
+      sound.ambience(mixFor(world), dtSeconds);
+      // **La caza y el asedio** (fase 5): lo que acaba de pasar sale de la
+      // diferencia entre dos fotogramas de `stats.moments` (`moments.ts`, puro),
+      // y cada suceso suena con la cercanía de la cámara. La cuenta se avanza
+      // siempre, se oiga o no: si no, al salir de un ×64 llegaría toda de golpe.
+      const happened = momentsFrom(lastMoments, stats.moments);
+      lastMoments = stats.moments;
+      if (momentsAudible(world, SOUND.AMBIENCE_FAST_SPEED)) {
+        for (const moment of happened) {
+          const cue = MOMENT_CUE[moment.kind];
+          if (cue === null) continue;
+          // Sin sitio se trata como el corazón de la aldea, que es donde se cierra un cerco.
+          const cells = cellsBetween(moment.at ?? { x: state.plaza.x, z: state.plaza.y }, stats.viewCentre);
+          sound.moment(cue, nowMs, nearness(cells, stats.viewHeight));
+        }
+      }
     }
     // UI-R2 · hora, fecha, tira, tendencias, actividad y resumen de órdenes:
     // todo lo que antes eran quince líneas sueltas por fotograma es ahora una
@@ -1510,6 +1537,13 @@ export function boot(
   window.__valleyTimeScale = (value: number): void => { timeScale = Math.max(0.05, Math.min(1, value)); };
   window.__valleyLook = (x: number, y: number): void => { backend.live.look(x, y); };
   window.__valleyHoldTicks = (on: boolean): void => { ticksHeld = on; };
+  /**
+   * El tablón, abierto desde fuera: en el juego sólo se abre tocándolo en el
+   * mundo 3D, y el recorrido del sonido (`tools/ui/sound-check.mjs`) necesita
+   * comprobar que su cierre suena una vez. Por `navigate` y no por
+   * `actions.navigate`: abrirlo así no es un toque y no suena.
+   */
+  window.__valleyOpenBoard = (): void => { navigate({ kind: 'board' }); };
 
   window.__valleyEnd = (cause: string): void => {
     if (state.ended !== null) return;
@@ -1526,6 +1560,45 @@ export function boot(
    * en pie más cercana al centro, por el mismo camino que el motor
    * (`burnBuilding`), y deja la cámara mirándola.
    */
+  /**
+   * **Dónde cae en pantalla la casa en pie más cercana al centro**, en píxeles
+   * del lienzo que se ve. Mismo trato que `__valleyBurn`: el juego no lo llama.
+   * Existe para la reja de interfaz (`tools/shots/valley.shots.ts`), que guarda
+   * que **tocar un edificio abre su ficha**: antes barría el lienzo a ciegas
+   * buscando una casa, y en el servidor, con el 3D por software, cada toque de
+   * más costaba segundos (30 sep 2026). En 3D lo dice la cámara (`screenOf`);
+   * en Canvas el mapa entero va estirado al lienzo, así que es proporción.
+   */
+  window.__valleyHouseOnScreen = (look = false): { x: number; y: number } | null => {
+    const houses = state.buildings.filter((b) => b.lostTick === null && (b.kind === 'house' || b.kind === 'stone_house'));
+    const cx = state.map.width / 2;
+    const cy = state.map.height / 2;
+    const target = houses.sort((a, b) => Math.hypot(a.x - cx, a.y - cy) - Math.hypot(b.x - cx, b.y - cy))[0];
+    if (target === undefined) return null;
+    // Con `look`, la cámara se vuelve antes hacia ella: en una villa de ochenta
+    // años la casa del centro puede caer fuera del encuadre.
+    if (look) backend.live.look(target.x + target.w / 2, target.y + target.h / 2);
+    const box = backend.live.surface.getBoundingClientRect();
+    const guess = backend.live.screenOf({ kind: 'building', id: target.id }) ?? {
+      x: ((target.x + target.w / 2) * box.width) / state.map.width,
+      y: ((target.y + target.h / 2) * box.height) / state.map.height,
+    };
+    // **Y el punto se comprueba con el mismo `pick` que usa el dedo** (30 sep
+    // 2026): la proyección del tejado podía caer en la hierba de al lado y el
+    // recorrido acababa barriendo a ciegas, a segundos por toque. Se busca en
+    // espiral, de cuatro en cuatro píxeles, el primero que el juego reconoce
+    // como un edificio; sólo si no hay ninguno se devuelve la proyección.
+    for (let r = 0; r <= 160; r += 4) {
+      for (let a = 0; a < (r === 0 ? 1 : 16); a++) {
+        const x = guess.x + r * Math.cos((a * Math.PI) / 8);
+        const y = guess.y + r * Math.sin((a * Math.PI) / 8);
+        if (x < 1 || y < 1 || x > box.width - 1 || y > box.height - 1) continue;
+        if (backend.live.pick(state, x, y, lastFraction)?.kind === 'building') return { x, y };
+      }
+    }
+    return guess;
+  };
+
   window.__valleyBurn = (): { x: number; y: number } | null => {
     const houses = state.buildings.filter((b) => b.lostTick === null && (b.kind === 'house' || b.kind === 'stone_house'));
     const cx = state.map.width / 2;
@@ -1655,10 +1728,14 @@ export function boot(
   // una pestaña oculta sigue donde el letargo deje la semana.
   let loopStarted = false;
   const beginLoop = (): void => {
+    // «Graphics»: el tope de fotogramas que eligió el jugador (29 sep 2026).
+    // Se lee al arrancar el bucle y no en cada fotograma, que era leer y
+    // descifrar el almacenamiento del navegador sesenta veces por segundo
+    // (revisión del 30 sep); sólo se elige en la portada, antes de abrir el valle.
+    const frameMs = 1000 / readGraphicsSettings().frameRate;
     loop = startLoop(() => speed, () => { if (!ticksHeld) runTick(); }, paint, () => timeScale,
       loopStarted ? 0 : options.startFraction ?? 0,
-      // «Graphics»: el tope de fotogramas que eligió el jugador (29 sep 2026).
-      () => 1000 / readGraphicsSettings().frameRate);
+      () => frameMs);
     loopStarted = true;
   };
 
@@ -1779,5 +1856,7 @@ declare global {
     __valleyTimeScale?: (value: number) => void;
     __valleyLook?: (x: number, y: number) => void;
     __valleyHoldTicks?: (on: boolean) => void;
+    __valleyOpenBoard?: () => void;
+    __valleyHouseOnScreen?: (look?: boolean) => { x: number; y: number } | null;
   }
 }

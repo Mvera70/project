@@ -36,6 +36,16 @@ export interface Body extends Point {
  * lo mismo haya lo que haya, que es la diferencia entre que la escala importe y
  * que no importe.
  */
+/**
+ * El suelo que pisa la vida.
+ *
+ * **No se modifica después de crearse**: quien lo cambie hace uno nuevo (como
+ * los campos cerrados del ganado o el tráfico de un desvío, que copian). La
+ * vida lo rehace al cambiar el mundo, y `navigate.ts` guarda por objeto las
+ * regiones cerradas de sus búsquedas fallidas (GV-4b): escribir en `blocked` o
+ * en `solids` de uno ya en uso haría que contestara «no hay ruta» a una que ya
+ * existe, sin que nada lo avisara.
+ */
 export interface Terrain {
   readonly width: number;
   readonly height: number;
@@ -177,6 +187,49 @@ export function turnTo(body: Body, heading: number, seconds: number): void {
 /** Lo que hay entre dos puntos, en celdas. */
 export function gap(a: Point, b: Point): number {
   return Math.hypot(a.x - b.x, a.z - b.z);
+}
+
+/**
+ * Revisión del 30 sep 2026 · **Por dónde sale andando un cuerpo estrecho hasta
+ * donde cabe uno ancho**, a no más de `reach` celdas: el camino más corto en
+ * una rejilla de 0,1 celdas por la que pasa un disco de `thin`, hasta el primer
+ * punto donde cabe uno de `wide`. Vacío si ya cabe donde está, null si no hay
+ * tal sitio a su alcance. Lo usa el cazador, que se cuela entre troncos con
+ * 0,22 y vuelve a su vida con la holgura del aldeano (0,32); el sitio libre
+ * más cercano en línea recta podía quedar al otro lado de un muro.
+ */
+export function exitRoute(land: Terrain, at: Point, thin: number, wide: number, reach = 2): Point[] | null {
+  if (fitsCircle(land, at.x, at.z, wide)) return [];
+  const STEP = 0.1;
+  const side = Math.round(reach / STEP) * 2 + 1;
+  const half = (side - 1) / 2;
+  const parent = new Int32Array(side * side).fill(-2);
+  const pointOf = (node: number): Point => ({ x: at.x + ((node % side) - half) * STEP, z: at.z + (Math.floor(node / side) - half) * STEP });
+  const start = half * side + half;
+  parent[start] = -1;
+  const queue = [start];
+  for (let head = 0; head < queue.length; head += 1) {
+    const node = queue[head]!;
+    const here = pointOf(node);
+    if (node !== start && fitsCircle(land, here.x, here.z, wide)) {
+      const route: Point[] = [];
+      for (let back = node; back !== start; back = parent[back]!) route.push(pointOf(back));
+      return route.reverse();
+    }
+    const nx = node % side, nz = Math.floor(node / side);
+    for (let dz = -1; dz <= 1; dz += 1) for (let dx = -1; dx <= 1; dx += 1) {
+      if (dx === 0 && dz === 0) continue;
+      const x = nx + dx, z = nz + dz;
+      if (x < 0 || z < 0 || x >= side || z >= side) continue;
+      const next = z * side + x;
+      if (parent[next] !== -2) continue;
+      const there = pointOf(next);
+      if (!fitsCircle(land, there.x, there.z, thin)) { parent[next] = -3; continue; }
+      parent[next] = node;
+      queue.push(next);
+    }
+  }
+  return null;
 }
 
 /**

@@ -61,7 +61,8 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `plan-audio.md` | **Inventario maestro de audio**: ambiente, interfaz, economía, hitos, fases y asedio. En curso |
 | `plan-audio-mundo.md` | **El sonido del mundo, contra el código**: 80 filas —naturaleza, vida, animales, sucesos, caza y asedio—, el plan en seis fases (§8), lo hecho (§9) y las nueve decisiones que son de Vera (§6). Fases 0 a 2 entregadas; cómo se fabrica un sonido está en la skill `sonido-del-valle` |
 | `agents.md` | Cómo se delega y se audita |
-| `dos-sesiones.md` | Quién toca qué cuando hay dos sesiones a la vez |
+| `dos-sesiones.md` | Quién toca qué cuando hay dos sesiones a la vez (el reparto de 14–17 sep; desde el 30 sep manda la skill `director`) |
+| **`.claude/skills/director/SKILL.md`** | **El índice de las direcciones y sus skills, las fronteras entre ellas y cómo se orquesta una tanda de varias sesiones sin pisarse** |
 
 ## Medidas: evidencia que sigue valiendo — `docs/medidas/`
 
@@ -72,6 +73,7 @@ Las herramientas que las produjeron están en `tools/reports/`.
 |---|---|
 | `medidas/animacion-matriz-2026-09-29.md` | **La matriz de animación (AN-0 a AN-4)**: 24 clips humanos, 15 especies y la golondrina, con origen, situación en partida, evidencia, defecto, gravedad, coste y decisión; línea de base y «después» de cada fase (cadencia, apoyo, plantado, rumbo, mezclas, gestos, combate) y los veredictos de AN-4 |
 | `medidas/animacion-tomas-2026-09-29.md` | **El índice de las tomas de la ronda AN**: cada toma del observatorio con semilla, año, lead, fps, viewport, cámara y escenario, y las hojas de gestos |
+| `medidas/fusion-cuatro-ramas-2026-09-29.md` | **La fusión de las cuatro ramas del 29 sep** (animación AN-0…AN-5, modelos de animales, gráficos GV, sonido): esquema de qué trajo cada una, cómo combinan y los huecos entre ellas repartidos por dueño |
 | `medidas/findings-drama.md` | Los dos sistemas del motor que no se disparaban nunca (13 sep). **La medida sigue valiendo**; el plan de arreglarla, no |
 | `medidas/rey-medida.md` | Qué llegó y qué no de la fase del rey (K-6) |
 | `medidas/spatial-engine.md` | Cierre real, accesos y trazado en cuatro semillas; límites y reproducción |

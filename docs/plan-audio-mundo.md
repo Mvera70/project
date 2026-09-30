@@ -465,6 +465,12 @@ las espadas (no hay) y el sonido de sangre (decisión 7).
 
 ## 9 · Lo que ya quedó hecho de este plan
 
+- **Fase 5, primera vuelta** (30 sep 2026): el contrato de sucesos
+  (`GraphicsStats.moments`, `ui/moments.ts`) y siete sonidos de ruido que se
+  apaga (0–12 ms de resonancia). Los de la primera tanda se descartaron
+  («juguetes, timbales»). **Sin oír todavía**: los elige el criterio de quien
+  los hace, por delegación de Vera. Sin cuerno, sin material del muro, sin
+  sangre y el oso sin gruñido.
 - **Pestaña oculta** (30 sep 2026): el contexto se suspende al ocultarla y se
   reanuda al volver; con la pestaña oculta `start()` no suena. La fase 5
   sigue abierta, y por ahí pasa el contrato de sucesos de caza y combate.
@@ -488,7 +494,11 @@ las espadas (no hay) y el sonido de sangre (decisión 7).
   «se salva a medias, fondo muy raro»). **El bullicio espera grabaciones o
   voces generadas** —no se vuelve a sintetizar—; la hoguera se rehará sin el
   lecho de ruido bajo los chasquidos. Los umbrales de población medidos
-  (`SOUND.MURMUR_*`) se quedan para entonces.
+  —el rumor entra con 4 personas y llena con 18; el segundo lecho entra con
+  28 y llena con 60 (`founding-report.ts`, semillas 7, 23, 42, 108, 999 y
+  2024)— se quedan apuntados aquí para entonces: vivían en `SOUND.MURMUR_*`
+  sin que nadie los leyera y la revisión del 30 sep 2026 los retiró del
+  código.
 - **El botón corriente suena** (29 sep 2026): `ui_button_press` y
   `ui_button_release`, el sello de cera que Vera eligió («Eligo el K»). Lo
   llevan todos los botones **menos los que ya tienen voz propia**, listados en

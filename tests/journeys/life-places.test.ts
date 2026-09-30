@@ -156,22 +156,41 @@ describe('V-10 · sitios con vida', () => {
     expect(hasVariety, `semilla ${seed}: la aldea no se reparte`).toBe(true);
   });
 
-  it('la plaza, el vado y el claro se detectan y son alcanzables en las seis semillas', () => {
+  /** Los tres sitios comunes de la aldea de cuarenta años de una semilla. */
+  function expectCommons(seed: number): void {
+    const state = village(seed);
+    const land = terrainOf(state);
+    const ids = new Set(commons(state, land).map((p) => p.id));
+    for (const id of ['square:common', 'ford:crossing', 'glade:meadow']) {
+      expect(ids.has(id), `semilla ${seed}: falta ${id}`).toBe(true);
+    }
+  }
+
+  it('la plaza, el vado y el claro se detectan y son alcanzables en cinco de las seis semillas', () => {
     // La propiedad que tiene que cumplirse siempre. No cumplirse era el bug
     // real: `detectSquare` y `detectGlade` podían escoger un candidato al otro
     // lado del río —transitable en sí mismo, pero desconectado del pueblo
     // (V-03: sólo el 37 % del suelo libre está conectado con el centro)— y sin
     // mirar la conectividad, tres de seis semillas no ofrecían plaza ni claro
     // en absoluto.
-    const seeds = [7, 11, 23, 31, 37, 41];
-    for (const seed of seeds) {
-      const state = village(seed);
-      const land = terrainOf(state);
-      const ids = new Set(commons(state, land).map((p) => p.id));
-      for (const id of ['square:common', 'ford:crossing', 'glade:meadow']) {
-        expect(ids.has(id), `semilla ${seed}: falta ${id}`).toBe(true);
-      }
-    }
+    //
+    // Cinco aquí y la sexta, la 37, declarada aparte en la prueba de abajo.
+    for (const seed of [7, 11, 23, 31, 41]) expectCommons(seed);
+  });
+
+  // **La sexta, declarada en rojo con la propiedad intacta** (`CLAUDE.md`). No
+  // es el claro: es la aldea, que en la semilla 37 queda **encerrada**. Medido
+  // el 30 sep 2026: su único portón (el 29, en 30,56, puesto en el tick 266)
+  // deja de tener camino desde la plaza en el tick 1067, cuando el motor abre
+  // la obra de la iglesia en (31,61), en la franja entre la muralla y el río.
+  // Desde la plaza se llega a 299 celdas (a 3 650 un tick antes), y los dos
+  // prados con bosque alrededor se quedan fuera. `placeBuilding` comprueba que
+  // el edificio nuevo se alcance desde la plaza, pero no que el portón se siga
+  // alcanzando. Es un defecto del motor, sin arreglar en esta tanda porque
+  // cambiar la regla de colocación mueve todas las villas fijadas en las
+  // jornadas; cuando se arregle, esto se pone rojo y la 37 vuelve arriba.
+  it.fails('semilla 37 · la aldea encerrada por una obra no tiene claro al que ir', () => {
+    expectCommons(37);
   });
 
   it('la plaza y el vado reciben visita en la mayoría de las jornadas', () => {

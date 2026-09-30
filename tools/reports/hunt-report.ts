@@ -31,6 +31,7 @@ import { createContactWorld, type ContactWorld } from '../../src/render3d/life/p
 import { standingOf } from '../../src/render3d/life/hunt-bodies';
 import { createWildPrey, type WildKind, type WildPrey } from '../../src/render3d/life/wild-prey';
 import { createBear } from '../../src/render3d/life/bear';
+import { createDeer } from '../../src/render3d/life/deer';
 import { fitsCircle, type Body, type Terrain } from '../../src/render3d/life/body';
 import { solidTerrain } from '../../src/render3d/world/obstacles';
 import { elevationAt } from '../../src/render3d/world/ground';
@@ -56,9 +57,15 @@ interface Tally {
   killed: number; wounded: number; clean: number; hits: number; shots: number; steps: number; runs: number;
   /** AN-5 · Qué tocó cada tiro o estocada: el pecho, el cuarto trasero, de refilón, algo de pie, el suelo o nada. */
   strokes: Record<'hit' | 'wound' | 'graze' | 'standing' | 'ground' | 'miss', number>;
+  /**
+   * RV-3b · Los valles en que la presa no pudo nacer, por semilla. Antes se
+   * saltaban en silencio, y las filas del ciervo y del jabalí eran de dos
+   * valles de cinco sin que el informe lo dijera.
+   */
+  missing: Set<number>;
 }
 const empty = (): Tally => ({ killed: 0, wounded: 0, clean: 0, hits: 0, shots: 0, steps: 0, runs: 0,
-  strokes: { hit: 0, wound: 0, graze: 0, standing: 0, ground: 0, miss: 0 } });
+  strokes: { hit: 0, wound: 0, graze: 0, standing: 0, ground: 0, miss: 0 }, missing: new Set() });
 
 /** Corre un encuentro hasta su parte, contando los tiros que salen. */
 function play(encounter: HuntEncounter, wildlife: () => readonly Animal[], tally: Tally): void {
@@ -160,22 +167,24 @@ function valley(species: HuntSpecies, weapon: HuntWeapon, places: readonly Valle
       let den: { x: number; z: number } | null = null;
       if (species === 'partridge' || species === 'rabbit' || species === 'boar') {
         wild = createWildPrey(state, land, seed, heart, species);
-        if (wild === null) continue;
+        if (wild === null) { tally.missing.add(state.seed); continue; }
       } else if (species === 'deer') {
-        // El ciervo del juego vive en el borde del bosque: donde el juego pondría un jabalí.
-        const spot = createWildPrey(state, land, seed, heart, 'boar');
-        if (spot === null) continue;
-        animal = { id: 40_000, kind: 'deer', x: spot.body.x, y: spot.body.z };
+        // RV-3b · El ciervo, donde lo pone el juego (`createDeer`, la vida de la
+        // aldea). Antes se ponía donde nacería un jabalí, y con él faltaba en
+        // los mismos valles.
+        const found = createDeer(state, land, seed, heart)[0];
+        if (found === undefined) { tally.missing.add(state.seed); continue; }
+        animal = { id: found.body.id, kind: 'deer', x: found.body.x, y: found.body.z };
       } else {
         const visiting = { ...state, flags: { ...state.flags, bear: state.tick + 2, 'hunt:boar': 0 } } as GameState;
         const bear = createBear(visiting, land, heart, ground);
-        if (bear === null) continue;
+        if (bear === null) { tally.missing.add(state.seed); continue; }
         animal = { id: 50_000, kind: 'bear', x: bear.clearing.x, y: bear.clearing.z };
         den = bear.mouth;
       }
       const encounter = createHuntEncounter(state, land, species, weapon, ground,
         animal === null ? [] : [animal], seed, den, true, { hunter, prey: wild, world });
-      if (encounter === null) continue;
+      if (encounter === null) { tally.missing.add(state.seed); continue; }
       const fixed = animal;
       play(encounter, () => (fixed === null ? [] : [fixed]), tally);
     }
@@ -189,7 +198,8 @@ function line(label: string, tally: Tally): string {
   const { hit, wound, graze, standing, ground, miss } = tally.strokes;
   return `${label.padEnd(16)} ${String(tally.runs).padStart(4)}   ${percent(tally.killed, tally.runs)} %   ${percent(tally.wounded, tally.runs)} %   ${percent(tally.clean, tally.runs)} %`
     + `   ${(tally.hits / runs).toFixed(2).padStart(5)}   ${(tally.shots / runs).toFixed(1).padStart(5)}   ${(tally.steps / runs * LIFE_STEP).toFixed(1).padStart(6)}`
-    + `   ${hit}/${wound}/${graze}/${standing}/${ground}/${miss}`;
+    + `   ${hit}/${wound}/${graze}/${standing}/${ground}/${miss}`
+    + (tally.missing.size === 0 ? '' : `   sin presa en ${[...tally.missing].join(', ')}`);
 }
 
 const header = `${'especie · arma'.padEnd(16)} ${'cazas'.padStart(4)}   cobrada  malherida  ilesa   golpes  tiros  segundos   pecho/trasero/roce/de pie/suelo/aire`;

@@ -136,6 +136,33 @@ describe('G-05 · el reloj de presentación', () => {
     expect(back.deltaSeconds).toBe(0);
   });
 
+  it('un fotograma que tarda en pintarse no es una ausencia, y no encadena otra', () => {
+    // GV-4 · la villa 7/60 se quedaba a 3,8 s por fotograma para siempre:
+    // montar la vida tardaba más de un segundo, el hueco hasta el fotograma
+    // siguiente pasaba del umbral de ausencia, la ausencia rehacía la vida…
+    // Lo que se guarda: con el pintado declarado, un fotograma de 1,5 s de
+    // trabajo y 16 ms de descanso sigue siendo continuo, una y otra vez.
+    const clock = createPresentationClock();
+    const input = (realMs: number) => ({
+      realMs, tick: 1, tickFraction: (realMs % TIME.REAL_MS_PER_TICK) / TIME.REAL_MS_PER_TICK,
+      speed: 1 as const, reducedMotion: false, hidden: false,
+    });
+    clock.frame(input(0));
+    clock.painted(1_500);
+    let at = 1_516;
+    for (let n = 0; n < 5; n += 1) {
+      const frame = clock.frame(input(at));
+      expect(frame.discontinuity, `fotograma ${n}`).toBe(false);
+      expect(frame.deltaSeconds).toBeGreaterThan(0);
+      clock.painted(at + 1_500);
+      at += 1_516;
+    }
+    // Y la ausencia de verdad sigue siéndolo: nadie pintó en dos segundos.
+    clock.painted(at - 1_516 + 20);
+    const back = clock.frame(input(at + 2_000));
+    expect(back.discontinuity).toBe(true);
+  });
+
   it('un fotograma lento avanza lo que puede, no lo que le falta', () => {
     // Cuatrocientos milisegundos de fotograma son 0,4 s escénicos a ×1, y el
     // paso se recorta a `MAX_STEP_SECONDS`: lo que se acota es **cuánto andan

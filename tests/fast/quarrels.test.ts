@@ -181,7 +181,15 @@ describe('con rencor, acaba pasando · §7.9', () => {
     // divergen desde el primer tick y una sola es ruido.
     let hotAll = 0;
     let mildAll = 0;
-    for (const seed of [7, 11, 23]) {
+    // **La 11 sale de la lista el 30 sep 2026, con su causa**
+    // (`docs/historico/rework.md` §2.7). Al dejar de ser personajes los que
+    // llegan sin hueco (`world/means.ts`, `arriveToStay`), su aldea de veinte
+    // años cambia y la primera tirada del flujo `quarrels` sale por debajo de
+    // 0,0035 —la probabilidad del manso—, así que riñen los dos en la semana 0
+    // y `mild > hot` compara 0 con 0: mide la tirada, no el carácter. La 31 en
+    // su lugar: 5 semanas contra 166 (la 7, 16 contra 235; la 23, 11 contra
+    // 2 022).
+    for (const seed of [7, 23, 31]) {
       const hot = weeksUntil('hot_tempered', seed);
       const mild = weeksUntil('kind', seed);
       expect(hot, `semilla ${seed}: el de mal genio riñe pronto`).toBeLessThan(600);

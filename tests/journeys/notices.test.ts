@@ -59,7 +59,18 @@ describe('los avisos sobre el valle · §11.6', () => {
       .toBeLessThan(1 / 3);
   });
 
-  it('y el valle no habla catorce veces al año', () => {
+  // **Roja a propósito y declarada** (`CLAUDE.md`: «las jornadas rojas… quedan
+  // dos, rojas a propósito y declaradas —la de los catorce avisos…—»; cuaderno,
+  // «Las jornadas rojas», punto 10: el peso de los avisos es decisión del
+  // dueño). Hasta hoy estaba escrita como `it` y ponía roja la suite de
+  // jornadas sin decirlo en el código; ahora lo dice. Lo que habla son los
+  // sucesos de R-1 —`fate.*` en los doce primeros puestos, remedido el 18 sep
+  // con 16,2 al año; 17,4 el 28 sep— y no una voz semanal, que es lo que la
+  // prueba de arriba vigila y pasa. Medido el 30 sep 2026: la semilla 7 da
+  // **14,7 avisos al año** contra la cota de seis. La cota no se toca: cuando
+  // el dueño decida cuánto habla el valle, esto se pone rojo y se quita el
+  // `.fails`.
+  it.fails('y el valle no habla catorce veces al año', () => {
     // El otro lado de lo mismo, dicho en el ritmo que el jugador siente. Antes
     // del arreglo el valle hablaba **ciento treinta y dos veces al año**; lo
     // medido ahora, en las cinco semillas canónicas y cuarenta años, son 107,

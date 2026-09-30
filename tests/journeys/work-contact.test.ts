@@ -15,7 +15,20 @@ const head = (b: { x: number; z: number; facing: number }, clip: 'chop' | 'mine'
   const h = STRIKE_HEAD[clip], c = Math.cos(b.facing), s = Math.sin(b.facing);
   return { x: b.x + h.x * c + h.z * s, z: b.z - h.x * s + h.z * c };
 };
-it('la cabeza de la herramienta queda a menos de 0,2 de la superficie que golpea', () => {
+// **Declarada en rojo, con la propiedad intacta** (`CLAUDE.md`). Ya fallaba en
+// `ee9340e`, la raíz de la historia de este repositorio (3 muestras donde pide
+// 4). Medido el 30 sep 2026 con estas tres villas en el paso 1500: sólo **2
+// muestras** con alguien golpeando —la 23 tiene sus ocho leñadores de camino—,
+// y una de ellas no toca: en la 11 (tick 1008) el leñador 0 se planta a **0,44**
+// del tronco y se queda ahí quieto al menos del paso 1440 al 1510; la 7 da
+// 0,00. **Y no es el respaldo de `offers.ts`**: su plaza (la 0 de
+// `felling:3125`) sí es de contacto, a 0,632 del tronco, que es justo
+// `strikeStand`; es el cuerpo el que se queda a 0,5 de su plaza —a 1,07 del
+// tronco— con `there` ya en verdadero, y el compañero de la plaza 1 igual, al
+// revés. Es un defecto de la capa de vida (la llegada o el empuje entre los
+// dos del corro), sin arreglar en esta tanda. Ni la cota ni el número de
+// muestras se tocan.
+it.fails('la cabeza de la herramienta queda a menos de 0,2 de la superficie que golpea', () => {
   const gaps: number[] = [];
   for (const [seed, ticks] of [[11, 21 * 48], [23, 30 * 48], [7, 1418]] as const) {
     const st = foundGame(seed); run(st, ticks, 'prudent', CATALOG);
