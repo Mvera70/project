@@ -341,6 +341,13 @@ export function createSoundEngine(): SoundEngine {
   const bytes = new Map<string, Promise<ArrayBuffer | null>>();
   /** Lo decodificado, que es lo que pesa: un lecho son megas y se suelta. */
   const buffers = new Map<string, Promise<AudioBuffer | null>>();
+  /**
+   * Lo mismo, ya resuelto: lo que se puede tocar **en el acto**. Una promesa,
+   * aunque esté cumplida, sólo suena cuando acaba el trabajo en curso, y la
+   * respuesta a una oferta se pide dentro del tick: con el relevo de jornada
+   * detrás pasaba de `LATE_PLAY_MS` y se tiraba siempre (30 sep 2026).
+   */
+  const ready = new Map<string, AudioBuffer>();
   /** Cuándo falló por última vez cada fichero, para no pedirlo en ráfaga. */
   const failedAt = new Map<string, number>();
   /** Una capa viva: su bucle, su ganancia, a qué volumen va y cuánto lleva callada. */
@@ -400,7 +407,11 @@ export function createSoundEngine(): SoundEngine {
       : raw.then((data) => (data === null ? null : context.decodeAudioData(data.slice(0)).catch(() => null)));
     buffers.set(cue, pending);
     // Un `null` no se queda guardado: la próxima vez se vuelve a intentar.
-    void pending.then((buffer) => { if (buffer === null && buffers.get(cue) === pending) buffers.delete(cue); });
+    void pending.then((buffer) => {
+      if (buffers.get(cue) !== pending) return;
+      if (buffer === null) buffers.delete(cue);
+      else ready.set(cue, buffer);
+    });
     return pending;
   };
 
@@ -415,6 +426,7 @@ export function createSoundEngine(): SoundEngine {
     }
     live.gain.disconnect();
     buffers.delete(layer);
+    ready.delete(layer);
   };
 
   /** Los sucesos del mundo que suenan ahora mismo (`SOUND.MAX_WORLD_VOICES`). */
@@ -428,7 +440,7 @@ export function createSoundEngine(): SoundEngine {
     if (ctx.state !== 'running') void ctx.resume().catch(() => undefined);
     const context = ctx;
     const out = master;
-    void decoded(cue).then((buffer) => {
+    const play = (buffer: AudioBuffer | null): void => {
       if (buffer === null || !isEnabled()) return;
       // Un sonido que llega tarde a su toque se lee como un fallo, no como
       // una respuesta (`SOUND.LATE_PLAY_MS`).
@@ -459,7 +471,11 @@ export function createSoundEngine(): SoundEngine {
         if (log.played.length > 64) log.played.splice(0, log.played.length - 64);
         window.__valleySound = log;
       }
-    });
+    };
+    // Ya decodificado, suena ahora mismo; si no, cuando termine de estarlo.
+    const now = ready.get(cue);
+    if (now !== undefined) play(now);
+    else void decoded(cue).then(play);
   };
 
   const arm = (): void => {

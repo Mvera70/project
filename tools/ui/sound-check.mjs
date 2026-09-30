@@ -66,7 +66,12 @@ async function step(name, expect, act, forbidden, waitMs = 500) {
   // con swiftshader eso ronda ya el medio segundo: esos pasos esperan más.
   await tab.waitForTimeout(waitMs);
   const after = await played();
-  const heard = after.slice(before).map((p) => (p.rate === 1 ? p.cue : `${p.cue}@${p.rate}`));
+  // Sólo la interfaz: el cielo y la caza suenan solos desde que el trueno
+  // cercano suena (30 sep 2026), y un rayo que cae en mitad de un paso no es
+  // el toque que se está midiendo.
+  const heard = after.slice(before)
+    .filter((p) => !/^(weather|combat)_/.test(p.cue))
+    .map((p) => (p.rate === 1 ? p.cue : `${p.cue}@${p.rate}`));
   const matches = (want) => heard.some((cue) => cue === want || cue.startsWith(`${want}@`));
   const once = forbidden === ONCE;
   const ok = (expect === null ? heard.length === 0 : matches(expect))

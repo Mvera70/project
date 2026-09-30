@@ -137,6 +137,25 @@ describe('el cielo · el trueno cercano suena detrás de su latigazo', () => {
   });
 });
 
+describe('en el acto · lo ya decodificado no espera al trabajo en curso', () => {
+  it('un toque pedido en mitad de un tick largo empieza antes de que el tick acabe', async () => {
+    // La respuesta a una oferta se pide dentro del tick, y detrás viene el
+    // repintado con el relevo de jornada. Si el sonido esperase a que eso
+    // acabe, pasaría de `LATE_PLAY_MS` y se tiraría: pasaba siempre.
+    let now = 1_000_000;
+    vi.spyOn(Date, 'now').mockImplementation(() => now);
+    const engine = createSoundEngine();
+    engine.arm();
+    await settle();
+    engine.tap('ui_offer_accept', now);
+    // Sin soltar el hilo: lo que sigue en el mismo tick todavía no ha acabado.
+    expect(played()).toEqual(['ui_offer_accept']);
+    now += SOUND.LATE_PLAY_MS * 4;
+    await settle();
+    expect(played()).toEqual(['ui_offer_accept']);
+  });
+});
+
 describe('el tope de voces · una salva no satura', () => {
   // Diez golpes distintos a la vez: el fusible por sonido no los separa,
   // porque cada uno es otro sonido.
