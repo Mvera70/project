@@ -290,7 +290,8 @@ hoy 1,53–1,61 s**, un 12–17 % más. Entre AN y hoy el motor no cambió (sól
 constantes de sonido en `balance.ts`); lo que lo movió está entre el 27 y el
 29 sep. El revisor de reglas lo encontró en el perfil: `wearValleyRoad`
 (`valley-road.ts`, paso 14) **recalcula las dos rutas de las bocas a la plaza
-cada semana**, 0,5–0,8 ms por llamada, el 18 % del tick. Es la roja de
+cada semana**, 0,5–0,8 ms por llamada, el 18 % del tick (el resto de la
+subida es más gente en el valle). Es lo que más pesa en la roja de
 `save.test.ts:304` en la CI (2,8–3,0 s contra 2 s) y lo que paga un teléfono
 al volver a la partida. Recalcularla sólo cuando cambia el mapa lo quita.
 
