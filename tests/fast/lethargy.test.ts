@@ -9,7 +9,7 @@ import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
 import { ticksOwed } from '@engine/save';
-import { checkpointSavedAtMs, runBatch } from '@ui/lethargy';
+import { checkpointSavedAtMs, finished, runBatch } from '@ui/lethargy';
 
 describe('runBatch · §13.2, §11.4', () => {
   it('nunca corre más de un lote de 64 ticks de una vez', () => {
@@ -72,6 +72,18 @@ describe('runBatch · §13.2, §11.4', () => {
     expect(state.tick).toBe(tickBefore);
     expect(progress.done).toBeLessThan(960);
     expect(Number.isInteger(progress.done)).toBe(true);
+  });
+});
+
+describe('RD-2 · una ausencia que para también termina', () => {
+  it('un letargo parado cuenta como terminado para quien lo espera', () => {
+    // La app tenía su propia condición de fin (`done >= total || ended`) y un
+    // letargo parado en un aviso de asalto no la cumplía: el juego se quedaba
+    // recuperando para siempre, sin parte y sin bucle (CI de la PR #21).
+    expect(finished({ done: 431, total: 960, ended: false, halted: 'raid' })).toBe(true);
+    expect(finished({ done: 0, total: 960, ended: false, halted: 'ending' })).toBe(true);
+    expect(finished({ done: 431, total: 960, ended: false, halted: null })).toBe(false);
+    expect(finished({ done: 960, total: 960, ended: false })).toBe(true);
   });
 });
 

@@ -44,7 +44,7 @@ import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom, type BackendHandle } from './backend';
 import { persistSave } from './idb';
 import { recogniseGesture, type Point } from './gestures';
-import { checkpointSavedAtMs, runLethargy } from './lethargy';
+import { checkpointSavedAtMs, finished as lethargyFinished, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
 import { readGraphicsSettings } from './graphics-settings';
 import { startStormedTransition, type StormedTransition } from './stormed-transition';
@@ -1756,7 +1756,7 @@ export function boot(
     runLethargy(state, elapsedMs, (progress) => {
       savedAtOverride = checkpointSavedAtMs(Date.now(), progress);
       paint(0);
-      if (progress.done >= progress.total || progress.ended) {
+      if (lethargyFinished(progress)) {
         catchingUp = false;
         if (state.ended !== null) finish();
         else {

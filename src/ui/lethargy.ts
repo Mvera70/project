@@ -17,7 +17,13 @@ export interface LethargyProgress {
   halted?: RestHalt | null;
 }
 
-function finished(p: LethargyProgress): boolean {
+/**
+ * Whether a catch-up is over: every week paid, the village ended, or the rest
+ * halted (RD-2). **The only definition** — `app.ts` used to keep its own
+ * (`done >= total || ended`), and a halted absence left the game catching up
+ * for ever, with neither the welcome nor the loop (CI, PR #21).
+ */
+export function finished(p: LethargyProgress): boolean {
   return p.done >= p.total || p.ended || (p.halted ?? null) !== null;
 }
 
@@ -63,7 +69,7 @@ export interface Lethargy {
  * `requestAnimationFrame`, so the tab never blocks in one long synchronous
  * stretch and the valley can be seen filling in rather than freezing then
  * jumping. `onProgress` fires after every batch, including the last —
- * `progress.done >= progress.total || progress.ended` is how the caller knows
+ * `finished(progress)` is how the caller knows
  * it is over.
  *
  * No decision is ever made here. A pending crossroad stays exactly as it was
