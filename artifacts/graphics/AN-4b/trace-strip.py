@@ -23,7 +23,7 @@ from collections import Counter
 
 from PIL import Image, ImageDraw
 
-COMBAT = {'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall', 'flee'}
+COMBAT = {'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'spear_thrust_high', 'spear_thrust_low', 'hit_take', 'fall', 'flee'}
 
 
 def load(take):

@@ -61,7 +61,7 @@ se monta con `?aa=fxaa`. El sonido compila contra `day-phases.ts` y
 ## 4 · Huecos, por dueño
 
 **Arreglado después**: Sonido 3 y 7, por la rama del sonido (v5.21, PR #9); y en
-la misma PR que este papel (v5.25), Animación 2,
+la misma PR que este papel (v5.34), Animación 2,
 Gráficos 1 (los enlaces del encargo; los de la revisión estaban bien, porque
 ella misma explica que no existen y `foot-shadows.ts` es un módulo propuesto) y
 el orden del changelog y del cuaderno. Lo demás sigue abierto.

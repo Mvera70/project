@@ -41,7 +41,13 @@ const CSS = `
   --nail: url(${nail}); --nail-bent: url(${nailBent}); --chip-cost: url(${chipCost}); --res-silver: url(${resSilver}); }
 /* Entre la cabecera y la barra, como en la lámina v8: ni tapa las cifras ni la
    navegación. --ui-hud-height lo publica la cabecera (hud.ts). */
+/* **Recibe los toques a propósito.** Cuelga de \`.ui-shell\`, que los deja pasar
+   al valle (\`pointer-events: none\`, y se hereda): sin esto el lienzo 3D se
+   comía el aspa, los avisos y el velo, y el tablón no se podía cerrar ni usar
+   tocando. Lo encontró el recorrido del sonido el 30 sep 2026 («canvas
+   #valley3d intercepts pointer events»), igual que la bandeja en shell.css. */
 .valley-board-veil { position: fixed; inset: 0; z-index: 20; display: grid; place-items: start center;
+  pointer-events: auto;
   padding: calc(var(--ui-hud-height, 104px) + 10px) 12px calc(86px + env(safe-area-inset-bottom, 0px));
   background: rgba(20, 12, 6, .42); animation: valley-board-in .18s ease-out; }
 @keyframes valley-board-in { from { opacity: 0; } to { opacity: 1; } }

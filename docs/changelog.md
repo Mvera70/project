@@ -1,6 +1,6 @@
 # The Valley — Registro de cambios
 
-## v5.26 · 30 sep 2026 · GV-4: el bucle de la villa, roto — un fotograma lento ya no es una ausencia
+## v5.35 · 30 sep 2026 · GV-4: el bucle de la villa, roto — un fotograma lento ya no es una ausencia
 
 Vera abrió el sitio con las cuatro ramas dentro en su tablet: la aldea 11/21 a
 57 fps y 11 ms por fotograma, y la villa 7/60 a 0 fps, 2 264 ms por fotograma y
@@ -39,7 +39,7 @@ una villa tarda más de un segundo en una tablet. Sin salida.
   equivalencia), baja `createVillage` 7/60 de 3,2 s a 0,15–0,22 s con la misma
   vida byte a byte en cuatro valles.
 
-## v5.25 · 30 sep 2026 · La fusión de las cuatro ramas, revisada, y lo fácil arreglado
+## v5.34 · 30 sep 2026 · La fusión de las cuatro ramas, revisada, y lo fácil arreglado
 
 Vera pidió revisar cómo quedaron juntas animación, modelos de animales,
 gráficos GV y sonido después de entrar las cuatro en una noche. El esquema y
@@ -60,6 +60,301 @@ del sonido en v5.21. Lo demás fácil, aquí:
   dejan **16–27 mallas por animal** (antes 1). Con la misma escena, la villa 7/60
   pasa de 500 a 964 llamadas de dibujo y la aldea 11/21 de 440 a 649. El papel
   decía «Modelos 3D: nada urgente»; ya no.
+
+## v5.32 · 30 sep 2026 · La respuesta a una oferta vuelve a sonar
+
+Tras la #14, el recorrido del sonido encontró muda la respuesta a una oferta
+aceptada, también en el `main` de antes de la #14. La oferta **sí** se
+aceptaba; lo que se perdía era su sonido. Se pide dentro del tick, y el
+reproductor, aun con el fichero ya decodificado, lo hacía sonar en una
+promesa, es decir, **después** de todo el trabajo síncrono del tick y del
+repintado. Con el relevo de jornada detrás eso pasa de `SOUND.LATE_PLAY_MS` y
+se tiraba siempre. Ahora lo ya decodificado suena en el acto
+(`sound-player.test.ts`, «en el acto», falla con el reproductor de antes).
+
+Y el recorrido cuenta sólo la interfaz en cada paso: desde que el trueno
+cercano suena, un rayo que caía en mitad de «silenciar el valle» lo ponía rojo.
+Recorrido 35/35 · 8/8, dos pasadas.
+
+## v5.31 · 30 sep 2026 · El sonido, arreglado tras la revisión: el trueno cercano, los botones que sonaban dos veces y la memoria
+
+Encargo de Vera sobre lo que la revisión del 30 sep encontró en el sonido
+(`docs/medidas/revision-rendimiento-2026-09-30.md` §6 y §7). **No cambia cómo
+suena nada**: cambia qué llega a sonar y lo que cuesta.
+
+- **El trueno cercano suena.** Latigazo y trueno iban por `sound.accent` y su
+  fusible de 2,5 s tiraba el trueno, que llega ≤ 0,71 s después: con la
+  cámara en el corazón del valle, el 60–70 % de los rayos. Ahora van por
+  `sound.sky`, con su fusible por sonido, y pasan por la compuerta de
+  velocidad del mundo: a ×16 y ×64 no suenan, como la caza y el asedio.
+- **Cada botón suena una vez.** Nueve botones que navegan por
+  `actions.navigate` sonaban a sello y además a `routeCue`: los cinco de la
+  revisión y cuatro más —el cierre de la bandeja, que es el que de verdad se
+  toca en la crónica, el carro, la gente y la ficha (el de la crónica y el del
+  carro están ocultos), el nombre enlazado, la carta sellada y los dos cierres
+  de la portada—. Entran en `OWN_VOICE`.
+- **La memoria.** Un lecho decodificado son 2,3 MB (30,7 MB los catorce a
+  48 kHz) y no se soltaba ninguno. Ahora se suelta el que lleva 30 s callado
+  (`SOUND.AMBIENCE_RELEASE_SECONDS`) y todos al apagar; con el sonido apagado
+  no se descarga, no se crea el contexto y no se decodifica nada.
+- **Sin red.** El service worker precachea los 47 ficheros
+  (`public/audio/manifest.json`, que escribe `sounds.py --stamp`), y un fallo
+  de descarga se vuelve a pedir pasados 30 s (`SOUND.FETCH_RETRY_MS`) en vez
+  de quedarse como `null` para siempre.
+- **Lo muerto y lo viejo.** `SOUND.MURMUR_*` sale del código (los umbrales,
+  apuntados en `plan-audio-mundo.md`); la cabecera de `sound.ts`, la SKILL §2,
+  §6 y §8 y design §10.7, §11.10 y §11.11 dicen lo que hay.
+- **Medido.** Los acentos de la interfaz salen en el 0,7–1,2 % de las semanas
+  (cinco semillas, sesenta años), con una semana como mínimo entre dos —13 s a
+  ×64—, así que no necesitan compuerta de velocidad: el fusible basta.
+- **Un tope de voces para el mundo** (`SOUND.MAX_WORLD_VOICES`, 8): el
+  fusible por sonido no impide que siete golpes **distintos** se apilen en la
+  salva de un asalto. Los toques del jugador no cuentan ni se descartan. Sin
+  medir contra un asalto real.
+- **Fuera del sonido: el tablón no recibía toques.** Su velo cuelga de
+  `.ui-shell`, que deja pasar los toques al valle, y no lo reactivaba: el
+  lienzo 3D se comía el aspa, los avisos y el velo, así que no se podía
+  cerrar ni mandar a nadie tocando. Lo encontró el recorrido al cerrar el
+  tablón; una línea en `board.ts`.
+- **Probado.** `tests/fast/sound-player.test.ts` ejercita por fin el
+  reproductor con un `AudioContext` simulado (seis de sus pruebas fallan
+  contra el de antes); el recorrido `sound-check.mjs` exige «una vez» en cada
+  cierre y vuelta, cierra el tablón (gancho `__valleyOpenBoard`), deja
+  decodificar tras armar y reintenta el ambiente en vez de esperar a ciegas:
+  **35/35 toques y 8/8 ambiente** en Chromium, tres pasadas seguidas. Y
+  `valley.pwa.ts` comprueba el sonido sin red tras una sola visita.
+
+## v5.30 · 30 sep 2026 · La caza, tras la revisión: el jabalí en la linde, el cazador que sale andando y la caza sin picos
+
+La revisión del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md` §7,
+en la rama `claude/revision-rendimiento-2026-09-30`; fila RV-3b) encontró
+cuatro cosas de AN-5 y se encargaron por orden de Vera. Todo en la capa de
+vida y el render: **el motor no cambia**.
+
+- **RV-3b · el jabalí nace en la linde** (`life/wild-prey.ts`). Sólo valía el
+  bosque, y el juego pone un tronco en cada celda de bosque: con los troncos
+  del juego no nacía en ningún valle de fundación ni en 11, 23 y 5 al año 30
+  (0 de 20), y sin jabalí cazado no hay oso. Vale también la pradera pegada al
+  bosque, como la guarida de AN-4c: ahora nace en todos (20 de 20). **Y la caza
+  del jabalí se ofrece en la partida donde antes no**: la toma 33/22 de AN-5
+  daba «no-prey» y ahora arranca (`artifacts/graphics/RV-3b/`). Prueba con
+  `solidTerrain` y los GLB publicados en cuatro semillas; falla sin el arreglo.
+- **El informe dice los valles que se salta** (`hunt-report.ts`, «sin presa en
+  …»), y el ciervo sale donde lo pone el juego (`createDeer`), no donde nacería
+  un jabalí.
+- **El cazador sale andando a donde cabe** (`life/hunt-encounter.ts`,
+  `exitRoute` en `life/body.ts`): se cuela entre troncos con 0,22 y vuelve a su
+  vida con la holgura del aldeano (0,32). Si acaba donde no cabe, sale por el
+  camino más corto a donde sí —sin atravesar muros: el sitio libre más cercano
+  en línea recta podía estar detrás de uno— y el parte lo espera; si no llega,
+  `releaseHunter` lo pone al lado al soltarlo.
+- **La caza sin picos.** Cada replanteo descarta por celdas los puestos a los
+  que no se llega y prueba un solo camino, con tope de 12.000 nodos
+  (`pathTo` admite ahora un tope; sin él, como siempre). Con la presa
+  encerrada, el peor paso de caza baja de 2,4 s a 18 ms (cercado de celdas) y
+  de 2,6 s a 77 ms (cercado de tablas); medido sin reloj, de 9,8 a 0,52
+  millones de consultas de sólidos. Los caminos buenos abren como mucho unos
+  8.200 nodos, así que el tope no corta ninguno.
+- **La escena que se pierde entrega su parte.** Con un fotograma de más de un
+  segundo, una carga u otro valle, el renderer descartaba la caza sin parte y
+  `runTick`, que espera a la caza, **no volvía a avanzar la semana hasta
+  recargar**: más grave de lo que la revisión leyó en el código (la señal y la
+  velocidad). Ahora `abandon()` da un parte sin pieza.
+- **El zarpazo del oso se ve entero**: dura lo que su clip `attack` (3 s) y la
+  embestida no lo corta; antes, al paso siguiente ya estaba en `charge`.
+- **La caída, en un solo sitio**: `DOWN_ROLL`, `DOWN_EASE` y `downSettleAfter`
+  en `life/hunt-bodies.ts`; el render y lo que la presa lleva clavado los leen
+  de ahí, y una prueba compara el render con esa curva.
+- **Papel**: filas en `tools/README.md` para `bake-clips.mjs`,
+  `plant-gait.mjs`, `trace-strip.py`, `build-compare.py` y `take.sh`; la
+  skill `animacion` cuenta 27 clips humanos; `encargos-3d.md` tacha la vía del
+  observatorio (hecha en AN-4b); `bear-visit-report.ts` mide `createBear`.
+- **Lo que cambia en el reparto, y es de Vera** (caza sola, cinco valles al año
+  30, `artifacts/physics/AN-5/rv-2026-09-30-caza.txt`): el jabalí nace ahora en
+  los cinco valles y no en dos, y en la linde es más fácil —con arco, del 46 al
+  65 % cobrado; con lanza, del 50 al 83 %—; el ciervo, medido donde lo pone
+  el juego y en cuatro valles (en 23/30 no hay ciervo), cae mucho menos que
+  medido donde nacería un jabalí —con arco, 27 % donde se medía 67; con lanza,
+  40 % donde se medía 79—: está más lejos (33–37 s por caza, antes 16–22); el oso, igual en el
+  valle (15 %) y un poco más cazable en el llano (de 20 a 27 %) porque ya no
+  embiste en mitad de su zarpazo. Perdiz y conejo, igual.
+
+## v5.29 · 30 sep 2026 · GV-4b: el relevo de jornada, de segundos a décimas — lo que una búsqueda fallida ya demostró
+
+La segunda mitad del bucle de la villa (`docs/medidas/bucle-villa-2026-09-29.md`).
+GV-4a (PR #8) deja de tomar un fotograma lento por una ausencia, pero la vida
+se sigue montando en cada relevo de jornada, y en la villa eso eran segundos:
+a ×16, 5–7 s congelada cada 7,5 s (revisión del 30 sep, §3). **El 93 % de las
+búsquedas A* finas de ese montaje fallaban y se llevaban el 99 % del tiempo.**
+
+- `life/navigate.ts`: cuando la búsqueda fina falla ha recorrido entera una
+  región de la que no se sale; se guarda —por objeto de terreno, radio y
+  resolución— y la siguiente que salga de dentro hacia un destino que ningún
+  nodo de la región alcanza se contesta «no» sin buscar. **Exacto por
+  construcción**: sólo contesta «no» cuando el A* también lo haría; si no,
+  busca como siempre. El prototipo es de la revisión (`claude/gv-4b-regiones-cerradas`);
+  aquí, revisado y medido.
+- **La misma vida byte a byte en diez valles** con el terreno de verdad
+  (troncos, enseres y cementerios de los GLB publicados): 7/60, 3/40, 23/60,
+  11/21, 1/30, 5/45, 13/50, 17/35, 29/55 y 41/25 —sitios, planes, cuerpos y
+  bestias, al montar y tras 600 pasos—. El montaje, en Node: 7/60 de 7,2 s a
+  0,53; 3/40 de 27,3 a 2,8; 23/60 de 16,2 a 0,5; 1/30 de 12,3 a 0,37 (con dos
+  pasadas a la vez: comparativo). En la aldea 11/21 no cambia nada: ahí no falla
+  ninguna búsqueda.
+- **En el navegador** (`relay-probe.mjs`, villa 7/60 a ×16 durante 60 s, escala
+  0,25, dos pasadas por versión, `artifacts/graphics/gv4b/relevos.txt`): `main`,
+  7–8 fotogramas de 7,7–8,1 s y la vida en cero pasos —el bucle—; con GV-4b,
+  **78–86 fotogramas, 169–182 ms de mediana y 3.200–3.600 pasos de vida**, con
+  relevos de 0,5 a 1,6 s cada 7 s. Rompe el bucle en el contenedor aun sin
+  GV-4a; en un aparato más lento un relevo aún puede pasar del segundo, y por
+  eso hacen falta los dos.
+- **El invariante que lo hace posible, escrito** (`life/body.ts`): un
+  `Terrain` no se modifica después de crearse. Hoy es así —quien lo cambia
+  copia—, pero nada lo protegía: escribir en uno ya en uso haría que la caché
+  contestara «no hay ruta» a una que ya existe.
+- La prueba, `navigate-closed-regions.test.ts`: cada pregunta contra el
+  terreno que acumula regiones y contra uno sin ninguna, con la misma respuesta.
+- **Independiente de GV-4a**: con los dos, la villa del contenedor pasó de 471
+  a 84 ms de mediana a ×16 (revisión §3). Lo que queda por relevo en la villa,
+  0,5–0,8 s en el contenedor, y medirlo en la tablet.
+
+## v5.28 · 30 sep 2026 · «Graphics»: la adaptativa ya no salta con un fotograma, y el tope de 60 da 60 a 90 Hz
+
+La revisión de rendimiento del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md`
+§4, fila RV-3, en la rama `claude/revision-rendimiento-2026-09-30`) encontró dos
+defectos de «Graphics» (v4.96) y unos menores. Numerada tras las dos PR
+abiertas: la #8 reserva la v5.25 y la v5.26, y la #11 (RV-1) la v5.27.
+
+- **La resolución adaptativa**, a `render3d/adaptive-scale.ts`, pura y probada:
+  decide **una vez por ventana de 2 s**, cambie o no (antes, pasados los dos
+  primeros segundos, en cada fotograma), con **la media de los huecos sin los
+  largos sueltos**. Un fotograma de 100 ms —un relevo de jornada, una
+  recolección, volver de otra pestaña— ya no baja la resolución durante 6 s; un
+  aparato lento de verdad sigue bajando.
+- **El tope de fotogramas acumula citas** (`ui/loop.ts`, `frameDue`): con 60 se
+  dibujan 60 por segundo a 72, 75, 90, 120 y 144 Hz. Antes, 45 a 90 Hz —y la
+  adaptativa hundía la resolución al suelo para siempre—, sin tope a 72–75 y 72
+  a 144.
+- **Menores**: el tope se lee al arrancar el bucle y no en cada fotograma (era
+  leer y descifrar el almacenamiento del navegador sesenta veces por segundo);
+  `track()` ya no repite la oclusión del bosque que `paint` hace después de
+  mover los cuerpos; la copa atenuada recibe sombra como la opaca, que no la
+  recibe; y la skill `performance` dice lo que cuesta la máscara del pie
+  (0,27–0,48 ms, no «unos 4»).
+- **Pruebas**: `adaptive-scale.test.ts` (6: «un fotograma largo suelto no
+  cambia la escala», una decisión por ventana, el aparato lento que sí baja, la
+  recuperación y las dos correcciones juntas de 60 a 144 Hz) y el tope en
+  `graphics-profile.test.ts` con cadencias de pantalla reales.
+- **Lo que no se mide aquí**: fotogramas de ningún aparato. En uno de 90 Hz, el
+  panel de taller debería decir 60 y la resolución al 100 %.
+
+
+## v5.13 · 29 sep 2026 · AN-5: la caza física, y la visita del oso que dura
+
+Vera, al leer el brief AN-5a: «que la caza enseñe el golpe; tiene que ser
+natural; cuanto más física y realista, mejor; que pueda fallar, que pueda
+acertar; que impacte». De la lanza que atravesaba la empalizada, «debe
+clavarse». Y de la visita del oso, «hay que ampliarla, claramente». Todo en la
+capa de vida y el render: **el motor no cambia** y el parte entra por
+`PlayerAct` `hunt` como siempre. El porqué y las cifras, en
+`docs/plan-animacion-integral-movil-2026-09-29.md` (AN-5); la evidencia, en la
+matriz (§2.7).
+
+- **AN-5a · el golpe, fechado.** La estocada y la suelta empiezan en el paso
+  que deciden (`clipSeconds` = 0 en el contacto), el arma sigue en la mano y
+  el parte espera a que la escena se vea (`settled`: la pieza tumbada 3 s, la
+  que se escapa huyendo 3 s). Dos estocadas nuevas, `spear_thrust_high` y
+  `spear_thrust_low`, y las tres medidas sobre el GLB con el arma colgada de su
+  `grip` (`hunt-gestures.test.ts`); el tiro sale de la mano que suelta, no de
+  1,2 celdas de alto.
+- **AN-5b · el contacto decide.** Un mundo de contacto de Rapier sólo de
+  consulta para la caza (`createContactWorld`): el suelo, lo que está de pie
+  con la altura con que se pinta y la cápsula de la presa, sacada de la caja
+  de su modelo (`hunt-bodies.ts`). Sin dados de «falla» ni de «roza»: pulso
+  sembrado, presa que se mueve, roce de refilón y **cuarto trasero que hiere y
+  no mata**. El cazador busca un puesto con la línea libre y se cuela entre
+  los árboles (0,22 de holgura). **La lanza ya no atraviesa la empalizada: se
+  clava en ella.**
+- **AN-5c · el impacto se ve.** La flecha que toca se queda con la punta
+  dentro —en la presa, en la madera, en el suelo—, la lanza clavada en madera
+  se queda hasta que el cazador la saca, la presa se sacude con el golpe, y
+  **la pieza caída se tumba de costado**: antes quedaba de pie sobre el hocico
+  y medio enterrada, y eso valía para todo animal que cae.
+- **AN-5d · la visita del oso.** Se alza a quien se acerca a 3,5 celdas y
+  vuelve a hozar; se mete si lo acosan a 1,6, a la tercera vez o al acabar su
+  rato. En 7/30, de 9,5 s fuera a 63; en 3/30, de 62,7 a 102,6; en los otros
+  tres valles medidos nadie pasaba a 5 celdas y el oso ya estaba fuera el rato
+  entero. Media, de 74,8 a 93,5 s (`tools/reports/bear-visit-report.ts`).
+- **Listos para los modelos nuevos** (Vera: «se van a subir nuevos modelos en
+  3D de los animales; el oso, por ejemplo, cambia»). Las cápsulas salen de la
+  caja de cada modelo (`PREY_MODEL`, copia del catálogo) con proporciones de
+  tronco; cuando un modelo cambia, `hunt-bodies.test.ts` falla y trae la caja
+  nueva en el mensaje, y la skill `fisica-combate` (§3b) dice qué se remide.
+- **Lo que cambia en el reparto, y es del dueño.** Medido con la caza sola en
+  cinco valles de verdad (`tools/reports/hunt-report.ts`,
+  `artifacts/physics/AN-5/`): la caza menor cae menos que con la suerte
+  —perdiz y conejo, del 67–68 % al 35–53 %: ahora se falla de verdad—, **las
+  cazas con lanza pasan de no darse nunca (0 %) a darse** —ciervo 79 %,
+  jabalí 50 %, oso 15 %—, el ciervo con arco baja del 83 % al 67 % y el jabalí
+  con arco se queda en el 46 %. Son las cifras con los animales nuevos.
+- **Con los animales nuevos de la PR #3**, que llegaron a `main` mientras se
+  cerraba esta ronda y se fusionaron antes de la PR: la prueba de las cajas
+  saltó con las tres nuevas (ciervo, jabalí, oso), como se diseñó. **La caja no
+  es el tronco**: la del ciervo la ensancha la cuerna, y con la fracción vieja
+  su cápsula salía casi el doble de ancha que el ciervo que se pinta. Ahora
+  cada cápsula se mide sobre **la malla del tronco** del GLB (`Torso`,
+  `Barrel`, `Massive_Torso`, `Plump_Body`) y una prueba las compara; el jabalí
+  conserva su barril ocho centímetros más abajo, y el oso v4 sube el eje a su
+  tronco. La pieza caída se apoya en el costado de su tronco —el ciervo
+  flotaba sobre su cuerna—. Lo que mueve en la caza sola, en valle: el ciervo
+  con arco, igual en cobradas (67 %) y de 29 a 21 % malherido; el oso, de 17 a
+  15 %; el resto, igual (`artifacts/physics/AN-5/despues.txt`, y las de los
+  modelos de antes en `despues-modelos-viejos.txt`).
+- **Al cerrar, la prueba de la lanza clavada no comprobaba nada**: en su
+  semilla la estocada salía al aire y la prueba volvía sin mirar. Recorriendo
+  veinte salieron dos defectos: la estocada baja clavada no se quedaba en su
+  contacto, y el zarpazo del oso dejaba al cazador agarrado a la lanza clavada
+  media celda más atrás y retomaba la estocada a medias. Ahora el empujón se la
+  arranca. Y la prueba del empujón del impacto, que la matriz citaba, no
+  existía: está escrita.
+- **Límites**, en `encargos-3d.md`: lo clavado no dura más que la escena; la
+  empalizada choca como su celda entera, no como sus estacas; el cazador al que
+  hiere el oso no sale herido en el parte; sin sangre (decisión del dueño); la
+  honda sigue con los gestos del arco, y su piedra desaparece donde da. Y de la toma del oso: el relevo del
+  anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
+  primera jornada de una sesión (matriz §2.7).
+
+## v5.27 · 30 sep 2026 · Un animal, una llamada de dibujo (RV-1)
+
+La revisión del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md` §2,
+en su rama) encontró la regresión que dejó la PR #3: los animales facetados son
+nodos rígidos con una malla por pieza, y la villa 7/60 pasó de 500 a 964
+llamadas sin que nada avisara. **Arreglado al cargar, sin tocar ningún GLB**:
+`skinRigidBody` (`src/render3d/assets.ts`) vuelve un cuerpo de piezas rígidas
+animado en una malla con esqueleto —cada vértice entero al nodo de su pieza,
+color y rugosidad en el vértice— y deja en el sitio de cada malla un nodo vacío
+con su nombre, su postura y sus hijos, que hace de hueso. Los clips de
+`rigid-clips.mjs`, los gestos y cualquier `getObjectByName` encuentran lo mismo.
+Sirve a los trece animales animados: los siete facetados y los de piezas de
+Vera (oso, jabalí, mula, lobo, perdiz, perro). La golondrina, que no trae
+clips, no cambia. `prepareModel` es el paso único que comparten el cargador y
+`tools/reports/model-draws.ts`.
+
+**Medido** (`gl-probe`, las rutas de la revisión, antes → después sobre el
+mismo `main`): villa 7/60 **950 → 506** llamadas (la de `da8836f`, con un
+cuerpo por animal, era 500); aldea 11/21 **650 → 413** (mejor que antes de la
+PR #3, 440, porque lobo, mula y compañía también bajan); por la portada en
+táctil, villa **564 → 310**, con las mallas de fauna de **583 a 31**. Los
+triángulos no cambian y el JS de animación tampoco (`animation-cost`, 0,28 →
+0,30 ms, dentro del ruido). Se ve igual: fotos antes y después en
+`artifacts/graphics/rv1/`.
+
+**La prueba de presupuesto** (`tests/fast/animal-draws.test.ts`): todo modelo
+publicado que se anima deja **una** malla al cargar, por el camino del juego,
+con la misma caja en reposo y en mitad de cada clip y sin perder ningún nodo
+con nombre. `pieced-assets.test.ts` pasa a cargar por `prepareModel`, y la
+marcha de `graphics-animal-motion.test.ts` mide la geometría de cada pata a
+través de la piel.
 
 ## v5.24 · 30 sep 2026 · Siete sonidos de caza y asedio, rehechos de ruido y elegidos «a mi criterio»
 
@@ -335,82 +630,6 @@ hay altavoz en el valle y en la portada, y el juego arranca con sonido.
 - `SOUND` gana `TAP_MIN_GAP_MS`, `LATE_PLAY_MS`, `MASTER_GAIN` y
   `SPEED_RATES` (TUNE, presentación). `tools/ui/sound-check.mjs` recorre la
   interfaz con clics de verdad: 20 de 20.
-
-## v5.13 · 29 sep 2026 · AN-5: la caza física, y la visita del oso que dura
-
-Vera, al leer el brief AN-5a: «que la caza enseñe el golpe; tiene que ser
-natural; cuanto más física y realista, mejor; que pueda fallar, que pueda
-acertar; que impacte». De la lanza que atravesaba la empalizada, «debe
-clavarse». Y de la visita del oso, «hay que ampliarla, claramente». Todo en la
-capa de vida y el render: **el motor no cambia** y el parte entra por
-`PlayerAct` `hunt` como siempre. El porqué y las cifras, en
-`docs/plan-animacion-integral-movil-2026-09-29.md` (AN-5); la evidencia, en la
-matriz (§2.7).
-
-- **AN-5a · el golpe, fechado.** La estocada y la suelta empiezan en el paso
-  que deciden (`clipSeconds` = 0 en el contacto), el arma sigue en la mano y
-  el parte espera a que la escena se vea (`settled`: la pieza tumbada 3 s, la
-  que se escapa huyendo 3 s). Dos estocadas nuevas, `spear_thrust_high` y
-  `spear_thrust_low`, y las tres medidas sobre el GLB con el arma colgada de su
-  `grip` (`hunt-gestures.test.ts`); el tiro sale de la mano que suelta, no de
-  1,2 celdas de alto.
-- **AN-5b · el contacto decide.** Un mundo de contacto de Rapier sólo de
-  consulta para la caza (`createContactWorld`): el suelo, lo que está de pie
-  con la altura con que se pinta y la cápsula de la presa, sacada de la caja
-  de su modelo (`hunt-bodies.ts`). Sin dados de «falla» ni de «roza»: pulso
-  sembrado, presa que se mueve, roce de refilón y **cuarto trasero que hiere y
-  no mata**. El cazador busca un puesto con la línea libre y se cuela entre
-  los árboles (0,22 de holgura). **La lanza ya no atraviesa la empalizada: se
-  clava en ella.**
-- **AN-5c · el impacto se ve.** La flecha que toca se queda con la punta
-  dentro —en la presa, en la madera, en el suelo—, la lanza clavada en madera
-  se queda hasta que el cazador la saca, la presa se sacude con el golpe, y
-  **la pieza caída se tumba de costado**: antes quedaba de pie sobre el hocico
-  y medio enterrada, y eso valía para todo animal que cae.
-- **AN-5d · la visita del oso.** Se alza a quien se acerca a 3,5 celdas y
-  vuelve a hozar; se mete si lo acosan a 1,6, a la tercera vez o al acabar su
-  rato. En 7/30, de 9,5 s fuera a 63; en 3/30, de 62,7 a 102,6; en los otros
-  tres valles medidos nadie pasaba a 5 celdas y el oso ya estaba fuera el rato
-  entero. Media, de 74,8 a 93,5 s (`tools/reports/bear-visit-report.ts`).
-- **Listos para los modelos nuevos** (Vera: «se van a subir nuevos modelos en
-  3D de los animales; el oso, por ejemplo, cambia»). Las cápsulas salen de la
-  caja de cada modelo (`PREY_MODEL`, copia del catálogo) con proporciones de
-  tronco; cuando un modelo cambia, `hunt-bodies.test.ts` falla y trae la caja
-  nueva en el mensaje, y la skill `fisica-combate` (§3b) dice qué se remide.
-- **Lo que cambia en el reparto, y es del dueño.** Medido con la caza sola en
-  cinco valles de verdad (`tools/reports/hunt-report.ts`,
-  `artifacts/physics/AN-5/`): la caza menor cae menos que con la suerte
-  —perdiz y conejo, del 67–68 % al 35–53 %: ahora se falla de verdad—, **las
-  cazas con lanza pasan de no darse nunca (0 %) a darse** —ciervo 79 %,
-  jabalí 50 %, oso 15 %—, el ciervo con arco baja del 83 % al 67 % y el jabalí
-  con arco se queda en el 46 %. Son las cifras con los animales nuevos.
-- **Con los animales nuevos de la PR #3**, que llegaron a `main` mientras se
-  cerraba esta ronda y se fusionaron antes de la PR: la prueba de las cajas
-  saltó con las tres nuevas (ciervo, jabalí, oso), como se diseñó. **La caja no
-  es el tronco**: la del ciervo la ensancha la cuerna, y con la fracción vieja
-  su cápsula salía casi el doble de ancha que el ciervo que se pinta. Ahora
-  cada cápsula se mide sobre **la malla del tronco** del GLB (`Torso`,
-  `Barrel`, `Massive_Torso`, `Plump_Body`) y una prueba las compara; el jabalí
-  conserva su barril ocho centímetros más abajo, y el oso v4 sube el eje a su
-  tronco. La pieza caída se apoya en el costado de su tronco —el ciervo
-  flotaba sobre su cuerna—. Lo que mueve en la caza sola, en valle: el ciervo
-  con arco, igual en cobradas (67 %) y de 29 a 21 % malherido; el oso, de 17 a
-  15 %; el resto, igual (`artifacts/physics/AN-5/despues.txt`, y las de los
-  modelos de antes en `despues-modelos-viejos.txt`).
-- **Al cerrar, la prueba de la lanza clavada no comprobaba nada**: en su
-  semilla la estocada salía al aire y la prueba volvía sin mirar. Recorriendo
-  veinte salieron dos defectos: la estocada baja clavada no se quedaba en su
-  contacto, y el zarpazo del oso dejaba al cazador agarrado a la lanza clavada
-  media celda más atrás y retomaba la estocada a medias. Ahora el empujón se la
-  arranca. Y la prueba del empujón del impacto, que la matriz citaba, no
-  existía: está escrita.
-- **Límites**, en `encargos-3d.md`: lo clavado no dura más que la escena; la
-  empalizada choca como su celda entera, no como sus estacas; el cazador al que
-  hiere el oso no sale herido en el parte; sin sangre (decisión del dueño); la
-  honda sigue con los gestos del arco, y su piedra desaparece donde da. Y de la toma del oso: el relevo del
-  anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
-  primera jornada de una sesión (matriz §2.7).
-
 ## v5.12 · 29 sep 2026 · La profundidad del valle en móvil: el pie de las casas, el prado hondo y el seguido a la vista
 
 Vera pidió ejecutar el encargo de Astra

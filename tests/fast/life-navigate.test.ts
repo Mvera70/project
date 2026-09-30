@@ -10,7 +10,7 @@ import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { hash32 } from '@engine/rng';
-import { blockedAt, gap, integrate, turnTo, type Body, type Terrain } from '../../src/render3d/life/body';
+import { blockedAt, gap, indexSolids, integrate, turnTo, type Body, type Solid, type Terrain } from '../../src/render3d/life/body';
 import { createNeighbourhood } from '../../src/render3d/life/grid';
 import { canReach, reachableFrom, terrainOf } from '../../src/render3d/life/terrain';
 import { avoid, drive, resolve, seek, separate } from '../../src/render3d/life/steering';
@@ -196,5 +196,29 @@ describe('V-03 · la navegación', () => {
       expect(trips, `semilla ${seed}: sólo ${trips} viajes completados`)
         .toBeGreaterThan(200);
     }
+  });
+});
+
+describe('Revisión del 30 sep 2026 · la búsqueda fina con tope', () => {
+  /** Un bosque de troncos finos con un cercado de tablas cerrado en medio. */
+  function fencedForest(): Terrain {
+    const solids: Solid[] = [];
+    for (let z = 5; z < 35; z += 1) for (let x = 5; x < 35; x += 1) solids.push({ minX: x + 0.4, maxX: x + 0.6, minZ: z + 0.4, maxZ: z + 0.6 });
+    solids.push({ minX: 18, maxX: 25, minZ: 18, maxZ: 18.6 }, { minX: 18, maxX: 25, minZ: 24.4, maxZ: 25 },
+      { minX: 18, maxX: 18.6, minZ: 18, maxZ: 25 }, { minX: 24.4, maxX: 25, minZ: 18, maxZ: 25 });
+    return { width: 40, height: 40, blocked: new Uint8Array(1600), solids: indexSolids(40, 40, solids) };
+  }
+
+  it('con tope de sobra, el mismo camino que sin tope; agotado, que no', () => {
+    const land = fencedForest();
+    for (const [from, to] of [[{ x: 6, z: 6 }, { x: 33, z: 31 }], [{ x: 2, z: 30 }, { x: 30, z: 8 }]] as const) {
+      const free = pathTo(land, from, to, 0.22);
+      expect(free, 'hay camino').not.toBeNull();
+      expect(pathTo(land, from, to, 0.22, 12_000)).toEqual(free);
+      expect(pathTo(land, from, to, 0.22, 5), 'con cinco nodos no llega').toBeNull();
+    }
+    // Dentro del cercado no se llega, con tope o sin él.
+    expect(pathTo(land, { x: 6, z: 6 }, { x: 21, z: 21 }, 0.22)).toBeNull();
+    expect(pathTo(land, { x: 6, z: 6 }, { x: 21, z: 21 }, 0.22, 12_000)).toBeNull();
   });
 });

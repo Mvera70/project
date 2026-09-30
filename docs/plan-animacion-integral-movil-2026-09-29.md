@@ -630,6 +630,13 @@ de costado) y `life-bear.test.ts` (se alza y vuelve a lo suyo; acosada o a la
 tercera, se mete). La visita con el valle entero —fuera más de 20 s— es una
 jornada (`tests/journeys/life-bear-visit.test.ts`, 6 s).
 
+**Tras la revisión del 30 sep 2026** (v5.30, `task-log.md`): el jabalí nace en
+la linde —con los troncos del juego no nacía en la mayoría de valles, y las
+cifras de caza del jabalí y del ciervo de arriba eran de dos valles de cinco—;
+el cazador sale andando a donde cabe; cada replanteo, un solo camino con tope;
+la escena perdida entrega su parte; el zarpazo del oso dura su clip. Las
+cifras que valen son las de `artifacts/physics/AN-5/rv-2026-09-30-caza.txt`.
+
 **Tomas** (`artifacts/graphics/AN-5/`, matriz §2.7): el conejo 7/22 con honda
 (suelta, la piedra sale de la mano, cae de costado); el jabalí 7/24 con lanza
 (dos estocadas bajas y cae; la empalizada queda entre la cámara y la caza); la

@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { foundTwenty } from '../helpers/founding';
 import type { Animal } from '../../src/derive/animals';
-import { createHuntEncounter, type HuntEncounter } from '../../src/render3d/life/hunt-encounter';
+import { createHuntEncounter, releaseHunter, type HuntEncounter } from '../../src/render3d/life/hunt-encounter';
 import { terrainOf } from '../../src/render3d/life/terrain';
 import { createContactWorld, type ContactWorld } from '../../src/render3d/life/physics';
 import { standingOf } from '../../src/render3d/life/hunt-bodies';
-import { indexSolids, type Terrain } from '../../src/render3d/life/body';
+import { fitsCircle, indexSolids, type Body, type Solid, type Terrain } from '../../src/render3d/life/body';
 import { foundGame } from '../../src/engine/found';
 import type { GameState } from '../../src/engine/state';
 
@@ -362,5 +362,135 @@ describe('AN-5 · la caza física, fechada y a la vista', () => {
     }
     expect(steps * (1 / 30), 'se ve caída unos segundos').toBeGreaterThanOrEqual(2.5);
     expect(encounter.settled).toBe(true);
+  });
+});
+
+describe('Revisión del 30 sep 2026 · el cazador vuelve a su vida donde cabe', () => {
+  // Se mueve con 0,22 para colarse entre troncos y vuelve a su vida con la
+  // holgura del aldeano (0,32): acabada la caza puede estar donde ésta no cabe,
+  // y ahí `integrate` no le deja moverse (32 de 184 cazas en la revisión).
+  /** Un pasillo de 0,55 entre dos muros, lejos de la caza: cabe 0,22 y no cabe 0,32. */
+  const corridor = (): Terrain => ({ ...open(), solids: indexSolids(50, 50, [
+    { minX: 44.2, maxX: 44.8, minZ: 44, maxZ: 46 },
+    { minX: 45.35, maxX: 45.95, minZ: 44, maxZ: 46 },
+  ]) });
+
+  it('acabada la caza, sale andando a donde cabe antes de dar la escena por vista', async () => {
+    const state = foundTwenty(31);
+    const land = corridor();
+    const world = await contactOf(land);
+    const deer: Animal = { id: 40_000, kind: 'deer', x: 25, y: 25 };
+    let checked = 0;
+    for (let seed = 1; seed <= 30 && checked < 2; seed += 1) {
+      const hunter: Body = { ...hunterFrom(seed * 7919), radius: 0.32 };
+      const encounter = createHuntEncounter(state, land, 'deer', 'bow', () => 0, [deer], seed * 7919, null, true,
+        { hunter, world })!;
+      run(encounter, 2400, [deer]);
+      if (encounter.completed === null) continue;
+      // Donde acabe, se le lleva al pasillo: ahí se cuela un cazador y no cabe un aldeano.
+      hunter.x = 45.075; hunter.z = 45;
+      expect(fitsCircle(land, hunter.x, hunter.z, 0.22) && !fitsCircle(land, hunter.x, hunter.z, 0.32)).toBe(true);
+      let before = { x: hunter.x, z: hunter.z };
+      let steps = 0;
+      for (; steps < 900 && !encounter.settled; steps += 1) {
+        encounter.step([deer]);
+        const moved = Math.hypot(hunter.x - before.x, hunter.z - before.z);
+        expect(moved, `semilla ${seed}: sale andando, sin saltos`).toBeLessThanOrEqual(1.15 / 30 + 1e-6);
+        before = { x: hunter.x, z: hunter.z };
+      }
+      expect(encounter.settled, `semilla ${seed}: la escena acaba`).toBe(true);
+      expect(fitsCircle(land, hunter.x, hunter.z, 0.32), `semilla ${seed}: acaba donde cabe un aldeano`).toBe(true);
+      expect(Math.hypot(hunter.x - 45.075, hunter.z - 45), `semilla ${seed}: al sitio libre más cercano`).toBeLessThan(2);
+      checked += 1;
+    }
+    expect(checked, 'dos cazas acabadas').toBe(2);
+  });
+
+  it('al soltarlo, si aún no cabe, se le pone al lado; si cabe, no se le toca', () => {
+    const land = corridor();
+    const stuck: Body = { id: 1, x: 45.075, z: 45, vx: 0.3, vz: 0, facing: 0, radius: 0.32, pace: 1 };
+    releaseHunter(land, stuck);
+    expect(fitsCircle(land, stuck.x, stuck.z, 0.32)).toBe(true);
+    expect(Math.hypot(stuck.x - 45.075, stuck.z - 45)).toBeLessThan(2);
+    expect(stuck.vx).toBe(0);
+    const free: Body = { id: 2, x: 20, z: 20, vx: 0, vz: 0, facing: 0, radius: 0.32, pace: 1 };
+    releaseHunter(land, free);
+    expect({ x: free.x, z: free.z }).toEqual({ x: 20, z: 20 });
+  });
+});
+
+describe('Revisión del 30 sep 2026 · la caza sin picos, y la escena que se pierde', () => {
+  it('con la presa donde no se llega, ningún paso de caza recorre el valle entero', async () => {
+    // Un bosque de troncos y la presa dentro de un cercado de tablas cerrado: por
+    // celdas se llega, y a paso de cazador no. Cada replanteo probaba hasta cinco
+    // caminos y cada uno recorría la región entera dos veces: pasos de 1,4 a 2,6 s
+    // en esta máquina. Se cuenta el trabajo y no el tiempo, para que no dependa
+    // de la máquina: las consultas a los sólidos de cada paso.
+    const solids: Solid[] = [];
+    for (let z = 5; z < 55; z += 1) for (let x = 5; x < 55; x += 1) solids.push({ minX: x + 0.4, maxX: x + 0.6, minZ: z + 0.4, maxZ: z + 0.6 });
+    solids.push({ minX: 30, maxX: 37, minZ: 30, maxZ: 30.6 }, { minX: 30, maxX: 37, minZ: 36.4, maxZ: 37 },
+      { minX: 30, maxX: 30.6, minZ: 30, maxZ: 37 }, { minX: 36.4, maxX: 37, minZ: 30, maxZ: 37 });
+    const index = indexSolids(60, 60, solids) as Map<number, readonly Solid[]>;
+    let lookups = 0;
+    const counted = new Proxy(index, { get(target, key) {
+      if (key === 'get') return (cell: number) => { lookups += 1; return target.get(cell); };
+      const value = Reflect.get(target, key) as unknown;
+      return typeof value === 'function' ? (value as (...args: unknown[]) => unknown).bind(target) : value;
+    } });
+    const land: Terrain = { width: 60, height: 60, blocked: new Uint8Array(3600), solids: counted };
+    const world = (await createContactWorld(land, { ground: () => 0 }))!;
+    worlds.push(world);
+    const deer: Animal = { id: 40_000, kind: 'deer', x: 33, y: 33 };
+    const hunter: Body = { id: 80_001, x: 12, z: 12, vx: 0, vz: 0, facing: 0, radius: 0.32, pace: 1.15 };
+    const encounter = createHuntEncounter(foundTwenty(7), land, 'deer', 'spear', () => 0, [deer], 11, null, true, { hunter, world })!;
+    let worst = 0;
+    for (let step = 0; step < 300 && encounter.completed === null; step += 1) {
+      lookups = 0;
+      encounter.step([deer]);
+      worst = Math.max(worst, lookups);
+    }
+    // Medido: 518 590 consultas el peor paso con el tope; 9 767 039 sin él.
+    expect(worst).toBeLessThan(1_500_000);
+  });
+
+  it('una escena que ya no se puede ver se acaba con su parte, sin pieza, para que la semana no espere', async () => {
+    const state = foundTwenty(31);
+    const land = open();
+    const deer: Animal = { id: 40_000, kind: 'deer', x: 25, y: 25 };
+    const encounter = createHuntEncounter(state, land, 'deer', 'bow', () => 0, [deer], 7919, null, true,
+      { hunter: hunterFrom(7919), world: await contactOf(land) })!;
+    for (let step = 0; step < 20; step += 1) encounter.step([deer]);
+    expect(encounter.completed, 'la caza sigue en marcha').toBeNull();
+    const report = encounter.abandon();
+    expect(report).toMatchObject({ sourceTick: state.tick, species: 'deer', weapon: 'bow', killed: false });
+    expect(encounter.completed, 'y ya tiene parte').toEqual(report);
+    expect(encounter.abandon(), 'la segunda vez, el mismo').toEqual(report);
+  });
+});
+
+describe('Revisión del 30 sep 2026 · el zarpazo del oso se ve entero', () => {
+  it('tras cada zarpazo el oso sigue alzado lo que dura su clip, sin que la embestida lo corte', async () => {
+    const state = foundTwenty(13);
+    const land = open();
+    let seen = 0;
+    for (const seed of [13, 17, 23]) {
+      const bear: Animal = { id: 50_000, kind: 'bear', x: 25, y: 25 };
+      const encounter = createHuntEncounter(state, land, 'bear', 'spear', () => 0, [bear], seed, { x: 30, z: 30 }, false,
+        { world: await contactOf(land) })!;
+      let swipeAt = -1;
+      for (let step = 0; step < 600 && encounter.completed === null; step += 1) {
+        const before = encounter.animals[0]?.action;
+        encounter.attack();
+        encounter.step([bear]);
+        const action = encounter.animals[0]?.action;
+        if (swipeAt < 0 && action === 'attack' && before !== 'attack') { swipeAt = step; continue; }
+        if (swipeAt < 0) continue;
+        // Los tres segundos del clip `attack` (el aviso de la visita): alzado todo el rato.
+        if (step - swipeAt >= 90 || encounter.completed !== null) break;
+        expect(action, `semilla ${seed}, ${step - swipeAt} pasos tras el zarpazo`).toBe('attack');
+      }
+      if (swipeAt >= 0) seen += 1;
+    }
+    expect(seen, 'hubo zarpazos que mirar').toBeGreaterThan(0);
   });
 });

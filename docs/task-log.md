@@ -1,6 +1,6 @@
 # Cuaderno de tareas — el rework
 
-## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.26)
+## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
 
 La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60
 a 0 fps con la vida en «0/0p», que es el bucle que GV dejó apuntado. Arreglo:
@@ -26,7 +26,7 @@ Animación (PR #2 y #6), modelos de animales (#3), gráficos GV (#4) y sonido
 lint y suite rápida limpios; la caza se hizo sobre los modelos nuevos y el
 sonido no toca el renderer— y los huecos entre ellas, repartidos por dueño,
 están en `docs/medidas/fusion-cuatro-ramas-2026-09-29.md`. Arreglado lo
-fácil (v5.25): la fila de `tools/art/bake-clips.mjs`, los enlaces rotos del
+fácil (v5.34): la fila de `tools/art/bake-clips.mjs`, los enlaces rotos del
 encargo GV y el orden de este cuaderno y del changelog; lo del sonido (pestaña
 oculta, prueba lenta) lo cerró su rama en v5.21. **Lo que esta auditoría no
 vio** (la revisión del 30 sep, fila RV-1, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar): los siete animales facetados de la
@@ -38,6 +38,128 @@ jornadas rojas** que la CI enseñó al terminar por primera vez. **No son de est
 ramas**: en local, el `main` de antes de ellas (`efafc2e`) falla igual, y el
 motor no cambió. Es deuda de rondas anteriores, por repartir aparte (el
 detalle, en el papel de la fusión §5).
+
+## 30 sep 2026 · La respuesta a una oferta vuelve a sonar (v5.32)
+
+El sonido ya decodificado suena en el acto y no al acabar el tick: la
+respuesta a una oferta se tiraba siempre por tardía. El recorrido del sonido
+sólo cuenta la interfaz. 35/35 · 8/8.
+
+## 30 sep 2026 · El sonido tras la revisión (v5.31) — **fusionada (PR #14)**
+
+Hecho lo que la revisión encontró en el sonido: el trueno cercano suena
+(`sound.sky`), nueve botones dejan de sonar dos o tres veces (`OWN_VOICE`), los
+lechos callados se sueltan y apagado no se paga nada, el audio entra en el
+precaché y un fallo de descarga se reintenta. Nada cambia de carácter.
+Y un tope de voces para el mundo (`SOUND.MAX_WORLD_VOICES`). El recorrido
+cierra ya el tablón, y al hacerlo destapó que **el tablón no recibía toques**
+(su velo heredaba `pointer-events: none`): arreglado en `board.ts`. Recorrido
+35/35 · 8/8 en tres pasadas; `test:pwa` 7/7.
+**Abierto:** que Vera lo oiga en el aparato; la cifra de coste en un aparato
+(no hay aparato aquí); el `duck` —bajar el mundo bajo un hito— es mezcla y la
+decide Vera escuchando; y `MAX_WORLD_VOICES` sin medir contra un asalto real
+(`?sandbox=battle`).
+
+## 30 sep 2026 · La caza tras la revisión: el jabalí en la linde, el cazador que sale andando, la caza sin picos (v5.30)
+
+Encargo de la revisión del 30 sep (sesión «Cambios recientes revisión», por
+orden de Vera): `docs/medidas/revision-rendimiento-2026-09-30.md` §7 y la fila
+RV-3b de `plan-meta.md`, las dos en la rama
+`claude/revision-rendimiento-2026-09-30`, sin fusionar. **PR sin fusionar,
+esperando a Vera.** El motor no cambia.
+
+**Hecho, con su prueba** (todas fallan sin el arreglo, comprobado):
+
+- **RV-3b · el jabalí nace en la linde.** Con los troncos del juego no nacía en
+  ningún valle de fundación ni en 11, 23 y 5 al año 30; ahora nace en todos, y
+  la caza del jabalí se ofrece donde antes daba «no-prey» (toma 33/22,
+  `artifacts/graphics/RV-3b/`). `hunt-report.ts` dice los valles sin presa y el
+  ciervo sale de `createDeer`.
+- **El cazador sale andando a donde cabe** al acabar (`exitRoute`, sin atravesar
+  muros) y el parte lo espera; `releaseHunter` lo coloca si no llega. En la caza
+  sola de cinco valles (cazador desde la aldea), de 1 de 198 cazas que acababan
+  sin sitio a 0 de 198.
+- **La caza sin picos**: puestos descartados por celdas y un solo camino con
+  tope por replanteo (`pathTo`, `budget`). Presa encerrada: el peor paso, de
+  2,4 s a 18 ms (celdas) y de 2,6 s a 77 ms (tablas).
+- **La escena que se pierde entrega su parte** (`abandon()`). Sin él, la semana
+  no avanzaba hasta recargar: `runTick` espera a la caza.
+- **El zarpazo del oso dura su clip**, y la caída tiene sus números en un solo
+  sitio (`hunt-bodies.ts`) con una prueba que ata el render a esa curva.
+- **Papel**: filas de herramientas, 27 clips en la skill, la vía del
+  observatorio tachada, `createBear` medido.
+
+**Las cifras, y el reparto es de Vera** (`artifacts/physics/AN-5/rv-2026-09-30-caza.txt`,
+`rv-2026-09-30-oso.txt`): el jabalí se caza ahora en los cinco valles y, en la
+linde, más a menudo (arco 65 %, lanza 83 %; antes 46 y 50 en dos valles). El
+ciervo, medido donde lo pone el juego, cae mucho menos que medido donde
+nacería un jabalí (arco 27 %, lanza 40 %; se medía 67 y 79): está más lejos.
+El oso, igual en el valle (15 %). **Si la caza del jabalí queda demasiado
+fácil o la del ciervo demasiado difícil**, las palancas son `RANGE`,
+`AIM_SIGMA` y, para el ciervo, su recelo (`WARY`), todas en `hunt-encounter.ts`.
+
+**No cuadra con la revisión, y va en la PR:** la revisión leyó que con la
+escena descartada `huntInProgress` se quedaba en verdadero (la señal no volvía
+y la velocidad quedaba a ×1); además, la semana no avanzaba. El cazador sin
+sitio: la revisión midió 32 de 184 cazas y aquí, con el cazador saliendo de la
+aldea en cinco valles, salió 1 de 198 (el escenario de la revisión no está
+escrito). Y los picos: en ese mismo escenario el peor paso ya era de 41 ms
+antes del arreglo; los segundos salen con la presa donde no se llega, que se
+reprodujo aparte (un cercado en un bosque de troncos).
+
+**Abierto:** el coste de `createBear` (se paga en cada relevo de jornada
+mientras dura la visita) queda medido y no abaratado; la toma del ciervo en su
+sitio nuevo no se ha rodado.
+
+## 30 sep 2026 · GV-4b: el relevo de jornada, con las regiones cerradas (v5.29)
+
+La segunda mitad del bucle de la villa, que la revisión del 30 sep (§3) pasó a
+gráficos con un prototipo para revisar con ojo crítico. **Revisado y dado por
+bueno**: una búsqueda A* fina que falla ha recorrido entera una región de la
+que no se sale, y la caché sólo contesta «no» cuando el A* también lo haría.
+Comprobado leyendo la búsqueda y **midiendo la misma vida byte a byte en diez
+valles** con los troncos de verdad (los cuatro de la revisión y seis más). La
+única salvedad, escrita en `life/body.ts`: un `Terrain` no se modifica después
+de crearse, que es lo que la caché supone y hoy se cumple. En el navegador
+(`relay-probe.mjs`, villa 7/60 a ×16): de 7–8 fotogramas por minuto y la vida
+parada a 78–86 fotogramas y 169–182 ms de mediana, con relevos de 0,5–1,6 s.
+**Abierto**: medirlo en la tablet con GV-4a dentro (la villa 7/60 a ×16).
+
+## 30 sep 2026 · «Graphics»: la adaptativa y el tope, arreglados (v5.28)
+
+Lo que la revisión de rendimiento del 30 sep (§4, RV-3) le pasó a gráficos. La
+adaptativa decidía en cada fotograma, y un solo fotograma de 100 ms bajaba la
+resolución 6 s; ahora decide una vez por ventana de 2 s, sin los largos sueltos
+(`render3d/adaptive-scale.ts`, puro). El tope de 60 pintaba a 45 en una
+pantalla de 90 Hz y hundía la resolución; ahora acumula citas y da 60 de 72 a
+144 Hz (`ui/loop.ts`). Y los menores: el tope leído una vez, `track()` sin el
+segundo revelado, la sombra de la copa atenuada y la cifra de la máscara en la
+skill. **Abierto**: verlo en un aparato de 90 Hz (el panel de taller debería
+decir 60 y resolución 100 %). El detalle, en el registro.
+
+## 30 sep 2026 · RV-1: un animal, una llamada de dibujo (v5.27) — **fusionada con el permiso de Vera**
+
+La revisión del 30 sep (su rama, `docs/medidas/revision-rendimiento-2026-09-30.md`
+§2) me devolvió la regresión de la PR #3: los animales facetados costaban 16–27
+llamadas cada uno. Arreglado al cargar y sin tocar ningún GLB
+(`skinRigidBody` en `assets.ts`): los trece animales animados dejan una malla.
+Villa 7/60 950 → 506 llamadas, aldea 11/21 650 → 413, mallas de fauna por la
+portada 583 → 31; se ve igual (`artifacts/graphics/rv1/`). Prueba de
+presupuesto en `tests/fast/animal-draws.test.ts`. **Abierto:** si la rama de la
+revisión entra después, `tools/reports/model-draws.ts` se queda con esta versión
+(la que mide por `prepareModel`, el cargador del juego).
+
+
+## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
+
+Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en
+cuatro tandas (`Prueba del botón`, no versionada). Gustó el foley de
+materiales; el tambor no; las notas afinadas agudas sonaron «infantil».
+`tools/ui/sounds.py` está reescrito con esa dirección (`plan-audio.md`, §29
+sep) y los veinte momentos suenan de materiales, sin notas afinadas. **Abierto:**
+elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
+botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
+los momentos de §11.10.
 
 ## 30 sep 2026 · Fase 5 del sonido: contrato y siete sonidos de ruido (v5.22–v5.24)
 
@@ -149,17 +271,6 @@ en disco, huella, presupuesto) y **20 de 20 pasos con clics reales**
 también resella—; el trueno sigue sin fichero; y **nada está oído en un
 teléfono de verdad**: los niveles se fijaron midiendo la banda de 350 Hz a
 6 kHz, no escuchando.
-## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
-
-Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en
-cuatro tandas (`Prueba del botón`, no versionada). Gustó el foley de
-materiales; el tambor no; las notas afinadas agudas sonaron «infantil».
-`tools/ui/sounds.py` está reescrito con esa dirección (`plan-audio.md`, §29
-sep) y los veinte momentos suenan de materiales, sin notas afinadas. **Abierto:**
-elegir variante (a/b/c) en la página de escucha; y decidir si **todos** los
-botones deben sonar al apretar y soltar (como en Clash), que hoy sólo suenan
-los momentos de §11.10.
-
 ## 30 sep 2026 · Monetización, promoción y publicación
 
 El plan `docs/plan-monetizacion-y-publicacion-2026-09-29.md` reúne la propuesta

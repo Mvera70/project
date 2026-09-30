@@ -7,7 +7,7 @@ probable de la tablet a 0 fps** que Vera vio ese mismo día («0 fps con
 fotogramas de dos segundos, año 60»,
 `docs/medidas/rendimiento-piel-v9-2026-09-29.md`).
 
-**Estado: la primera mitad, arreglada el 30 sep 2026 (v5.26, GV-4a):** el hueco
+**Estado: la primera mitad, arreglada el 30 sep 2026 (v5.35, GV-4a):** el hueco
 que decide la ausencia es el ocioso, desde que acabó el pintado anterior
 (`clock.painted`). Medido igual que abajo: de 4 595 ms por `paint` con la vida a
 cero a 142 ms con la vida andando (mediana de 80 s, primer montaje incluido).
