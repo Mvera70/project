@@ -1,5 +1,13 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · RD-0: la primera ocasión del mapa, tocable; el tablón, en cuadro (v5.42)
+
+D1 y D7 de RD-0 arreglados: la perdiz de la fundación ya no nace tapada (7 de 7
+ofertas de la semana 0 tocables en 12 semillas, antes 4 de 7) y el tablón no
+se sale del encuadre. **Abierto:** D2 (la oferta dura una semana: 13 s a ×64),
+D4 (cobrar la pieza fuerza el tick) y D5 (la consecuencia sólo en la crónica),
+que dependen de la velocidad normal y van a RD-1.
+
 ## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
 
 La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60

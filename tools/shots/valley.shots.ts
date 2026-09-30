@@ -778,6 +778,41 @@ test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ p
   test.expect(['storm', 'rain', 'overcast', 'clear']).toContain(sky);
 });
 
+test('la primera ocasión del mapa se puede tocar y el tablón queda en el encuadre (RD-0, D1 y D7)', async ({ page }) => {
+  // RD-0 (30 sep 2026). En la semilla 7 la perdiz de la fundación nacía pegada
+  // a la linde y las copas la tapaban desde la cámara de apertura: la señal
+  // estaba apagada en 368 de 368 muestras y la primera ocasión del mapa no se
+  // podía tocar. Y el tablón de la plaza se salía del encuadre a la tercera
+  // semana (x = −23 px de 390). Se mira como lo ve el dedo: la señal visible,
+  // sin tapar, encima de todo en su punto; el tablón dentro de la pantalla.
+  test.setTimeout(300_000);
+  await lowGraphics(page);
+  // El camino del jugador, no la ruta de depuración: el menú, la semilla 7 y
+  // un valle nuevo, con su vuelo de entrada y la cámara de apertura.
+  await page.goto('/');
+  await page.locator('.title-scrim').waitFor();
+  await page.locator('#valley-seed').fill('7');
+  await page.locator('.title-new').click();
+  await page.waitForFunction(() => ['hints', 'done'].includes(document.documentElement.dataset.intro ?? ''),
+    null, { timeout: 180_000 });
+  const sign = page.locator('.hunt-sign');
+  await test.expect.poll(async () => {
+    return sign.evaluate((el) => {
+      const button = el as HTMLButtonElement;
+      if (button.hidden || button.classList.contains('hunt-sign--covered')) return false;
+      const box = button.getBoundingClientRect();
+      const top = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+      return top === button || button.contains(top);
+    });
+  }, { timeout: 120_000, intervals: [500] }).toBe(true);
+  const board = await page.evaluate(() => window.__valleyBoardScreen?.() ?? null);
+  const view = page.viewportSize()!;
+  test.expect(board, 'el tablón existe en la escena').not.toBeNull();
+  test.expect(board!.x).toBeGreaterThan(0);
+  test.expect(board!.x).toBeLessThan(view.width);
+  await page.screenshot({ path: 'artifacts/rd0-first-sign.png', fullPage: true });
+});
+
 test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {
   await page.clock.install();
   await page.goto('/?debug=1&live=1&render=canvas&hunger=1&seed=7&year=80&season=summer');

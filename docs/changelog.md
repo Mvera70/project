@@ -1,5 +1,26 @@
 # The Valley — Registro de cambios
 
+## v5.42 · 30 sep 2026 · La primera ocasión del mapa se puede tocar, y el tablón no se sale del encuadre
+
+Dos defectos de RD-0 (`docs/medidas/rd0-apertura-visible-2026-09-30.md`, D1 y
+D7) que impedían completar la primera oportunidad del mapa. **D1:** la perdiz
+de la fundación nacía en la celda de pradera más cercana al árbol de tala —la
+linde— y las copas la tapaban desde la cámara de apertura: señal apagada en 3
+de las 7 semillas con oferta en la semana 0 (semilla 7: 368 de 368 muestras).
+Ahora la presa de campo abierto busca pradera sin bosque a 3 celdas
+(`OPEN_CLEARANCE`, relaja a 2, 1 y 0), y mientras hay ocasión y la presa está
+fuera del bosque, las copas que la tapan se atenúan con el `forest.reveal` de
+GV-2; la señal sólo se apaga si la presa **entra** en el bosque, que es la
+regla de Vera (28 sep). Medido en el navegador, semillas 1–12: **7 de 7**
+ofertas de la semana 0 tocables (antes 4 de 7; las otras 5 semillas no tienen
+oferta ese día). **D7:** el tablón, en el borde oeste de la plaza, salía del
+encuadre a la tercera semana en la semilla 7 (x = −23 px de 390); ahora entra
+en la caja que se encuadra (`BOARD_FRAME_AIR`) y se queda en x ≈ 39 px.
+Pruebas: `life-wild-prey.test.ts` (24 valles, perdiz y conejo con dos celdas
+de pradera alrededor: antes 1 de 24) y un recorrido de navegador nuevo que
+toca la señal y mira el tablón en la semilla 7 (falla sin el arreglo). Skill
+`senales-en-el-mapa` al día.
+
 ## v5.37 · 30 sep 2026 · Las 21 jornadas rojas viejas, una a una
 
 `test:journeys` tenía **21 rojas en 13 ficheros**, las mismas en `main` y en

@@ -71,11 +71,17 @@ es ver la ocasión a tiempo.
   el icono; la huella del animal … cada uno que tenga la suya»): la caza pinta
   la huella de cada especie (`HUNT_TRACKS` en `app.ts`). La próxima señal busca
   su equivalente: lo que la cosa deja en el mundo.
-- **Sólo se ofrece lo que se va a poder ver.** Si la cosa queda tapada (la
-  presa entre los árboles), la señal se apaga con un fundido de medio segundo y
-  no se puede tocar; vuelve cuando la cosa sale a la vista (Vera, 28 sep 2026:
+- **Sólo se ofrece lo que se va a poder ver.** Si la cosa entra en el bosque
+  (la presa en una celda de bosque), la señal se apaga con un fundido de medio
+  segundo y no se puede tocar; vuelve cuando la cosa sale (Vera, 28 sep 2026:
   «que desaparezca con transición cuando entra en un bosque… porque si no la
-  caza no se ve»). Se pregunta al bosque con `forest.hides(camera, punto)`. El área de toque
+  caza no se ve»). **Pero si la cosa está fuera y sólo una copa se cruza por
+  delante, la copa se atenúa y la señal sigue** (RD-0, 30 sep 2026): con la
+  regla de antes, `forest.hides(camera, punto)`, la perdiz de la fundación
+  nacía en la linde y quedaba apagada en 3 de 7 valles con la cámara de
+  apertura, y la primera ocasión del mapa no se podía tocar. La presa de campo
+  abierto nace además con pradera alrededor (`OPEN_CLEARANCE`). Se atenúa con
+  el mismo `forest.reveal` que usa quien se sigue (GV-2). El área de toque
   sí es de dedo (36 px), invisible. Referencia: `redesign/hunt-sign.css`. Se esconde si la cosa sale de pantalla, con la
   pantalla despejada no, y con una hoja abierta sí.
 - **El toque**: llama a una sola función del renderer/backend (`startHunt`,
