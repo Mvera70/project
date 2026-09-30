@@ -68,7 +68,15 @@ export type Cue =
   | 'weather_lightning_crack'
   | 'weather_thunder_near'
   | 'weather_thunder_mid'
-  | 'weather_thunder_far';
+  | 'weather_thunder_far'
+  // La caza y el asedio (fase 5): los dispara `moments.ts`, con su distancia.
+  | 'combat_arrow_loose'
+  | 'combat_arrow_hit'
+  | 'combat_arrow_miss'
+  | 'combat_melee'
+  | 'combat_fall'
+  | 'combat_gate_hit'
+  | 'combat_gate_break';
 
 /**
  * Qué fichero suena en cada momento, relativo a la página
@@ -106,6 +114,13 @@ export const CUE_FILES: Readonly<Partial<Record<Cue, string>>> = {
   weather_thunder_near: 'weather_thunder_near.mp3?v=9f478873',
   weather_thunder_mid: 'weather_thunder_mid.mp3?v=017d246e',
   weather_thunder_far: 'weather_thunder_far.mp3?v=2d10980b',
+  combat_arrow_loose: 'combat_arrow_loose.mp3?v=48031948',
+  combat_arrow_hit: 'combat_arrow_hit.mp3?v=f846e59b',
+  combat_arrow_miss: 'combat_arrow_miss.mp3?v=680c4b09',
+  combat_melee: 'combat_melee.mp3?v=bce5b662',
+  combat_fall: 'combat_fall.mp3?v=ea836f82',
+  combat_gate_hit: 'combat_gate_hit.mp3?v=4566a021',
+  combat_gate_break: 'combat_gate_break.mp3?v=d594b2ca',
 };
 
 /**

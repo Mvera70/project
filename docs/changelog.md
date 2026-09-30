@@ -75,6 +75,21 @@ matriz (§2.7).
   anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
   primera jornada de una sesión (matriz §2.7).
 
+## v5.24 · 30 sep 2026 · Siete sonidos de caza y asedio, rehechos de ruido y elegidos «a mi criterio»
+
+Vera, ante la segunda tanda de cinco familias: «hazlo tú». Se eligió la C
+(ariete con herrajes) como lenguaje y se rehicieron los siete con la misma
+idea: **ruido en banda que se apaga, crujidos minúsculos y golpecitos de
+hierro, sin ninguna resonancia** (`_thump`, `_splinters`, `_rattle` en
+`sounds.py`). Medido con `tools/ui/tonality.py`: **0 a 12 ms de resonancia
+sostenida** (los descartados: 84–264; un timbal: 336), 93–100 % de la energía
+en la banda del teléfono, < 1,3 % sobre 4 kHz, primera y última muestra a cero.
+Vuelven a `CUE_FILES` y a `MOMENT_CUE`; el oso sigue sin voz.
+
+**Sin oír por quien los hizo, y sin comprobar en un cerco real del
+navegador.** Si alguno suena mal, su fila de `MOMENT_CUE` vuelve a `null` y
+calla; los ficheros pesan 48 KB en total.
+
 ## v5.23 · 30 sep 2026 · Los siete sonidos de caza y asedio, descartados; queda el contrato
 
 Vera los oyó y descartó los siete: «suenan como juguetes de niño pequeño,
