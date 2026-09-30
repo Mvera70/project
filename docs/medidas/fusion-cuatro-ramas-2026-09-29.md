@@ -147,8 +147,19 @@ pidió. El ladrido del perro es decisión de Vera.
       una casilla prohibida), `life-props` ×3, `life-places`, `work-contact`,
       `engine-long` (las riñas), `founding`, `title-cooperative`.
     - Ninguna en las pruebas de caza ni de oso.
-- **Nadie sabe todavía de qué PR viene cada roja:** todas las ejecuciones de
-  jornadas anteriores se cortaban en el tope de 60 minutos, así que no hay
-  línea de base. La comparación de los 13 ficheros sobre `efafc2e` (el `main`
-  de antes de las cuatro ramas) contra `7d027bb` está en marcha; su resultado
-  va a `docs/task-log.md`.
+- **Las 21 rojas no son de ninguna de las cuatro ramas: ya fallaban antes.**
+  Medido en local el 30 sep:
+  - En `7d027bb` se reproducen las mismas 21 en los mismos 13 ficheros, así
+    que no son cosa de la CI.
+  - En `efafc2e` (el `main` de antes de las cuatro ramas) fallan igual, con el
+    mismo número de pruebas por fichero, `works`, `life-decide`, `life-props`
+    ×3, `life-wildlife` ×3, `founding` y `life-places`.
+  - Las cuatro ramas no cambiaron el motor: sólo añadieron constantes de
+    sonido a `balance.ts`, que no mueven una partida. Como el motor es
+    determinista, las jornadas que sólo dependen de él (`works`, `wall-rings`,
+    `e3b-corridor`, `fate-chaos`, `founding`, `notices`, `engine-long`,
+    `title-cooperative`) salen igual que antes por construcción.
+  - `work-contact` es la única que depende de la capa de vida que animación
+    tocó; su pasada sobre `efafc2e` estaba pendiente al escribir esto.
+  - Por qué nadie lo vio: la CI se cortaba siempre en el tope de 60 minutos
+    antes de llegar. Es deuda de rondas anteriores que sale a la luz ahora.

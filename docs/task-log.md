@@ -13,8 +13,10 @@ de acentos (28 s) se muda a `tests/journeys/sound-accents.test.ts`, la fila de
 cuaderno y del changelog. **Abierto:** que suenen caza, oso y combate (sonido
 con animación: primero el contrato de qué publica la vida para que el sonido lo
 oiga); una medida de rendimiento con todo junto en iPhone o iPad; y **las 21
-jornadas rojas** que la CI enseñó al terminar por primera vez, sin línea de base
-todavía.
+jornadas rojas** que la CI enseñó al terminar por primera vez. **No son de estas
+ramas**: en local, el `main` de antes de ellas (`efafc2e`) falla igual, y el
+motor no cambió. Es deuda de rondas anteriores, por repartir aparte (el
+detalle, en el papel de la fusión §5).
 
 ## 30 sep 2026 · Fase 2 del sonido: día y noche sí; aldea, hoguera y fiesta, no (v5.20)
 
