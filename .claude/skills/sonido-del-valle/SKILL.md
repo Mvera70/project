@@ -82,6 +82,7 @@ Cada material tiene su papel, para que la interfaz se aprenda de oído:
 | `tools/ui/sounds.py` | **Fabrica los sonidos.** Materiales modelados con numpy, nivelados en la banda del teléfono, a `public/audio/*.mp3`. Determinista byte a byte. Sella la huella de cada fichero en `sound.ts` | `python tools/ui/sounds.py [--audition] [--stamp] [--only <ids>]` |
 | `tools/ui/sound-check.mjs` | **Comprueba que suena lo que toca, cuando toca.** Recorre la interfaz con clics de verdad en Chromium y lee `window.__valleySound` | `node tools/ui/sound-check.mjs --chrome /opt/pw-browsers/chromium [--headed]` |
 | `tests/fast/sound.test.ts` | Las propiedades puras del *cuándo*, que los ficheros existen, su huella y el presupuesto de peso | `npx vitest run tests/fast/sound.test.ts` |
+| `tests/journeys/sound-long.test.ts` | El acento en sesenta años de motor (25 s: no cabe en la rápida) | `npx vitest run -c vitest.journeys.config.ts tests/journeys/sound-long.test.ts` |
 | La hoja de análisis | Espectrograma, forma de onda, centroide, % por encima de 4 kHz y **% en la banda del teléfono**. No está versionada: se escribe en el cuaderno de la sesión | ver §4 |
 
 **Dependencias:** `pip install numpy scipy soundfile` (y `matplotlib` para los

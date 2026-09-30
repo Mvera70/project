@@ -75,6 +75,25 @@ matriz (§2.7).
   anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
   primera jornada de una sesión (matriz §2.7).
 
+## v5.21 · 30 sep 2026 · El sonido calla con la pestaña oculta; una prueba de 25 s se muda a las jornadas
+
+Dos de los cuatro puntos que integración trajo sobre el sonido. Los otros dos
+(que caza, oso y combate suenen, y el contrato para que publiquen sus sucesos)
+son la fase 5 de `docs/plan-audio-mundo.md` y necesitan que Vera oiga cada
+sonido antes de integrarlo; siguen abiertos.
+
+- **El `AudioContext` se suspende al ocultar la pestaña** y se reanuda al
+  volver (`contextAction`, pura; `sound.visibility`, cableada a
+  `visibilitychange` en `installSound`). Cubre también el `interrupted` de
+  Safari tras una llamada. Antes sólo callaba la mezcla: el contexto seguía
+  vivo y gastando batería con la pantalla apagada. Y `start()` no suena ni
+  reanuda con la pestaña oculta: un temporizador de trueno que vence de fondo
+  soltaba todo de golpe al volver.
+- **«Un puñado de acentos en sesenta años»** (24 s: cinco semillas de motor)
+  se muda de `tests/fast/sound.test.ts` a `tests/journeys/sound-long.test.ts`,
+  con el mismo cuerpo y el mismo umbral, como manda CLAUDE.md. La suite de
+  sonido rápida baja a 0,9 s (61 pruebas).
+
 ## v5.20 · 30 sep 2026 · Fase 2: el día y la noche entran; la aldea, la hoguera y la fiesta, tachadas
 
 Vera aprobó la fase 1 («sigue perfecto»). De los siete lechos de la fase 2
