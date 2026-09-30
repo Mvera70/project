@@ -354,3 +354,52 @@ diez sin comprender un efecto suyo. **Terminado cuando** la tabla de §3 puede
 marcarse con evidencia o con huecos precisos, la matriz cubre 21/21 decisiones
 con dictamen y RD-1 tiene una primera intervención y una primera elección
 identificadas para diseñar.
+
+### Siguiente brief: RD-1 · la apertura jugable (30 sep 2026, tras RD-0)
+
+**Objetivo.** Antes del minuto 10 a la velocidad normal: una ocasión en el
+mapa que se toca, una escena con resultado a la vista y una primera elección
+de fundación con coste y consecuencia cercana.
+
+**Depende de.** RD-0 (`docs/medidas/rd0-sintesis-2026-09-30.md`) y de **tres
+decisiones de Vera**: la velocidad normal, la primera elección (contenido) y
+—para D4— si cobrar una pieza puede adelantar la semana.
+
+**Ya hecho en RD-0** (PR aparte): el sol sigue la hora a cualquier velocidad
+(#19); la perdiz de la fundación se puede tocar en 7 de 7 valles con oferta y
+el tablón queda en el encuadre (#23).
+
+**Lo que queda, por pieza:**
+
+| Pieza | Qué | Ficheros | Prueba de terminado |
+|---|---|---|---|
+| Ocasión | La oferta de la semana 0 dura lo que su semana: 52 s a ×16, 13 s a ×64 (D2). Si la normal es ×16, basta; si es ×64, la ocasión dura un mínimo de tiempo real | `ui/app.ts` (`huntOpportunityTick`), `render3d/renderer.ts` (`huntSighting`) | a la velocidad normal, en 8 semillas, la señal de la semana 0 se puede tocar durante ≥ 20 s reales |
+| Resultado | La pieza cobrada se ve: el cazador vuelve con ella y un «+N» sobre el granero, como la leña (D5) | `ui/redesign/wood-gains.ts` (generalizar), `render3d/renderer.ts` | en 8 semillas la consecuencia se enseña en el mundo, no sólo en la crónica |
+| Semana | Cobrar la pieza fuerza el tick (D4). Opción: el parte entra en la semana natural y el «+N» se enseña ya | `ui/app.ts` (`endHunt`, `runTick`) | el calendario no salta al cobrar; el grano sube en su semana |
+| Elección | Una encrucijada de fundación elegible en las primeras semanas: su plantilla, sus textos y su imagen pedida | `engine/crossroads/catalog/hamlet.ts`, `chronicle/bank.en.ts`, `docs/plan-arte-pendiente.md` | en 16 semillas se plantea antes del minuto 10 a la velocidad normal, sus opciones cambian algo en pantalla y una consecuencia vuelve dentro de la primera hora |
+| Suelo | La primera ranura legal de §8.6 (hoy la semana 15) no puede caer después del minuto 10 | `engine/balance.ts` (`CROSSROADS`), `design.md` §8.6 | `pace-report` y `eligibility`: la primera elección y la variedad del resto del catálogo, antes y después |
+
+**Falsaría RD-1** que, en 8 semillas a la velocidad normal, un jugador llegue
+al minuto 10 sin haber tocado nada que cambie algo visible, o que la primera
+elección sea la misma pregunta en todas las semillas sin variación de reparto.
+
+### Siguiente brief: RD-2 · el descanso (30 sep 2026, tras RD-0)
+
+**Ya hecho** (#21): ninguna ausencia resuelve un asalto ni acaba la partida
+(`restTick`: para en el aviso y deshace la semana del final).
+
+**Pendiente de Vera:** qué más para el descanso (A, A′ o pausa guardada), a
+qué velocidad corre y si se activa sola o a mano. Medidas en
+`docs/medidas/rd2-descanso-2026-09-30.md`.
+
+**Lo que queda con la recomendación (A′, sola, a la velocidad dejada):**
+
+| Pieza | Qué | Ficheros | Prueba |
+|---|---|---|---|
+| Velocidad | Guardar la velocidad con la partida para que la apertura en frío corra la ausencia igual que la pestaña oculta | `engine/save.ts` (campo del fichero, no del estado), `ui/app.ts` | la misma ausencia da el mismo estado por las dos puertas |
+| Parte | El parte de regreso distingue hechos, pendientes (la decisión que espera, el asalto que viene) y próximos pasos | `ui/welcome.ts`, `derive/` | lectura del parte en 3 semillas con parada y sin ella |
+| Sonido y reloj | Silencio en la ausencia y reanudación con el sol donde dice la hora | `ui/ambience.ts`, `presentation-clock.ts` | recorrido: ocultar, volver, sol y cabecera iguales |
+| Expediciones | Nadie vuelve, muere o cobra dos veces al alternar descanso, guardado y reanudación | `engine/world/expeditions.ts` (sólo prueba) | prueba de ida y vuelta con una expedición en curso |
+
+**Falsaría RD-2** que la misma ausencia dé estados distintos por pestaña oculta
+y por apertura nueva, o que al volver falte una decisión pendiente en el parte.
