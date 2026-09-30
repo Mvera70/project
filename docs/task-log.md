@@ -1,5 +1,13 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · RD-2: ninguna derrota mientras nadie mira (v5.40)
+
+`restTick` para el letargo en el aviso de un asalto y deshace la semana que
+acabaría la partida. Es la parte del descanso que no depende de la decisión de
+Vera (común a A y A′). **Abierto, de Vera:** qué más para el descanso, a qué
+velocidad corre, y si se activa a mano o al ocultar la app
+(`docs/medidas/rd2-descanso-2026-09-30.md`).
+
 ## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
 
 La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60

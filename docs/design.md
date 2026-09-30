@@ -4953,6 +4953,22 @@ Si había una encrucijada pendiente, **sigue pendiente**: la aldea ha vivido esa
 semanas sin decisión, con las consecuencias que eso tenga. No se resuelve sola,
 no caduca y no mata (§1).
 
+**Y ninguna derrota mientras nadie mira** (RD-2, v5.40, 30 sep 2026). El
+letargo avanza cada semana con `restTick` (`engine/save.ts`), que es el mismo
+tick con dos paradas: **el aviso de un asalto** —esa semana se vive y la
+ausencia se detiene, con las semanas de §1b para prepararse por delante— y
+**la semana que acabaría la partida**, que se deshace byte a byte para que el
+final, si llega, llegue con el jugador delante. Las semanas que quedaban
+debidas se perdonan: el reloj, el sol y el calendario se paran juntos. Medido
+antes del cambio con `tools/reports/rest-report.ts`: en el tope de 960
+semanas acababan 4 valles de 24 (3 tomados) y se resolvían 66 asaltos sin
+jugador; con la regla, ninguno. Para no copiar el estado cada semana (cuesta lo
+que un tick en el año 60), sólo se copia cuando la partida puede acabar esa
+semana: 15 habitantes o menos (`TIME.REST_WATCH_POPULATION`), valle menguante,
+peste o asalto en camino. **Lo que el descanso hace además** —si una
+encrucijada planteada también lo para, a qué velocidad corre, si se activa a
+mano— es decisión pendiente del dueño (`docs/medidas/rd2-descanso-2026-09-30.md`).
+
 Al terminar, se abre el **parte de bienvenida** (§9.2).
 
 **El letargo tiene dos puertas, no una** (v2.84). Arrancar con un guardado

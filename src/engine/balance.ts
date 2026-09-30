@@ -67,6 +67,13 @@ export const TIME = {
   // cambiar el tick y dejar esto atrás.
   LETHARGY_CAP_MS: 20 * 48 * 840_000,
   LETHARGY_BATCH: 64, // §13.2: ticks per requestAnimationFrame while catching up
+  // TUNE (RD-2, 30 sep 2026): por debajo de cuánta gente el descanso guarda
+  // una copia de la semana para poder deshacerla si acabara la partida
+  // (`restTick`, §13.2). La peor semana medida fuera de peste, asalto y valle
+  // menguante perdió 6 personas de 10 (24 semillas × 60 años sin jugador,
+  // semilla 17, tick 696); 15 es dos veces y media eso. Copiar cuesta lo que
+  // una semana en el año 60 (7 ms), así que no se copia siempre.
+  REST_WATCH_POPULATION: 15,
   // TUNE: how long a notable event stays legible over the valley (§11.6,
   // v2.84). Long enough to read one sentence, short enough that a village at
   // 16x does not queue a backlog. Real time on purpose and cut hard, never

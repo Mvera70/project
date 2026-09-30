@@ -41,25 +41,35 @@ describe('runBatch · §13.2, §11.4', () => {
       done = progress.done;
       seen.push(done);
       frames += 1;
-      if (progress.ended) break;
+      if (progress.ended || (progress.halted ?? null) !== null) break;
     }
 
-    expect(done).toBe(total);
-    expect(state.tick).toBe(total);
+    // RD-2: un aviso de asalto puede parar la ausencia antes; si no para,
+    // corre exactamente las 960.
+    const halted = seen.length > 0 && done < total;
+    expect(done === total || halted).toBe(true);
+    expect(state.tick).toBe(done);
     for (let i = 1; i < seen.length; i += 1) {
       const step = seen[i]! - seen[i - 1]!;
       expect(step).toBeGreaterThan(0);
       expect(step).toBeLessThanOrEqual(TIME.LETHARGY_BATCH);
     }
-    // Exactamente 960 / 64 = 15 lotes, ni uno de más ni de menos.
-    expect(frames).toBe(960 / TIME.LETHARGY_BATCH);
+    // Exactamente 960 / 64 = 15 lotes si no para antes, ni uno de más.
+    expect(frames).toBe(Math.ceil(done / TIME.LETHARGY_BATCH));
   });
 
-  it('una aldea que se extingue a mitad de lote detiene el progreso ahí, no lo esconde', () => {
+  it('una aldea que se acabaría a mitad de lote detiene el progreso ahí, y el final llega con el jugador delante', () => {
+    // RD-2 (30 sep 2026): antes el letargo dejaba que la partida acabara en la
+    // ausencia. Ahora la semana que la acabaría se deshace y el letargo para;
+    // la primera semana que se juegue mirando es la que la acaba.
     const state = foundTwenty(7);
     for (const v of state.people.villagers) v.diedTick = state.tick; // extinción inmediata
+    const tickBefore = state.tick;
     const progress = runBatch(state, 0, 960);
-    expect(progress.ended).toBe(true);
+    expect(progress.halted).toBe('ending');
+    expect(progress.ended).toBe(false);
+    expect(state.ended).toBeNull();
+    expect(state.tick).toBe(tickBefore);
     expect(progress.done).toBeLessThan(960);
     expect(Number.isInteger(progress.done)).toBe(true);
   });

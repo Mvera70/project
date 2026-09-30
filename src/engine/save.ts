@@ -653,13 +653,58 @@ export function ticksOwed(elapsedMs: number, speed = 1): number {
 /** What a catch-up did. `sinceTick` is where the welcome digest (§9.2) starts reading from. */
 export interface CatchUpReport {
   sinceTick: number;
-  ticks: number; // ticks actually run — fewer than owed only if the village ended
+  ticks: number; // ticks actually run — fewer than owed if the village ended or the rest halted
   capped: boolean; // elapsedMs exceeded the four-hour lethargy cap
   ended: boolean;
+  /** RD-2: why the absence stopped before the weeks owed, or `null` if it ran them all. */
+  halted: RestHalt | null;
 }
 
 /**
- * §13.2, run all at once. A pending crossroad is never answered here — `tick`
+ * RD-2 · Por qué se para una ausencia: `raid` es el aviso de que el clan baja
+ * (la semana del aviso sí se vive, y quedan las semanas de §1b para
+ * prepararse); `ending` es la semana que acabaría la partida, que se deshace.
+ */
+export type RestHalt = 'raid' | 'ending';
+
+/** Si esta semana puede acabar la partida: sólo entonces merece la pena copiarla. */
+function atRisk(state: GameState): boolean {
+  return population(state) <= TIME.REST_WATCH_POPULATION
+    || state.dwindlingSince !== null
+    || state.outbreak !== null
+    || state.threat.comingTick !== null;
+}
+
+/**
+ * RD-2 · Una semana de ausencia. Invariante del rework de ritmo (goal del
+ * 30 sep 2026): **ninguna decisión importante ni derrota irreversible se
+ * resuelve mientras nadie mira**. Hasta aquí el letargo avanzaba con el tick
+ * normal y dejaba que un asalto se resolviera por la cuenta de B3: con el tope
+ * de 960 semanas acababan 4 valles de 24 (3 tomados), y 66 asaltos se
+ * resolvían sin jugador (`docs/medidas/rd2-descanso-2026-09-30.md`).
+ *
+ * Lo que para es **común a las dos reglas de descanso medidas** (A y A′):
+ * el aviso de un asalto, y la semana que acabaría la partida, que se deshace
+ * para que el final —si llega— llegue con el jugador delante. Qué más para
+ * (una encrucijada planteada, una crisis) es la decisión de Vera pendiente;
+ * aquí la encrucijada sigue esperando como dice §13.2.
+ *
+ * Sin azar nuevo y sin tocar el orden de §4.2: es el mismo `tick` y, si se
+ * deshace, el estado vuelve byte a byte al de antes.
+ */
+export function restTick(state: GameState): RestHalt | null {
+  const before = atRisk(state) ? structuredClone(state) : null;
+  const report = tick(state, CATALOG);
+  if (state.ended !== null && before !== null) {
+    Object.assign(state, before);
+    return 'ending';
+  }
+  return report.entries.some((entry) => entry.templateKey === 'raid.coming') ? 'raid' : null;
+}
+
+/**
+ * §13.2, run all at once, and stopped by `restTick` (RD-2) before an ending
+ * or right after a raid warning. A pending crossroad is never answered here — `tick`
  * is called with no decision, the same as any tick nobody was there to
  * answer, so the village lives those weeks exactly as if the player had been
  * watching and had not decided (§1: it does not resolve itself, expire, or
@@ -677,14 +722,16 @@ export function catchUp(state: GameState, elapsedMs: number): CatchUpReport {
   const sinceTick = state.tick;
   const owed = ticksOwed(elapsedMs);
   let ran = 0;
-  while (ran < owed && state.ended === null) {
-    tick(state, CATALOG);
-    ran += 1;
+  let halted: RestHalt | null = null;
+  while (ran < owed && state.ended === null && halted === null) {
+    halted = restTick(state);
+    if (halted !== 'ending') ran += 1;
   }
   return {
     sinceTick,
     ticks: ran,
     capped: elapsedMs > TIME.LETHARGY_CAP_MS,
     ended: state.ended !== null,
+    halted,
   };
 }

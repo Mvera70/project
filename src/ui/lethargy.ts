@@ -1,9 +1,7 @@
 // M-23 · The batched catch-up. design.md §13.2, §11.4.
 
 import { TIME } from '@engine/balance';
-import { CATALOG } from '@engine/crossroads/catalog';
-import { ticksOwed } from '@engine/save';
-import { tick } from '@engine/sim';
+import { restTick, ticksOwed, type RestHalt } from '@engine/save';
 import type { GameState } from '@engine/state';
 
 export interface LethargyProgress {
@@ -11,10 +9,16 @@ export interface LethargyProgress {
   total: number;
   /** The village ran out before `done` reached `total` — a batch stops early, it never keeps going. */
   ended: boolean;
+  /**
+   * RD-2 · The absence stopped before `total`: a raid warning, or the week that
+   * would have ended the game (undone). The weeks still owed are forgiven —
+   * the clock, the sun and the calendar stop together.
+   */
+  halted?: RestHalt | null;
 }
 
 function finished(p: LethargyProgress): boolean {
-  return p.done >= p.total || p.ended;
+  return p.done >= p.total || p.ended || (p.halted ?? null) !== null;
 }
 
 /**
@@ -42,11 +46,12 @@ export function checkpointSavedAtMs(nowMs: number, progress: LethargyProgress): 
 export function runBatch(state: GameState, done: number, total: number): LethargyProgress {
   const owed = Math.min(TIME.LETHARGY_BATCH, Math.max(0, total - done));
   let ran = 0;
-  while (ran < owed && state.ended === null) {
-    tick(state, CATALOG);
-    ran += 1;
+  let halted: RestHalt | null = null;
+  while (ran < owed && state.ended === null && halted === null) {
+    halted = restTick(state);
+    if (halted !== 'ending') ran += 1;
   }
-  return { done: done + ran, total, ended: state.ended !== null };
+  return { done: done + ran, total, ended: state.ended !== null, halted };
 }
 
 export interface Lethargy {
@@ -63,7 +68,8 @@ export interface Lethargy {
  *
  * No decision is ever made here. A pending crossroad stays exactly as it was
  * (§1, §13.2): `tick` is called with none, the same as any tick nobody
- * answered.
+ * answered. And no defeat either (RD-2): `restTick` stops at a raid warning
+ * and undoes the week that would end the game.
  */
 export function runLethargy(
   state: GameState,

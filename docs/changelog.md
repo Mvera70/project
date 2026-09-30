@@ -1,5 +1,21 @@
 # The Valley — Registro de cambios
 
+## v5.40 · 30 sep 2026 · Ninguna derrota mientras nadie mira
+
+El letargo de §13.2 dejaba que un asalto se resolviera por la cuenta de B3 y
+que la partida acabara en ausencia: en el tope de 960 semanas, 4 valles de 24
+acabados (3 tomados) y 66 asaltos resueltos sin jugador
+(`tools/reports/rest-report.ts`, `docs/medidas/rd2-descanso-2026-09-30.md` en
+la rama `claude/ritmo-rd0`). Incumple un invariante del rework de ritmo.
+`restTick` (`engine/save.ts`) es el mismo tick con dos paradas, comunes a las
+dos reglas de descanso medidas: el aviso de un asalto y la semana que acabaría
+la partida, que se deshace. Lo usan las dos puertas del letargo (`catchUp` y
+`runBatch`). Nueva constante `TIME.REST_WATCH_POPULATION` (TUNE, 15, con su
+medida). Pruebas: `rest-no-defeat.test.ts`; `lethargy.test.ts` y
+`save.test.ts` dicen ahora «960 semanas, o menos si paró con motivo». **Lo
+que no decide este cambio:** si una encrucijada planteada también para el
+descanso, a qué velocidad corre y si se activa a mano; es de Vera.
+
 ## v5.37 · 30 sep 2026 · Las 21 jornadas rojas viejas, una a una
 
 `test:journeys` tenía **21 rojas en 13 ficheros**, las mismas en `main` y en
