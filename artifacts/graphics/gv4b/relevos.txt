@@ -1,0 +1,9 @@
+-- wt-base r1 (villa 7/60, ×16, 60 s, escala 0,25)
+{"seed":7,"year":60,"speed":16,"seconds":60,"frames":7,"paintMedian":8147,"paintP90":8666,"paintMax":8666,"over500":["0.1s:7338ms","9.3s:8666ms","18.2s:8036ms","27.0s:8325ms","35.7s:8061ms","44.5s:8260ms","53.1s:8147ms"],"worst":["9.3s:8666ms","27.0s:8325ms","44.5s:8260ms","53.1s:8147ms","35.7s:8061ms","18.2s:8036ms"],"lifeSteps":0,"framesWithLife":0}
+-- wt-gv4b r1 (villa 7/60, ×16, 60 s, escala 0,25)
+{"seed":7,"year":60,"speed":16,"seconds":60,"frames":78,"paintMedian":182,"paintP90":733,"paintMax":3278,"over500":["0.0s:3278ms","1.0s:535ms","6.1s:1575ms","12.7s:1094ms","13.7s:527ms","19.4s:654ms","28.0s:1542ms","35.6s:1257ms","42.0s:900ms","49.7s:947ms","56.8s:733ms"],"worst":["6.1s:1575ms","28.0s:1542ms","35.6s:1257ms","12.7s:1094ms","49.7s:947ms","42.0s:900ms","56.8s:733ms","19.4s:654ms"],"lifeSteps":3202,"framesWithLife":67}
+-- wt-base r2 (villa 7/60, ×16, 60 s, escala 0,25)
+{"seed":7,"year":60,"speed":16,"seconds":60,"frames":8,"paintMedian":7690,"paintP90":7985,"paintMax":7985,"over500":["0.1s:7060ms","8.4s:7777ms","16.1s:7186ms","24.1s:7684ms","32.3s:7594ms","40.6s:7985ms","48.9s:7779ms","57.1s:7690ms"],"worst":["40.6s:7985ms","48.9s:7779ms","8.4s:7777ms","57.1s:7690ms","24.1s:7684ms","32.3s:7594ms","16.1s:7186ms"],"lifeSteps":0,"framesWithLife":0}
+-- wt-gv4b r2 (villa 7/60, ×16, 60 s, escala 0,25)
+{"seed":7,"year":60,"speed":16,"seconds":60,"frames":86,"paintMedian":169,"paintP90":522,"paintMax":2913,"over500":["0.1s:2913ms","5.8s:619ms","12.7s:1106ms","19.8s:767ms","27.6s:917ms","34.5s:522ms","42.2s:738ms","50.3s:935ms","57.1s:569ms"],"worst":["12.7s:1106ms","50.3s:935ms","27.6s:917ms","19.8s:767ms","42.2s:738ms","5.8s:619ms","57.1s:569ms","34.5s:522ms"],"lifeSteps":3590,"framesWithLife":75}
+done

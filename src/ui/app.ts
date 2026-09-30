@@ -1675,10 +1675,14 @@ export function boot(
   // una pestaña oculta sigue donde el letargo deje la semana.
   let loopStarted = false;
   const beginLoop = (): void => {
+    // «Graphics»: el tope de fotogramas que eligió el jugador (29 sep 2026).
+    // Se lee al arrancar el bucle y no en cada fotograma, que era leer y
+    // descifrar el almacenamiento del navegador sesenta veces por segundo
+    // (revisión del 30 sep); sólo se elige en la portada, antes de abrir el valle.
+    const frameMs = 1000 / readGraphicsSettings().frameRate;
     loop = startLoop(() => speed, () => { if (!ticksHeld) runTick(); }, paint, () => timeScale,
       loopStarted ? 0 : options.startFraction ?? 0,
-      // «Graphics»: el tope de fotogramas que eligió el jugador (29 sep 2026).
-      () => 1000 / readGraphicsSettings().frameRate);
+      () => frameMs);
     loopStarted = true;
   };
 

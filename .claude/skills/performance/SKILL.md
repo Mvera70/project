@@ -111,10 +111,15 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
    `render3d/profile.ts` —sin MSAA, densidad de píxeles tope 1,5 (en vez de 2) y mapa
    de sombras de 1024 (en vez de 2048)—, y «Graphics» deja elegir otro. En una tablet
    la pantalla tiene el doble de píxeles y la GPU la mitad.
-7. **Resolución adaptativa** (`adaptResolution`, constantes `ADAPT`): si la media entre
-   fotogramas pasa de 36 ms baja la densidad un 15 % cada 2 s, hasta la mitad; si pasa 6 s
-   por debajo de 20 ms, sube un paso. Cambiar la densidad rehace el lienzo: nunca más de
-   una vez cada 2 s.
+7. **Resolución adaptativa** (`render3d/adaptive-scale.ts`, pura desde el 30 sep 2026):
+   una vez por ventana de 2 s, cambie o no, si la media de sus huecos pasa del umbral lento
+   del perfil (1,3 veces el presupuesto) baja la densidad un 15 %, hasta el suelo del
+   perfil; tras 6 s holgados sube un paso. **Los huecos largos sueltos no cuentan** (más de
+   tres veces la mediana, si no pasan de un cuarto de la ventana): la de v4.96 decidía en
+   cada fotograma con una media exponencial y un solo fotograma de 100 ms —un relevo, una
+   recolección, volver de otra pestaña— la bajaba 6 s. **Y el tope de fotogramas acumula
+   citas** (`ui/loop.ts`, `frameDue`): contando desde el último dibujo, un tope de 60 en
+   una pantalla de 90 Hz pintaba a 45 y la adaptativa hundía la resolución al suelo.
 8. **`renderer.compileAsync` al montar el valle NO sirve tal cual**: los programas
    enlazados pasaron de 35 a 68 —compiló variantes con otro estado de luces/sombras que
    luego no se usaron— y se retiró. Precompilar bien pide hacerlo con la escena ya
@@ -195,8 +200,9 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
     `world/contact-shade.ts`): el pie de los edificios es una máscara R8 para todo el
     valle (8 texeles por celda, 516 KB) que el suelo lee donde three aplica su
     oclusión. Cero llamadas, ningún programa más (el del suelo cambia de clave), sin
-    z-fighting, y se rehace sólo cuando cambian los edificios con tejado (unos 4 ms
-    de CPU en un portátil, una vez por obra). Un disco o una luz por edificio habría
+    z-fighting, y se rehace sólo cuando cambian los edificios con tejado (0,27 ms en
+    la aldea y 0,48 en la villa desde que recorre sólo la caja de los edificios,
+    medido por la revisión del 30 sep; al principio, 3–7 ms). Un disco o una luz por edificio habría
     sido una llamada —y una sombra— por casa. Lo que cuesta de verdad es un
     muestreo por fragmento de suelo, que en software no se distingue del ruido: se
     lee en el aparato con `?contact=off`.
