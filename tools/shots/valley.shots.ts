@@ -974,7 +974,9 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
   // partida real que haya tocado esta vez.
   await welcome.click();
   await test.expect(welcome).toBeHidden();
-  await test.expect(page.locator('.valley-date')).not.toContainText('Year 1');
+  // «Year 1 ·» y no «Year 1»: desde RD-2 la ausencia puede pararse en el aviso
+  // de un asalto en el año 10–19, y «Year 13» contiene «Year 1» (CI, PR #21).
+  await test.expect(page.locator('.valley-date')).not.toContainText('Year 1 ·');
 });
 
 test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruinas (§13.3)', async ({ page }) => {
