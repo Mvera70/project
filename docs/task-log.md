@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.23)
+
+La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60
+a 0 fps con la vida en «0/0p», que es el bucle que GV dejó apuntado. Arreglo:
+el hueco que cuenta como ausencia en `presentation-clock.ts` es el ocioso, desde
+que acabó el pintado anterior (`clock.painted`), no el entero. Medido en el
+contenedor: la villa pasa de 4 595 ms por `paint` con la vida a cero a 142 ms
+con la vida dando pasos; la aldea no cambia. **Abierto:** el primer montaje de
+la villa sigue costando 4–5 s y se paga en cada relevo de jornada —Vera vio
+bajar los fotogramas de la aldea pequeña **justo al anochecer**—; abaratar
+`createVillage` (rutas por plan de escena, no por jornada) es la segunda parte
+de GV-4. Y que Vera vuelva a abrir la villa 7/60 en la tablet con esto dentro.
+
 ## 30 sep 2026 · La fusión de las cuatro ramas del 29 sep: cómo quedaron juntas
 
 Animación (PR #2 y #6), modelos de animales (#3), gráficos GV (#4) y sonido

@@ -218,9 +218,14 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
 
 ## Lo que queda (por lo que pesa)
 
-- **Romper el bucle de la villa** (lección 22): que el hueco que cuenta como
-  ausencia descuente el trabajo del propio fotograma, y abaratar `createVillage`.
-  Es la causa probable de la tablet a 0 fps con fotogramas de dos segundos.
+- **Abaratar `createVillage`** (GV-4b): el bucle de la villa (lección 22) está
+  roto desde v5.23 —el hueco que cuenta como ausencia es el ocioso, y la villa
+  7/60 pasó de 4 595 ms por `paint` a 142—, pero el primer montaje y cada relevo
+  de jornada siguen en 4–5 s: Vera ve bajar los fotogramas de la aldea pequeña
+  al anochecer. Las rutas del común, la orilla y el vado, por plan de escena.
+- **Fuera de Windows, las sondas quieren el navegador de Playwright a mano:**
+  `VALLEY_CHROMIUM=/opt/pw-browsers/chromium-<n>/chrome-linux/chrome`, y
+  `bundle-game.ts --out` sólo acepta una carpeta dentro de `artifacts/`.
 - **Medir en un aparato real** (la tablet de Vera) y apuntar aquí las cifras: FPS, y
   si siguen los tirones al caer un rayo o empezar una fiesta. Y las dos lecturas que
   dejó GV (29 sep 2026): el pie de los edificios (`?contact=off` contra el valle

@@ -1,5 +1,33 @@
 # The Valley — Registro de cambios
 
+## v5.23 · 30 sep 2026 · GV-4: el bucle de la villa, roto — un fotograma lento ya no es una ausencia
+
+Vera abrió el sitio con las cuatro ramas dentro en su tablet: la aldea 11/21 a
+57 fps y 11 ms por fotograma, y la villa 7/60 a 0 fps, 2 264 ms por fotograma y
+la vida en «0/0p». La primera medida en un aparato real, y la confirmación de lo
+que GV había dejado apuntado sin tocar (`docs/medidas/bucle-villa-2026-09-29.md`):
+el reloj de presentación tomaba cualquier hueco de más de un segundo entre
+fotogramas por una ausencia, la ausencia rehacía la vida, y rehacer la vida de
+una villa tarda más de un segundo en una tablet. Sin salida.
+
+- `presentation-clock.ts`: el hueco que decide si hubo ausencia es **el ocioso**,
+  desde que el fotograma anterior terminó de pintarse (`clock.painted(ms)`,
+  que `backend.ts` llama tras cada `paint`). El hueco entero sigue explicando
+  los ticks y moviendo la animación; `hidden` sigue cubriendo la pestaña
+  escondida. Sin `painted` el reloj se comporta como antes.
+- Medido en el contenedor (Chromium con SwiftShader, `gl-probe`, villa 7/60,
+  perfil táctil a escala 0,25): **antes**, 4 595 ms por `paint`, vida 0 ms, 8
+  fotogramas en 43 s; **después**, 142 ms por `paint` (mediana de 80 s, con el
+  primer montaje dentro), vida 13 ms, 33 fotogramas. La aldea 11/21, igual que
+  antes: 32 ms.
+- La prueba, en `graphics-clock.test.ts`: cinco fotogramas de 1,5 s de trabajo
+  seguidos no encadenan discontinuidades, y dos segundos sin pintar sí lo son.
+- **Abierto (segunda parte de GV-4):** el primer montaje sigue costando 4–5 s
+  (`createVillage`, rutas de A*), y se paga también en cada relevo de jornada:
+  Vera vio bajar los fotogramas de la aldea pequeña justo al anochecer.
+  Abaratarlo es guardar las rutas del común, la orilla y el vado por plan de
+  escena en vez de por jornada.
+
 ## v5.22 · 30 sep 2026 · La fusión de las cuatro ramas, revisada, y lo fácil arreglado
 
 Vera pidió revisar cómo quedaron juntas animación, modelos de animales,
