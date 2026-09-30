@@ -1,5 +1,35 @@
 # The Valley — Registro de cambios
 
+## v5.27 · 30 sep 2026 · «Graphics»: la adaptativa ya no salta con un fotograma, y el tope de 60 da 60 a 90 Hz
+
+La revisión de rendimiento del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md`
+§4, fila RV-3, en la rama `claude/revision-rendimiento-2026-09-30`) encontró dos
+defectos de «Graphics» (v4.96) y unos menores. Numerada tras la PR #8, que
+reserva la v5.25 y la v5.26.
+
+- **La resolución adaptativa**, a `render3d/adaptive-scale.ts`, pura y probada:
+  decide **una vez por ventana de 2 s**, cambie o no (antes, pasados los dos
+  primeros segundos, en cada fotograma), con **la media de los huecos sin los
+  largos sueltos**. Un fotograma de 100 ms —un relevo de jornada, una
+  recolección, volver de otra pestaña— ya no baja la resolución durante 6 s; un
+  aparato lento de verdad sigue bajando.
+- **El tope de fotogramas acumula citas** (`ui/loop.ts`, `frameDue`): con 60 se
+  dibujan 60 por segundo a 72, 75, 90, 120 y 144 Hz. Antes, 45 a 90 Hz —y la
+  adaptativa hundía la resolución al suelo para siempre—, sin tope a 72–75 y 72
+  a 144.
+- **Menores**: el tope se lee al arrancar el bucle y no en cada fotograma (era
+  leer y descifrar el almacenamiento del navegador sesenta veces por segundo);
+  `track()` ya no repite la oclusión del bosque que `paint` hace después de
+  mover los cuerpos; la copa atenuada recibe sombra como la opaca, que no la
+  recibe; y la skill `performance` dice lo que cuesta la máscara del pie
+  (0,27–0,48 ms, no «unos 4»).
+- **Pruebas**: `adaptive-scale.test.ts` (6: «un fotograma largo suelto no
+  cambia la escala», una decisión por ventana, el aparato lento que sí baja, la
+  recuperación y las dos correcciones juntas de 60 a 144 Hz) y el tope en
+  `graphics-profile.test.ts` con cadencias de pantalla reales.
+- **Lo que no se mide aquí**: fotogramas de ningún aparato. En uno de 90 Hz, el
+  panel de taller debería decir 60 y la resolución al 100 %.
+
 ## v5.13 · 29 sep 2026 · AN-5: la caza física, y la visita del oso que dura
 
 Vera, al leer el brief AN-5a: «que la caza enseñe el golpe; tiene que ser

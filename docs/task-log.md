@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · «Graphics»: la adaptativa y el tope, arreglados (v5.27)
+
+Lo que la revisión de rendimiento del 30 sep (§4, RV-3) le pasó a gráficos. La
+adaptativa decidía en cada fotograma, y un solo fotograma de 100 ms bajaba la
+resolución 6 s; ahora decide una vez por ventana de 2 s, sin los largos sueltos
+(`render3d/adaptive-scale.ts`, puro). El tope de 60 pintaba a 45 en una
+pantalla de 90 Hz y hundía la resolución; ahora acumula citas y da 60 de 72 a
+144 Hz (`ui/loop.ts`). Y los menores: el tope leído una vez, `track()` sin el
+segundo revelado, la sombra de la copa atenuada y la cifra de la máscara en la
+skill. **Abierto**: verlo en un aparato de 90 Hz (el panel de taller debería
+decir 60 y resolución 100 %). El detalle, en el registro.
+
 ## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
 
 Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en
