@@ -36,6 +36,16 @@ export interface Body extends Point {
  * lo mismo haya lo que haya, que es la diferencia entre que la escala importe y
  * que no importe.
  */
+/**
+ * El suelo que pisa la vida.
+ *
+ * **No se modifica después de crearse**: quien lo cambie hace uno nuevo (como
+ * los campos cerrados del ganado o el tráfico de un desvío, que copian). La
+ * vida lo rehace al cambiar el mundo, y `navigate.ts` guarda por objeto las
+ * regiones cerradas de sus búsquedas fallidas (GV-4b): escribir en `blocked` o
+ * en `solids` de uno ya en uso haría que contestara «no hay ruta» a una que ya
+ * existe, sin que nada lo avisara.
+ */
 export interface Terrain {
   readonly width: number;
   readonly height: number;

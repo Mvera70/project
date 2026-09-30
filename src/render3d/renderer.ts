@@ -48,6 +48,7 @@ import {
   contactShadeAsked, createContactShade, enableContactShade, tuneContactShade, type ContactShade,
 } from './world/contact-shade';
 import { aaTrialOf, createScreenAa, type ScreenAa } from './effects/screen-aa';
+import { adaptScale, adaptWindow } from './adaptive-scale';
 import { buildRoadStones, buildSignposts, valleyRoad } from './world/road';
 import { createTrampleMap, setTramplers, snowTracks, SNOW_FROM, type TrampleMap, type Trampler } from './effects/trample';
 import { cloudsFor, stepClouds } from './effects/clouds';
@@ -169,14 +170,10 @@ const POINT_LIGHTS = 1;
  * igual pasado este tiempo. TUNE.
  */
 const WARM_UP_MS = 8000;
-/**
- * La resolución adaptativa. TUNE: por debajo de ~28 FPS (0,036 s) baja un 15 %
- * cada 2 s, hasta la mitad de la densidad; con más de ~50 FPS durante 6 s la
- * recupera un paso.
- */
-const ADAPT = { everySeconds: 2, recoverSeconds: 6, step: 0.15 } as const;
-// (Los umbrales «lento» y «holgado» y el suelo los pone el perfil desde el
-// 29 sep 2026: salen del objetivo de fotogramas que eligió el jugador.)
+// La resolución adaptativa decide en `adaptive-scale.ts` (30 sep 2026: una vez
+// por ventana de 2 s, sin que un fotograma largo suelto la mueva); los umbrales
+// «lento» y «holgado» y el suelo los pone el perfil, del objetivo de fotogramas
+// que eligió el jugador.
 const VILLAGER = 'villager';
 const TREE = 'tree';
 const TREE_PINE = 'tree-pine';
@@ -1815,10 +1812,10 @@ export async function createGraphicsRenderer(
   // luces fijo (`LightPool`) las luces del primer dibujo son las de siempre.
   let warmUp: 'pending' | 'running' | 'done' = 'pending';
   // **La resolución se adapta a lo que el aparato da.** Se mide el intervalo
-  // entre fotogramas; si la media pasa de `ADAPT.slowSeconds` (por debajo de
-  // unos 28 FPS) se dibuja con menos píxeles, a pasos, hasta `ADAPT.lowest` de
-  // la densidad; si durante un rato sobra, se recupera. Cambiar la densidad
-  // rehace el lienzo, así que se decide como mucho cada `ADAPT.everySeconds`.
+  // entre fotogramas y, una vez por ventana de dos segundos, si su media pasa
+  // del umbral lento del perfil se dibuja con menos píxeles, a pasos, hasta el
+  // suelo del perfil; si durante un rato sobra, se recupera. Cambiar la
+  // densidad rehace el lienzo. La decisión es pura: `adaptive-scale.ts`.
   let renderScale = 1;
   // El panel de taller (`ui/dev-hud.ts`): lo que costó el último dibujo y a
   // qué resolución va la adaptativa. Ligero: lo lee dos veces por segundo.
@@ -1854,9 +1851,7 @@ export async function createGraphicsRenderer(
       return target === null || forest === null ? null : forest.hides(camera, target);
     })(),
   });
-  let frameAverage = 1 / 60;
-  let sinceAdapt = 0;
-  let easySeconds = 0;
+  let adapt = adaptWindow();
   let lastAdaptAt = 0;
   // Se mide el hueco real entre dos `paint`, no `realDeltaSeconds`: ése llega
   // recortado a `MAX_STEP_SECONDS` (0,1 s) por el reloj de presentación, así
@@ -1915,8 +1910,7 @@ export async function createGraphicsRenderer(
     heldScale = scale === null || !Number.isFinite(scale) ? null : Math.max(0.25, Math.min(1, scale));
     if (heldScale === null || disposed) return;
     renderScale = heldScale;
-    sinceAdapt = 0;
-    easySeconds = 0;
+    adapt = adaptWindow();
     sizeCanvas();
   };
   const adaptResolution = (): void => {
@@ -1924,18 +1918,9 @@ export async function createGraphicsRenderer(
     const realDelta = lastAdaptAt === 0 ? 0 : Math.min(1, (now - lastAdaptAt) / 1000);
     lastAdaptAt = now;
     if (heldScale !== null) return;
-    if (!(realDelta > 0)) return;
-    frameAverage = frameAverage * 0.9 + realDelta * 0.1;
-    sinceAdapt += realDelta;
-    easySeconds = frameAverage < profile.easySeconds ? easySeconds + realDelta : 0;
-    if (sinceAdapt < ADAPT.everySeconds) return;
-    let next = renderScale;
-    if (frameAverage > profile.slowSeconds && renderScale > profile.lowestScale) next = Math.max(profile.lowestScale, renderScale - ADAPT.step);
-    else if (easySeconds > ADAPT.recoverSeconds && renderScale < 1) next = Math.min(1, renderScale + ADAPT.step);
+    const next = adaptScale(adapt, realDelta, renderScale, profile);
     if (next === renderScale) return;
     renderScale = next;
-    sinceAdapt = 0;
-    easySeconds = 0;
     sizeCanvas();
   };
   /** La presa de la ocasión, ya en el valle: la suelta se crea; ciervo y oso ya están. */
@@ -2887,7 +2872,10 @@ export async function createGraphicsRenderer(
       // que «sube dos celdas» no es «sube en pantalla». Y no acumula: cada
       // fotograma vuelve a mirar y a correr lo mismo.
       view.pan(0, -viewport.heightCss * TRACK_LIFT);
-      revealAssault();
+      // Aquí se llamaba también a `revealAssault()`; desde GV-2 el seguido es
+      // uno de sus objetivos, y como `app.ts` llama a esto antes de cada
+      // `paint`, la oclusión del bosque se calculaba dos veces por fotograma
+      // (revisión del 30 sep). La hace `paint`, después de mover los cuerpos.
     },
 
     zoom(factor: number, atXCss: number, atYCss: number): void {

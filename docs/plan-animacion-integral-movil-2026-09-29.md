@@ -630,7 +630,7 @@ de costado) y `life-bear.test.ts` (se alza y vuelve a lo suyo; acosada o a la
 tercera, se mete). La visita con el valle entero —fuera más de 20 s— es una
 jornada (`tests/journeys/life-bear-visit.test.ts`, 6 s).
 
-**Tras la revisión del 30 sep 2026** (v5.25, `task-log.md`): el jabalí nace en
+**Tras la revisión del 30 sep 2026** (v5.30, `task-log.md`): el jabalí nace en
 la linde —con los troncos del juego no nacía en la mayoría de valles, y las
 cifras de caza del jabalí y del ciervo de arriba eran de dos valles de cinco—;
 el cazador sale andando a donde cabe; cada replanteo, un solo camino con tope;
