@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · RD-0 cerrada: la apertura y el catálogo, medidos (v5.41)
+
+Síntesis en `docs/medidas/rd0-sintesis-2026-09-30.md`. **A ninguna velocidad
+hay hoy una intervención visible y una elección antes del minuto 10**: a ×1 no
+pasa ni una semana; a ×16 la primera elección llega a los 13 min; a ×64 a los
+3,3 min pero la oferta de caza dura 13 s. La perdiz nacía tapada por el
+bosque en 2 de 3 valles (D1, arreglo en su PR). Las 21 encrucijadas tienen
+dictamen (7 conservar, 8 reescribir, 5 sustituir, 1 retirar). Los arreglos
+van en PR aparte: sol (v5.38), retiradas pendientes (v5.39), ninguna derrota
+en ausencia (v5.40). **Esperando a Vera:** velocidad normal, regla del
+descanso y la primera elección de la fundación. Versiones reservadas para el
+rework: v5.38–v5.49.
+
 ## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
 
 La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60
