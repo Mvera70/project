@@ -30,6 +30,16 @@ ramas**: en local, el `main` de antes de ellas (`efafc2e`) falla igual, y el
 motor no cambió. Es deuda de rondas anteriores, por repartir aparte (el
 detalle, en el papel de la fusión §5).
 
+## 30 sep 2026 · Fase 5 del sonido: contrato y siete sonidos de ruido (v5.22–v5.24)
+
+Los siete de la primera tanda se descartaron por timbales (resonancia de
+84–264 ms, `tools/ui/tonality.py`). Vera delegó la elección de la segunda
+(«hazlo tú») y se rehicieron de ruido, con 0–12 ms de resonancia. **Abierto:**
+que Vera los oiga en el juego y diga cuáles sobran (su fila de `MOMENT_CUE` a
+`null`); comprobar el cableado con un cerco real en navegador; el cuerno de
+aviso y el material de la flecha (`encargos-3d.md`); si el ruido tampoco
+convence, grabaciones libres de derechos.
+
 ## 30 sep 2026 · Sonido: pestaña oculta y prueba lenta (v5.21)
 
 Integración pidió cuatro cosas. Hechas: el `AudioContext` se suspende al

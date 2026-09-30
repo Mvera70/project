@@ -353,6 +353,8 @@ export interface Village {
    * tipo sólo para esto: una fuente en vivo en vez de la fórmula de siempre.
    */
   readonly wildlife: readonly Animal[];
+  /** El oso que hay ahora en el valle y cuántas veces se ha alzado a avisar (AN-5d), o `null`. */
+  readonly bearAlert: { readonly warnings: number; readonly x: number; readonly z: number } | null;
   /** Entrada exterior de la guarida; no existe interior navegable. */
   readonly bearDen: { readonly x: number; readonly z: number;
     /** AN-4c · La boca de la cueva: donde el oso nace y por donde se mete. */
@@ -1620,6 +1622,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         ...foxPosition(fox), ...duckPositions(ducks), ...visitors.flatMap(beastOf), ...bearPosition(bear), ...(wolf !== null && wolf.phase !== 'gone'
         ? [{ id: wolf.body.id, kind: 'wolf' as const, x: wolf.body.x, y: wolf.body.z, facing: wolf.body.facing }]
         : [])];
+    },
+    get bearAlert() {
+      if (bear === null || bear.phase === 'gone') return null;
+      return { warnings: bear.warnings ?? 0, x: bear.body.x, z: bear.body.z };
     },
     get bearDen() {
       if (bear === null) return null;

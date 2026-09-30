@@ -2808,6 +2808,17 @@ export const SOUND = {
   // que las dos familias del principio, llena hacia las veinte, y el segundo
   // lecho —el que hace que se solapen los golpes— sube desde la treintena y
   // llena donde llegan los valles buenos.
+  // La caza y el asedio (fase 5, 30 sep 2026): los sucesos de la muralla, el
+  // monte y la cueva (`ui/moments.ts`) suenan por el reproductor con su
+  // distancia. Fusible por sonido, como el de los toques pero más ancho: un
+  // cerco de siete arqueros suelta una salva en el mismo fotograma y no debe
+  // ser una ametralladora. TUNE: sin medir contra un asalto real; se ajusta
+  // con Vera y `?sandbox=battle`.
+  MOMENT_MIN_GAP_MS: 90,
+  /** Por debajo de esta cercanía un suceso ya no se oye: no se programa. */
+  MOMENT_MIN_GAIN: 0.04,
+  /** ±3 % de tono por golpe (skill §7): diez seguidos no suenan a máquina. */
+  MOMENT_PITCH_JITTER: 0.06,
   MURMUR_SPARSE_FROM: 4,
   MURMUR_SPARSE_FULL: 18,
   MURMUR_BUSY_FROM: 28,
