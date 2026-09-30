@@ -75,7 +75,7 @@ matriz (§2.7).
   anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
   primera jornada de una sesión (matriz §2.7).
 
-## v5.25 · 30 sep 2026 · Un animal, una llamada de dibujo (RV-1)
+## v5.27 · 30 sep 2026 · Un animal, una llamada de dibujo (RV-1)
 
 La revisión del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md` §2,
 en su rama) encontró la regresión que dejó la PR #3: los animales facetados son

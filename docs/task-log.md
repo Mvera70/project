@@ -1,6 +1,6 @@
 # Cuaderno de tareas — el rework
 
-## 30 sep 2026 · RV-1: un animal, una llamada de dibujo (v5.25) — **PR abierta, sin fusionar**
+## 30 sep 2026 · RV-1: un animal, una llamada de dibujo (v5.27) — **PR abierta, sin fusionar**
 
 La revisión del 30 sep (su rama, `docs/medidas/revision-rendimiento-2026-09-30.md`
 §2) me devolvió la regresión de la PR #3: los animales facetados costaban 16–27
