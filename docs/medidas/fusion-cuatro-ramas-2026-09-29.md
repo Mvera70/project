@@ -61,7 +61,7 @@ se monta con `?aa=fxaa`. El sonido compila contra `day-phases.ts` y
 ## 4 · Huecos, por dueño
 
 **Arreglado después**: Sonido 3 y 7, por la rama del sonido (v5.21, PR #9); y en
-la misma PR que este papel (v5.22), Animación 2,
+la misma PR que este papel (v5.25), Animación 2,
 Gráficos 1 (los enlaces del encargo; los de la revisión estaban bien, porque
 ella misma explica que no existen y `foot-shadows.ts` es un módulo propuesto) y
 el orden del changelog y del cuaderno. Lo demás sigue abierto.
@@ -113,8 +113,18 @@ el orden del changelog y del cuaderno. Lo demás sigue abierto.
    uno: redundante, no dañino.
 
 ### Modelos 3D
-Nada urgente. Zorro, conejo y aldeano siguen con el esquema anterior, como se
-pidió. El ladrido del perro es decisión de Vera.
+~~Nada urgente.~~ **Corregido el 30 sep tras la revisión de rendimiento**
+(`docs/medidas/revision-rendimiento-2026-09-30.md` §2, fila RV-1 de
+`docs/plan-meta.md`, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar): esta auditoría no midió las llamadas de dibujo. Los
+siete animales facetados (vaca, ciervo, cerdo, pato, trucha, gallina, cuervo)
+son nodos rígidos sin esqueleto y dejan **16–27 mallas por animal** donde antes
+había 1. Con la misma escena, la villa 7/60 pasa de **500 a 964 llamadas** y la
+aldea 11/21 de **440 a 649**. Es la regresión de más peso de las cuatro ramas en
+una tablet. Pesan la mitad y tienen menos triángulos, que es lo que se dijo
+arriba; lo que se paga son las llamadas.
+
+Zorro, conejo y aldeano siguen con el esquema anterior, como se pidió. El
+ladrido del perro es decisión de Vera.
 
 ### De todos
 1. **No hay medida combinada de rendimiento.** Cada rama midió sola y en

@@ -1,6 +1,6 @@
 # Cuaderno de tareas — el rework
 
-## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.23)
+## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.26)
 
 La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60
 a 0 fps con la vida en «0/0p», que es el bucle que GV dejó apuntado. Arreglo:
@@ -9,9 +9,15 @@ que acabó el pintado anterior (`clock.painted`), no el entero. Medido en el
 contenedor: la villa pasa de 4 595 ms por `paint` con la vida a cero a 142 ms
 con la vida dando pasos; la aldea no cambia. **Abierto:** el primer montaje de
 la villa sigue costando 4–5 s y se paga en cada relevo de jornada —Vera vio
-bajar los fotogramas de la aldea pequeña **justo al anochecer**—; abaratar
-`createVillage` (rutas por plan de escena, no por jornada) es la segunda parte
-de GV-4. Y que Vera vuelva a abrir la villa 7/60 en la tablet con esto dentro.
+bajar los fotogramas de la aldea pequeña **justo al anochecer**—; con GV-4a
+solo, a ×16 la villa 7/60 se congela 5–7 s en cada relevo. Abaratar
+`createVillage` es la segunda parte de GV-4, y **no** va por guardar rutas por
+plan de escena (no toca `dayPlans`, la mitad del coste): va por las regiones
+cerradas —el 93 % de las búsquedas A* finas fallan y son el 99 % del tiempo—,
+con el prototipo exacto de `claude/gv-4b-regiones-cerradas` (7/60 de 3,2 s a
+0,15–0,22 s, misma vida byte a byte en cuatro valles;
+`docs/medidas/revision-rendimiento-2026-09-30.md` §3, fila RV-2, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar). Y que Vera vuelva a abrir la villa 7/60 en la
+tablet con esto dentro.
 
 ## 30 sep 2026 · La fusión de las cuatro ramas del 29 sep: cómo quedaron juntas
 
@@ -20,9 +26,12 @@ Animación (PR #2 y #6), modelos de animales (#3), gráficos GV (#4) y sonido
 lint y suite rápida limpios; la caza se hizo sobre los modelos nuevos y el
 sonido no toca el renderer— y los huecos entre ellas, repartidos por dueño,
 están en `docs/medidas/fusion-cuatro-ramas-2026-09-29.md`. Arreglado lo
-fácil (v5.22): la fila de `tools/art/bake-clips.mjs`, los enlaces rotos del
+fácil (v5.25): la fila de `tools/art/bake-clips.mjs`, los enlaces rotos del
 encargo GV y el orden de este cuaderno y del changelog; lo del sonido (pestaña
-oculta, prueba lenta) lo cerró su rama en v5.21. **Abierto:** que suenen caza, oso y combate (sonido
+oculta, prueba lenta) lo cerró su rama en v5.21. **Lo que esta auditoría no
+vio** (la revisión del 30 sep, fila RV-1, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar): los siete animales facetados de la
+PR #3 dejan 16–27 mallas por animal, antes 1; con la misma escena, la villa 7/60
+va de 500 a 964 llamadas y la aldea 11/21 de 440 a 649. **Abierto:** que suenen caza, oso y combate (sonido
 con animación: primero el contrato de qué publica la vida para que el sonido lo
 oiga); una medida de rendimiento con todo junto en iPhone o iPad; y **las 21
 jornadas rojas** que la CI enseñó al terminar por primera vez. **No son de estas

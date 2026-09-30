@@ -1,6 +1,6 @@
 # The Valley — Registro de cambios
 
-## v5.23 · 30 sep 2026 · GV-4: el bucle de la villa, roto — un fotograma lento ya no es una ausencia
+## v5.26 · 30 sep 2026 · GV-4: el bucle de la villa, roto — un fotograma lento ya no es una ausencia
 
 Vera abrió el sitio con las cuatro ramas dentro en su tablet: la aldea 11/21 a
 57 fps y 11 ms por fotograma, y la villa 7/60 a 0 fps, 2 264 ms por fotograma y
@@ -23,12 +23,23 @@ una villa tarda más de un segundo en una tablet. Sin salida.
 - La prueba, en `graphics-clock.test.ts`: cinco fotogramas de 1,5 s de trabajo
   seguidos no encadenan discontinuidades, y dos segundos sin pintar sí lo son.
 - **Abierto (segunda parte de GV-4):** el primer montaje sigue costando 4–5 s
-  (`createVillage`, rutas de A*), y se paga también en cada relevo de jornada:
-  Vera vio bajar los fotogramas de la aldea pequeña justo al anochecer.
-  Abaratarlo es guardar las rutas del común, la orilla y el vado por plan de
-  escena en vez de por jornada.
+  (`createVillage`), y se paga también en cada relevo de jornada: Vera vio
+  bajar los fotogramas de la aldea pequeña justo al anochecer. **GV-4a solo no
+  basta**: a ×16 la villa 7/60 se sigue congelando 5–7 s en cada relevo (uno
+  cada 7,5 s), y a ×64 la jornada dura menos que su montaje. Dónde se va, medido
+  por la revisión del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md` §3, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar): el relevo es
+  `dayPlans`→`choose` en un 50 % en 7/60 (99 % en 3/40), y el 93 % de las
+  búsquedas A* finas **fallan** y se llevan el 99 % del tiempo. La propuesta que
+  se escribió aquí primero —guardar las rutas del común, la orilla y el vado por
+  plan de escena— no toca `dayPlans` y queda **sustituida** por la de las
+  regiones cerradas: una búsqueda fallida ya recorrió una región de la que no se
+  sale, y la siguiente que salga de dentro hacia un destino que no está en ella
+  se contesta «no» sin buscar. Es exacta por construcción; el prototipo, en la
+  rama `claude/gv-4b-regiones-cerradas` (sin fusionar, con su prueba de
+  equivalencia), baja `createVillage` 7/60 de 3,2 s a 0,15–0,22 s con la misma
+  vida byte a byte en cuatro valles.
 
-## v5.22 · 30 sep 2026 · La fusión de las cuatro ramas, revisada, y lo fácil arreglado
+## v5.25 · 30 sep 2026 · La fusión de las cuatro ramas, revisada, y lo fácil arreglado
 
 Vera pidió revisar cómo quedaron juntas animación, modelos de animales,
 gráficos GV y sonido después de entrar las cuatro en una noche. El esquema y
@@ -44,6 +55,11 @@ del sonido en v5.21. Lo demás fácil, aquí:
   sonido y la v5.15 encima de la v5.20.
 - Las 21 jornadas rojas que la CI enseñó al terminar por primera vez **ya
   fallaban antes** de las cuatro ramas: medido en local sobre `efafc2e`.
+- **Lo que esta revisión no vio**, corregido tras la del 30 sep
+  (`docs/medidas/revision-rendimiento-2026-09-30.md` §2, fila RV-1): los siete animales facetados de la PR #3
+  dejan **16–27 mallas por animal** (antes 1). Con la misma escena, la villa 7/60
+  pasa de 500 a 964 llamadas de dibujo y la aldea 11/21 de 440 a 649. El papel
+  decía «Modelos 3D: nada urgente»; ya no.
 
 ## v5.24 · 30 sep 2026 · Siete sonidos de caza y asedio, rehechos de ruido y elegidos «a mi criterio»
 

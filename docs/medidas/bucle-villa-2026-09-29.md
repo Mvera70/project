@@ -7,12 +7,16 @@ probable de la tablet a 0 fps** que Vera vio ese mismo día («0 fps con
 fotogramas de dos segundos, año 60»,
 `docs/medidas/rendimiento-piel-v9-2026-09-29.md`).
 
-**Estado: la primera mitad, arreglada el 30 sep 2026 (v5.23, GV-4a):** el hueco
+**Estado: la primera mitad, arreglada el 30 sep 2026 (v5.26, GV-4a):** el hueco
 que decide la ausencia es el ocioso, desde que acabó el pintado anterior
 (`clock.painted`). Medido igual que abajo: de 4 595 ms por `paint` con la vida a
 cero a 142 ms con la vida andando (mediana de 80 s, primer montaje incluido).
 Queda la segunda (GV-4b): el primer montaje y cada relevo de jornada siguen
-costando 4–5 s. Lo que sigue es el diagnóstico tal como se escribió. Salió midiendo la ronda GV
+costando 4–5 s, y con GV-4a solo la villa a ×16 se congela 5–7 s en cada relevo.
+El remedio no es guardar rutas por plan de escena sino las **regiones
+cerradas** (el 93 % de las búsquedas A* finas fallan y son el 99 % del relevo;
+prototipo en `claude/gv-4b-regiones-cerradas`, 7/60 de 3,2 s a 0,15–0,22 s):
+`docs/medidas/revision-rendimiento-2026-09-30.md` §3, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar. Lo que sigue es el diagnóstico tal como se escribió. Salió midiendo la ronda GV
 (`docs/encargos/profundidad-visual-movil-2026-09-29.md`), que no podía tocar
 estos ficheros. La fila es **GV-4** en `docs/plan-meta.md`, propuesta como P1;
 el orden es del dueño.
