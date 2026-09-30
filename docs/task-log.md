@@ -1,5 +1,14 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · Decisiones de Vera tras RD-0
+
+**×1 es la velocidad normal** (la escalera se mantiene; el primer año se
+rellena con contenido entre medias), **descanso A′** y **primera elección
+«Uno en el vado» desde la fundación**, con el forastero llegando andando y una
+señal encima. Escritas en el plan (§6, «Decisiones de Vera tras RD-0»).
+Siguiente: RD-1 a ×1 —la caza sin adelantar la semana (D4) y con su
+consecuencia a la vista (D5), y el forastero del vado en la semana 0—.
+
 ## 30 sep 2026 · RD-0 cerrada: la apertura y el catálogo, medidos (v5.41)
 
 Síntesis en `docs/medidas/rd0-sintesis-2026-09-30.md`. **A ninguna velocidad

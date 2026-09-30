@@ -355,6 +355,30 @@ marcarse con evidencia o con huecos precisos, la matriz cubre 21/21 decisiones
 con dictamen y RD-1 tiene una primera intervención y una primera elección
 identificadas para diseñar.
 
+### Decisiones de Vera tras RD-0 (30 sep 2026)
+
+1. **La velocidad normal es ×1.** «La aldea debe moverse a un ritmo normal,
+   que se vea todo normal; lo que hay que adelantar son las cosas o meter cosas
+   entre medias.» A ×1 una semana son 14 min: la primera semana del motor
+   acaba en el minuto 14, la primera hora son las semanas 0–4 y **las 8–10 h
+   son el primer año** (semanas 34–43). Los objetivos de §3 se miden a ×1.
+2. **La escalera larga se mantiene y se rellena.** Piedra ~54–60 h y primer
+   asalto ~100 h se quedan (su objetivo de «piedra en 60/70 h»); el primer año
+   se llena con contenido nuevo del caserío entre medias.
+3. **Descanso A′**: la encrucijada espera; paran el aviso de un asalto y la
+   semana que acabaría la partida; sola al ocultar o cerrar, a la velocidad
+   que se dejó, guardada para las dos puertas.
+4. **Primera elección: «Uno en el vado»**, desde la fundación. El forastero
+   baja andando hasta el vado hacia el minuto 4–6 y espera con una señal
+   encima; tocarla abre la encrucijada. Si no se toca, espera como cualquier
+   decisión pendiente.
+
+Consecuencias para lo que sigue: como a ×1 no hay ticks antes del minuto 14,
+**todo lo de los primeros diez minutos vive dentro de la semana 0**: escenas de
+la capa de vida y ocasiones que el motor deja preparadas al fundar. Y nada
+que cierre la semana antes de tiempo (D4: cobrar una pieza ya no puede
+adelantar el calendario catorce minutos).
+
 ### Siguiente brief: RD-1 · la apertura jugable (30 sep 2026, tras RD-0)
 
 **Objetivo.** Antes del minuto 10 a la velocidad normal: una ocasión en el
