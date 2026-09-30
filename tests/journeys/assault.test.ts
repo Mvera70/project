@@ -135,7 +135,14 @@ describe('D3b/D5 · el portón que cede', () => {
     // puestos y arcos: el portón cae a los veinte segundos, cuatro hombres
     // entran por él, y **los doce acaban muertos**. Contar «entró alguien»
     // perdía una partida que la muralla había ganado.
-    const held = await fight(raided(7, 25, { bows: true, assault: true }));
+    //
+    // **Y desde v5.36 es la semilla 3** (30 sep 2026). El cambio del motor que
+    // quitó las riñas a los recién llegados sin sitio movió la villa de la 7 a
+    // los veinticinco años, y su partida ya no llega a golpear el portón (0
+    // golpes, 9 caídos). Medido con arcos en 7, 11, 23 y 3, a los 25 y 30
+    // años: la escena —portón roto, doce caídos, nadie dentro— sale en la 3 a
+    // los 25 y a los 30, y en la 7 a los 30. La propiedad no cambia.
+    const held = await fight(raided(3, 25, { bows: true, assault: true }));
     expect(held.broken, 'la puerta cedió').toBe(true);
     expect(held.fallen, 'y cayeron los doce').toBe(12);
     expect(held.entered, 'pero no queda nadie dentro: el valle aguanta').toBe(false);
