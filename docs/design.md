@@ -3204,11 +3204,10 @@ destello a cualquier velocidad— y **en pausa no se apaga**, como todo lo que s
 mueve (§11.4); eso es además lo que permite fotografiarlo, porque 0,12 s no los
 alcanza ninguna captura corriendo. El trueno llega entre 0,4 y 2,2 s después,
 porque el sonido va más despacio que la luz: el renderer **cuenta** los rayos
-(`GraphicsStats.bolts`) y `app.ts` pide el acento del trueno, así que el render
-sigue sin saber que existe el sonido. **Desde el 24 sep 2026 ese acento está
-en silencio**: el audio sintetizado se retiró y el trueno sonará cuando haya un
-fichero (`src/ui/sound.ts`, `CUE_FILES`). La interfaz suena desde el 29 sep
-(§11.10); el trueno no es de la interfaz y sigue sin el suyo.
+(`GraphicsStats.bolts`) y `app.ts` pide el trueno, así que el render sigue sin
+saber que existe el sonido. Suena desde el 29 sep 2026 por la distancia
+(§11.11), y desde el 30 sep por su propio canal (`sound.sky`) y no como un
+acento de la interfaz: el fusible de los acentos tiraba el trueno cercano.
 
 **Y se puede mirar desde fuera:** la raíz lleva `data-sky` y `data-bolts`, la
 ruta de depuración acepta `&weather=storm`, `&weather=snow` y `&weather=wet`
@@ -4147,16 +4146,15 @@ que dibujar escribiera en el estado o gastara una tirada.
 **La interfaz suena, y el valle no.** Vera retiró el 24 sep la síntesis en
 vivo de U-09 —«el audio es malísimo, el de fondo es hasta incómodo»— y el 29
 eligió que suene la interfaz entera con ficheros fabricados fuera del juego:
-portada, navegación, reloj, decisiones, medios, ofertas e hitos. **Sin
-ambiente**: el lecho de fondo es lo que resultó incómodo, y vuelve sólo si
-ella lo pide (`docs/plan-audio.md` §4.1).
+portada, navegación, reloj, decisiones, medios, ofertas e hitos. El fondo
+del mundo vino después, pedido por ella, y es §11.11.
 
 Lo normativo es **cuándo**; cómo suena cada cosa lo decide
 `tools/ui/sounds.py` y se escucha, no se prueba.
 
 | Momento | Suena | Por qué ahí |
 |---|---|---|
-| **Tocar cualquier botón que no tenga voz propia** | `ui_button_press` al bajar el dedo, `ui_button_release` al levantarlo | El sello de cera que eligió Vera («Eligo el K», 29 sep 2026). Los que sí tienen voz propia están listados en `OWN_VOICE` (`sound.ts`) y no lo llevan encima. Soltar fuera del botón —arrepentirse— no suena |
+| **Tocar cualquier botón que no tenga voz propia** | `ui_button_press` al bajar el dedo, `ui_button_release` al levantarlo | El sello de cera que eligió Vera («Eligo el K», 29 sep 2026). Los que sí tienen voz propia están listados en `OWN_VOICE` (`sound.ts`) y no lo llevan encima; **todo botón que navega por `actions.navigate` es de ésos**, o suena dos o tres veces. Soltar fuera del botón —arrepentirse— no suena |
 | Fundar / continuar en la portada | `ui_title_begin` / `ui_title_continue` | Volver es más discreto que empezar |
 | Abrir una hoja desde el valle, y el cronicón o las opciones gráficas | `ui_panel_open` | Un cambio de contexto |
 | Volver al valle | `ui_panel_close` | La pareja, más corta y más baja |
@@ -4173,7 +4171,10 @@ Lo normativo es **cuándo**; cómo suena cada cosa lo decide
 
 **Tres reglas.** *Los acentos del juego* —encrucijada, oferta, hito— pasan
 por el fusible de reloj de pared de §11.4 (`SOUND.ACCENT_MIN_GAP_MS`), nunca
-suenan en un letargo y, si coinciden, gana el hito. *Los toques del jugador*
+suenan en un letargo y, si coinciden, gana el hito. No pasan por la compuerta
+de velocidad del mundo (§11.11), y es medido: salen en el 0,7–1,2 % de las
+semanas, con una semana como mínimo entre dos —13 s a ×64—, así que el
+fusible ya basta. El trueno no es un acento: va por su canal (§11.11). *Los toques del jugador*
 no pasan por ese fusible —quien toca espera oírlo aunque acabe de sonar un
 hito— sino por uno propio y corto por sonido (`SOUND.TAP_MIN_GAP_MS`). Y *lo
 que el juego hace solo* no suena como si lo hubiera hecho el jugador: la caza
@@ -4194,7 +4195,18 @@ fichero con el mismo nombre en `public/audio/`.
 (`tools/ui/sound-check.mjs` recorre la interfaz con clics de verdad y lo lee
 de `window.__valleySound`), que sonara algo en un letargo o a cada tick, que
 en silencio sonara algo, o que el primer toque de una sesión se quedara sin
-sonido más de `SOUND.LATE_PLAY_MS`.
+sonido más de `SOUND.LATE_PLAY_MS`; que un botón sonara más de una vez
+(el recorrido lo exige en cada cierre y vuelta); o que con el sonido apagado
+se descargara, se decodificara o girara algo.
+
+**Y lo que cuesta** (revisión del 30 sep 2026). Apagado no se paga nada: ni
+descarga, ni `AudioContext`, ni decodificar. Encendido, los toques
+decodificados pesan 4,2 MB a 48 kHz y se quedan; los lechos pesan 2,3 MB cada
+uno (30,7 MB los catorce) y **se sueltan** cuando llevan
+`SOUND.AMBIENCE_RELEASE_SECONDS` callados, y todos al apagar. Un fichero que no
+llegó se vuelve a pedir pasado `SOUND.FETCH_RETRY_MS`, y el service worker
+precachea los 47 en la instalación (`public/audio/manifest.json`, que escribe
+`sounds.py` al sellar).
 
 ### 11.11 El fondo del mundo (29 sep 2026)
 
@@ -4235,7 +4247,12 @@ volumen sino que el aire se come los agudos y estira la cola. Encima chasquea
 casi a la vez y lleva su latigazo delante; al otro lado del valle tarda dos
 segundos y llega hecho un retumbar. El reloj del retardo es de pared y no se
 escala con la velocidad: es del aire, no de la simulación, igual que el
-destello (§10.7).
+destello (§10.7). **Latigazo y trueno van por `sound.sky`**, con un fusible
+propio por sonido, y no por el de los acentos: el trueno cercano llega a menos
+de un segundo del latigazo y ese fusible de 2,5 s lo tiraba siempre (con la
+cámara en el corazón del valle, el 60–70 % de los rayos; revisión del 30 sep
+2026). Y pasan por la misma compuerta que la caza y el asedio: a ×16 y ×64 no
+suenan, porque una tormenta dura segundos y serían un traqueteo.
 
 **Qué falsaría esto:** que el cielo y el sonido discrepen; que algo suene en
 pausa, en un letargo o con el sonido apagado; que un rayo lejano suene antes o

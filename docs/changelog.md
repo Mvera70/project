@@ -75,6 +75,42 @@ matriz (§2.7).
   anochecer devuelve a la boca de su cueva al oso que sigue fuera, sólo la
   primera jornada de una sesión (matriz §2.7).
 
+## v5.25 · 30 sep 2026 · El sonido, arreglado tras la revisión: el trueno cercano, los botones que sonaban dos veces y la memoria
+
+Encargo de Vera sobre lo que la revisión del 30 sep encontró en el sonido
+(`docs/medidas/revision-rendimiento-2026-09-30.md` §6 y §7). **No cambia cómo
+suena nada**: cambia qué llega a sonar y lo que cuesta.
+
+- **El trueno cercano suena.** Latigazo y trueno iban por `sound.accent` y su
+  fusible de 2,5 s tiraba el trueno, que llega ≤ 0,71 s después: con la
+  cámara en el corazón del valle, el 60–70 % de los rayos. Ahora van por
+  `sound.sky`, con su fusible por sonido, y pasan por la compuerta de
+  velocidad del mundo: a ×16 y ×64 no suenan, como la caza y el asedio.
+- **Cada botón suena una vez.** Nueve botones que navegan por
+  `actions.navigate` sonaban a sello y además a `routeCue`: los cinco de la
+  revisión y cuatro más —el cierre de la bandeja, que es el que de verdad se
+  toca en la crónica, el carro, la gente y la ficha (el de la crónica y el del
+  carro están ocultos), el nombre enlazado, la carta sellada y los dos cierres
+  de la portada—. Entran en `OWN_VOICE`.
+- **La memoria.** Un lecho decodificado son 2,3 MB (30,7 MB los catorce a
+  48 kHz) y no se soltaba ninguno. Ahora se suelta el que lleva 30 s callado
+  (`SOUND.AMBIENCE_RELEASE_SECONDS`) y todos al apagar; con el sonido apagado
+  no se descarga, no se crea el contexto y no se decodifica nada.
+- **Sin red.** El service worker precachea los 47 ficheros
+  (`public/audio/manifest.json`, que escribe `sounds.py --stamp`), y un fallo
+  de descarga se vuelve a pedir pasados 30 s (`SOUND.FETCH_RETRY_MS`) en vez
+  de quedarse como `null` para siempre.
+- **Lo muerto y lo viejo.** `SOUND.MURMUR_*` sale del código (los umbrales,
+  apuntados en `plan-audio-mundo.md`); la cabecera de `sound.ts`, la SKILL §2,
+  §6 y §8 y design §10.7, §11.10 y §11.11 dicen lo que hay.
+- **Medido.** Los acentos de la interfaz salen en el 0,7–1,2 % de las semanas
+  (cinco semillas, sesenta años), con una semana como mínimo entre dos —13 s a
+  ×64—, así que no necesitan compuerta de velocidad: el fusible basta.
+- **Probado.** `tests/fast/sound-player.test.ts` ejercita por fin el
+  reproductor con un `AudioContext` simulado (seis de sus nueve pruebas fallan
+  contra el de antes); el recorrido `sound-check.mjs` exige «una vez» en cada
+  cierre y vuelta: **34/34 toques y 8/8 ambiente** en Chromium.
+
 ## v5.24 · 30 sep 2026 · Siete sonidos de caza y asedio, rehechos de ruido y elegidos «a mi criterio»
 
 Vera, ante la segunda tanda de cinco familias: «hazlo tú». Se eligió la C

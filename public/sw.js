@@ -122,6 +122,29 @@ async function modelAssets(cache) {
   }
 }
 
+/**
+ * **El sonido**, por el mismo motivo que los modelos: el juego lo pide en
+ * marcha (`ui/sound.ts`) y el documento no lo nombra. Hasta el 30 sep 2026 no
+ * se precacheaba, y quien abría el juego una vez y se quedaba sin red jugaba
+ * en silencio. Son 47 ficheros y 0,9 MB, cada uno con su huella (`?v=`), así
+ * que una copia guardada nunca es la equivocada.
+ *
+ * La lista la escribe `tools/ui/sounds.py` al sellar, y se pide **sin caché y
+ * sin guardarla**: sólo se lee aquí, y una lista rancia precachearía sonidos
+ * que ya nadie pide.
+ */
+async function audioAssets() {
+  try {
+    const response = await fetch('./audio/manifest.json', { cache: 'no-store' });
+    if (!response.ok) return [];
+    const manifest = await response.json();
+    const files = Array.isArray(manifest.files) ? manifest.files : [];
+    return files.filter((file) => typeof file === 'string').map((file) => `./audio/${file}`);
+  } catch {
+    return [];
+  }
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE)
@@ -133,6 +156,8 @@ self.addEventListener('install', (event) => {
         await Promise.all(assets.map((url) => store(cache, url)));
         const models = await modelAssets(cache);
         await Promise.all(models.map((url) => store(cache, url)));
+        const sounds = await audioAssets();
+        await Promise.all(sounds.map((url) => store(cache, url)));
       })
       .then(() => self.skipWaiting()),
   );

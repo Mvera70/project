@@ -894,6 +894,7 @@ export function boot(
       // lado del valle tarda dos segundos y llega hecho un retumbar
       // (`ambience.ts`, `thunderFor`). Sigue siendo decorado del navegador y
       // no una tirada de la partida (§4.3).
+      const world = worldSound(stats);
       if (stats.bolts > lastBolts) {
         lastBolts = stats.bolts;
         const where = document.documentElement.dataset.boltAt?.split(',').map(Number);
@@ -904,16 +905,22 @@ export function boot(
           : SKY.THUNDER_DELAY[1] * SOUND.THUNDER_CELLS_PER_SECOND / 2;
         const { cue, delaySeconds } = thunderFor(cells);
         // El latigazo va con el destello y el trueno después: es lo que hace
-        // que se lean como una misma cosa lejos o encima.
-        if (cue === 'weather_thunder_near') sound.accent('weather_lightning_crack', Date.now());
-        window.setTimeout(() => sound.accent(cue, Date.now()), delaySeconds * 1000);
+        // que se lean como una misma cosa lejos o encima. **Por `sky`, no por
+        // `accent`**: el fusible de los acentos (2,5 s) tiraba siempre el
+        // trueno cercano, que llega a menos de un segundo de su latigazo
+        // (revisión del 30 sep 2026). Y con la misma compuerta que la caza y
+        // el asedio: a ×16 y ×64 una tormenta dura segundos y el trueno sería
+        // un traqueteo, así que el mundo sólo deja sus lechos.
+        if (momentsAudible(world, SOUND.AMBIENCE_FAST_SPEED)) {
+          if (cue === 'weather_thunder_near') sound.sky('weather_lightning_crack', Date.now());
+          window.setTimeout(() => sound.sky(cue, Date.now()), delaySeconds * 1000);
+        }
       }
       // **El fondo del mundo** (fase 1): lo que suena se decide en
       // `ambience.ts`, que es puro; aquí sólo se recoge cómo está el valle.
       const nowMs = Date.now();
       const dtSeconds = lastAmbienceMs === null ? 0 : (nowMs - lastAmbienceMs) / 1000;
       lastAmbienceMs = nowMs;
-      const world = worldSound(stats);
       sound.ambience(mixFor(world), dtSeconds);
       // **La caza y el asedio** (fase 5): lo que acaba de pasar sale de la
       // diferencia entre dos fotogramas de `stats.moments` (`moments.ts`, puro),

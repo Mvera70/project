@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · El sonido tras la revisión (v5.25) — **en PR, sin fusionar**
+
+Hecho lo que la revisión encontró en el sonido: el trueno cercano suena
+(`sound.sky`), nueve botones dejan de sonar dos o tres veces (`OWN_VOICE`), los
+lechos callados se sueltan y apagado no se paga nada, el audio entra en el
+precaché y un fallo de descarga se reintenta. Nada cambia de carácter.
+**Abierto:** que Vera lo oiga en el aparato; el cierre del tablón no está en
+el recorrido (sólo se abre tocándolo en el mundo); el paso «de noche se
+relevan» del recorrido salió rojo una vez de cinco y verde en las otras
+cuatro —la mezcla es de `ambience.ts`, que esta ronda no toca—; y sigue sin
+cifra de coste en un aparato, sin tope de voces y sin `duck` (revisión §7).
+
 ## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
 
 Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en

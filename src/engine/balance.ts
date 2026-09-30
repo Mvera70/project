@@ -2798,19 +2798,10 @@ export const SOUND = {
   THUNDER_NEAR_CELLS: 22,
   THUNDER_MID_CELLS: 44,
 
-  // ---- la vida del fondo (fase 2, 29 sep 2026) ----
+  // ---- la caza y el asedio (fase 5, 30 sep 2026) ----
 
-  // TUNE: **cuánta gente hace falta para que la aldea suene a aldea, y a
-  // pueblo.** Sale de medir, no de la cabeza: `founding-report.ts` sobre las
-  // semillas 7, 23, 42, 108, 999 y 2024 da 6–13 personas el primer año,
-  // 20–39 el quinto, 21–54 en la primera década y 50–80 en un valle maduro
-  // (el tope es 80: 16 casas × 5). Así que el rumor entra en cuanto hay más
-  // que las dos familias del principio, llena hacia las veinte, y el segundo
-  // lecho —el que hace que se solapen los golpes— sube desde la treintena y
-  // llena donde llegan los valles buenos.
-  // La caza y el asedio (fase 5, 30 sep 2026): los sucesos de la muralla, el
-  // monte y la cueva (`ui/moments.ts`) suenan por el reproductor con su
-  // distancia. Fusible por sonido, como el de los toques pero más ancho: un
+  // Los sucesos de la muralla, el monte y la cueva (`ui/moments.ts`) suenan
+  // por el reproductor con su distancia. Fusible por sonido, como el de los toques pero más ancho: un
   // cerco de siete arqueros suelta una salva en el mismo fotograma y no debe
   // ser una ametralladora. TUNE: sin medir contra un asalto real; se ajusta
   // con Vera y `?sandbox=battle`.
@@ -2819,10 +2810,23 @@ export const SOUND = {
   MOMENT_MIN_GAIN: 0.04,
   /** ±3 % de tono por golpe (skill §7): diez seguidos no suenan a máquina. */
   MOMENT_PITCH_JITTER: 0.06,
-  MURMUR_SPARSE_FROM: 4,
-  MURMUR_SPARSE_FULL: 18,
-  MURMUR_BUSY_FROM: 28,
-  MURMUR_BUSY_FULL: 60,
+
+  // ---- la memoria del reproductor (revisión del 30 sep 2026) ----
+
+  // TUNE: cuánto tiempo real lleva callado un lecho antes de soltarlo: se
+  // para su bucle, se desengancha su ganancia y se tira lo decodificado. Un
+  // lecho de doce segundos decodificado a 48 kHz son 2,3 MB (mono, en coma
+  // flotante), los catorce 30,7 MB, y antes no se soltaba ninguno: tras una
+  // hora a ×1 el reproductor retenía ~20 MB, y hasta 33 con todos los cielos. Treinta segundos
+  // esperan de sobra a que un cruce termine (2,5 s) y a que una nube pase, y
+  // volver a decodificar uno cuesta milisegundos, sin red: los bytes
+  // comprimidos se quedan.
+  AMBIENCE_RELEASE_SECONDS: 30,
+  // TUNE: cuánto se espera para volver a pedir un fichero que no llegó. Antes
+  // un fallo de descarga se guardaba para siempre y ese sonido no volvía a
+  // sonar en la sesión; pedirlo en cada fotograma, en cambio, sería una
+  // ráfaga sin red. Medio minuto es lo que tarda en volver una red de móvil.
+  FETCH_RETRY_MS: 30_000,
 
   // TUNE: la fuerza del viento por cielo, de 0 a 1. **Vive aquí y no en el
   // renderer porque la leen dos capas**: el meneo de las hojas
