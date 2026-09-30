@@ -195,10 +195,21 @@ export function arriveToStay(
   const name = pool[hash32(state.tick, `${salt}-name`) % pool.length] ?? 'Stranger';
   const id = state.people.nextId;
   state.people.nextId += 1;
+  // §6.1: nombrado quiere decir personaje —rasgos que pesan, memoria que se
+  // desgasta, opiniones que derivan— y sólo lo es quien entra en `namedIds`.
+  // Quien llega sin hueco (la familia que huye, o el brazo del carro con la
+  // lista llena) conserva el nombre, que la crónica cita al llegar, pero no es
+  // personaje. Hasta el 30 sep 2026 entraba con `named: true` fuera de la
+  // lista: `quarrelOf` lo veía y `decayMemories`/`driftOpinions` no, así que
+  // sus rencores no se curaban nunca, su memoria llena de hambres de peso 4–5
+  // expulsaba al momento el recuerdo de la riña (el freno de
+  // `QUARREL.REPEAT_TICKS`) y las riñas pasaron de 132 a 1 610 en tres siglos
+  // de tres semillas (`engine-long.test.ts`, «no es una taberna»).
+  const character = options.character !== false && state.people.namedIds.length < PEOPLE.MAX_NAMED;
   state.people.villagers.push({
     id,
     name,
-    named: true,
+    named: character,
     role: null,
     female,
     bornTick: state.tick - ageYears * TIME.WEEKS_PER_YEAR,
@@ -217,7 +228,7 @@ export function arriveToStay(
     memories: [],
     opinions: {},
   });
-  if (options.character !== false && state.people.namedIds.length < PEOPLE.MAX_NAMED) state.people.namedIds.push(id);
+  if (character) state.people.namedIds.push(id);
   return id;
 }
 
