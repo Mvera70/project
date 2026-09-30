@@ -1,6 +1,6 @@
 # The Valley — Registro de cambios
 
-## v5.32 · 30 sep 2026 · La CI en verde de una vez, y un director para las tandas
+## v5.33 · 30 sep 2026 · La CI en verde de una vez, y un director para las tandas
 
 Vera, harta de leer «ya estaba rojo» en cada PR: «¿por qué no lo arreglamos ya
 de una maldita vez?». Y a continuación pidió una dirección que mande sobre las
@@ -26,6 +26,21 @@ demás para no volver a pisarse.
   sobre `main` en verde, informe de fusión—, con lo que costó cada regla el
   29 sep. `CLAUDE.md` la manda cargar antes que nada. La primera hoja de
   reparto está en `docs/task-log.md`.
+## v5.32 · 30 sep 2026 · La respuesta a una oferta vuelve a sonar
+
+Tras la #14, el recorrido del sonido encontró muda la respuesta a una oferta
+aceptada, también en el `main` de antes de la #14. La oferta **sí** se
+aceptaba; lo que se perdía era su sonido. Se pide dentro del tick, y el
+reproductor, aun con el fichero ya decodificado, lo hacía sonar en una
+promesa, es decir, **después** de todo el trabajo síncrono del tick y del
+repintado. Con el relevo de jornada detrás eso pasa de `SOUND.LATE_PLAY_MS` y
+se tiraba siempre. Ahora lo ya decodificado suena en el acto
+(`sound-player.test.ts`, «en el acto», falla con el reproductor de antes).
+
+Y el recorrido cuenta sólo la interfaz en cada paso: desde que el trueno
+cercano suena, un rayo que caía en mitad de «silenciar el valle» lo ponía rojo.
+Recorrido 35/35 · 8/8, dos pasadas.
+
 ## v5.31 · 30 sep 2026 · El sonido, arreglado tras la revisión: el trueno cercano, los botones que sonaban dos veces y la memoria
 
 Encargo de Vera sobre lo que la revisión del 30 sep encontró en el sonido
