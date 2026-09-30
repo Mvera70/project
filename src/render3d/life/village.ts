@@ -195,7 +195,9 @@ export interface Dweller {
   sceneCooldownUntil: number;
   /**
    * V-09: qué trasto lleva en la mano ahora mismo, si lleva alguno. Id de
-   * `Prop`, no de cuerpo.
+   * `Prop`, no de cuerpo. **Negativo, en cambio, es una carga del oficio**
+   * —el haz de leña, el grano, el pago— sin `Prop` detrás, y se pinta como
+   * fardo (`cast.ts`).
    *
    * La cabaña (`beasts.ts`, V-08) no coge nada y lo lleva siempre a `null`:
    * mejor un campo obligatorio que nunca cambia que uno opcional que obliga a
@@ -347,8 +349,10 @@ export interface Village {
     readonly triggerTick: number | null;
   };
   /**
-   * IA-5: el lobo del corral, listo para pintarse — vacío si no hay visita
-   * hoy o ya se ha ido. Misma forma que `@derive/animals`' `Animal`, la que
+   * IA-5: el lobo del corral, listo para pintarse — y desde entonces toda la
+   * fauna de la jornada (ciervos, conejos, perro, zorro, patos, las bestias
+   * del camino, el oso), con el lobo el último y sólo mientras dura su visita.
+   * Misma forma que `@derive/animals`' `Animal`, la que
    * ya consume `effects/fauna.ts`, para que el render no necesite un segundo
    * tipo sólo para esto: una fuente en vivo en vez de la fórmula de siempre.
    */
@@ -2716,6 +2720,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // Va de camino o ya está contando: el pago lo apunta el final de su
         // encargo, en el bucle de la gente (`offer.id === 'pay'`).
         if (payer !== undefined && payer.doing?.place.id === `pay:${visitor.body.id}`) continue;
+        // Y no antes de que la huella del puesto esté en el suelo: entra al
+        // empezar el paso siguiente al que se monta (arriba, `stallSolids`), y
+        // una ruta trazada en este mismo paso la cruza en línea recta. Medido
+        // el 30 sep 2026 en la semilla 7 (año ocho, `life-trade.test.ts`): el
+        // vecino que venía por detrás del salinero empujó contra el puesto mil
+        // pasos y nadie pagó.
+        const stall = stallOf(visitor);
+        if (stall !== null && !stallSolids.has(stall.id)) continue;
         const front = { x: visitor.body.x + Math.sin(visitor.body.facing) * 0.7, z: visitor.body.z + Math.cos(visitor.body.facing) * 0.7 };
         const offer = placedOffer(OFFERS['pay']!, front, land);
         if (offer === null) continue;
