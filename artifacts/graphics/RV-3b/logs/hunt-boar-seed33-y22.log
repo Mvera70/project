@@ -1,0 +1,9 @@
+CMD: node tools/graphics/observe-life.mjs --seed 33 --year 22 --hunted partridge,rabbit,deer --means bows,arms --hunt --lead 20 --seconds 24 --fps 5 --zoom 0.35 --viewport 390x844 --out artifacts/graphics/RV-3b/hunt-boar-seed33-y22
+INICIO 10:23:27
+Caza antes de empezar: {"stage":"offered","species":"boar","weapon":null,"targetId":null,"prey":{"x":17.5,"z":54.5}}
+Caza en marcha: {"stage":"running","species":"boar","weapon":"spear","targetId":42002,"hunter":{"x":19.027,"z":53.321,"clip":"walk"},"prey":{"x":17.5,"z":54.5,"action":null}}
+0s, fase 0.447, 35 personas
+10s, fase 0.53, 35 personas
+20s, fase 0.613, 35 personas
+Observatorio: /home/user/project/artifacts/graphics/RV-3b/hunt-boar-seed33-y22/index.html · errores: 0
+rc=0

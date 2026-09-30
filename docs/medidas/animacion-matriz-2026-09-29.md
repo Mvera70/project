@@ -276,6 +276,15 @@ caza sola, en `artifacts/physics/AN-5/`, y las tomas, en
 | flecha, piedra y lanza · lo que toca | la flecha que acertaba seguía volando; la pieza desaparecía en el fotograma del parte | la flecha se queda con la punta dentro —en la presa (se mueve y cae con ella), en la madera o en el suelo—; la lanza clavada en madera, hasta que se saca; **la piedra de la honda desaparece donde da** (límite: ni rebota ni cae); y el parte espera a que la escena se vea (`settled`: la pieza tumbada 3 s, la que se escapa huye 3 s) | `hunt-shot.test.ts`, `life-hunt-encounter.test.ts` |
 | bear · la visita | se metía al primer aviso: en 7/30, fuera 9,5 s (el leñador pasa a menos de 5 celdas en el segundo 2,9) | tolera a quien trabaja a su distancia, se alza a quien se acerca a 3,5 y vuelve a hozar; se mete si lo acosan a 1,6, a la tercera o al acabar su rato. En 7/30, fuera 63 s y se mete a la tercera | `bear-visit-report.ts`, cinco valles (`artifacts/physics/AN-5/oso-antes.txt`, `oso-despues.txt`); `life-bear.test.ts` y la jornada `life-bear-visit.test.ts`. En partida: 7/30 (`--happening bear_in_the_wood --lead 0 --look 13.5,66.5`, 1 fps × 80 s), sale de la cueva, se alza en los fotogramas 3–5, sigue hozando, vuelve a alzarse en 17–19 (fuera de cuadro) y sigue fuera los 80 s (`AN-5/bear-seed7-y30/strip-bear-visita.png`) |
 
+**Tras la revisión del 30 sep 2026** (v5.30): el zarpazo del oso en la caza
+dura su clip `attack` (antes la embestida lo cortaba al paso siguiente:
+`life-hunt-encounter.test.ts`), la caída que pinta el render lee sus números
+de `life/hunt-bodies.ts` (una prueba la ata a la curva de lo clavado), y el
+jabalí nace en la linde: en partida, 33/22 con lanza, sale de entre los
+árboles y carga; el cazador estoca bajo entre los fotogramas 4 y 12 (5 fps),
+el jabalí cae en el 8 y queda de costado desde el 9
+(`artifacts/graphics/RV-3b/hunt-boar-seed33-y22/strip-prey.png`, `find.txt`).
+
 **Lo que la toma del oso enseña además, y no es de AN-5.** En el fotograma 63
 (fase 0,805) la aldea se estrena de nuevo —el relevo de la jornada al
 anochecer, `scenic-state.ts`— y el oso, que seguía fuera, vuelve a nacer en

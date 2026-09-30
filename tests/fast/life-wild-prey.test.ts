@@ -1,7 +1,13 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import type { Object3D } from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { foundTwenty } from '../helpers/founding';
 import { terrainOf } from '../../src/render3d/life/terrain';
-import { fitsCircle } from '../../src/render3d/life/body';
+import { fitsCircle, type Terrain } from '../../src/render3d/life/body';
+import { solidTerrain } from '../../src/render3d/world/obstacles';
+import { elevationAt } from '../../src/render3d/world/ground';
+import { TERRAIN_CODE, type GameState } from '../../src/engine/state';
 import { createWildPrey, stepWildPrey, wildPreyPosition, type WildKind, type WildPrey } from '../../src/render3d/life/wild-prey';
 import { valleyCore } from '../../src/derive/anchors';
 import { createDeer } from '../../src/render3d/life/deer';
@@ -93,5 +99,51 @@ describe('presas silvestres', () => {
     prey.phase = 'gone';
     expect(wildPreyPosition(prey)).toEqual([]);
     expect(wildPreyPosition(null)).toEqual([]);
+  });
+});
+
+describe('RV-3b · las presas nacen con los troncos del juego', () => {
+  // La prueba de arriba monta el terreno a secas, y así el jabalí nacía siempre
+  // aunque en el juego no naciera nunca: `solidTerrain` pone un tronco en cada
+  // celda de bosque. Aquí va el terreno del juego, con los GLB publicados.
+  const manifest = JSON.parse(readFileSync('public/assets/valley3d/manifest.json', 'utf8')) as { assets: { id: string; file: string }[] };
+  const models = new Map<string, Object3D | undefined>();
+  async function gameLand(state: GameState): Promise<Terrain> {
+    const wanted = new Set<string>();
+    solidTerrain(state, (id) => { wanted.add(id); return undefined; });
+    for (const id of wanted) {
+      if (models.has(id)) continue;
+      const file = manifest.assets.find(asset => asset.id === id)?.file;
+      if (file === undefined) { models.set(id, undefined); continue; }
+      const bytes = readFileSync(`public/assets/valley3d/${file}`);
+      const gltf = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
+      models.set(id, gltf.scene);
+    }
+    return solidTerrain(state, id => models.get(id)?.clone());
+  }
+
+  it('el jabalí nace en cada valle, en el bosque o en su linde; y la perdiz, el conejo, el ciervo y el oso también', async () => {
+    for (const seed of [3, 7, 11, 23]) {
+      const state = foundTwenty(seed);
+      const land = await gameLand(state);
+      const core = valleyCore(state);
+      const heart = { x: core.x, z: core.y };
+      const boar = createWildPrey(state, land, seed, heart, 'boar');
+      expect(boar, `semilla ${seed}: sin jabalí no hay caza del jabalí ni oso`).not.toBeNull();
+      const { x, z } = boar!.body;
+      expect(fitsCircle(land, x, z, boar!.body.radius), `semilla ${seed}: cabe donde nace`).toBe(true);
+      let forest = 0;
+      for (let dz = -1; dz <= 1; dz += 1) for (let dx = -1; dx <= 1; dx += 1) {
+        if (state.map.terrain[(Math.floor(z) + dz) * land.width + Math.floor(x) + dx] === TERRAIN_CODE.forest) forest += 1;
+      }
+      expect(forest, `semilla ${seed}: el jabalí está en el bosque o pegado a él`).toBeGreaterThan(0);
+      for (const kind of ['partridge', 'rabbit'] as const) {
+        expect(createWildPrey(state, land, seed, heart, kind), `semilla ${seed}: ${kind}`).not.toBeNull();
+      }
+      expect(createDeer(state, land, seed, heart).length, `semilla ${seed}: ciervo`).toBeGreaterThan(0);
+      state.flags['hunt:boar'] = 0;
+      state.flags['bear'] = state.tick + 2;
+      expect(createBear(state, land, heart, (px, pz) => elevationAt(state.map, px, pz)), `semilla ${seed}: oso`).not.toBeNull();
+    }
   });
 });

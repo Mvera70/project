@@ -99,7 +99,7 @@ import { standingOf } from './life/hunt-bodies';
 import { clipTime } from './clips';
 import { DRAWN_BODY, type ArcheryShadow } from './life/archery';
 import { garrisonAs, type Arm } from '@derive/garrison';
-import { createHuntEncounter, type HuntEncounter, type HuntReport } from './life/hunt-encounter';
+import { createHuntEncounter, releaseHunter, type HuntEncounter, type HuntReport } from './life/hunt-encounter';
 import { createWildPrey, stepWildPrey, wildPreyPosition, type WildKind, type WildPrey } from './life/wild-prey';
 import { indoors } from './life/home';
 import type { Dweller } from './life/village';
@@ -2114,6 +2114,10 @@ export async function createGraphicsRenderer(
       // estrena otra con la gente que el motor diga.
       if (frame.discontinuity || (!holdPresentation && (life === null || lifeState !== shown))) {
         const previous = life;
+        // Revisión del 30 sep 2026 · La caza en marcha se acaba con su parte
+        // (sin pieza si no la hubo): la semana la está esperando, y descartarla
+        // sin parte dejaba el juego parado hasta recargar.
+        if (huntScene !== null && huntReport === null) huntReport = huntScene.abandon();
         huntScene = null;
         dropHuntWorld();
         huntSighting = null;
@@ -2767,8 +2771,11 @@ export async function createGraphicsRenderer(
       if (report !== null) {
         huntScene = null;
         dropHuntWorld();
-        // El cazador vuelve a su día desde donde terminó, sin saltos.
+        // El cazador vuelve a su día desde donde terminó, sin saltos: si
+        // acabó donde un aldeano no cabe, ya salió andando (`settled` lo
+        // espera), y si no llegó, se coloca al lado (revisión del 30 sep).
         if (huntHunter !== null && life !== null) {
+          releaseHunter(life.land, huntHunter.body);
           huntHunter.hunting = false;
           huntHunter.doing = null;
           huntHunter.rethinkAt = life.steps;

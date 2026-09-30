@@ -1,5 +1,56 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · La caza tras la revisión: el jabalí en la linde, el cazador que sale andando, la caza sin picos (v5.30)
+
+Encargo de la revisión del 30 sep (sesión «Cambios recientes revisión», por
+orden de Vera): `docs/medidas/revision-rendimiento-2026-09-30.md` §7 y la fila
+RV-3b de `plan-meta.md`, las dos en la rama
+`claude/revision-rendimiento-2026-09-30`, sin fusionar. **PR sin fusionar,
+esperando a Vera.** El motor no cambia.
+
+**Hecho, con su prueba** (todas fallan sin el arreglo, comprobado):
+
+- **RV-3b · el jabalí nace en la linde.** Con los troncos del juego no nacía en
+  ningún valle de fundación ni en 11, 23 y 5 al año 30; ahora nace en todos, y
+  la caza del jabalí se ofrece donde antes daba «no-prey» (toma 33/22,
+  `artifacts/graphics/RV-3b/`). `hunt-report.ts` dice los valles sin presa y el
+  ciervo sale de `createDeer`.
+- **El cazador sale andando a donde cabe** al acabar (`exitRoute`, sin atravesar
+  muros) y el parte lo espera; `releaseHunter` lo coloca si no llega. En la caza
+  sola de cinco valles (cazador desde la aldea), de 1 de 198 cazas que acababan
+  sin sitio a 0 de 198.
+- **La caza sin picos**: puestos descartados por celdas y un solo camino con
+  tope por replanteo (`pathTo`, `budget`). Presa encerrada: el peor paso, de
+  2,4 s a 18 ms (celdas) y de 2,6 s a 77 ms (tablas).
+- **La escena que se pierde entrega su parte** (`abandon()`). Sin él, la semana
+  no avanzaba hasta recargar: `runTick` espera a la caza.
+- **El zarpazo del oso dura su clip**, y la caída tiene sus números en un solo
+  sitio (`hunt-bodies.ts`) con una prueba que ata el render a esa curva.
+- **Papel**: filas de herramientas, 27 clips en la skill, la vía del
+  observatorio tachada, `createBear` medido.
+
+**Las cifras, y el reparto es de Vera** (`artifacts/physics/AN-5/rv-2026-09-30-caza.txt`,
+`rv-2026-09-30-oso.txt`): el jabalí se caza ahora en los cinco valles y, en la
+linde, más a menudo (arco 65 %, lanza 83 %; antes 46 y 50 en dos valles). El
+ciervo, medido donde lo pone el juego, cae mucho menos que medido donde
+nacería un jabalí (arco 27 %, lanza 40 %; se medía 67 y 79): está más lejos.
+El oso, igual en el valle (15 %). **Si la caza del jabalí queda demasiado
+fácil o la del ciervo demasiado difícil**, las palancas son `RANGE`,
+`AIM_SIGMA` y, para el ciervo, su recelo (`WARY`), todas en `hunt-encounter.ts`.
+
+**No cuadra con la revisión, y va en la PR:** la revisión leyó que con la
+escena descartada `huntInProgress` se quedaba en verdadero (la señal no volvía
+y la velocidad quedaba a ×1); además, la semana no avanzaba. El cazador sin
+sitio: la revisión midió 32 de 184 cazas y aquí, con el cazador saliendo de la
+aldea en cinco valles, salió 1 de 198 (el escenario de la revisión no está
+escrito). Y los picos: en ese mismo escenario el peor paso ya era de 41 ms
+antes del arreglo; los segundos salen con la presa donde no se llega, que se
+reprodujo aparte (un cercado en un bosque de troncos).
+
+**Abierto:** el coste de `createBear` (se paga en cada relevo de jornada
+mientras dura la visita) queda medido y no abaratado; la toma del ciervo en su
+sitio nuevo no se ha rodado.
+
 ## 30 sep 2026 · GV-4b: el relevo de jornada, con las regiones cerradas (v5.29)
 
 La segunda mitad del bucle de la villa, que la revisión del 30 sep (§3) pasó a
@@ -37,6 +88,7 @@ portada 583 → 31; se ve igual (`artifacts/graphics/rv1/`). Prueba de
 presupuesto en `tests/fast/animal-draws.test.ts`. **Abierto:** si la rama de la
 revisión entra después, `tools/reports/model-draws.ts` se queda con esta versión
 (la que mide por `prepareModel`, el cargador del juego).
+
 
 ## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
 

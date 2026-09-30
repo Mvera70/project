@@ -88,6 +88,21 @@ export const BEAR_RISEN = {
   centre: 0.534 * PREY_MODEL.bear.length,
 } as const;
 
+/**
+ * La pieza caída se tumba de costado: rueda sobre su eje largo un cuarto de
+ * vuelta hacia -Z (`DOWN_ROLL`), con 0,14 s de constante (`DOWN_EASE`) y un
+ * suavizado al final. El render la pinta así (`effects/animal-motion.ts`) y lo
+ * que lleva clavado rueda con ella (`hunt-encounter.ts`). Revisión del 30 sep
+ * 2026: cada uno tenía su copia de los números, y nada vigilaba que casaran.
+ */
+export const DOWN_ROLL = -Math.PI / 2;
+export const DOWN_EASE = 0.14;
+/** Cuánto ha rodado ya (0 a 1) la pieza que cayó hace `seconds`. */
+export function downSettleAfter(seconds: number): number {
+  const blend = 1 - Math.exp(-Math.max(0, seconds) / DOWN_EASE);
+  return blend * blend * (3 - 2 * blend);
+}
+
 /** La cápsula de una presa en este instante: donde pisa, hacia dónde mira y si está alzada. */
 export function preyShape(species: HuntSpecies, id: number, x: number, z: number, feet: number,
   facing: number, altitude = 0, risen = false): ContactShape {

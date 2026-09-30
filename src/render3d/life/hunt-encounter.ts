@@ -28,12 +28,13 @@ import type { ArrowSighting } from '../world/arrows';
 import { combatClip, VILLAGER_CLIPS, type ClipName } from '../clips';
 import type { HuntSpecies, HuntWeapon } from '@engine/world/hunting';
 import { hash32 } from '@engine/rng';
-import { fitsCircle, integrate, turnTo, type Body, type Point, type Terrain } from './body';
+import { exitRoute, fitsCircle, integrate, turnTo, type Body, type Point, type Terrain } from './body';
 import { pathTo } from './navigate';
+import { canReach, reachableFrom } from './terrain';
 import { LIFE_STEP } from './clock';
 import type { Contact, ContactShape, ContactWorld } from './physics';
 import { createWildPrey, escapeFrom, stepWildPrey, wildPreyPosition, type WildKind, type WildPrey } from './wild-prey';
-import { PREY_BODY, preyShape } from './hunt-bodies';
+import { DOWN_ROLL, downSettleAfter, PREY_BODY, preyShape } from './hunt-bodies';
 import { WARNING_SECONDS } from './bear';
 import {
   aimHuntShot, launchHuntShot, RELEASE, SHOT_RADIUS, SHOT_SPEED, stepHuntShot, THRUST, thrustContact, thrustFor, tipReach,
@@ -72,6 +73,19 @@ const DRAW_STEPS = Math.round(0.9 / LIFE_STEP);
 const SPEAR_STEPS = Math.round(VILLAGER_CLIPS.spear_thrust.seconds / LIFE_STEP);
 /** TUNE: la lanza clavada en la madera, hasta que el cazador la saca. */
 const STUCK_STEPS = Math.round(0.8 / LIFE_STEP);
+/**
+ * TUNE: lo más que se espera, tras el parte, a que el cazador salga andando a
+ * un sitio donde quepa: 6 s dan para dos celdas a paso de caza con holgura.
+ * Si no llega, lo coloca `releaseHunter` al soltarlo.
+ */
+const EXIT_STEPS = Math.round(6 / LIFE_STEP);
+/**
+ * TUNE: los nodos que puede abrir la búsqueda fina de un replanteo. Medido en
+ * la caza sola de cinco valles (año 30, revisión del 30 sep 2026): los caminos
+ * que se encuentran abren 324 de mediana y 8.215 como mucho; con la presa
+ * encerrada, uno que no se encuentra abría la región entera.
+ */
+const PATH_BUDGET = 12_000;
 /** Las tres estocadas de la caza, sacadas de `THRUST` para que no se quede ninguna fuera. */
 const THRUST_CLIPS: readonly ClipName[] = Object.values(THRUST).map(thrust => thrust.clip);
 const isThrust = (clip: ClipName): boolean => THRUST_CLIPS.includes(clip);
@@ -159,6 +173,8 @@ const BEAR_SWIPES = 4;
  * en el llano: con 1,2–2 s caía el 75 %; con 1–1,7 s, el 43 %; así, el 32 %.
  */
 const BEAR_CADENCE = { fast: 27, slow: 48 } as const;
+/** Lo que dura el zarpazo a la vista: el clip `attack` del oso, el de su aviso. */
+const SWIPE_STEPS = Math.round(WARNING_SECONDS / LIFE_STEP);
 /**
  * TUNE: el zarpazo empuja al cazador media celda hacia atrás y lo deja sin
  * clavar lo que dura el golpe recibido (`hit_take`). Sin él, a un palmo del oso
@@ -167,12 +183,6 @@ const BEAR_CADENCE = { fast: 27, slow: 48 } as const;
 const SHOVE = 0.5;
 const SHOVE_STEPS = 8;
 const STAGGER_STEPS = Math.round(VILLAGER_CLIPS.hit_take.seconds / LIFE_STEP);
-/**
- * La presa caída se tumba como la pinta `effects/animal-motion.ts`: de costado,
- * rodando sobre su eje largo un cuarto de vuelta hacia -Z, en unas décimas.
- */
-const DOWN_EASE = 0.14;
-const DOWN_ROLL = -Math.PI / 2;
 
 export interface HuntReport {
   readonly sourceTick: number;
@@ -228,6 +238,13 @@ export interface HuntEncounter {
   step(wildlife: readonly Animal[]): void;
   /** AN-5b · El mundo de contacto. Hasta que llega, el cazador se acerca pero no tira. */
   attach(world: ContactWorld | null): void;
+  /**
+   * Revisión del 30 sep 2026 · La escena ya no se puede ver —un fotograma de
+   * más de un segundo, una carga, otro valle— y se acaba aquí: devuelve el parte
+   * que haya, o uno sin pieza con los golpes dados. Sin él, la semana se quedaba
+   * esperando un parte que no llegaba nunca.
+   */
+  abandon(): HuntReport;
 }
 
 /** Lo clavado. En la presa, en su marco (`local`); en el mundo, donde tocó. */
@@ -326,6 +343,13 @@ export function createHuntEncounter(
   let thrustClip: ClipName = 'spear_thrust';
   let report: HuntReport | null = null;
   let reportStep = -1;
+  /**
+   * Revisión del 30 sep 2026 · Por dónde sale el cazador al acabar, si donde
+   * está no cabe con su holgura de aldeano (null si no hay sitio a su alcance).
+   */
+  let exit: Point[] | null | undefined;
+  /** Cuántos replanteos seguidos no han encontrado camino: el siguiente prueba otro puesto. */
+  let failedPlans = 0;
   let downAt = -1;
   let shotsMade = 0;
   let externalTarget: Animal | null = initialTarget;
@@ -383,16 +407,12 @@ export function createHuntEncounter(
   const facingOf = (): number => wild?.body.facing ?? deerRun?.facing ?? externalTarget?.facing ?? 0;
   // Alzado lo que dura su `attack`, el mismo que su aviso en la visita.
   const risen = (): boolean => species === 'bear' && bearAction === 'attack'
-    && stepNumber - lastBearSwipe < Math.round(WARNING_SECONDS / LIFE_STEP);
+    && stepNumber - lastBearSwipe < SWIPE_STEPS;
   const shapeAt = (point: Point): ContactShape =>
     preyShape(species, targetId, point.x, point.z, ground(point.x, point.z), facingOf(), altitudeOf(), risen());
 
   /** La presa caída: cuánto ha rodado ya sobre su costado (0 a 1), como la pinta el render. */
-  const downSettle = (): number => {
-    if (downAt < 0) return 0;
-    const blend = 1 - Math.exp(-(stepNumber - downAt) * LIFE_STEP / DOWN_EASE);
-    return blend * blend * (3 - 2 * blend);
-  };
+  const downSettle = (): number => downAt < 0 ? 0 : downSettleAfter((stepNumber - downAt) * LIFE_STEP);
 
   /** La sacudida del impacto: un empujón que se apaga en unas décimas. */
   const kickOf = (): { x: number; z: number } => {
@@ -558,14 +578,21 @@ export function createHuntEncounter(
       }
     });
     candidates.sort((a, b) => a.order - b.order || a.cost - b.cost);
-    let tries = 0;
-    for (const { at, ring } of candidates) {
-      if (tries++ >= 4) break;
-      const path = pathTo(land, hunterBody, at, NAV_RADIUS);
-      if (path !== null) { standRing = ring; return path.map(point => ({ x: point.x, z: point.z })); }
-    }
-    standRing = rings[0] ?? 0;
-    return pathTo(land, hunterBody, target, NAV_RADIUS)?.map(point => ({ x: point.x, z: point.z })) ?? null;
+    // Revisión del 30 sep 2026 · **Cada replanteo cuesta, como mucho, una
+    // búsqueda con tope.** Se probaban hasta cinco caminos, y con la presa donde
+    // no se llega cada uno recorría la región entera dos veces: pasos de caza de
+    // 0,1 a 2,4 s, que el reloj toma por una ausencia (y la escena se perdía).
+    // Primero se descarta, por celdas, el puesto al que no se llega (el agua, un
+    // cercado); luego se prueba el mejor, y si no hay camino, el replanteo
+    // siguiente prueba el siguiente.
+    const reach = reachableFrom(land, hunterBody);
+    const open = candidates.filter(candidate => canReach(land, reach, candidate.at));
+    const pick = open.length > 0 ? open[failedPlans % open.length]! : null;
+    const goal = pick?.at ?? (canReach(land, reach, target) ? target : null);
+    standRing = pick?.ring ?? rings[0] ?? 0;
+    const path = goal === null ? null : pathTo(land, hunterBody, goal, NAV_RADIUS, PATH_BUDGET);
+    failedPlans = path === null ? failedPlans + 1 : 0;
+    return path?.map(point => ({ x: point.x, z: point.z })) ?? null;
   };
 
   /** El camino del cazador a su puesto, rehecho cada tanto o si la presa se ha movido. */
@@ -680,7 +707,11 @@ export function createHuntEncounter(
       const dx = hunterBody.x - externalTarget.x;
       const dz = hunterBody.z - externalTarget.y;
       const gap = Math.hypot(dx, dz);
-      if (gap > 1.2 && gap < 7) {
+      // Revisión del 30 sep 2026 · El zarpazo se ve entero: mientras dura su
+      // `attack` (el mismo clip que el aviso de la visita) el oso sigue alzado
+      // y no embiste. El empujón aparta al cazador más allá de 1,2 y la
+      // embestida pisaba el zarpazo al paso siguiente: duraba un fotograma.
+      if (gap > 1.2 && gap < 7 && stepNumber - lastBearSwipe >= SWIPE_STEPS) {
         const x = externalTarget.x + dx / gap * LIFE_STEP * 0.72;
         const z = externalTarget.y + dz / gap * LIFE_STEP * 0.72;
         if (fitsCircle(land, x, z, 0.52)) externalTarget = { ...externalTarget, x, y: z, facing: Math.atan2(dx, dz) };
@@ -854,7 +885,33 @@ export function createHuntEncounter(
     flyShots();
     const gesture = combatClip(clip) ? VILLAGER_CLIPS[clip].seconds : 0;
     if (combatClip(clip) && clip !== 'fall' && (stepNumber - Math.max(gestureSince, holdUntil)) * LIFE_STEP >= gesture) clip = 'idle';
+    // Revisión del 30 sep 2026 · El cazador se mueve con 0,22 para colarse
+    // entre troncos, y vuelve a su vida con la holgura del aldeano (0,32): donde
+    // acaba puede no caber, y ahí se quedaba clavado (32 de 184 cazas; en 7/30,
+    // tres cazadores casi quietos hasta 40 s). Acabado el gesto, sale andando al
+    // sitio libre más cercano, y `settled` lo espera.
+    if (!combatClip(clip) && !fitsCircle(land, hunterBody.x, hunterBody.z, hunterBody.radius)) {
+      exit ??= exitRoute(land, hunterBody, NAV_RADIUS, hunterBody.radius);
+      if (exit === null || exit.length === 0) return;
+      while (exit.length > 1 && Math.hypot(exit[0]!.x - hunterBody.x, exit[0]!.z - hunterBody.z) < 0.05) exit.shift();
+      const next = exit[0]!;
+      if (exit.length === 1 && Math.hypot(next.x - hunterBody.x, next.z - hunterBody.z) <= SPEED * LIFE_STEP) {
+        hunterBody.x = next.x; hunterBody.z = next.z; hunterBody.vx = 0; hunterBody.vz = 0;
+        clip = 'idle';
+      } else {
+        walkTo(next);
+        clip = 'walk';
+      }
+    } else if (clip === 'walk') {
+      hunterBody.vx = 0; hunterBody.vz = 0;
+      clip = 'idle';
+    }
   };
+
+  /** Si el cazador ya cabe donde está con su holgura, o si no hay dónde (lo coloca `releaseHunter`). */
+  const hunterFree = (): boolean => exit === null
+    || fitsCircle(land, hunterBody.x, hunterBody.z, hunterBody.radius)
+    || stepNumber - reportStep >= EXIT_STEPS;
 
   return {
     weapon,
@@ -884,6 +941,7 @@ export function createHuntEncounter(
     get settled() {
       if (report === null) return false;
       const after = stepNumber - reportStep;
+      if (!hunterFree()) return false;
       if (report.killed) return after >= CORPSE_STEPS && shots.length === 0;
       if (species === 'bear') return true;
       return after >= FLEE_AFTER_STEPS && shots.length === 0;
@@ -898,10 +956,28 @@ export function createHuntEncounter(
       return true;
     },
     attach(next) { world = next; },
+    abandon() {
+      if (report === null) finish(false);
+      return report!;
+    },
     step(snapshots: readonly Animal[]): void {
       if (report !== null) aftermathStep();
       else huntStep(snapshots);
       stepNumber += 1;
     },
   };
+}
+
+/**
+ * Revisión del 30 sep 2026 · Al devolver el cazador a su vida: si aún no cabe
+ * con su holgura de aldeano (no llegó a salir andando en `EXIT_STEPS`, o la
+ * escena se descartó), al sitio libre más cercano. Sin esto se quedaba donde
+ * `integrate` no le deja moverse.
+ */
+export function releaseHunter(land: Terrain, body: Body): void {
+  body.vx = 0; body.vz = 0;
+  if (fitsCircle(land, body.x, body.z, body.radius)) return;
+  // Al sitio libre al que llegaría andando, no al otro lado de un muro.
+  const spot = exitRoute(land, body, NAV_RADIUS, body.radius, 4)?.at(-1);
+  if (spot !== undefined) { body.x = spot.x; body.z = spot.z; }
 }

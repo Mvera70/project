@@ -140,6 +140,30 @@ pieza caída sube lo que el render mide sobre el modelo. Al llegar uno nuevo:
   para la caza, ni al revés; la caza se mide con
   `npx tsx tools/reports/hunt-report.ts` (llano y valles de verdad, reparto de
   finales y qué tocó cada tiro).
+- **Una presa se coloca sobre el terreno del juego, no sobre `terrainOf`**
+  (revisión del 30 sep 2026, RV-3b): `solidTerrain` pone un tronco en cada
+  celda de bosque, y el jabalí, que sólo podía nacer en el centro de una, no
+  nacía en ningún valle de fundación ni en tres de cinco al año 30. La prueba
+  pasaba porque montaba el terreno a secas. Es el mismo tropiezo que la guarida
+  del oso de AN-4c: la prueba de colocar monta `solidTerrain` con los GLB
+  publicados (`life-wild-prey.test.ts`).
+- **Un informe que se salta casos tiene que decirlo**: `hunt-report.ts` se
+  saltaba en silencio los valles sin presa y las filas del ciervo y del jabalí
+  eran de dos valles de cinco. Ahora escribe «sin presa en …».
+- **Una búsqueda de camino sin tope, dentro de un paso de escena, es un pico**:
+  el A* fino que no encuentra el destino recorre la región entera dos veces (a
+  media y a cuarto de celda). Con la presa encerrada, un paso de caza llegaba a
+  2,4 s, el reloj lo tomaba por una ausencia y descartaba la escena. Cada
+  replanteo del cazador descarta por celdas lo que no se alcanza y prueba un
+  solo camino con tope (`pathTo(..., budget)`); se mide contando consultas de
+  sólidos por paso, no con el reloj (`life-hunt-encounter.test.ts`).
+- **Una escena que se descarta tiene que entregar su parte**: la semana espera
+  a la caza (`app.ts`, `runTick`), y sin parte no avanzaba nunca. `abandon()`
+  da uno sin pieza.
+- **Quien se mueve con menos holgura vuelve a su vida donde quepa**: el cazador
+  se cuela entre troncos con 0,22 y la aldea anda con 0,32; al acabar sale
+  andando por `exitRoute` (el camino más corto a donde cabe, sin atravesar
+  muros: el sitio libre más cercano en línea recta puede estar al otro lado).
 - **Rapier no ve un colisionador fijo hasta el primer `world.step()`**: sin él,
   una caza sin presa colocada todavía tiraba a través de la empalizada. El
   mundo de contacto da un paso al crearse.

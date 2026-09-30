@@ -158,14 +158,22 @@ function bodyTraffic(land: Terrain, point: Point, radius: number): number {
  * quien pregunta tiene que poder oír que no. Inventarse una es lo que hacía el
  * render viejo y por eso la gente cruzaba el agua.
  */
-export function pathTo(land: Terrain, from: Point, to: Point, radius = ROUTE_CLEARANCE): Waypoint[] | null {
+export function pathTo(land: Terrain, from: Point, to: Point, radius = ROUTE_CLEARANCE,
+  /**
+   * Revisión del 30 sep 2026 · Cuántos nodos puede abrir, como mucho, cada
+   * búsqueda fina antes de dar que no. Sin tope, una búsqueda que no encuentra
+   * el destino recorre la región entera a media celda y otra vez a cuarto de
+   * celda: con la presa encerrada, un paso de caza llegaba a 2,4 s. Por omisión
+   * no hay tope, que es lo de siempre para la vida de la aldea.
+   */
+  budget = Number.POSITIVE_INFINITY): Waypoint[] | null {
   const coarse = coarsePathTo(land, from, to);
   if (land.solids === undefined || land.solids.size === 0) return coarse;
   let previous = from;
   if (coarse !== null && coarse.every(point => {
     const clear = clearBetween(land, previous, point, radius); previous = point; return clear;
   })) return coarse;
-  return finePathTo(land, from, to, radius);
+  return finePathTo(land, from, to, radius, 2, budget);
 }
 
 function coarsePathTo(land: Terrain, from: Point, to: Point): Waypoint[] | null {
@@ -299,7 +307,8 @@ function provedUnreachable(
 
 /** Sólo cuando los troncos o lápidas cortan la ruta gruesa: medias celdas,
  * con cada segmento comprobado contra los sólidos reales. */
-function finePathTo(land: Terrain, from: Point, to: Point, radius: number, resolution = 2): Waypoint[] | null {
+function finePathTo(land: Terrain, from: Point, to: Point, radius: number, resolution = 2,
+  budget = Number.POSITIVE_INFINITY): Waypoint[] | null {
   if (!fitsCircle(land, to.x, to.z, radius)) return null;
   const width = land.width * resolution - 1, height = land.height * resolution - 1;
   const point = (cell: number): Point => ({ x: (cell % width + 1) / resolution, z: (Math.floor(cell / width) + 1) / resolution });
@@ -308,13 +317,19 @@ function finePathTo(land: Terrain, from: Point, to: Point, radius: number, resol
   const key = `${radius}:${resolution}`;
   const known = land.traffic === undefined && land.trafficBodies === undefined ? CLOSED.get(land)?.get(key) : undefined;
   if (known !== undefined && provedUnreachable(land, known, from, to, radius, resolution, start, width, height, point)) {
-    return resolution === 2 ? finePathTo(land, from, to, radius, 4) : null;
+    // El afinado a cuarto de celda lleva el mismo tope: sin él, la caza volvía
+    // a tener picos aquí (revisión del 30 sep 2026).
+    return resolution === 2 ? finePathTo(land, from, to, radius, 4, budget) : null;
   }
   const heuristic = (cell: number): number => { const p = point(cell); return Math.floor(Math.hypot(to.x - p.x, to.z - p.z) * 4.5 * resolution); };
   const cost = new Int32Array(width * height).fill(-1), came = new Int32Array(width * height).fill(-1);
   const open = new Frontier(); cost[start] = 0; open.push(start, heuristic(start));
   let goal = -1;
+  let opened = 0;
   while (open.size > 0) {
+    // Con tope, la búsqueda que lo agota da que no, y no se afina: afinar es
+    // volver a recorrer lo mismo, cuatro veces más menudo.
+    if (++opened > budget) return null;
     const cell = open.pop(), here = cell === start ? from : point(cell);
     if (Math.hypot(here.x - to.x, here.z - to.z) <= 0.8 && clearBetween(land, here, to, radius)) { goal = cell; break; }
     for (const [dx, dz, step] of WAYS) {
@@ -353,7 +368,7 @@ function finePathTo(land: Terrain, from: Point, to: Point, radius: number, resol
   }
   // Algunos huecos junto a postes no contienen ningún nodo de media celda.
   // Se afina sólo tras fallar, con un límite para no buscar indefinidamente.
-  if (goal < 0) return resolution === 2 ? finePathTo(land, from, to, radius, 4) : null;
+  if (goal < 0) return resolution === 2 ? finePathTo(land, from, to, radius, 4, budget) : null;
   const chain: Point[] = [to];
   for (let cell = goal; cell !== start; cell = came[cell]!) chain.push(point(cell));
   chain.reverse();
