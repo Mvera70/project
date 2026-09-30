@@ -1,6 +1,6 @@
 # Rework del ritmo, la progresión y el descanso
 
-**29 sep 2026 · revisado el 30 sep tras las cuatro integraciones.** La
+**29 sep 2026 · revisado el 30 sep sobre `main` debf7f82.** La
 especificación vigente sigue en `design.md`. Este documento separa lo que Vera
 ha decidido, las hipótesis que hay que probar y las reglas todavía abiertas.
 Una cifra propuesta aquí es un objetivo de experiencia, no una constante de
@@ -43,11 +43,12 @@ descanso; qué progresa durante él; qué oportunidades se pierden y cómo se
 protegen las decisiones y crisis. Estas cuestiones se cierran antes de escribir
 el contrato técnico del descanso.
 
-## 2. Línea de base que obliga a rehacer la apertura
+## 2. Línea de base histórica que obliga a rehacer la apertura
 
 `npx tsx tools/reports/pace-report.ts --seeds 24 --years 20`, con política
 `prudent` y el código del 29 sep, da estas medianas. Son **horas de reloj a
-×1**, no años de juego:
+×1**, no años de juego. La tabla se conserva para comparar; no es una medición
+repetida sobre el `main` del 30 sep:
 
 | Peldaño | ×1 | ×16 | ×64 |
 |---|---:|---:|---:|
@@ -88,6 +89,14 @@ pero pocas situaciones distintas. `child_lost` se resuelve automáticamente en
 esa foto; si se convierte en señal interactiva, su resolución debe pasar por la
 escena y no duplicarse en la crónica.
 
+**No extrapolar la cifra antigua de caza a la escena actual.** La PR #13
+permitió que el jabalí naciera en la linde: antes los troncos impedían su
+aparición en los valles medidos, aunque el motor pudiera ofrecer una caza.
+Ahora hay que medir por separado oferta, presa realmente presente, señal
+tocable, duración de la escena y resultado. También corrigió la salida del
+cazador, los picos de búsqueda de caminos y el caso en que abandonar la escena
+dejaba la semana detenida. El motor y el reloj no cambiaron.
+
 El informe vivo `npm run eligibility` del 29 sep, ocho semillas × 60 años,
 planteó 412 encrucijadas. `quiet_years` no se planteó ninguna vez (es un
 **canario intencional**, no un fallo que haya que forzar) y la pareja
@@ -95,6 +104,15 @@ planteó 412 encrucijadas. `quiet_years` no se planteó ninguna vez (es un
 una partida humana, pero obliga a medir **diversidad, repetición y reparto por
 etapa**, además del número total de sucesos. Un catálogo más grande no mejora
 el ritmo si la selección sigue mostrando los mismos temas.
+
+La PR #17 corrigió una fuente posterior de repetición: quienes llegaban sin
+hueco en `namedIds` podían generar riñas sin que su rencor se desgastase. En
+tres siglos de tres semillas, esa jornada pasó de 1.610 riñas a 244. **Esto sí
+cambia la trayectoria de las partidas**, sobre todo después de crecer la
+población. RD-0 repetirá el informe de variedad con el motor integrado antes
+de usar los 412 planteamientos del 29 sep para ajustar frecuencia o escribir
+sucesos. Las «21 jornadas rojas» corregidas en CI eran pruebas, distintas de
+las 21 encrucijadas activas que este plan auditará por contenido.
 
 ## 3. Objetivos de experiencia por tramo
 
@@ -242,9 +260,9 @@ inventada. En ambos casos el sol y la fecha avanzan o se detienen **juntos**.
 
 | Ronda | Prioridad | Objetivo y entrega | Depende de / criterio de cierre |
 |---|---|---|---|
-| **RD-0 · Apertura visible y auditoría del catálogo** | P0 | Traza de los primeros diez minutos y la primera hora: qué entra en cámara, cuándo se puede tocar, cuánto tarda el resultado y cuándo llega una elección. Comparación ×1/×16/×64 en móvil, incluida la caza física, el sol, el sonido y el tablón. Matriz de las 21 encrucijadas según §4; diversidad y repetición de sucesos. | Antes de mover balance o escribir contenido. El informe distingue «el motor lo ofreció» de «el jugador lo vio», recomienda una velocidad normal provisional sólo si cumple la sincronía solar e identifica qué decisiones están desfasadas. |
+| **RD-0 · Apertura visible y auditoría del catálogo** | P0 | Traza de los primeros diez minutos y la primera hora: qué entra en cámara, cuándo se puede tocar, cuánto tarda el resultado y cuándo llega una elección. Comparación ×1/×16/×64 en móvil, incluida la caza con presa real, el sol, el sonido y el tablón. Matriz de las 21 encrucijadas según §4; diversidad y repetición de sucesos. | Antes de mover balance o escribir contenido. El informe distingue «el motor lo ofreció» de «el jugador lo vio y pudo completar la escena», recomienda una velocidad normal provisional sólo si cumple la sincronía solar e identifica qué decisiones están desfasadas. |
 | **RD-1 · Fundación y primeras decisiones** | P0 | Una apertura de punta a punta: ocasión visible, intervención, resultado, primera elección propia de la fundación con coste y una consecuencia cercana. Reescribir o sustituir las decisiones tempranas obsoletas; brief de contenido y archivos cerrado antes de programar. | Primeros diez minutos jugables en varias semillas; lectura humana en móvil. Si sólo mejora una semilla, no pasa. |
-| **RD-2 · Contrato y prototipo de descanso** | P0 | Cerrar las siete categorías de §5, comparar A/B y probar ausencia con pestaña oculta y app cerrada, incluidas expediciones y audio. | Sol/reloj coherentes; ni final desatendido ni ganancia gratuita; guardado reproducible; GV-4 resuelto para validar el regreso en villa. |
+| **RD-2 · Contrato y prototipo de descanso** | P0 | Cerrar las siete categorías de §5, comparar A/B y probar ausencia con pestaña oculta y app cerrada, incluidas expediciones y audio. | Sol/reloj coherentes; ni final desatendido ni ganancia gratuita; guardado reproducible; reutilizar GV-4a y GV-4b ya integrados, con verificación del regreso en la tablet. |
 | **RD-3 · Rework del resto de encrucijadas** | P0 | Ejecutar el dictamen de RD-0 para las decisiones restantes: textos, costes, elegibilidad, efectos visibles y consecuencias diferidas. Conservar compatibilidad de las retiradas. | Las 21 tienen dictamen y ninguna obsoleta sigue activa; opciones veraces y con efecto visible; cobertura de etapas sin repetir una misma pregunta. |
 | **RD-4 · Catálogo de señales y recompensa** | P1 | Dos tipos nuevos y distintos de ocasión, selección común, costes, resultados y conexión con personas, recursos y crónica. | Tres desenlaces legibles donde corresponda, sin iconos simultáneos ni repetición que tape los otros tipos. |
 | **RD-5 · Arco de las primeras 8–10 h** | P1 | Completar tramos de §3 con cadenas de consecuencias, acceso a medios, desarrollo de personajes y preparación de la defensa. | Jornadas con varias semillas y recorrido humano: sin mesetas largas ni biografías idénticas. |
@@ -258,10 +276,16 @@ de los minutos que tarda hoy un jugador en ver y resolver una escena.
 
 | Integración | Efecto para este plan | Ajuste de la siguiente ronda |
 |---|---|---|
-| Animación integral y caza física (AN-0–AN-5) | La caza necesita contacto y lectura de la escena; al aceptarla, la app baja temporalmente a ×1 y luego restaura la velocidad elegida. El resultado físico no lo predice `pace-report`. El oso permanece visible más tiempo. | RD-0 cronometra oferta → toque → golpe → consecuencia en móvil, por especie y arma, y anota la velocidad antes, durante y después. RD-1 no cuenta sólo el tick que ofreció la caza como «intervención completada». |
-| Modelos 3D mejorados | Cambian tamaño, silueta y colisionadores de animales; AN-5 ya adaptó sus cuerpos físicos a esos modelos. | RD-0 juzga visibilidad y tactilidad con los modelos integrados; evita rescatar cifras visuales anteriores. |
-| Gráficos remasterizados | Mejoran la lectura del valle; no fijan velocidad normal ni resuelven la sincronía solar. La ronda GV detectó el bucle de la villa GV-4, que ya existía antes de GV: un fotograma lento se interpreta como ausencia y reconstruye la vida una y otra vez. | Separar GV-4 de este rework, pero exigir su cierre antes de validar regreso del descanso o ritmo tardío en móvil. No atribuirle a la nueva piel un defecto anterior. |
-| Sonido | Hay sonidos de interfaz y ambientes de naturaleza/día/noche; aldea, hoguera y fiesta fueron rechazados y retirados. Faltan golpes de caza, oso y combate. La pestaña oculta suspende el audio. | RD-0 anota qué información llega por sonido y qué queda muda; RD-1 no usa un efecto ausente como señal de éxito. RD-2 prueba silencio y reanudación al dormir/despertar. |
+| Animación integral y caza física (AN-0–AN-5, PR #13) | La caza necesita contacto y lectura de la escena; al aceptarla, la app baja temporalmente a ×1 y luego restaura la velocidad elegida. La PR #13 hace aparecer al jabalí en la linde, deja salir al cazador y evita que una escena perdida bloquee la semana. El resultado físico no lo predice `pace-report`. | RD-0 cronometra oferta → presa real → toque → golpe → consecuencia en móvil, por especie y arma, y anota la velocidad antes, durante y después. RD-1 no cuenta sólo el tick que ofreció la caza como «intervención completada». |
+| Modelos 3D mejorados y RV-1 | Cambian tamaño, silueta y colisionadores de animales; AN-5 adaptó sus cuerpos físicos. RV-1 corrigió la regresión de llamadas de dibujo de los animales facetados: trece modelos animados se dibujan con una malla cada uno. | RD-0 juzga visibilidad y tactilidad con los modelos y el cargador actuales, además del coste combinado en móvil; no usa cifras visuales ni de rendimiento anteriores. |
+| Gráficos remasterizados, «Graphics» y GV-4 | Mejoran la lectura del valle; la escala adaptativa y el tope de fotogramas se corrigieron. GV-4b abarató los relevos de jornada y GV-4a distingue el trabajo de un fotograma de una ausencia: ambos están ya en `main`. En contenedor, la villa 7/60 pasó del bucle de vida parada a fotogramas con pasos. | RD-0 mide apertura y villa en el móvil real, con la configuración de calidad elegida; RD-2 usa la detección de ausencia corregida. La medida combinada en la tablet sigue pendiente y no se sustituye por la del contenedor. |
+| Sonido integrado (PR #10, #14 y #16) | Suenan interfaz, naturaleza, día y noche; aldea, hoguera y fiesta fueron rechazados y retirados. Caza y asedio publican sucesos y siete sonidos de materiales cubren flechas, golpes, caídas y portón; acierto y fallo de caza reutilizan dos de ellos. El oso publica su aviso pero sigue mudo. La revisión corrigió el trueno cercano, botones duplicados, respuesta tardía a ofertas, memoria de lechos, precarga y tope de voces; el tablón ya recibe toques. | RD-0 mide qué se oye y comprende en la apertura y prueba el tablón, la caza y los multiplicadores en móvil. Los sonidos nuevos aún requieren escucha de Vera en el juego y prueba de mezcla en un asedio real. RD-2 prueba silencio y reanudación al dormir/despertar. |
+
+Los sucesos físicos del sonido **callan a ×16 y ×64** (`momentsAudible`);
+durante la caza, la bajada temporal a ×1 permite oír el golpe. Esto afecta a
+la elección de velocidad normal: a ×16 una amenaza puede verse sin esos sonidos,
+y RD-0 debe probar si sus señales visuales bastan. No se presupone que los
+siete sonidos de PR #10 estén aprobados por Vera porque hayan entrado en `main`.
 
 **Bloqueo de coherencia ya presente en `main`:** `src/render3d/effects/daylight.ts`
 mezcla el sol y la luz de la hora real con una media mañana fija: 55 % a ×16 y
@@ -272,14 +296,21 @@ requisito previo para recomendar ×16 o ×64 como velocidad habitual. RD-0 debe
 mostrar el desacople en una captura continua; RD-6 no puede aprobar una
 velocidad normal que lo mantenga.
 
-**Riesgo independiente para RD-2:** `docs/medidas/bucle-villa-2026-09-29.md`
-documenta GV-4: la detección de ausencia por un hueco entre fotogramas superior
-a un segundo puede tratar un render lento como pestaña oculta. El descanso debe
-basarse en el estado real de visibilidad y persistencia, con prueba de que un
-fotograma lento no activa el regreso ni congela la vida. El informe de fusión
-de cuatro ramas detectó además falta de una medición conjunta en móvil; RD-0
-hará esa medición sobre `main` ya integrado, sin dar por actuales los errores
-de audio que la integración posterior corrigió.
+**GV-4 ya cambió de estado:** `docs/medidas/bucle-villa-2026-09-29.md`
+documentó cómo un fotograma de varios segundos se confundía con una pestaña
+oculta. GV-4b redujo el coste de los relevos y GV-4a hace que el reloj descuente
+el trabajo de pintado anterior antes de decidir si hubo ausencia. `main` tiene
+ambos arreglos. Esto quita el bucle reproducido en contenedor, pero todavía no
+demuestra el rendimiento del conjunto en la tablet de Vera. RD-0 repetirá la
+medida móvil y RD-2 comprobará que una ausencia real y un fotograma lento
+producen estados de regreso distintos, sin inventar otro detector de pausa.
+
+**Sonido y tablón también están integrados:** ya no se considera pendiente la
+corrección del trueno, el audio de respuesta a ofertas, la memoria de lechos,
+el tope de voces ni los toques del velo del tablón. Siguen pendientes la
+escucha de los sonidos nuevos por Vera, la mezcla en un asedio real y el coste
+combinado en dispositivo. Son puertas de validación de RD-0, no trabajo que
+RD-1 deba volver a implementar.
 
 RD-0 y el diseño de RD-1/RD-2 pueden prepararse sin tocar archivos de estas
 rondas; cada implementación delimitará propiedad antes de empezar.
@@ -292,8 +323,8 @@ porteador → leñera → obra mantiene el interés, como pide `plan-meta.md` §
 tocadas y comprendidas, no sólo de ticks del motor, y emitir el dictamen de
 contenido de cada una de las 21 encrucijadas activas.
 
-**Depende de.** `CLAUDE.md`; `design.md` §1–4, §7.15, §8.6, §11.6,
-§11.10–11.11, §12.1 y §13.2;
+**Depende de.** `CLAUDE.md`; `.claude/skills/director/SKILL.md`;
+`design.md` §1–4, §7.15, §8.6, §11.6, §11.10–11.12, §12.1 y §13.2;
 `.claude/skills/senales-en-el-mapa/SKILL.md`; `tools/README.md`; el catálogo
 `src/engine/crossroads/catalog/`, banco de textos y este plan.
 
@@ -311,7 +342,8 @@ distinguir tiempo de simulación y tiempo real de caza a ×1, y registrar
 sol/reloj/audio en cada caso.
 Contar por separado escenas nuevas y repeticiones en diez minutos, una hora y
 el tramo de ocho a diez horas; el total de líneas de crónica no es la métrica.
-Para el catálogo, ejecutar `npm run eligibility`, revisar código y textos de los
+Para el catálogo, repetir `npm run eligibility` con el motor posterior a PR #17,
+revisar código y textos de los
 21 IDs y registrar cada columna de la matriz pedida en §4. Los tres retirados
 se comprueban por separado para guardados; no se les asigna una nueva cadencia.
 
