@@ -1,5 +1,6 @@
 # La documentación de The Valley — el mapa
 
+- [Rework del ritmo, el descanso y la progresión](plan-ritmo-descanso-y-progresion-2026-09-29.md): apertura, primeras ocho a diez horas, descanso y auditoría de las decisiones; revisado tras las cuatro integraciones del 30 sep.
 - [Monetización, marketing y publicación](plan-monetizacion-y-publicacion-2026-09-29.md):
   propuesta comercial, dudas por resolver y registro de aprendizaje; la
   [skill del proyecto](../.agents/skills/monetizacion-marketing-valley/SKILL.md)
