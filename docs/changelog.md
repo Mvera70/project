@@ -1,5 +1,44 @@
 # The Valley — Registro de cambios
 
+## v5.28 · 30 sep 2026 · GV-4b: el relevo de jornada, de segundos a décimas — lo que una búsqueda fallida ya demostró
+
+La segunda mitad del bucle de la villa (`docs/medidas/bucle-villa-2026-09-29.md`).
+GV-4a (PR #8) deja de tomar un fotograma lento por una ausencia, pero la vida
+se sigue montando en cada relevo de jornada, y en la villa eso eran segundos:
+a ×16, 5–7 s congelada cada 7,5 s (revisión del 30 sep, §3). **El 93 % de las
+búsquedas A* finas de ese montaje fallaban y se llevaban el 99 % del tiempo.**
+
+- `life/navigate.ts`: cuando la búsqueda fina falla ha recorrido entera una
+  región de la que no se sale; se guarda —por objeto de terreno, radio y
+  resolución— y la siguiente que salga de dentro hacia un destino que ningún
+  nodo de la región alcanza se contesta «no» sin buscar. **Exacto por
+  construcción**: sólo contesta «no» cuando el A* también lo haría; si no,
+  busca como siempre. El prototipo es de la revisión (`claude/gv-4b-regiones-cerradas`);
+  aquí, revisado y medido.
+- **La misma vida byte a byte en diez valles** con el terreno de verdad
+  (troncos, enseres y cementerios de los GLB publicados): 7/60, 3/40, 23/60,
+  11/21, 1/30, 5/45, 13/50, 17/35, 29/55 y 41/25 —sitios, planes, cuerpos y
+  bestias, al montar y tras 600 pasos—. El montaje, en Node: 7/60 de 7,2 s a
+  0,53; 3/40 de 27,3 a 2,8; 23/60 de 16,2 a 0,5; 1/30 de 12,3 a 0,37 (con dos
+  pasadas a la vez: comparativo). En la aldea 11/21 no cambia nada: ahí no falla
+  ninguna búsqueda.
+- **En el navegador** (`relay-probe.mjs`, villa 7/60 a ×16 durante 60 s, escala
+  0,25, dos pasadas por versión, `artifacts/graphics/gv4b/relevos.txt`): `main`,
+  7–8 fotogramas de 7,7–8,1 s y la vida en cero pasos —el bucle—; con GV-4b,
+  **78–86 fotogramas, 169–182 ms de mediana y 3.200–3.600 pasos de vida**, con
+  relevos de 0,5 a 1,6 s cada 7 s. Rompe el bucle en el contenedor aun sin
+  GV-4a; en un aparato más lento un relevo aún puede pasar del segundo, y por
+  eso hacen falta los dos.
+- **El invariante que lo hace posible, escrito** (`life/body.ts`): un
+  `Terrain` no se modifica después de crearse. Hoy es así —quien lo cambia
+  copia—, pero nada lo protegía: escribir en uno ya en uso haría que la caché
+  contestara «no hay ruta» a una que ya existe.
+- La prueba, `navigate-closed-regions.test.ts`: cada pregunta contra el
+  terreno que acumula regiones y contra uno sin ninguna, con la misma respuesta.
+- **Independiente de GV-4a**: con los dos, la villa del contenedor pasó de 471
+  a 84 ms de mediana a ×16 (revisión §3). Lo que queda por relevo en la villa,
+  0,5–0,8 s en el contenedor, y medirlo en la tablet.
+
 ## v5.27 · 30 sep 2026 · «Graphics»: la adaptativa ya no salta con un fotograma, y el tope de 60 da 60 a 90 Hz
 
 La revisión de rendimiento del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md`
