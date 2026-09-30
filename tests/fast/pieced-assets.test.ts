@@ -1,6 +1,8 @@
 // Los modelos de Vera hechos pieza a pieza (`deliverables/marked-models-trial/`):
-// al cargarlos se funden las piezas que se mueven juntas (`fuseRigidPieces`), y
-// los animales traen `idle` y `walk` sobre sus nodos (`tools/art/rigid-clips.mjs`).
+// al cargarlos, por el mismo camino que el juego (`prepareModel`), los animales
+// se vuelven una malla con esqueleto (`skinRigidBody`, 30 sep 2026) y las
+// herramientas funden las piezas que se mueven juntas (`fuseRigidPieces`); los
+// animales traen `idle` y `walk` sobre sus nodos (`tools/art/rigid-clips.mjs`).
 // Lo que se vigila: menos llamadas de dibujo, la misma forma, y los clips siguen
 // teniendo a quién mover.
 
@@ -9,7 +11,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { Box3, Mesh, type AnimationClip, type Object3D } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { fuseRigidPieces, PIECED } from '../../src/render3d/assets';
+import { PIECED, prepareModel } from '../../src/render3d/assets';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
 const ANIMALS = new Set(['wolf', 'bear', 'partridge', 'boar', 'dog', 'mule']);
@@ -30,12 +32,12 @@ describe('Los modelos pieza a pieza, en el juego', () => {
     const gltf = await load(id);
     const before = meshesOf(gltf.scene);
     const box = new Box3().setFromObject(gltf.scene);
-    fuseRigidPieces(gltf.scene, gltf.animations);
+    prepareModel(id, gltf.scene, gltf.animations);
     const after = meshesOf(gltf.scene);
     expect(after).toBeLessThanOrEqual(before);
-    // Medido al escribirlo: los animales pasan de 40–68 mallas a 22–40, y las
-    // herramientas de 6–25 a 4–6. Lo que queda son materiales distintos en cada
-    // articulación, que no se pueden fundir sin cambiar el modelo.
+    // Medido: los animales pasan de 40–68 mallas a una (el presupuesto lo
+    // guarda `animal-draws.test.ts`), y las herramientas de 6–25 a 4–6: lo que
+    // queda son materiales distintos, que no se funden sin cambiar el modelo.
     if (before > 8) expect(after, `${id}: ${before} → ${after}`).toBeLessThan(before * 0.75);
     const fusedBox = new Box3().setFromObject(gltf.scene);
     for (const axis of ['x', 'y', 'z'] as const) {

@@ -77,6 +77,18 @@ segundo revelado, la sombra de la copa atenuada y la cifra de la máscara en la
 skill. **Abierto**: verlo en un aparato de 90 Hz (el panel de taller debería
 decir 60 y resolución 100 %). El detalle, en el registro.
 
+## 30 sep 2026 · RV-1: un animal, una llamada de dibujo (v5.27) — **fusionada con el permiso de Vera**
+
+La revisión del 30 sep (su rama, `docs/medidas/revision-rendimiento-2026-09-30.md`
+§2) me devolvió la regresión de la PR #3: los animales facetados costaban 16–27
+llamadas cada uno. Arreglado al cargar y sin tocar ningún GLB
+(`skinRigidBody` en `assets.ts`): los trece animales animados dejan una malla.
+Villa 7/60 950 → 506 llamadas, aldea 11/21 650 → 413, mallas de fauna por la
+portada 583 → 31; se ve igual (`artifacts/graphics/rv1/`). Prueba de
+presupuesto en `tests/fast/animal-draws.test.ts`. **Abierto:** si la rama de la
+revisión entra después, `tools/reports/model-draws.ts` se queda con esta versión
+(la que mide por `prepareModel`, el cargador del juego).
+
 
 ## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
 
