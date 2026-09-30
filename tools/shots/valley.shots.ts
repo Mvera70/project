@@ -851,6 +851,9 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
   // VZ-04a vistió esta pantalla— la prueba caía sin que el parte tuviera nada
   // mal. Ahora comprueba **la propiedad**: que atenúa el valle en vez de
   // taparlo (§11.2) y que la página es la hoja de siempre.
+  // Pagar 960 semanas cuesta lo que cueste la máquina, y en la CI comparte
+  // procesador con un recorrido 3D por software: los 120 s de siempre no dan.
+  test.setTimeout(300_000);
   const t0 = Date.now();
   await page.clock.install({ time: t0 });
   await page.goto(CANVAS); // sin parámetros de depuración: la ruta real, guardado incluido
@@ -899,8 +902,9 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
 
   const welcome = page.locator('.welcome');
   // Pagar 960 semanas antes del parte tarda lo que tarde la máquina: en el
-  // servidor pasaba de los 15 s de antes (30 sep 2026).
-  await welcome.waitFor({ timeout: 60_000 });
+  // servidor pasaba de los 15 s de antes, y con el 3D de la ruta viva en el
+  // otro trabajador, de los 60 (30 sep 2026). Es una espera, no una cota.
+  await welcome.waitFor({ timeout: 180_000 });
   // §11.2 pide el valle **atenuado y no tapado**: el velo tiene que dejarse ver
   // a través. Se lee su alfa en vez de su color, que es lo que la sección dice.
   const velo = await page.locator('.welcome-scrim').evaluate((el) => getComputedStyle(el).backgroundColor);
