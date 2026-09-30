@@ -60,6 +60,93 @@ y 11, 120 años, cota 259,2): 132 en `ee9340e`, **1 610** antes del arreglo,
   los dos riñen en la semana 0 (0 contra 0), que mide la tirada y no el
   carácter.
 
+## v5.35 · 30 sep 2026 · GV-4: el bucle de la villa, roto — un fotograma lento ya no es una ausencia
+
+Vera abrió el sitio con las cuatro ramas dentro en su tablet: la aldea 11/21 a
+57 fps y 11 ms por fotograma, y la villa 7/60 a 0 fps, 2 264 ms por fotograma y
+la vida en «0/0p». La primera medida en un aparato real, y la confirmación de lo
+que GV había dejado apuntado sin tocar (`docs/medidas/bucle-villa-2026-09-29.md`):
+el reloj de presentación tomaba cualquier hueco de más de un segundo entre
+fotogramas por una ausencia, la ausencia rehacía la vida, y rehacer la vida de
+una villa tarda más de un segundo en una tablet. Sin salida.
+
+- `presentation-clock.ts`: el hueco que decide si hubo ausencia es **el ocioso**,
+  desde que el fotograma anterior terminó de pintarse (`clock.painted(ms)`,
+  que `backend.ts` llama tras cada `paint`). El hueco entero sigue explicando
+  los ticks y moviendo la animación; `hidden` sigue cubriendo la pestaña
+  escondida. Sin `painted` el reloj se comporta como antes.
+- Medido en el contenedor (Chromium con SwiftShader, `gl-probe`, villa 7/60,
+  perfil táctil a escala 0,25): **antes**, 4 595 ms por `paint`, vida 0 ms, 8
+  fotogramas en 43 s; **después**, 142 ms por `paint` (mediana de 80 s, con el
+  primer montaje dentro), vida 13 ms, 33 fotogramas. La aldea 11/21, igual que
+  antes: 32 ms.
+- La prueba, en `graphics-clock.test.ts`: cinco fotogramas de 1,5 s de trabajo
+  seguidos no encadenan discontinuidades, y dos segundos sin pintar sí lo son.
+- **Abierto (segunda parte de GV-4):** el primer montaje sigue costando 4–5 s
+  (`createVillage`), y se paga también en cada relevo de jornada: Vera vio
+  bajar los fotogramas de la aldea pequeña justo al anochecer. **GV-4a solo no
+  basta**: a ×16 la villa 7/60 se sigue congelando 5–7 s en cada relevo (uno
+  cada 7,5 s), y a ×64 la jornada dura menos que su montaje. Dónde se va, medido
+  por la revisión del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md` §3, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar): el relevo es
+  `dayPlans`→`choose` en un 50 % en 7/60 (99 % en 3/40), y el 93 % de las
+  búsquedas A* finas **fallan** y se llevan el 99 % del tiempo. La propuesta que
+  se escribió aquí primero —guardar las rutas del común, la orilla y el vado por
+  plan de escena— no toca `dayPlans` y queda **sustituida** por la de las
+  regiones cerradas: una búsqueda fallida ya recorrió una región de la que no se
+  sale, y la siguiente que salga de dentro hacia un destino que no está en ella
+  se contesta «no» sin buscar. Es exacta por construcción; el prototipo, en la
+  rama `claude/gv-4b-regiones-cerradas` (sin fusionar, con su prueba de
+  equivalencia), baja `createVillage` 7/60 de 3,2 s a 0,15–0,22 s con la misma
+  vida byte a byte en cuatro valles.
+
+## v5.34 · 30 sep 2026 · La fusión de las cuatro ramas, revisada, y lo fácil arreglado
+
+Vera pidió revisar cómo quedaron juntas animación, modelos de animales,
+gráficos GV y sonido después de entrar las cuatro en una noche. El esquema y
+los huecos, por dueño, están en `docs/medidas/fusion-cuatro-ramas-2026-09-29.md`.
+Los dos arreglos de sonido que salieron de esta revisión (el audio suspendido
+con la pestaña oculta y la prueba lenta a las jornadas) los hizo la propia rama
+del sonido en v5.21. Lo demás fácil, aquí:
+
+- `tools/art/bake-clips.mjs` tiene fila en `tools/README.md`.
+- Los enlaces a dos capturas que nunca se versionaron, en el encargo GV,
+  apuntan a la revisión que lo explica.
+- El changelog y el cuaderno, en orden: AN-5 (v5.13) quedó encima de todo el
+  sonido y la v5.15 encima de la v5.20.
+- Las 21 jornadas rojas que la CI enseñó al terminar por primera vez **ya
+  fallaban antes** de las cuatro ramas: medido en local sobre `efafc2e`.
+- **Lo que esta revisión no vio**, corregido tras la del 30 sep
+  (`docs/medidas/revision-rendimiento-2026-09-30.md` §2, fila RV-1): los siete animales facetados de la PR #3
+  dejan **16–27 mallas por animal** (antes 1). Con la misma escena, la villa 7/60
+  pasa de 500 a 964 llamadas de dibujo y la aldea 11/21 de 440 a 649. El papel
+  decía «Modelos 3D: nada urgente»; ya no.
+
+## v5.33 · 30 sep 2026 · La CI en verde de una vez, y un director para las tandas
+
+Vera, harta de leer «ya estaba rojo» en cada PR: «¿por qué no lo arreglamos ya
+de una maldita vez?». Y a continuación pidió una dirección que mande sobre las
+demás para no volver a pisarse.
+
+- **Los cronómetros del jugador, a la escala del servidor.** §13.2 (960 ticks
+  en 2 s) y V-13 (una jornada en 2,5 s) se fijaron en un portátil y la CI los
+  mide unas tres veces más lentos: salían rojos siempre (`catchUp` 3,0–3,6 s,
+  la jornada 4,2 s). El número del diseño no cambia: `tests/helpers/timing.ts`
+  lo lee a `VALLEY_TIMING_SCALE`, que la CI fija en 3.
+- **Las jornadas, en tres trozos.** Enteras pasaban del tope de 60 min y se
+  cortaban sin decir nada.
+- **La reja de interfaz, al día.** Las rutas de depuración iban al 3D sin
+  decirlo y con el reloj falso de Playwright el relevo no llega nunca: van en
+  Canvas, como dice la cabecera del fichero, y las cuatro que miden el 3D lo
+  esperan (`await3d`). Lo que la piel v9 cambió —«Valley» exacto, el sello de
+  cerrar de la carcasa, aplazar desde la cabecera, el ajuste de cuentas del
+  epitafio, 64 dibujos y no un 52 congelado— y la bienvenida, que medía un
+  cronómetro en vez de si se guarda.
+- **La skill `director`**: el índice de las direcciones con su skill y su
+  documento, las fronteras con su contrato y su prueba, y cómo se orquesta
+  una tanda —hoja de reparto, versiones reservadas, integrar de una en una
+  sobre `main` en verde, informe de fusión—, con lo que costó cada regla el
+  29 sep. `CLAUDE.md` la manda cargar antes que nada. La primera hoja de
+  reparto está en `docs/task-log.md`.
 ## v5.32 · 30 sep 2026 · La respuesta a una oferta vuelve a sonar
 
 Tras la #14, el recorrido del sonido encontró muda la respuesta a una oferta

@@ -1,5 +1,80 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
+
+La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60
+a 0 fps con la vida en «0/0p», que es el bucle que GV dejó apuntado. Arreglo:
+el hueco que cuenta como ausencia en `presentation-clock.ts` es el ocioso, desde
+que acabó el pintado anterior (`clock.painted`), no el entero. Medido en el
+contenedor: la villa pasa de 4 595 ms por `paint` con la vida a cero a 142 ms
+con la vida dando pasos; la aldea no cambia. **Abierto:** el primer montaje de
+la villa sigue costando 4–5 s y se paga en cada relevo de jornada —Vera vio
+bajar los fotogramas de la aldea pequeña **justo al anochecer**—; con GV-4a
+solo, a ×16 la villa 7/60 se congela 5–7 s en cada relevo. Abaratar
+`createVillage` es la segunda parte de GV-4, y **no** va por guardar rutas por
+plan de escena (no toca `dayPlans`, la mitad del coste): va por las regiones
+cerradas —el 93 % de las búsquedas A* finas fallan y son el 99 % del tiempo—,
+con el prototipo exacto de `claude/gv-4b-regiones-cerradas` (7/60 de 3,2 s a
+0,15–0,22 s, misma vida byte a byte en cuatro valles;
+`docs/medidas/revision-rendimiento-2026-09-30.md` §3, fila RV-2, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar). Y que Vera vuelva a abrir la villa 7/60 en la
+tablet con esto dentro.
+
+## 30 sep 2026 · La fusión de las cuatro ramas del 29 sep: cómo quedaron juntas
+
+Animación (PR #2 y #6), modelos de animales (#3), gráficos GV (#4) y sonido
+(#7) entraron en `main` en una noche. **El código combina bien** —typecheck,
+lint y suite rápida limpios; la caza se hizo sobre los modelos nuevos y el
+sonido no toca el renderer— y los huecos entre ellas, repartidos por dueño,
+están en `docs/medidas/fusion-cuatro-ramas-2026-09-29.md`. Arreglado lo
+fácil (v5.34): la fila de `tools/art/bake-clips.mjs`, los enlaces rotos del
+encargo GV y el orden de este cuaderno y del changelog; lo del sonido (pestaña
+oculta, prueba lenta) lo cerró su rama en v5.21. **Lo que esta auditoría no
+vio** (la revisión del 30 sep, fila RV-1, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar): los siete animales facetados de la
+PR #3 dejan 16–27 mallas por animal, antes 1; con la misma escena, la villa 7/60
+va de 500 a 964 llamadas y la aldea 11/21 de 440 a 649. **Abierto:** que suenen caza, oso y combate (sonido
+con animación: primero el contrato de qué publica la vida para que el sonido lo
+oiga); una medida de rendimiento con todo junto en iPhone o iPad; y **las 21
+jornadas rojas** que la CI enseñó al terminar por primera vez. **No son de estas
+ramas**: en local, el `main` de antes de ellas (`efafc2e`) falla igual, y el
+motor no cambió. Es deuda de rondas anteriores, por repartir aparte (el
+detalle, en el papel de la fusión §5).
+
+## 30 sep 2026 · Tanda del 30 sep: la hoja de reparto (skill `director`, v5.33)
+
+Vera pidió una dirección que mande sobre las demás: la skill `director`
+(`.claude/skills/director/SKILL.md`) es el índice de las direcciones, sus
+skills y sus fronteras, y el protocolo de una tanda de varias sesiones. Esta
+es la primera hoja escrita con ella. **El director es la sesión «Análisis de
+conflictos entre ramas»**, rama `ccr-16705aa8-9x5ofm`.
+
+| Carril | Rama · PR | Versiones | Tuyo | No es tuyo |
+|---|---|---|---|---|
+| CI en verde (director) | `claude/ci-verde` · #15 | v5.33 (la v5.32 la tomó la #16 del sonido antes de que esta hoja llegara a `main`) | `.github/workflows/ci.yml`, `playwright.config.ts`, `tests/helpers/timing.ts`, `tools/shots/**`, la skill `director` | el juego: sólo pruebas y configuración |
+| Sonido | `claude/sonido-arreglos-revision` · #14, **fusionada** (12:58, antes de la #15) | v5.31 | `src/ui/sound.ts`, `ambience.ts`, `moments.ts`, `public/audio/`, `tools/ui/` | la reja de interfaz y los cronómetros: van en #15 |
+| Informe y GV-4a (director) | `ccr-16705aa8-9x5ofm` · #8 | v5.34–v5.35 (renumera sus v5.25–v5.26 al traer `main`) | `docs/medidas/fusion-*`, `presentation-clock.ts`, `backend.ts` (sólo `clock.painted`) | GV-4b, ya en `main` (v5.29) |
+| Las 21 jornadas viejas (agente del director) | rama propia · PR por abrir | v5.36–v5.37 | `tests/journeys/**`; código sólo si la causa está ahí, **y si es del motor lo dice antes** | la reja y los cronómetros |
+| Revisión de rendimiento | `claude/revision-rendimiento-2026-09-30` | — | nada hasta que Vera le asigne el resto de su lista | — |
+
+**Orden de integración**, de una en una y con `main` en verde (director §3.3):
+1. **#15**, porque sin ella ninguna PR puede salir verde (la #14 entró antes,
+   con sus pruebas limpias y sólo los rojos heredados);
+2. **#8**, que trae `main` y renumera;
+3. **las jornadas**.
+Tras cada fusión, las que quedan traen `main` (merge, no rebase) y vuelven a
+pasar su puerta. **Una sesión nueva pide su bloque de versiones al director:
+el siguiente libre es la v5.38.**
+
+**Cerrado el mismo día, y no era del juego:** el recorrido de «tocar un
+edificio» en Canvas y el de «la ruta viva» en 3D fallaban porque buscaban la
+ficha `.valley-panel`, y desde A1 (piel v8) el toque en el valle abre la
+etiqueta de pergamino `.valley-label`. Con la etiqueta abierta delante, la ruta
+viva seguía barriendo hasta agotar los 300 s. Las dos pasan en local; el
+gancho `__valleyHouseOnScreen` comprueba ahora su punto con el mismo `pick` que
+usa el dedo.
+
+**Abierto para Vera:** fusionar en ese orden; decidir el reparto de lo que la
+revisión de rendimiento dejó sin dueño; y, con #8 dentro, abrir la villa 7/60
+en la tablet —es la medida combinada que cierra la tanda (director §3.4)—.
 ## 30 sep 2026 · La respuesta a una oferta vuelve a sonar (v5.32)
 
 El sonido ya decodificado suena en el acto y no al acabar el tick: la

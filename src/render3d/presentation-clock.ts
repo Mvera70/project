@@ -71,6 +71,15 @@ const MAX_STEP_SECONDS = 0.1;
  * the final state instead of playing the missing minutes. One second is well
  * past any frame a device can produce and well under any absence a person would
  * notice, so it separates the two cases without needing to be told.
+ *
+ * **El hueco que se compara es el ocioso, no el entero** (GV-4, 30 sep 2026):
+ * desde que el fotograma anterior *terminó* de pintarse hasta que empieza
+ * éste. Medido con el hueco entero, un fotograma que tardara más de un segundo
+ * en pintarse —montar la vida de una villa en una tablet— se tomaba por una
+ * ausencia, la ausencia rehacía la vida, y rehacerla volvía a pasar del
+ * segundo: la villa 7/60 se quedaba en 3,8 s por fotograma con la vida a cero
+ * pasos, para siempre (`docs/medidas/bucle-villa-2026-09-29.md`). El trabajo
+ * propio no es una ausencia; sólo lo es el tiempo en que nadie pintó.
  */
 const SUSPEND_GAP_SECONDS = 1;
 
@@ -152,6 +161,13 @@ export interface PresentationClock {
    */
   reset(): void;
   /**
+   * El fotograma que `frame` abrió ya está pintado. `realMs` es cuándo acabó,
+   * y es desde ahí desde donde se cuenta el hueco ocioso que decide si hubo
+   * una ausencia. Llamarlo es opcional: sin él el hueco se mide de inicio a
+   * inicio, como antes de GV-4.
+   */
+  painted(realMs: number): void;
+  /**
    * Scenic seconds: los del motor, no una cuenta propia (v3.72). Suben con el
    * tick y su fracción, así que sólo saltan cuando salta el mundo —una carga,
    * el letargo, otro valle— y ese fotograma viene marcado `discontinuity`.
@@ -161,13 +177,15 @@ export interface PresentationClock {
 
 interface Memory {
   realMs: number;
+  /** Cuándo terminó de pintarse el último fotograma, o `null` si no se dijo. */
+  paintedMs: number | null;
   tick: number;
   seconds: number;
   started: boolean;
 }
 
 export function createPresentationClock(): PresentationClock {
-  const memory: Memory = { realMs: 0, tick: 0, seconds: 0, started: false };
+  const memory: Memory = { realMs: 0, paintedMs: null, tick: 0, seconds: 0, started: false };
 
   return {
     get seconds(): number {
@@ -179,17 +197,29 @@ export function createPresentationClock(): PresentationClock {
       memory.seconds = 0;
       memory.tick = 0;
       memory.realMs = 0;
+      memory.paintedMs = null;
+    },
+
+    painted(realMs: number): void {
+      memory.paintedMs = Math.max(realMs, memory.realMs);
     },
 
     frame(input: ClockInput): GraphicsFrame {
       const previousMs = memory.realMs;
+      const previousPaintedMs = memory.paintedMs;
       const previousTick = memory.tick;
       const first = !memory.started;
       memory.started = true;
       memory.realMs = input.realMs;
+      memory.paintedMs = null;
       memory.tick = input.tick;
 
+      // El hueco entero, de inicio a inicio, es el que explica los ticks y el
+      // que anda la animación; el ocioso, desde que acabó el pintado anterior,
+      // es el que dice si alguien se fue.
       const gapSeconds = first ? 0 : Math.max(0, (input.realMs - previousMs) / 1000);
+      const idleSeconds = first ? 0
+        : Math.max(0, (input.realMs - (previousPaintedMs ?? previousMs)) / 1000);
 
       // How many ticks this frame's own elapsed time can explain. Anything
       // beyond that came from somewhere else: lethargy, a load, a background
@@ -199,7 +229,7 @@ export function createPresentationClock(): PresentationClock {
       const jumped = first ? 0 : input.tick - previousTick;
       const lethargy = jumped < 0 || jumped > explained + LETHARGY_SLACK_TICKS;
 
-      const suspended = input.hidden || gapSeconds > SUSPEND_GAP_SECONDS;
+      const suspended = input.hidden || idleSeconds > SUSPEND_GAP_SECONDS;
       const discontinuity = first || lethargy || suspended;
 
       // Pause freezes movement and clips; the camera and the cards keep

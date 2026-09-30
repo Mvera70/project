@@ -245,9 +245,20 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
 
 ## Lo que queda (por lo que pesa)
 
-- **Romper el bucle de la villa** (lección 22): que el hueco que cuenta como
-  ausencia descuente el trabajo del propio fotograma, y abaratar `createVillage`.
-  Es la causa probable de la tablet a 0 fps con fotogramas de dos segundos.
+- **Abaratar `createVillage`** (GV-4b): el bucle de la villa (lección 22) está
+  roto desde v5.35 —el hueco que cuenta como ausencia es el ocioso, y la villa
+  7/60 pasó de 4 595 ms por `paint` a 142—, pero el primer montaje y cada relevo
+  de jornada siguen en 4–5 s: Vera ve bajar los fotogramas de la aldea pequeña
+  al anochecer, y a ×16 la villa se congela 5–7 s en cada relevo. **No** va por
+  guardar rutas por plan de escena: el relevo es `dayPlans`→`choose` en un 50 %
+  (99 % en 3/40) y el 93 % de las búsquedas A* finas fallan y son el 99 % del
+  tiempo. Va por **regiones cerradas** (una búsqueda fallida guarda la región
+  de la que no se sale y contesta «no» a la siguiente sin buscar): prototipo
+  exacto en `claude/gv-4b-regiones-cerradas`, `createVillage` 7/60 de 3,2 s a
+  0,15–0,22 s. `docs/medidas/revision-rendimiento-2026-09-30.md` §3, en la rama `claude/revision-rendimiento-2026-09-30` sin fusionar.
+- **Fuera de Windows, las sondas quieren el navegador de Playwright a mano:**
+  `VALLEY_CHROMIUM=/opt/pw-browsers/chromium-<n>/chrome-linux/chrome`, y
+  `bundle-game.ts --out` sólo acepta una carpeta dentro de `artifacts/`.
 - **Medir en un aparato real** (la tablet de Vera) y apuntar aquí las cifras: FPS, y
   si siguen los tirones al caer un rayo o empezar una fiesta. Y las dos lecturas que
   dejó GV (29 sep 2026): el pie de los edificios (`?contact=off` contra el valle
