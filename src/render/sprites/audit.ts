@@ -5,6 +5,8 @@ import { PALETTES } from '@derive/palette';
 import { BUILDING_SPRITES } from './index';
 
 export interface SpriteAudit {
+  /** Cuántos edificios tienen dibujo: cada uno se audita en cuatro casos. */
+  sprites: number;
   cases: number;
   empty: string[];
   spills: string[];
@@ -52,5 +54,5 @@ export function auditSprites(): SpriteAudit {
       }
     }
   }
-  return { cases, empty, spills, principalShapes: principal.size };
+  return { sprites: Object.keys(BUILDING_SPRITES).length, cases, empty, spills, principalShapes: principal.size };
 }
