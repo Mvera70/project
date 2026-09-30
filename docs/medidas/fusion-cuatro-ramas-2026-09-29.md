@@ -122,6 +122,28 @@ pidió. El ladrido del perro es decisión de Vera.
    y no tiene un «qué está abierto» único. CLAUDE.md no nombra el sonido ni
    las skills `fisica-combate`, `sonido-del-valle` o `monetizacion-marketing-valley`.
 
-## 5 · Suite
+## 5 · Suite y CI
 
-Se rellena al terminar la suite rápida sobre `7d027bb`.
+- Local sobre `7d027bb`: typecheck y lint limpios.
+- CI de `main` con AN-5 dentro (#280, sobre `6b677bc`), según las sesiones de
+  modelos y animación:
+  - **fast** en verde (typecheck, suite rápida, build, lint). En #276, justo
+    antes de AN-5, estaba en rojo.
+  - **browser** (`test:shots`) en rojo: los 12 recorridos ya conocidos más uno
+    de M-0 (el trato en el camino), igual que en #276.
+  - **journeys** terminan por primera vez (48 min, tope 60): 168 bien y **21
+    rojas en 13 ficheros**, no las 2 declaradas.
+    - Declaradas: `notices` (los catorce avisos). La segunda ya no sale como
+      «palanca del bosque»; en su lugar sale `fate-chaos`.
+    - De tiempo: `life-decide`, «una jornada entera cuesta poco» (4,2 s en la
+      CI contra 2,5 de tope).
+    - Ya rojas antes de AN-5: tres de `life-wildlife`.
+    - Sin dueño todavía: `e3b-corridor` ×5, `wall-rings`, `works` (un muro en
+      una casilla prohibida), `life-props` ×3, `life-places`, `work-contact`,
+      `engine-long` (las riñas), `founding`, `title-cooperative`.
+    - Ninguna en las pruebas de caza ni de oso.
+- **Nadie sabe todavía de qué PR viene cada roja:** todas las ejecuciones de
+  jornadas anteriores se cortaban en el tope de 60 minutos, así que no hay
+  línea de base. La comparación de los 13 ficheros sobre `efafc2e` (el `main`
+  de antes de las cuatro ramas) contra `7d027bb` está en marcha; su resultado
+  va a `docs/task-log.md`.
