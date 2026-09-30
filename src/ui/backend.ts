@@ -432,6 +432,10 @@ export function attachBackend(
             reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
             hidden: document.hidden,
           }));
+          // Y cuándo acabó, para que un fotograma que tarde en pintarse —la
+          // vida de una villa montándose en una tablet— no cuente como una
+          // ausencia (GV-4).
+          clock.painted(performance.now());
         },
         pick(_state, xCss, yCss) { return renderer.pick(xCss, yCss); },
         screenOf(target) { return target.kind === 'terrain' ? null : renderer.screenOf(target); },
