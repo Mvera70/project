@@ -671,7 +671,9 @@ export function scatterCells(
         // GV-2 · El árbol sigue ahí: su sombra no se va al atenuarlo (antes se
         // iba con el siguiente mapa de sombras, un salto más en el suelo).
         revealed.castShadow = true;
-        revealed.receiveShadow = true;
+        // Y recibe sombra como la copa opaca, que no la recibe: atenuada, la
+        // copa cambiaba de luz además de transparentarse (revisión del 30 sep).
+        revealed.receiveShadow = instanced.receiveShadow;
         faded.push(revealed);
         fadedMaterials.push(fadedMaterial);
       }

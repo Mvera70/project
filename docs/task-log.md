@@ -1,5 +1,31 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · GV-4b: el relevo de jornada, con las regiones cerradas (v5.29)
+
+La segunda mitad del bucle de la villa, que la revisión del 30 sep (§3) pasó a
+gráficos con un prototipo para revisar con ojo crítico. **Revisado y dado por
+bueno**: una búsqueda A* fina que falla ha recorrido entera una región de la
+que no se sale, y la caché sólo contesta «no» cuando el A* también lo haría.
+Comprobado leyendo la búsqueda y **midiendo la misma vida byte a byte en diez
+valles** con los troncos de verdad (los cuatro de la revisión y seis más). La
+única salvedad, escrita en `life/body.ts`: un `Terrain` no se modifica después
+de crearse, que es lo que la caché supone y hoy se cumple. En el navegador
+(`relay-probe.mjs`, villa 7/60 a ×16): de 7–8 fotogramas por minuto y la vida
+parada a 78–86 fotogramas y 169–182 ms de mediana, con relevos de 0,5–1,6 s.
+**Abierto**: medirlo en la tablet con GV-4a dentro (la villa 7/60 a ×16).
+
+## 30 sep 2026 · «Graphics»: la adaptativa y el tope, arreglados (v5.28)
+
+Lo que la revisión de rendimiento del 30 sep (§4, RV-3) le pasó a gráficos. La
+adaptativa decidía en cada fotograma, y un solo fotograma de 100 ms bajaba la
+resolución 6 s; ahora decide una vez por ventana de 2 s, sin los largos sueltos
+(`render3d/adaptive-scale.ts`, puro). El tope de 60 pintaba a 45 en una
+pantalla de 90 Hz y hundía la resolución; ahora acumula citas y da 60 de 72 a
+144 Hz (`ui/loop.ts`). Y los menores: el tope leído una vez, `track()` sin el
+segundo revelado, la sombra de la copa atenuada y la cifra de la máscara en la
+skill. **Abierto**: verlo en un aparato de 90 Hz (el panel de taller debería
+decir 60 y resolución 100 %). El detalle, en el registro.
+
 ## 29 sep 2026 · Sonidos de materiales (v5.15) — **a la espera de que Vera elija variantes**
 
 Vera descartó los veinte de v5.14 y se buscó la dirección con un solo botón en
