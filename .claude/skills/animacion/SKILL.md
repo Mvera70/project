@@ -41,7 +41,7 @@ lo guarda y qué papel deja. La pantalla de referencia es el móvil (390×844 y
 
 | Qué | Dónde |
 |---|---|
-| 25 clips humanos: 4 del GLB (`idle`, `walk`, `work_hoe`, `carry_walk`) y 21 fabricados sobre el `idle` | `src/render3d/clips.ts` (tabla, segundos, zancada, `STRIKE_AT`, `STRIKE_HEAD`) y `src/render3d/action-clips.ts` (`ACTION_CLIPS`) |
+| 27 clips humanos: 4 del GLB (`idle`, `walk`, `work_hoe`, `carry_walk`) y 23 fabricados sobre el `idle` (AN-5 sumó `spear_thrust_high` y `spear_thrust_low`) | `src/render3d/clips.ts` (tabla, segundos, zancada, `STRIKE_AT`, `STRIKE_HEAD`) y `src/render3d/action-clips.ts` (`ACTION_CLIPS`) |
 | Qué clip enseña cada situación de la vida | `src/render3d/life/cast.ts`, `clipOf` (personas) y los emisores de `Animal` (`beasts.ts`, `companions.ts`, `deer.ts`, `bear.ts`, `rabbits.ts`, `wild-prey.ts`, `wildlife.ts`, `visitors.ts`) |
 | La pose, las mezclas, la parada, lo que se lleva en la mano y el golpe | `src/render3d/world/cast.ts` (`pose`, `equip`, `strike`, `wound`) y `src/render3d/hand-tools.ts` |
 | 15 especies con sus clips del GLB | `art/catalog.json` (`motion`), `src/render3d/effects/animal-motion.ts` (rumbo, marcha por distancia, gestos, fundidos, caída), `animal-gestures.ts` (run, bark y play del perro), `effects/fauna.ts` |

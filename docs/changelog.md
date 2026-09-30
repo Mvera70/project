@@ -1,5 +1,60 @@
 # The Valley — Registro de cambios
 
+## v5.25 · 30 sep 2026 · La caza, tras la revisión: el jabalí en la linde, el cazador que sale andando y la caza sin picos
+
+La revisión del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md` §7,
+en la rama `claude/revision-rendimiento-2026-09-30`; fila RV-3b) encontró
+cuatro cosas de AN-5 y se encargaron por orden de Vera. Todo en la capa de
+vida y el render: **el motor no cambia**.
+
+- **RV-3b · el jabalí nace en la linde** (`life/wild-prey.ts`). Sólo valía el
+  bosque, y el juego pone un tronco en cada celda de bosque: con los troncos
+  del juego no nacía en ningún valle de fundación ni en 11, 23 y 5 al año 30
+  (0 de 20), y sin jabalí cazado no hay oso. Vale también la pradera pegada al
+  bosque, como la guarida de AN-4c: ahora nace en todos (20 de 20). **Y la caza
+  del jabalí se ofrece en la partida donde antes no**: la toma 33/22 de AN-5
+  daba «no-prey» y ahora arranca (`artifacts/graphics/RV-3b/`). Prueba con
+  `solidTerrain` y los GLB publicados en cuatro semillas; falla sin el arreglo.
+- **El informe dice los valles que se salta** (`hunt-report.ts`, «sin presa en
+  …»), y el ciervo sale donde lo pone el juego (`createDeer`), no donde nacería
+  un jabalí.
+- **El cazador sale andando a donde cabe** (`life/hunt-encounter.ts`,
+  `exitRoute` en `life/body.ts`): se cuela entre troncos con 0,22 y vuelve a su
+  vida con la holgura del aldeano (0,32). Si acaba donde no cabe, sale por el
+  camino más corto a donde sí —sin atravesar muros: el sitio libre más cercano
+  en línea recta podía estar detrás de uno— y el parte lo espera; si no llega,
+  `releaseHunter` lo pone al lado al soltarlo.
+- **La caza sin picos.** Cada replanteo descarta por celdas los puestos a los
+  que no se llega y prueba un solo camino, con tope de 12.000 nodos
+  (`pathTo` admite ahora un tope; sin él, como siempre). Con la presa
+  encerrada, el peor paso de caza baja de 2,4 s a 18 ms (cercado de celdas) y
+  de 2,6 s a 77 ms (cercado de tablas); medido sin reloj, de 9,8 a 0,52
+  millones de consultas de sólidos. Los caminos buenos abren como mucho unos
+  8.200 nodos, así que el tope no corta ninguno.
+- **La escena que se pierde entrega su parte.** Con un fotograma de más de un
+  segundo, una carga u otro valle, el renderer descartaba la caza sin parte y
+  `runTick`, que espera a la caza, **no volvía a avanzar la semana hasta
+  recargar**: más grave de lo que la revisión leyó en el código (la señal y la
+  velocidad). Ahora `abandon()` da un parte sin pieza.
+- **El zarpazo del oso se ve entero**: dura lo que su clip `attack` (3 s) y la
+  embestida no lo corta; antes, al paso siguiente ya estaba en `charge`.
+- **La caída, en un solo sitio**: `DOWN_ROLL`, `DOWN_EASE` y `downSettleAfter`
+  en `life/hunt-bodies.ts`; el render y lo que la presa lleva clavado los leen
+  de ahí, y una prueba compara el render con esa curva.
+- **Papel**: filas en `tools/README.md` para `bake-clips.mjs`,
+  `plant-gait.mjs`, `trace-strip.py`, `build-compare.py` y `take.sh`; la
+  skill `animacion` cuenta 27 clips humanos; `encargos-3d.md` tacha la vía del
+  observatorio (hecha en AN-4b); `bear-visit-report.ts` mide `createBear`.
+- **Lo que cambia en el reparto, y es de Vera** (caza sola, cinco valles al año
+  30, `artifacts/physics/AN-5/rv-2026-09-30-caza.txt`): el jabalí nace ahora en
+  los cinco valles y no en dos, y en la linde es más fácil —con arco, del 46 al
+  65 % cobrado; con lanza, del 50 al 83 %—; el ciervo, medido donde lo pone
+  el juego y en cuatro valles (en 23/30 no hay ciervo), cae mucho menos que
+  medido donde nacería un jabalí —con arco, 27 % donde se medía 67; con lanza,
+  40 % donde se medía 79—: está más lejos (33–37 s por caza, antes 16–22); el oso, igual en el
+  valle (15 %) y un poco más cazable en el llano (de 20 a 27 %) porque ya no
+  embiste en mitad de su zarpazo. Perdiz y conejo, igual.
+
 ## v5.13 · 29 sep 2026 · AN-5: la caza física, y la visita del oso que dura
 
 Vera, al leer el brief AN-5a: «que la caza enseñe el golpe; tiene que ser

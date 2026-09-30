@@ -4,6 +4,7 @@ import { AnimationMixer, Bone, Box3, Mesh, SkinnedMesh, Vector3, type Object3D }
 import { loadAssets } from '../../src/render3d/assets';
 import { Fauna } from '../../src/render3d/effects/fauna';
 import type { AnimalKind } from '../../src/derive/animals';
+import { DOWN_ROLL, downSettleAfter } from '../../src/render3d/life/hunt-bodies';
 
 const manifest=JSON.parse(readFileSync('public/assets/valley3d/manifest.json','utf8')) as {schemaVersion:1;generatedAt:string;assets:Array<{id:string;file:string;motion:Array<{name:string}>}>};
 const species:AnimalKind[]=['cow','pig','hen','wolf','crow','fish','dog','mule','boar','bear','partridge'];
@@ -163,6 +164,16 @@ describe('AN-1 · rumbo, carreras, mezclas y caída de los animales',()=>{
     // apoya en el suelo. Antes quedaba de pie sobre el hocico, medio enterrado.
     expect(lying.max.y-lying.min.y,'de costado, no de pie').toBeLessThan((standing.max.y-standing.min.y)*0.75);
     expect(lying.min.y,'sobre el suelo, no enterrado').toBeGreaterThan(-0.02);
+    fauna.dispose();lib.dispose();
+  });
+  it('la caída que pinta el render es la de la caza: el mismo vuelco con la misma curva que lo que lleva clavado',async()=>{
+    const lib=await library('boar'),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
+    fauna.paint([{id:9,kind:'boar',x:1,y:1}],0);
+    const body=fauna.group.children[0]!;
+    for(let i=1;i<=30;i++){
+      fauna.paint([{id:9,kind:'boar',x:1,y:1,action:'down'}],i/60);
+      expect(body.rotation.x,`fotograma ${i}`).toBeCloseTo(DOWN_ROLL*downSettleAfter(i/60),6);
+    }
     fauna.dispose();lib.dispose();
   });
   it('el ciervo caído se apoya en el costado de su tronco: la cuerna, más ancha, no lo deja flotando',async()=>{

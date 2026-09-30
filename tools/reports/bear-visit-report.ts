@@ -15,6 +15,8 @@ import type { Object3D } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { stateAt, huntedNow } from '../../src/ui/debug';
 import { createVillage } from '../../src/render3d/life/village';
+import { createBear } from '../../src/render3d/life/bear';
+import { valleyCore } from '../../src/derive/anchors';
 import { solidTerrain } from '../../src/render3d/world/obstacles';
 import { elevationAt } from '../../src/render3d/world/ground';
 import { LIFE_STEP, STEPS_PER_DAY } from '../../src/render3d/life/clock';
@@ -39,11 +41,27 @@ for (const asset of manifest.assets) {
 console.log(`La visita del oso · año ${year}, un día entero de vida por valle`);
 console.log('semilla   fuera (s)   primer aviso (s)   avisos   se mete porque');
 let total = 0;
+/**
+ * Revisión del 30 sep 2026 · Lo que cuesta montar la visita (`createBear`): se
+ * paga en cada relevo de jornada mientras dura el suceso, dentro de
+ * `createVillage`. Es tiempo de esta máquina: vale para comparar, no como cifra
+ * del teléfono.
+ */
+const bearCost: string[] = [];
 for (const seed of seeds) {
   const state = stateAt({ seed, year, season: 'summer' });
   huntedNow(state, ['partridge', 'rabbit', 'deer', 'boar']);
   state.flags['bear'] = state.tick + 2;
   const land = solidTerrain(state, id => models.get(id)?.clone());
+  const core = valleyCore(state);
+  const times: number[] = [];
+  for (let n = 0; n < 5; n += 1) {
+    const started = performance.now();
+    createBear(state, land, { x: core.x, z: core.y }, (x, z) => elevationAt(state.map, x, z));
+    times.push(performance.now() - started);
+  }
+  times.sort((a, b) => a - b);
+  bearCost.push(`${seed}: ${times[2]!.toFixed(0)} ms (peor ${times[4]!.toFixed(0)})`);
   const village = createVillage(state, 0, { land, ground: (x, z) => elevationAt(state.map, x, z) });
   let out = 0, firstWarning = -1, warnings = 0, rising = false, ended = 'sigue fuera al acabar el día';
   let seen = false;
@@ -66,3 +84,4 @@ for (const seed of seeds) {
   village.dispose();
 }
 console.log(`media fuera: ${(total / seeds.length * LIFE_STEP).toFixed(1)} s`);
+console.log(`montar la visita (createBear, mediana de cinco): ${bearCost.join(' · ')}`);
