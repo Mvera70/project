@@ -2811,6 +2811,15 @@ export const SOUND = {
   /** ±3 % de tono por golpe (skill §7): diez seguidos no suenan a máquina. */
   MOMENT_PITCH_JITTER: 0.06,
 
+  // TUNE: cuántos sucesos del mundo pueden sonar a la vez; el siguiente no se
+  // programa hasta que acabe uno. El fusible por sonido (`MOMENT_MIN_GAP_MS`)
+  // no impide que siete sonidos **distintos** se apilen —flecha, impacto,
+  // fallo, golpe, caída, portón— en la salva de un asalto. Ocho es más que
+  // una salva de siete arcos más su portón, y menos que lo que satura el
+  // altavoz de un móvil. Los toques del jugador no cuentan ni se descartan
+  // nunca. Sin medir contra un asalto real: se ajusta con `?sandbox=battle`.
+  MAX_WORLD_VOICES: 8,
+
   // ---- la memoria del reproductor (revisión del 30 sep 2026) ----
 
   // TUNE: cuánto tiempo real lleva callado un lecho antes de soltarlo: se

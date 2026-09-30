@@ -113,6 +113,11 @@ await step('crónica · cerrarla (una vez)', 'ui_panel_close',
   () => tab.locator('.ui-shell-content-close').click(), ONCE);
 await step('cabecera · abrir el carro (una vez)', 'ui_panel_open', () => tab.locator('.valley-orders-now').click(), ONCE);
 await step('carro · cerrarlo (una vez)', 'ui_panel_close', () => tab.locator('.ui-shell-content-close').click(), ONCE);
+// El tablón sólo se abre tocándolo en el mundo: se abre por el gancho, que no
+// suena, y lo que se mide es su cierre.
+await tab.evaluate(() => window.__valleyOpenBoard?.());
+await tab.locator('.valley-board-close').waitFor();
+await step('tablón · cerrarlo (una vez)', 'ui_panel_close', () => tab.locator('.valley-board-close').click(), ONCE);
 await step('abrir la gente', 'ui_panel_open', () => tabButton('People').click());
 await step('volver al valle', 'ui_panel_close', () => tabButton('Valley').click());
 await tab.waitForTimeout(400);
@@ -166,14 +171,22 @@ const ambience = [];
 async function bed(name, check, act) {
   await act();
   // Un cruce entero tarda 1/`AMBIENCE_EASE` = 2,5 s: con menos espera se mide
-  // una capa a medio entrar y parece que falta.
+  // una capa a medio entrar y parece que falta. Y luego **se reintenta hasta
+  // ocho segundos**: con swiftshader el fotograma que recoge la hora retenida
+  // puede tardar, y una espera fija dejó el paso de la noche rojo una vez de
+  // cinco midiendo el cielo de antes (30 sep 2026).
   await tab.waitForTimeout(3200);
-  const now = await mix();
-  const layers = Object.entries(now).filter(([, gain]) => gain > 0.01)
-    .map(([layer, gain]) => `${layer.replace('amb_', '')} ${gain.toFixed(2)}`);
+  let now = await mix();
   let ok = true;
   let why = '';
-  try { check(now); } catch (error) { ok = false; why = String(error.message ?? error); }
+  for (let tries = 0; ; tries += 1) {
+    try { check(now); ok = true; why = ''; break; } catch (error) { ok = false; why = String(error.message ?? error); }
+    if (tries >= 16) break;
+    await tab.waitForTimeout(500);
+    now = await mix();
+  }
+  const layers = Object.entries(now).filter(([, gain]) => gain > 0.01)
+    .map(([layer, gain]) => `${layer.replace('amb_', '')} ${gain.toFixed(2)}`);
   ambience.push({ name, layers, ok, why });
   console.log(`${ok ? '✓' : '✗'} ${name.padEnd(42)} ${layers.join(' · ') || '—'}${why ? `  ← ${why}` : ''}`);
 }

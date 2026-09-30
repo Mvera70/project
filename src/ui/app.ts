@@ -1537,6 +1537,13 @@ export function boot(
   window.__valleyTimeScale = (value: number): void => { timeScale = Math.max(0.05, Math.min(1, value)); };
   window.__valleyLook = (x: number, y: number): void => { backend.live.look(x, y); };
   window.__valleyHoldTicks = (on: boolean): void => { ticksHeld = on; };
+  /**
+   * El tablón, abierto desde fuera: en el juego sólo se abre tocándolo en el
+   * mundo 3D, y el recorrido del sonido (`tools/ui/sound-check.mjs`) necesita
+   * comprobar que su cierre suena una vez. Por `navigate` y no por
+   * `actions.navigate`: abrirlo así no es un toque y no suena.
+   */
+  window.__valleyOpenBoard = (): void => { navigate({ kind: 'board' }); };
 
   window.__valleyEnd = (cause: string): void => {
     if (state.ended !== null) return;
@@ -1806,5 +1813,6 @@ declare global {
     __valleyTimeScale?: (value: number) => void;
     __valleyLook?: (x: number, y: number) => void;
     __valleyHoldTicks?: (on: boolean) => void;
+    __valleyOpenBoard?: () => void;
   }
 }

@@ -417,7 +417,10 @@ export function createSoundEngine(): SoundEngine {
     buffers.delete(layer);
   };
 
-  const start = (cue: Cue, rate: number, requestedMs: number, level = 1): void => {
+  /** Los sucesos del mundo que suenan ahora mismo (`SOUND.MAX_WORLD_VOICES`). */
+  let worldVoices = 0;
+
+  const start = (cue: Cue, rate: number, requestedMs: number, level = 1, world = false): void => {
     if (!isEnabled() || ctx === null || master === null) return;
     // Con la pestaña oculta no suena nada, y menos aún se reanuda el contexto:
     // un temporizador de trueno que vence de fondo soltaría todo de golpe al volver.
@@ -430,6 +433,10 @@ export function createSoundEngine(): SoundEngine {
       // Un sonido que llega tarde a su toque se lee como un fallo, no como
       // una respuesta (`SOUND.LATE_PLAY_MS`).
       if (Date.now() - requestedMs > SOUND.LATE_PLAY_MS) return;
+      // **El tope de voces**, sólo para el mundo: una salva no puede apilar
+      // más de `SOUND.MAX_WORLD_VOICES` golpes. Se mira aquí, al empezar de
+      // verdad, y no al pedirlo: lo que se descartó por tarde no ocupa sitio.
+      if (world && worldVoices >= SOUND.MAX_WORLD_VOICES) return;
       const source = context.createBufferSource();
       source.buffer = buffer;
       source.playbackRate.value = rate;
@@ -440,6 +447,10 @@ export function createSoundEngine(): SoundEngine {
         near.gain.value = level;
         source.connect(near);
         near.connect(out);
+      }
+      if (world) {
+        worldVoices += 1;
+        source.onended = () => { worldVoices -= 1; };
       }
       source.start();
       if (typeof window !== 'undefined') {
@@ -589,7 +600,7 @@ export function createSoundEngine(): SoundEngine {
       if (CUE_FILES[cue] === undefined || !momentAllowed(nowMs, lastMomentMs[cue], gain)) return;
       lastMomentMs[cue] = nowMs;
       const jitter = 1 + (Math.random() - 0.5) * SOUND.MOMENT_PITCH_JITTER;
-      start(cue, jitter, Date.now(), Math.min(1, gain));
+      start(cue, jitter, Date.now(), Math.min(1, gain), true);
     },
   };
 }

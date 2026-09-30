@@ -36,7 +36,10 @@ class FakeSource extends FakeNode {
   readonly playbackRate = new FakeParam();
   started = false;
   stopped = false;
+  onended: (() => void) | null = null;
   start(): void { this.started = true; }
+  /** Lo que el navegador hace al acabar un sonido de un disparo. */
+  finish(): void { this.onended?.(); }
   stop(): void { this.stopped = true; }
 }
 
@@ -131,6 +134,38 @@ describe('el cielo · el trueno cercano suena detrás de su latigazo', () => {
     engine.accent('ui_crossroad_opens', SOUND.ACCENT_MIN_GAP_MS / 2);
     await settle();
     expect(played()).toEqual(['stinger_milestone_minor']);
+  });
+});
+
+describe('el tope de voces · una salva no satura', () => {
+  // Diez golpes distintos a la vez: el fusible por sonido no los separa,
+  // porque cada uno es otro sonido.
+  const VOLLEY: Cue[] = ['combat_arrow_loose', 'combat_arrow_hit', 'combat_arrow_miss', 'combat_melee',
+    'combat_fall', 'combat_gate_hit', 'combat_gate_break', 'weather_thunder_far', 'weather_thunder_mid',
+    'weather_lightning_crack'];
+
+  it(`del mundo no suenan más de SOUND.MAX_WORLD_VOICES a la vez, y al acabar uno entra el siguiente`, async () => {
+    const engine = createSoundEngine();
+    engine.arm();
+    await settle();
+    for (const cue of VOLLEY) engine.moment(cue, 0, 1);
+    await settle();
+    expect(played()).toHaveLength(SOUND.MAX_WORLD_VOICES);
+
+    context().sources.find((s) => s.started && s.onended !== null)!.finish();
+    engine.moment('combat_arrow_loose', 1_000, 1);
+    await settle();
+    expect(played()).toHaveLength(SOUND.MAX_WORLD_VOICES + 1);
+  });
+
+  it('y un toque del jugador suena aunque el mundo esté lleno', async () => {
+    const engine = createSoundEngine();
+    engine.arm();
+    await settle();
+    for (const cue of VOLLEY) engine.moment(cue, 0, 1);
+    engine.tap('ui_pause', 0);
+    await settle();
+    expect(played()).toContain('ui_pause');
   });
 });
 
