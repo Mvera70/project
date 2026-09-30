@@ -192,3 +192,34 @@ test('con red, el documento viene de la red y no de la caché', async ({ page, c
   await page.goto('/index.html');
   await test.expect(page).toHaveTitle('Redeployed');
 });
+
+// Revisión del 30 sep 2026 · **sin red, el valle no calla.** El sonido se pide
+// en marcha (`ui/sound.ts`) y el documento no lo nombra, así que antes sólo
+// quedaba guardado lo que la primera visita hubiera llegado a bajar: quien
+// abría el juego una vez y se quedaba sin red, jugaba en silencio. El
+// trabajador lo precachea en la instalación con `public/audio/manifest.json`.
+test('tras una sola visita, todo el sonido está guardado y se sirve sin red', async ({ page, context }) => {
+  await page.goto('/');
+  await controlled(page);
+  const files = await page.evaluate(async () => {
+    const response = await fetch('./audio/manifest.json', { cache: 'no-store' });
+    return ((await response.json()) as { files: string[] }).files;
+  });
+  test.expect(files.length).toBeGreaterThan(0);
+
+  await context.setOffline(true);
+  const missing = await page.evaluate(async (list) => {
+    const failed: string[] = [];
+    for (const file of list) {
+      try {
+        const response = await fetch(`./audio/${file}`);
+        if (!response.ok || (await response.arrayBuffer()).byteLength === 0) failed.push(file);
+      } catch {
+        failed.push(file);
+      }
+    }
+    return failed;
+  }, files);
+  test.expect(missing).toEqual([]);
+  await context.setOffline(false);
+});

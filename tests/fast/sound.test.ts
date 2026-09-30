@@ -439,6 +439,16 @@ describe('los lechos · lo que se registra, existe y no se nota que da la vuelta
     }
   });
 
+  it('el service worker precachea exactamente lo que suena, con su huella', () => {
+    // Sin esto, quien abría el juego una vez y se quedaba sin red jugaba en
+    // silencio (revisión del 30 sep 2026). La lista la escribe `sounds.py` al
+    // sellar; una que no coincida precachearía lo que nadie pide y dejaría
+    // fuera lo que sí.
+    const manifest = JSON.parse(readFileSync(resolve(AUDIO, 'manifest.json'), 'utf-8')) as { files: string[] };
+    const wanted = [...AMBIENCE_LAYERS.map((l) => LOOP_FILES[l].file), ...Object.values(CUE_FILES)];
+    expect([...manifest.files].sort()).toEqual([...new Set(wanted)].sort());
+  });
+
   it('todo el sonido cabe en un presupuesto de móvil: menos de 1,5 MB', () => {
     // Medido el 29 sep 2026, con las fases 1 y 2 dentro: **1043 KB** —18
     // lechos, 4 del cielo y 22 de interfaz—. El tope deja sitio para los

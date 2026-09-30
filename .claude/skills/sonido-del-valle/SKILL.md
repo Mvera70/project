@@ -84,7 +84,8 @@ Cada material tiene su papel, para que la interfaz se aprenda de oído:
 | `tools/ui/sounds.py` | **Fabrica los sonidos.** Materiales modelados con numpy, nivelados en la banda del teléfono, a `public/audio/*.mp3`. Determinista byte a byte. Sella la huella de cada fichero en `sound.ts` | `python tools/ui/sounds.py [--audition] [--stamp] [--only <ids>]` |
 | `tools/ui/sound-check.mjs` | **Comprueba que suena lo que toca, cuando toca.** Recorre la interfaz con clics de verdad en Chromium y lee `window.__valleySound` | `node tools/ui/sound-check.mjs --chrome /opt/pw-browsers/chromium [--headed]` |
 | `tools/ui/tonality.py` | **Cuánto suena a nota** (resonancia sostenida en ms). Un golpe: ≤ 30 ms. Se mide con el resto en §4 | `python tools/ui/tonality.py a.wav` |
-| `tests/fast/sound.test.ts` | Las propiedades puras del *cuándo*, que los ficheros existen, su huella y el presupuesto de peso | `npx vitest run tests/fast/sound.test.ts` |
+| `tests/fast/sound.test.ts` | Las propiedades puras del *cuándo*, que los ficheros existen, su huella, el manifiesto del precaché y el presupuesto de peso | `npx vitest run tests/fast/sound.test.ts` |
+| `tests/fast/sound-player.test.ts` | **El reproductor de verdad**, con un `AudioContext` simulado: qué empieza a sonar, qué bucles siguen vivos, qué se descarga y qué se decodifica. Existe porque el trueno cercano estuvo mudo con todas las pruebas puras en verde | `npx vitest run tests/fast/sound-player.test.ts` |
 | `tests/journeys/sound-long.test.ts` | El acento en sesenta años de motor (25 s: no cabe en la rápida) | `npx vitest run -c vitest.journeys.config.ts tests/journeys/sound-long.test.ts` |
 | La hoja de análisis | Espectrograma, forma de onda, centroide, % por encima de 4 kHz y **% en la banda del teléfono**. No está versionada: se escribe en el cuaderno de la sesión | ver §4 |
 
@@ -176,15 +177,22 @@ que sí está versionado es el generador de los sonidos.
 3. **La huella.** Cada entrada lleva `?v=` con el `sha256` del fichero, porque
    **el service worker sirve de la caché primero** (§13.4): sin ella, cambiar
    un sonido no llega nunca a un teléfono que ya tenía el viejo. La reescribe
-   `python tools/ui/sounds.py --stamp` y la vigila `sound.test.ts`.
+   `python tools/ui/sounds.py --stamp`, que escribe a la vez
+   `public/audio/manifest.json` —lo que el service worker precachea—, y las
+   dos las vigila `sound.test.ts`.
 4. **Un botón sin voz propia suena a sello**, y no hay que hacer nada: el
    genérico (`ui_button_press` / `ui_button_release`) se engancha solo a todo
    `<button>` de la página. Si el botón nuevo **sí** tiene su propio sonido,
    añade su selector a **`OWN_VOICE`** en `sound.ts` o no sonarán los dos. La
    lista está en un único sitio a propósito: un atributo repartido por siete
    ficheros no se ve, y un botón que suena dos veces tampoco se ve — se oye, y
-   nadie que programa esto lo oye. Para eso está el paso `forbidden` del
-   recorrido (§2): comprueba que el sello **no** se pone encima.
+   nadie que programa esto lo oye. **Todo botón que llama a
+   `actions.navigate` va en la lista**, porque ahí suena `routeCue`: la
+   revisión del 30 sep 2026 encontró nueve fuera —cierres, vueltas, el carro
+   de la cabecera— sonando dos o tres veces. Para eso está el paso `ONCE` del
+   recorrido (§2): exige que suene eso y sólo eso. Y mira qué cierre **se
+   ve**: en la bandeja, el de la crónica y el del carro están ocultos y el que
+   se toca es `.ui-shell-content-close`.
 5. **El disparador.** Una función **pura** que diga *cuándo* suena
    (`routeCue`, `speedCue`, `playerAnswer`, `accentFor`, `milestoneCue`…), y su
    llamada en el sitio que ya manda sobre ese momento. Nunca un `sound.tap`
@@ -198,11 +206,13 @@ que sí está versionado es el generador de los sonidos.
 8. **El papel**: `docs/design.md` §11.10 si es de interfaz, `plan-audio.md` /
    `plan-audio-mundo.md`, el changelog y `task-log.md`.
 
-**Los dos fusibles, y por qué son dos.** Los acentos del juego (encrucijada,
-oferta, hito) pasan por `SOUND.ACCENT_MIN_GAP_MS` (2,5 s): son voces del mundo y
-no deben apilarse. Los toques del jugador pasan por `SOUND.TAP_MIN_GAP_MS`
-(70 ms): quien toca espera oírlo **aunque acabe de sonar un hito**. No los
-mezcles.
+**Los fusibles, y por qué no son uno.** Los acentos del juego (encrucijada,
+oferta, hito) pasan por `SOUND.ACCENT_MIN_GAP_MS` (2,5 s): son voces de la
+interfaz y no deben apilarse. Los toques del jugador pasan por
+`SOUND.TAP_MIN_GAP_MS` (70 ms): quien toca espera oírlo **aunque acabe de sonar
+un hito**. El cielo (`sky`) y los sucesos (`moment`) llevan el suyo por sonido
+(`SOUND.MOMENT_MIN_GAP_MS`). No los mezcles: el trueno iba por `accent` y el
+cercano, que llega a menos de un segundo de su latigazo, no sonó nunca.
 
 **Y lo que el juego hace solo no suena como un toque.** La caza y el final
 cambian la velocidad; la encrucijada cierra la hoja para abrirse. Por eso el
@@ -235,10 +245,20 @@ dentro de `navigate` (que también llama el juego).
 
 ## 8. El mundo suena distinto que la interfaz
 
-Lo de arriba vale para un sonido de un solo disparo. **Un ambiente no es eso**, y
-el reproductor de hoy **no sabe hacerlo todavía**: no tiene bucles, ni capas con
-su ganancia, ni fundidos, ni posición. Construirlo es la fase 0 de
-`docs/plan-audio-mundo.md`.
+Lo de arriba vale para un sonido de un solo disparo. **Un ambiente no es eso.**
+El reproductor lo sabe hacer desde la fase 0 de `docs/plan-audio-mundo.md`:
+bucles (`LOOP_FILES`), una ganancia por capa que cruza (`ambience`) y la
+cercanía de la cámara, y un tope de voces para los sucesos del mundo
+(`SOUND.MAX_WORLD_VOICES`; los toques del jugador no cuentan). Lo que **no**
+tiene es panorámica estéreo ni `duck`: bajar el mundo bajo un hito es
+mezcla, y la decide Vera escuchando.
+
+**Y un bucle pesa mientras vive.** Un lecho de doce segundos decodificado son
+2,3 MB, y los catorce 30,7 MB a 48 kHz. Por eso el reproductor **suelta** el
+que lleva `SOUND.AMBIENCE_RELEASE_SECONDS` callado (para el bucle, lo
+desengancha y tira lo decodificado; los bytes comprimidos se quedan y
+volver a sonar no necesita red), y todos al apagar el sonido. Antes seguían
+girando a ganancia cero: ~20 MB tras una hora a ×1.
 
 **Un bucle no puede latir al dar la vuelta, y eso no se puede oír desde aquí**,
 así que se resuelve por construcción y no escuchando:
@@ -308,7 +328,10 @@ Lo que hay que tener en la cabeza antes de tocar el ambiente:
   abrirse y cerrarse, el día y la noche alternarse cada dos segundos. El
   renderer ya aplana la luz a esas velocidades (`daylight.ts`, `LIGHT_STEADY`);
   el sonido tiene que hacer lo mismo o será un parpadeo. **Un umbral de sonido
-  se mira en velocidades, no sólo en segundos.**
+  se mira en velocidades, no sólo en segundos.** Lo que hay: a ×16 y ×64 los
+  lechos se apagan a `SOUND.AMBIENCE_FAST_GAIN` y los sucesos y el trueno
+  callan (`momentsAudible`); los acentos de la interfaz siguen, porque salen
+  en el ~1 % de las semanas y el fusible ya los separa.
 - **La pantalla va hasta una jornada por detrás del motor** (el «relevo» de
   `scenic-state.ts`). Un sonido atado al tick llega **antes que la imagen** para
   edificios, nacimientos y muertes. Lo que se pinta del estado vivo (fuegos,
