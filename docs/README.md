@@ -60,7 +60,8 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `plan-audio.md` | **Inventario maestro de audio**: ambiente, interfaz, economía, hitos, fases y asedio. En curso |
 | `plan-audio-mundo.md` | **El sonido del mundo, contra el código**: 80 filas —naturaleza, vida, animales, sucesos, caza y asedio—, el plan en seis fases (§8), lo hecho (§9) y las nueve decisiones que son de Vera (§6). Fases 0 a 2 entregadas; cómo se fabrica un sonido está en la skill `sonido-del-valle` |
 | `agents.md` | Cómo se delega y se audita |
-| `dos-sesiones.md` | Quién toca qué cuando hay dos sesiones a la vez |
+| `dos-sesiones.md` | Quién toca qué cuando hay dos sesiones a la vez (el reparto de 14–17 sep; desde el 30 sep manda la skill `director`) |
+| **`.claude/skills/director/SKILL.md`** | **El índice de las direcciones y sus skills, las fronteras entre ellas y cómo se orquesta una tanda de varias sesiones sin pisarse** |
 
 ## Medidas: evidencia que sigue valiendo — `docs/medidas/`
 

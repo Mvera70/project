@@ -1,5 +1,32 @@
 # The Valley — Registro de cambios
 
+## v5.32 · 30 sep 2026 · La CI en verde de una vez, y un director para las tandas
+
+Vera, harta de leer «ya estaba rojo» en cada PR: «¿por qué no lo arreglamos ya
+de una maldita vez?». Y a continuación pidió una dirección que mande sobre las
+demás para no volver a pisarse.
+
+- **Los cronómetros del jugador, a la escala del servidor.** §13.2 (960 ticks
+  en 2 s) y V-13 (una jornada en 2,5 s) se fijaron en un portátil y la CI los
+  mide unas tres veces más lentos: salían rojos siempre (`catchUp` 3,0–3,6 s,
+  la jornada 4,2 s). El número del diseño no cambia: `tests/helpers/timing.ts`
+  lo lee a `VALLEY_TIMING_SCALE`, que la CI fija en 3.
+- **Las jornadas, en tres trozos.** Enteras pasaban del tope de 60 min y se
+  cortaban sin decir nada.
+- **La reja de interfaz, al día.** Las rutas de depuración iban al 3D sin
+  decirlo y con el reloj falso de Playwright el relevo no llega nunca: van en
+  Canvas, como dice la cabecera del fichero, y las cuatro que miden el 3D lo
+  esperan (`await3d`). Lo que la piel v9 cambió —«Valley» exacto, el sello de
+  cerrar de la carcasa, aplazar desde la cabecera, el ajuste de cuentas del
+  epitafio, 64 dibujos y no un 52 congelado— y la bienvenida, que medía un
+  cronómetro en vez de si se guarda.
+- **La skill `director`**: el índice de las direcciones con su skill y su
+  documento, las fronteras con su contrato y su prueba, y cómo se orquesta
+  una tanda —hoja de reparto, versiones reservadas, integrar de una en una
+  sobre `main` en verde, informe de fusión—, con lo que costó cada regla el
+  29 sep. `CLAUDE.md` la manda cargar antes que nada. La primera hoja de
+  reparto está en `docs/task-log.md`.
+
 ## v5.30 · 30 sep 2026 · La caza, tras la revisión: el jabalí en la linde, el cazador que sale andando y la caza sin picos
 
 La revisión del 30 sep (`docs/medidas/revision-rendimiento-2026-09-30.md` §7,

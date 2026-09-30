@@ -9,6 +9,10 @@ hay que tener en la cabeza siempre. Cuando algo no esté aquí, está allí.
 
 ## Antes de tocar nada
 
+0. **Carga la skill `director`** (`.claude/skills/director/SKILL.md`): dice qué
+   dirección lleva tu tarea, qué skill cargar, qué documento manda y dónde
+   están las fronteras con las demás. Y si hay más de una sesión trabajando a
+   la vez, su §3 es cómo se reparte, se integra y se cierra sin pisarse.
 1. Lee `docs/design.md` §1–4 (decisiones, convenciones, modelo de dominio, tick).
    Son quince minutos y evitan reescrituras.
 2. Localiza tu módulo en `docs/design.md` §17 y lee **tu brief**. Define los

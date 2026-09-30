@@ -1,5 +1,10 @@
 # Dos sesiones a la vez: quién toca qué
 
+> **Desde el 30 sep 2026, el reparto de una tanda de varias sesiones lo gobierna
+> la skill `director` (§3: hoja de reparto, versiones reservadas, integrar de
+> una en una, informe de fusión).** Lo de abajo es el reparto del 14–17 sep,
+> que queda como ejemplo.
+
 **14 sep 2026 · repasado el 15 tras la auditoría.** Hubo dos sesiones trabajando
 sobre este repositorio al mismo tiempo: una en **diseño de aldeanos en Blender**
 y otra en **la vida del valle y la interfaz**. Este fichero existe para que no se
