@@ -1,5 +1,11 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · La respuesta a una oferta vuelve a sonar (v5.32)
+
+El sonido ya decodificado suena en el acto y no al acabar el tick: la
+respuesta a una oferta se tiraba siempre por tardía. El recorrido del sonido
+sólo cuenta la interfaz. 35/35 · 8/8.
+
 ## 30 sep 2026 · El sonido tras la revisión (v5.31) — **fusionada (PR #14)**
 
 Hecho lo que la revisión encontró en el sonido: el trueno cercano suena
