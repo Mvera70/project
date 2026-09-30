@@ -91,6 +91,37 @@ async function advanceWeeks(page: Page, weeks: number, speed: 1 | 4 | 16 | 64): 
   await page.clock.runFor(200);
 }
 
+/**
+ * **Los pocos recorridos que miden el 3D lo piden y lo esperan.** Casi toda
+ * esta reja va en Canvas (`?render=canvas`), pero la ficha que dice qué hace
+ * un aldeano ahora, el cielo de tormenta y el centro de la vista sólo existen
+ * en el renderer 3D: esto espera al relevo. Con el reloj falso de Playwright
+ * instalado el relevo no avanza solo —sus cargas esperan temporizadores—, así
+ * que se empuja a tramos cortos; y en el servidor el 3D es por software
+ * (SwiftShader): lento pero cierto, de ahí los márgenes (30 sep 2026).
+ */
+/**
+ * El 3D de estas pruebas va en el perfil bajo de «Graphics» y a 30 fps: lo que
+ * miden —el cielo, la frase del aldeano, la cámara— no depende de la calidad,
+ * y en el servidor sin tarjeta cada fotograma en alto cuesta segundos.
+ */
+async function lowGraphics(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    try { localStorage.setItem('valley.graphics', JSON.stringify({ quality: 'low', frameRate: 30 })); } catch { /* sin almacenamiento */ }
+  });
+}
+
+async function await3d(page: Page, clock: boolean): Promise<void> {
+  await test.expect.poll(async () => {
+    if (clock) await page.clock.runFor(100);
+    return page.evaluate(() => {
+      const webgl = document.getElementById('valley3d');
+      return document.documentElement.dataset.render === 'pilot3d'
+        && webgl !== null && webgl.getBoundingClientRect().width > 300;
+    });
+  }, { timeout: 150_000, intervals: [250] }).toBe(true);
+}
+
 async function answerAnyCrossroad(page: Page): Promise<void> {
   const options = page.locator('.crossroad-options button');
   if (await options.count() === 0) return;
@@ -138,7 +169,10 @@ test('el juego abre con el menú de inicio: un valle nuevo con su número, y con
   test.expect(first).not.toMatch(/\[intro\./u);
   await voice.click();
   await test.expect(hint).toBeVisible();
-  test.expect(await voice.innerText()).not.toBe(first);
+  // Se espera al texto nuevo: el toque cambia la pista en el fotograma
+  // siguiente, y leerla en el mismo instante era una carrera que el servidor,
+  // más lento, perdía (30 sep 2026).
+  await test.expect.poll(() => voice.innerText()).not.toBe(first);
   await voice.click();
   // Retirada la pista, el hueco no se queda vacío: lo ocupa el fondo, que es lo
   // que la aldea está haciendo. Lo que desaparece es el papel de pista.
@@ -169,8 +203,10 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
   await test.expect(page.locator('.people-scrim')).toBeVisible();
   await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'people');
   // Y la barra sigue ahí, encima del velo: es la salida que el dedo busca.
-  await test.expect(page.getByRole('button', { name: 'Valley' })).toBeVisible();
-  await page.getByRole('button', { name: 'Valley' }).click();
+  // `exact`: desde la piel v9 hay también «Just the valley», que despeja la
+  // pantalla y no es la salida.
+  await test.expect(page.getByRole('button', { name: 'Valley', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Valley', exact: true }).click();
   await test.expect(page.locator('.people-scrim')).toHaveCount(0);
   await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
 
@@ -179,11 +215,27 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
   // cómo se sale—.
   await page.getByRole('button', { name: 'Chronicle' }).click();
   await test.expect(page.locator('.chronicle-scrim')).toBeVisible();
-  await page.locator('.chronicle-close').click();
+  // Desde la piel v9 el cierre es **el sello de la carcasa**, en la misma
+  // esquina en las cuatro hojas (Vera: «los botones de close, ajustarlos al
+  // mismo sitio»; `wood.css`, «un cierre, en un sitio»); el propio de la
+  // crónica sólo queda cuando se abre desde el final.
+  await page.locator('.ui-shell-content-close').click();
   await test.expect(page.locator('.chronicle-scrim')).toHaveCount(0);
   // Y la pestaña encendida deja de estar encendida: no hay pantalla que valga.
   await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
 
+
+});
+
+test('tocar un edificio abre su ficha y «Valley» la cierra (S-05, Canvas)', async ({ page }) => {
+  // **Separado de U-14 el 30 sep 2026**, y dado por roto una hora: en la
+  // reserva 2D (`?render=canvas`) tocar la casa no montaba `.valley-panel`.
+  // No estaba roto: desde A1 el toque abre la etiqueta de pergamino
+  // (`.valley-label`), en Canvas igual que en 3D, y la prueba miraba la ficha
+  // vieja.
+  await page.goto(CANVAS);
+  await passTitle(page);
+  await page.locator('html[data-app-ready="true"]').waitFor();
   // S-05 · la ficha de un edificio o un aldeano es el mismo fallo, más
   // pequeño: se cerraba sólo con su cruz, no avisaba a la barra y podía
   // reaparecer al volver de la crónica o la gente. Se abre tocando el
@@ -222,7 +274,12 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
   // que valga. Así que se barre el encuadre de veinte en veinte píxeles desde
   // el centro hacia fuera y se para en el primer toque que abre algo, que es
   // exactamente lo que hace un dedo que busca una casa.
-  const panel = page.locator('.valley-panel:not(.valley-orders)');
+  // **Lo que abre un toque en el valle es la etiqueta de pergamino** (A1,
+  // `redesign/label.ts`): desde la piel v8 el toque no monta ya la ficha
+  // `.valley-panel`, que queda para la gente y la crónica. La prueba buscaba
+  // la ficha vieja y barría hasta agotar el tiempo con la etiqueta abierta
+  // delante (medido el 30 sep 2026, a mano, en 3D y en Canvas).
+  const panel = page.locator('.valley-label, .valley-panel:not(.valley-orders)').first();
   const ancho = box?.width ?? 390;
   const alto = box?.height ?? 844;
   const cx = ancho / 2;
@@ -233,9 +290,17 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
   // píxeles en el centro. Un barrido de treinta en treinta la salta —medido:
   // 220 toques sin abrir nada, tres veces seguidas—. De cinco en cinco
   // alrededor del centro, que es donde se funda (§7.1) y de donde no se mueve.
+  // **Primero, donde el juego dice que está la casa** (`__valleyHouseOnScreen`,
+  // 30 sep 2026): el barrido de abajo queda sólo de respaldo.
+  const casa = await page.evaluate(() => window.__valleyHouseOnScreen?.() ?? null);
+  if (casa !== null) {
+    await canvas.click({ position: casa, force: true });
+    await page.waitForTimeout(80);
+  }
   const around: [number, number][] = [];
   for (let dx = -20; dx <= 20; dx += 5) for (let dy = -20; dy <= 20; dy += 5) around.push([dx, dy]);
   around.sort((a, b) => Math.hypot(a[0], a[1]) - Math.hypot(b[0], b[1]));
+  if (await panel.isVisible()) around.length = 0;
   for (const [dx, dy] of around) {
     // VZ-3 · un fotograma de espera entre el toque y la comprobación, y la
     // encrucijada contestada si asoma. Sin las dos cosas el barrido era
@@ -250,7 +315,7 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
   // Abrirla no deja la pestaña encendida diciendo otra cosa: sigue en Valley,
   // que es donde está el lienzo que se acaba de tocar.
   await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
-  await page.getByRole('button', { name: 'Valley' }).click();
+  await page.getByRole('button', { name: 'Valley', exact: true }).click();
   await test.expect(panel).toBeHidden();
 });
 
@@ -272,8 +337,15 @@ test('cada edificio pinta dentro de su caja a 9 y 10 px sobre claro y oscuro', a
   await page.goto('/?debug=1&seed=7&year=1&season=spring');
   await page.locator('html[data-debug-ready="true"]').waitFor();
   const audit = await page.locator('html').getAttribute('data-sprite-audit');
-  const result = JSON.parse(audit ?? '{}') as { cases: number; empty: string[]; spills: string[]; principalShapes: number };
-  test.expect(result.cases).toBe(52);
+  const result = JSON.parse(audit ?? '{}') as {
+    sprites: number; cases: number; empty: string[]; spills: string[]; principalShapes: number;
+  };
+  // Cada dibujo, a dos tamaños y sobre dos fondos. Antes era un 52 congelado
+  // (trece edificios) y se rompió en cuanto el valle ganó dibujos nuevos, sin
+  // que nada de lo que guarda hubiera cambiado (CLAUDE.md: no se congela una
+  // lista que crece). Los trece de entonces siguen siendo el suelo.
+  test.expect(result.sprites).toBeGreaterThanOrEqual(13);
+  test.expect(result.cases).toBe(result.sprites * 4);
   test.expect(result.empty).toEqual([]);
   test.expect(result.spills).toEqual([]);
   test.expect(result.principalShapes).toBe(4);
@@ -313,6 +385,10 @@ test('la aplicación abre el valle con año y cuatro velocidades táctiles', asy
 });
 
 test('la ruta viva abre un valle maduro determinista para revisar la multitud', async ({ page }) => {
+  // Toca el valle en 3D, que es el que el jugador toca: todo lo de abajo habla
+  // del lienzo 3D y de su cámara.
+  test.setTimeout(300_000);
+  await lowGraphics(page);
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   await answerAnyCrossroad(page);
@@ -339,10 +415,7 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // mide **300 × 150**: el tamaño por defecto de un `<canvas>` antes de que
   // `size()` lo estire. Medido así, el «centro» caía en (150, 75), o sea la
   // esquina de arriba, y ningún toque abría nada.
-  await test.expect.poll(
-    async () => (await canvas.boundingBox())?.width ?? 0,
-    { timeout: 20_000 },
-  ).toBeGreaterThan(300);
+  await await3d(page, false);
   const box = await canvas.boundingBox();
   // `force`, y con razón: contestar la encrucijada de arriba hace que el mapa
   // enfoque y **siga** a alguien de su reparto, y en Canvas eso es cambiar la
@@ -374,16 +447,34 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // que valga. Así que se barre el encuadre de veinte en veinte píxeles desde
   // el centro hacia fuera y se para en el primer toque que abre algo, que es
   // exactamente lo que hace un dedo que busca una casa.
-  const panel = page.locator('.valley-panel:not(.valley-orders)');
+  // **Lo que abre un toque en el valle es la etiqueta de pergamino** (A1,
+  // `redesign/label.ts`): desde la piel v8 el toque no monta ya la ficha
+  // `.valley-panel`, que queda para la gente y la crónica. La prueba buscaba
+  // la ficha vieja y barría hasta agotar el tiempo con la etiqueta abierta
+  // delante (medido el 30 sep 2026, a mano, en 3D y en Canvas).
+  const panel = page.locator('.valley-label, .valley-panel:not(.valley-orders)').first();
   const ancho = box?.width ?? 390;
   const alto = box?.height ?? 844;
   const cx = ancho / 2;
   const cy = alto / 2;
+  // **Primero, donde el juego dice que está la casa**: la cámara se vuelve
+  // hacia ella, se deja asentar y se toca ahí. En el servidor, con el 3D por
+  // software, cada toque de un barrido a ciegas cuesta segundos y el barrido
+  // entero no cabía en el tiempo del recorrido (30 sep 2026).
+  await page.evaluate(() => window.__valleyHouseOnScreen?.(true));
+  await page.waitForTimeout(1_500);
+  const casa = await page.evaluate(() => window.__valleyHouseOnScreen?.() ?? null);
+  if (casa !== null && casa.x > 0 && casa.y > 0 && casa.x < ancho && casa.y < alto) {
+    await answerAnyCrossroad(page);
+    await canvas.click({ position: casa, force: true });
+    await page.waitForTimeout(250);
+  }
   const around: [number, number][] = [];
   for (let dx = -Math.round(ancho * 0.4); dx <= ancho * 0.4; dx += 30) {
     for (let dy = -Math.round(alto * 0.35); dy <= alto * 0.35; dy += 30) around.push([dx, dy]);
   }
   around.sort((a, b) => Math.hypot(a[0], a[1]) - Math.hypot(b[0], b[1]));
+  if (await panel.isVisible()) around.length = 0;
   for (const [dx, dy] of around) {
     // A ×1 y con ochenta personas, una encrucijada puede abrirse entre dos
     // toques y esconder el lienzo; se contesta y se sigue.
@@ -393,7 +484,7 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
     if (await panel.isVisible()) break;
   }
   await test.expect(panel).toBeVisible();
-  await test.expect(page.locator('.valley-panel:not(.valley-orders) h2')).not.toBeEmpty();
+  await test.expect(panel.locator('h2, h3').first()).not.toBeEmpty();
   await page.screenshot({ path: 'artifacts/m21-panel.png', fullPage: true });
 });
 
@@ -409,8 +500,11 @@ test('la ficha de un aldeano dice qué está haciendo ahora mismo (prototipo 03)
   // Se abre por la lista de gente y no tocando el lienzo: la lista sólo enseña
   // a quien está presente y tiene nombre, o sea exactamente a quien tiene
   // cuerpo en la escena.
+  test.setTimeout(300_000);
+  await lowGraphics(page);
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
+  await await3d(page, false);
   await answerAnyCrossroad(page);
   await page.getByRole('button', { name: 'People' }).click();
   await page.locator('.people-row').first().click();
@@ -420,7 +514,7 @@ test('la ficha de un aldeano dice qué está haciendo ahora mismo (prototipo 03)
   // baja 2,7 MB de modelos—, así que se espera a que haya cuerpo en vez de
   // fijar un instante.
   const hoy = page.locator('.person-today');
-  await test.expect(hoy).toBeVisible({ timeout: 30_000 });
+  await test.expect(hoy).toBeVisible({ timeout: 90_000 });
   const frase = await hoy.innerText();
   // Lo que se guarda es la propiedad, no la frase: que está compuesta del banco
   // y que dice algo de las nueve cosas que un cuerpo puede estar haciendo.
@@ -447,14 +541,16 @@ test('una decisión aplazada deja ir a mirar otra cosa (§8.6)', async ({ page }
   // se midió fijaba semilla y año —«semilla 11, año 37»— y desde R-1 el valle
   // tira sucesos cada semana: esa trayectoria ya no es la que era, y la prueba
   // pide **el estado** en vez de adivinar dónde estaba.
-  await page.goto('/?debug=1&live=1&crossroad=1&seed=11&year=37&season=summer');
+  await page.goto('/?debug=1&live=1&render=canvas&crossroad=1&seed=11&year=37&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   const scrim = page.locator('.crossroad-scrim');
   await test.expect(scrim).toBeVisible();
 
   // Se aplaza deslizando hacia abajo, que es el único gesto que §11.2 le da:
   // esta pantalla no tiene botón de cerrar.
-  await scrim.dispatchEvent('pointerdown', { clientX: 195, clientY: 300, pointerId: 1 });
+  // El gesto **empieza en la cabecera** del documento (`crossroad.ts`): desde
+  // la piel v9 un dedo que baja por las opciones está leyendo, no aplazando.
+  await page.locator('.crossroad-head').dispatchEvent('pointerdown', { clientX: 195, clientY: 300, pointerId: 1 });
   await scrim.dispatchEvent('pointerup', { clientX: 195, clientY: 560, pointerId: 1 });
   await test.expect(scrim).toHaveCount(0);
   // Y la marca es el sello de lacre del ornamento (VZ-03), no una píldora.
@@ -494,7 +590,7 @@ test('una decisión aplazada deja ir a mirar otra cosa (§8.6)', async ({ page }
   await test.expect(page.locator('.people-scrim')).toBeVisible();
 
   // El sello sigue ahí: la decisión no se ha perdido por haber ido a mirar.
-  await page.getByRole('button', { name: 'Valley' }).click();
+  await page.getByRole('button', { name: 'Valley', exact: true }).click();
   await page.clock.runFor(1_000);
   await test.expect(page.locator('.skin-ornament--seal')).toBeVisible();
   // Y tocarlo la devuelve a la pantalla, que es para lo que está.
@@ -511,7 +607,7 @@ test('alguien sube por el camino y el trato se cierra con un toque (M-0)', async
   // quién sube a vender lo sortea la tabla de sucesos y esperar no es una
   // forma de probarlo.
   await page.clock.install();
-  await page.goto('/?debug=1&live=1&offer=1&seed=7&year=20&season=summer');
+  await page.goto('/?debug=1&live=1&render=canvas&offer=1&seed=7&year=20&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
 
   const voice = page.locator('.valley-voice[data-role="offer"]');
@@ -549,7 +645,7 @@ test('el carro: se da algo al valle y el valle lo celebra esa semana (M-2)', asy
   // la cabecera, que lo que no se puede dar **dice por qué**, y que darlo se ve
   // en la misma semana.
   await page.clock.install();
-  await page.goto('/?debug=1&live=1&seed=7&year=40&season=summer');
+  await page.goto('/?debug=1&live=1&render=canvas&seed=7&year=40&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   await answerAnyCrossroad(page);
   // Se espera al relevo del 3D antes de fotografiar: la captura es lo que
@@ -604,7 +700,7 @@ test('el carro: se da algo al valle y el valle lo celebra esa semana (M-2)', asy
     await ale.click();
     // La crónica lo cuenta y la voz lo dice; basta con que el valle hable de
     // ello, que es lo que §11.6 promete.
-    await page.getByRole('button', { name: 'Valley' }).click();
+    await page.getByRole('button', { name: 'Valley', exact: true }).click();
     await test.expect(page.locator('.valley-voice-line')).not.toBeEmpty();
     // Y **sin los dos toques de una oferta encima**: la voz está contando la
     // fiesta, no preguntando nada. Lo cazó una captura de esta misma prueba.
@@ -614,6 +710,10 @@ test('el carro: se da algo al valle y el valle lo celebra esa semana (M-2)', asy
 });
 
 test('lo que se da al valle se ve en el valle (M-3)', async ({ page }) => {
+  // Éste sí necesita el 3D —cuenta los cuerpos de la capa de vida, que Canvas
+  // no tiene— y en el servidor el 3D es por software: montar el valle dos veces
+  // no cabe en los dos minutos de siempre (30 sep 2026).
+  test.setTimeout(300_000);
   // **La mitad que M-3 pide y que no depende de la capa de vida.** El principio
   // del juego de los medios es «ciertas cosas dan lugar a otras», y eso sólo se
   // sostiene si lo que se mete **se ve**: dar dos cerdos y no ver cerdos sería
@@ -627,14 +727,14 @@ test('lo que se da al valle se ve en el valle (M-3)', async ({ page }) => {
     await page.locator('html[data-app-ready="true"]').waitFor();
     await test.expect.poll(
       async () => (await page.locator('canvas:visible').first().boundingBox())?.width ?? 0,
-      { timeout: 20_000 },
+      { timeout: 90_000 },
     ).toBeGreaterThan(300);
     // La vida puebla la escena en sus primeros pasos: se espera a que haya
     // algún animal antes de contar, en vez de fijar un instante.
     await test.expect.poll(async () => page.evaluate(
       () => (window as unknown as { __valleyLife?: () => { beasts: { kind: string }[] } })
         .__valleyLife?.().beasts.length ?? 0,
-    ), { timeout: 20_000 }).toBeGreaterThan(0);
+    ), { timeout: 60_000 }).toBeGreaterThan(0);
     return page.evaluate(() => (window as unknown as { __valleyLife?: () => { beasts: { kind: string }[] } })
       .__valleyLife?.().beasts.filter((beast) => beast.kind === 'pig').length ?? 0);
   };
@@ -650,9 +750,12 @@ test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ p
   // depuración adelanta el valle hasta una jornada de tormenta (`runToSky`),
   // porque salen en el 4 % de los días y esperarla no es una forma de
   // probarla.
+  test.setTimeout(300_000);
   await page.clock.install();
+  await lowGraphics(page);
   await page.goto('/?debug=1&live=1&weather=storm&seed=7&year=20&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
+  await await3d(page, true);
   await page.clock.runFor(2_000);
   await test.expect(page.locator('html')).toHaveAttribute('data-sky', 'storm');
 
@@ -664,7 +767,7 @@ test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ p
   await test.expect.poll(async () => {
     await page.clock.runFor(90);
     return Number(await page.locator('html').getAttribute('data-bolts') ?? '0');
-  }, { timeout: 60_000, intervals: [50] }).toBeGreaterThan(0);
+  }, { timeout: 120_000, intervals: [50] }).toBeGreaterThan(0);
   await page.screenshot({ path: 'artifacts/storm.png', fullPage: true });
 
   // La lluvia y el destello se juzgan mirando la captura —§11 no tiene reja
@@ -677,7 +780,7 @@ test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ p
 
 test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {
   await page.clock.install();
-  await page.goto('/?debug=1&live=1&hunger=1&seed=7&year=80&season=summer');
+  await page.goto('/?debug=1&live=1&render=canvas&hunger=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   await page.clock.runFor(5_000);
   await page.screenshot({ path: 'artifacts/m21-hunger.png', fullPage: true });
@@ -701,9 +804,13 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
   // partida. Lo que §11.2 y M-22 prometen es que cuando hay una decisión ocupa
   // la pantalla, que se leen sus tres precios sin desplazar, y que contestarla
   // enfoca el mapa.
+  test.setTimeout(300_000);
   await page.clock.install();
+  await lowGraphics(page);
   await page.goto('/?debug=1&live=1&crossroad=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
+  // Enfocar mueve la cámara del 3D: sin él no hay centro de vista que mirar.
+  await await3d(page, true);
   const scrim = page.locator('.crossroad-scrim');
   await test.expect(scrim).toBeVisible();
   // La decisión ocupa la pantalla: el mando de la velocidad se aparta (§11.2).
@@ -729,7 +836,10 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
   await page.locator('.crossroad-options button').first().click();
   await test.expect(scrim).toBeHidden();
   await test.expect
-    .poll(() => page.evaluate(() => document.documentElement.dataset.viewCentre ?? ''))
+    .poll(async () => {
+      await page.clock.runFor(100);
+      return page.evaluate(() => document.documentElement.dataset.viewCentre ?? '');
+    }, { timeout: 60_000 })
     .not.toBe(centroAntes);
   await page.screenshot({ path: 'artifacts/m22-focus.png', fullPage: true });
 });
@@ -741,6 +851,9 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
   // VZ-04a vistió esta pantalla— la prueba caía sin que el parte tuviera nada
   // mal. Ahora comprueba **la propiedad**: que atenúa el valle en vez de
   // taparlo (§11.2) y que la página es la hoja de siempre.
+  // Pagar 960 semanas cuesta lo que cueste la máquina, y en la CI comparte
+  // procesador con un recorrido 3D por software: los 120 s de siempre no dan.
+  test.setTimeout(300_000);
   const t0 = Date.now();
   await page.clock.install({ time: t0 });
   await page.goto(CANVAS); // sin parámetros de depuración: la ruta real, guardado incluido
@@ -788,7 +901,10 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
   await page.locator('html[data-app-ready="true"]').waitFor();
 
   const welcome = page.locator('.welcome');
-  await welcome.waitFor({ timeout: 15_000 });
+  // Pagar 960 semanas antes del parte tarda lo que tarde la máquina: en el
+  // servidor pasaba de los 15 s de antes, y con el 3D de la ruta viva en el
+  // otro trabajador, de los 60 (30 sep 2026). Es una espera, no una cota.
+  await welcome.waitFor({ timeout: 180_000 });
   // §11.2 pide el valle **atenuado y no tapado**: el velo tiene que dejarse ver
   // a través. Se lee su alfa en vez de su color, que es lo que la sección dice.
   const velo = await page.locator('.welcome-scrim').evaluate((el) => getComputedStyle(el).backgroundColor);
@@ -833,9 +949,13 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
   const returnAt = t0 + TIME.LETHARGY_CAP_MS;
   await test.expect.poll(async () => (await persistedCatchUp())?.savedAtMs ?? 0)
     .toBeGreaterThanOrEqual(returnAt);
-  await test.expect.poll(async () => (await persistedCatchUp())?.savedAtMs ?? Number.POSITIVE_INFINITY)
-    .toBeLessThan(returnAt + 2_000);
   await test.expect.poll(async () => (await persistedCatchUp())?.tick ?? 0).toBeGreaterThan(900);
+  // Y eso **con el parte todavía en pantalla**, que es lo que la propiedad
+  // pide: cerrar sobre la bienvenida no puede devolver el estado de antes.
+  // Aquí había además un «menos de dos segundos después de volver», que era un
+  // cronómetro disfrazado: medía cuánto tarda la máquina en pagar 960 ticks
+  // (6 s en el contenedor el 30 sep 2026) y no si se guarda.
+  await test.expect(welcome).toBeVisible();
 
   // El letargo no decide por el jugador ni deja de correr el juego: la
   // encrucijada, si había una pendiente, sigue exactamente donde estaba
@@ -848,18 +968,23 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
 });
 
 test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruinas (§13.3)', async ({ page }) => {
-  await page.goto('/?debug=1&live=1&ended=1&seed=7&year=80&season=autumn');
+  await page.goto('/?debug=1&live=1&render=canvas&ended=1&seed=7&year=80&season=autumn');
   await page.locator('html[data-app-ready="true"]').waitFor();
   const epitaph = page.locator('.epitaph-scrim');
   await test.expect(epitaph).toBeVisible();
-  await test.expect(epitaph.getByRole('heading')).toHaveText('The valley is empty');
+  // El titular es el `h1`: debajo va el ajuste de cuentas, con el suyo.
+  await test.expect(epitaph.getByRole('heading', { level: 1 })).toHaveText('The valley is empty');
   await test.expect(epitaph).toContainText('The last households left in year 81.');
   // **VZ-6 · el máximo de población no se congela.** Decía «82 people at its
   // height» y la semilla 7 a los ochenta años da 39: es una cifra del motor, y
   // CLAUDE.md lo dice desde v3.75 —«un cambio del motor mueve todas las
   // pruebas que midan una aldea hecha»—. Lo que §13.3 promete es que el
   // epitafio diga **cuánto duró y cuánto llegó a ser**, no un número concreto.
-  await test.expect(epitaph).toContainText(/80 years\. \d+ people at its height\./u);
+  // Desde la piel v9 lo dice el ajuste de cuentas, en cifras grandes: los
+  // años y el máximo, cada uno con su rótulo.
+  const big = epitaph.locator('.epitaph-ledger-big > div');
+  await test.expect(big.nth(0)).toHaveText(/^80\s*Years$/u);
+  await test.expect(big.nth(1)).toHaveText(/^[1-9]\d*\s*People at its height$/u);
   await test.expect(page.locator('.valley-speeds')).toHaveCSS('visibility', 'hidden');
   await page.screenshot({ path: 'artifacts/m25-epitaph.png', fullPage: true });
 
@@ -983,7 +1108,7 @@ test('cuando pasa algo, el valle lo dice donde el jugador está mirando (§11.6)
   // pantalla donde el jugador está mirando** (§11.6), no cuánto tarda el valle
   // en tener hambre: `hunger=1` es la misma ruta que usa el recorrido del
   // hambre de más arriba.
-  await page.goto('/?debug=1&live=1&hunger=1&seed=7&year=80&season=summer');
+  await page.goto('/?debug=1&live=1&render=canvas&hunger=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   await answerAnyCrossroad(page);
   await page.locator('.valley-speed-badge').click();

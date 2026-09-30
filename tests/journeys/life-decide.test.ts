@@ -10,6 +10,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { foundTwenty } from '../helpers/founding';
+import { budgetMs } from '../helpers/timing';
 import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
 import type { GameState } from '@engine/state';
@@ -164,7 +165,7 @@ describe('V-06 · elegir', () => {
     for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
     const spent = performance.now() - started;
     expect(spent, `una jornada de ${life.dwellers.length} personas cuesta ${spent.toFixed(0)} ms`)
-      .toBeLessThan(2500);
+      .toBeLessThan(budgetMs(2500));
   });
 
   it('nadie se apiña, nadie se pasa del aforo y nadie se queda forcejeando', () => {

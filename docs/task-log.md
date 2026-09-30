@@ -1,5 +1,41 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · Tanda del 30 sep: la hoja de reparto (skill `director`, v5.33)
+
+Vera pidió una dirección que mande sobre las demás: la skill `director`
+(`.claude/skills/director/SKILL.md`) es el índice de las direcciones, sus
+skills y sus fronteras, y el protocolo de una tanda de varias sesiones. Esta
+es la primera hoja escrita con ella. **El director es la sesión «Análisis de
+conflictos entre ramas»**, rama `ccr-16705aa8-9x5ofm`.
+
+| Carril | Rama · PR | Versiones | Tuyo | No es tuyo |
+|---|---|---|---|---|
+| CI en verde (director) | `claude/ci-verde` · #15 | v5.33 (la v5.32 la tomó la #16 del sonido antes de que esta hoja llegara a `main`) | `.github/workflows/ci.yml`, `playwright.config.ts`, `tests/helpers/timing.ts`, `tools/shots/**`, la skill `director` | el juego: sólo pruebas y configuración |
+| Sonido | `claude/sonido-arreglos-revision` · #14, **fusionada** (12:58, antes de la #15) | v5.31 | `src/ui/sound.ts`, `ambience.ts`, `moments.ts`, `public/audio/`, `tools/ui/` | la reja de interfaz y los cronómetros: van en #15 |
+| Informe y GV-4a (director) | `ccr-16705aa8-9x5ofm` · #8 | v5.34–v5.35 (renumera sus v5.25–v5.26 al traer `main`) | `docs/medidas/fusion-*`, `presentation-clock.ts`, `backend.ts` (sólo `clock.painted`) | GV-4b, ya en `main` (v5.29) |
+| Las 21 jornadas viejas (agente del director) | rama propia · PR por abrir | v5.36–v5.37 | `tests/journeys/**`; código sólo si la causa está ahí, **y si es del motor lo dice antes** | la reja y los cronómetros |
+| Revisión de rendimiento | `claude/revision-rendimiento-2026-09-30` | — | nada hasta que Vera le asigne el resto de su lista | — |
+
+**Orden de integración**, de una en una y con `main` en verde (director §3.3):
+1. **#15**, porque sin ella ninguna PR puede salir verde (la #14 entró antes,
+   con sus pruebas limpias y sólo los rojos heredados);
+2. **#8**, que trae `main` y renumera;
+3. **las jornadas**.
+Tras cada fusión, las que quedan traen `main` (merge, no rebase) y vuelven a
+pasar su puerta. **Una sesión nueva pide su bloque de versiones al director:
+el siguiente libre es la v5.38.**
+
+**Cerrado el mismo día, y no era del juego:** el recorrido de «tocar un
+edificio» en Canvas y el de «la ruta viva» en 3D fallaban porque buscaban la
+ficha `.valley-panel`, y desde A1 (piel v8) el toque en el valle abre la
+etiqueta de pergamino `.valley-label`. Con la etiqueta abierta delante, la ruta
+viva seguía barriendo hasta agotar los 300 s. Las dos pasan en local; el
+gancho `__valleyHouseOnScreen` comprueba ahora su punto con el mismo `pick` que
+usa el dedo.
+
+**Abierto para Vera:** fusionar en ese orden; decidir el reparto de lo que la
+revisión de rendimiento dejó sin dueño; y, con #8 dentro, abrir la villa 7/60
+en la tablet —es la medida combinada que cierra la tanda (director §3.4)—.
 ## 30 sep 2026 · La respuesta a una oferta vuelve a sonar (v5.32)
 
 El sonido ya decodificado suena en el acto y no al acabar el tick: la

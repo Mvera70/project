@@ -22,6 +22,7 @@ import { TERRAIN_CODE } from '@engine/state';
 import type { DecisionRecord } from '@engine/state';
 import type { Policy } from '@engine/sim';
 import { fingerprint } from '../helpers/fingerprint';
+import { budgetMs } from '../helpers/timing';
 
 describe('serialize / deserialize · §13.1', () => {
   it('la ida y vuelta por un almacén real (clonado estructurado) es idéntica', () => {
@@ -301,7 +302,8 @@ describe('catchUp · §13.2', () => {
     expect(report.ticks).toBe(960);
     expect(state.tick).toBe(960);
     expect(report.capped).toBe(false); // justo en el tope, no por encima
-    expect(elapsedMs).toBeLessThan(2_000);
+    // §13.2: dos segundos en el aparato del jugador (`helpers/timing.ts`).
+    expect(elapsedMs).toBeLessThan(budgetMs(2_000));
   });
 
   it('una ausencia a velocidad alta vale lo que habría valido mirándola', () => {

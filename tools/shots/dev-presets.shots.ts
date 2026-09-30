@@ -3,6 +3,9 @@
 import { test } from '@playwright/test';
 
 test('Dev ofrece partidas preparadas y abre la villa con un toque', async ({ page }) => {
+  // Abrir el año 60 simula sesenta años en la página: 28 s en el contenedor a
+  // solas (30 sep 2026), y más con la máquina ocupada. Dos minutos no bastaban.
+  test.setTimeout(240_000);
   await page.goto('/?render=canvas');
   await page.locator('.title-scrim').waitFor();
   const presets = page.locator('.title-preset');
@@ -15,6 +18,6 @@ test('Dev ofrece partidas preparadas y abre la villa con un toque', async ({ pag
   await test.expect(presets.nth(2)).toContainText('Year 60');
   await page.screenshot({ path: 'artifacts/dev-presets-title.png', fullPage: true });
   await presets.nth(2).click();
-  await page.locator('html[data-app-ready="true"]').waitFor();
+  await page.locator('html[data-app-ready="true"]').waitFor({ timeout: 200_000 });
   await test.expect(page.locator('.valley-date')).toContainText('Year 60');
 });
