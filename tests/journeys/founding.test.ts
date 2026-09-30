@@ -183,13 +183,21 @@ describe('G3 · el caserío pregunta antes de ser aldea', () => {
   for (const seed of SEEDS) {
     const state = foundGame(seed);
     for (let t = 1; t <= 10 * TIME.WEEKS_PER_YEAR && state.ended === null; t += 1) {
-      const before = state.history.length;
+      // **Se cuenta en el tick en que se plantea, no en el que se contesta.**
+      // `run` contesta al principio del tick siguiente, y lo que pasa en ese
+      // tick antes de la respuesta —el paso 2a, quien llega por el camino—
+      // entraba en la cuenta. Medido el 30 sep 2026 en la semilla 31:
+      // `breaking_ground` se plantea con 6 personas y se contesta en el tick 60
+      // después de `arrival.many`, con 10; la prueba leía 10 y lo daba por una
+      // pregunta hecha a una aldea. `requires` se evalúa al plantear
+      // (`selectCrossroad`, paso 15 de §4.2), y ése es el momento que esta
+      // prueba dice medir.
+      const pending = state.crossroad;
       run(state, 1, 'prudent', CATALOG);
-      for (const d of state.history.slice(before)) {
-        if (!HAMLET_IDS.includes(d.templateId)) continue;
-        asks.push({ seed, tick: d.tick, id: d.templateId, people: population(state) });
-        asked.add(seed);
-      }
+      const posed = state.crossroad;
+      if (posed === null || posed === pending || !HAMLET_IDS.includes(posed.templateId)) continue;
+      asks.push({ seed, tick: posed.posedTick, id: posed.templateId, people: population(state) });
+      asked.add(seed);
     }
     // Y su texto, compuesto como lo compone la pantalla.
     const bundle = makeBundle(seed);

@@ -323,11 +323,24 @@ describe('A2c · el cerco tiene una capa y dos puertas que sirven', () => {
    * y se quedaba con cero portones, con lo que esta prueba leía un fallo de
    * colocación donde lo que había era una derrota.
    */
+  /**
+   * Las semillas en las que el jugador **llegó a pagar** la segunda puerta. Sin
+   * pagarla no hay segunda puerta que medir: el tope de la aldea es una
+   * (`works.ts`, A2c) y la segunda es del carro. Medido el 30 sep 2026: la
+   * semilla 41 nunca junta las diez monedas de plata que cuesta —entre 0 y 9
+   * en sesenta años, con madera de sobra— y se quedaba con su única puerta, que
+   * esta prueba leía como un fallo de colocación. `placeBuilding` sí le
+   * encuentra sitio (49,55) si se la pidieran.
+   */
+  const paidFor = new Set<number>();
   function valley(seed: number): GameState {
     const state = foundGame(seed);
     for (let year = 0; year < 60 && state.ended === null; year += 1) {
       run(state, TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
-      if (canGive(state, 'gate')) giveMeans(state, 'gate', 'spring', year);
+      if (canGive(state, 'gate')) {
+        giveMeans(state, 'gate', 'spring', year);
+        paidFor.add(seed);
+      }
     }
     if (state.ended === null) run(state, TIME.WEEKS_PER_YEAR * 3, 'prudent', CATALOG);
     return state;
@@ -359,6 +372,10 @@ describe('A2c · el cerco tiene una capa y dos puertas que sirven', () => {
     for (const seed of TEN) {
       const state = valley(seed);
       if (state.ended !== null) continue;
+      // Un valle que nunca pudo pagar la segunda no es una muestra de dónde se
+      // coloca (ver `paidFor`); la guarda de abajo impide que esto vacíe la
+      // prueba. La que se pagó y no está, sí es un fallo.
+      if (!paidFor.has(seed)) continue;
       measured += 1;
       const gates = state.buildings.filter((b) => b.lostTick === null && b.kind === 'gate');
       expect(gates.length, `semilla ${seed}: ${gates.length} portones`).toBe(2);

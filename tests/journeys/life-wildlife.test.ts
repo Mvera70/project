@@ -67,6 +67,21 @@ function atTick(state: GameState, tick: number): GameState {
   return moved;
 }
 
+/**
+ * El lobo que hay en escena, si lo hay. **`life.wildlife` ya no es sólo el
+ * lobo**: es toda la fauna que se pinta —ciervos, conejos, el perro, el zorro,
+ * los patos, las bestias de los que suben por el camino y el oso de AN-4/AN-5—
+ * y el lobo va el último (`village.ts`, `get wildlife`). Ya era así en
+ * `ee9340e`, la raíz de la historia del repositorio. Estas pruebas se
+ * escribieron cuando la lista era el lobo solo y leían `wildlife[0]` y
+ * `toEqual([])`: medido el 30 sep 2026 en la semilla 7, una jornada tranquila
+ * trae cuatro animales que no son lobos, y la gallina «no se calmaba» porque
+ * `wildlife[0]` era un ciervo que no se iba nunca. Lo que guardan es el lobo.
+ */
+function wolvesIn(life: { readonly wildlife: readonly { readonly kind: string }[] }): readonly unknown[] {
+  return life.wildlife.filter((animal) => animal.kind === 'wolf');
+}
+
 /** Los ticks en los que el motor soltó `wolves_at_the_coop` en esta partida.
  *  `state.happenings` no se poda (`sim.ts`, `happenings.push`), así que
  *  cuarenta años de historia caben enteros para buscar en ellos. */
@@ -115,7 +130,7 @@ describe('IA-5 · sólo la semana real del suceso', () => {
       const life = createVillage(quiet, 0);
       for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
       expect(life.threats.appeared, `semilla ${seed}`).toBe(0);
-      expect(life.wildlife, `semilla ${seed}`).toEqual([]);
+      expect(wolvesIn(life), `semilla ${seed}`).toEqual([]);
     }
   });
 });
@@ -137,7 +152,7 @@ describe('IA-5 · la visita aparece, se nota y se recupera — nunca colgada', (
       expect(stuck, `semilla ${seed}, tick ${tick}: se quedó colgada`).toBe(0);
       expect(recovered, `semilla ${seed}, tick ${tick}`).toBe(1);
       // Y al final del día, ya no queda en escena.
-      expect(life.wildlife).toEqual([]);
+      expect(wolvesIn(life)).toEqual([]);
     }
   });
 
@@ -189,7 +204,7 @@ describe('IA-5 · una gallina huye del lobo y se calma cuando se ha ido', () => 
       let wolfLeftAt = -1;
       for (let n = 0; n < STEPS_PER_DAY; n += 1) {
         life.step();
-        const wolf = life.wildlife[0];
+        const wolf = life.wildlife.find((animal) => animal.kind === 'wolf');
         if (wolf !== undefined) {
           sawWolf = true;
           for (const beast of life.beasts) {
@@ -223,7 +238,7 @@ describe('IA-5 · nunca atraviesa una pared', () => {
       const life = createVillage(state, 0);
       for (let n = 0; n < STEPS_PER_DAY; n += 1) {
         life.step();
-        const wolf = life.wildlife[0];
+        const wolf = life.wildlife.find((animal) => animal.kind === 'wolf');
         if (wolf === undefined) continue;
         measured += 1;
         expect(blockedAt(life.land, wolf.x, wolf.y), `semilla ${seed}, tick ${tick}, paso ${n}`).toBe(false);

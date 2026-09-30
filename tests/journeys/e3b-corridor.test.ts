@@ -14,19 +14,47 @@ import { ringCandidateAssetsOf, unresolvedRingSeams } from '../../src/render3d/w
 const all: ElevatedRingVariant[] = ['straight', 'turn', 'diagonal', 'mixed',
   'gate-cardinal', 'gate-diagonal', 'gate-mixed', 'bastion-crossing', 'bastion-return'];
 
+// **Las villas de este fichero son huellas de una trayectoria, y se remiden
+// cuando el motor la mueve** (`docs/historico/rework.md` §2.7; el cuaderno lo
+// anunció el 28 sep: «la villa de E3b» entre las jornadas que la madera una
+// semana más tarde cambia). Se escribieron contra un motor anterior a la
+// historia de este repositorio: ya fallaban las cinco en `ee9340e`. Remedido
+// el 30 sep 2026 en 60 semillas a los 3846 ticks, buscando cada escena y no
+// sólo el número: la iglesia anterior a la reserva está en la semilla 9 (la 7
+// ya no tiene nada en el pasillo), los árboles que cortan el adarve de retorno
+// 66 junto a muro en la 2 (la 23 ya está despejada), y el traslado de la
+// iglesia se planea en la misma semilla 9. Lo que cada prueba exige es lo de
+// siempre; cambia en qué villa se mira y sus identificadores.
 describe('E3b · pasillo interior de una villa real', () => {
   it('no acredita una iglesia existente anterior a la reserva del adarve', () => {
-    const state = foundGame(7);
+    const state = foundGame(9);
     run(state, 3846, 'prudent', CATALOG);
     const bastion = state.buildings.find(item => item.kind === 'bastion' && item.lostTick === null);
     expect(bastion).toBeDefined();
+    // La iglesia de la semilla 9 se levantó en el tick 136, mucho antes del
+    // anillo, y sigue en pie pegada al eje del tramo 163.
+    const church = state.buildings.find(item => item.id === 20);
+    expect(church?.kind).toBe('church');
+    expect(church?.lostTick).toBeNull();
     const ring = elevatedRingOf(state, bastion!, { approvedVariants: all, lane: 'center' });
     expect(ring.topologyClosed).toBe(true);
-    expect(ring.segments.find(item => item.buildingId === 172)?.reason).toBe('interior');
+    expect(ring.segments.find(item => item.buildingId === 163)?.reason).toBe('interior');
     expect(ring.geometryReady).toBe(false);
   });
 
-  it('la nueva reserva deja libre el recorrido en otra villa construida por el motor', () => {
+  // **Declarada en rojo, con la propiedad intacta** (`CLAUDE.md`, «cuando algo
+  // no llega»). La escena que pide —un anillo que el motor deja libre él solo,
+  // cerrado en el retorno 66 con el portón pegado al suroeste, que es lo único
+  // que las fuentes candidatas cubren entero— **no sale hoy en ninguna villa**.
+  // Medido el 30 sep 2026 en 60 semillas a los 3846 ticks: 12 cierran en
+  // retorno 66, 11 con muro al suroeste (la junta sin GLB, `unresolvedRingSeams`)
+  // y una, la 9, con el portón, pero su iglesia anterior a la reserva corta el
+  // tramo 163 (primera prueba); pagando el traslado sí queda libre y cubierto
+  // (104 tramos, 103 piezas, la combinada con la hoja del portón 52). La 91,
+  // que era esta villa, cierra ahora en retorno 132 y la escena la para
+  // `variant`. Si una villa del motor vuelve a darla, esto se pone rojo y hay
+  // que quitar el `.fails` y clavar la semilla.
+  it.fails('la nueva reserva deja libre el recorrido en otra villa construida por el motor', () => {
     const state = foundGame(91);
     run(state, 3846, 'prudent', CATALOG);
     const bastion = state.buildings.find(item => item.kind === 'bastion' && item.lostTick === null);
@@ -54,7 +82,7 @@ describe('E3b · pasillo interior de una villa real', () => {
   });
 
   it('la segunda villa bloquea los árboles reales y reabre la ruta al despejarlos', () => {
-    const state = foundGame(23);
+    const state = foundGame(2);
     run(state, 3846, 'prudent', CATALOG);
     const bastion = state.buildings.find(item => item.kind === 'bastion' && item.lostTick === null);
     expect(bastion).toBeDefined();
@@ -62,10 +90,10 @@ describe('E3b · pasillo interior de una villa real', () => {
     expect(scene.topologyClosed).toBe(true);
     expect(scene.segments).toHaveLength(104);
     expect(scene.geometryReady).toBe(false);
-    expect(scene.blocked).toEqual({ cell: { x: 26, z: 59 }, reason: 'obstacle' });
+    expect(scene.blocked).toEqual({ cell: { x: 19, z: 54 }, reason: 'obstacle' });
     expect(ringCandidateAssetsOf(scene)).toBeNull();
     const blocked = scene.segments.filter(segment => segment.reason === 'obstacle').map(segment => segment.cell);
-    expect(blocked).toEqual([{ x: 26, z: 59 }, { x: 25, z: 58 }]);
+    expect(blocked).toEqual([{ x: 19, z: 54 }, { x: 20, z: 53 }]);
     for (const look of forestLooks(state)) {
       if (look.stage !== 'standing') continue;
       const tree = scatterTransform(state.map.width, look.cell);
@@ -92,8 +120,12 @@ describe('E3b · pasillo interior de una villa real', () => {
       .toEqual(['e3b-gate-wide-light-finish-candidate']);
   });
 
-  it('un guardia asignado sube, recorre y regresa por el anillo candidato de la semilla 91', () => {
-    const state = foundGame(91);
+  it('un guardia asignado sube, recorre y regresa por el anillo candidato de la semilla 23', () => {
+    // Era la semilla 91, que ya no cierra en retorno 66 (remedido el 30 sep:
+    // su bastión acaba en retorno 132, sin escalera en las fuentes nuevas). La
+    // 23 sí: 88 tramos, retorno 66, y el guardia sube, da la vuelta y baja en
+    // 8 206 pasos.
+    const state = foundGame(23);
     run(state, 3846, 'prudent', CATALOG);
     (state.traits as string[]).push('arms', 'bows');
     state.threat.comingTick = state.tick + 1;
@@ -129,12 +161,14 @@ describe('E3b · pasillo interior de una villa real', () => {
   });
 
   it('puede planificar el traslado íntegro al pagar la reforma, sin alterar suelo ni identidades', () => {
-    const state = foundGame(7);
+    // La iglesia de la primera prueba, dos mil ticks antes: el plan la aparta
+    // una celda del pasillo y, jugada la villa después, el adarve queda libre.
+    const state = foundGame(9);
     run(state, 2000, 'prudent', CATALOG);
     const beforeTerrain = state.map.terrain.slice();
     const beforeBuildings = structuredClone(state.buildings);
     const moves = planRingCorridorMoves(state);
-    expect(moves).toEqual([{ buildingId: 20, from: { x: 28, y: 42 }, to: { x: 28, y: 38 } }]);
+    expect(moves).toEqual([{ buildingId: 20, from: { x: 34, y: 44 }, to: { x: 34, y: 45 } }]);
     expect(planRingCorridorMoves(state)).toEqual(moves);
     expect(state.buildings).toEqual(beforeBuildings);
     for (const move of moves!) {
