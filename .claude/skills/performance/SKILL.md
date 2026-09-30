@@ -69,7 +69,16 @@ todo lo de arriba es comparativo. El banco del proyecto para eso es
 
 Pasos de la segunda tanda en la villa: cuerpos fundidos 796 → 598 (aldeanos 187 → 70
 mallas, animales 177 → 43); recorte de animales → 585; humo → 546; sombras cada dos
-fotogramas → 447 (en táctil, cada cuatro: menos aún). Recompilaciones (`shader-churn`,
+fotogramas → 447 (en táctil, cada cuatro: menos aún).
+
+**Y el 30 sep (RV-1) los animales volvieron a pesar, y ya no**: los facetados de
+la PR #3 son nodos rígidos con una malla por pieza (16–27 por animal) y la villa
+subió de 500 a 964. Hoy `skinRigidBody` (`assets.ts`) deja **una malla por
+animal**: mallas de fauna en la villa por la portada **583 → 31**, villa
+(`debug=1&seed=7&year=60&season=summer&live=1`) **950 → 506**, aldea 11/21
+**650 → 413**. La cifra de «animales 177 → 43» de arriba es del 27 sep y ya no
+describe nada. Lo guarda `tests/fast/animal-draws.test.ts`, y lo que deja cada
+GLB al cargar se lee con `npx tsx tools/reports/model-draws.ts`. Recompilaciones (`shader-churn`,
 aldea): **antes, un rayo 27 programas y la fiesta 26 más; ahora 4 y 2**.
 
 Lo que hay que retener: **las rondas de arte del 26–27 sep sumaron un 1–4 %; el peso
@@ -102,10 +111,15 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
    `render3d/profile.ts` —sin MSAA, densidad de píxeles tope 1,5 (en vez de 2) y mapa
    de sombras de 1024 (en vez de 2048)—, y «Graphics» deja elegir otro. En una tablet
    la pantalla tiene el doble de píxeles y la GPU la mitad.
-7. **Resolución adaptativa** (`adaptResolution`, constantes `ADAPT`): si la media entre
-   fotogramas pasa de 36 ms baja la densidad un 15 % cada 2 s, hasta la mitad; si pasa 6 s
-   por debajo de 20 ms, sube un paso. Cambiar la densidad rehace el lienzo: nunca más de
-   una vez cada 2 s.
+7. **Resolución adaptativa** (`render3d/adaptive-scale.ts`, pura desde el 30 sep 2026):
+   una vez por ventana de 2 s, cambie o no, si la media de sus huecos pasa del umbral lento
+   del perfil (1,3 veces el presupuesto) baja la densidad un 15 %, hasta el suelo del
+   perfil; tras 6 s holgados sube un paso. **Los huecos largos sueltos no cuentan** (más de
+   tres veces la mediana, si no pasan de un cuarto de la ventana): la de v4.96 decidía en
+   cada fotograma con una media exponencial y un solo fotograma de 100 ms —un relevo, una
+   recolección, volver de otra pestaña— la bajaba 6 s. **Y el tope de fotogramas acumula
+   citas** (`ui/loop.ts`, `frameDue`): contando desde el último dibujo, un tope de 60 en
+   una pantalla de 90 Hz pintaba a 45 y la adaptativa hundía la resolución al suelo.
 8. **`renderer.compileAsync` al montar el valle NO sirve tal cual**: los programas
    enlazados pasaron de 35 a 68 —compiló variantes con otro estado de luces/sombras que
    luego no se usaron— y se retiró. Precompilar bien pide hacerlo con la escena ya
@@ -186,8 +200,9 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
     `world/contact-shade.ts`): el pie de los edificios es una máscara R8 para todo el
     valle (8 texeles por celda, 516 KB) que el suelo lee donde three aplica su
     oclusión. Cero llamadas, ningún programa más (el del suelo cambia de clave), sin
-    z-fighting, y se rehace sólo cuando cambian los edificios con tejado (unos 4 ms
-    de CPU en un portátil, una vez por obra). Un disco o una luz por edificio habría
+    z-fighting, y se rehace sólo cuando cambian los edificios con tejado (0,27 ms en
+    la aldea y 0,48 en la villa desde que recorre sólo la caja de los edificios,
+    medido por la revisión del 30 sep; al principio, 3–7 ms). Un disco o una luz por edificio habría
     sido una llamada —y una sombra— por casa. Lo que cuesta de verdad es un
     muestreo por fragmento de suelo, que en software no se distingue del ruido: se
     lee en el aparato con `?contact=off`.
@@ -215,6 +230,18 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
     30 s se recupera a 18–78 ms. **Mientras no se arregle, la villa no sirve
     para medir el dibujo**: mide el bucle. La nota entera, con cómo
     reproducirlo: `docs/medidas/bucle-villa-2026-09-29.md`.
+23. **Un animal de piezas rígidas se vuelve una piel al cargar** (RV-1, 30 sep
+    2026, `skinRigidBody` en `assets.ts`). Los nodos que mueven los clips son
+    articulaciones con piezas colgando, y `fuseRigidPieces` sólo funde dentro de
+    una articulación: la vaca se quedaba en 26 mallas. Ahora todas las piezas
+    pasan a una malla con esqueleto, un hueso por pieza (el nodo vacío que queda
+    en su sitio, con su nombre y sus hijos), color y rugosidad en el vértice: una
+    llamada por animal, la misma forma en cada clip y los mismos nombres para
+    gestos y clips. **Un modelo nuevo no se da por bueno sin medir sus
+    llamadas**: `npx tsx tools/reports/model-draws.ts --ids <id>` dice cuántas
+    mallas deja al cargar, y `animal-draws.test.ts` falla si un animal pasa de
+    una. Es lo que la PR #3 no hizo: sus modelos pesaban la mitad y tenían
+    menos triángulos, y aun así casi doblaron las llamadas de la villa.
 
 ## Lo que queda (por lo que pesa)
 

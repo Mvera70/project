@@ -29,7 +29,7 @@
 import { AnimationMixer, Box3, Group, LoopOnce, Mesh, SkinnedMesh, type AnimationAction, type Object3D } from 'three';
 import type { LoadedAsset } from '../assets';
 import type { Animal } from '@derive/animals';
-import { PREY_BODY } from '../life/hunt-bodies';
+import { DOWN_EASE, DOWN_ROLL, PREY_BODY } from '../life/hunt-bodies';
 import { dogGestures } from './animal-gestures';
 
 /** Correr abre la zancada lo mismo que abre las patas (`animal-gestures.ts`). */
@@ -52,16 +52,13 @@ const FLEE_HOP = 2.2;
  * siempre): quedarse quieto deslizando es peor que un pie que se arrastra.
  */
 const TURN_PROGRESS = 0.05;
-/** Constantes de tiempo de las mezclas, en segundos (63 % del camino). */
-const BLEND = { walk: 0.1, gesture: 0.08, down: 0.14 };
+/** Constantes de tiempo de las mezclas, en segundos (63 % del camino). La caída, la de la caza. */
+const BLEND = { walk: 0.1, gesture: 0.08, down: DOWN_EASE };
 /** Una vuelta de la cara por segundo, como `TURN_RATE` de `body.ts` (seis radianes). */
 const TURN = 12;
-/**
- * El vuelco de la pieza caída sobre su eje largo: queda sobre el costado -Z,
- * con las patas hacia fuera. `life/hunt-encounter.ts` rueda igual lo que lleva
- * clavado (`DOWN_ROLL` de allí).
- */
-export const DOWN_ROLL = -Math.PI / 2;
+// El vuelco de la pieza caída sobre su eje largo (`DOWN_ROLL`) y su constante
+// de tiempo (`DOWN_EASE`) viven en `life/hunt-bodies.ts`: lo que la presa lleva
+// clavado rueda con los mismos números.
 
 const ease = (seconds: number, delta: number): number => 1 - Math.exp(-delta / seconds);
 

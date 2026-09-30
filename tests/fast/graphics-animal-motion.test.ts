@@ -4,6 +4,7 @@ import { AnimationMixer, Bone, Box3, Mesh, SkinnedMesh, Vector3, type Object3D }
 import { loadAssets } from '../../src/render3d/assets';
 import { Fauna } from '../../src/render3d/effects/fauna';
 import type { AnimalKind } from '../../src/derive/animals';
+import { DOWN_ROLL, downSettleAfter } from '../../src/render3d/life/hunt-bodies';
 
 const manifest=JSON.parse(readFileSync('public/assets/valley3d/manifest.json','utf8')) as {schemaVersion:1;generatedAt:string;assets:Array<{id:string;file:string;motion:Array<{name:string}>}>};
 const species:AnimalKind[]=['cow','pig','hen','wolf','crow','fish','dog','mule','boar','bear','partridge'];
@@ -11,6 +12,21 @@ const species:AnimalKind[]=['cow','pig','hen','wolf','crow','fish','dog','mule',
 // articulaciones son los nodos que mueven los clips, y su pie, el punto más bajo
 // de cada pata (`tools/art/rigid-clips.mjs`). La propiedad es la misma.
 const jointsOf=(object:Object3D,names:Set<string>):Object3D[]=>{const out:Object3D[]=[];object.traverse(n=>{if(n instanceof Bone||names.has(n.name))out.push(n);});return out;};
+// Desde el 30 sep 2026 las piezas de un animal rígido se funden al cargar en
+// una malla con esqueleto (`skinRigidBody`): la geometría de un nodo son los
+// vértices que cuelgan de él o de sus hijos, estén en su malla o en la piel.
+const pointsUnder=(root:Object3D,node:Object3D):Vector3[]=>{
+  const under=new Set<Object3D>();node.traverse(m=>under.add(m));
+  const out:Vector3[]=[];
+  node.traverse(m=>{if(m instanceof Mesh&&!(m instanceof SkinnedMesh)){const pos=m.geometry.getAttribute('position');for(let i=0;i<pos.count;i++)out.push(new Vector3().fromBufferAttribute(pos,i).applyMatrix4(m.matrixWorld));}});
+  root.traverse(m=>{
+    if(!(m instanceof SkinnedMesh))return;
+    const bones=new Set(m.skeleton.bones.map((b,i)=>under.has(b)?i:-1).filter(i=>i>=0));if(bones.size===0)return;
+    m.skeleton.update();const index=m.geometry.getAttribute('skinIndex'),weight=m.geometry.getAttribute('skinWeight');
+    for(let i=0;i<index.count;i++)if(bones.has(index.getX(i))&&weight.getX(i)===1)out.push(m.getVertexPosition(i,new Vector3()).applyMatrix4(m.matrixWorld));
+  });
+  return out;
+};
 const feetOf=(object:Object3D):Map<string,Vector3>=>{
   const feet=new Map<string,Vector3>();
   object.traverse(n=>{
@@ -18,8 +34,8 @@ const feetOf=(object:Object3D):Map<string,Vector3>=>{
     else if(!(n instanceof Bone)&&/^((fore|hind)[LR]Lower|foot[LR])$/u.test(n.name)){
       // El apoyo es el vértice más bajo de la pata, no el centro de su caja:
       // ese se mueve menos que el pie cuando la pata gira.
-      let low:Vector3|null=null;const v=new Vector3();
-      n.traverse(m=>{if(m instanceof Mesh){const pos=m.geometry.getAttribute('position');for(let i=0;i<pos.count;i++){v.fromBufferAttribute(pos,i).applyMatrix4(m.matrixWorld);if(low===null||v.y<low.y)low=v.clone();}}});
+      let low:Vector3|null=null;
+      for(const at of pointsUnder(object,n))if(low===null||at.y<low.y)low=at;
       if(low!==null)feet.set(n.name,low);
     }
   });
@@ -165,13 +181,23 @@ describe('AN-1 · rumbo, carreras, mezclas y caída de los animales',()=>{
     expect(lying.min.y,'sobre el suelo, no enterrado').toBeGreaterThan(-0.02);
     fauna.dispose();lib.dispose();
   });
+  it('la caída que pinta el render es la de la caza: el mismo vuelco con la misma curva que lo que lleva clavado',async()=>{
+    const lib=await library('boar'),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
+    fauna.paint([{id:9,kind:'boar',x:1,y:1}],0);
+    const body=fauna.group.children[0]!;
+    for(let i=1;i<=30;i++){
+      fauna.paint([{id:9,kind:'boar',x:1,y:1,action:'down'}],i/60);
+      expect(body.rotation.x,`fotograma ${i}`).toBeCloseTo(DOWN_ROLL*downSettleAfter(i/60),6);
+    }
+    fauna.dispose();lib.dispose();
+  });
   it('el ciervo caído se apoya en el costado de su tronco: la cuerna, más ancha, no lo deja flotando',async()=>{
     const lib=await library('deer'),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
     for(let i=0;i<=90;i++)fauna.paint([{id:8,kind:'deer',x:1,y:1,action:'down'}],i/60);
     fauna.group.updateMatrixWorld(true);
     const trunk=fauna.group.children[0]!.getObjectByName('Torso');
     expect(trunk,'el ciervo publicado trae su tronco').toBeDefined();
-    const lying=new Box3().setFromObject(trunk!);
+    const lying=new Box3().setFromPoints(pointsUnder(fauna.group,trunk!));
     expect(Math.abs(lying.min.y),'el tronco toca el suelo').toBeLessThan(0.02);
     fauna.dispose();lib.dispose();
   });

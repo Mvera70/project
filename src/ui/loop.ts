@@ -27,16 +27,27 @@ export interface Loop {
 }
 
 /**
- * Si toca dibujar este fotograma o se deja pasar (29 sep 2026). Con un tope
- * de 60 en una pantalla de 120 Hz se dibuja uno de cada dos; con 30, uno de
- * cada dos en una de 60. El margen de un cuarto de fotograma evita que un
- * `requestAnimationFrame` que llega unas décimas antes de tiempo se salte y
- * el siguiente se dibuje tarde: sin él, a 60 en una pantalla de 60 Hz se
- * perdía uno de cada tres. Puro, para probarse sin pantalla.
+ * Si toca dibujar este fotograma o se deja pasar (29 sep 2026): devuelve
+ * cuándo toca el siguiente si se dibuja éste, o `null` si se deja pasar. Con
+ * un tope de 60 en una pantalla de 120 Hz se dibuja uno de cada dos; con 30,
+ * uno de cada dos en una de 60. Puro, para probarse sin pantalla.
+ *
+ * **Las citas se acumulan** (`dueAt += minFrameMs`, revisión del 30 sep): antes
+ * se contaba desde el último dibujo con un margen de un cuarto, y en una
+ * pantalla de 90 Hz eso pintaba uno de cada dos —45 fps con un tope de 60—, con
+ * huecos de 22,2 ms que la adaptativa tomaba por lentos hasta dejar la
+ * resolución en el suelo; a 72–75 Hz no topaba y a 144 topaba a 72. Contando
+ * desde la cita y no desde el dibujo, la media es la del tope en cualquier
+ * pantalla más rápida que él. El margen de un cuarto sigue: un
+ * `requestAnimationFrame` que llega unas décimas antes no se salta. Y si se ha
+ * quedado más de un fotograma atrás —una pausa, un tirón— se reengancha desde
+ * ahora, sin ráfaga para recuperar lo perdido.
  */
-export function frameDue(now: number, lastPainted: number | null, minFrameMs: number): boolean {
-  if (lastPainted === null || !(minFrameMs > 0)) return true;
-  return now - lastPainted >= minFrameMs * 0.75;
+export function frameDue(now: number, dueAt: number | null, minFrameMs: number): number | null {
+  if (!(minFrameMs > 0)) return now;
+  if (dueAt === null) return now + minFrameMs;
+  if (now < dueAt - minFrameMs * 0.25) return null;
+  return now - dueAt > minFrameMs ? now + minFrameMs : dueAt + minFrameMs;
 }
 
 export function startLoop(
@@ -57,7 +68,7 @@ export function startLoop(
 ): Loop {
   let frameId = 0;
   let previous: number | null = null;
-  let lastPainted: number | null = null;
+  let dueAt: number | null = null;
   let remainder = Math.max(0, Math.min(0.999, startFraction)) * TIME.REAL_MS_PER_TICK;
   let stopped = false;
 
@@ -72,11 +83,12 @@ export function startLoop(
       frameId = requestAnimationFrame(frame);
       return;
     }
-    if (!frameDue(now, lastPainted, minFrameMs())) {
+    const due = frameDue(now, dueAt, minFrameMs());
+    if (due === null) {
       frameId = requestAnimationFrame(frame);
       return;
     }
-    lastPainted = now;
+    dueAt = due;
     const advanced = advanceAccumulator(remainder, (now - previous) * scale(), speed());
     previous = now;
     remainder = advanced.remainderMs;

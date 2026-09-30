@@ -41,8 +41,27 @@ const CHARGE_STOP = 0.68;
 /** Lo que dura el despegue de la perdiz, en pasos: el clip `takeoff` (1,17 s). */
 const TAKEOFF_STEPS = Math.round(1.17 / LIFE_STEP);
 
-function preferred(kind: WildKind, code: number): boolean {
-  if (kind === 'boar') return code === TERRAIN_CODE.forest;
+/** Si alguna de las ocho celdas de alrededor es bosque: la linde. */
+function besideForest(state: GameState, width: number, x: number, z: number): boolean {
+  for (let dz = -1; dz <= 1; dz += 1) for (let dx = -1; dx <= 1; dx += 1) {
+    if ((dx !== 0 || dz !== 0) && state.map.terrain[(z + dz) * width + x + dx] === TERRAIN_CODE.forest) return true;
+  }
+  return false;
+}
+
+/**
+ * Dónde puede estar cada presa. RV-3b (30 sep 2026) · **El jabalí, en el
+ * bosque o en su linde.** Sólo valía el bosque, y el juego pone un tronco en
+ * cada celda de bosque (`solidTerrain`): con ellos no cabe un jabalí de 0,38 en
+ * ninguna, y la caza del jabalí —y detrás de ella la visita del oso— no salía
+ * en la mayoría de valles (medido por la revisión: 0 de 60 en 11, 23 y 5 al año
+ * 30; 4 valles de 17). Es el mismo tropiezo que la guarida del oso de AN-4c, y
+ * el mismo arreglo: vale también la pradera pegada al bosque, que es donde un
+ * jabalí sale a hozar.
+ */
+function preferred(kind: WildKind, state: GameState, width: number, x: number, z: number): boolean {
+  const code = state.map.terrain[z * width + x] ?? -1;
+  if (kind === 'boar') return code === TERRAIN_CODE.forest || (code === TERRAIN_CODE.meadow && besideForest(state, width, x, z));
   if (kind === 'rabbit') return code === TERRAIN_CODE.meadow || code === TERRAIN_CODE.forest;
   return code === TERRAIN_CODE.meadow;
 }
@@ -64,7 +83,7 @@ export function createWildPrey(
     for (let z = minZ; z <= maxZ; z += 1) {
       for (let x = minX; x <= maxX; x += 1) {
         const cell = z * land.width + x;
-        if (!preferred(kind, state.map.terrain[cell] ?? -1) || connected[cell] !== 1) continue;
+        if (!preferred(kind, state, land.width, x, z) || connected[cell] !== 1) continue;
         const px = x + 0.5, pz = z + 0.5;
         const d2 = (x - tx) ** 2 + (z - tz) ** 2;
         if (d2 < 4 || (nearTree && d2 > MAX_RANGE * MAX_RANGE)
