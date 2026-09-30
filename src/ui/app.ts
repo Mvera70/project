@@ -1560,6 +1560,33 @@ export function boot(
    * en pie más cercana al centro, por el mismo camino que el motor
    * (`burnBuilding`), y deja la cámara mirándola.
    */
+  /**
+   * **Dónde cae en pantalla la casa en pie más cercana al centro**, en píxeles
+   * del lienzo que se ve. Mismo trato que `__valleyBurn`: el juego no lo llama.
+   * Existe para la reja de interfaz (`tools/shots/valley.shots.ts`), que guarda
+   * que **tocar un edificio abre su ficha**: antes barría el lienzo a ciegas
+   * buscando una casa, y en el servidor, con el 3D por software, cada toque de
+   * más costaba segundos (30 sep 2026). En 3D lo dice la cámara (`screenOf`);
+   * en Canvas el mapa entero va estirado al lienzo, así que es proporción.
+   */
+  window.__valleyHouseOnScreen = (look = false): { x: number; y: number } | null => {
+    const houses = state.buildings.filter((b) => b.lostTick === null && (b.kind === 'house' || b.kind === 'stone_house'));
+    const cx = state.map.width / 2;
+    const cy = state.map.height / 2;
+    const target = houses.sort((a, b) => Math.hypot(a.x - cx, a.y - cy) - Math.hypot(b.x - cx, b.y - cy))[0];
+    if (target === undefined) return null;
+    // Con `look`, la cámara se vuelve antes hacia ella: en una villa de ochenta
+    // años la casa del centro puede caer fuera del encuadre.
+    if (look) backend.live.look(target.x + target.w / 2, target.y + target.h / 2);
+    const seen = backend.live.screenOf({ kind: 'building', id: target.id });
+    if (seen !== null) return seen;
+    const box = backend.live.surface.getBoundingClientRect();
+    return {
+      x: ((target.x + target.w / 2) * box.width) / state.map.width,
+      y: ((target.y + target.h / 2) * box.height) / state.map.height,
+    };
+  };
+
   window.__valleyBurn = (): { x: number; y: number } | null => {
     const houses = state.buildings.filter((b) => b.lostTick === null && (b.kind === 'house' || b.kind === 'stone_house'));
     const cx = state.map.width / 2;
@@ -1818,5 +1845,6 @@ declare global {
     __valleyLook?: (x: number, y: number) => void;
     __valleyHoldTicks?: (on: boolean) => void;
     __valleyOpenBoard?: () => void;
+    __valleyHouseOnScreen?: (look?: boolean) => { x: number; y: number } | null;
   }
 }

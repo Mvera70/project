@@ -25,6 +25,12 @@ Tras cada fusión, las que quedan traen `main` (merge, no rebase) y vuelven a
 pasar su puerta. **Una sesión nueva pide su bloque de versiones al director:
 el siguiente libre es la v5.37.**
 
+**Abierto, hallado al poner la reja en verde:** en la reserva 2D
+(`?render=canvas`) tocar un edificio no abre su ficha —medido: el toque cae en
+`#valley` sobre la casa y `data-screen` sigue en `valley`—; en el 3D sí. Su
+recorrido queda como fallo esperado (`test.fail`, «S-05, Canvas») hasta que
+alguien arregle el toque de la reserva. Es de interfaz.
+
 **Abierto para Vera:** fusionar en ese orden; decidir el reparto de lo que la
 revisión de rendimiento dejó sin dueño; y, con #8 dentro, abrir la villa 7/60
 en la tablet —es la medida combinada que cierra la tanda (director §3.4)—.

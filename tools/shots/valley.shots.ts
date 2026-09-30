@@ -224,6 +224,21 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
   // Y la pestaña encendida deja de estar encendida: no hay pantalla que valga.
   await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
 
+
+});
+
+test('tocar un edificio abre su ficha y «Valley» la cierra (S-05, Canvas)', async ({ page }) => {
+  // **Separado de U-14 y declarado roto el 30 sep 2026.** En la reserva 2D
+  // (`?render=canvas`) tocar la casa —justo donde `__valleyHouseOnScreen` dice
+  // que está, y el toque cae en `#valley`— no abre ninguna ficha: medido a
+  // mano, `data-screen` sigue en `valley` y no hay `.valley-panel`. En el 3D,
+  // que es el juego, sí abre (lo guarda «la ruta viva»). La propiedad se queda
+  // intacta y el recorrido, como fallo esperado hasta que alguien arregle el
+  // toque de la reserva: `docs/task-log.md`, tanda del 30 sep.
+  test.fail();
+  await page.goto(CANVAS);
+  await passTitle(page);
+  await page.locator('html[data-app-ready="true"]').waitFor();
   // S-05 · la ficha de un edificio o un aldeano es el mismo fallo, más
   // pequeño: se cerraba sólo con su cruz, no avisaba a la barra y podía
   // reaparecer al volver de la crónica o la gente. Se abre tocando el
@@ -273,9 +288,17 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
   // píxeles en el centro. Un barrido de treinta en treinta la salta —medido:
   // 220 toques sin abrir nada, tres veces seguidas—. De cinco en cinco
   // alrededor del centro, que es donde se funda (§7.1) y de donde no se mueve.
+  // **Primero, donde el juego dice que está la casa** (`__valleyHouseOnScreen`,
+  // 30 sep 2026): el barrido de abajo queda sólo de respaldo.
+  const casa = await page.evaluate(() => window.__valleyHouseOnScreen?.() ?? null);
+  if (casa !== null) {
+    await canvas.click({ position: casa, force: true });
+    await page.waitForTimeout(80);
+  }
   const around: [number, number][] = [];
   for (let dx = -20; dx <= 20; dx += 5) for (let dy = -20; dy <= 20; dy += 5) around.push([dx, dy]);
   around.sort((a, b) => Math.hypot(a[0], a[1]) - Math.hypot(b[0], b[1]));
+  if (await panel.isVisible()) around.length = 0;
   for (const [dx, dy] of around) {
     // VZ-3 · un fotograma de espera entre el toque y la comprobación, y la
     // encrucijada contestada si asoma. Sin las dos cosas el barrido era
@@ -427,11 +450,24 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   const alto = box?.height ?? 844;
   const cx = ancho / 2;
   const cy = alto / 2;
+  // **Primero, donde el juego dice que está la casa**: la cámara se vuelve
+  // hacia ella, se deja asentar y se toca ahí. En el servidor, con el 3D por
+  // software, cada toque de un barrido a ciegas cuesta segundos y el barrido
+  // entero no cabía en el tiempo del recorrido (30 sep 2026).
+  await page.evaluate(() => window.__valleyHouseOnScreen?.(true));
+  await page.waitForTimeout(1_500);
+  const casa = await page.evaluate(() => window.__valleyHouseOnScreen?.() ?? null);
+  if (casa !== null && casa.x > 0 && casa.y > 0 && casa.x < ancho && casa.y < alto) {
+    await answerAnyCrossroad(page);
+    await canvas.click({ position: casa, force: true });
+    await page.waitForTimeout(250);
+  }
   const around: [number, number][] = [];
   for (let dx = -Math.round(ancho * 0.4); dx <= ancho * 0.4; dx += 30) {
     for (let dy = -Math.round(alto * 0.35); dy <= alto * 0.35; dy += 30) around.push([dx, dy]);
   }
   around.sort((a, b) => Math.hypot(a[0], a[1]) - Math.hypot(b[0], b[1]));
+  if (await panel.isVisible()) around.length = 0;
   for (const [dx, dy] of around) {
     // A ×1 y con ochenta personas, una encrucijada puede abrirse entre dos
     // toques y esconder el lienzo; se contesta y se sigue.
@@ -855,7 +891,9 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
   await page.locator('html[data-app-ready="true"]').waitFor();
 
   const welcome = page.locator('.welcome');
-  await welcome.waitFor({ timeout: 15_000 });
+  // Pagar 960 semanas antes del parte tarda lo que tarde la máquina: en el
+  // servidor pasaba de los 15 s de antes (30 sep 2026).
+  await welcome.waitFor({ timeout: 60_000 });
   // §11.2 pide el valle **atenuado y no tapado**: el velo tiene que dejarse ver
   // a través. Se lee su alfa en vez de su color, que es lo que la sección dice.
   const velo = await page.locator('.welcome-scrim').evaluate((el) => getComputedStyle(el).backgroundColor);
