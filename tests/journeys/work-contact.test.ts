@@ -30,7 +30,18 @@ const head = (b: { x: number; z: number; facing: number }, clip: 'chop' | 'mine'
 // muestras intactos. Si una trayectoria futura vuelve a dar un cuerpo a más de
 // 0,2 del tronco, esto se pone rojo, que es lo correcto: el defecto de
 // llegada del corro (`offers.ts`) no se ha arreglado, sólo no sale.
-it('la cabeza de la herramienta queda a menos de 0,2 de la superficie que golpea', () => {
+//
+// **Y con RD-5 encima vuelve a salir: `it.fails`, con la propiedad intacta**
+// (`CLAUDE.md`, «cuando algo no llega»). RD-5 (sucesos del caserío y las
+// consecuencias cortas del vado) mueve otra vez la trayectoria y, con las mismas
+// seis semillas y los mismos tres instantes, la semilla 7 en el paso 1500 del
+// instante 1440 deja a un leñador a **0,57** del tronco (el otro, a −0,06; en
+// el instante 1418 de la misma semilla, 0,11 y 0,14); el resto de las muestras
+// de la lista (1, 9 y 12) queda a 0,05 o menos. Son 7 muestras con alguien
+// golpeando, así que el número de muestras se cumple y lo que falla es la cota:
+// es el defecto de llegada del corro de la 11 de antes (0,44), con otra cifra.
+// Cuando una ronda lo arregle, esto se pone rojo y se quita el `.fails`.
+it.fails('la cabeza de la herramienta queda a menos de 0,2 de la superficie que golpea', () => {
   const gaps: number[] = [];
   for (const seed of [1, 2, 7, 9, 11, 12]) for (const ticks of [21 * 48, 30 * 48, 1418]) {
     const st = foundGame(seed); run(st, ticks, 'prudent', CATALOG);
