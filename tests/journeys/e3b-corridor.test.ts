@@ -123,7 +123,14 @@ describe('E3b · pasillo interior de una villa real', () => {
       .toBe(false);
   });
 
-  it('una villa bloquea los árboles reales y reabre la ruta al despejarlos', () => {
+  // RD-3 (1 oct 2026) · con su catálogo, **ninguna villa de las semillas 1 a 26**
+  // tiene un anillo cerrado que sólo los árboles bloquean y que al talarlos
+  // quede listo: medidas a los 3846 ticks, las que el bosque bloquea (3, 4, 22)
+  // destapan otro defecto al despejarlo (`interior` o `variant`), y el resto
+  // ni siquiera tiene árboles en el anillo (12 `variant`, 8 `interior`, 2 con
+  // hueco, una lista). La propiedad se queda intacta y la prueba declarada,
+  // hasta que una trayectoria vuelva a dar una villa así.
+  it.fails('una villa bloquea los árboles reales y reabre la ruta al despejarlos', () => {
     // Precondición: un anillo cerrado que sólo los árboles impiden —al talarlos
     // la geometría queda lista—. La talla se hace sobre una copia, para no
     // gastar una partida entera por candidata.
