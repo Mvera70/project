@@ -10,6 +10,13 @@ Lo pidió el dueño del diseño con estas palabras: «necesito saber qué es
 prioritario, qué va después y la dificultad de la tarea para así poder
 destinarla a diferentes agentes en función de la dificultad».
 
+**Rework de experiencia abierto.** La apertura, las primeras ocho a diez horas,
+las 21 encrucijadas y el contrato de descanso se ordenan en
+`docs/plan-ritmo-descanso-y-progresion-2026-09-29.md` (RD-0 a RD-6).
+Sus cifras del 29 sep son una base histórica; RD-0 remide sobre el juego
+integrado antes de proponer velocidad o cadencia. El sol, la hora y el
+calendario permanecen sincronizados.
+
 **Estado sincronizado el 23 sep 2026.** Las rondas E1–E3 y D6 ya entregaron
 los siete gestos procedurales, siete modelos publicados, armas en mano,
 visibilidad del frente, huida civil, saqueo, transición terminal, ragdolls y

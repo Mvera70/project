@@ -137,6 +137,15 @@ medida). Pruebas: `rest-no-defeat.test.ts`; `lethargy.test.ts` y
 `save.test.ts` dicen ahora «960 semanas, o menos si paró con motivo». **Lo
 que no decide este cambio:** si una encrucijada planteada también para el
 descanso, a qué velocidad corre y si se activa a mano; es de Vera.
+## v5.41 · 30 sep 2026 · RD-0: la apertura y el catálogo, medidos sobre el juego integrado
+
+Primera ronda del rework de ritmo, descanso y progresión: trae el plan
+(`docs/plan-ritmo-descanso-y-progresion-2026-09-29.md`, de la rama
+`docs/ritmo-integraciones`) y lo mide sobre `main` posterior a la PR #17. Cuatro
+informes en `docs/medidas/` —motor, apertura visible, encrucijadas y descanso—
+y su síntesis (`rd0-sintesis-2026-09-30.md`), con la tabla de §3 del plan
+marcada. Herramienta nueva: `tools/reports/rest-report.ts`. Los arreglos que
+salieron de aquí van en PR aparte (v5.38–v5.40 y D1).
 
 ## v5.37 · 30 sep 2026 · Las 21 jornadas rojas viejas, una a una
 

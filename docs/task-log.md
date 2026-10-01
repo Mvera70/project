@@ -84,6 +84,48 @@ acabaría la partida. Es la parte del descanso que no depende de la decisión de
 Vera (común a A y A′). **Abierto, de Vera:** qué más para el descanso, a qué
 velocidad corre, y si se activa a mano o al ocultar la app
 (`docs/medidas/rd2-descanso-2026-09-30.md`).
+## 1 oct 2026 · Decisiones de Vera para RD-3, RD-4 y RD-5, y la hoja de reparto
+
+**RD-3:** aplicar el dictamen de `docs/medidas/rd0-encrucijadas-2026-09-30.md`
+—retirar `plague_blame` y las cinco que duplican mecanismos posteriores
+(`tithe_demand`, `chapel_or_granary`, `relic_pedlar`, `wolf_winter`,
+`bandits`), reescribir las ocho para que coste, efecto y lo que se ve
+coincidan, conservar las siete—. **RD-4:** las dos señales nuevas son **el
+niño perdido** (señal en la linde; sale un adulto a buscarlo; varios
+finales) y **la visita del camino** (el que viene a vender espera en la plaza
+con su señal encima, en vez de dos botones en la voz). **RD-5:** el primer año
+a ×1 se rellena con **consecuencias que vuelven** de la primera elección,
+**sucesos pequeños del caserío** y **metas a la vista**.
+
+| Carril | Rama | Versiones | Tuyo | No es tuyo |
+|---|---|---|---|---|
+| RD-3 (agente) | `claude/rd3-encrucijadas` (sobre la #20) | v5.46 | `src/engine/crossroads/catalog/*` salvo `hamlet.ts`, las claves `crossroad.*` y `consequence.*` de `bank.en.ts`, `tests/fast/catalog*.test.ts`, `docs/plan-arte-pendiente.md` (sus filas) | `hamlet.ts` y la fundación (RD-1), `fate.ts` y los sucesos (RD-5), la interfaz |
+| RD-4 (director) | `claude/rd4-senales` | v5.47–v5.48 | `child_lost` y su señal, la visita como señal: `world/fate.ts` (sólo `child_lost`), `ui/app.ts`, `render3d/renderer.ts`, `life/` | el catálogo de encrucijadas |
+| RD-5 (director, después) | `claude/rd5-primer-ano` | v5.49–v5.52 | sucesos del caserío, consecuencias del vado, metas a la vista | — |
+
+Versiones del rework ampliadas a **v5.38–v5.55**.
+
+## 30 sep 2026 · Decisiones de Vera tras RD-0
+
+**×1 es la velocidad normal** (la escalera se mantiene; el primer año se
+rellena con contenido entre medias), **descanso A′** y **primera elección
+«Uno en el vado» desde la fundación**, con el forastero llegando andando y una
+señal encima. Escritas en el plan (§6, «Decisiones de Vera tras RD-0»).
+Siguiente: RD-1 a ×1 —la caza sin adelantar la semana (D4) y con su
+consecuencia a la vista (D5), y el forastero del vado en la semana 0—.
+
+## 30 sep 2026 · RD-0 cerrada: la apertura y el catálogo, medidos (v5.41)
+
+Síntesis en `docs/medidas/rd0-sintesis-2026-09-30.md`. **A ninguna velocidad
+hay hoy una intervención visible y una elección antes del minuto 10**: a ×1 no
+pasa ni una semana; a ×16 la primera elección llega a los 13 min; a ×64 a los
+3,3 min pero la oferta de caza dura 13 s. La perdiz nacía tapada por el
+bosque en 2 de 3 valles (D1, arreglo en su PR). Las 21 encrucijadas tienen
+dictamen (7 conservar, 8 reescribir, 5 sustituir, 1 retirar). Los arreglos
+van en PR aparte: sol (v5.38), retiradas pendientes (v5.39), ninguna derrota
+en ausencia (v5.40). **Esperando a Vera:** velocidad normal, regla del
+descanso y la primera elección de la fundación. Versiones reservadas para el
+rework: v5.38–v5.49.
 
 ## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
 

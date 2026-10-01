@@ -4208,7 +4208,7 @@ que dibujar escribiera en el estado o gastara una tirada.
 
 ### 11.10 El sonido de la interfaz (29 sep 2026)
 
-**La interfaz suena, y el valle no.** Vera retiró el 24 sep la síntesis en
+**La interfaz y el valle suenan.** Vera retiró el 24 sep la síntesis en
 vivo de U-09 —«el audio es malísimo, el de fondo es hasta incómodo»— y el 29
 eligió que suene la interfaz entera con ficheros fabricados fuera del juego:
 portada, navegación, reloj, decisiones, medios, ofertas e hitos. El fondo
