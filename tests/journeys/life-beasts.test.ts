@@ -34,7 +34,13 @@ function village(seed: number): GameState {
 
 describe('V-08 · los animales, iguales que la gente', () => {
   it('la cuenta por clase sale de la cabaña del estado, no del tick vivo', () => {
-    for (const seed of [3, 7, 11, 23]) {
+    // RD-3 (1 oct 2026): la semilla 7 sale de la lista —a los cuarenta años su
+    // corral queda en `hens: 0, pigs: 0, cows: 0` (la trayectoria se movió al
+    // retirar y reescribir encrucijadas), y sin cabaña no hay cuenta que
+    // comparar—; entra la 1 (siete gallinas). Medido: 1 → 7, 3 → 1, 11 → 4 y
+    // 23 → 19 gallinas a los cuarenta años con `foundTwenty` y la política
+    // prudente. La propiedad es la misma.
+    for (const seed of [1, 3, 11, 23]) {
       const state = village(seed);
       const life = createVillage(state, 0);
       expect(life.beasts.length, `semilla ${seed}: no hay cabaña`).toBeGreaterThan(0);
@@ -55,8 +61,12 @@ describe('V-08 · los animales, iguales que la gente', () => {
     }
   });
 
-  it('ningún animal de tierra pisa el agua en una jornada, seis semillas', () => {
-    for (const seed of [1, 3, 7, 11, 17, 23]) {
+  it('ningún animal de tierra pisa el agua en una jornada, cinco semillas', () => {
+    // RD-3 (1 oct 2026): eran seis, con la 7; su corral está vacío a los cuarenta
+    // años (ver la prueba de arriba) y «no se comprobó ningún animal» no es una
+    // propiedad. Las otras cinco tienen gallinas: 1 → 7, 3 → 1, 11 → 4, 17 → 2
+    // y 23 → 19.
+    for (const seed of [1, 3, 11, 17, 23]) {
       const state = village(seed);
       const life = createVillage(state, 0);
       const { width, terrain } = state.map;

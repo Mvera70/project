@@ -174,7 +174,7 @@ describe('V-10 · sitios con vida', () => {
     // mirar la conectividad, tres de seis semillas no ofrecían plaza ni claro
     // en absoluto.
     //
-    // Cinco aquí y la sexta, la 37, declarada aparte en la prueba de abajo.
+    // Cinco aquí y la sexta, la 37, aparte en la prueba de abajo.
     for (const seed of [7, 11, 23, 31, 41]) expectCommons(seed);
   });
 
@@ -189,7 +189,16 @@ describe('V-10 · sitios con vida', () => {
   // alcanzando. Es un defecto del motor, sin arreglar en esta tanda porque
   // cambiar la regla de colocación mueve todas las villas fijadas en las
   // jornadas; cuando se arregle, esto se pone rojo y la 37 vuelve arriba.
-  it.fails('semilla 37 · la aldea encerrada por una obra no tiene claro al que ir', () => {
+  //
+  // **Y vuelve a verde (RD-3, 1 oct 2026), sin que nadie toque la regla de
+  // colocación.** Retirar seis encrucijadas y reescribir ocho movió el flujo
+  // `crossroads` y con él la trayectoria de la 37: la iglesia ya no se abre en
+  // la franja que cierra el portón, y el `it.fails` de abajo pasa («Expect test
+  // to fail»; medido en la jornada completa del 1 oct). El defecto del motor
+  // —`placeBuilding` no comprueba que el portón se siga alcanzando— sigue
+  // intacto y le puede tocar a cualquier otra semilla: cuando vuelva, esto se
+  // pone de nuevo en `it.fails` con la semilla que lo muestre.
+  it('semilla 37 · la aldea no queda encerrada por una obra (desde RD-3)', () => {
     expectCommons(37);
   });
 

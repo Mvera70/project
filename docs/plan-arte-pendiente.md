@@ -9,6 +9,30 @@ tanda de aldeanos. Sirve como lista de trabajo para las siguientes rondas y
 separa las ilustraciones de crónica, los adornos de interfaz y el arte 3D del
 mundo.
 
+## RD-3 · encrucijadas reescritas (1 oct 2026): ninguna imagen nueva que pedir
+
+La regla del dueño del diseño («cada vez que creas una crónica hay que ir
+creando la tarea de pedir las imágenes») se comprobó contra las ocho
+reescrituras y las seis retiradas, y **no genera ninguna tarea**:
+
+- **No se ha creado ninguna clave de crónica.** Cambian los textos de pantalla
+  (`crossroad.*.title/body/label/cost`) y dos líneas de la crónica de decisión
+  (`crossroad.feud_inherited.let_it_be_settled`,
+  `crossroad.winter_grain_debt.kneel`), pero las claves, los ids de opción y los
+  ids de semilla son los mismos.
+- **Y las entradas de decisión y de consecuencia no llevan grabado propio:**
+  llevan el «documento sellado» (`src/ui/redesign/chronicle-art.ts`:
+  `crossroad_posed`/`crossroad_taken`/`consequence` devuelven `null`), así que
+  ni una clave nueva habría caído al respaldo por `kind`, que es la trampa que
+  esa regla vigila (`wall.closed`, que es un `kind` con grabado). Lo que sí
+  tiene grabado por clave son los sucesos del valle (`HAPPENING_ART`), y este
+  carril no toca ninguno.
+- Dos consecuencias que antes casi no ocurrían ahora pueden verse, y se dejan
+  anotadas por si algún día las consecuencias llevan dibujo:
+  `consequence.the_wood_holds` (la semilla pedía bosque > 0,5, que el corazón del
+  valle no alcanza nunca; ahora > 0,20) y `crossroad.first_stone.*` (sale a los
+  ~6 años, con la iglesia recién levantada, no a los 41).
+
 ## Propuesta pendiente · portada del menú y apertura del libro
 
 **Estado:** cubierta estática con pergamino, lomo, cuero y canto de páginas
