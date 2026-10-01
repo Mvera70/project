@@ -262,6 +262,8 @@ export const WANTED = [
  * pixeles. Acercarse mas es el trabajo de gestos de G-07.
  */
 const FRAME_MARGIN = 2.5;
+/** El aire que se deja alrededor del tablón al meterlo en el encuadre, en celdas (D7). */
+const BOARD_FRAME_AIR = 1.5;
 
 /** Cuántas nubes de §11.1.1 pueden verse a la vez. TUNE: tres; ver el uso. */
 const MOST_BUBBLES = 3;
@@ -795,6 +797,8 @@ export async function createGraphicsRenderer(
   let liveDeal: LiveDeal | null = null;
   /** RD-4 · el niño que el jugador ya mandó buscar: no vuelve a la linde en los días que se rehacen. */
   let lostFound: { villager: VillagerId; tick: number } | null = null;
+  /** Dónde está el tablón de la plaza, para que el encuadre lo incluya (D7). */
+  let boardSpot: { x: number; z: number } | null = null;
   let observedFrame: GraphicsFrame | null = null;
   let sampling = false;
   let observing = false;
@@ -893,7 +897,30 @@ export async function createGraphicsRenderer(
     // copas que sólo tapaban a esa persona.
     const followed = trackedTarget();
     if (followed !== null) targets.push(followed);
+    // RD-0 (30 sep 2026), D1 · **Y la presa que se ofrece, si está en la
+    // pradera.** Con la cámara de apertura las copas de la linde tapaban a la
+    // perdiz de la fundación en 3 de 7 valles con la señal en pantalla, y la
+    // primera ocasión del mapa no se podía tocar. Vera pidió que la señal se
+    // apague cuando la presa **entra** en el bosque (28 sep 2026), no cuando
+    // un árbol se cruza por delante: eso se resuelve como con quien se sigue.
+    const prey = offeredPrey();
+    if (prey !== null && !prey.inForest) targets.push(prey.target);
     return forest.reveal(camera, targets);
+  }
+
+  /** La presa de la ocasión de caza a la vista, como volumen, y si está dentro del bosque. */
+  function offeredPrey(): { target: ForestRevealTarget; inForest: boolean } | null {
+    if (huntScene !== null || huntSighting === null || life === null) return null;
+    const at = huntSighting.prey !== null
+      ? { x: huntSighting.prey.body.x, z: huntSighting.prey.body.z }
+      : (() => { const found = life.wildlife.find(animal => animal.kind === huntSighting!.species); return found === undefined ? null : { x: found.x, z: found.y }; })();
+    if (at === null) return null;
+    const cell = Math.floor(at.z) * mapWidth + Math.floor(at.x);
+    const inForest = observedState !== null && observedState.map.terrain[cell] === TERRAIN_CODE.forest;
+    return {
+      target: { x: at.x, y: groundFloor(at.x, at.z) + ACTOR_VISUAL_HEIGHT / 2, z: at.z, radius: HUNT_SIGN_COVER, canopyOnly: true },
+      inForest,
+    };
   }
 
   /** La caza o el frente del asalto, como volúmenes a dejar ver; nada si no hay encuentro. */
@@ -956,6 +983,22 @@ export async function createGraphicsRenderer(
    * una partida recien fundada.
    */
   function framed(): { minX: number; minZ: number; maxX: number; maxZ: number } {
+    const box = framedBuildings();
+    // RD-0 (30 sep 2026), D7 · **Y el tablón dentro.** Es el primer objeto del
+    // valle que abre su propia interfaz (§7.15), está en el borde oeste de la
+    // plaza y el núcleo de lo construido crece hacia otro lado: en la semilla 7
+    // salía del cuadro a partir de la semana 6, justo cuando se abría la
+    // primera misión (x = −21 px de 390). Se mete con una celda de aire.
+    if (boardSpot === null || box.maxX - box.minX >= mapWidth) return box;
+    return {
+      minX: Math.max(0, Math.min(box.minX, boardSpot.x - BOARD_FRAME_AIR)),
+      minZ: Math.max(0, Math.min(box.minZ, boardSpot.z - BOARD_FRAME_AIR)),
+      maxX: Math.min(mapWidth, Math.max(box.maxX, boardSpot.x + BOARD_FRAME_AIR)),
+      maxZ: Math.min(mapHeight, Math.max(box.maxZ, boardSpot.z + BOARD_FRAME_AIR)),
+    };
+  }
+
+  function framedBuildings(): { minX: number; minZ: number; maxX: number; maxZ: number } {
     const buildings = plan?.buildings ?? [];
     if (buildings.length === 0) return { minX: 0, minZ: 0, maxX: mapWidth, maxZ: mapHeight };
 
@@ -2030,6 +2073,7 @@ export async function createGraphicsRenderer(
         ? lifeState : scenic.of(state as GameState, phase);
 
       const next = planFor(shown);
+      boardSpot = noticeBoardOf(shown);
       const change = planChange(plan, next);
       if (firstPaint) markStage('paint:plan-ready');
       let fallingChanged = treeFalls.observe(state.map, frame.discontinuity);
@@ -2801,10 +2845,10 @@ export async function createGraphicsRenderer(
       const point = new Vector3(at.x, groundFloor(at.x, at.z) + HUNT_SIGN_LIFT, at.z).project(camera);
       if (point.z > 1 || point.x < -1.05 || point.x > 1.05 || point.y < -1.05 || point.y > 1.05) return null;
       // Entre los árboles no se ofrece: la caza que empezara ahí no se vería
-      // (Vera, 28 sep 2026). Se mide la presa a media altura, no la señal.
-      const hidden = forest !== null && forest.hides(camera, {
-        x: at.x, y: groundFloor(at.x, at.z) + ACTOR_VISUAL_HEIGHT / 2, z: at.z, radius: HUNT_SIGN_COVER,
-      });
+      // (Vera, 28 sep 2026). **Entre** quiere decir dentro del bosque: si la
+      // presa está en la pradera y una copa se cruza por delante, esa copa se
+      // atenúa (`revealAssault`, D1) y la señal sigue ahí.
+      const hidden = offeredPrey()?.inForest === true;
       return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, species: huntSighting.species, hidden };
     },
     fordSign(): { x: number; y: number; hidden: boolean } | null {

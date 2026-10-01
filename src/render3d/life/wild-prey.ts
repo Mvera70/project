@@ -50,6 +50,28 @@ function besideForest(state: GameState, width: number, x: number, z: number): bo
 }
 
 /**
+ * RD-0 (30 sep 2026) · Cuántas celdas de pradera libre quiere alrededor la
+ * presa que vive en campo abierto antes de conformarse con menos. La celda más
+ * cercana al árbol de tala era siempre la de la linde, y con la cámara de
+ * apertura las copas tapaban a la perdiz en 2 de 3 valles medidos (semilla 7:
+ * 368 de 368 muestras con la señal apagada; `docs/medidas/
+ * rd0-apertura-visible-2026-09-30.md`, D1): la primera ocasión del mapa no se
+ * podía tocar. TUNE: 3 celdas son unos nueve metros, más que la altura de una
+ * copa vista desde la cámara de juego; se baja de uno en uno si no hay sitio.
+ */
+const OPEN_CLEARANCE = [3, 2, 1, 0] as const;
+
+/** Si hay bosque a `reach` celdas o menos (en cuadrado) de esta celda. */
+function forestWithin(state: GameState, width: number, height: number, x: number, z: number, reach: number): boolean {
+  for (let dz = -reach; dz <= reach; dz += 1) for (let dx = -reach; dx <= reach; dx += 1) {
+    const cx = x + dx, cz = z + dz;
+    if (cx < 0 || cz < 0 || cx >= width || cz >= height) continue;
+    if (state.map.terrain[cz * width + cx] === TERRAIN_CODE.forest) return true;
+  }
+  return false;
+}
+
+/**
  * Dónde puede estar cada presa. RV-3b (30 sep 2026) · **El jabalí, en el
  * bosque o en su linde.** Sólo valía el bosque, y el juego pone un tronco en
  * cada celda de bosque (`solidTerrain`): con ellos no cabe un jabalí de 0,38 en
@@ -74,7 +96,7 @@ export function createWildPrey(
   if (tree === null) return null;
   const tx = tree % land.width, tz = Math.floor(tree / land.width);
   const connected = reachableNear(land, heart);
-  const search = (nearTree: boolean): { x: number; z: number; score: number } | null => {
+  const search = (nearTree: boolean, clearance: number): { x: number; z: number; score: number } | null => {
     let best: { x: number; z: number; score: number } | null = null;
     const minZ = nearTree ? Math.max(1, tz - MAX_RANGE) : 1;
     const maxZ = nearTree ? Math.min(land.height - 2, tz + MAX_RANGE) : land.height - 2;
@@ -84,6 +106,7 @@ export function createWildPrey(
       for (let x = minX; x <= maxX; x += 1) {
         const cell = z * land.width + x;
         if (!preferred(kind, state, land.width, x, z) || connected[cell] !== 1) continue;
+        if (kind !== 'boar' && clearance > 0 && forestWithin(state, land.width, land.height, x, z, clearance)) continue;
         const px = x + 0.5, pz = z + 0.5;
         const d2 = (x - tx) ** 2 + (z - tz) ** 2;
         if (d2 < 4 || (nearTree && d2 > MAX_RANGE * MAX_RANGE)
@@ -98,7 +121,13 @@ export function createWildPrey(
   };
   // El árbol de tala puede quedar en la otra orilla o detrás de una muralla.
   // La caza sigue ocurriendo en suelo accesible y no desaparece en esa aldea.
-  const best = search(true) ?? search(false);
+  // Y la presa de campo abierto, en campo abierto: primero con margen hasta el
+  // bosque, y sólo si no cabe en ninguna parte, pegada a él como antes.
+  let best: { x: number; z: number; score: number } | null = null;
+  for (const clearance of kind === 'boar' ? [0] : OPEN_CLEARANCE) {
+    best = search(true, clearance) ?? search(false, clearance);
+    if (best !== null) break;
+  }
   if (best === null) return null;
   const home = { x: best.x, z: best.z };
   return {
