@@ -224,9 +224,27 @@ describe('B2 · el aviso, y lo que se puede hacer con él', () => {
     const paid = structuredClone(base);
     paid.flags['bought_off'] = paid.tick + TIME.WEEKS_PER_YEAR;
 
-    for (const state of [waited, braced, paid]) run(state, 2, 'prudent', CATALOG);
+    const keysOf = (state: GameState): string[] =>
+      run(state, 2, 'prudent', CATALOG).flatMap((report) => report.entries.map((entry) => entry.templateKey));
+    const waitedKeys = keysOf(waited);
+    keysOf(braced);
+    const paidKeys = keysOf(paid);
 
-    expect(paid.village.silver, 'a quien paga no le saquean').toBe(200);
+    // **No se mira «200 exacto»** (remedido el 1 oct 2026, RD-1: la fundación
+    // mueve la trayectoria y la semana 1442 de la 47 trae al juglar, `fate.minstrel`,
+    // que cobra 2 de plata y no tiene nada que ver con el asalto: 198). Lo que
+    // pagar promete es que la partida da la vuelta sin llevarse nada, y se
+    // mide con lo que el asalto cuenta: ninguna entrada de saqueo, y la plata
+    // que se salva respecto a quien espera —ochenta, la del saqueo— es casi
+    // toda. Los 2 del juglar caben en el margen; el saqueo no.
+    for (const key of ['raid.open', 'raid.walled', 'raid.burnt']) {
+      expect(paidKeys, `a quien paga no le saquean: ${key}`).not.toContain(key);
+    }
+    expect(paidKeys).toContain('raid.turned_back');
+    expect(waitedKeys, 'a quien espera le saquean').toContain('raid.open');
+    expect(paid.village.silver, 'a quien paga no le quitan la plata').toBeGreaterThan(200 - 10);
+    expect(paid.village.silver, 'y conserva lo que el que espera pierde')
+      .toBeGreaterThan(waited.village.silver + 50);
     expect(paid.threat.raids, 'y la partida no cuenta como asalto').toBe(base.threat.raids);
     expect(braced.village.grain, 'prepararse salva grano').toBeGreaterThan(waited.village.grain);
     expect(waited.threat.raids, 'a quien espera le saquean').toBeGreaterThan(base.threat.raids);

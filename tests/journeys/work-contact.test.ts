@@ -15,27 +15,39 @@ const head = (b: { x: number; z: number; facing: number }, clip: 'chop' | 'mine'
   const h = STRIKE_HEAD[clip], c = Math.cos(b.facing), s = Math.sin(b.facing);
   return { x: b.x + h.x * c + h.z * s, z: b.z - h.x * s + h.z * c };
 };
-// **Declarada en rojo, con la propiedad intacta** (`CLAUDE.md`). Ya fallaba en
-// `ee9340e`, la raíz de la historia de este repositorio (3 muestras donde pide
-// 4). Medido el 30 sep 2026 con estas tres villas en el paso 1500: sólo **2
-// muestras** con alguien golpeando —la 23 tiene sus ocho leñadores de camino—,
-// y una de ellas no toca: en la 11 (tick 1008) el leñador 0 se planta a **0,44**
-// del tronco y se queda ahí quieto al menos del paso 1440 al 1510; la 7 da
-// 0,00. **Y no es el respaldo de `offers.ts`**: su plaza (la 0 de
-// `felling:3125`) sí es de contacto, a 0,632 del tronco, que es justo
-// `strikeStand`; es el cuerpo el que se queda a 0,5 de su plaza —a 1,07 del
-// tronco— con `there` ya en verdadero, y el compañero de la plaza 1 igual, al
-// revés. Es un defecto de la capa de vida (la llegada o el empuje entre los
-// dos del corro), sin arreglar en esta tanda. Ni la cota ni el número de
-// muestras se tocan.
+// **Era `it.fails` y vuelve a `it`** (1 oct 2026, RD-1). Declarada en rojo el
+// 30 sep con tres villas fijas (11, 23 y 7 en el paso 1500): sólo 2 muestras
+// golpeando, y en la 11 el leñador a 0,44 del tronco. RD-1 deja planteada la
+// encrucijada del vado desde el tick 0 y mueve la trayectoria de toda villa
+// jugada con `run` desde `foundGame`: esas tres villas dejaron de ser las
+// mismas y la prueba pasó sin que nadie tocara la capa de vida —un `it.fails`
+// verde-por-azar, que es lo que la regla de «no fijar un umbral con una
+// semilla» prohíbe en las dos direcciones—. Remedido en las semillas 1, 2 y 7 a 12 × los
+// tres instantes originales: 18 muestras en las seis que tienen a alguien
+// golpeando, la peor a 0,19 (semilla 1) y el resto a 0,16 o menos; ninguna
+// a 0,44. Por eso la propiedad se mira ahora en seis semillas que tienen
+// muestras en esos instantes (1, 2, 7, 9, 11, 12), con la cota y el número de
+// muestras intactos. Si una trayectoria futura vuelve a dar un cuerpo a más de
+// 0,2 del tronco, esto se pone rojo, que es lo correcto: el defecto de
+// llegada del corro (`offers.ts`) no se ha arreglado, sólo no sale.
+//
+// **Y con RD-5 encima vuelve a salir: `it.fails`, con la propiedad intacta**
+// (`CLAUDE.md`, «cuando algo no llega»). RD-5 (sucesos del caserío y las
+// consecuencias cortas del vado) mueve otra vez la trayectoria y, con las mismas
+// seis semillas y los mismos tres instantes, la semilla 7 en el paso 1500 del
+// instante 1440 deja a un leñador a **0,57** del tronco (el otro, a −0,06; en
+// el instante 1418 de la misma semilla, 0,11 y 0,14); el resto de las muestras
+// de la lista (1, 9 y 12) queda a 0,05 o menos. Son 7 muestras con alguien
+// golpeando, así que el número de muestras se cumple y lo que falla es la cota:
+// es el defecto de llegada del corro de la 11 de antes (0,44), con otra cifra.
+// Cuando una ronda lo arregle, esto se pone rojo y se quita el `.fails`.
 it.fails('la cabeza de la herramienta queda a menos de 0,2 de la superficie que golpea', () => {
   const gaps: number[] = [];
-  for (const [seed, ticks] of [[11, 21 * 48], [23, 30 * 48], [7, 1418]] as const) {
+  for (const seed of [1, 2, 7, 9, 11, 12]) for (const ticks of [21 * 48, 30 * 48, 1418]) {
     const st = foundGame(seed); run(st, ticks, 'prudent', CATALOG);
     const land = solidTerrain(st, () => undefined);
     const life = createVillage(st, st.tick * 7, { land });
     while (life.steps < 1500) life.step();
-    const out: string[] = [];
     for (const d of life.dwellers) {
       const id = d.doing?.place.id ?? '';
       if (!d.doing?.there || d.doing.offer.id !== 'work') continue;
@@ -46,14 +58,13 @@ it.fails('la cabeza de la herramienta queda a menos de 0,2 de la superficie que 
           if (st.map.terrain[c] !== 1 || st.map.forestStock[c]! <= 0) continue;
           const t = scatterTransform(st.map.width, c); gap = Math.min(gap, Math.hypot(p.x - t.x, p.z - t.z) - 0.34 / 3 * t.scale);
         }
-        out.push(`tala gap ${gap.toFixed(2)}`); gaps.push(gap);
+        gaps.push(gap);
       } else if (id.startsWith('quarry:')) {
         const cell = Number(id.split(':')[1]); const cx = cell % st.map.width, cz = Math.floor(cell / st.map.width); const p = head(d.body, 'mine');
         const inside = Math.min(p.x - cx, cx + 1 - p.x, p.z - cz, cz + 1 - p.z);
-        out.push(`pico dentro ${inside.toFixed(2)}`); gaps.push(Math.max(0, -inside));
+        gaps.push(Math.max(0, -inside));
       }
     }
-    console.log(seed, ticks, out.join(' | ') || 'nadie trabajando en tajo/cantera');
   }
   expect(gaps.length).toBeGreaterThanOrEqual(4);
   for (const gap of gaps) expect(gap).toBeLessThan(0.2);
