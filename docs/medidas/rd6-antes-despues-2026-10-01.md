@@ -82,8 +82,8 @@ Con la misma respuesta forzada, RD-5 no empeora nada:
 1. **Acoger al forastero al fundar es caro**, y no viene de RD-6: es así desde
    RD-1. Trae hambre el primer año en la mitad de los valles y acaba 2 de 24 en
    diez años. El texto ya lo avisa («a third mouth before the first harvest»).
-   Con «el caos es el juego» puede quedarse así. Si se siente injusto para la
-   primera elección del juego, hay dos palancas medibles:
+   **Decisión de Vera (1 oct 2026): se queda así.** El coste está avisado y
+   el caos es el juego. Las palancas que no se usaron, por si vuelve:
    - que traiga algo de grano consigo;
    - que la llegada de gente del primer año (`arrival.many`, cuatro bocas en la
      semana 4) espere a la cosecha cuando ya hay una boca de más.
