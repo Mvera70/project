@@ -6,7 +6,17 @@
 import { describe, expect, it } from 'vitest';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { foundGame } from '@engine/found';
-import { welcomeLines } from '@ui/welcome';
+import type { GameState } from '@engine/state';
+import { pendingLines, welcomeLines } from '@ui/welcome';
+
+/**
+ * El parte sin lo pendiente del final. Desde RD-2 (v5.45) el parte acaba con lo
+ * que espera —la pregunta del vado está abierta desde la fundación—, y estas
+ * pruebas, que miran el resumen, lo buscaban en las tres últimas líneas.
+ */
+function told(state: GameState, lines: string[]): string[] {
+  return lines.slice(0, lines.length - pendingLines(state).length);
+}
 
 describe('welcomeLines · §9.2', () => {
   it('trae el titular primero, sin huecos, y el resumen numérico al final', () => {
@@ -18,7 +28,7 @@ describe('welcomeLines · §9.2', () => {
     ];
 
     const digest = welcomeDigest(state, 0);
-    const lines = welcomeLines(state, digest);
+    const lines = told(state, welcomeLines(state, digest));
 
     for (const line of lines) expect(line, line).not.toMatch(/\{\w+\}/);
     expect(lines[0]).toContain('house'); // el titular: el incendio, peso 3
@@ -36,8 +46,8 @@ describe('welcomeLines · §9.2', () => {
     const digest = welcomeDigest(state, 0);
     const lines = welcomeLines(state, digest);
 
-    // Sin titular ni entradas notables: solo las tres líneas del resumen.
-    expect(lines).toHaveLength(3);
+    // Sin titular ni entradas notables: solo las tres líneas del resumen, y lo pendiente.
+    expect(told(state, lines)).toHaveLength(3);
     for (const line of lines) expect(line, line).not.toMatch(/\{\w+\}/);
   });
 
@@ -49,7 +59,7 @@ describe('welcomeLines · §9.2', () => {
       { tick: 10, kind: 'death', templateKey: 'death.old.anon.many', params: { count: 1, people: 22 }, weight: 1 },
     ];
     const digest = welcomeDigest(state, 0);
-    const lines = welcomeLines(state, digest);
+    const lines = told(state, welcomeLines(state, digest));
     const peopleLine = lines.at(-2) as string;
     expect(peopleLine).toMatch(/\b3\b/); // nacidos
     expect(peopleLine).toMatch(/\b1\b/); // muertos
@@ -62,7 +72,7 @@ describe('welcomeLines · cuánto tiempo se ha perdido', () => {
     // semanas. «960 weeks passed» es un número que nadie puede sentir.
     const state = foundGame(7);
     state.tick = 960;
-    const lines = welcomeLines(state, welcomeDigest(state, 0));
+    const lines = told(state, welcomeLines(state, welcomeDigest(state, 0)));
     const time = lines.at(-3) ?? '';
     expect(time).toMatch(/\b20 years\b/);
     expect(time).not.toMatch(/weeks/);
@@ -73,7 +83,7 @@ describe('welcomeLines · cuánto tiempo se ha perdido', () => {
     // año pierde más de lo que aclara, y las semanas se sienten bien.
     const state = foundGame(7);
     state.tick = 30;
-    const lines = welcomeLines(state, welcomeDigest(state, 0));
+    const lines = told(state, welcomeLines(state, welcomeDigest(state, 0)));
     expect(lines.at(-3) ?? '').toMatch(/\b30 weeks\b/);
   });
 });
