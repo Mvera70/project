@@ -1,5 +1,18 @@
 # The Valley — Registro de cambios
 
+## v5.55 · 2 oct 2026 · Las piedras de la calzada, en grupos de orilla
+
+Vera, sobre los cantos de v5.54: «haz grupos más realistas, típicas del río,
+algunas más grandes, otras más pequeñas; cuidado con el rendimiento». Fuera el
+peñasco de Astra, que es anguloso: un canto rodado propio (icosaedro de 80
+caras, vértices movidos un poco), aplastado por piedra. En una celda de cada
+tres, un canto grande (0,2–0,38 de celda), una mediana arrimada y de dos a
+cinco pequeñas **amontonadas hacia un lado**, casi tocándose (en anillo
+alrededor del grande salía una flor); en otras, un guijarro suelto. Cada
+piedra con su tono (`setColorAt`). Sigue siendo una malla instanciada, una
+llamada de dibujo, y la prueba pone el techo de triángulos en 40 000.
+Captura: `docs/medidas/k-img/piedras-grupos.png`.
+
 ## v5.54 · 2 oct 2026 · Lo que Vera vio en la tablet: laderas, piedras, crónica y encrucijada
 
 Cuatro cosas que Vera marcó jugando la versión publicada, en la tablet.
