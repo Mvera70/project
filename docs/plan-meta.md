@@ -260,7 +260,7 @@ una mezcla de city builder de recursos, defensa de la aldea, juego narrativo y
 roguelike**. Cada partida enseña algo, y quien ya sabe llega a una aldea estable
 —más fácil de mantener, entre comillas— y su dificultad pasa a ser defenderla
 bien. «Hay un montón de cosas que implementar que se deben ir poco a poco.»
-Esto no es un brief: es el rumbo contra el que se ordenan las rondas que
+Y lo de roguelike no va al pie de la letra (ver K7). Esto no es un brief: es el rumbo contra el que se ordenan las rondas que
 vengan. Cada fila se abre con su medida, como todas.
 
 | Punto | Qué pidió | Lo que ya se sabe | Prioridad | Dificultad |
@@ -271,7 +271,7 @@ vengan. Cada fila se abre con su medida, como todas.
 | **K4 · La era siguiente: metales** | **Cobre, plata, oro**, y ampliar mucho más | La plata hoy es moneda del camino (M-0), no mineral. Necesita veta en el mapa (la montaña de §7.15), oficio y su cadena | P2 | Alta |
 | **K5 · Más de la caza y la recolección** | **Cuero** de la caza, **lino**, **recolección de plantas** | La caza ya existe con señal en el mapa (RD-1/D1) y paga carne; las setas y la miel salen como sucesos (RD-5). Falta que dejen materia que se use | P2 | Media |
 | **K6 · Las necesidades de una ciudad** | **Medicina, construcción, educación, sanidad, música**, «de todo» | La curandera y la peste existen como sucesos; la capilla y la fe como stat. Cada una sería un oficio con su edificio y su efecto medible | P3, de una en una | Alta |
-| **K7 · El roguelike** | Cada intento enseña; quien ya sabe llega a una aldea estable y su reto pasa a ser la defensa | Hoy hay `foundSuccessor` (un valle nuevo tras el final) y el archivo de partidas. Falta lo que se lleva de una partida a otra —conocimiento, desbloqueos o el valle vecino— y decidir qué es: del dueño | P2 | Alta |
+| **K7 · Aprender a llevar una aldea (lo «roguelike», no al pie de la letra)** | Matiz de Vera, el mismo día: **no es un roguelike literal**. No hay partidas cortas y durísimas que desbloquean mejoras. La idea es que vas fundando aldeas, **algunas mueren** (no siempre), **aprendes** y poco a poco llegas a «la aldea buena». Habrá mecánicas que aprieten, y queda por decidir si esa aldea buena también puede caer en un asalto: «ya veremos, poco a poco» | Lo que se aprende es **del jugador**, no un sistema de mejoras. Ya existen `foundSuccessor` (un valle nuevo tras el final) y el archivo de partidas. Lo que falta es que morir tenga causas que se entiendan y que la crónica las cuente, para que la siguiente partida se juegue mejor | P2 | Media |
 
 **El orden que propongo**, con el porqué: primero **K1 + K2 + K3 juntos**, porque son
 la misma mecánica vista desde tres lados (el bosque que se gasta y se mueve es
@@ -368,7 +368,8 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
 - **Cuánto hay que nivelar** (G): del dueño, con las medidas delante.
 - **Qué encargar a Blender y en qué orden** (E): del dueño con la sesión de
   arte; este plan sólo dice qué hace falta y para cuándo.
-- **Qué se lleva de una partida a la siguiente** (K7, el roguelike) y **qué
+- **Si la aldea buena puede caer en un asalto** y **qué mecánicas aprietan**
+  (K7), y **qué
   metales y oficios entran, y en qué orden** (K4, K6): del dueño.
 - **Qué es el anillo final en detalle** (A3b): aclarado que existe y cuándo
   llega —al techo de crecimiento del valle—, pero no cómo se ve ni cómo se
