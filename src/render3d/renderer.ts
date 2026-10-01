@@ -793,6 +793,8 @@ export async function createGraphicsRenderer(
    * vuelva a cerrarlo (`LiveDeal`).
    */
   let liveDeal: LiveDeal | null = null;
+  /** RD-4 · el niño que el jugador ya mandó buscar: no vuelve a la linde en los días que se rehacen. */
+  let lostFound: { villager: VillagerId; tick: number } | null = null;
   let observedFrame: GraphicsFrame | null = null;
   let sampling = false;
   let observing = false;
@@ -908,13 +910,20 @@ export async function createGraphicsRenderer(
       });
       return targets;
     }
+    // RD-4 · el niño perdido espera en la linde con su señal: las copas que lo
+    // tapan se atenúan, como las de la caza (D1), o la señal nacía apagada.
+    const lost = scene.lostChild;
+    const lostTargets: ForestRevealTarget[] = lost !== null && lost.phase === 'lost' && lost.searcher === null ? [{
+      x: lost.body.x, y: groundFloor(lost.body.x, lost.body.z) + ACTOR_VISUAL_HEIGHT / 2,
+      z: lost.body.z, radius: ACTOR_VISUAL_HEIGHT,
+    }] : [];
     const gate = scene.defence.gate;
-    if (gate === null) return [];
+    if (gate === null) return lostTargets;
     const active = scene.raiders.filter(raider => raider.phase !== 'down'
       && raider.phase !== 'gone' && raider.phase !== 'leaving');
     // El portón puede conservar su parte después de caer el último atacante.
     // Sin un cuerpo hostil activo ya no hay encuentro que revelar.
-    if (active.length === 0) return [];
+    if (active.length === 0) return lostTargets;
     const targets: ForestRevealTarget[] = [{
       x: gate.at.x,
       y: groundFloor(gate.at.x, gate.at.z) + GATE_REVEAL_RADIUS / 2,
@@ -938,7 +947,7 @@ export async function createGraphicsRenderer(
       z,
       radius,
     });
-    return targets;
+    return [...targets, ...lostTargets];
   }
 
   /**
@@ -2162,6 +2171,7 @@ export async function createGraphicsRenderer(
           ...(forcedVisits === null ? {} : { visits: forcedVisits, dealt: forcedDeal }),
           fordAnswer: shown.crossroad?.templateId === FOUNDING_CROSSROAD.id ? fordAnswer : null,
           liveDeal,
+          lostFound,
           ...(heldSky === null ? {} : { sky: heldSky }),
           ...(battleChoice === null ? {} : { battle: {
             raiders: battleChoice.raiders, garrison: garrisonAs(shown, battleChoice.hands, battleChoice.arm),
@@ -2825,6 +2835,24 @@ export async function createGraphicsRenderer(
         x: at.x, y: groundFloor(at.x, at.z) + ACTOR_VISUAL_HEIGHT / 2, z: at.z, radius: HUNT_SIGN_COVER,
       });
       return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, hidden };
+    },
+    lostSign(): { x: number; y: number; hidden: boolean } | null {
+      const child = life?.lostChild ?? null;
+      if (child === null || child.phase !== 'lost' || child.searcher !== null) return null;
+      const at = child.body;
+      const point = new Vector3(at.x, groundFloor(at.x, at.z) + HUNT_SIGN_LIFT + ACTOR_VISUAL_HEIGHT * 0.45, at.z).project(camera);
+      if (point.z > 1 || point.x < -1.05 || point.x > 1.05 || point.y < -1.05 || point.y > 1.05) return null;
+      // Está fuera del bosque (`lost-child.ts`) y las copas que se interponen
+      // se atenúan (`encounterTargets`): la señal no se apaga nunca.
+      return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, hidden: false };
+    },
+    searchChild(tick: number): { child: VillagerId; searcher: VillagerId } | null {
+      const child = life?.lostChild ?? null;
+      if (child === null) return null;
+      const searcher = life!.searchChild();
+      if (searcher === null) return null;
+      lostFound = { villager: child.villager, tick };
+      return { child: child.villager, searcher };
     },
     dealVisit(kind: HappeningId, tick: number): boolean {
       if (life === null || !life.dealVisit(kind)) return false;

@@ -282,6 +282,10 @@ export interface GraphicsRenderer {
   visitSign(kind: HappeningId): { x: number; y: number; hidden: boolean } | null;
   /** RD-4 · Cerrar el trato en la escena, la semana `tick`, antes de que el motor lo apunte. */
   dealVisit(kind: HappeningId, tick: number): boolean;
+  /** RD-4 · Dónde va la señal del niño perdido —mientras espera en la linde—, o `null`. */
+  lostSign(): { x: number; y: number; hidden: boolean } | null;
+  /** RD-4 · Mandar a buscarlo, la semana `tick`: quién es y quién va, o `null`. */
+  searchChild(tick: number): { child: VillagerId; searcher: VillagerId } | null;
   /** Esquema 12 · los «+1» y «−N» de la leñera, proyectados; `age` va de 0 a 1. */
   woodGains(): readonly { id: number; count: number; x: number; y: number; age: number; icon?: 'logs' | 'wheat' }[];
   /** Parte de la cacería, entregado una sola vez al motor. */

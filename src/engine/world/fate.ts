@@ -472,8 +472,14 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
     case 'child_lost': {
       moraleBy(state, FATE.CHILD_MORALE);
       const child = weighted(state.rng, 'fate', children(state), () => 1);
-      if (child.named) who.push(child.id);
-      key = child.named ? 'fate.child_lost.named' : 'fate.child_lost';
+      // RD-4 · el id va siempre: la capa de vida tiene que saber a quién
+      // dejar en la linde. Los enlaces de la crónica emparejan `who` con los
+      // nombres de `params`, así que sin `A` no se enlaza nada.
+      who.push(child.id);
+      // Y la línea ya no lo encuentra: lo encuentra la semana siguiente quien
+      // fue a buscarlo, o el valle al anochecer (`world/lost-child.ts`). Las
+      // claves viejas se quedan en el banco para las partidas guardadas.
+      key = child.named ? 'fate.child_missing.named' : 'fate.child_missing';
       if (child.named) params['A'] = child.name;
       visible.push({ k: 'gather', where: 'ford', days: 1 });
       break;

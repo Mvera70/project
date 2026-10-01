@@ -636,6 +636,9 @@ export const FATE = {
   BEAR_MORALE: -3,
   // TUNE: un niño perdido y encontrado, y un forastero que pasa.
   CHILD_MORALE: -3,
+  // TUNE (RD-4): lo que vuelve si el jugador manda a buscarlo; sin búsqueda
+  // el valle lo encuentra igual al anochecer y el ánimo perdido no vuelve.
+  CHILD_FOUND_MORALE: 3,
   STRANGER_MORALE: 1,
   // TUNE: los que llegan por el camino (28 sep 2026). Escala: una boda da 5 de
   // ánimo y el forastero 1; el buhonero se lleva 80 de leña por 6 de plata.

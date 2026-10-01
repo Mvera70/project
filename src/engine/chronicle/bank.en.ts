@@ -966,6 +966,33 @@ export const BANK: Record<string, string[]> = {
     '{A} went missing for an afternoon that {season}. Found by the ford, cold and whole.',
     '{A} was lost and found in year {year}, and the whole village out along the river looking.',
   ],
+  // RD-4 · el niño perdido, en dos tiempos: se pierde la semana del suceso, y
+  // la siguiente lo trae quien fue a buscarlo o lo encuentra el valle.
+  'fate.child_missing': [
+    'A child wandered off toward the wood in the {season} of year {year} and did not come back for supper.',
+    'One of the children was missing at the wood edge that {season}.',
+    'A child gone from the houses in year {year}, last seen near the trees.',
+  ],
+  'fate.child_missing.named': [
+    '{A} wandered off toward the wood in the {season} of year {year} and did not come back for supper.',
+    '{A} was missing at the wood edge that {season}.',
+    '{A} gone from the houses in year {year}, last seen near the trees.',
+  ],
+  'lost.found_by.named': [
+    '{A} went into the trees for the lost child and carried it home before dark.',
+    'It was {A} who found the child at the wood edge that {season}, and the valley did not forget it.',
+    '{A} brought the lost child back on one arm in year {year}. The mother would not let go of either of them.',
+  ],
+  'lost.found_by': [
+    'A neighbour went into the trees for the lost child and carried it home before dark.',
+    'Someone found the child at the wood edge that {season} and walked it home by the hand.',
+    'The lost child came back on a neighbour\'s shoulders in year {year}.',
+  ],
+  'lost.found_at_dusk': [
+    'The lost child was found at dusk by the ford, cold and whole, after the whole valley had searched the river.',
+    'They found the child at nightfall that {season}, asleep under the alders. Nobody slept much.',
+    'Found by the ford at last, in year {year}, cold and frightened. The valley had looked everywhere else first.',
+  ],
   'fate.stranger_passes': [
     'A stranger came through the valley in {season}, stayed one night, and left {silver} silver for the bed.',
     'Someone passed along the road in the {season} of year {year}, stopped at the square, paid {silver} silver, and went on.',
@@ -2559,6 +2586,7 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
 /** Stable interface copy: unlike chronicle prose, labels do not vary by seed. */
 export const UI_BANK: Record<string, string> = {
   'ford.sign': 'Someone is waiting at the ford',
+  'lost.sign': 'A child is lost at the wood edge: send someone',
   'hunt.sign.partridge': 'A partridge: go hunting',
   'hunt.sign.rabbit': 'A rabbit: go hunting',
   'hunt.sign.deer': 'A deer: go hunting',

@@ -58,6 +58,7 @@ import {
 } from './raiders';
 import type { HappeningId } from '@engine/state';
 import { createTravellers, returningToday, stepTraveller, travelling, type Traveller } from './expeditions';
+import { bringHome, createLostChild, lostChildToday, lostInSight, stepLostChild, type LostChild } from './lost-child';
 import { answerFordStranger, arrivingToday, beastOf, createVisitors, stallOf, stallSiteOf, stayForGoods, stepVisitor, visiting, visitsToday, type LiveDeal, type Visitor } from './visitors';
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
@@ -386,6 +387,13 @@ export interface Village {
    * hoy no hay nadie de esa visita esperando.
    */
   dealVisit(kind: HappeningId): boolean;
+  /** RD-4 · el niño perdido de hoy, si lo hay (`lost-child.ts`). */
+  readonly lostChild: LostChild | null;
+  /**
+   * RD-4 · mandar a buscarlo: el adulto libre más cercano va a por él desde
+   * donde esté. Devuelve quién va, o `null` si no hay a quién mandar.
+   */
+  searchChild(): VillagerId | null;
   /**
    * §7.15 · Los que salen de expedición, están en el bosque o vuelven hoy
    * (`expeditions.ts`). Son vecinos de verdad —llevan su `VillagerId`— pero
@@ -514,6 +522,8 @@ export interface DayOptions {
   readonly fordAnswer?: 'in' | 'out' | null;
   /** RD-4 · el trato que el jugador cerró con el vendedor delante (`LiveDeal`). */
   readonly liveDeal?: LiveDeal | null;
+  /** RD-4 · el niño que el jugador ya mandó buscar esta semana: no vuelve a la linde. */
+  readonly lostFound?: { readonly villager: VillagerId; readonly tick: number } | null;
   /** Gancho de observación: el cielo de hoy, en vez del de `skyAt` (`window.__valleyHoldSky`). */
   readonly sky?: SkyKind;
   /**
@@ -969,8 +979,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // Y los que vuelven hoy de una expedición: entran andando por donde se
   // fueron (`expeditions.ts`), y mañana ya están en casa.
   const returning = returningToday(state, day);
+  // RD-4 · y el niño perdido: hoy está en la linde (`lost-child.ts`), no en casa.
+  const lostToday = lostChildToday(state, day, options.lostFound ?? null);
+  const lost: LostChild | null = lostToday === null ? null : createLostChild(state, land, heart, lostToday, seed);
   const alive = state.people.villagers.filter((v) => v.diedTick === null && v.leftTick === null
-    && !arriving.has(v.id) && !returning.has(v.id));
+    && !arriving.has(v.id) && !returning.has(v.id) && v.id !== lost?.villager);
   alive.forEach((villager, n) => {
     // Se le deja junto a un sitio de la aldea, repartidos.
     const homeBuilding = villager.homeId === null ? undefined
@@ -1609,6 +1622,29 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         answerFordStranger(visitor, land, { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 }, answer, steps);
       }
     },
+    get lostChild(): LostChild | null { return lost; },
+    searchChild(): VillagerId | null {
+      if (lost === null || lost.phase !== 'lost' || lost.searcher !== null) return null;
+      const at = { x: lost.body.x, z: lost.body.z };
+      const offer = placedOffer(OFFERS['pay']!, at, land);
+      if (offer === null) return null;
+      const free = dwellers.filter((one) => one.ageGroup === undefined && !indoors(one) && one.flight === null
+        && one.scene === null && one.holding === null && !isPost(one.dayPlan?.job?.place ?? '')
+        && !preparationByVillager.has(one.villager))
+        .sort((a, b) => gap(a.body, at) - gap(b.body, at) || a.villager - b.villager);
+      for (const candidate of free.slice(0, 4)) {
+        const route = pathTo(land, candidate.body, seatAt(offer, 0), candidate.body.radius);
+        if (route === null) continue;
+        lost.searcher = candidate.villager;
+        candidate.doing = {
+          place: { id: `search:${lost.villager}`, at, offers: [offer] }, offer, route,
+          seat: 0, since: steps, until: steps, there: false,
+        };
+        candidate.rethinkAt = steps + GIVE_UP;
+        return candidate.villager;
+      }
+      return null;
+    },
     dealVisit(kind: HappeningId): boolean {
       // RD-4 · el trato se cierra con él delante: la aldea sale ahora a
       // llevarle la leña o el grano, o a pagarle la vaca o la sal, desde donde
@@ -1743,7 +1779,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       }), ...raiders
         .filter((raider) => raider.phase !== 'gone' && raider.phase !== 'down')
         .map((raider) => raider.body), ...visitors.filter(visiting).map((visitor) => visitor.body),
-        ...travellers.filter(travelling).map((traveller) => traveller.body)];
+        ...travellers.filter(travelling).map((traveller) => traveller.body),
+        ...(lost !== null && lostInSight(lost) ? [lost.body] : [])];
       const taken = seats();
       // Se va actualizando conforme la gente decide: ver el comentario de abajo.
       around.rebuild(outside());
@@ -2277,6 +2314,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             }
             dweller.holding = null;
           }
+          // RD-4 · quien fue a buscar al niño perdido ha llegado: vuelven.
+          if (dweller.doing.place.id.startsWith('search:') && lost !== null) bringHome(lost, land);
           // El vecino que ha ido a pagar al tratante o al salinero acaba de
           // contar: pasan las monedas a la mano del que vende.
           if (dweller.doing.offer.id === 'pay' && dweller.doing.place.id.startsWith('pay:')) {
@@ -2738,6 +2777,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // Y los del camino, a su hora.
       for (const visitor of visitors) stepVisitor(visitor, land, phase, steps);
       for (const traveller of travellers) stepTraveller(traveller, land, phase, steps);
+      if (lost !== null) stepLostChild(lost, land, phase);
       // Al tratante y al salinero, que venden a la aldea, les paga un vecino:
       // el adulto libre más cercano va a él cuando ya está en la plaza, habla
       // un momento y, al terminar, pasan las monedas.

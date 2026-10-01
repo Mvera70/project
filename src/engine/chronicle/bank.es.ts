@@ -9,6 +9,7 @@ export const UI_BANK_ES: Record<string, string> = {
   'hunt.weapon.bow': 'Arco',
   'hunt.weapon.spear': 'Lanza',
   'ford.sign': 'Alguien espera en el vado',
+  'lost.sign': 'Un niño perdido en la linde: manda a alguien',
   'hunt.sign.partridge': 'Una perdiz: ir de caza',
   'hunt.sign.rabbit': 'Un conejo: ir de caza',
   'hunt.sign.deer': 'Un ciervo: ir de caza',

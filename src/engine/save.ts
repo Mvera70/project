@@ -145,6 +145,10 @@ function actRecord(value: unknown): boolean {
   if (act['kind'] === 'battle') {
     return tickValue(act['slain']) && tickValue(act['lost']) && typeof act['breached'] === 'boolean';
   }
+  // RD-4 · ir a buscar al niño perdido.
+  if (act['kind'] === 'search') {
+    return tickValue(act['sourceTick']) && tickValue(act['child']) && tickValue(act['searcher']);
+  }
   // §7.15 · mandar gente a una misión.
   if (act['kind'] === 'expedition') {
     return (MISSION_IDS as readonly string[]).includes(act['mission'] as string) && tickValue(act['count']);

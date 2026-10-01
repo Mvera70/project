@@ -404,3 +404,19 @@ Líneas nuevas de crónica que hoy caen en un grabado prestado
 | `expedition-mountain.png` | `expedition.wolf_den.*`, `expedition.high_seam.*`, `expedition.*.mountain` | Una fila de tres subiendo una ladera de roca con cuerda, picos y lanzas |
 | `expedition-road.png` | `expedition.market.*`, `expedition.*.road` | Dos con fardos a la espalda bajando el camino del desfiladero |
 | `expedition-lost.png` | `expedition.lost.*` | Una cesta volcada en el suelo del bosque, sin nadie |
+
+## RD-4 · El niño perdido, en dos tiempos (1 oct 2026) — **pedidas por la regla de la crónica**
+
+El suceso `child_lost` ya no se pierde y se encuentra en la misma línea: la
+semana del suceso el niño espera en la linde con una señal encima, y la
+siguiente lo trae quien fue a buscarlo o lo encuentra el valle al anochecer
+(`world/lost-child.ts`). Mientras no lleguen, las tres claves nuevas usan
+`child.png`, y las de la semana del suceso (`fate.child_missing*`) siguen con
+`child.png` por el registro del suceso. 640 × 512, por `public/ui/art/index.json`
+y `src/ui/redesign/chronicle-art.ts` (`HAPPENING_KEY_ART`).
+
+| Fichero | Clave | Qué tiene que enseñar |
+|---|---|---|
+| `child-missing.png` | `fate.child_missing`, `fate.child_missing.named` | **La linde vacía a la hora de cenar.** Los primeros troncos del bosque con la luz baja, un zapato pequeño o un juguete de madera en la hierba, y al fondo, lejos, las casas con humo |
+| `child-found.png` | `lost.found_by`, `lost.found_by.named` | **Uno solo que vuelve con el niño.** Un adulto saliendo de entre los árboles con el crío a hombros o de la mano, la última luz detrás; nadie más en el cuadro |
+| `child-dusk.png` | `lost.found_at_dusk` | **El valle entero buscando.** Antorchas a lo largo de la orilla del vado al anochecer, siluetas en fila, y una de ellas agachada junto a un bulto pequeño bajo los alisos |

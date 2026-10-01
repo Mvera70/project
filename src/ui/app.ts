@@ -718,6 +718,37 @@ export function boot(
     visitSign.tabIndex = at.hidden ? -1 : 0;
   };
 
+  // RD-4 (Vera, 1 oct 2026) · **El niño perdido, como señal en el mapa.** Los
+  // dos primeros días de la semana del suceso el niño espera en la linde con
+  // una señal encima; tocarla manda al adulto libre más cercano a por él, desde
+  // donde esté, y el motor lo apunta al cerrar la semana (`search`, §2.60). Sin
+  // toque, el valle lo encuentra al anochecer, como antes.
+  const lostSign = document.createElement('button');
+  lostSign.type = 'button';
+  lostSign.className = 'hunt-sign lost-sign';
+  lostSign.hidden = true;
+  lostSign.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="#people"/></svg>';
+  lostSign.setAttribute('aria-label', renderUiText('lost.sign'));
+  lostSign.addEventListener('click', () => {
+    if (lostSign.classList.contains('hunt-sign--covered') || backend.live.kind !== 'pilot3d') return;
+    if (pendingActs.some((act) => act.kind === 'search')) return;
+    const sent = backend.live.searchChild(state.tick);
+    if (sent === null) return;
+    pendingActs.push({ kind: 'search', sourceTick: state.tick, child: sent.child, searcher: sent.searcher });
+    lostSign.hidden = true;
+  });
+  const placeLostSign = (): void => {
+    const open = state.ended === null && currentRoute.kind === 'valley'
+      && !document.documentElement.classList.contains('crossroad-open');
+    const at = open && backend.live.kind === 'pilot3d' ? backend.live.lostSign() : null;
+    lostSign.hidden = at === null;
+    if (at === null) return;
+    const box = backend.live.surface.getBoundingClientRect();
+    lostSign.style.transform = `translate(${Math.round(box.left + at.x)}px, ${Math.round(box.top + at.y)}px) translate(-50%, -50%)`;
+    lostSign.classList.toggle('hunt-sign--covered', at.hidden);
+    lostSign.tabIndex = at.hidden ? -1 : 0;
+  };
+
   const hudRight = document.createElement('div');
   // UI-V2b · la segunda clase es la que sube el rincón por encima de la
   // bandeja (`skin.css`): la regla de `index.html` lo dejaba a 60 px del
@@ -728,7 +759,7 @@ export function boot(
   cameraControls = mountCameraControls(() => backend.live, () => backend.live.surface);
   hudRight.append(bareToggle, soundToggle, hud.speedControls, hud.speedBadge);
 
-  root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, fordSign, visitSign, woodGains.element, shell.element);
+  root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, fordSign, visitSign, lostSign, woodGains.element, shell.element);
 
   /**
    * **UI-R1 · la pila del mensaje, y el fallo concreto que esta ronda tiene
@@ -1158,6 +1189,7 @@ export function boot(
     placeHuntSign();
     placeFordSign();
     placeVisitSign();
+    placeLostSign();
     woodGains.paint(
       currentRoute.kind === 'valley' && backend.live.kind === 'pilot3d' ? backend.live.woodGains() : [],
       backend.live.kind === 'pilot3d' ? backend.live.surface.getBoundingClientRect() : null,

@@ -12,7 +12,7 @@
 
 import { readGraphicsSettings } from './graphics-settings';
 import { WORLD } from '@engine/balance';
-import type { GameState, HappeningId } from '@engine/state';
+import type { GameState, HappeningId, VillagerId } from '@engine/state';
 import type { HuntSpecies, HuntWeapon } from '@engine/world/hunting';
 import type { ActorDoing, BattleReport, GraphicsStats } from '../render3d/contracts';
 import type { InspectTarget } from './inspect';
@@ -73,6 +73,10 @@ interface ValleyBackend {
   visitSign(kind: HappeningId): { x: number; y: number; hidden: boolean } | null;
   /** RD-4 · Cerrar el trato en la escena: la aldea sale a llevarle lo suyo. */
   dealVisit(kind: HappeningId, tick: number): boolean;
+  /** RD-4 · Dónde va la señal del niño perdido, o `null`. */
+  lostSign(): { x: number; y: number; hidden: boolean } | null;
+  /** RD-4 · Mandar a buscarlo: quién es y quién va, o `null`. */
+  searchChild(tick: number): { child: VillagerId; searcher: VillagerId } | null;
   /** Esquema 12 · los «+1» y «−N» de la leñera, proyectados; `age` va de 0 a 1. */
   woodGains(): readonly { id: number; count: number; x: number; y: number; age: number; icon?: 'logs' | 'wheat' }[];
   /** Completed hunt report, consumed once by the UI and forwarded to the engine. */
@@ -196,6 +200,8 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     answerFord() { /* Canvas: sin escena, la tarjeta basta. */ },
     visitSign() { return null; },
     dealVisit() { return false; },
+    lostSign() { return null; },
+    searchChild() { return null; },
     woodGains() { return []; },
     hunt() { return null; },
     siege() { return null; },
@@ -432,6 +438,8 @@ export function attachBackend(
         answerFord(optionId) { renderer.answerFord(optionId); },
         visitSign(kind) { return renderer.visitSign(kind); },
         dealVisit(kind, tick) { return renderer.dealVisit(kind, tick); },
+        lostSign() { return renderer.lostSign(); },
+        searchChild(tick) { return renderer.searchChild(tick); },
         woodGains() { return renderer.woodGains(); },
         hunt() { return renderer.hunt(); },
         siege() { return renderer.siege(); },
