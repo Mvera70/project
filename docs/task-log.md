@@ -1,5 +1,39 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · Piedras de orilla, zorro, encrucijada a 600 (v5.55) · y dos abiertos
+
+Hecho: las piedras de la calzada en grupos de canto rodado; el zorro vuelve
+andando a su linde al amanecer; la hoja de la encrucijada a 600 px, centrada;
+el encargo de sus quince viñetas a Codex (`docs/encargos/ilustraciones-encrucijada.md`);
+las tomas de los plantones y del frente de tala lejano. En vuelo, en otra
+sesión: mudar las pruebas lentas de la suite rápida a las jornadas (rama
+`claude/pruebas-lentas-a-jornadas`, v5.56).
+
+**Abierto, para otra sesión: el camino de la garganta flota** (Vera, 2 oct:
+«el camino sigue flotando… no sé cómo llegan las visitas al valle»). Medido,
+semillas 7/11/23: del 61 al 96 % de los vértices de la cinta más de 0,35
+celdas por encima de la malla que se dibuja, el peor a 22 celdas. Tres causas,
+de menos a más honda:
+
+1. La cota se lee de la fórmula `ridgeAt`, pero la malla de la sierra lleva un
+   vértice cada 2–4 celdas, movidos de su nudo: entre vértices no es la
+   fórmula. Leer la malla dibujada baja el peor caso de 22 a 4–10 celdas.
+2. `ROAD_GRADE` sólo sube: una muestra que roza un cortado levanta una
+   calzada en rampa de decenas de celdas. Quitarla rompe «la senda no tiene
+   muros» (`valley-road`): la cinta trepa 6,5 celdas entre dos muestras.
+3. **La de fondo:** fuera del mapa el suelo del cañón sigue el eje del valle
+   (`valleyShoulder`, recto), pero el río se curva hasta 2,8 celdas
+   (`riverSection`); la senda, que va en seco por fuera del río, no cabe en el
+   fondo y sube por la pared. Hay que trazar la senda por el fondo real (que
+   `gorgeRoadPaths` mire `ridgeAt` fuera del mapa, como mira el suelo dentro)
+   o que el cañón siga al río. Densificar la malla a paso 1 en el pasillo no
+   sirve: de 18 000 a 31 600 triángulos y flotaba más.
+
+**Abierto, para otra sesión: el valle es un rectángulo** («no es muy
+cuadrado, debería tener una forma más natural, y zonas muy desaprovechadas»).
+Es el corazón productivo de 36 × 56 del mapa de 72 × 112: cambio del motor, mueve
+todas las trayectorias. Va con el camino, porque los dos tocan el eje y la garganta.
+
 ## 2 oct 2026 · Lo que Vera vio en la tablet (v5.54)
 
 Hecho y en PR: las laderas sin el suelo asomando por la piel, las piedras de la
