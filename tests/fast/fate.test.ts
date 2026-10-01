@@ -121,10 +121,10 @@ describe('los sucesos del valle · R-1', () => {
 
   it('todo lo que pasa se cuenta, con sus palabras en el banco', () => {
     for (const state of worlds) {
-      // RD-4 · el niño perdido se cierra la semana siguiente (`lost.*`,
+      // RD-4 · el niño perdido se cierra la semana siguiente (`child.found*`,
       // `world/lost-child.ts`): es el segundo tiempo del mismo suceso, no otro.
       const told = state.chronicle.filter((e) => e.kind === 'happening');
-      expect(told.filter((e) => !e.templateKey.startsWith('lost.')).length).toBe(state.happenings.length);
+      expect(told.filter((e) => !e.templateKey.startsWith('child.found')).length).toBe(state.happenings.length);
       for (const entry of told) {
         const texts = BANK[entry.templateKey];
         expect(texts, entry.templateKey).toBeDefined();

@@ -117,9 +117,9 @@ const RAID_ART: Readonly<Record<string, string>> = {
  * `docs/plan-arte-pendiente.md` («child-found.png», «child-dusk.png»).
  */
 const HAPPENING_KEY_ART: Readonly<Record<string, string>> = {
-  'lost.found_by': 'child.png',
-  'lost.found_by.named': 'child.png',
-  'lost.found_at_dusk': 'child.png',
+  'child.found_by': 'child.png',
+  'child.found_by.named': 'child.png',
+  'child.found_at_dusk': 'child.png',
 };
 
 /** A1, A2, A4 y C3 · obras que antes compartían el grabado genérico. */

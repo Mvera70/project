@@ -978,17 +978,17 @@ export const BANK: Record<string, string[]> = {
     '{A} was missing at the wood edge that {season}.',
     '{A} gone from the houses in year {year}, last seen near the trees.',
   ],
-  'lost.found_by.named': [
+  'child.found_by.named': [
     '{A} went into the trees for the lost child and carried it home before dark.',
     'It was {A} who found the child at the wood edge that {season}, and the valley did not forget it.',
     '{A} brought the lost child back on one arm in year {year}. The mother would not let go of either of them.',
   ],
-  'lost.found_by': [
+  'child.found_by': [
     'A neighbour went into the trees for the lost child and carried it home before dark.',
     'Someone found the child at the wood edge that {season} and walked it home by the hand.',
     'The lost child came back on a neighbour\'s shoulders in year {year}.',
   ],
-  'lost.found_at_dusk': [
+  'child.found_at_dusk': [
     'The lost child was found at dusk by the ford, cold and whole, after the whole valley had searched the river.',
     'They found the child at nightfall that {season}, asleep under the alders. Nobody slept much.',
     'Found by the ford in year {year}, cold and frightened. The valley had looked everywhere else first.',

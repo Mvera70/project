@@ -50,10 +50,10 @@ export function settleLostChild(
     adjustOpinion(state, act.child, act.searcher, OPINION.WAS_SAVED);
     return {
       tick: state.tick, kind: 'happening',
-      templateKey: searcher.named ? 'lost.found_by.named' : 'lost.found_by',
+      templateKey: searcher.named ? 'child.found_by.named' : 'child.found_by',
       params: { season, year, ...(searcher.named ? { A: searcher.name } : {}) },
       weight: 2,
     };
   }
-  return { tick: state.tick, kind: 'happening', templateKey: 'lost.found_at_dusk', params: { season, year }, weight: 1 };
+  return { tick: state.tick, kind: 'happening', templateKey: 'child.found_at_dusk', params: { season, year }, weight: 1 };
 }
