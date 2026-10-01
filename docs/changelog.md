@@ -1,5 +1,18 @@
 # The Valley — Registro de cambios
 
+## v5.45 · 30 sep 2026 · RD-2: volver a la velocidad que se dejó, y un parte que dice lo que espera
+
+Decisión de Vera: descanso **A′**, automático al ocultar o cerrar, a la
+velocidad que se dejó. La pestaña oculta ya recuperaba a esa velocidad; la
+apertura en frío recuperaba a ×1 porque el guardado no la llevaba (deuda de
+§13.2), y la pausa no sobrevivía a cerrar. Ahora `SaveFile.speed` (opcional,
+del fichero y no del estado; sin subir el esquema) viaja con la partida: la
+misma ausencia debe las mismas semanas por las dos puertas, se vuelve a esa
+velocidad y en pausa no se debe nada. Y el parte de regreso añade **lo que
+espera**: la pregunta sin contestar, por su título, y el asalto anunciado, con
+sus semanas (`pendingLines`, claves `welcome.pending.*`). Prueba:
+`tests/fast/rest-return.test.ts`. Sobre la #21 (`restTick`).
+
 ## v5.40 · 30 sep 2026 · Ninguna derrota mientras nadie mira
 
 El letargo de §13.2 dejaba que un asalto se resolviera por la cuenta de B3 y

@@ -214,7 +214,9 @@ export function boot(
 ): App {
   let state = save?.state ?? foundGame(freshSeed());
   const archive: ArchivedGame[] = save !== undefined ? [...save.archive] : [];
-  let speed: Speed = 1;
+  // RD-2 (Vera, 30 sep 2026) · se vuelve a la velocidad a la que se dejó,
+  // también la pausa: la ausencia ya corrió a ella.
+  let speed: Speed = save?.speed ?? 1;
   // El banco de batallas (`?sandbox=battle`): la cámara lenta. El juego, 1.
   let timeScale = 1;
   // Y la semana congelada: el motor no avanza, así que la partida no se acaba
@@ -1424,7 +1426,7 @@ export function boot(
     // opens could otherwise let the final dead-village write land after the
     // successor write and resurrect the epitaph on reload.
     const snapshot = structuredClone(serialize(
-      state, state.history, archive, savedAtOverride ?? Date.now(),
+      state, state.history, archive, savedAtOverride ?? Date.now(), speed,
     ));
     saveQueue = saveQueue.then(() => persistSave(snapshot));
   };
@@ -1797,7 +1799,10 @@ export function boot(
   paint(0);
   document.documentElement.dataset.appReady = 'true';
 
-  const owed = save !== undefined ? ticksOwed(Date.now() - save.savedAtMs) : 0;
+  // RD-2 · la ausencia corre a la velocidad a la que se dejó, como con la
+  // pestaña oculta (`resumeAfterHidden`): la misma ausencia, el mismo valle,
+  // por las dos puertas. En pausa no se debe nada.
+  const owed = save !== undefined ? ticksOwed(Date.now() - save.savedAtMs, save.speed ?? 1) : 0;
   if (state.ended !== null) {
     finish();
   } else if (save !== undefined && owed > 0) {
@@ -1811,7 +1816,7 @@ export function boot(
     // stamped `Date.now()` at boot) owes zero ticks, and a "welcome back,
     // nothing happened" screen over every debug route would be worse than
     // the screen it is supposed to replace.
-    catchUpFor(Date.now() - save.savedAtMs, true);
+    catchUpFor(Date.now() - save.savedAtMs, true, save.speed ?? 1);
   } else {
     beginLoop();
   }

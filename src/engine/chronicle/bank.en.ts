@@ -2302,6 +2302,16 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     '{built} went up, {lost} came down.',
     'Building: {built} raised, {lost} lost.',
   ],
+  // RD-2 · lo que espera al volver: la pregunta sin contestar y el asalto
+  // anunciado, que es lo que paró la ausencia.
+  'welcome.pending.crossroad': [
+    'A question is still waiting: {title}.',
+    'Still unanswered: {title}.',
+  ],
+  'welcome.pending.raid': [
+    'Riders were seen on the far ridge. They come in {weeks} weeks.',
+    'The valley woke to a warning: raiders, {weeks} weeks off.',
+  ],
 
   // --- the founding (U-04) ---
   //

@@ -29,6 +29,7 @@ export function serialize(
   decisions: readonly DecisionRecord[],
   archive: readonly ArchivedGame[],
   savedAtMs: number,
+  speed?: 0 | 1 | 4 | 16 | 64,
 ): SaveFile {
   return {
     schema: SCHEMA_VERSION,
@@ -36,6 +37,7 @@ export function serialize(
     state,
     decisions: [...decisions],
     archive: [...archive],
+    ...(speed === undefined ? {} : { speed }),
   };
 }
 
@@ -593,6 +595,9 @@ export function deserialize(raw: unknown): SaveFile {
     state,
     decisions: candidate.decisions as DecisionRecord[],
     archive,
+    // RD-2 · la velocidad, si el guardado la trae y es una de verdad.
+    ...([0, 1, 4, 16, 64].includes(candidate.speed as number)
+      ? { speed: candidate.speed as 0 | 1 | 4 | 16 | 64 } : {}),
   };
 }
 

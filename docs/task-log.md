@@ -1,5 +1,13 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · RD-2: volver a la velocidad que se dejó (v5.45)
+
+Con la #21 (ninguna derrota en ausencia) y ésta, el descanso A′ está entero en
+el motor y la interfaz: automático, a la velocidad dejada por las dos puertas,
+la pausa guardada, y el parte con lo pendiente. **Abierto:** la comprobación
+en el aparato (ocultar, volver, sonido y sol); el silencio y la reanudación ya
+los cubren las compuertas de `ambience.ts` (pestaña oculta, letargo).
+
 ## 30 sep 2026 · RD-2: ninguna derrota mientras nadie mira (v5.40)
 
 `restTick` para el letargo en el aviso de un asalto y deshace la semana que

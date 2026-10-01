@@ -5,6 +5,7 @@
 // has to reconstruct by hand to know what happened while they were gone.
 
 import { TIME } from '@engine/balance';
+import { CATALOG } from '@engine/crossroads/catalog';
 import type { Digest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import type { ChronicleEntry, GameState } from '@engine/state';
@@ -106,6 +107,32 @@ export function welcomeLines(state: GameState, digest: Digest): string[] {
   lines.push(renderEntry(synthetic(state.tick, 'welcome.buildings', {
     built: s.built, lost: s.lost,
   }), state.rng, 902));
+  // RD-2 (Vera, 30 sep 2026) · y lo que espera: la ausencia no contesta por
+  // el jugador y se para en el aviso de un asalto, así que el parte dice qué
+  // está pendiente, no sólo qué pasó.
+  const pending = pendingLines(state);
+  lines.push(...pending);
+  return lines;
+}
+
+/** RD-2 · Lo que el regreso tiene pendiente: la pregunta que espera y el asalto que viene. */
+export function pendingLines(state: GameState): string[] {
+  const lines: string[] = [];
+  const crossroad = state.crossroad;
+  if (crossroad !== null) {
+    const template = CATALOG.find((t) => t.id === crossroad.templateId);
+    if (template !== undefined) {
+      lines.push(renderEntry(synthetic(state.tick, 'welcome.pending.crossroad', {
+        title: renderUiText(template.title),
+      }), state.rng, 903));
+    }
+  }
+  const coming = state.threat.comingTick;
+  if (coming !== null && coming >= state.tick) {
+    lines.push(renderEntry(synthetic(state.tick, 'welcome.pending.raid', {
+      weeks: Math.max(1, coming - state.tick),
+    }), state.rng, 904));
+  }
   return lines;
 }
 

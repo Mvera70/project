@@ -4942,8 +4942,17 @@ pasó de quince segundos a catorce minutos. Un idle que se mira de fondo pide
 justo eso: volver al día siguiente y encontrar dos años de crónica.
 
 **Y una pestaña que se oculta recupera a la velocidad que estaba puesta**
-(`resumeAfterHidden`, v3.72), no a ×1. El arranque en frío no puede: el guardado
-no lleva la velocidad. Queda anotado como deuda en `docs/historico/handover.md`.
+(`resumeAfterHidden`, v3.72), no a ×1. **Y desde RD-2 (v5.45, 30 sep 2026) la
+apertura en frío también**: el guardado lleva la velocidad (`SaveFile.speed`,
+del fichero y no del estado, opcional: un guardado viejo vuelve a ×1), así que
+la misma ausencia da el mismo valle por las dos puertas, y se vuelve a la
+velocidad a la que se dejó. **La pausa sobrevive a cerrar la app**: en pausa
+no se debe nada por ninguna de las dos puertas. Es la regla A′ que Vera eligió
+para el descanso: automático al ocultar o cerrar, a la velocidad dejada; la
+decisión espera (no para la ausencia) y lo que para es el aviso de un asalto o
+la semana que acabaría la partida. **El parte de regreso dice lo pendiente**
+(`pendingLines`): la pregunta que espera, por su título, y el asalto anunciado,
+con las semanas que faltan.
 
 Se ejecutan esos ticks en lotes de 64 dentro de `requestAnimationFrame`, con una
 pantalla de progreso que ya muestra el valle dibujándose. 960 ticks tardan menos
