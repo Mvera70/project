@@ -11,7 +11,8 @@ import { PALETTES } from '@derive/palette';
 import { Color, type Mesh, type MeshStandardMaterial } from 'three';
 import { buildRidge, exteriorWaterAt, ridgeAt } from '../../src/render3d/world/ridge';
 import { gorgeAt, valleyAxis, valleyShoulder } from '../../src/render3d/world/valley-profile';
-import { buildCairns, buildGorgeRoads, faceColour, MOUNTAIN_PEAK, placeCrags } from '../../src/render3d/world/mountains';
+import { buildCairns, buildGorgeRoads, faceColour, MOUNTAIN_PEAK, mountainSurfaceAt, placeCrags } from '../../src/render3d/world/mountains';
+import { buildGround, underSkin } from '../../src/render3d/world/ground';
 import { TERRAIN_CODE } from '@engine/state';
 
 const SEEDS = [7, 11, 23];
@@ -65,6 +66,34 @@ describe('las montañas y las entradas', () => {
     const bare = new Color();
     faceColour(bare, PALETTES.spring, MOUNTAIN_PEAK * 0.6, 0.9, 3, 4, 0);
     expect(peak.getHSL({ h: 0, s: 0, l: 0 }).l).toBeGreaterThan(bare.getHSL({ h: 0, s: 0, l: 0 }).l + 0.2);
+  });
+
+  it('el suelo no asoma por la piel de la montaña', () => {
+    // Vera, 2 oct 2026: «se ve rara la ladera; desde arriba es muy feo». La
+    // piel facetada iba 0,012 por encima de un suelo con otras diagonales y
+    // con las esquinas movidas, y el suelo la atravesaba a trozos: manchas
+    // dentadas y verde entre la roca. Donde la piel lo tapa entero, el suelo
+    // va por debajo de ella en todos sus vértices.
+    for (const seed of SEEDS) {
+      const { map } = foundGame(seed);
+      const ground = buildGround(map, PALETTES.spring);
+      const position = ground.mesh.geometry.getAttribute('position');
+      const columns = map.width + 1;
+      let buried = 0;
+      for (let z = 1; z < map.height; z += 1) {
+        for (let x = 1; x < map.width; x += 1) {
+          if (!underSkin(map, x, z)) continue;
+          const at = z * columns + x;
+          const px = position.getX(at), pz = position.getZ(at);
+          const col = Math.floor(px), row = Math.floor(pz);
+          // La esquina movida cae en una celda cuyas cuatro esquinas están hundidas.
+          if (![[col, row], [col + 1, row], [col, row + 1], [col + 1, row + 1]].every(([cx, cz]) => underSkin(map, cx!, cz!))) continue;
+          buried += 1;
+          expect(position.getY(at), `semilla ${seed}, esquina ${x},${z}`).toBeLessThan(mountainSurfaceAt(map, px, pz));
+        }
+      }
+      expect(buried, `semilla ${seed}: hay montaña con piel`).toBeGreaterThan(100);
+    }
   });
 
   it('ni un peñasco ni un mojón caen al agua', () => {

@@ -13,7 +13,8 @@ import { PALETTES } from '@derive/palette';
 import { plazaOf } from '@derive/plaza';
 import { foundGame } from '@engine/found';
 import { foundTwenty } from '../helpers/founding';
-import { valleyRoad } from '../../src/render3d/world/road';
+import { buildRoadStones, townCells, valleyRoad } from '../../src/render3d/world/road';
+import { BoxGeometry, Matrix4, Quaternion, Vector3 } from 'three';
 import { buildGorgeRoads } from '../../src/render3d/world/mountains';
 import { elevationAt } from '../../src/render3d/world/ground';
 import { ridgeAt } from '../../src/render3d/world/ridge';
@@ -85,5 +86,34 @@ describe('el camino del valle', () => {
       expect(steepest, `semilla ${seed}`).toBeLessThan(0.5);
       void elevationAt;
     }
+  });
+});
+
+describe('las piedras de la calzada', () => {
+  it('son cantos bajos, aunque el modelo sea alto, y no hay ninguna en el pueblo', () => {
+    // Vera, 2 oct 2026: «las piedras pequeñas están muy para arriba,
+    // puntiagudas, muy feas» y «hay también que quitarlas del pueblo». El
+    // peñasco de Astra va de pie; aquí, una caja tres veces más alta que ancha.
+    const tall = new BoxGeometry(1, 3, 1);
+    let stones = 0;
+    for (const seed of SEEDS) {
+      const state = foundTwenty(seed);
+      const plaza = plazaOf(state);
+      const road = valleyRoad(state.map, state.terrainSeed, plaza, 'town');
+      const town = townCells(state, plaza);
+      const mesh = buildRoadStones(road, state.map, state.terrainSeed, tall, () => 0, '#888888', town);
+      expect(mesh, `semilla ${seed}: la villa tiene calzada fuera del pueblo`).not.toBeNull();
+      const matrix = new Matrix4(), at = new Vector3(), size = new Vector3();
+      for (let i = 0; i < mesh!.count; i += 1) {
+        mesh!.getMatrixAt(i, matrix);
+        matrix.decompose(at, new Quaternion(), size);
+        const wide = size.x, high = size.y * 3;
+        expect(high / wide, `semilla ${seed}: canto ${i}`).toBeLessThan(0.6);
+        const cell = Math.floor(at.z) * state.map.width + Math.floor(at.x);
+        expect(town.has(cell), `semilla ${seed}: piedra en el pueblo, celda ${cell}`).toBe(false);
+        stones += 1;
+      }
+    }
+    expect(stones).toBeGreaterThan(10);
   });
 });

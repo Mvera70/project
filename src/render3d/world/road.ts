@@ -25,7 +25,8 @@
 import { BoxGeometry, type BufferGeometry, Color, Group, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, Quaternion, Vector3 } from 'three';
 import { stepCost } from '@engine/world/astar';
 import { hash32 } from '@engine/rng';
-import type { ValleyMap } from '@engine/state';
+import type { Building, ValleyMap } from '@engine/state';
+import { visibleBuildings } from '@derive/visible-buildings';
 import { roadMouths, valleyRoadCells } from '@engine/world/valley-road';
 import type { Era } from '@derive/era';
 
@@ -41,7 +42,12 @@ const SIGN_DISTANCE = 10;
 /** Cuánto se aparta el cartel del eje del camino, en celdas. */
 const SIGN_ASIDE = 0.55;
 /** TUNE visual. Las piedras sueltas de la calzada de la villa: cuántas por celda, y su tamaño en celdas. */
-const STONES = { PER_CELL: 0.6, SIZE: 0.14, SPREAD: 0.5 } as const;
+// TUNE visual: `FLAT` es el alto de una piedra sobre su ancho. El peñasco de
+// Astra (`crag-2`) está hecho para ir de pie; escalado igual en los tres ejes
+// salía una estaca oscura clavada en la calzada (Vera, 2 oct 2026: «las
+// piedras pequeñas están muy para arriba, puntiagudas, muy feas»). Una piedra
+// de camino es un canto: ancha, baja y medio hundida.
+const STONES = { PER_CELL: 0.6, SIZE: 0.14, SPREAD: 0.5, FLAT: 0.38, FLAT_SPREAD: 0.17, SUNK: 0.25 } as const;
 
 export interface Signpost { readonly x: number; readonly z: number; readonly yaw: number }
 
@@ -94,16 +100,17 @@ export function valleyRoad(
  * Las piedras sueltas de la calzada (Vera: «para la villa, piedras sueltas por
  * la calzada, de cerca»): una malla instanciada con la forma de un peñasco de
  * Astra, pequeño, repartidas por las celdas del eje con el hash de la celda.
- * Sólo en la villa; una llamada de dibujo.
+ * Sólo en la villa, y fuera de `town` (el pueblo: la calle está barrida); una
+ * llamada de dibujo.
  */
 export function buildRoadStones(
   road: ValleyRoad, map: ValleyMap, seed: number, shape: BufferGeometry | null,
-  ground: (x: number, z: number) => number, colour: string,
+  ground: (x: number, z: number) => number, colour: string, town?: ReadonlySet<number>,
 ): InstancedMesh | null {
   if (shape === null) return null;
-  const spots: { x: number; z: number; turn: number; size: number }[] = [];
+  const spots: { x: number; z: number; turn: number; size: number; flat: number }[] = [];
   for (let cell = 0; cell < road.wear.length; cell += 1) {
-    if (road.wear[cell] !== 3) continue;
+    if (road.wear[cell] !== 3 || town?.has(cell) === true) continue;
     const x = cell % map.width, z = Math.floor(cell / map.width);
     const n = Math.floor(STONES.PER_CELL + unit(seed, `stone:${cell}`));
     for (let k = 0; k < n; k += 1) {
@@ -112,6 +119,7 @@ export function buildRoadStones(
         z: z + 0.5 + (unit(seed, `sz:${cell}:${k}`) - 0.5) * STONES.SPREAD,
         turn: unit(seed, `st:${cell}:${k}`) * Math.PI * 2,
         size: STONES.SIZE * (0.6 + unit(seed, `ss:${cell}:${k}`) * 0.8),
+        flat: STONES.FLAT + unit(seed, `sf:${cell}:${k}`) * STONES.FLAT_SPREAD,
       });
     }
   }
@@ -121,17 +129,57 @@ export function buildRoadStones(
   mesh.name = 'Valley_Road_Stones';
   mesh.castShadow = false;
   mesh.receiveShadow = true;
+  // La forma se mide una vez: la planta da el ancho y el alto se pone aparte,
+  // así que el canto sale igual de bajo lo alto que sea el modelo.
+  shape.computeBoundingBox();
+  const box = shape.boundingBox!;
+  const span = Math.max(box.max.x - box.min.x, box.max.z - box.min.z) || 1;
+  const tall = box.max.y - box.min.y || 1;
   const matrix = new Matrix4(), at = new Vector3(), size = new Vector3(), turn = new Quaternion(), up = new Vector3(0, 1, 0);
   spots.forEach((spot, i) => {
     turn.setFromAxisAngle(up, spot.turn);
-    at.set(spot.x, ground(spot.x, spot.z) + spot.size * 0.3, spot.z);
-    size.setScalar(spot.size);
+    const wide = spot.size / span, high = spot.size * spot.flat / tall;
+    // El pie del modelo a ras de suelo, y hundido una parte de su alto.
+    at.set(spot.x, ground(spot.x, spot.z) - box.min.y * high - spot.size * spot.flat * STONES.SUNK, spot.z);
+    size.set(wide, high, wide);
     matrix.compose(at, turn, size);
     mesh.setMatrixAt(i, matrix);
   });
   mesh.instanceMatrix.needsUpdate = true;
   mesh.computeBoundingSphere();
   return mesh;
+}
+
+/** Cuánto se aparta del pueblo la calzada con piedras, en celdas. TUNE visual. */
+const TOWN_MARGIN = 3;
+
+/**
+ * El pueblo, para la calzada: las celdas a `TOWN_MARGIN` o menos de algo
+ * construido, y la plaza con ese mismo margen.
+ */
+export function townCells(
+  state: { readonly buildings: readonly Building[]; readonly map: ValleyMap },
+  plaza: { readonly x: number; readonly y: number; readonly radius: number },
+): Set<number> {
+  const { map } = state;
+  const town = new Set<number>();
+  const mark = (cx: number, cz: number): void => {
+    for (let z = Math.max(0, cz - TOWN_MARGIN); z <= Math.min(map.height - 1, cz + TOWN_MARGIN); z += 1) {
+      for (let x = Math.max(0, cx - TOWN_MARGIN); x <= Math.min(map.width - 1, cx + TOWN_MARGIN); x += 1) town.add(z * map.width + x);
+    }
+  };
+  for (const building of visibleBuildings(state)) {
+    for (let row = 0; row < building.h; row += 1) {
+      for (let column = 0; column < building.w; column += 1) mark(building.x + column, building.y + row);
+    }
+  }
+  const reach = plaza.radius + TOWN_MARGIN;
+  for (let z = Math.max(0, Math.floor(plaza.y - reach)); z <= Math.min(map.height - 1, Math.ceil(plaza.y + reach)); z += 1) {
+    for (let x = Math.max(0, Math.floor(plaza.x - reach)); x <= Math.min(map.width - 1, Math.ceil(plaza.x + reach)); x += 1) {
+      if (Math.hypot(x + 0.5 - plaza.x, z + 0.5 - plaza.y) <= reach) town.add(z * map.width + x);
+    }
+  }
+  return town;
 }
 
 function unit(seed: number, key: string): number {

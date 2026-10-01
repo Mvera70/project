@@ -1,5 +1,20 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · Lo que Vera vio en la tablet (v5.54)
+
+Hecho y en PR: las laderas sin el suelo asomando por la piel, las piedras de la
+calzada como cantos bajos y fuera del pueblo, y la viñeta de la crónica a 2:1
+para que no corte caras. **Abierto, de la misma tanda de capturas:**
+
+- **La hoja de la encrucijada en la tablet** (captura a 800 px): el título,
+  el texto y las opciones no comparten columna y el canto rasgado de arriba
+  queda vacío encima del título. Es de interfaz (`piel-del-valle`):
+  `screens/crossroad.ts` y `redesign/wood.css`.
+- **El grabado genérico en blanco y negro** entre las viñetas a color de la
+  crónica: es el respaldo por `kind` de las líneas que aún no tienen dibujo.
+  Es terreno de las ilustraciones de Codex (`public/ui/art/index.json`,
+  `chronicle-art.ts`, `docs/plan-arte-pendiente.md`), no se toca desde aquí.
+
 ## 1 oct 2026 · K1–K3: el bosque que se gasta, se reproduce y pesa (v5.53)
 
 Rama `ccr-372e1786-k4brcp`, sobre `main` con la Parte 0 dentro. Decisiones de
