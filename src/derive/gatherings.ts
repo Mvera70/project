@@ -16,6 +16,7 @@ import type { Catalogue } from '@engine/crossroads/schema';
 import type { GameState } from '@engine/state';
 import { ford } from '@engine/sim';
 import { standing } from './anchors';
+import { templateOf } from '@engine/crossroads/catalog';
 
 export interface Gathering {
   x: number;
@@ -71,7 +72,7 @@ export function gatheringsAt(
   const out: Gathering[] = [];
   for (const decision of state.history) {
     if (decision.tick > state.tick) continue;
-    const template = catalogue.find((t) => t.id === decision.templateId);
+    const template = templateOf(catalogue, decision.templateId);
     const option = template?.options.find((o) => o.id === decision.optionId);
     if (option === undefined) continue;
     for (const effect of option.visible) {

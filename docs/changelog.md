@@ -75,6 +75,20 @@ iguales a ×1 en 240 fases; orden de claridad; a ×64 al menos el 40 % de la
 jornada). Evidencia: `docs/medidas/sol-sincronia-2026-09-30.md`. D.6.5, §10.7 y
 §10.8 de `design.md`, al día. **Abierto:** que Vera juzgue la comodidad a ×64
 en la tablet.
+## v5.39 · 30 sep 2026 · Una encrucijada retirada pendiente vuelve a ser una pregunta
+
+La auditoría de RD-0 (`docs/medidas/rd0-encrucijadas-2026-09-30.md` §6) midió
+que una pendiente retirada en un guardado de esquema 12 **carga pero no se ve
+ni se resuelve**: la tarjeta, la crónica y `tick` buscaban la plantilla sólo en
+`CATALOG`, y como hay una pregunta a la vez (§8.6) el valle no volvía a
+preguntar (303 semanas sin ninguna). Hoy no se alcanzaba —las tres retiradas lo
+son desde antes de M-0—, pero el rework de ritmo va a retirar plantillas vivas.
+`templateOf(catalogue, id)` busca en el catálogo vivo y, si no está, en
+`RETIRED_TEMPLATES`; lo usan resolver, semillas, la política de `run`, marcas,
+reuniones, la tarjeta y la crónica. **Qué se plantea no cambia**: la selección
+sigue leyendo sólo el catálogo vivo. Prueba: `tests/fast/retired-pending.test.ts`
+(en tres semillas, la pendiente retirada se enseña, se contesta y el valle
+vuelve a preguntar sin plantear nunca una retirada).
 
 ## v5.37 · 30 sep 2026 · Las 21 jornadas rojas viejas, una a una
 

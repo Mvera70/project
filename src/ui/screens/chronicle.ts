@@ -5,7 +5,7 @@
 // welcome digest of a return from absence (§9.2, §13.2) is M-23's `sinceTick`
 // to spend; today it only decides where the list opens.
 
-import { CATALOG } from '@engine/crossroads/catalog';
+import { CATALOG, templateOf } from '@engine/crossroads/catalog';
 import { namesOf } from '@engine/crossroads/resolve';
 import { renderChronicleYear, renderEntry, renderUiText } from '@engine/chronicle/render';
 import { makeBundle, type RngBundle } from '@engine/rng';
@@ -462,7 +462,7 @@ function flatCard(text: string): HTMLElement {
 function sealedCard(state: GameState, pending: PendingCrossroad, actions: UiActions): HTMLElement | null {
   // RD-1 · la pregunta del vado no existe para el jugador hasta que él llega.
   if (isConcealed(pending)) return null;
-  const template = CATALOG.find((t) => t.id === pending.templateId);
+  const template = templateOf(CATALOG, pending.templateId);
   if (template === undefined) return null;
   const params = { year: yearOf(pending.posedTick), ...namesOf(state, pending.cast) };
   const title = renderEntry({ tick: pending.posedTick, kind: 'crossroad_posed', templateKey: template.title, params, weight: 3 }, state.rng);

@@ -93,6 +93,7 @@ import {
   namedDeathEntry,
   seasonKey,
 } from './chronicle/events';
+import { templateOf } from './crossroads/catalog';
 
 /** The offices a village fills on its own. §6.2. */
 const RENEWABLE_ROLES: readonly Role[] = ['smith', 'midwife', 'priest', 'woodward', 'reeve'];
@@ -295,7 +296,7 @@ function optionOf(
   catalogue: Catalogue,
   optionId: string,
 ): CrossroadTemplate['options'][number] | undefined {
-  const template = catalogue.find((t) => t.id === state.crossroad?.templateId);
+  const template = templateOf(catalogue, state.crossroad?.templateId ?? '');
   return template?.options.find((o) => o.id === optionId);
 }
 
@@ -322,7 +323,7 @@ function immediatePeopleLost(state: GameState, catalogue: Catalogue, optionId: s
  * then grain, then the two moods.
  */
 function immediateCost(state: GameState, catalogue: Catalogue, optionId: string): number {
-  const template = catalogue.find((t) => t.id === state.crossroad?.templateId);
+  const template = templateOf(catalogue, state.crossroad?.templateId ?? '');
   const option = template?.options.find((o) => o.id === optionId);
   if (option === undefined) return 0;
 

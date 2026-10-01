@@ -14,6 +14,7 @@ import type { Catalogue } from '@engine/crossroads/schema';
 import type { BuildingId, GameState } from '@engine/state';
 import { standing } from './anchors';
 import { plazaCentre } from '@engine/world/plaza';
+import { templateOf } from '@engine/crossroads/catalog';
 
 export interface Banner {
   x: number;
@@ -27,7 +28,7 @@ function visibleOf(
   templateId: string,
   optionId: string,
 ): Catalogue[number]['options'][number]['visible'] {
-  const template = catalogue.find((t) => t.id === templateId);
+  const template = templateOf(catalogue, templateId);
   return template?.options.find((o) => o.id === optionId)?.visible ?? [];
 }
 

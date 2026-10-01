@@ -18,6 +18,7 @@ import { styleOf } from '../people/crown';
 import { seasonOf, yearOf } from '../time';
 import { standing } from '../subsistence/building-counts';
 import type { AppliedEffects, Catalogue, Effect } from './schema';
+import { templateOf } from './catalog';
 
 const clampStat = (name: string, x: number): number =>
   name === 'morale' || name === 'faith' ? Math.max(0, Math.min(100, x)) : Math.max(0, x);
@@ -244,7 +245,7 @@ export function applyOption(
   const pending = state.crossroad;
   if (pending === null) return null;
 
-  const template = catalogue.find((t) => t.id === pending.templateId);
+  const template = templateOf(catalogue, pending.templateId);
   if (template === undefined) return null;
 
   const option = template.options.find((o) => o.id === optionId);

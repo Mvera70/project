@@ -54,6 +54,14 @@ aplana hacia la media mañana a ×16/×64: se suaviza la amplitud y el sol sigue
 la hora (`LIGHT_SWING`). Evidencia: `docs/medidas/sol-sincronia-2026-09-30.md`.
 **Versiones reservadas para este rework: v5.38–v5.49.** **Abierto:** la
 comodidad a ×64 en la tablet.
+## 30 sep 2026 · RD-0: una encrucijada retirada pendiente vuelve a ser una pregunta (v5.39)
+
+Prerrequisito de RD-3, que va a retirar plantillas vivas: `templateOf` resuelve
+lo ya planteado contra el catálogo vivo y las retiradas. Hallado por la
+auditoría del catálogo (`docs/medidas/rd0-encrucijadas-2026-09-30.md` §6, en
+la rama `claude/ritmo-rd0`). **Abierto:** la migración anterior a M-0 sigue
+borrando una pendiente retirada (`save.ts:519-531`); es inalcanzable hoy y no
+se toca.
 
 ## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
 

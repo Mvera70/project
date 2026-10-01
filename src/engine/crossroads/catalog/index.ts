@@ -74,3 +74,18 @@ export { TRADE_TEMPLATES } from './trade';
  * busque el título de una decisión pasada.
  */
 export const RETIRED_TEMPLATES: Catalogue = [...TRADE_TEMPLATES];
+
+/**
+ * La plantilla de una decisión **ya planteada**: la del catálogo vivo y, si ya
+ * no está, la retirada. RD-0 (30 sep 2026): con sólo `catalogue.find`, una
+ * pendiente retirada en un guardado cargaba pero no se enseñaba ni se
+ * resolvía, y como sólo hay una pregunta a la vez (§8.6) el valle se quedaba
+ * sin encrucijadas para siempre. Hoy no se alcanzaba; el rework de ritmo va a
+ * retirar plantillas vivas, y entonces sí.
+ *
+ * **Sólo para leer lo ya planteado** —resolverlo, titularlo, sus semillas, sus
+ * marcas—. Qué se plantea lo sigue decidiendo el catálogo vivo (`select.ts`).
+ */
+export function templateOf(catalogue: Catalogue, id: string): Catalogue[number] | undefined {
+  return catalogue.find((t) => t.id === id) ?? RETIRED_TEMPLATES.find((t) => t.id === id);
+}

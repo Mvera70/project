@@ -6,7 +6,7 @@
 // taken, or a swipe returns to the valley and the crossroad stays pending,
 // marked with a discreet dot the player can tap to come back to it.
 
-import { CATALOG } from '@engine/crossroads/catalog';
+import { CATALOG, templateOf } from '@engine/crossroads/catalog';
 import { namesOf } from '@engine/crossroads/resolve';
 import { renderEntry } from '@engine/chronicle/render';
 import type { GameState, PendingCrossroad } from '@engine/state';
@@ -270,7 +270,7 @@ export function closeCrossroad(): void {
 function mountOverlay(app: App, p: PendingCrossroad): void {
   ensureStyle();
   const state = app.state();
-  const template = CATALOG.find((t) => t.id === p.templateId);
+  const template = templateOf(CATALOG, p.templateId);
   if (template === undefined) return;
   document.documentElement.classList.add('crossroad-open');
 
