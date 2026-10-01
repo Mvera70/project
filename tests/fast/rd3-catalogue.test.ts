@@ -58,10 +58,15 @@ describe('RD-3 · escala: nada que dependa del tamaño de la aldea es un número
     expect(CROSSROAD_EFFECTS.THEFT_GRAIN_MUL).toBeGreaterThan(0.5);
   });
 
-  it('`winter_grain_debt` ya no llega a un caserío', () => {
-    const needs = theOne('winter_grain_debt').requires.find((c) => c.k === 'stat' && c.stat === 'people');
-    expect(needs).toMatchObject({ op: '>=' });
-    expect(needs !== undefined && needs.k === 'stat' ? needs.v : 0).toBeGreaterThanOrEqual(20);
+  it('`winter_grain_debt` llega al caserío, con un préstamo proporcional y no fijo', () => {
+    // RD-6 (Vera, 1 oct 2026): el límite de veinte personas de RD-3 dejaba al
+    // caserío sin su salvavidas del segundo invierno (hambre a tres años de 20 a
+    // 39 muertes en 16 semillas). El préstamo sigue siendo proporcional.
+    const t = theOne('winter_grain_debt');
+    expect(t.requires.some((c) => c.k === 'stat' && c.stat === 'people' && c.op === '>=' && c.v > 2)).toBe(false);
+    const kneel = t.options.find((o) => o.id === 'kneel')!;
+    expect(kneel.effects.some((e) => e.k === 'stat' && e.stat === 'grain' && 'mul' in e)).toBe(true);
+    expect(kneel.effects.some((e) => e.k === 'stat' && e.stat === 'grain' && 'delta' in e)).toBe(false);
   });
 
   it('`granary_theft` toca el grano en las tres opciones', () => {

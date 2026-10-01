@@ -273,3 +273,14 @@ node   <scratchpad>/sum.js out.json ...    # las tablas de §2 y §3
 npx vitest run tests/fast/catalog.test.ts tests/fast/rd3-catalogue.test.ts tests/fast/retired-pending.test.ts
 npx vitest run --config vitest.journeys.config.ts tests/journeys/catalogue-coverage.test.ts
 ```
+
+## RD-6 · `winter_grain_debt` vuelve al caserío (decisión de Vera, 1 oct 2026)
+
+Al integrar RD-3 con el resto del rework, el hambre a tres años se duplicó
+(16 semillas, `prudent`): de 20 muertes en 8 valles (`main`) a 39 en 13 con
+RD-3. La causa medida es el límite de veinte personas de `winter_grain_debt`:
+el préstamo del señor era, sin que nadie lo supiera, el salvavidas del caserío
+en su segundo invierno. Sin ese límite, y con el préstamo proporcional de RD-3,
+hay 16 muertes en 8 valles y la población media pasa de 13,9 a 19,3. Vera eligió
+devolverlo al caserío. La fila «`winter_grain_debt`, primera vez» de la tabla de
+arriba deja de valer: vuelve a llegar en los primeros inviernos.

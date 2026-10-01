@@ -39,9 +39,12 @@ const WINTER_GRAIN_DEBT: CrossroadTemplate = {
     { k: 'season', season: 'winter', minWeek: 6 },
     { k: 'ratio', ratio: 'grainToHarvest', op: '<', v: 0.9 },
     { k: 'flag', flag: 'vassal', set: false },
-    // RD-3 · una aldea y no un caserío: con menos de veinte personas el señor
-    // no tiene a quién cobrar ni los carros a quién alimentar.
-    { k: 'stat', stat: 'people', op: '>=', v: 20 },
+    // RD-6 (Vera, 1 oct 2026) · **llega también al caserío**. RD-3 la limitó a
+    // aldeas de veinte, y medido en 16 semillas a tres años el hambre pasó de
+    // 20 muertes (8 valles) a 39 (13): sin saberlo, era el salvavidas del
+    // caserío en su segundo invierno. Sin el límite, con el préstamo
+    // proporcional de RD-3, quedan 16 (8 valles) y la población media sube de
+    // 13,9 a 19,3.
   ],
   cast: [{ as: 'A', role: 'leader' }],
   title: 'crossroad.winter_grain_debt.title',
