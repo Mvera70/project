@@ -4,6 +4,7 @@ import { greatOakCell } from '@derive/landmark';
 import type { Yard } from '@derive/yards';
 import { Box3, Matrix4, Mesh, Quaternion, Vector3, type Object3D } from 'three';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
+import { sapling } from '@engine/world/forest';
 import { terrainOf } from '../life/terrain';
 import { indexSolids, type Solid, type Terrain } from '../life/body';
 import { steadingOf } from './steading';
@@ -87,7 +88,10 @@ export function solidTerrain(
   if (tree !== undefined) {
     const trunks = groundFootprints(tree);
     for (let cell = 0; cell < state.map.terrain.length; cell++) {
-      if (state.map.terrain[cell] !== TERRAIN_CODE.forest || taken.has(cell)) continue;
+      // K2 · un plantón no tiene tronco que pare a nadie: se pinta pequeño y
+      // transitable, como el rebrote (`forest-state.ts`).
+      if (state.map.terrain[cell] !== TERRAIN_CODE.forest || taken.has(cell)
+        || sapling(state.map.forestAge[cell] as number)) continue;
       const { x, z, scale, facing } = scatterTransform(land.width, cell);
       const matrix = new Matrix4().compose(new Vector3(x, 0, z), new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), facing), new Vector3(scale, scale, scale));
       for (const trunk of trunks) add(trunk.clone().applyMatrix4(matrix));

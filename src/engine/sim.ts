@@ -63,7 +63,7 @@ import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
 import { ringClosed } from './world/placement';
 import { advanceThreat, type Battle } from './world/threat';
-import { fellForest, fellForestWithLocation, regrowForest } from './world/forest';
+import { fellForest, fellForestWithLocation, regrowForest, woodHaul } from './world/forest';
 import { neighbours4 } from './world/tiles';
 import { accrueTraffic, routesFor, upgradePaths } from './world/paths';
 import { holderOf, ratioOf } from './crossroads/conditions';
@@ -1024,12 +1024,15 @@ export function tick(
   // The cutters can only bring back what is standing. M-15 fells it first and
   // says how much it actually got, which is §5.2's `woodCap`: a valley that has
   // been cut flat stops producing timber instead of producing it out of air.
-  const allocation = allocateLabour(state);
+  // K3 · lo que trae cada leñador por lo lejos que tala (`woodHaul`), y con
+  // ello cuántos manda la aldea y cuánto sale del bosque.
+  const haul = woodHaul(state);
+  const allocation = allocateLabour(state, haul);
   // M-4 · **el hacha buena** del carro (§7.12): cada leñador trae más leña, y
   // el bosque del corazón retrocede más rápido. Lo segundo no hay que
   // escribirlo aquí: la riada ya pesa con el bosque que ya no está (M-1).
   const axe = hasTrait(state, 'axe') ? MEANS.AXE_WOOD : 1;
-  const felled = fellForest(state, allocation.cutters * LABOUR.WOOD_PER_CUTTER * axe);
+  const felled = fellForest(state, allocation.cutters * LABOUR.WOOD_PER_CUTTER * axe * haul);
   const produced = produce(state, allocation, felled);
   // §7.7, v2.92: the hands the allocation sent out come back with food. The
   // forest fraction is read here and passed in because `subsistence/` may not

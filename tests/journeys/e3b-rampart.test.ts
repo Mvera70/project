@@ -91,17 +91,35 @@ describe('E3b.3 · adarve generado en villas reales', () => {
     }
   });
 
+  // **El tramo que se pierde se busca, no se fija** (1 oct 2026, K1–K3). Era
+  // el tramo 40 de la lista; con K1–K3 la villa elegida es la 17, y su tramo 40
+  // es una esquina: al quitarlo, sus dos vecinas se tocan en diagonal y el
+  // anillo se cierra por ahí (de 104 tramos a 103, las dos rondas cerradas). Eso
+  // es una muralla que sigue cerrada, no un adarve que no corta. Se pierde el
+  // primer tramo de muralla cuyas dos vecinas del anillo no se tocan.
   it('perder un tramo de la villa corta la vuelta allí', () => {
     const state = structuredClone(chosen);
     const before = sceneRampartOf(state)!;
-    const [a] = before.layout.edges[40]!;
-    const lost = state.buildings.find(item => item.x === a.x && item.y === a.z && item.lostTick === null)!;
+    const key = (c: { x: number; z: number }): string => `${c.x},${c.z}`;
+    const around = new Map<string, { x: number; z: number }[]>();
+    for (const [p, q] of before.layout.edges) {
+      around.set(key(p), [...(around.get(key(p)) ?? []), q]);
+      around.set(key(q), [...(around.get(key(q)) ?? []), p]);
+    }
+    const a = before.layout.edges.map(([p]) => p).find((cell) => {
+      const [m, n] = around.get(key(cell)) ?? [];
+      const wall = state.buildings.some(item => item.x === cell.x && item.y === cell.z && item.lostTick === null
+        && (item.kind === 'wall' || item.kind === 'palisade'));
+      return wall && m !== undefined && n !== undefined && Math.max(Math.abs(m.x - n.x), Math.abs(m.z - n.z)) > 1;
+    });
+    expect(a, 'un tramo de muralla cuyas vecinas no se tocan').toBeDefined();
+    const lost = state.buildings.find(item => item.x === a!.x && item.y === a!.z && item.lostTick === null)!;
     lost.lostTick = state.tick;
     const after = sceneRampartOf(state)!;
     for (const patrol of after.patrols.values()) {
       expect(patrol.closed).toBe(false);
-      expect(patrol.route.some(point => Math.floor(point.x) === a.x && Math.floor(point.z) === a.z)).toBe(false);
+      expect(patrol.route.some(point => Math.floor(point.x) === a!.x && Math.floor(point.z) === a!.z)).toBe(false);
     }
-    expect(after.layout.edges.some(([p, q]) => [p, q].some(cell => cell.x === a.x && cell.z === a.z))).toBe(false);
+    expect(after.layout.edges.some(([p, q]) => [p, q].some(cell => cell.x === a!.x && cell.z === a!.z))).toBe(false);
   });
 });

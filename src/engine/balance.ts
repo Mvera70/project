@@ -237,7 +237,7 @@ export const WOOD_RUN = {
 } as const;
 
 export const LABOUR = {
-  WOOD_PER_CUTTER: 3.0, // per week
+  WOOD_PER_CUTTER: 3.5, // per week
   // TUNE: **cuánto levanta un albañil en una semana, y cuántas manos tiene
   // garantizada la obra** (B-1, 18 sep 2026). Los dos números de esta pareja
   // eran 2,0 y 0,15 desde M-02, y los dos se fijaron cuando la aldea se fundaba
@@ -353,6 +353,18 @@ export const LABOUR = {
    * disparó: el banco de §12.9 pasó de once minutos a cuarenta y tres.
    */
   WOOD_CHOICES: 48,
+  /**
+   * K3 (Vera, 1 oct 2026) · **talar lejos cuesta.** Hasta tantas celdas de la
+   * plaza, un leñador trae lo de siempre; más allá, `HAUL_NEAR / distancia`,
+   * porque media jornada se le va en ir y volver con el haz. La aldea lo sabe:
+   * pide más leñadores (`allocateLabour`), hasta el techo de `CUTTER_CAP_SHARE`,
+   * y lo que no llega es escasez.
+   *
+   * TUNE: medido en `docs/medidas/k1-k3-madera-2026-10-01.md` §6.
+   */
+  HAUL_NEAR: 10,
+  /** K3 · y nunca menos de esto por leñador, por lejos que esté. TUNE: ídem. */
+  HAUL_MIN: 0.35,
   SMITHY_BONUS: 1.2,
   WINTER_WOOD: 0.4, // per person and week
   COLD_HOUSES_WOOD_MULTIPLIER: 1.5,
@@ -1982,9 +1994,33 @@ export const WORLD = {
   HEART_WIDTH: 36,
   HEART_HEIGHT: 56,
   FOREST_TARGET: [0.18, 0.3],
-  WOOD_PER_FOREST_TILE: 300,
+  WOOD_PER_FOREST_TILE: 100,
   FOREST_REGROWTH_YEARS: 8,
   FOREST_REGROWTH_NEIGHBOURS: 3,
+  /**
+   * K2 (Vera, 1 oct 2026) · **el bosque se extiende.** Cada año, cada celda de
+   * prado o de claro que linda con bosque —fuera del pueblo— brota con esta
+   * probabilidad por vecina arbolada (flujo `forest`), y el plantón tarda
+   * `FOREST_REGROWTH_YEARS` en dar madera entera.
+   *
+   * TUNE: medido en `docs/medidas/k1-k3-madera-2026-10-01.md` §6.
+   */
+  FOREST_SPREAD: 0.004,
+  /**
+   * K2 · a cuántas celdas de la plaza no brota bosque nuevo: el pueblo y lo que
+   * pisa. Con el cerco trazado manda el cerco, si es mayor (y dentro de él
+   * tampoco rebrota lo talado: K1, el interior se queda despejado).
+   *
+   * TUNE: 18, un poco más que el cerco más ancho medido (17, semilla 12).
+   */
+  FOREST_SPREAD_CLEAR: 18,
+  /**
+   * K2 · Vera (1 oct 2026): un valle **no** se queda sin bosque. Por debajo de
+   * tantas celdas arboladas no se tala: queda un foco, y desde él se extiende.
+   *
+   * TUNE: 24, un bosquete de cinco por cinco.
+   */
+  FOREST_FLOOR_CELLS: 24,
   BARREN_CLEARING: 254, // a crossroad felled it for a lifetime (§A.11)
   FLOOD_PRONE_SHIFT: 0.05, // ruinous weather borrowed from the fair row
   PATH_T1: 400,

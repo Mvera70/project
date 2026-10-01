@@ -14,6 +14,7 @@ import { ANIMALS, TIME } from '@engine/balance';
 import type { Building, GameState } from '@engine/state';
 import { standing, valleyCore } from './anchors';
 import { allocateLabour } from '@engine/subsistence/labour';
+import { woodHaul } from '@engine/world/forest';
 import { wardensWanted } from '@engine/subsistence/crows';
 import { TERRAIN_CODE } from '@engine/state';
 import { seasonOf, weekOf } from '@engine/time';
@@ -184,7 +185,7 @@ const COVER = new WeakMap<GameState, { tick: number; share: number }>();
 function wardenCover(state: GameState): number {
   const known = COVER.get(state);
   if (known !== undefined && known.tick === state.tick) return known.share;
-  const a = allocateLabour(state);
+  const a = allocateLabour(state, woodHaul(state));
   const wanted = wardensWanted(state, a.workedFields);
   const share = wanted <= 0 ? 0 : Math.max(0, Math.min(1, a.wardens / wanted));
   COVER.set(state, { tick: state.tick, share });

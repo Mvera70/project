@@ -308,6 +308,10 @@ function destinations(
   const crew = workers(state);
   if (crew.length === 0 || workforce(state) === 0) return out;
 
+  // K3 · sin el acarreo (`woodHaul`): `forest.ts` mira a `paths.ts` para avisar
+  // de que los árboles se han movido, y la flecha no puede volver. Con el
+  // bosque lejos el motor manda algún leñador más; aquí, al pisar los caminos,
+  // cuentan los de siempre. Es desgaste de suelo, no madera.
   const a = allocateLabour(state);
   const share = crew.length / Math.max(1, workforce(state));
   // §11.9, v3.03: seis oficios, no tres. §5.2 lleva repartiendo cazadores,

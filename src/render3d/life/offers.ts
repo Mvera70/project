@@ -21,7 +21,7 @@ import { cropOf, fieldMoment } from '@engine/world/crops';
 import { allocateLabour } from '@engine/subsistence/labour';
 import { TIME } from '@engine/balance';
 import { seasonOf, weekOf } from '@engine/time';
-import { fellingTarget } from '@engine/world/forest';
+import { fellingTarget, sapling, woodHaul } from '@engine/world/forest';
 import type { Point, Terrain } from './body';
 import { blockedAt, fitsCircle, WALL_CLEAR } from './body';
 import type { NeedName } from './needs';
@@ -277,7 +277,9 @@ function nearTrees(state: GameState, target: number): number[] {
     const x = tx + dx, z = tz + dz;
     if (x < 0 || z < 0 || x >= width || z >= state.map.height) continue;
     const cell = z * width + x;
-    if (state.map.terrain[cell] === TERRAIN_CODE.forest && (state.map.forestStock[cell] ?? 0) > 0) near.push(cell);
+    // K2 · y un plantón no se tala (`world/forest.ts`, `fellable`).
+    if (state.map.terrain[cell] === TERRAIN_CODE.forest && (state.map.forestStock[cell] ?? 0) > 0
+      && !sapling(state.map.forestAge[cell] as number)) near.push(cell);
   }
   return near.sort((a, b) => Math.hypot(a % width - tx, Math.floor(a / width) - tz)
     - Math.hypot(b % width - tx, Math.floor(b / width) - tz) || a - b);
@@ -373,7 +375,7 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
    * capa: más manos al bosque, más plazas en el tajo del bosque, más gente que
    * la elige y se va allí andando. La orden se ve sin leer una cifra.
   */
-  const hands = allocateLabour(state);
+  const hands = allocateLabour(state, woodHaul(state));
   const week = weekOf(state.tick);
   const winter = seasonOf(state.tick) === 'winter';
   const harvesting = week === TIME.HARVEST_WEEK;

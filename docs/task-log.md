@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 1 oct 2026 · K1–K3: el bosque que se gasta, se reproduce y pesa (v5.53)
+
+Rama `ccr-372e1786-k4brcp`, sobre `main` con la Parte 0 dentro. Decisiones de
+Vera: escasez en la mitad de las partidas y por el bosque; ningún valle sin
+bosque; la regla de tala es «lo más cercano». Medido (12 semillas × 60 años):
+escasez seria 8 de 12, todas con el bosque lejos; interior al cerrarse 9 %
+(antes 58 %); frío 57 semanas (antes 302). **Abierto:** (1) **nivelar es de
+Vera**: lo temprano llega antes (capilla 33 h, antes 48) y 1 villa de 12 no
+cierra en 60 años; (2) las tomas de la capa de vida —un plantón que crece, los
+leñadores yendo a un foco lejano— con el observatorio; (3) las jornadas que
+este cambio de motor mueva, cada una con su causa, cuando pase la CI.
+Siguiente en el orden: **K8+K9**, la herrería y la iglesia con tablón.
+
 ## 1 oct 2026 · Parte 0: el niño perdido, sin rescates que nadie hizo (v5.52)
 
 Rama `ccr-372e1786-k4brcp`. Reproducido en `main`: semilla 23, el buscador se

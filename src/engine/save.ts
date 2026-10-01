@@ -589,6 +589,12 @@ export function deserialize(raw: unknown): SaveFile {
       rng: { ...state.rng, expeditions: state.rng.expeditions ?? hash32(state.seed, 'expeditions') },
     } as GameState;
   }
+  // K2 · el flujo del bosque que se extiende, también **sin subir el esquema**:
+  // sale de la semilla maestra como todos, y una partida guardada antes sigue
+  // cargando con el mismo bosque.
+  if (state.rng.forest === undefined) {
+    state = { ...state, rng: { ...state.rng, forest: hash32(state.seed, 'forest') } } as GameState;
+  }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');
   if (!(candidate.decisions as unknown[]).every(decisionRecord)) {

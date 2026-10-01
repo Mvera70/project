@@ -1,5 +1,6 @@
 import { visibleBuildings } from '@derive/visible-buildings';
 import { TRAITS, WORLD } from '@engine/balance';
+import { sapling } from '@engine/world/forest';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 
 export type ForestState = Pick<GameState, 'map' | 'buildings' | 'works' | 'traits'>;
@@ -58,6 +59,15 @@ export function forestLooks(
     if (occupied.has(cell) || suppressed.has(cell)) continue;
     const terrain = state.map.terrain[cell];
     const age = state.map.forestAge[cell] as number;
+    // K2 (1 oct 2026) · **el bosque nuevo se ve crecer.** Lo que brota junto al
+    // bosque es bosque para el motor desde el primer año, pero un plantón: no se
+    // tala hasta `FOREST_REGROWTH_YEARS` (`world/forest.ts`, `fellable`). Se
+    // pinta como el rebrote —pequeño, creciendo, transitable— y no como un
+    // árbol hecho con su tronco y su obstáculo.
+    if (terrain === TERRAIN_CODE.forest && sapling(age)) {
+      looks.push({ cell, stage: 'regrowth', crown: 1, size: 0.18 + (age / WORLD.FOREST_REGROWTH_YEARS) * 0.78 });
+      continue;
+    }
     if (terrain === TERRAIN_CODE.forest && (state.map.forestStock[cell] as number) > 0) {
       const capacity = age === WORLD.VIRGIN_FOREST && state.traits.includes('old_forest')
         ? oldCapacity : WORLD.WOOD_PER_FOREST_TILE;

@@ -289,12 +289,15 @@ describe('el bosque · §7.5', () => {
     expect(s.map.forestAge[cleared]).toBe(0);
   });
 
-  it('devuelve menos de lo pedido cuando el valle se acaba', () => {
+  it('devuelve menos de lo pedido cuando el valle se acaba, y deja un foco', () => {
+    // K2 (Vera, 1 oct 2026): un valle no se queda sin bosque. Talado todo lo
+    // que se puede, quedan `FOREST_FLOOR_CELLS` celdas, y de ahí no se saca más.
     const s = foundTwenty(7);
     const all = woodStanding(s);
-    expect(fellForest(s, all + 5000)).toBe(all);
-    expect(woodStanding(s)).toBe(0);
-    expect(forestCells(s)).toBe(0);
+    const got = fellForest(s, all + 5000);
+    expect(got).toBeLessThan(all);
+    expect(woodStanding(s)).toBe(all - got);
+    expect(forestCells(s)).toBe(WORLD.FOREST_FLOOR_CELLS);
     expect(fellForest(s, 100)).toBe(0);
   });
 
@@ -390,11 +393,29 @@ describe('el bosque · §7.5', () => {
 });
 
 describe('el bosque viejo · §9, v2.16', () => {
+  /**
+   * K2 · por debajo de `FOREST_FLOOR_CELLS` celdas no se tala, así que si el
+   * foco que queda fuera bosque viejo, el bosque viejo no se acabaría nunca
+   * talando. Aquí el foco son las celdas más lejanas, convertidas en bosque que
+   * volvió (edad 0) y sin madera que sacar, para que no se talen antes que el
+   * viejo: «talarlo entero» acaba con todo el viejo, que es lo que miran estas
+   * dos pruebas.
+   */
+  function regrownFloor(s: ReturnType<typeof foundTwenty>): void {
+    const cx = s.plaza.x + 0.5, cy = s.plaza.y + 0.5;
+    const far = [...s.map.terrain.keys()].filter((i) => s.map.terrain[i] === TERRAIN_CODE.forest)
+      .sort((a, b) => Math.hypot((b % s.map.width) - cx, Math.floor(b / s.map.width) - cy)
+        - Math.hypot((a % s.map.width) - cx, Math.floor(a / s.map.width) - cy))
+      .slice(0, WORLD.FOREST_FLOOR_CELLS);
+    for (const cell of far) { s.map.forestAge[cell] = 0; s.map.forestStock[cell] = 0; }
+  }
+
   it('nace todo marcado y la marca no vuelve', () => {
     const s = foundTwenty(7);
     expect(virginForestCells(s)).toBe(forestCells(s));
     // Talarlo entero y dejar que rebrote no devuelve la marca: lo que crece no
     // es el bosque que encontraron.
+    regrownFloor(s);
     fellForest(s, woodStanding(s));
     expect(virginForestCells(s)).toBe(0);
   });
@@ -403,13 +424,20 @@ describe('el bosque viejo · §9, v2.16', () => {
     const s = foundTwenty(7);
     const before = s.chronicle.length;
     // Talar a mano hasta el final y luego dejar correr una semana del motor.
+    regrownFloor(s);
     fellForest(s, woodStanding(s));
     expect(s.flags['old_forest_gone']).toBe(0);
 
+    // Una sola celda de bosque viejo, la más cercana a la plaza, y el foco que
+    // nunca se tala (K2) hecho de bosque que volvió, lejos.
     const t = foundTwenty(42);
-    const last = [...t.map.terrain].findIndex((terrain) => terrain === TERRAIN_CODE.forest);
-    for (let cell = 0; cell < t.map.terrain.length; cell += 1) {
-      if (t.map.terrain[cell] !== TERRAIN_CODE.forest) continue;
+    regrownFloor(t);
+    const cx = t.plaza.x + 0.5, cy = t.plaza.y + 0.5;
+    const virgin = [...t.map.terrain.keys()].filter((i) => t.map.terrain[i] === TERRAIN_CODE.forest
+      && t.map.forestAge[i] === WORLD.VIRGIN_FOREST);
+    const last = virgin.sort((a, b) => Math.hypot((a % t.map.width) - cx, Math.floor(a / t.map.width) - cy)
+      - Math.hypot((b % t.map.width) - cx, Math.floor(b / t.map.width) - cy))[0]!;
+    for (const cell of virgin) {
       t.map.terrain[cell] = TERRAIN_CODE.cleared;
       t.map.forestStock[cell] = 0;
       t.map.forestAge[cell] = 0;

@@ -39,9 +39,20 @@ const DAY_STEPS = 3600;
  * piezas a los veinticinco. Un valle sin cerco no tiene guarnición —es la
  * propiedad de `garrison.test.ts`— y aquí lo que se mide es la que sí la tiene.
  */
+const played = new Map<string, GameState>();
+function grownTo(seed: number, years: number): GameState {
+  const key = `${seed}:${years}`;
+  let base = played.get(key);
+  if (base === undefined) {
+    base = foundTwenty(seed);
+    run(base, TIME.WEEKS_PER_YEAR * years, 'prudent', CATALOG);
+    played.set(key, base);
+  }
+  return base;
+}
+
 function besieged(seed: number, years: number): GameState {
-  const state = foundTwenty(seed);
-  run(state, TIME.WEEKS_PER_YEAR * years, 'prudent', CATALOG);
+  const state = structuredClone(grownTo(seed, years));
   (state.traits as ValleyTrait[]).push('arms', 'bows');
   state.threat.comingTick = state.tick + 1;
   return state;
@@ -57,14 +68,29 @@ function besieged(seed: number, years: number): GameState {
  * nada: eso es la propiedad «sin cerco no hay guarnición», y la guarda
  * `tests/fast/garrison.test.ts`.
  */
-const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [11, 25], [23, 25], [36, 30]];
+//
+// **Y desde K1–K3 (1 oct 2026) se buscan, no se fijan.** La semilla 11 a los
+// veinticinco años tenía cerco; con la madera que aprieta lo traza hacia el año
+// treinta y cinco, y a los veinticinco no tiene puestos que ocupar. Se toman,
+// de unas candidatas, las que a esa edad tienen portón y siguen en pie, y tienen
+// que salir tres como poco.
+const CANDIDATES: readonly (readonly [number, number])[] = [[7, 25], [11, 25], [23, 25], [36, 30], [3, 25], [11, 40]];
+let walled: (readonly [number, number])[] | null = null;
+function valleys(): readonly (readonly [number, number])[] {
+  walled ??= CANDIDATES.filter(([seed, years]) => {
+    const state = grownTo(seed, years);
+    return state.ended === null && state.buildings.some((b) => b.lostTick === null && b.kind === 'gate');
+  });
+  expect(walled.length, `sólo ${walled.length} valles con cerco entre las candidatas`).toBeGreaterThanOrEqual(3);
+  return walled;
+}
 
 describe('C2 · la guarnición, en pantalla', () => {
   it('todos los puestos se ocupan en algún momento del día', () => {
     // «En algún momento» y no «al cerrar» a propósito: la jornada acaba de
     // noche y de noche se va a dormir. Lo que esto guarda es que quien tiene el
     // puesto **llega** a él, que es lo que D2 necesita para que alguien dispare.
-    for (const [seed, years] of VALLEYS) {
+    for (const [seed, years] of valleys()) {
       const state = besieged(seed, years);
       const garrison = garrisonOf(state);
       expect(garrison.manned, `semilla ${seed}: hay guarnición`).toBe(true);
@@ -86,7 +112,7 @@ describe('C2 · la guarnición, en pantalla', () => {
   });
 
   it('y la aldea no se sube entera a la muralla', () => {
-    for (const [seed, years] of VALLEYS) {
+    for (const [seed, years] of valleys()) {
       const state = besieged(seed, years);
       const life = createVillage(state, 0);
       const guarding = life.dwellers

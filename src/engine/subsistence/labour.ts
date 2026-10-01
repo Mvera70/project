@@ -54,7 +54,7 @@ function clamp(value: number, low: number, high: number): number {
  *   cutters      = spare · CUTTER_SHARE
  *   builders     = spare − cutters
  */
-export function allocateLabour(state: GameState): Allocation {
+export function allocateLabour(state: GameState, haul = 1): Allocation {
   const w = workforce(state);
   const people = population(state);
 
@@ -156,7 +156,13 @@ export function allocateLabour(state: GameState): Allocation {
   // de leñadores para que el bosque no se quede vacío de gente. **Y aquí es
   // donde el hacha se convierte en manos libres**: si cada leñador trae más, la
   // misma necesidad pide menos leñadores.
-  const perCutter = LABOUR.WOOD_PER_CUTTER * (hasTrait(state, 'axe') ? MEANS.AXE_WOOD : 1);
+  //
+  // K3 (Vera, 1 oct 2026) · **y lo lejos que está el bosque**: `haul` es lo que
+  // trae un leñador de lo que traería al lado del pueblo (`world/forest.ts`,
+  // `woodHaul`; se pasa porque `subsistence/` no mira `world/`). Con el bosque
+  // lejos la misma necesidad pide más manos, hasta el techo, y lo que no llega
+  // es escasez: la obra espera y la tira lo dice.
+  const perCutter = LABOUR.WOOD_PER_CUTTER * (hasTrait(state, 'axe') ? MEANS.AXE_WOOD : 1) * haul;
   const want = people * LABOUR.WINTER_WOOD * LABOUR.WOOD_TARGET_WEEKS + LABOUR.WOOD_WORKS_STOCK;
   const missing = Math.max(0, want - state.village.wood);
   const wanted = perCutter > 0 ? missing / (perCutter * LABOUR.WOOD_CATCH_UP_WEEKS) : 0;
@@ -203,7 +209,11 @@ export function produce(
   a: Allocation,
   woodCap: number = Number.POSITIVE_INFINITY,
 ): { wood: number; buildPoints: number } {
-  const cut = a.cutters * LABOUR.WOOD_PER_CUTTER;
+  // K3 · **con el hacha**, que es lo que `allocateLabour` ya contaba al pedir
+  // menos leñadores: sin ella aquí, el hacha mandaba menos manos al bosque y la
+  // leñera recibía lo de un leñador sin hacha, así que el medio de M-4 **daba
+  // menos leña**. Lo que el bosque no da —lejos, o ya talado— lo recorta `woodCap`.
+  const cut = a.cutters * LABOUR.WOOD_PER_CUTTER * (hasTrait(state, 'axe') ? MEANS.AXE_WOOD : 1);
   const wood = Math.max(0, Math.min(cut, woodCap));
   state.woodRun = planWoodRun(state, wood);
 

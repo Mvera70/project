@@ -5,12 +5,12 @@
 // harvest is eaten first and reaped afterwards, which is what makes a bad
 // autumn show up in the granary before the winter rather than after it.
 
-import { CHARACTER, FOOD, LABOUR } from '../balance';
+import { CHARACTER, FOOD, LABOUR, TIME } from '../balance';
 import { isHere, population } from '../people/demography';
 import { ageOf } from '../people/villagers';
 import { next, weighted } from '../rng';
 import type { GameState, Villager, VillagerId } from '../state';
-import { seasonOf } from '../time';
+import { seasonOf, weekOf } from '../time';
 import { feedAndSlaughter, type HerdReport } from './herd';
 import { scarHunger } from '../people/scars';
 
@@ -100,6 +100,31 @@ export function consume(state: GameState): {
   }
 
   return { severity, starved, herd };
+}
+
+/**
+ * K3a (Vera, 1 oct 2026) · **La leña del invierno que queda, que no se toca
+ * para obras.**
+ *
+ * Medido en `main` (`docs/medidas/k1-k3-madera-2026-10-01.md`): la madera ya
+ * apretaba en 11 de 12 partidas, pero no por el bosque. 37 de 50 rachas de
+ * escasez empezaban la semana en que se pagaba una obra: la aldea abría un
+ * granero de 120 a las puertas del invierno, se quedaba con 9 y pasaba frío
+ * (semilla 5, hora 20). Vera eligió que la escasez venga del bosque, así que
+ * la aldea guarda, en otoño, el invierno entero, y en invierno, lo que le
+ * queda. No es un número de gusto: es la misma cuenta que `overwinter` quema,
+ * con el calendario de §3.2.
+ */
+export function winterReserve(state: GameState): number {
+  const season = seasonOf(state.tick);
+  if (season !== 'autumn' && season !== 'winter') return 0;
+  const weeks = season === 'autumn'
+    ? TIME.WEEKS_PER_SEASON
+    : TIME.WEEKS_PER_SEASON - (weekOf(state.tick) % TIME.WEEKS_PER_SEASON);
+  const coldUntil = state.flags['cold_houses'];
+  const coldHouses = coldUntil !== undefined && (coldUntil === 0 || coldUntil > state.tick);
+  return population(state) * LABOUR.WINTER_WOOD * weeks
+    * (coldHouses ? LABOUR.COLD_HOUSES_WOOD_MULTIPLIER : 1);
 }
 
 /**

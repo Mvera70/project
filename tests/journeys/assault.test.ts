@@ -40,11 +40,22 @@ const DAY_STEPS = 3600;
  * `assault` es la marca del motor (B3): sin ella lo de hoy es un saqueo y nadie
  * toca la puerta, que es la propiedad que separa D3 de D3b.
  */
+const played = new Map<string, GameState>();
+function grownTo(seed: number, years: number): GameState {
+  const key = `${seed}:${years}`;
+  let base = played.get(key);
+  if (base === undefined) {
+    base = foundTwenty(seed);
+    run(base, TIME.WEEKS_PER_YEAR * years, 'prudent', CATALOG);
+    played.set(key, base);
+  }
+  return base;
+}
+
 function raided(seed: number, years: number, opts: {
   bows: boolean; assault: boolean; band?: number;
 }): GameState {
-  const state = foundTwenty(seed);
-  run(state, TIME.WEEKS_PER_YEAR * years, 'prudent', CATALOG);
+  const state = structuredClone(grownTo(seed, years));
   (state.traits as ValleyTrait[]).push('arms');
   if (opts.bows) (state.traits as ValleyTrait[]).push('bows');
   state.threat.arrivedTick = state.tick;
@@ -80,15 +91,32 @@ async function fight(state: GameState): Promise<{
   };
 }
 
-/** Los valles que tienen cerco con portón a esa altura, medidos al cerrar D5. */
-const WALLED: readonly (readonly [number, number])[] = [[7, 25], [11, 25], [23, 25], [3, 25]];
+/**
+ * Los valles que tienen cerco con portón a esa altura, medidos al cerrar D5.
+ *
+ * **Y desde K1–K3 (1 oct 2026) se buscan, no se fijan:** la semilla 11 a los
+ * veinticinco años ya no tiene cerco —con la madera que aprieta lo traza hacia
+ * el año treinta y cinco— y no tenía puestos desde los que disparar. Se toman,
+ * de unas candidatas, las que a esa edad tienen portón y siguen en pie; tienen
+ * que salir tres como poco.
+ */
+const CANDIDATES: readonly (readonly [number, number])[] = [[7, 25], [11, 25], [23, 25], [3, 25], [11, 40]];
+let walledCache: (readonly [number, number])[] | null = null;
+function walled(): readonly (readonly [number, number])[] {
+  walledCache ??= CANDIDATES.filter(([seed, years]) => {
+    const state = grownTo(seed, years);
+    return state.ended === null && state.buildings.some((b) => b.lostTick === null && b.kind === 'gate');
+  });
+  expect(walledCache.length, `sólo ${walledCache.length} valles con portón entre las candidatas`).toBeGreaterThanOrEqual(3);
+  return walledCache;
+}
 
 describe('D3b/D5 · el portón que cede', () => {
   it('un saqueo no toca la puerta', async () => {
     // La propiedad que separa las dos visitas. Sin esto, cualquier partida que
     // baje a robar grano acabaría tirando el portón, y el asalto —que el motor
     // reserva para la partida que da para tomar el valle— dejaría de ser nada.
-    for (const [seed, years] of WALLED) {
+    for (const [seed, years] of walled()) {
       const sack = await fight(raided(seed, years, { bows: true, assault: false }));
       expect(sack.gateHits, `semilla ${seed}: golpes en un saqueo`).toBe(0);
       expect(sack.broken, `semilla ${seed}: la puerta aguanta`).toBe(false);
@@ -101,7 +129,7 @@ describe('D3b/D5 · el portón que cede', () => {
     // 31 segundos escénicos y entran los doce. Sin nadie que dispare, sesenta
     // golpes son doce hombres durante cinco segundos más lo que tardan en
     // llegar.
-    for (const [seed, years] of WALLED) {
+    for (const [seed, years] of walled()) {
       const storm = await fight(raided(seed, years, { bows: false, assault: true }));
       expect(storm.gateHits, `semilla ${seed}: golpes`).toBeGreaterThan(0);
       expect(storm.broken, `semilla ${seed}: la puerta cede`).toBe(true);
@@ -117,7 +145,7 @@ describe('D3b/D5 · el portón que cede', () => {
     // 18 a 31, caen de 2 a 12 saqueadores, y **la semilla 7 salva el valle con
     // el portón roto** porque no queda ni uno en pie para pasar por él.
     let helped = 0;
-    for (const [seed, years] of WALLED) {
+    for (const [seed, years] of walled()) {
       const bare = await fight(raided(seed, years, { bows: false, assault: true }));
       const bowed = await fight(raided(seed, years, { bows: true, assault: true }));
       expect(bowed.loosed, `semilla ${seed}: se dispara`).toBeGreaterThan(0);
@@ -126,8 +154,8 @@ describe('D3b/D5 · el portón que cede', () => {
       const saved = !bowed.entered;
       if (slower || saved) helped += 1;
     }
-    expect(helped, `los arcos cambiaron la carrera en ${helped} de ${WALLED.length}`)
-      .toBe(WALLED.length);
+    expect(helped, `los arcos cambiaron la carrera en ${helped} de ${walled().length}`)
+      .toBe(walled().length);
   });
 
   it('un portón roto con la partida entera en el suelo no es un valle tomado', async () => {
@@ -173,13 +201,13 @@ describe('D4 · y defender cuesta', () => {
     // determinista: **en algún valle cuesta gente**. Que costara siempre sería
     // un número, no una batalla.
     let bled = 0;
-    for (const [seed, years] of WALLED) {
+    for (const [seed, years] of walled()) {
       for (const bows of [true, false]) {
         const fight2 = await fight(raided(seed, years, { bows, assault: true }));
         if (fight2.lost > 0) bled += 1;
       }
     }
-    expect(bled, `hubo bajas propias en ${bled} de ${WALLED.length * 2} asaltos`)
+    expect(bled, `hubo bajas propias en ${bled} de ${walled().length * 2} asaltos`)
       .toBeGreaterThan(0);
   });
 
@@ -187,7 +215,7 @@ describe('D4 · y defender cuesta', () => {
     // Nadie se acerca a la muralla en un saqueo (D3), así que el cuerpo a
     // cuerpo no ocurre. Es la otra mitad de la propiedad de arriba: lo que
     // cuesta gente es el asalto.
-    for (const [seed, years] of WALLED) {
+    for (const [seed, years] of walled()) {
       const sack = await fight(raided(seed, years, { bows: true, assault: false }));
       expect(sack.lost, `semilla ${seed}: ni una baja propia en un saqueo`).toBe(0);
     }

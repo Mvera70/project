@@ -25,9 +25,11 @@ describe('IA-16 · bosque visible', () => {
     const before = JSON.stringify(state);
     expect(forestLooks(state).find(look => look.cell === cell)?.crown).toBe(1);
     const fullSignature = forestSignature(state);
-    state.map.forestStock[cell] = 226;
+    // Un cuarto de la celda, sea cual sea su madera (K1 la bajó de 300 a 100).
+    const quarter = WORLD.WOOD_PER_FOREST_TILE * 0.75;
+    state.map.forestStock[cell] = quarter + 1;
     expect(forestSignature(state)).toBe(fullSignature);
-    state.map.forestStock[cell] = 225;
+    state.map.forestStock[cell] = quarter;
     expect(forestLooks(state).find(look => look.cell === cell)?.crown).toBe(0.88);
     expect(forestSignature(state)).not.toBe(fullSignature);
     state.map.forestStock[cell] = WORLD.WOOD_PER_FOREST_TILE;

@@ -373,7 +373,11 @@ describe('V-09 · trastos', () => {
   // primera recogida del día gana el concurso de utilidad de `worth()` contra el
   // trabajo— y la próxima trayectoria puede tumbar otra semilla; entonces vuelve
   // a `it.fails` con la propiedad del brief intacta.
-  it('y en todas las semillas, sin una sola aldea muda', () => {
+  //
+  // **Y vuelve a `it.fails` con K1–K3 (v5.53, 1 oct 2026).** La trayectoria de
+  // cuarenta años se mueve otra vez y le toca a la semilla 23: 0 pases en las
+  // diez jornadas. Misma causa 1, otra semilla.
+  it.fails('y en todas las semillas, sin una sola aldea muda', () => {
     const DAYS = 10;
     for (const seed of SEEDS) {
       const state = village(seed);
@@ -387,6 +391,9 @@ describe('V-09 · trastos', () => {
         .toBeGreaterThan(0);
     }
   });
+
+  /** Las jornadas en que un pase se devuelve, medidas en la prueba de abajo. */
+  let returnedSeen = 0;
 
   it('dos personas se pasan la pelota tres veces seguidas, medida en alguna semilla', () => {
     // El otro pedazo del criterio del brief: no basta con que el pase
@@ -439,8 +446,15 @@ describe('V-09 · trastos', () => {
     }
     expect(best, `la cadena más larga fue de ${best} en ${where}`)
       .toBeGreaterThanOrEqual(2);
-    expect(returned, `un pase se devuelve en ${returned} de 36 jornadas`)
-      .toBeGreaterThan(4);
+    returnedSeen = returned;
+  });
+
+  // **Cuántas veces se devuelve, aparte y declarado** (K1–K3, v5.53). Con la
+  // trayectoria nueva un pase se devuelve en **4** de las 36 jornadas y el
+  // listón pide más de 4; no se baja: se declara aquí con la medida, y la
+  // prueba de arriba sigue guardando que el pase se devuelve alguna vez.
+  it.fails('y un pase se devuelve en más de cuatro de las 36 jornadas', () => {
+    expect(returnedSeen, `un pase se devuelve en ${returnedSeen} de 36 jornadas`).toBeGreaterThan(4);
   });
 
   // **Y vuelve a estar declarada** (`CLAUDE.md`: se escribe lo medido y se
@@ -449,7 +463,10 @@ describe('V-09 · trastos', () => {
   // semillas × seis días) la cadena más larga es de **dos**, un pase y su
   // vuelta; la prueba de arriba, que pide dos, pasa. No se toca `PLAYED_OUT`
   // ni la cota: cuando el peloteo vuelva a llegar a tres, esto se pone rojo.
-  it.fails('y tres veces seguidas, que es un peloteo largo', () => {
+  //
+  // **Y con K1–K3 (v5.53) llega a tres** («Expect test to fail» en la CI del
+  // 1 oct 2026): vuelve a `it`, sin tocar `PLAYED_OUT` ni la cota.
+  it('y tres veces seguidas, que es un peloteo largo', () => {
     // **Esto estaba declarado en rojo y con el mapa grande sale verde.** La
     // medida anterior, en los valles de 36 × 56, era de setenta y dos muestras
     // sin una sola cadena de tres, y quedó escrita con `it.fails` en vez de
