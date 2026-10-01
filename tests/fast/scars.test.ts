@@ -24,8 +24,11 @@ function village(years: number, seed = 7): GameState {
   return structuredClone(base);
 }
 
+// Los que **siguen en el valle**: quien se marchó (`leftTick`) tampoco recuerda
+// nada de lo que pasa aquí (RD-3: `smith_feud.side_with_*` y las demás hacen
+// que alguien se vaya de verdad).
 const named = (state: GameState): Villager[] =>
-  state.people.villagers.filter((v) => v.named && v.diedTick === null);
+  state.people.villagers.filter((v) => v.named && v.diedTick === null && v.leftTick === null);
 
 const memoriesOf = (v: Villager, kind: string): number =>
   v.memories.filter((m) => m.kind === kind).length;

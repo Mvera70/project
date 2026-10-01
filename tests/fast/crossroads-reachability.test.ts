@@ -76,31 +76,13 @@ describe('el catálogo · alcanzabilidad de las condiciones', () => {
   let passes: Map<string, number>;
   beforeAll(() => { passes = passesByTemplate(); }, 15_000);
 
-  // Dos plantillas siguen sin cumplir `requires` en esta ventana, y ninguna de
-  // las dos por un umbral inalcanzable:
-  //
-  //   · `tithe_demand` depende de haberse arrodillado en `winter_grain_debt`
-  //     (A.1 kneel: `flag vassal years:0`), una cadena que existe y funciona
-  //     —comprobado disparando la opción a mano— pero que rara vez se recorre:
-  //     `winter_grain_debt` mismo es elegible ~0,2 % de los ticks y sólo una
-  //     de sus tres opciones vota vasallaje. Documentado en design.md v3.65 y
-  //     en la auditoría de v2.46 como "por diseño, gira sobre una decisión
-  //     anterior, no sobre la edad". No se toca en esta ronda.
-  //   · `chapel_or_granary` exige a la vez `people >= 30`, `wood > 200` y
-  //     `faith > 45` sin capilla, y es hito de una sola vez (`maxPerGame: 1`):
-  //     la combinación es estrecha y ya está en el `SLOW` de
-  //     `tests/fast/catalog.test.ts` por el mismo motivo, midiendo sobre el
-  //     banco sintético.
-  //   · `relic_pedlar` exige `has chapel`, y levantar una capilla depende a su
-  //     vez de que salga `chapel_or_granary` —la única puerta a ese edificio
-  //     en el catálogo—, así que hereda su misma rareza. Es además el fallo
-  //     "por descuido" que design.md ya tiene anotado aparte (la fe se
-  //     estabiliza fuera de banda una vez hay capilla) y que esta ronda no
-  //     tenía encargo de tocar.
-  //
-  // Si otra entra aquí sin que nadie la haya sacado a propósito, el fallo es
-  // real y hay que investigarlo, no ampliar la lista.
-  const NARROW_NOT_IMPOSSIBLE = ['tithe_demand', 'chapel_or_granary', 'relic_pedlar'];
+  // RD-3 (1 oct 2026) · aquí había una lista de tres plantillas estrechas
+  // (`tithe_demand`, `chapel_or_granary`, `relic_pedlar`) que se medían sin
+  // cumplir `requires`. Las tres se retiraron del sorteo —duplicaban mecanismos
+  // posteriores, ver `docs/medidas/rd3-encrucijadas-2026-10-01.md`— y la lista
+  // queda vacía: **si otra entra aquí sin que nadie la haya sacado a propósito,
+  // el fallo es real y hay que investigarlo, no ampliar la lista.**
+  const NARROW_NOT_IMPOSSIBLE: string[] = [];
 
   // **Estuvo roja a propósito durante tres días, y ya no lo está** (18 sep
   // 2026). Llegó con la rama del 14 sep y su lista se midió contra el mapa de
@@ -121,20 +103,19 @@ describe('el catálogo · alcanzabilidad de las condiciones', () => {
     expect(never, `\`requires\` nunca satisfecho: ${never.join(', ')}`).toEqual([]);
   });
 
-  // `wolf_winter` es el caso que motiva el fichero: exigía `forestLeft > 0.25`
-  // y el valle nunca funda ni se queda con más de `MAPGEN.FOREST_FRACTION`
-  // (0.20–0.26), así que el umbral estaba por encima de lo que el motor podía
-  // dar el día uno y sólo baja desde ahí. Aserto nombrado para que una futura
-  // subida de este umbral, o de cualquier otro basado en `forestLeft`, se note
-  // aquí y no sólo como una entrada más en la lista genérica de arriba.
-  it('`wolf_winter` sale de la lista de las nunca-elegibles: su umbral de bosque es alcanzable', () => {
-    // **Y lo es con el 0.25 original, desde el mapa grande** (medido el 15 sep
-    // 2026 al fusionar esta rama). La rama lo bajaba a 0.15 porque en el mapa
-    // de 36 × 56 el umbral era imposible —el valle fundaba entre 0.20 y 0.26 y
-    // `forestLeft` sólo baja—; v3.68 redefinió `forestLeft` contra el corazón
-    // productivo y con eso el bosque del mapa entero pasa a dar de sí. Así que
-    // el arreglo sobraba: se deshizo el cambio de umbral y **esta prueba pasa
-    // sin él**, que es la única manera de saber que sobraba.
-    expect(passes.get('wolf_winter') ?? 0).toBeGreaterThan(0);
+  // `wolf_winter` fue el caso que motivó el fichero (exigía `forestLeft > 0.25`,
+  // por encima de lo que el valle da el día uno) y RD-3 lo retiró del sorteo.
+  // El aserto nombrado pasa a la plantilla que hoy depende de `forestLeft` **y**
+  // del tope de campos: `forest_cut` pide a la vez `forestLeft > 0,12`, la
+  // despensa corta y sitio para otro campo (`room field`), y las tres tienen
+  // que coincidir alguna vez en una partida real.
+  it('`forest_cut` sigue siendo alcanzable con su sitio para un campo y su despensa corta', () => {
+    expect(passes.get('forest_cut') ?? 0).toBeGreaterThan(0);
+  });
+
+  // Y lo mismo para la primera piedra, que antes esperaba al año 41: ahora pide
+  // la iglesia en pie y el cerco sin cerrar.
+  it('`first_stone` es alcanzable: la iglesia llega antes que el cerco cerrado', () => {
+    expect(passes.get('first_stone') ?? 0).toBeGreaterThan(0);
   });
 });

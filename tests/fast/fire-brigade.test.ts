@@ -14,7 +14,10 @@ import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
 function alight(seed: number): { state: GameState; id: number } {
   const state = foundTwenty(seed);
   run(state, TIME.WEEKS_PER_YEAR * 8, 'prudent', CATALOG);
-  const house = state.buildings.find((b) => b.kind === 'house' && b.lostTick === null)!;
+  // Casa de madera o de piedra: RD-3 trae la primera piedra al año 4–8 y la
+  // política prudente contesta «las casas», así que a los ocho años una aldea
+  // puede no tener ya ninguna de madera.
+  const house = state.buildings.find((b) => (b.kind === 'house' || b.kind === 'stone_house') && b.lostTick === null)!;
   // Una casa que la aldea está salvando de las flechas (`fireArrows`).
   state.flags[`doused:${house.id}`] = state.tick + 1;
   return { state, id: house.id };

@@ -31,8 +31,12 @@ function village(years: number, seed = 7): GameState {
  */
 const QUARREL_FLOOR = -60;
 
+// **Y que sigan en el valle** (`leftTick`): RD-3 hizo real que quien pierde una
+// riña se marche (`smith_feud.side_with_*`), y un nombrado que se fue no riñe
+// con nadie —`quarrelOf` sólo mira a los presentes—, así que la prueba medía la
+// semana 3 000 de dos que ya no estaban.
 const namedOf = (s: GameState): Villager[] =>
-  s.people.villagers.filter((v) => v.named && v.diedTick === null);
+  s.people.villagers.filter((v) => v.named && v.diedTick === null && v.leftTick === null);
 
 /**
  * Dos que se detestan de verdad, con su rencor ya cocido, **y los únicos del

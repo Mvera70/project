@@ -5,11 +5,19 @@
 import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
+import type { Catalogue } from '@engine/crossroads/schema';
 import { run } from '@engine/sim';
 import { crowdPositions } from '@render/crowd';
 import { reactionsAt } from '@render/reactions';
 import { fingerprint } from '../helpers/fingerprint';
 import type { GameState } from '@engine/state';
+
+// **Un valle de casas de madera (RD-3, 1 oct 2026).** La pregunta de la primera
+// piedra sale ahora con la iglesia —año 4 a 8— y la política prudente contesta
+// «las casas»: a los veinte años todas son `stone_house`, y estas pruebas
+// prenden fuego a «una casa» (`kind: 'house'`). Lo que guardan es cómo reacciona
+// la gente a una pérdida, no la piedra, así que el valle se juega sin esa pregunta.
+const WOODEN: Catalogue = CATALOG.filter((t) => t.id !== 'first_stone');
 
 const grown = new Map<string, GameState>();
 function village(years: number, seed = 7): GameState {
@@ -17,7 +25,7 @@ function village(years: number, seed = 7): GameState {
   let base = grown.get(key);
   if (base === undefined) {
     base = foundTwenty(seed);
-    run(base, years * 48, 'prudent', CATALOG);
+    run(base, years * 48, 'prudent', WOODEN);
     grown.set(key, base);
   }
   const copy = structuredClone(base);

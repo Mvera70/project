@@ -6,7 +6,9 @@
 // plantilla que nunca sale es contenido muerto, y con dieciséis escritas a mano
 // es fácil que pase.
 import { beforeAll, describe, expect, it } from 'vitest';
-import { CATALOG, RETIRED_TEMPLATES } from '@engine/crossroads/catalog';
+import { CATALOG, RETIRED_TEMPLATES, templateOf } from '@engine/crossroads/catalog';
+import { fireSeeds } from '@engine/crossroads/seeds';
+import { BUILDINGS } from '@engine/balance';
 import type { CrossroadCategory } from '@engine/crossroads/schema';
 import type { GameState } from '@engine/state';
 import { population } from '@engine/people/demography';
@@ -26,12 +28,66 @@ describe('el catálogo · forma', () => {
     // categoría que el Anexo A no tenía porque el asedio es de la meta.
     // Veintiuna desde G3: las dos del caserío (`hamlet.ts`), la primera
     // decisión que un valle de menos de diez personas puede ver.
-    expect(CATALOG).toHaveLength(21);
-    expect(RETIRED_TEMPLATES).toHaveLength(3);
+    //
+    // **Quince desde RD-3 (1 oct 2026), y nueve retiradas.** Vera aplicó el
+    // dictamen de `docs/medidas/rd0-encrucijadas-2026-09-30.md`: seis plantillas
+    // salen del sorteo —`plague_blame` (casi inalcanzable), `tithe_demand` (el
+    // diezmo ya lo cobra el motor cada otoño), `chapel_or_granary` (se plantea
+    // con la iglesia ya en pie), `relic_pedlar` (duplica el medio `relic`),
+    // `wolf_winter` (los lobos ya son un suceso con cuerpo) y `bandits` (es el
+    // clan vecino sin su batalla)— y pasan a `RETIRED_TEMPLATES`, de modo que
+    // un guardado con una pendiente o con ellas en el registro sigue cargando.
+    expect(CATALOG).toHaveLength(15);
+    expect(RETIRED_TEMPLATES).toHaveLength(9);
     for (const retired of RETIRED_TEMPLATES) {
       expect(CATALOG.some((t) => t.id === retired.id), retired.id).toBe(false);
     }
     expect(CATALOG.some((t) => t.id === 'quiet_years')).toBe(true);
+  });
+
+  it('las seis que RD-3 retiró están retiradas, no borradas: título, opciones y semillas siguen', () => {
+    const six = ['plague_blame', 'tithe_demand', 'chapel_or_granary', 'relic_pedlar', 'wolf_winter', 'bandits'];
+    for (const id of six) {
+      expect(CATALOG.some((t) => t.id === id), id).toBe(false);
+      const template = templateOf(CATALOG, id);
+      expect(template, id).toBeDefined();
+      expect(CROSSROAD_BANK[template?.title ?? ''], `${id}: título`).toBeDefined();
+      for (const option of template?.options ?? []) {
+        expect(CROSSROAD_BANK[option.label], `${id}.${option.id}`).toBeDefined();
+        expect(BANK[`crossroad.${id}.${option.id}`], `${id}.${option.id}: crónica`).toBeDefined();
+      }
+    }
+  });
+
+  it('ninguna semilla de una retirada queda colgando: se dispara con su efecto y su crónica', () => {
+    // `seeds.ts` busca la plantilla con `templateOf`; con `catalogue.find` a
+    // secas una semilla plantada por una retirada caía en `spec === null` y se
+    // marcaba disparada sin efecto ni crónica.
+    for (const retired of RETIRED_TEMPLATES) {
+      for (const option of retired.options) {
+        for (const spec of option.seeds) {
+          const s = founded(3);
+          s.seeds.push({
+            id: `${retired.id}:${option.id}:${spec.id}:0`,
+            fromTemplateId: retired.id,
+            fromOptionId: option.id,
+            plantedTick: 0,
+            firesAtTick: 0,
+            cast: {},
+            condition: null,
+            firedTick: null,
+            witheredTick: null,
+          });
+          const before = s.chronicle.length;
+          const fired = fireSeeds(s, CATALOG);
+          expect(fired, `${retired.id}.${option.id}.${spec.id}`).toHaveLength(1);
+          expect(fired[0]?.fired).toBe(true);
+          expect(fired[0]?.effects?.visible, `${retired.id}.${option.id}.${spec.id}`).toEqual(spec.visible);
+          expect(s.chronicle.length, `${retired.id}.${option.id}.${spec.id}`).toBe(before + 1);
+          expect(s.chronicle.at(-1)?.templateKey).toBe(spec.chronicleKey);
+        }
+      }
+    }
   });
 
   it('ningún identificador repetido, y todos en snake_case', () => {
@@ -40,21 +96,24 @@ describe('el catálogo · forma', () => {
     for (const id of ids) expect(id, id).toMatch(/^[a-z][a-z0-9_]*$/);
   });
 
-  it('cada categoría lleva al menos dos plantillas', () => {
+  it('las categorías que quedan vivas, y cuántas plantillas lleva cada una', () => {
     const byCategory = new Map<CrossroadCategory, number>();
     for (const t of CATALOG) byCategory.set(t.category, (byCategory.get(t.category) ?? 0) + 1);
-    for (const c of [
-      'famine', 'plague', 'lord', 'feud', 'faith', 'forest', 'succession', 'hamlet',
-    ] as CrossroadCategory[]) {
+    // Con dos: la pregunta no se repite sola (§12.9).
+    for (const c of ['famine', 'feud', 'succession', 'hamlet', 'raid'] as CrossroadCategory[]) {
       expect(byCategory.get(c), c).toBe(2);
     }
-    // Y `trade` ya no está en esa lista: sus tres plantillas están retiradas.
+    // stranger lleva dos: la suya y quiet_years, que es la reserva.
+    expect(byCategory.get('stranger')).toBe(2);
+    // RD-3: señor, peste y bosque se quedan con una sola —la otra era un
+    // duplicado de un mecanismo posterior o inalcanzable—, y `faith` y `trade`
+    // dejan de tener plantillas vivas. Una categoría con una sola plantilla
+    // repite la misma pregunta; lo que lo impide es el reposo de cada una.
+    for (const c of ['lord', 'plague', 'forest'] as CrossroadCategory[]) {
+      expect(byCategory.get(c), c).toBe(1);
+    }
+    expect(byCategory.get('faith')).toBeUndefined();
     expect(byCategory.get('trade')).toBeUndefined();
-    // stranger lleva tres: las dos suyas y quiet_years, que es la reserva.
-    expect(byCategory.get('stranger')).toBe(3);
-    // Y ninguna categoría puede quedarse con una sola: con una, salir dos
-    // veces seguidas es repetirse, y §12.9 lo prohibe.
-    for (const [category, n] of byCategory) expect(n, category).toBeGreaterThanOrEqual(2);
   });
 
   it('toda plantilla tiene 2 o 3 opciones, con ids únicos', () => {
@@ -66,8 +125,8 @@ describe('el catálogo · forma', () => {
     }
   });
 
-  it('la capilla compromete una cosecha al ochenta por ciento', () => {
-    const chapel = CATALOG.find((t) => t.id === 'chapel_or_granary')
+  it('la capilla retirada conserva su cosecha al ochenta por ciento, por si un guardado la contesta', () => {
+    const chapel = RETIRED_TEMPLATES.find((t) => t.id === 'chapel_or_granary')
       ?.options.find((o) => o.id === 'the_chapel');
     expect(chapel?.effects).toContainEqual({ k: 'harvest', factor: 0.8, harvests: 1 });
   });
@@ -88,8 +147,8 @@ describe('el catálogo · forma', () => {
     });
   });
 
-  it('A.10 sigue abierta cuando la fe supera setenta', () => {
-    const relic = CATALOG.find((t) => t.id === 'relic_pedlar');
+  it('A.10 (retirada) sigue abierta cuando la fe supera setenta', () => {
+    const relic = RETIRED_TEMPLATES.find((t) => t.id === 'relic_pedlar');
     expect(relic?.requires).toContainEqual({ k: 'stat', stat: 'faith', op: '>', v: 30 });
     expect(relic?.requires).not.toContainEqual({ k: 'stat', stat: 'faith', op: '<', v: 70 });
   });
@@ -131,6 +190,52 @@ describe('el catálogo · forma', () => {
         expect(o.visible.length, `${t.id}.${o.id}`).toBeGreaterThanOrEqual(1);
       }
     }
+  });
+
+  it('lo que una opción enseña es lo que ocurre (RD-3: ninguna `visible` sin respaldo)', () => {
+    // RD-0 midió 7 opciones que anunciaban una obra, una tala o una ruina que
+    // no ocurría (`raise`/`scar` sin `build` ni `fell`) y 4 que apagaban una
+    // fragua o un molino sin relación con lo decidido. Cada efecto visible del
+    // catálogo vivo tiene que estar respaldado por un efecto del mismo gesto, y
+    // un `raise` de algo con tope sólo se ofrece si hay sitio (`room`).
+    type Backing = { template: string; option: string; where: string };
+    const unbacked: string[] = [];
+    for (const t of CATALOG) {
+      // `hamlet.ts` es de otro carril (la fundación): su semilla
+      // `the_cleared_strip` levanta un campo sin `room`, y queda dicho en el
+      // informe de RD-3 en vez de arreglarse aquí.
+      if (t.category === 'hamlet') continue;
+      for (const o of t.options) {
+        const rooms = new Set(
+          [...t.requires, ...(o.requires ?? [])]
+            .filter((c) => c.k === 'room')
+            .map((c) => (c.k === 'room' ? c.building : '')),
+        );
+        const check = (effects: typeof o.effects, visible: typeof o.visible, where: string): void => {
+          for (const v of visible) {
+            const has = (pred: (e: (typeof effects)[number]) => boolean): boolean => effects.some(pred);
+            if (v.k === 'raise' && !has((e) => e.k === 'build' && e.kind === v.kind)) unbacked.push(`${where}: raise ${v.kind} sin build`);
+            // Con tope, o estaca/muralla (que sin anillo se rechazan: A2c).
+            if (v.k === 'raise') {
+              const needsRoom = BUILDINGS[v.kind].cap !== null || v.kind === 'palisade' || v.kind === 'wall';
+              if (needsRoom && !rooms.has(v.kind)) unbacked.push(`${where}: raise ${v.kind} sin room`);
+            }
+            if (v.k === 'ruin' && !has((e) => e.k === 'destroy' && e.kind === v.kind)) unbacked.push(`${where}: ruin ${v.kind} sin destroy`);
+            // `douse` con `who` señala **la casa de una persona** (A.7, §11.5): la
+            // cámara va a donde vive B. Sin `who` tiene que apagar algo de verdad.
+            if (v.k === 'douse' && v.who === undefined && !has((e) => e.k === 'lit' && e.kind === v.kind && !e.on)) unbacked.push(`${where}: douse ${v.kind} sin lit off`);
+            if (v.k === 'scar' && v.what === 'felled_wood' && !has((e) => e.k === 'fell')) unbacked.push(`${where}: scar felled_wood sin fell`);
+            if (v.k === 'scar' && v.what === 'burnt_field' && !has((e) => e.k === 'destroy' && e.kind === 'field')) unbacked.push(`${where}: scar burnt_field sin destroy field`);
+            // El camposanto es una marca que el render no dibuja.
+            if (v.k === 'scar' && v.what === 'grave_row') unbacked.push(`${where}: scar grave_row no se dibuja`);
+          }
+        };
+        check(o.effects, o.visible, `${t.id}.${o.id}`);
+        for (const seed of o.seeds) check(seed.effects, seed.visible, `${t.id}.${o.id}.${seed.id}`);
+      }
+    }
+    void (undefined as Backing | undefined);
+    expect(unbacked).toEqual([]);
   });
 
   it('los pesos, reposos y topes son sensatos', () => {
@@ -356,9 +461,12 @@ describe('el catálogo · cobertura rápida', () => {
   // Esto se queda como lo que sirve: un barrido barato que caza una plantilla
   // cuyas condiciones no se pueden cumplir **ni siquiera en un banco generoso**,
   // que es un defecto de forma y se ve en dos segundos.
+  // RD-3: `plague_blame`, `wolf_winter` y `chapel_or_granary` salen de la lista
+  // porque salen del catálogo (retiradas); `first_stone` y `forest_cut` se
+  // quedan, ahora con condiciones de estado que este banco generoso no siempre
+  // cumple (la iglesia en pie, sitio para un campo).
   const SLOW = [
-    'plague_blame', 'forest_cut', 'wolf_winter', 'first_stone',
-    'chapel_or_granary', 'feud_inherited', 'smith_feud', 'quiet_years',
+    'forest_cut', 'first_stone', 'feud_inherited', 'smith_feud', 'quiet_years',
     'grain_factor', 'breaking_ground', 'one_at_the_ford',
   ];
 
@@ -373,7 +481,8 @@ describe('el catálogo · cobertura rápida', () => {
     const byCategory = new Set(
       CATALOG.filter((t) => (seen.get(t.id) ?? 0) > 0).map((t) => t.category),
     );
-    for (const c of ['famine', 'lord', 'feud', 'faith', 'stranger', 'succession'] as CrossroadCategory[]) {
+    // RD-3: `faith` ya no tiene plantillas vivas (las dos se retiraron).
+    for (const c of ['famine', 'lord', 'feud', 'stranger', 'succession'] as CrossroadCategory[]) {
       expect(byCategory.has(c), c).toBe(true);
     }
   });
