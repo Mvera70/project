@@ -698,6 +698,14 @@ function atRisk(state: GameState): boolean {
  * deshace, el estado vuelve byte a byte al de antes.
  */
 export function restTick(state: GameState): RestHalt | null {
+  // RD-6 · **y el asalto ya anunciado no se pelea sin nadie delante.** El aviso
+  // para la ausencia la semana en que llega; pero si llegó antes de irse el
+  // jugador, la ausencia vivía las semanas de preparación y luego el asalto,
+  // resuelto por la cuenta de B3: medido en la integración del 1 oct, 9
+  // asaltos en 24 valles con cuatro ausencias al tope. Ahora la ausencia corre
+  // hasta la víspera y se para ahí, sin vivir la semana en que llegan.
+  const coming = state.threat.comingTick;
+  if (coming !== null && state.tick + 1 >= coming) return 'raid';
   const before = atRisk(state) ? structuredClone(state) : null;
   const report = tick(state, CATALOG);
   if (state.ended !== null && before !== null) {
