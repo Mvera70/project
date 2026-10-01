@@ -30,6 +30,7 @@ import { moodsFor } from '@derive/moods';
 import { createValleyCamera, BASE_YAW } from './camera';
 import { TERRAIN_CODE, type GameState, type HappeningId, type VillagerId } from '@engine/state';
 import { BUILDINGS, HUNT, TIME } from '@engine/balance';
+import { FOUNDING_CROSSROAD } from '@engine/crossroads/catalog/hamlet';
 import { woodCostOf } from '@engine/world/works';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
@@ -780,6 +781,12 @@ export async function createGraphicsRenderer(
   let lifeDay = -1;
   let lifeState: GameState | null = null;
   let observedState: Readonly<GameState> | null = null;
+  /**
+   * RD-1 · lo que el jugador contestó al forastero del vado y el motor aún no
+   * ha apuntado: la decisión espera a su semana (§2.60), y mientras tanto la
+   * escena ya lo enseña, también en las jornadas que se rehacen.
+   */
+  let fordAnswer: 'in' | 'out' | null = null;
   let observedFrame: GraphicsFrame | null = null;
   let sampling = false;
   let observing = false;
@@ -1967,6 +1974,9 @@ export async function createGraphicsRenderer(
     paint(state: Readonly<GameState>, frame: GraphicsFrame): void {
       if (observing && !sampling) return;
       observedState = state; observedFrame = frame;
+      // RD-1 · contestada y apuntada por el motor, la respuesta al forastero
+      // ya no hace falta: o es vecino, o se fue.
+      if (state.crossroad?.templateId !== FOUNDING_CROSSROAD.id) fordAnswer = null;
       if (disposed) return;
       // GV-0 · el seguimiento de la herramienta, repetido como lo repite
       // `app.ts` antes de cada `paint` (VZ-4).
@@ -2144,6 +2154,7 @@ export async function createGraphicsRenderer(
           rampartOf: sceneRampartPatrolView,
           ragdollSeed: (id, bornAt, placement) => cast.captureRagdoll(id, bornAt, placement),
           ...(forcedVisits === null ? {} : { visits: forcedVisits, dealt: forcedDeal }),
+          fordAnswer: shown.crossroad?.templateId === FOUNDING_CROSSROAD.id ? fordAnswer : null,
           ...(heldSky === null ? {} : { sky: heldSky }),
           ...(battleChoice === null ? {} : { battle: {
             raiders: battleChoice.raiders, garrison: garrisonAs(shown, battleChoice.hands, battleChoice.arm),
@@ -2778,6 +2789,22 @@ export async function createGraphicsRenderer(
         x: at.x, y: groundFloor(at.x, at.z) + ACTOR_VISUAL_HEIGHT / 2, z: at.z, radius: HUNT_SIGN_COVER,
       });
       return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, species: huntSighting.species, hidden };
+    },
+    fordSign(): { x: number; y: number; hidden: boolean } | null {
+      if (life === null || fordAnswer !== null) return null;
+      const stranger = life.visitors.find((visitor) => visitor.scene === 'ford');
+      if (stranger === undefined || stranger.phase !== 'staying') return null;
+      const at = stranger.body;
+      const point = new Vector3(at.x, groundFloor(at.x, at.z) + HUNT_SIGN_LIFT + ACTOR_VISUAL_HEIGHT * 0.6, at.z).project(camera);
+      if (point.z > 1 || point.x < -1.05 || point.x > 1.05 || point.y < -1.05 || point.y > 1.05) return null;
+      const hidden = forest !== null && forest.hides(camera, {
+        x: at.x, y: groundFloor(at.x, at.z) + ACTOR_VISUAL_HEIGHT / 2, z: at.z, radius: HUNT_SIGN_COVER,
+      });
+      return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, hidden };
+    },
+    answerFord(optionId: string): void {
+      fordAnswer = optionId === 'take_him_in' ? 'in' : 'out';
+      life?.answerFord(fordAnswer);
     },
     attackHunt(precision?: number): boolean { return huntScene?.attack(precision) ?? false; },
     hunt(): HuntReport | null {

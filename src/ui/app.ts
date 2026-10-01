@@ -52,7 +52,8 @@ import { milestonesAt } from './milestones';
 import { doingNow, gateNow } from './doing';
 import { noticeText } from './notice';
 import { chroniclePanel, closeChronicle } from './screens/chronicle';
-import { closeCrossroad, isDeferred, openCrossroad, openDeferred } from './screens/crossroad';
+import { closeCrossroad, conceal, isConcealed, isDeferred, openCrossroad, openDeferred, reveal } from './screens/crossroad';
+import { FOUNDING_CROSSROAD } from '@engine/crossroads/catalog/hamlet';
 import { openEpitaph } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
 import { accentFor, playerAnswer, routeCue, sound, speedCue } from './sound';
@@ -610,7 +611,11 @@ export function boot(
   });
   /** La señal sigue a su presa: se coloca después de pintar, con la cámara de ese fotograma. */
   const placeHuntSign = (): void => {
-    const at = huntInProgress || currentHuntOffer === null || currentRoute.kind !== 'valley' || state.crossroad !== null
+    // Con la tarjeta de una encrucijada en pantalla no; con una pendiente que
+    // espera (aplazada, o el forastero del vado aún sin llegar), sí: si no, la
+    // pregunta con la que se funda el valle se comía la primera caza (RD-1).
+    const crossroadOnScreen = document.documentElement.classList.contains('crossroad-open');
+    const at = huntInProgress || currentHuntOffer === null || currentRoute.kind !== 'valley' || crossroadOnScreen
       || state.ended !== null || backend.live.kind !== 'pilot3d' ? null : backend.live.huntSign();
     huntSign.hidden = at === null;
     if (at === null) return;
@@ -626,6 +631,53 @@ export function boot(
     }
   };
 
+  // RD-1 (Vera, 30 sep 2026) · **El forastero del vado, como señal en el
+  // mapa** (skill `senales-en-el-mapa`). La pregunta con la que se funda el
+  // valle está planteada desde el tick 0, pero no se enseña hasta que él baja
+  // por el camino y espera en la orilla (`fordToday`, hacia el minuto 4–6 a
+  // ×1); entonces queda aplazada —el sello— y encima de él aparece su rastro:
+  // unas pisadas, lo que deja quien llega andando. Tocarlas abre la pregunta.
+  const fordSign = document.createElement('button');
+  fordSign.type = 'button';
+  fordSign.className = 'hunt-sign ford-sign';
+  fordSign.hidden = true;
+  fordSign.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="#footprints"/></svg>';
+  fordSign.setAttribute('aria-label', renderUiText('ford.sign'));
+  let fordRevealed: string | null = null;
+  fordSign.addEventListener('click', () => {
+    const pending = state.crossroad;
+    if (pending === null || pending.templateId !== FOUNDING_CROSSROAD.id || fordSign.classList.contains('hunt-sign--covered')) return;
+    if (currentRoute.kind !== 'valley') navigate({ kind: 'valley' });
+    openDeferred(app, pending);
+  });
+  /** La pregunta del vado: escondida hasta que él llega, y su señal mientras espera. */
+  const placeFordSign = (): void => {
+    const pending = state.crossroad;
+    const founding = pending !== null && pending.templateId === FOUNDING_CROSSROAD.id && state.ended === null
+      && pendingDecision === undefined;
+    const key = founding ? `${pending.templateId}:${pending.posedTick}` : null;
+    const at = founding && backend.live.kind === 'pilot3d' ? backend.live.fordSign() : null;
+    if (founding && fordRevealed !== key) {
+      // Sin escena que enseñarlo (Canvas), o si ya pasó su semana, la pregunta
+      // se ve como cualquier otra aplazada; si no, espera a que él llegue.
+      const noScene = backend.wanted !== 'pilot3d' || backend.failure !== null;
+      if (noScene || state.tick > pending.posedTick || at !== null) {
+        reveal(pending);
+        fordRevealed = key;
+      } else {
+        conceal(pending);
+      }
+    }
+    const show = at !== null && founding && isDeferred(pending!) && currentRoute.kind === 'valley'
+      && !document.documentElement.classList.contains('crossroad-open');
+    fordSign.hidden = !show;
+    if (!show) return;
+    const box = backend.live.surface.getBoundingClientRect();
+    fordSign.style.transform = `translate(${Math.round(box.left + at.x)}px, ${Math.round(box.top + at.y)}px) translate(-50%, -50%)`;
+    fordSign.classList.toggle('hunt-sign--covered', at.hidden);
+    fordSign.tabIndex = at.hidden ? -1 : 0;
+  };
+
   const hudRight = document.createElement('div');
   // UI-V2b · la segunda clase es la que sube el rincón por encima de la
   // bandeja (`skin.css`): la regla de `index.html` lo dejaba a 60 px del
@@ -636,7 +688,7 @@ export function boot(
   cameraControls = mountCameraControls(() => backend.live, () => backend.live.surface);
   hudRight.append(bareToggle, soundToggle, hud.speedControls, hud.speedBadge);
 
-  root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, woodGains.element, shell.element);
+  root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, fordSign, woodGains.element, shell.element);
 
   /**
    * **UI-R1 · la pila del mensaje, y el fallo concreto que esta ronda tiene
@@ -1061,6 +1113,7 @@ export function boot(
     if (trackedId !== null) renderer.track(trackedId);
     renderer.paint(state, fraction);
     placeHuntSign();
+    placeFordSign();
     woodGains.paint(
       currentRoute.kind === 'valley' && backend.live.kind === 'pilot3d' ? backend.live.woodGains() : [],
       backend.live.kind === 'pilot3d' ? backend.live.surface.getBoundingClientRect() : null,
@@ -1103,6 +1156,10 @@ export function boot(
     // ni sella la bandeja.
     if (state.crossroad !== null && state.ended === null && pendingDecision === undefined) {
       const pending = state.crossroad;
+      // RD-1 · la del vado, mientras él no ha llegado, no existe todavía.
+      if (isConcealed(pending)) {
+        shell.setOrnament('leaf');
+      } else
       // VZ-03 · si el jugador la aplazó, **la marca es el sello del ornamento**
       // y no se le vuelve a plantear hasta que lo toque (§8.6: espera, no
       // caduca). Antes esto era una píldora `position: fixed`, la tercera pieza
@@ -1819,6 +1876,8 @@ export function boot(
       const attempt = attemptDecision(state.crossroad !== null, pendingDecision !== undefined, speed);
       if (!attempt.accepted || state.crossroad === null) return false;
       pendingDecision = { templateId: state.crossroad.templateId, optionId };
+      // RD-1 · el forastero contesta ya en la escena: sube a la plaza o se va.
+      if (state.crossroad.templateId === FOUNDING_CROSSROAD.id) backend.live.answerFord(optionId);
       return true;
     },
     look(x: number, y: number): void {

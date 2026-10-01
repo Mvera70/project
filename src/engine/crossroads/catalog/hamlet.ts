@@ -116,6 +116,12 @@ const ONE_AT_THE_FORD: CrossroadTemplate = {
   category: 'hamlet',
   weight: 9,
   cooldownYears: 6,
+  // RD-1 (Vera, 30 sep 2026) · **Es la primera pregunta del valle y sale una
+  // vez.** La planta `foundGame` al fundar (`foundingCrossroad`): a ×1, la
+  // velocidad normal, el primer tick llega en el minuto 14, y la primera
+  // elección tenía que caber antes del diez. Sus `requires` quedan para quien
+  // lea el catálogo, pero el sorteo ya no la vuelve a sacar.
+  maxPerGame: 1,
   requires: [
     { k: 'stat', stat: 'people', op: '<', v: 10 },
     // **Verano, y la estación aquí decide si el contenido existe.** Con el
@@ -186,3 +192,10 @@ const ONE_AT_THE_FORD: CrossroadTemplate = {
 };
 
 export const HAMLET_TEMPLATES: readonly CrossroadTemplate[] = [BREAKING_GROUND, ONE_AT_THE_FORD];
+
+/**
+ * RD-1 · La pregunta con la que se funda un caserío: alguien sube solo por el
+ * camino del valle y espera en el vado. La escena y la señal que la abren son
+ * de la capa de vida y de la interfaz; aquí sólo se dice cuál es.
+ */
+export const FOUNDING_CROSSROAD: CrossroadTemplate = ONE_AT_THE_FORD;

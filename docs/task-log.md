@@ -1,5 +1,15 @@
 # Cuaderno de tareas — el rework
 
+## 30 sep 2026 · RD-1b: el forastero del vado (v5.44)
+
+La primera elección del valle llega a ×1 entre el minuto 4,6 y el 5,1: el
+forastero baja al vado y sus pisadas abren «Uno en el vado». Con la perdiz
+(RD-0/D1) y el «+N» (RD-1a), **los diez primeros minutos a ×1 tienen ya una
+ocasión que se toca, su resultado a la vista y una elección con coste**.
+**Abierto:** lectura humana en móvil; que la escena de acogida termine en un
+vecino con cuerpo al cerrar la semana (hoy desaparece el visitante y aparece
+el vecino en su casa); y RD-5, el relleno del primer año entre medias.
+
 ## 30 sep 2026 · RD-1a: a ×1 nada salta (v5.43)
 
 Los actos del jugador esperan a su semana (Vera). La pieza cobrada deja su

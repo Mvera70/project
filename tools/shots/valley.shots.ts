@@ -782,6 +782,41 @@ test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ p
   test.expect(['storm', 'rain', 'overcast', 'clear']).toContain(sky);
 });
 
+test('el forastero del vado: llega andando, su señal abre la primera pregunta y contestarla no la reabre (RD-1)', async ({ page }) => {
+  // RD-1 (Vera, 30 sep 2026). La primera elección del valle está planteada
+  // desde la fundación, pero no existe para el jugador hasta que el forastero
+  // baja por el camino y espera en el vado (a ×1, hacia el minuto 4,6–5,1):
+  // antes, ni tarjeta ni sello. Entonces, unas pisadas encima de él; tocarlas
+  // abre la pregunta. Se corre a ×16 para no esperar cinco minutos: la escena
+  // va por el reloj de la jornada, no por el de pared.
+  test.setTimeout(300_000);
+  await lowGraphics(page);
+  await page.goto('/');
+  await page.locator('.title-scrim').waitFor();
+  await page.locator('#valley-seed').fill('7');
+  await page.locator('.title-new').click();
+  await page.waitForFunction(() => ['hints', 'done'].includes(document.documentElement.dataset.intro ?? ''),
+    null, { timeout: 180_000 });
+  await page.evaluate(() => window.__valleySpeed?.(16));
+  const sign = page.locator('.ford-sign');
+  const scrim = page.locator('.crossroad-scrim:not([inert])');
+  await test.expect.poll(async () => {
+    // Mientras él no ha llegado, la pregunta no se ve.
+    if (await sign.isHidden()) test.expect(await scrim.count()).toBe(0);
+    return sign.isVisible();
+  }, { timeout: 180_000, intervals: [400] }).toBe(true);
+  await page.screenshot({ path: 'artifacts/rd1-ford-sign.png', fullPage: true });
+  await sign.click();
+  await test.expect(scrim).toHaveCount(1);
+  await test.expect(scrim).toContainText('One at the Ford');
+  await page.locator('.crossroad-options button').first().click();
+  await test.expect(scrim).toHaveCount(0);
+  // Contestada, no vuelve a abrirse ni vuelve la señal mientras la semana acaba.
+  await page.waitForTimeout(3_000);
+  await test.expect(scrim).toHaveCount(0);
+  await test.expect(sign).toBeHidden();
+});
+
 test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {
   await page.clock.install();
   await page.goto('/?debug=1&live=1&render=canvas&hunger=1&seed=7&year=80&season=summer');

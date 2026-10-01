@@ -58,7 +58,7 @@ import {
 } from './raiders';
 import type { HappeningId } from '@engine/state';
 import { createTravellers, returningToday, stepTraveller, travelling, type Traveller } from './expeditions';
-import { arrivingToday, beastOf, createVisitors, stallOf, stallSiteOf, stayForGoods, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
+import { answerFordStranger, arrivingToday, beastOf, createVisitors, stallOf, stallSiteOf, stayForGoods, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
@@ -379,6 +379,8 @@ export interface Village {
    * sortea. Tampoco son vecinos, así que van por su lista.
    */
   readonly visitors: readonly Visitor[];
+  /** RD-1 · contestar al forastero del vado ahora: sube a la plaza o se va por donde vino. */
+  answerFord(answer: 'in' | 'out'): void;
   /**
    * §7.15 · Los que salen de expedición, están en el bosque o vuelven hoy
    * (`expeditions.ts`). Son vecinos de verdad —llevan su `VillagerId`— pero
@@ -499,6 +501,12 @@ export interface DayOptions {
   readonly visits?: readonly HappeningId[];
   /** Con `visits`: si vienen a cerrar el trato (`window.__valleyVisit(kind, true)`). */
   readonly dealt?: boolean;
+  /**
+   * RD-1 · lo que el jugador ya contestó al forastero del vado y el motor aún
+   * no ha apuntado (la decisión espera a su semana): acogido, espera en la
+   * plaza; despedido, ya se fue.
+   */
+  readonly fordAnswer?: 'in' | 'out' | null;
   /** Gancho de observación: el cielo de hoy, en vez del de `skyAt` (`window.__valleyHoldSky`). */
   readonly sky?: SkyKind;
   /**
@@ -1203,7 +1211,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const visitors: Visitor[] = createVisitors(state, land, heart,
     { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 }, seed,
     options.visits?.map((kind) => ({ kind, dealt: options.dealt === true }))
-      ?? visitsToday(state, day, TIME.DAYS_PER_WEEK), pastureHeart);
+      ?? visitsToday(state, day, TIME.DAYS_PER_WEEK, options.fordAnswer ?? null), pastureHeart);
   // El valle más vivo · **lo que se vende, a la vista.** Con el trato cerrado,
   // dos o tres vecinos llevan la leña (buhonero) o el grano (factor) desde la
   // leñera o el granero hasta el sitio del puesto, por la misma maquinaria de
@@ -1588,6 +1596,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
 
     get raiders(): readonly Raider[] { return raiders; },
     get visitors(): readonly Visitor[] { return visitors; },
+    answerFord(answer: 'in' | 'out'): void {
+      for (const visitor of visitors) {
+        answerFordStranger(visitor, land, { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 }, answer, steps);
+      }
+    },
     get travellers(): readonly Traveller[] { return travellers; },
     get payments(): readonly Payment[] { return payments; },
     get dog() {

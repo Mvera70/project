@@ -65,6 +65,10 @@ interface ValleyBackend {
   attackHunt(precision?: number): boolean;
   /** Dónde va la señal de caza en la pantalla, o `null`. */
   huntSign(): { x: number; y: number; species: HuntSpecies; hidden: boolean } | null;
+  /** RD-1 · Dónde va la señal del forastero del vado, o `null` si no ha llegado. */
+  fordSign(): { x: number; y: number; hidden: boolean } | null;
+  /** RD-1 · Contestar al forastero del vado en la escena. */
+  answerFord(optionId: string): void;
   /** Esquema 12 · los «+1» y «−N» de la leñera, proyectados; `age` va de 0 a 1. */
   woodGains(): readonly { id: number; count: number; x: number; y: number; age: number; icon?: 'logs' | 'wheat' }[];
   /** Completed hunt report, consumed once by the UI and forwarded to the engine. */
@@ -184,6 +188,8 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     startHunt() { return false; },
     attackHunt() { return false; },
     huntSign() { return null; },
+    fordSign() { return null; },
+    answerFord() { /* Canvas: sin escena, la tarjeta basta. */ },
     woodGains() { return []; },
     hunt() { return null; },
     siege() { return null; },
@@ -416,6 +422,8 @@ export function attachBackend(
         startHunt(state, species, weapon) { return renderer.startHunt(state, species, weapon); },
         attackHunt(precision) { return renderer.attackHunt(precision); },
         huntSign() { return renderer.huntSign(); },
+        fordSign() { return renderer.fordSign(); },
+        answerFord(optionId) { renderer.answerFord(optionId); },
         woodGains() { return renderer.woodGains(); },
         hunt() { return renderer.hunt(); },
         siege() { return renderer.siege(); },

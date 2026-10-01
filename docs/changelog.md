@@ -1,5 +1,21 @@
 # The Valley — Registro de cambios
 
+## v5.44 · 30 sep 2026 · RD-1: el forastero del vado, la primera elección antes del minuto diez
+
+Decisión de Vera tras RD-0: la primera elección es «Uno en el vado», desde la
+fundación, con el forastero llegando andando y una señal encima. `foundGame`
+la deja planteada en el tick 0 en toda fundación de caserío (`maxPerGame: 1`).
+La capa de vida lo hace bajar por el camino del valle el tercer día escénico y
+esperar en la orilla del vado (`fordToday`, `fordStranger`): **a ×1 llega
+entre el minuto 4,6 y el 5,1** en ocho semillas. Hasta entonces la pregunta no
+se ve (ni tarjeta, ni sello, ni crónica); al llegar, unas pisadas encima de él
+la abren. Contestada, él sube a la plaza o se va en el acto, y el motor lo
+apunta al cerrar la semana. La caza ya no se esconde por una encrucijada
+pendiente, sólo por una abierta en pantalla. Pruebas:
+`tests/fast/founding-ford.test.ts` y un recorrido de navegador nuevo. Texto:
+«A third mouth before the first harvest». §8.6 y la skill `senales-en-el-mapa`
+al día.
+
 ## v5.43 · 30 sep 2026 · RD-1: a ×1 nada salta — los actos esperan a su semana
 
 Decisión de Vera tras RD-0: **×1 es la velocidad normal** y «la aldea debe

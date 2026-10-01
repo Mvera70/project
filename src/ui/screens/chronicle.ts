@@ -21,6 +21,7 @@ import {
   ENTRY_DIAMOND, ORNAMENT_VIEWBOX, PAGE_VINE, YEAR_FLOURISH, type OrnamentName,
 } from '../redesign/chronicle-ornaments';
 import type { PanelFactory, UiActions, UiSnapshot } from '../redesign/contracts';
+import { isConcealed } from './crossroad';
 
 const STYLE_ID = 'valley-chronicle-style';
 // UI-V3 · La piel de `docs/ui-redesign/piel/plan-piel.md` §3.2: la página de
@@ -459,6 +460,8 @@ function flatCard(text: string): HTMLElement {
  * puerta a la que ya lleva deslizar hacia abajo para aplazarla.
  */
 function sealedCard(state: GameState, pending: PendingCrossroad, actions: UiActions): HTMLElement | null {
+  // RD-1 · la pregunta del vado no existe para el jugador hasta que él llega.
+  if (isConcealed(pending)) return null;
   const template = CATALOG.find((t) => t.id === pending.templateId);
   if (template === undefined) return null;
   const params = { year: yearOf(pending.posedTick), ...namesOf(state, pending.cast) };

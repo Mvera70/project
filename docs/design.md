@@ -2766,6 +2766,27 @@ contenido temprano es alcanzable. Las dos plantillas del caserío (§7.3, G3)
 están escritas contra esa ranura —una de primavera y otra de verano— y si el
 hueco se mueve hay que remedirlas.
 
+**La primera pregunta del valle no sale del sorteo: se planta al fundar** (RD-1,
+v5.44, decisión de Vera del 30 sep 2026). Con ×1 como velocidad normal la
+primera semana acaba en el minuto 14 y la primera ranura legal de arriba cae
+en la semana 15, tres horas y media después: el jugador no tenía verbo en toda
+la apertura. Así que `foundGame` deja **«Uno en el vado» (`one_at_the_ford`,
+`FOUNDING_CROSSROAD`) pendiente desde el tick 0** en toda fundación de caserío
+(menos de diez personas; `foundTwenty` no la trae), con su línea
+`crossroad_posed` en la crónica y `maxPerGame: 1`, que la saca del sorteo para
+siempre. La pregunta **no se enseña hasta que el forastero llega**: la capa de
+vida lo hace bajar por el camino del valle el tercer día escénico de la semana
+0 y esperar en la orilla del vado (`ford`), y a ×1 llega entre el minuto 4,6 y
+el 5,1 en ocho semillas (`tests/fast/founding-ford.test.ts`). Hasta entonces,
+ni tarjeta, ni sello, ni crónica (`conceal`/`reveal`, `screens/crossroad.ts`);
+al llegar queda aplazada y encima de él aparecen unas pisadas —la señal en el
+mapa, skill `senales-en-el-mapa`—; tocarlas abre la pregunta. Contestada, él
+sube a la plaza o se va por donde vino en el acto, y el motor lo apunta al
+cerrar la semana (§2.60, regla 2). Mientras está pendiente, el sorteo y las
+ofertas del camino esperan (`select.ts`, `fate.ts`), como con cualquier otra.
+La segunda pregunta pasa a ser la primera del sorteo: `breaking_ground` en la
+primavera del año 1 cuando cabe.
+
 **El componente `story`, y cómo se compone (v2.43).** Las semillas pueden
 modificar el peso de una categoría: es lo que el Anexo A prometía desde la v2.0
 para `a_name_in_the_valley` (×0,5 sobre `lord`) y `behind_the_wall` (×0,4 sobre

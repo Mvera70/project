@@ -58,7 +58,10 @@ function coverage(seeds: number, years: number): Map<string, number> {
     // Se cuenta la **transición** a planteada y no el tick con una pendiente:
     // una decisión sin contestar se queda semanas en `state.crossroad` (§8.6 no
     // plantea dos), así que contar ticks contaría la espera, no la pregunta.
-    let pending: string | null = null;
+    // RD-1 (30 sep 2026): la primera pregunta se planta al fundar
+    // (`one_at_the_ford`, desde el tick 0), antes de la primera semana.
+    let pending: string | null = state.crossroad?.templateId ?? null;
+    if (pending !== null) here.add(pending);
     for (let week = 0; week < years * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
       run(state, 1, 'prudent', CATALOG);
       const now = state.crossroad?.templateId ?? null;

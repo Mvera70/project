@@ -88,6 +88,17 @@ es ver la ocasión a tiempo.
 - **Y su imagen**: cada final nuevo con crónica trae su ilustración pedida en
   `docs/plan-arte-pendiente.md` en la misma ronda (regla de `CLAUDE.md`).
 
+## La segunda: el forastero del vado (RD-1, 30 sep 2026)
+
+La primera pregunta del valle llega así: un forastero baja andando por el
+camino y espera en la orilla del vado; encima, **unas pisadas** (lo que deja
+quien llega andando), con el mismo estilo que la huella de la caza. Tocarlas
+abre la encrucijada «Uno en el vado», que existe desde la fundación pero no
+se enseña hasta que él llega. Es la primera señal que **abre una decisión** en
+vez de una escena: la escena es la respuesta (él sube a la plaza o se va por
+donde vino, en el acto). Código: `fordToday`/`fordStranger` en
+`life/visitors.ts`, `fordSign()` en el renderer, `placeFordSign` en `app.ts`.
+
 ## Candidatas (para cuando toquen)
 
 Lo que hoy el motor ofrece de otra forma y encajaría aquí: el buhonero y los

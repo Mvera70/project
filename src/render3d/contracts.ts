@@ -268,6 +268,13 @@ export interface GraphicsRenderer {
   attackHunt(precision?: number): boolean;
   /** Dónde va la señal de caza en la pantalla (`senales-en-el-mapa`), o `null`. */
   huntSign(): { x: number; y: number; species: HuntSpecies; hidden: boolean } | null;
+  /**
+   * RD-1 · Dónde va la señal del forastero del vado en la pantalla —sólo
+   * cuando ya ha llegado a la orilla y espera—, o `null`.
+   */
+  fordSign(): { x: number; y: number; hidden: boolean } | null;
+  /** RD-1 · Contestar al forastero del vado en la escena, antes de que el motor lo apunte. */
+  answerFord(optionId: string): void;
   /** Esquema 12 · los «+1» y «−N» de la leñera, proyectados; `age` va de 0 a 1. */
   woodGains(): readonly { id: number; count: number; x: number; y: number; age: number; icon?: 'logs' | 'wheat' }[];
   /** Parte de la cacería, entregado una sola vez al motor. */

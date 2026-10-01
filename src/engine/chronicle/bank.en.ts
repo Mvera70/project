@@ -1669,7 +1669,7 @@ export const CROSSROAD_BANK: Record<string, string> = {
   'crossroad.one_at_the_ford.body':
     'A man has come up the river road with a bundle and no cart, and says he will work for a roof. {A} has counted the grain twice. It is the counting that is the trouble, not the man.',
   'crossroad.one_at_the_ford.take_him_in.label': 'Take him in',
-  'crossroad.one_at_the_ford.take_him_in.cost': 'A third mouth before the harvest',
+  'crossroad.one_at_the_ford.take_him_in.cost': 'A third mouth before the first harvest',
   'crossroad.one_at_the_ford.feed_him_and_send_him_on.label': 'Feed him and send him on',
   'crossroad.one_at_the_ford.feed_him_and_send_him_on.cost': 'A day of grain for nothing that stays',
   'crossroad.one_at_the_ford.turn_him_away.label': 'Turn him away',
@@ -2558,6 +2558,7 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
 
 /** Stable interface copy: unlike chronicle prose, labels do not vary by seed. */
 export const UI_BANK: Record<string, string> = {
+  'ford.sign': 'Someone is waiting at the ford',
   'hunt.sign.partridge': 'A partridge: go hunting',
   'hunt.sign.rabbit': 'A rabbit: go hunting',
   'hunt.sign.deer': 'A deer: go hunting',
