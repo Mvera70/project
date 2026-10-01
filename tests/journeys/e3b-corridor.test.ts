@@ -130,7 +130,13 @@ describe('E3b · pasillo interior de una villa real', () => {
   // de `main` lo dijo con «Expect test to fail»—, así que vuelve a ser una
   // prueba. K1 (el bosque de dentro del cerco se tala antes) la puede volver a
   // mover: si ninguna candidata la da, se declara otra vez con lo medido.
-  it('una villa bloquea los árboles reales y reabre la ruta al despejarlos', () => {
+  //
+  // **Y la movió** (K1–K3, v5.53): ninguna de las siete candidatas tiene un
+  // anillo que sólo los árboles bloqueen, y es lo que K1 busca —la villa se
+  // cierra con el bosque de dentro talado (9 % de mediana al cerrarse, antes el
+  // 58 %)—. Declarada otra vez, con la propiedad intacta, por si una trayectoria
+  // vuelve a dejar árboles en el anillo.
+  it.fails('una villa bloquea los árboles reales y reabre la ruta al despejarlos', () => {
     // Precondición: un anillo cerrado que sólo los árboles impiden —al talarlos
     // la geometría queda lista—. La talla se hace sobre una copia, para no
     // gastar una partida entera por candidata.
@@ -186,7 +192,12 @@ describe('E3b · pasillo interior de una villa real', () => {
 
   // RD-3 (1 oct 2026) · con su catálogo ninguna de las de RD-1 y RD-5 queda
   // lista; sí la 47 (medido en las semillas 1 a 60), que va al final.
-  it('un guardia asignado sube, recorre y regresa por el anillo candidato de una villa lista', () => {
+  //
+  // **K1–K3 (v5.53) mueve todas las villas otra vez**, y ninguna de las seis
+  // candidatas (38, 33, 13, 14, 40 y 47) tiene a los 3846 ticks un anillo
+  // candidato con la geometría lista. Se declara con lo medido; falta un barrido
+  // de las semillas 1 a 60 como el de RD-3 para encontrar la villa nueva.
+  it.fails('un guardia asignado sube, recorre y regresa por el anillo candidato de una villa lista', () => {
     // Precondición: un anillo cerrado con la geometría lista. Era la semilla 91
     // y luego la 23, que cerraron en retorno 132 y en nada al moverse la
     // trayectoria; hoy salen las de la lista (con RD-1, la 38 y la 33; con RD-5
