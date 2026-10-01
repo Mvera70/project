@@ -4,6 +4,7 @@
 // to somebody else; what lives here is the sequence, and the sequence is
 // normative — changing it changes the balance and breaks saved games.
 
+import { searchValid, settleLostChild, type SearchAct } from './world/lost-child';
 import { CROWS, FORAGE, LABOUR, MIGRATION, PEOPLE, TIME, MEANS } from './balance';
 import {
   isHere,
@@ -92,6 +93,7 @@ import {
   namedDeathEntry,
   seasonKey,
 } from './chronicle/events';
+import { templateOf } from './crossroads/catalog';
 
 /** The offices a village fills on its own. §6.2. */
 const RENEWABLE_ROLES: readonly Role[] = ['smith', 'midwife', 'priest', 'woodward', 'reeve'];
@@ -294,7 +296,7 @@ function optionOf(
   catalogue: Catalogue,
   optionId: string,
 ): CrossroadTemplate['options'][number] | undefined {
-  const template = catalogue.find((t) => t.id === state.crossroad?.templateId);
+  const template = templateOf(catalogue, state.crossroad?.templateId ?? '');
   return template?.options.find((o) => o.id === optionId);
 }
 
@@ -321,7 +323,7 @@ function immediatePeopleLost(state: GameState, catalogue: Catalogue, optionId: s
  * then grain, then the two moods.
  */
 function immediateCost(state: GameState, catalogue: Catalogue, optionId: string): number {
-  const template = catalogue.find((t) => t.id === state.crossroad?.templateId);
+  const template = templateOf(catalogue, state.crossroad?.templateId ?? '');
   const option = template?.options.find((o) => o.id === optionId);
   if (option === undefined) return 0;
 
@@ -655,6 +657,7 @@ export function tick(
   let means: MeansOutcome | null = null;
   let crown: CrownOutcome | null = null;
   let battle: Battle | undefined;
+  let search: SearchAct | null = null;
   for (const act of acts) {
     if (act.kind === 'offer') {
       const outcome = settleOffer(state, act.accept, seasonOf(state.tick), yearOf(state.tick));
@@ -686,6 +689,12 @@ export function tick(
       const outcome = sendExpedition(state, act.mission, act.count, yearOf(state.tick));
       state.acts.push({ tick: state.tick, act, done: outcome.sent });
       if (outcome.entry !== null) say(outcome.entry);
+    } else if (act.kind === 'search') {
+      // RD-4 · ir a buscar al niño perdido: lo cierra `settleLostChild`, aquí
+      // abajo, con o sin búsqueda.
+      const valid = search === null && searchValid(state, act);
+      state.acts.push({ tick: state.tick, act, done: valid });
+      if (valid) search = act;
     } else if (act.kind === 'hunt') {
       // La presa sólo paga comida si el encuentro de la semana anterior
       // produjo un impacto real. El parte queda en el guardado para reproducirlo.
@@ -713,6 +722,10 @@ export function tick(
       state.acts.push({ tick: state.tick, act, done: state.flags['assault'] !== undefined });
     }
   }
+  // RD-4 · el niño que se perdió la semana pasada: lo trae quien fue a por él,
+  // o lo encuentra el valle al anochecer.
+  const found = settleLostChild(state, search, seasonOf(state.tick), yearOf(state.tick));
+  if (found !== null) say(found);
   // Y quien esperaba y no tuvo respuesta, sigue camino.
   const gone = expireOffer(state, seasonOf(state.tick), yearOf(state.tick));
   if (gone !== null) say(gone);

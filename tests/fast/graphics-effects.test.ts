@@ -522,44 +522,61 @@ describe('G-10 · la luz del día escénico', () => {
     }
   });
 
-  it('a velocidad alta la jornada de luz se queda quieta', () => {
-    // D.6.1: desde que la jornada sigue la velocidad entera, a ×64 el día dura
-    // 1,9 segundos reales. Un valle que amanece y anochece dos veces cada cuatro
-    // segundos no cuenta la hora, parpadea — y tapa lo que uno mira a ×64, que
-    // es que el valle crece.
-    //
-    // Se mide como se ve: la diferencia entre lo más claro y lo más oscuro del
-    // día entero, a cada velocidad.
-    const swing = (speed: 0 | 1 | 4 | 16 | 64): number => {
-      let low = Number.POSITIVE_INFINITY;
-      let high = 0;
-      for (let step = 0; step < 240; step += 1) {
-        const light = daylightAt(step / 240, speed).daylight;
-        low = Math.min(low, light);
-        high = Math.max(high, light);
+  // RD-0 (30 sep 2026): Vera decidió el 29 sep que el sol, la hora y el
+  // calendario van juntos a cualquier velocidad. Hasta ese día ×16 y ×64
+  // aplanaban la luz hacia la media mañana y el valle estaba a pleno sol con
+  // la cabecera diciendo las tres de la madrugada.
+  const SPEEDS = [0, 1, 4, 16, 64] as const;
+  const PHASES_OF_DAY = Array.from({ length: 240 }, (_, step) => step / 240);
+
+  it('a cualquier velocidad el sol está donde dice la hora', () => {
+    for (const phase of PHASES_OF_DAY) {
+      const truth = daylightAt(phase, 1);
+      for (const speed of SPEEDS) {
+        const painted = daylightAt(phase, speed);
+        expect(painted.sun.x, `fase ${phase} a ×${speed}`).toBeCloseTo(truth.sun.x, 9);
+        expect(painted.sun.y).toBeCloseTo(truth.sun.y, 9);
+        expect(painted.sun.z).toBeCloseTo(truth.sun.z, 9);
+        // Y de noche no alumbra: un sol bajo el horizonte que proyecta sombras
+        // miente sobre la hora igual que uno fijo en la media mañana.
+        expect(painted.sunIntensity > 0, `sol encendido a la fase ${phase}, ×${speed}`)
+          .toBe(truth.sunIntensity > 0);
       }
-      return high - low;
-    };
-    // A ×1 y a ×4 la jornada cuenta la hora entera: dos minutos y medio minuto
-    // de día son tiempo de sobra para verla.
-    expect(swing(1), 'a ×1 hay jornada').toBeGreaterThan(0.9);
-    expect(swing(4), 'a ×4 también').toBeCloseTo(swing(1), 6);
-    // Y a partir de ahí se aplana, sin llegar a mentir del todo a ×16.
-    expect(swing(16), 'a ×16 queda algo de jornada').toBeLessThan(swing(1) * 0.6);
-    expect(swing(16)).toBeGreaterThan(0.2);
-    expect(swing(64), 'a ×64 ya no parpadea').toBeLessThan(0.1);
+    }
   });
 
-  it('y quieta quiere decir de día, no a oscuras', () => {
-    // Aplanar hacia la medianoche habría sido igual de estable y habría dejado
-    // el valle en penumbra permanente a ×64, que es el fallo contrario.
-    const fast = daylightAt(0.99, 64);
-    const noon = daylightAt(NOON);
-    expect(fast.daylight).toBeGreaterThan(0.9);
-    expect(fast.sunIntensity).toBeGreaterThan(noon.sunIntensity * 0.5);
-    // Y sigue siendo pura: misma hora y misma velocidad, misma luz.
+  it('la jornada conserva su orden: lo claro sigue claro y lo oscuro, oscuro', () => {
+    // Suavizar el contraste está permitido; cambiar qué momento es más claro
+    // que otro, no. Si el mediodía es más claro que el alba a ×1, lo es a ×64.
+    for (const speed of SPEEDS) {
+      for (let i = 0; i < PHASES_OF_DAY.length; i += 7) {
+        for (let j = 0; j < PHASES_OF_DAY.length; j += 11) {
+          const a = PHASES_OF_DAY[i]!;
+          const b = PHASES_OF_DAY[j]!;
+          const truth = daylightAt(a, 1).daylight - daylightAt(b, 1).daylight;
+          const painted = daylightAt(a, speed).daylight - daylightAt(b, speed).daylight;
+          if (Math.abs(truth) < 1e-9) continue;
+          expect(Math.sign(painted), `×${speed}: ${a} contra ${b}`).toBe(Math.sign(truth));
+        }
+      }
+    }
+  });
+
+  it('a velocidad alta la noche se sigue leyendo como noche, sin parpadear entera', () => {
+    const swing = (speed: 0 | 1 | 4 | 16 | 64): number => {
+      const light = PHASES_OF_DAY.map(phase => daylightAt(phase, speed).daylight);
+      return Math.max(...light) - Math.min(...light);
+    };
+    expect(swing(1), 'a ×1 hay jornada').toBeGreaterThan(0.9);
+    expect(swing(4), 'a ×4 también, entera').toBeCloseTo(swing(1), 6);
+    // Más suave a ×16 y ×64, que es la comodidad que se conserva…
+    expect(swing(16)).toBeLessThan(swing(1));
+    expect(swing(64)).toBeLessThan(swing(16));
+    // …pero nunca plana: con menos del 40 % de la jornada, la noche a ×64 ya
+    // no se distinguía de una tarde nublada.
+    expect(swing(64), 'a ×64 la noche sigue siendo noche').toBeGreaterThanOrEqual(swing(1) * 0.4);
+    // Las mismas horas, la misma luz; y el sol sigue siendo una dirección.
     expect(daylightAt(0.61, 16)).toEqual(daylightAt(0.61, 16));
-    // El vector del sol sigue siendo una dirección, no un vector cualquiera.
     for (const speed of [1, 16, 64] as const) {
       const sun = daylightAt(0.61, speed).sun;
       expect(Math.hypot(sun.x, sun.y, sun.z)).toBeCloseTo(1, 6);

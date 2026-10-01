@@ -53,7 +53,12 @@ describe('los sucesos del valle · R-1', () => {
 
     const young = foundGame(7);
     run(young, 4 * TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
-    const youngRate = young.happenings.length / 4;
+    // RD-5 (1 oct 2026) · los sucesos pequeños del caserío (`FATE.HAMLET_WEIGHT`)
+    // no cuentan aquí: tienen su propia tirada, ninguno destruye nada, y esta
+    // propiedad guarda que una pareja no reciba **el sorteo** de una aldea de
+    // cuarenta —la catástrofe por trimestre—, no que su vida sea muda.
+    const smallOnes = Object.keys(FATE.HAMLET_WEIGHT);
+    const youngRate = young.happenings.filter((h) => !smallOnes.includes(h.id)).length / 4;
 
     expect(madeRate, `aldea hecha: ${madeRate.toFixed(1)} al año`).toBeGreaterThan(6);
     expect(madeRate, `aldea hecha: ${madeRate.toFixed(1)} al año`).toBeLessThan(24);
@@ -116,8 +121,10 @@ describe('los sucesos del valle · R-1', () => {
 
   it('todo lo que pasa se cuenta, con sus palabras en el banco', () => {
     for (const state of worlds) {
+      // RD-4 · el niño perdido se cierra la semana siguiente (`child.found*`,
+      // `world/lost-child.ts`): es el segundo tiempo del mismo suceso, no otro.
       const told = state.chronicle.filter((e) => e.kind === 'happening');
-      expect(told.length).toBe(state.happenings.length);
+      expect(told.filter((e) => !e.templateKey.startsWith('child.found')).length).toBe(state.happenings.length);
       for (const entry of told) {
         const texts = BANK[entry.templateKey];
         expect(texts, entry.templateKey).toBeDefined();

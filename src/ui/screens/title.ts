@@ -255,7 +255,10 @@ const YEAR_MAX = 120;
 /** Partidas reales y reproducibles, comprobadas en sus tres eras. Sólo taller. */
 export const DEV_PRESETS = [
   { id: 'hamlet', seed: 7, year: 1 },
-  { id: 'village', seed: 11, year: 21 },
+  // RD-5 (1 oct 2026) · la 11 cerraba la muralla en el año 19 con la
+  // trayectoria nueva y a los 21 ya era villa. Medido: aldea del año 5 al 18;
+  // el 12 queda en medio para que otra ronda no la saque de su era.
+  { id: 'village', seed: 11, year: 12 },
   { id: 'town', seed: 7, year: 60 },
 ] as const;
 

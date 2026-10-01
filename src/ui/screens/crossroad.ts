@@ -6,7 +6,7 @@
 // taken, or a swipe returns to the valley and the crossroad stays pending,
 // marked with a discreet dot the player can tap to come back to it.
 
-import { CATALOG } from '@engine/crossroads/catalog';
+import { CATALOG, templateOf } from '@engine/crossroads/catalog';
 import { namesOf } from '@engine/crossroads/resolve';
 import { renderEntry } from '@engine/chronicle/render';
 import type { GameState, PendingCrossroad } from '@engine/state';
@@ -212,6 +212,31 @@ let shown: Shown | null = null;
  */
 let deferred: string | null = null;
 
+/**
+ * RD-1 (Vera, 30 sep 2026) · **La pregunta que todavía no se ve.** La del
+ * forastero del vado está planteada desde que se funda el valle, pero no
+ * existe para el jugador hasta que él llega andando a la orilla: ni tarjeta,
+ * ni sello, ni crónica. Al llegar (`reveal`) pasa a aplazada —el sello, y la
+ * señal sobre él en el valle— y sólo se abre al tocarla.
+ */
+let concealed: string | null = null;
+
+export function conceal(p: PendingCrossroad): void {
+  if (deferred !== key(p) && shown?.key !== key(p)) concealed = key(p);
+}
+
+export function reveal(p: PendingCrossroad): void {
+  if (concealed === key(p)) concealed = null;
+  // Aplazada, también si nunca estuvo escondida (Canvas, sin escena que la
+  // enseñe): la primera pregunta del valle no abre la tarjeta en plena
+  // fundación, espera en el sello a que el jugador la busque.
+  if (shown?.key !== key(p)) deferred = key(p);
+}
+
+export function isConcealed(p: PendingCrossroad): boolean {
+  return concealed === key(p);
+}
+
 /** Si la decisión que hay planteada está aplazada (§8.6: no caduca, espera). */
 export function isDeferred(p: PendingCrossroad): boolean {
   return deferred === key(p);
@@ -239,12 +264,13 @@ export function closeCrossroad(): void {
   removeShown();
   shown = null;
   deferred = null;
+  concealed = null;
 }
 
 function mountOverlay(app: App, p: PendingCrossroad): void {
   ensureStyle();
   const state = app.state();
-  const template = CATALOG.find((t) => t.id === p.templateId);
+  const template = templateOf(CATALOG, p.templateId);
   if (template === undefined) return;
   document.documentElement.classList.add('crossroad-open');
 
@@ -361,6 +387,7 @@ export function openCrossroad(app: App, p: PendingCrossroad): void {
   // Aplazada es aplazada: §8.6 dice que espera, y reabrirla cada tick sería
   // quitarle al jugador el gesto que acaba de hacer.
   if (deferred === key(p)) return;
+  if (concealed === key(p)) return;
   removeShown();
   mountOverlay(app, p);
 }

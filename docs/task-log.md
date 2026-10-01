@@ -1,5 +1,168 @@
 # Cuaderno de tareas — el rework
 
+## 1 oct 2026 · RD-5: el primer año (v5.49–v5.51)
+
+Rama `claude/rd5-primer-ano` (sobre `claude/rd4-senales`). Medido antes y
+después con 8 semillas, primer año a ×1 (una hora ≈ 4 semanas), entradas de
+crónica por valle sin contar estaciones:
+
+| Tramo a ×1 | Antes | Después |
+|---|---|---|
+| 0–1 h | 6,75 | 7,50 |
+| 1–3 h | 5,13 | 6,38 |
+| 3–6 h (la meseta) | 2,75 | 3,88 (11 claves) |
+| 6–10 h | 10,4 | 11,75 |
+
+Ningún valle acabado en el primer año, antes ni después. Capturas de la meta
+en `docs/medidas/rd0-img/rd5-meta-*.jpg`. Queda: el recorrido humano.
+
+## 1 oct 2026 · RD-4: niño perdido y visita, como señales (v5.47–v5.48)
+
+Rama `claude/rd4-senales` (sobre `claude/rd1-vado`). Hecho: la visita (señal
+sobre el vendedor en la plaza, trato cerrado con él delante) y el niño perdido
+(dos días en la linde con señal, acto `search`, cierre la semana siguiente).
+Medido: en Node el tratante espera en la plaza de la fase 0,30 a la 0,60
+(semillas 28 y 33), así que la señal se ve unos 36 s por día a ×1 durante sus
+tres días; el niño, en la semilla 23 año 6, señal visible y sin tapar a los
+8 s, y quien va a buscarlo llega entre la fase 0,35 y la 0,75 en las semillas
+7, 23 y 41. **Sin captura de la visita**: Chromium por software va a ~3 fps, el
+delta está acotado y la vida anda a un tercio, así que el tratante no llega a
+la plaza antes de irse; en un móvil a 30 fps no pasa. Queda: lectura humana y
+medida en dispositivo.
+
+## 30 sep 2026 · RD-1b: el forastero del vado (v5.44)
+
+La primera elección del valle llega a ×1 entre el minuto 4,6 y el 5,1: el
+forastero baja al vado y sus pisadas abren «Uno en el vado». Con la perdiz
+(RD-0/D1) y el «+N» (RD-1a), **los diez primeros minutos a ×1 tienen ya una
+ocasión que se toca, su resultado a la vista y una elección con coste**.
+**Abierto:** lectura humana en móvil; que la escena de acogida termine en un
+vecino con cuerpo al cerrar la semana (hoy desaparece el visitante y aparece
+el vecino en su casa); y RD-5, el relleno del primer año entre medias.
+
+## 30 sep 2026 · RD-1a: a ×1 nada salta (v5.43)
+
+Los actos del jugador esperan a su semana (Vera). La pieza cobrada deja su
+«+N» en el acto. **Abierto:** el enfoque de la encrucijada llega al cerrar la
+semana, hasta 14 min después a ×1; si se siente tarde, la escena de la opción
+tendría que empezar en el toque (lo hace el forastero del vado, RD-1b).
+## 30 sep 2026 · RD-0: el sol vuelve a decir la hora a ×16 y ×64 (v5.38)
+
+Primer paso del rework de ritmo, descanso y progresión (goal del 30 sep; plan
+en `docs/plan-ritmo-descanso-y-progresion-2026-09-29.md`). La luz ya no se
+aplana hacia la media mañana a ×16/×64: se suaviza la amplitud y el sol sigue
+la hora (`LIGHT_SWING`). Evidencia: `docs/medidas/sol-sincronia-2026-09-30.md`.
+**Versiones reservadas para este rework: v5.38–v5.49.** **Abierto:** la
+comodidad a ×64 en la tablet.
+## 1 oct 2026 · RD-3: el catálogo de encrucijadas, de 21 a 15 (v5.46)
+
+Rama `claude/rd3-encrucijadas`. Seis retiradas del sorteo y ocho reescritas
+contra el dictamen de RD-0; antes y después medidos en
+`docs/medidas/rd3-encrucijadas-2026-10-01.md` (10 semillas × 60 años con `run`
+y la política prudente: **46,8 → 36,0 preguntas por partida**, `smith_feud` y
+`forest_cut` dejan de ser «exactamente 4», `hungry_spring` sale desde el año 1 y
+`first_stone` desde el 8). **Abierto:** (1) `raiders_coming` + `after_the_raid`
+pasan del 31 % al 36 % de las preguntas —al quitar seis plantillas pesan más—;
+el peso de `after_the_raid` no es la palanca (probado, trayectorias idénticas
+byte a byte); (2) `after_the_raid` sigue ciega al parte de la batalla (el DSL no
+pregunta por `threat`); (3) la semilla `the_cleared_strip` de `hamlet.ts` levanta
+un campo sin `room` y `raise field` sin respaldo —no es de este carril—; (4) la
+migración anterior a M-0 sigue borrando una pendiente retirada (`save.ts`),
+inalcanzable; (5) **la primera piedra llega con la iglesia (año 4–8) y la
+política prudente contesta «las casas»**, así que las dieciséis casas pasan a
+piedra dentro de los primeros veinte años y no a partir del 41: eso destapa dos
+cosas de otros carriles —`life/companions.ts:129` busca el hogar del perro sólo
+entre `kind === 'house'` (un valle de casas de piedra se queda **sin perro**) y
+`ui/milestones.ts` cuenta un `work_done` por cada casa de piedra (60 años dan 67
+hitos, no 28–36; la cota de `ui-milestones.test.ts` sube de 60 a 80 con su
+causa)—; (6) `granary_theft` sale ahora **exactamente 3 veces en cada semilla**:
+el mismo bloqueo por reposo que `smith_feud`, sin tocar; (7) `side_with_*` de
+`smith_feud` apagaba la fragua **para siempre** (`lit smithy off`; nada la
+enciende) y dejaba sin piedra a la aldea: quitado. **Para el jugador, nada nuevo
+en crónica:** no hay claves de crónica nuevas (`docs/plan-arte-pendiente.md`).
+**Jornadas que esta ronda movió y que quedan rojas, sin remedir** (la suite entera
+y las jornadas las pasa la CI; aquí sólo se verificó lo tocado, por orden del
+coordinador): `archery` (semilla 11 a los 25 años: 96 flechas, 0 aciertos),
+`e3b-corridor` (4) y `e3b-rampart` (2), que son huellas de villas concretas y
+hay que remedir en 60 semillas como en `docs/historico/rework.md` §2.7, y
+`life-beasts` (se cambió la 7 por la 1, medida). Vuelven a verde `life-places`
+(37) y `life-props` (las seis semillas juegan): sus `it.fails` pasaron a `it`.
+`life-decide` y los cronómetros de `save` y `life-perf` fallan igual en la base
+cuando la máquina va cargada.
+
+## 30 sep 2026 · RD-0: una encrucijada retirada pendiente vuelve a ser una pregunta (v5.39)
+
+Prerrequisito de RD-3, que va a retirar plantillas vivas: `templateOf` resuelve
+lo ya planteado contra el catálogo vivo y las retiradas. Hallado por la
+auditoría del catálogo (`docs/medidas/rd0-encrucijadas-2026-09-30.md` §6, en
+la rama `claude/ritmo-rd0`). **Abierto:** la migración anterior a M-0 sigue
+borrando una pendiente retirada (`save.ts:519-531`); es inalcanzable hoy y no
+se toca.
+## 30 sep 2026 · RD-0: la primera ocasión del mapa, tocable; el tablón, en cuadro (v5.42)
+
+D1 y D7 de RD-0 arreglados: la perdiz de la fundación ya no nace tapada (7 de 7
+ofertas de la semana 0 tocables en 12 semillas, antes 4 de 7) y el tablón no
+se sale del encuadre. **Abierto:** D2 (la oferta dura una semana: 13 s a ×64),
+D4 (cobrar la pieza fuerza el tick) y D5 (la consecuencia sólo en la crónica),
+que dependen de la velocidad normal y van a RD-1.
+## 30 sep 2026 · RD-2: volver a la velocidad que se dejó (v5.45)
+
+Con la #21 (ninguna derrota en ausencia) y ésta, el descanso A′ está entero en
+el motor y la interfaz: automático, a la velocidad dejada por las dos puertas,
+la pausa guardada, y el parte con lo pendiente. **Abierto:** la comprobación
+en el aparato (ocultar, volver, sonido y sol); el silencio y la reanudación ya
+los cubren las compuertas de `ambience.ts` (pestaña oculta, letargo).
+
+## 30 sep 2026 · RD-2: ninguna derrota mientras nadie mira (v5.40)
+
+`restTick` para el letargo en el aviso de un asalto y deshace la semana que
+acabaría la partida. Es la parte del descanso que no depende de la decisión de
+Vera (común a A y A′). **Abierto, de Vera:** qué más para el descanso, a qué
+velocidad corre, y si se activa a mano o al ocultar la app
+(`docs/medidas/rd2-descanso-2026-09-30.md`).
+## 1 oct 2026 · Decisiones de Vera para RD-3, RD-4 y RD-5, y la hoja de reparto
+
+**RD-3:** aplicar el dictamen de `docs/medidas/rd0-encrucijadas-2026-09-30.md`
+—retirar `plague_blame` y las cinco que duplican mecanismos posteriores
+(`tithe_demand`, `chapel_or_granary`, `relic_pedlar`, `wolf_winter`,
+`bandits`), reescribir las ocho para que coste, efecto y lo que se ve
+coincidan, conservar las siete—. **RD-4:** las dos señales nuevas son **el
+niño perdido** (señal en la linde; sale un adulto a buscarlo; varios
+finales) y **la visita del camino** (el que viene a vender espera en la plaza
+con su señal encima, en vez de dos botones en la voz). **RD-5:** el primer año
+a ×1 se rellena con **consecuencias que vuelven** de la primera elección,
+**sucesos pequeños del caserío** y **metas a la vista**.
+
+| Carril | Rama | Versiones | Tuyo | No es tuyo |
+|---|---|---|---|---|
+| RD-3 (agente) | `claude/rd3-encrucijadas` (sobre la #20) | v5.46 | `src/engine/crossroads/catalog/*` salvo `hamlet.ts`, las claves `crossroad.*` y `consequence.*` de `bank.en.ts`, `tests/fast/catalog*.test.ts`, `docs/plan-arte-pendiente.md` (sus filas) | `hamlet.ts` y la fundación (RD-1), `fate.ts` y los sucesos (RD-5), la interfaz |
+| RD-4 (director) | `claude/rd4-senales` | v5.47–v5.48 | `child_lost` y su señal, la visita como señal: `world/fate.ts` (sólo `child_lost`), `ui/app.ts`, `render3d/renderer.ts`, `life/` | el catálogo de encrucijadas |
+| RD-5 (director, después) | `claude/rd5-primer-ano` | v5.49–v5.52 | sucesos del caserío, consecuencias del vado, metas a la vista | — |
+
+Versiones del rework ampliadas a **v5.38–v5.55**.
+
+## 30 sep 2026 · Decisiones de Vera tras RD-0
+
+**×1 es la velocidad normal** (la escalera se mantiene; el primer año se
+rellena con contenido entre medias), **descanso A′** y **primera elección
+«Uno en el vado» desde la fundación**, con el forastero llegando andando y una
+señal encima. Escritas en el plan (§6, «Decisiones de Vera tras RD-0»).
+Siguiente: RD-1 a ×1 —la caza sin adelantar la semana (D4) y con su
+consecuencia a la vista (D5), y el forastero del vado en la semana 0—.
+
+## 30 sep 2026 · RD-0 cerrada: la apertura y el catálogo, medidos (v5.41)
+
+Síntesis en `docs/medidas/rd0-sintesis-2026-09-30.md`. **A ninguna velocidad
+hay hoy una intervención visible y una elección antes del minuto 10**: a ×1 no
+pasa ni una semana; a ×16 la primera elección llega a los 13 min; a ×64 a los
+3,3 min pero la oferta de caza dura 13 s. La perdiz nacía tapada por el
+bosque en 2 de 3 valles (D1, arreglo en su PR). Las 21 encrucijadas tienen
+dictamen (7 conservar, 8 reescribir, 5 sustituir, 1 retirar). Los arreglos
+van en PR aparte: sol (v5.38), retiradas pendientes (v5.39), ninguna derrota
+en ausencia (v5.40). **Esperando a Vera:** velocidad normal, regla del
+descanso y la primera elección de la fundación. Versiones reservadas para el
+rework: v5.38–v5.49.
+
 ## 30 sep 2026 · GV-4: el bucle de la villa, roto (v5.35)
 
 La tablet de Vera con las cuatro ramas dentro: aldea 11/21 a 57 fps, villa 7/60

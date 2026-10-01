@@ -149,6 +149,8 @@ export interface ShellHandle {
    * escribe texto— y quien la ofrece la saca de `derive/era.ts`.
    */
   setEra(text: string): void;
+  /** RD-5 · la meta a la vista bajo la era, o `null` para esconderla. */
+  setGoal(text: string | null): void;
   /**
    * M-0 · **Los dos toques de una oferta del camino**, dentro de la voz: se
    * enseñan cuando hay alguien esperando respuesta y `onAnswer` recibe `true`

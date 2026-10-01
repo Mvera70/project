@@ -34,6 +34,13 @@ import { foundTwenty } from '../helpers/founding';
 function quarrying(seed = 7): GameState {
   const state = foundTwenty(seed);
   run(state, TIME.WEEKS_PER_YEAR * 12, 'prudent', CATALOG);
+  // **RD-3 (1 oct 2026): la primera piedra llega con la piedra.** La pregunta de
+  // A.16 sale ahora con la iglesia recién levantada —año 4 a 8— y la política
+  // prudente contesta «las casas» (`stone_house_unlocked`), así que una aldea de
+  // doce años ya no llega con la piedra sin desbloquear, que es el estado que
+  // estas pruebas describen («el estado del juego hasta A4»). Se deshace la
+  // respuesta, no la prueba.
+  delete state.flags['stone_house_unlocked'];
   state.village.wood = 4_000;
   state.village.stone = 400;
   state.ring = 10;

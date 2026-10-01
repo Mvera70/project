@@ -29,7 +29,8 @@ import type { Palette } from '@derive/palette';
 import { moodsFor } from '@derive/moods';
 import { createValleyCamera, BASE_YAW } from './camera';
 import { TERRAIN_CODE, type GameState, type HappeningId, type VillagerId } from '@engine/state';
-import { BUILDINGS, TIME } from '@engine/balance';
+import { BUILDINGS, HUNT, TIME } from '@engine/balance';
+import { FOUNDING_CROSSROAD } from '@engine/crossroads/catalog/hamlet';
 import { woodCostOf } from '@engine/world/works';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
@@ -61,7 +62,7 @@ import { createYards } from './effects/yards';
 import { createBarks } from './effects/barks';
 import { createCoins } from './effects/coins';
 import { createStalls, STALL_ASSETS, type MuleLoad, type Stall } from './effects/stalls';
-import { stallOf } from './life/visitors';
+import { stallOf, type LiveDeal } from './life/visitors';
 import { yardsOf, type Yard } from '../derive/yards';
 import { festivityOf } from '@derive/festivity';
 import { buildGreatOak, type GreatOak } from './world/great-oak';
@@ -135,6 +136,8 @@ const HUNT_SIGN_COVER = 0.2;
 const WEEK_SECONDS = TIME.REAL_MS_PER_TICK / 1000;
 /** Lo que vive un «+1» sobre la leñera, en segundos de reloj real. */
 const WOOD_GAIN_LIFE = 2.6;
+/** El dibujo del aviso que sube: la leña de la leñera o el grano de una pieza cobrada (RD-1). */
+type GainIcon = 'logs' | 'wheat';
 /** Dos entradas más juntas que esto se cuentan en el mismo aviso (×16, ×64). */
 const WOOD_GAIN_MERGE = 0.7;
 /** Altura del aviso sobre el suelo de la leñera, en celdas. */
@@ -259,6 +262,8 @@ export const WANTED = [
  * pixeles. Acercarse mas es el trabajo de gestos de G-07.
  */
 const FRAME_MARGIN = 2.5;
+/** El aire que se deja alrededor del tablón al meterlo en el encuadre, en celdas (D7). */
+const BOARD_FRAME_AIR = 1.5;
 
 /** Cuántas nubes de §11.1.1 pueden verse a la vez. TUNE: tres; ver el uso. */
 const MOST_BUBBLES = 3;
@@ -503,8 +508,8 @@ export async function createGraphicsRenderer(
    * De que color es la luz a esta hora del dia escenico, a esta velocidad.
    *
    * La velocidad entra porque desde D.6.1 la jornada la sigue entera: a x64 el
-   * dia dura menos de dos segundos, y una jornada de luz de dos segundos es un
-   * parpadeo. `daylightAt` la aplana; aqui solo se le pasa el dato.
+   * dia dura menos de dos segundos. `daylightAt` suaviza el contraste pero el
+   * sol sigue la hora (RD-0, 30 sep 2026); aqui solo se le pasa el dato.
    */
   function light(phase: number, speed: GraphicsFrame['speed'], overcast = 0): void {
     const day = daylightAt(phase, speed, overcast);
@@ -770,7 +775,7 @@ export async function createGraphicsRenderer(
   // Esquema 12 · lo que el motor ha apuntado de la madera de la semana, visto
   // desde aquí, y los avisos «+1» / «−40» que eso deja sobre la leñera.
   let woodSeen: { tick: number; credited: number; total: number; wood: number; work: number | null } | null = null;
-  let woodGains: { id: number; count: number; x: number; z: number; age: number }[] = [];
+  let woodGains: { id: number; count: number; x: number; z: number; age: number; icon: GainIcon }[] = [];
   let woodGainId = 0;
   /** Quién caza ahora, para seguirlo y devolverlo a su día al acabar. */
   let huntHunter: Dweller | null = null;
@@ -778,6 +783,22 @@ export async function createGraphicsRenderer(
   let lifeDay = -1;
   let lifeState: GameState | null = null;
   let observedState: Readonly<GameState> | null = null;
+  /**
+   * RD-1 · lo que el jugador contestó al forastero del vado y el motor aún no
+   * ha apuntado: la decisión espera a su semana (§2.60), y mientras tanto la
+   * escena ya lo enseña, también en las jornadas que se rehacen.
+   */
+  let fordAnswer: 'in' | 'out' | null = null;
+  /**
+   * RD-4 · el trato que el jugador cerró con el vendedor delante: vale para
+   * los días que le quedan en la plaza y para que la semana siguiente no
+   * vuelva a cerrarlo (`LiveDeal`).
+   */
+  let liveDeal: LiveDeal | null = null;
+  /** RD-4 · el niño que el jugador ya mandó buscar: no vuelve a la linde en los días que se rehacen. */
+  let lostFound: { villager: VillagerId; tick: number } | null = null;
+  /** Dónde está el tablón de la plaza, para que el encuadre lo incluya (D7). */
+  let boardSpot: { x: number; z: number } | null = null;
   let observedFrame: GraphicsFrame | null = null;
   let sampling = false;
   let observing = false;
@@ -837,13 +858,13 @@ export async function createGraphicsRenderer(
     const z = Math.floor(store / width) + 0.5;
     const shout = (count: number): void => {
       const last = woodGains[woodGains.length - 1];
-      if (last !== undefined && Math.sign(last.count) === Math.sign(count) && last.age < WOOD_GAIN_MERGE) {
+      if (last !== undefined && last.icon === 'logs' && Math.sign(last.count) === Math.sign(count) && last.age < WOOD_GAIN_MERGE) {
         last.count += count;
         last.age = 0;
         return;
       }
       woodGainId += 1;
-      woodGains.push({ id: woodGainId, count, x, z, age: 0 });
+      woodGains.push({ id: woodGainId, count, x, z, age: 0, icon: 'logs' });
     };
     if (now.tick === seen.tick) {
       if (now.credited > seen.credited) shout(now.credited - seen.credited);
@@ -876,7 +897,30 @@ export async function createGraphicsRenderer(
     // copas que sólo tapaban a esa persona.
     const followed = trackedTarget();
     if (followed !== null) targets.push(followed);
+    // RD-0 (30 sep 2026), D1 · **Y la presa que se ofrece, si está en la
+    // pradera.** Con la cámara de apertura las copas de la linde tapaban a la
+    // perdiz de la fundación en 3 de 7 valles con la señal en pantalla, y la
+    // primera ocasión del mapa no se podía tocar. Vera pidió que la señal se
+    // apague cuando la presa **entra** en el bosque (28 sep 2026), no cuando
+    // un árbol se cruza por delante: eso se resuelve como con quien se sigue.
+    const prey = offeredPrey();
+    if (prey !== null && !prey.inForest) targets.push(prey.target);
     return forest.reveal(camera, targets);
+  }
+
+  /** La presa de la ocasión de caza a la vista, como volumen, y si está dentro del bosque. */
+  function offeredPrey(): { target: ForestRevealTarget; inForest: boolean } | null {
+    if (huntScene !== null || huntSighting === null || life === null) return null;
+    const at = huntSighting.prey !== null
+      ? { x: huntSighting.prey.body.x, z: huntSighting.prey.body.z }
+      : (() => { const found = life.wildlife.find(animal => animal.kind === huntSighting!.species); return found === undefined ? null : { x: found.x, z: found.y }; })();
+    if (at === null) return null;
+    const cell = Math.floor(at.z) * mapWidth + Math.floor(at.x);
+    const inForest = observedState !== null && observedState.map.terrain[cell] === TERRAIN_CODE.forest;
+    return {
+      target: { x: at.x, y: groundFloor(at.x, at.z) + ACTOR_VISUAL_HEIGHT / 2, z: at.z, radius: HUNT_SIGN_COVER, canopyOnly: true },
+      inForest,
+    };
   }
 
   /** La caza o el frente del asalto, como volúmenes a dejar ver; nada si no hay encuentro. */
@@ -893,13 +937,20 @@ export async function createGraphicsRenderer(
       });
       return targets;
     }
+    // RD-4 · el niño perdido espera en la linde con su señal: las copas que lo
+    // tapan se atenúan, como las de la caza (D1), o la señal nacía apagada.
+    const lost = scene.lostChild;
+    const lostTargets: ForestRevealTarget[] = lost !== null && lost.phase === 'lost' && lost.searcher === null ? [{
+      x: lost.body.x, y: groundFloor(lost.body.x, lost.body.z) + ACTOR_VISUAL_HEIGHT / 2,
+      z: lost.body.z, radius: ACTOR_VISUAL_HEIGHT,
+    }] : [];
     const gate = scene.defence.gate;
-    if (gate === null) return [];
+    if (gate === null) return lostTargets;
     const active = scene.raiders.filter(raider => raider.phase !== 'down'
       && raider.phase !== 'gone' && raider.phase !== 'leaving');
     // El portón puede conservar su parte después de caer el último atacante.
     // Sin un cuerpo hostil activo ya no hay encuentro que revelar.
-    if (active.length === 0) return [];
+    if (active.length === 0) return lostTargets;
     const targets: ForestRevealTarget[] = [{
       x: gate.at.x,
       y: groundFloor(gate.at.x, gate.at.z) + GATE_REVEAL_RADIUS / 2,
@@ -923,7 +974,7 @@ export async function createGraphicsRenderer(
       z,
       radius,
     });
-    return targets;
+    return [...targets, ...lostTargets];
   }
 
   /**
@@ -932,6 +983,22 @@ export async function createGraphicsRenderer(
    * una partida recien fundada.
    */
   function framed(): { minX: number; minZ: number; maxX: number; maxZ: number } {
+    const box = framedBuildings();
+    // RD-0 (30 sep 2026), D7 · **Y el tablón dentro.** Es el primer objeto del
+    // valle que abre su propia interfaz (§7.15), está en el borde oeste de la
+    // plaza y el núcleo de lo construido crece hacia otro lado: en la semilla 7
+    // salía del cuadro a partir de la semana 6, justo cuando se abría la
+    // primera misión (x = −21 px de 390). Se mete con una celda de aire.
+    if (boardSpot === null || box.maxX - box.minX >= mapWidth) return box;
+    return {
+      minX: Math.max(0, Math.min(box.minX, boardSpot.x - BOARD_FRAME_AIR)),
+      minZ: Math.max(0, Math.min(box.minZ, boardSpot.z - BOARD_FRAME_AIR)),
+      maxX: Math.min(mapWidth, Math.max(box.maxX, boardSpot.x + BOARD_FRAME_AIR)),
+      maxZ: Math.min(mapHeight, Math.max(box.maxZ, boardSpot.z + BOARD_FRAME_AIR)),
+    };
+  }
+
+  function framedBuildings(): { minX: number; minZ: number; maxX: number; maxZ: number } {
     const buildings = plan?.buildings ?? [];
     if (buildings.length === 0) return { minX: 0, minZ: 0, maxX: mapWidth, maxZ: mapHeight };
 
@@ -1965,6 +2032,9 @@ export async function createGraphicsRenderer(
     paint(state: Readonly<GameState>, frame: GraphicsFrame): void {
       if (observing && !sampling) return;
       observedState = state; observedFrame = frame;
+      // RD-1 · contestada y apuntada por el motor, la respuesta al forastero
+      // ya no hace falta: o es vecino, o se fue.
+      if (state.crossroad?.templateId !== FOUNDING_CROSSROAD.id) fordAnswer = null;
       if (disposed) return;
       // GV-0 · el seguimiento de la herramienta, repetido como lo repite
       // `app.ts` antes de cada `paint` (VZ-4).
@@ -2003,6 +2073,7 @@ export async function createGraphicsRenderer(
         ? lifeState : scenic.of(state as GameState, phase);
 
       const next = planFor(shown);
+      boardSpot = noticeBoardOf(shown);
       const change = planChange(plan, next);
       if (firstPaint) markStage('paint:plan-ready');
       let fallingChanged = treeFalls.observe(state.map, frame.discontinuity);
@@ -2142,6 +2213,9 @@ export async function createGraphicsRenderer(
           rampartOf: sceneRampartPatrolView,
           ragdollSeed: (id, bornAt, placement) => cast.captureRagdoll(id, bornAt, placement),
           ...(forcedVisits === null ? {} : { visits: forcedVisits, dealt: forcedDeal }),
+          fordAnswer: shown.crossroad?.templateId === FOUNDING_CROSSROAD.id ? fordAnswer : null,
+          liveDeal,
+          lostFound,
           ...(heldSky === null ? {} : { sky: heldSky }),
           ...(battleChoice === null ? {} : { battle: {
             raiders: battleChoice.raiders, garrison: garrisonAs(shown, battleChoice.hands, battleChoice.arm),
@@ -2281,7 +2355,20 @@ export async function createGraphicsRenderer(
           huntScene.step(life.wildlife);
           // AN-5a · El parte espera a que la escena acabe de verse: la pieza
           // cae y se queda, o la que se escapa se va.
-          if (huntScene.completed !== null && huntScene.settled && huntReport === null) huntReport = huntScene.completed;
+          if (huntScene.completed !== null && huntScene.settled && huntReport === null) {
+            huntReport = huntScene.completed;
+            // RD-1 (30 sep 2026) · **La pieza se ve en el acto.** Desde que los
+            // actos esperan a su semana (Vera: a ×1 nada salta), el motor la
+            // apunta al cerrarla, hasta catorce minutos después; lo que el
+            // jugador ve ya es la pieza en el suelo y su «+N» encima del cazador,
+            // con el mismo aviso que la leña. Lo que vale es lo que el motor
+            // pagará (`HUNT.meat`), no una cifra de aquí.
+            if (huntReport.killed) {
+              const hunter = huntScene.hunter;
+              woodGainId += 1;
+              woodGains.push({ id: woodGainId, count: HUNT.meat[huntReport.species], x: hunter.x, z: hunter.z, age: 0, icon: 'wheat' });
+            }
+          }
         } else if (huntSighting !== null && huntSighting.prey !== null) {
           // Esperando: pace a su aire; con el paso congelado en 0 no caduca.
           stepWildPrey(huntSighting.prey, life.land, state.seed ^ huntSighting.tick, 0, []);
@@ -2738,12 +2825,12 @@ export async function createGraphicsRenderer(
       return beginHunt(state, species, weapon) === 'started';
     },
     /** Esquema 12 · los avisos de la leñera en la pantalla: cuánto, dónde y cuánto llevan. */
-    woodGains(): readonly { id: number; count: number; x: number; y: number; age: number }[] {
-      const shown: { id: number; count: number; x: number; y: number; age: number }[] = [];
+    woodGains(): readonly { id: number; count: number; x: number; y: number; age: number; icon: GainIcon }[] {
+      const shown: { id: number; count: number; x: number; y: number; age: number; icon: GainIcon }[] = [];
       for (const gain of woodGains) {
         const point = new Vector3(gain.x, groundFloor(gain.x, gain.z) + WOOD_GAIN_LIFT, gain.z).project(camera);
         if (point.z > 1 || Math.abs(point.x) > 1.05 || Math.abs(point.y) > 1.05) continue;
-        shown.push({ id: gain.id, count: gain.count, age: gain.age / WOOD_GAIN_LIFE,
+        shown.push({ id: gain.id, count: gain.count, age: gain.age / WOOD_GAIN_LIFE, icon: gain.icon,
           x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2 });
       }
       return shown;
@@ -2758,11 +2845,63 @@ export async function createGraphicsRenderer(
       const point = new Vector3(at.x, groundFloor(at.x, at.z) + HUNT_SIGN_LIFT, at.z).project(camera);
       if (point.z > 1 || point.x < -1.05 || point.x > 1.05 || point.y < -1.05 || point.y > 1.05) return null;
       // Entre los árboles no se ofrece: la caza que empezara ahí no se vería
-      // (Vera, 28 sep 2026). Se mide la presa a media altura, no la señal.
+      // (Vera, 28 sep 2026). **Entre** quiere decir dentro del bosque: si la
+      // presa está en la pradera y una copa se cruza por delante, esa copa se
+      // atenúa (`revealAssault`, D1) y la señal sigue ahí.
+      const hidden = offeredPrey()?.inForest === true;
+      return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, species: huntSighting.species, hidden };
+    },
+    fordSign(): { x: number; y: number; hidden: boolean } | null {
+      if (life === null || fordAnswer !== null) return null;
+      const stranger = life.visitors.find((visitor) => visitor.scene === 'ford');
+      if (stranger === undefined || stranger.phase !== 'staying') return null;
+      const at = stranger.body;
+      const point = new Vector3(at.x, groundFloor(at.x, at.z) + HUNT_SIGN_LIFT + ACTOR_VISUAL_HEIGHT * 0.6, at.z).project(camera);
+      if (point.z > 1 || point.x < -1.05 || point.x > 1.05 || point.y < -1.05 || point.y > 1.05) return null;
       const hidden = forest !== null && forest.hides(camera, {
         x: at.x, y: groundFloor(at.x, at.z) + ACTOR_VISUAL_HEIGHT / 2, z: at.z, radius: HUNT_SIGN_COVER,
       });
-      return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, species: huntSighting.species, hidden };
+      return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, hidden };
+    },
+    answerFord(optionId: string): void {
+      fordAnswer = optionId === 'take_him_in' ? 'in' : 'out';
+      life?.answerFord(fordAnswer);
+    },
+    visitSign(kind: HappeningId): { x: number; y: number; hidden: boolean } | null {
+      if (life === null) return null;
+      const seller = life.visitors.find((visitor) => visitor.kind === kind && visitor.scene === undefined
+        && !visitor.dealt && visitor.phase === 'staying');
+      if (seller === undefined) return null;
+      const at = seller.body;
+      const point = new Vector3(at.x, groundFloor(at.x, at.z) + HUNT_SIGN_LIFT + ACTOR_VISUAL_HEIGHT * 0.6, at.z).project(camera);
+      if (point.z > 1 || point.x < -1.05 || point.x > 1.05 || point.y < -1.05 || point.y > 1.05) return null;
+      const hidden = forest !== null && forest.hides(camera, {
+        x: at.x, y: groundFloor(at.x, at.z) + ACTOR_VISUAL_HEIGHT / 2, z: at.z, radius: HUNT_SIGN_COVER,
+      });
+      return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, hidden };
+    },
+    lostSign(): { x: number; y: number; hidden: boolean } | null {
+      const child = life?.lostChild ?? null;
+      if (child === null || child.phase !== 'lost' || child.searcher !== null) return null;
+      const at = child.body;
+      const point = new Vector3(at.x, groundFloor(at.x, at.z) + HUNT_SIGN_LIFT + ACTOR_VISUAL_HEIGHT * 0.45, at.z).project(camera);
+      if (point.z > 1 || point.x < -1.05 || point.x > 1.05 || point.y < -1.05 || point.y > 1.05) return null;
+      // Está fuera del bosque (`lost-child.ts`) y las copas que se interponen
+      // se atenúan (`encounterTargets`): la señal no se apaga nunca.
+      return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, hidden: false };
+    },
+    searchChild(tick: number): { child: VillagerId; searcher: VillagerId } | null {
+      const child = life?.lostChild ?? null;
+      if (child === null) return null;
+      const searcher = life!.searchChild();
+      if (searcher === null) return null;
+      lostFound = { villager: child.villager, tick };
+      return { child: child.villager, searcher };
+    },
+    dealVisit(kind: HappeningId, tick: number): boolean {
+      if (life === null || !life.dealVisit(kind)) return false;
+      liveDeal = { kind, tick };
+      return true;
     },
     attackHunt(precision?: number): boolean { return huntScene?.attack(precision) ?? false; },
     hunt(): HuntReport | null {

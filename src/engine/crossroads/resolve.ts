@@ -11,13 +11,14 @@ import { adjustOpinion } from '../people/opinions';
 import { makeName } from '../people/names';
 import { ageOf, makeVillager, promoteToNamed } from '../people/villagers';
 import { rollCharacter } from '../people/traits';
-import { int, next, pick } from '../rng';
+import { int, next, pick, hash32 } from '../rng';
 import { herdCapacity } from '../subsistence/herd';
 import type { GameState, Villager, VillagerId } from '../state';
 import { styleOf } from '../people/crown';
 import { seasonOf, yearOf } from '../time';
 import { standing } from '../subsistence/building-counts';
 import type { AppliedEffects, Catalogue, Effect } from './schema';
+import { templateOf } from './catalog';
 
 const clampStat = (name: string, x: number): number =>
   name === 'morale' || name === 'faith' ? Math.max(0, Math.min(100, x)) : Math.max(0, x);
@@ -244,7 +245,7 @@ export function applyOption(
   const pending = state.crossroad;
   if (pending === null) return null;
 
-  const template = catalogue.find((t) => t.id === pending.templateId);
+  const template = templateOf(catalogue, pending.templateId);
   if (template === undefined) return null;
 
   const option = template.options.find((o) => o.id === optionId);
@@ -292,15 +293,18 @@ export function applyOption(
   // §8.5. The delay is drawn once, now, so that the year it lands in is part of
   // the decision and not of whenever the seed happens to be looked at.
   for (const spec of option.seeds) {
-    const years = int(state.rng, 'crossroads', spec.delayYears[0], spec.delayYears[1]);
+    const weeks = spec.delayWeeks === undefined
+      ? int(state.rng, 'crossroads', spec.delayYears[0], spec.delayYears[1]) * 48
+      : spec.delayWeeks[0] + hash32(state.seed, `seed:${template.id}:${option.id}:${spec.id}:${state.tick}`)
+        % (spec.delayWeeks[1] - spec.delayWeeks[0] + 1);
     // A flag that lasts exactly until this seed comes due (§8.5, v2.13).
-    if (spec.holdsFlag !== undefined) state.flags[spec.holdsFlag] = state.tick + years * 48;
+    if (spec.holdsFlag !== undefined) state.flags[spec.holdsFlag] = state.tick + weeks;
     state.seeds.push({
       id: `${template.id}:${option.id}:${spec.id}:${state.tick}`,
       fromTemplateId: template.id,
       fromOptionId: option.id,
       plantedTick: state.tick,
-      firesAtTick: state.tick + years * 48,
+      firesAtTick: state.tick + weeks,
       cast: { ...pending.cast },
       condition: spec.condition ?? null,
       firedTick: null,

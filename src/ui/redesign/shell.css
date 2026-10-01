@@ -169,6 +169,17 @@ html.bare .ui-shell-stack { visibility: hidden; }
 /* La trampa de §12 del estandar: una hoja de autor que pone `display` le gana
    al `hidden` del navegador, que no tiene especificidad. */
 .valley-era[hidden] { display: none; }
+/* RD-5 · la meta a la vista, bajo la era: mas pequena y sin versalitas, para
+   que se lea como una nota al titulo y no como otro titulo. */
+.valley-goal {
+  display: block;
+  margin: -4px 0 8px;
+  text-align: center;
+  font-size: var(--skin-text-label);
+  font-style: italic;
+  color: var(--skin-ink-faded);
+}
+.valley-goal[hidden] { display: none; }
 /* El filo sombreado de la bandeja lo pone `.skin-torn-top` (skin.css), que es
    la clase de las seis superficies del canto; aquí sólo se apaga cuando el
    hueco está vacío y la bandeja se pliega a cero. */

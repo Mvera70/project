@@ -10,11 +10,20 @@ import { foundTwenty, villageWhere } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { MARKS, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
+import type { Catalogue } from '@engine/crossroads/schema';
 import { run } from '@engine/sim';
 import { bannersAt, dousedAt } from '@derive/marks';
 import { tellsFor } from '@derive/tells';
 import { fingerprint } from '../helpers/fingerprint';
 import type { GameState } from '@engine/state';
+
+// **Un valle de casas de madera (RD-3, 1 oct 2026).** La pregunta de la primera
+// piedra sale ahora con la iglesia —año 4 a 8— y la política prudente contesta
+// «las casas»: a los veinte años todas son `stone_house`, y `dousedAt` sin `who`
+// apaga «la primera casa **de madera** en pie» (`kind: 'house'`), que ya no hay.
+// Lo que estas pruebas guardan es el apagón y no la piedra, así que el valle se
+// juega sin esa pregunta.
+const WOODEN: Catalogue = CATALOG.filter((t) => t.id !== 'first_stone');
 
 const grown = new Map<string, GameState>();
 function village(years: number, seed = 7): GameState {
@@ -22,7 +31,7 @@ function village(years: number, seed = 7): GameState {
   let base = grown.get(key);
   if (base === undefined) {
     base = foundTwenty(seed);
-    run(base, years * 48, 'prudent', CATALOG);
+    run(base, years * 48, 'prudent', WOODEN);
     grown.set(key, base);
   }
   return structuredClone(base);
@@ -158,7 +167,7 @@ function dousedKind(): BuildingKind {
 
 function doused(): GameState {
   const kind = dousedKind();
-  const found = villageWhere(20, (s) => standing(s, kind).length > 0);
+  const found = villageWhere(20, (s) => standing(s, kind).length > 0, undefined, WOODEN);
   expect(found, `alguna semilla debe llegar a los 20 años con ${kind} en pie`).not.toBeNull();
   return found as GameState;
 }

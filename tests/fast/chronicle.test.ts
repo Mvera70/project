@@ -354,6 +354,8 @@ describe('render', () => {
       faith: 2,
       a: 'Edwin',
       b: 'Hild',
+      // RD-2 · el parte de regreso nombra la pregunta que espera.
+      title: 'One at the Ford',
     };
     const keys = bankKeys();
     let rendered = 0;

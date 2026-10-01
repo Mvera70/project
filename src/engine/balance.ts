@@ -67,6 +67,13 @@ export const TIME = {
   // cambiar el tick y dejar esto atrás.
   LETHARGY_CAP_MS: 20 * 48 * 840_000,
   LETHARGY_BATCH: 64, // §13.2: ticks per requestAnimationFrame while catching up
+  // TUNE (RD-2, 30 sep 2026): por debajo de cuánta gente el descanso guarda
+  // una copia de la semana para poder deshacerla si acabara la partida
+  // (`restTick`, §13.2). La peor semana medida fuera de peste, asalto y valle
+  // menguante perdió 6 personas de 10 (24 semillas × 60 años sin jugador,
+  // semilla 17, tick 696); 15 es dos veces y media eso. Copiar cuesta lo que
+  // una semana en el año 60 (7 ms), así que no se copia siempre.
+  REST_WATCH_POPULATION: 15,
   // TUNE: how long a notable event stays legible over the valley (§11.6,
   // v2.84). Long enough to read one sentence, short enough that a village at
   // 16x does not queue a backlog. Real time on purpose and cut hard, never
@@ -587,7 +594,32 @@ export const FATE = {
     tinker: 1,
     wise_woman: 0.5,
     refugees: 0.4,
+    // RD-5 · los del caserío no entran en este sorteo (`HAMLET_WEIGHT`).
+    wild_honey: 0,
+    mushrooms_after_rain: 0,
+    fox_at_the_hens: 0,
+    first_frost: 0,
   },
+  // RD-5 (1 oct 2026) · **la tirada del caserío.** Si el sorteo de la semana no
+  // trae nada y el valle tiene menos de `HAMLET_PEOPLE`, se tira otra vez, sólo
+  // entre los sucesos pequeños y con esta probabilidad. Sale de un hash de la
+  // semilla y la semana (`rollHamlet`), no de un flujo: un flujo nuevo cambiaba
+  // la forma del guardado. TUNE, medido con el informe de RD-5: con 0,3 la
+  // meseta de la hora 3 a la 6 a ×1 pasa de 2,75 entradas por valle a ~5.
+  HAMLET_PEOPLE: 10,
+  HAMLET_CHANCE: 0.3,
+  HAMLET_WEIGHT: { wild_honey: 1, mushrooms_after_rain: 1.5, fox_at_the_hens: 1, first_frost: 2 },
+  // TUNE: lo que deja cada uno. Escala: la buena pesca da 10–30 de grano y 2
+  // de ánimo; éstos son más pequeños, que para eso son del caserío.
+  HONEY_GRAIN: 4,
+  HONEY_MORALE: 2,
+  MUSHROOM_GRAIN: [5, 10] as [number, number],
+  MUSHROOM_WET_DAYS: 2,
+  FOX_MORALE: -1,
+  FOX_AGAIN_WEEKS: 12,
+  FROST_WOOD: 6,
+  // Desde qué semana del otoño (de doce) puede helar.
+  FROST_FROM_WEEK: 8,
   // La fiesta de la cosecha no es suerte: si hay grano y hay gente, la semana
   // después de la siega se celebra. Medido sin esto: una vez cada veinte años,
   // porque una sola semana al año casi nunca coincidía con el sorteo.
@@ -636,6 +668,9 @@ export const FATE = {
   BEAR_MORALE: -3,
   // TUNE: un niño perdido y encontrado, y un forastero que pasa.
   CHILD_MORALE: -3,
+  // TUNE (RD-4): lo que vuelve si el jugador manda a buscarlo; sin búsqueda
+  // el valle lo encuentra igual al anochecer y el ánimo perdido no vuelve.
+  CHILD_FOUND_MORALE: 3,
   STRANGER_MORALE: 1,
   // TUNE: los que llegan por el camino (28 sep 2026). Escala: una boda da 5 de
   // ánimo y el forastero 1; el buhonero se lleva 80 de leña por 6 de plata.
@@ -2036,6 +2071,46 @@ export const CROSSROADS = {
   STORY_FLOOR: 0.25,
   NOVELTY_MULTIPLIER: 0.4, // if it already came up this game
   DEFAULT_COOLDOWN_YEARS: 25,
+} as const;
+
+/**
+ * RD-3 (1 oct 2026) · Las cifras de las encrucijadas reescritas, que hasta aquí
+ * eran literales en el catálogo y **absolutas** (+900, +300, −450…): pensadas
+ * para 40–80 personas y heredadas por aldeas de 7 (RD-0, T5). Ahora son
+ * proporciones de lo que haya en el almacén —`mul`—, y viven aquí.
+ * Medidas contra las despensas a las que llega cada pregunta en
+ * `docs/medidas/rd3-encrucijadas-2026-10-01.md`.
+ */
+export const CROSSROAD_EFFECTS = {
+  // TUNE: `winter_grain_debt.kneel`, múltiplo de lo que hay en el granero.
+  KNEEL_GRAIN_MUL: 2.2,
+  // TUNE: `winter_grain_debt.take_it_at_night`.
+  NIGHT_GRAIN_MUL: 1.8,
+  // TUNE: `winter_grain_debt` → `tithe_due`: una quinta parte del granero.
+  TITHE_DUE_MUL: 0.8,
+  // TUNE: `hungry_spring.eat_it` y `.half_and_half`: lo que se come de la
+  // semilla, como múltiplo de lo que hay (eran +300 y +140 fijos).
+  EAT_SEED_GRAIN_MUL: 1.4,
+  HALF_SEED_GRAIN_MUL: 1.2,
+  // TUNE: `granary_theft`: lo que falta del granero esa noche.
+  THEFT_GRAIN_MUL: 0.9,
+  // TUNE: `granary_theft.a_new_latch`: la madera y el hierro de un cerrojo y
+  // una puerta nuevos, que es lo que cuesta el «y todos lo saben».
+  LATCH_WOOD: 40,
+  // TUNE: `smith_feud`: la opinión de B sobre A a partir de la cual la riña es
+  // real (la condición ambiental era `grudge ≥ 45` de *cualquiera* con
+  // cualquiera), y el ánimo por debajo del cual estalla.
+  SMITH_FEUD_MIN_OPINION: 55,
+  SMITH_FEUD_MORALE: 45,
+  // TUNE: `feud_inherited`: el rencor mínimo de B hacia A, el de la condición.
+  FEUD_INHERITED_MIN_OPINION: 45,
+  // TUNE: `forest_cut`: la despensa a partir de la cual «faltan campos», contra
+  // las semanas que quedan hasta la cosecha (`grainToHarvest`).
+  FOREST_CUT_PANTRY: 1.15,
+  // TUNE: `forest_cut.leave_it_standing` → `the_wood_holds`: el bosque del
+  // corazón que cuenta como «aguanta» (medido 0,18–0,26; antes 0,5, que no se
+  // alcanza nunca).
+  WOOD_HOLDS_FOREST: 0.2,
 } as const;
 
 // ---------------------------------------------------------------------------

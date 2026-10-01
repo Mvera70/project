@@ -116,6 +116,12 @@ const ONE_AT_THE_FORD: CrossroadTemplate = {
   category: 'hamlet',
   weight: 9,
   cooldownYears: 6,
+  // RD-1 (Vera, 30 sep 2026) · **Es la primera pregunta del valle y sale una
+  // vez.** La planta `foundGame` al fundar (`foundingCrossroad`): a ×1, la
+  // velocidad normal, el primer tick llega en el minuto 14, y la primera
+  // elección tenía que caber antes del diez. Sus `requires` quedan para quien
+  // lea el catálogo, pero el sorteo ya no la vuelve a sacar.
+  maxPerGame: 1,
   requires: [
     { k: 'stat', stat: 'people', op: '<', v: 10 },
     // **Verano, y la estación aquí decide si el contenido existe.** Con el
@@ -147,6 +153,21 @@ const ONE_AT_THE_FORD: CrossroadTemplate = {
       // malo en ninguna parte. Es la forma de A.13 a escala de caserío: se gana
       // un par de manos ahora y se hereda lo que ese hombre traía detrás.
       seeds: [
+        // RD-5 (Vera, 1 oct 2026: «consecuencias que vuelven») · lo que se
+        // nota pronto. A ×1 una semana son catorce minutos: dos o tres semanas
+        // después de contestar es la primera hora de juego, que es cuando el
+        // plan pide que una elección anterior regrese (§3, 10–60 min).
+        {
+          id: 'he_knew_the_axe',
+          delayYears: [0, 0],
+          delayWeeks: [2, 3],
+          effects: [
+            { k: 'stat', stat: 'wood', delta: 25 },
+            { k: 'stat', stat: 'morale', delta: 2 },
+          ],
+          visible: [{ k: 'gather', where: 'square', days: 1 }],
+          chronicleKey: 'consequence.he_knew_the_axe',
+        },
         {
           id: 'what_he_was_running_from',
           delayYears: [3, 8],
@@ -167,7 +188,20 @@ const ONE_AT_THE_FORD: CrossroadTemplate = {
         { k: 'stat', stat: 'morale', delta: 2 },
       ],
       visible: [{ k: 'gather', where: 'ford', days: 1 }],
-      seeds: [],
+      // RD-5 · el pan que se le dio vuelve por el mismo camino.
+      seeds: [
+        {
+          id: 'he_came_back_with_fish',
+          delayYears: [0, 0],
+          delayWeeks: [2, 3],
+          effects: [
+            { k: 'stat', stat: 'grain', delta: 10 },
+            { k: 'stat', stat: 'faith', delta: 1 },
+          ],
+          visible: [{ k: 'gather', where: 'ford', days: 1 }],
+          chronicleKey: 'consequence.he_came_back_with_fish',
+        },
+      ],
       traitWeight: { devout: 2, cunning: 1 },
     },
     {
@@ -179,10 +213,30 @@ const ONE_AT_THE_FORD: CrossroadTemplate = {
         { k: 'stat', stat: 'faith', delta: -4 },
       ],
       visible: [{ k: 'gather', where: 'ford', days: 1 }],
-      seeds: [],
+      // RD-5 · y el que se fue con hambre no se fue lejos.
+      seeds: [
+        {
+          id: 'tracks_from_the_ford',
+          delayYears: [0, 0],
+          delayWeeks: [2, 3],
+          effects: [
+            { k: 'stat', stat: 'grain', delta: -12 },
+            { k: 'stat', stat: 'morale', delta: -2 },
+          ],
+          visible: [{ k: 'gather', where: 'ford', days: 1 }],
+          chronicleKey: 'consequence.tracks_from_the_ford',
+        },
+      ],
       traitWeight: { craven: 2, secretive: 2, generous: 0.4 },
     },
   ],
 };
 
 export const HAMLET_TEMPLATES: readonly CrossroadTemplate[] = [BREAKING_GROUND, ONE_AT_THE_FORD];
+
+/**
+ * RD-1 · La pregunta con la que se funda un caserío: alguien sube solo por el
+ * camino del valle y espera en el vado. La escena y la señal que la abren son
+ * de la capa de vida y de la interfaz; aquí sólo se dice cuál es.
+ */
+export const FOUNDING_CROSSROAD: CrossroadTemplate = ONE_AT_THE_FORD;

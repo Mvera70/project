@@ -2322,8 +2322,51 @@ con los números, es §12.10; y el código que la lee es `weightOf` en
 | La fiesta de la cosecha | rito: la semana después de la siega | ánimo y fe | la capilla, dos días |
 | La riña en la plaza | dos nombrados | los dos que peor se llevan, peor todavía | la plaza |
 | El oso en el bosque | verano u otoño, bosque | una bandera dos semanas, ánimo | — |
-| El niño perdido | hay niños | ánimo; si es nombrado, con su nombre | el vado |
+| El niño perdido | hay niños | ánimo; si es nombrado, con su nombre; **desde v5.48, en dos tiempos** (abajo) | el vado, y el niño en la linde |
 | El forastero | salvo valle hostil | ánimo | la plaza |
+
+**Y desde v5.48 (1 oct 2026, RD-4) el niño perdido es una señal en el mapa.**
+La semana del suceso la crónica dice que se perdió (`fate.child_missing*`) y la
+capa de vida lo deja los dos primeros días escénicos en la linde más cercana a
+su casa, quieto y con una señal encima (`life/lost-child.ts`); las copas que lo
+tapan se atenúan. Tocarla manda al adulto libre más cercano a por él desde
+donde esté y deja el acto `search` en la cola. La semana siguiente, en el paso
+1b, `settleLostChild` (`world/lost-child.ts`) lo cierra: con búsqueda, quien
+fue lo trae (`child.found_by*`, `FATE.CHILD_FOUND_MORALE` de ánimo de vuelta y
+`OPINION.WAS_SAVED` del niño hacia él); sin ella, lo encuentra el valle al
+anochecer (`child.found_at_dusk`) y el ánimo perdido no vuelve. Ninguna tirada
+nueva. `who` lleva siempre el `id` del niño; las claves viejas
+`fate.child_lost*` se quedan en el banco por los guardados.
+
+**Y la visita, también (v5.47).** El que sube a vender espera en la plaza con
+unas monedas encima mientras el trato se puede pagar; tocarlas lo cierra con él
+delante (`Village.dealVisit`): la aldea le lleva la leña o el grano, o le paga,
+esa misma jornada, y la semana siguiente no vuelve a cerrarlo (`LiveDeal`).
+Cuando no está a la vista —ya se fue, o no hay escena— la voz conserva sus dos
+toques y la oferta vive sus dos semanas como antes.
+
+**Y desde v5.49–v5.51 (1 oct 2026, RD-5) el primer año tiene cosas entre
+medias.** A ×1 una hora real es un mes de juego y el primer año son doce
+horas; RD-5 midió en ocho semillas una meseta de la hora 3 a la 6 (2,75
+entradas de crónica por valle en tres horas) y ninguna consecuencia que
+volviera. Tres piezas, pedidas por Vera:
+
+- **Lo que se contestó en el vado vuelve en la primera hora.** Cada respuesta
+  planta una consecuencia corta (`delayWeeks: [2, 3]`, §8.5), sorteada con un
+  hash y no con el flujo `crossroads`: acogido, sabe de hacha (leña);
+  alimentado y despedido, vuelve con pescado; echado, falta grano y las
+  huellas van al vado.
+- **Los sucesos pequeños del caserío** —miel silvestre, setas tras la lluvia,
+  el zorro en las gallinas, la primera helada— tienen **su propia tirada**:
+  sólo si el sorteo de la semana no trajo nada, sólo con menos de
+  `FATE.HAMLET_PEOPLE` (10), con `FATE.HAMLET_CHANCE` (0,3), y de un hash, sin
+  consumir azar del motor. Ninguno destruye nada. Una miel por verano y un
+  zorro cada doce semanas como mucho. Medido: la meseta pasa a 3,88 entradas
+  por valle y 11 claves distintas, sin ningún valle acabado en el primer año.
+- **La meta a la vista** (`derive/goal.ts`): una línea bajo la era de la
+  bandeja —la primera cosecha con su cuenta atrás, las diez almas, la obra que
+  espera leña con lo que le falta, la fragua, la muralla—. Nace del estado y
+  se cumple sola; el jugador la acerca o la aleja.
 
 **Y desde v4.63 (26 sep 2026) la riada se ve en el río, no sólo en el vado.**
 Hasta entonces `river_flood` sólo se enseñaba con gente reunida en el vado; el
@@ -2585,11 +2628,24 @@ export type Condition =
   | { k: 'role';    role: Role; alive: boolean }
   | { k: 'grudge';  min: number }            // existe una opinión ≤ −N (no el registro)
   | { k: 'trait';   role: Role; trait: Trait }
+  | { k: 'room';    building: BuildingKind }  // RD-3: cabe una obra más de esa familia (`withinCap`)
   | { k: 'not';     c: Condition }
   | { k: 'any';     cs: Condition[] };
 
 export type Op = '<' | '<=' | '>' | '>=' | '==' ;
 ```
+
+**`room` (RD-3, 1 oct 2026).** `build` a un tope lleno se cobraba entera y no
+construía nada (RD-0, T2: campos al tope de 8 desde el año ~18, graneros a 3,
+camposanto a 1). `{ k: 'room', building }` pregunta lo mismo que la aldea
+antes de levantar algo —el tope de §12 contando lo en pie y lo ya reservado— y
+sirve para `requires` de plantilla y de opción: una opción que anuncia una obra
+sólo se ofrece si la obra puede ocurrir. Para la empalizada y la muralla
+pregunta además si **el anillo ya está escrito** (A2c: la aldea lo decide con
+once casas y `placeBuilding` rechaza la estaca antes; medido, `build_together`
+y `build_up` no construían nada en las semillas 7 y 11 hasta el año 12). Un
+`raise` de algo con tope —o de una estaca— sin su `room` es un fallo de forma, y
+`tests/fast/catalog.test.ts` lo caza.
 
 **Trampa de estación: el invierno es el momento MÁS lleno del granero.** La
 cosecha cae en la semana 35 y el invierno empieza en la 36, así que `season =
@@ -2610,7 +2666,7 @@ plantilla no es elegible.
 export type CastSpec =
   | { as: string; role: Role }
   | { as: string; anyNamed: true; excluding?: string[] }
-  | { as: string; grudgeAgainst: string }        // el que más le odia
+  | { as: string; grudgeAgainst: string; min?: number } // el que más le odia (RD-3: con `min`, ≤ −min)
   | { as: string; childOf: string }
   | { as: string; youngestNamed: true; female?: boolean };
 ```
@@ -2634,6 +2690,17 @@ muestras. Es la trampa que `docs/historico/handover.md` §4 ya tenía escrita �
 elegibilidad de una sola plantilla mueve el balance entero*— y por eso va con
 el carril del ritmo de decisión, donde el recalibrado está presupuestado, y no
 de propina en una ronda de texto. Queda declarado en `tests/fast/chronicle.test.ts`.
+
+**Resuelto en RD-3 (1 oct 2026), y no con `named?: true`.** `feud_inherited` ya
+no usa `childOf`: su B es `grudgeAgainst` A con `min` —el que de verdad lo odia—,
+que por construcción es un **nombrado, vivo y adulto** (`worstEnemyOf` sólo
+mira a los nombrados, y los nombrados lo son por un oficio con edad mínima). La
+llave `{B}` literal de la tarjeta pendiente (medida en RD-0 con `fi.ts`: en el
+tick 1200 B era una chica de catorce años sin nombre, y `give_b_the_smithy` le
+dio el oficio de herrero) desaparece sin tocar la lista de candidatos de
+`childOf`. `min` (la opinión de B sobre A ≤ −min) es lo que hace real la riña de
+`smith_feud` y `feud_inherited`: sin él «el que más le odia» podía tener un −1.
+`childOf` queda en el DSL, sin ninguna plantilla que lo use.
 
 El reparto se resuelve **en orden de dependencia, no de declaración**: una
 plantilla puede escribir `{as:'B', grudgeAgainst:'A'}` antes que `A` sin fallar
@@ -2765,6 +2832,27 @@ qué estación cae la primera ranura legal de una partida**, y con ello qué
 contenido temprano es alcanzable. Las dos plantillas del caserío (§7.3, G3)
 están escritas contra esa ranura —una de primavera y otra de verano— y si el
 hueco se mueve hay que remedirlas.
+
+**La primera pregunta del valle no sale del sorteo: se planta al fundar** (RD-1,
+v5.44, decisión de Vera del 30 sep 2026). Con ×1 como velocidad normal la
+primera semana acaba en el minuto 14 y la primera ranura legal de arriba cae
+en la semana 15, tres horas y media después: el jugador no tenía verbo en toda
+la apertura. Así que `foundGame` deja **«Uno en el vado» (`one_at_the_ford`,
+`FOUNDING_CROSSROAD`) pendiente desde el tick 0** en toda fundación de caserío
+(menos de diez personas; `foundTwenty` no la trae), con su línea
+`crossroad_posed` en la crónica y `maxPerGame: 1`, que la saca del sorteo para
+siempre. La pregunta **no se enseña hasta que el forastero llega**: la capa de
+vida lo hace bajar por el camino del valle el tercer día escénico de la semana
+0 y esperar en la orilla del vado (`ford`), y a ×1 llega entre el minuto 4,6 y
+el 5,1 en ocho semillas (`tests/fast/founding-ford.test.ts`). Hasta entonces,
+ni tarjeta, ni sello, ni crónica (`conceal`/`reveal`, `screens/crossroad.ts`);
+al llegar queda aplazada y encima de él aparecen unas pisadas —la señal en el
+mapa, skill `senales-en-el-mapa`—; tocarlas abre la pregunta. Contestada, él
+sube a la plaza o se va por donde vino en el acto, y el motor lo apunta al
+cerrar la semana (§2.60, regla 2). Mientras está pendiente, el sorteo y las
+ofertas del camino esperan (`select.ts`, `fate.ts`), como con cualquier otra.
+La segunda pregunta pasa a ser la primera del sorteo: `breaking_ground` en la
+primavera del año 1 cuando cabe.
 
 **El componente `story`, y cómo se compone (v2.43).** Las semillas pueden
 modificar el peso de una categoría: es lo que el Anexo A prometía desde la v2.0
@@ -3175,8 +3263,9 @@ que el cielo cuenta lo mismo que la cosecha y dos valles del mismo año se ven
 distintos — que es la esencia del juego según su dueño.
 
 **La luz.** `daylightAt(phase, speed, overcast)` aplica el cielo **antes** del
-aplanado por velocidad, para que una tormenta a ×64 siga siendo una tormenta: lo
-que `LIGHT_STEADY` aplana es la hora, no el tiempo que hace. El sol pierde toda
+suavizado por velocidad, para que una tormenta a ×64 siga siendo una tormenta:
+lo que `LIGHT_SWING` suaviza es el contraste de la jornada, no el tiempo que
+hace (D.6.5; hasta v5.38 aplanaba la hora). El sol pierde toda
 su intensidad a tope de tormenta —es lo que quita las sombras duras—, el
 ambiente pierde mucho menos (un valle bajo la lluvia se sigue viendo) y el cielo
 se va al plomo un 25 % más deprisa que el resto, porque es lo primero que se ve
@@ -4143,7 +4232,7 @@ que dibujar escribiera en el estado o gastara una tirada.
 
 ### 11.10 El sonido de la interfaz (29 sep 2026)
 
-**La interfaz suena, y el valle no.** Vera retiró el 24 sep la síntesis en
+**La interfaz y el valle suenan.** Vera retiró el 24 sep la síntesis en
 vivo de U-09 —«el audio es malísimo, el de fondo es hasta incómodo»— y el 29
 eligió que suene la interfaz entera con ficheros fabricados fuera del juego:
 portada, navegación, reloj, decisiones, medios, ofertas e hitos. El fondo
@@ -4232,8 +4321,9 @@ que sigue sonando es un valle roto—, **en un letargo** (§9.2) y **con la
 pestaña escondida**. Y a **×16 y ×64** no calla pero adelgaza: quedan los
 lechos al 35 %, y el fuego se va. Una jornada dura 120 s a ×1 y 1,9 s a ×64,
 así que el cielo cambia más deprisa de lo que una capa puede cruzarse; es lo
-mismo que el renderer hace con la luz (`daylight.ts`, `LIGHT_STEADY`) y por el
-mismo motivo: a esa velocidad, lo fiel parpadea.
+mismo que el renderer hace con la luz (`daylight.ts`, `LIGHT_SWING`): se baja la
+amplitud, y lo que suena sigue siendo lo de esa hora (pájaros de día, grillos
+de noche).
 
 **Las fuentes están en un sitio.** El río, la cascada y el fuego se atenúan por
 dos cosas: la distancia al centro de la vista y **el zoom**, que es lo que de
@@ -4942,8 +5032,17 @@ pasó de quince segundos a catorce minutos. Un idle que se mira de fondo pide
 justo eso: volver al día siguiente y encontrar dos años de crónica.
 
 **Y una pestaña que se oculta recupera a la velocidad que estaba puesta**
-(`resumeAfterHidden`, v3.72), no a ×1. El arranque en frío no puede: el guardado
-no lleva la velocidad. Queda anotado como deuda en `docs/historico/handover.md`.
+(`resumeAfterHidden`, v3.72), no a ×1. **Y desde RD-2 (v5.45, 30 sep 2026) la
+apertura en frío también**: el guardado lleva la velocidad (`SaveFile.speed`,
+del fichero y no del estado, opcional: un guardado viejo vuelve a ×1), así que
+la misma ausencia da el mismo valle por las dos puertas, y se vuelve a la
+velocidad a la que se dejó. **La pausa sobrevive a cerrar la app**: en pausa
+no se debe nada por ninguna de las dos puertas. Es la regla A′ que Vera eligió
+para el descanso: automático al ocultar o cerrar, a la velocidad dejada; la
+decisión espera (no para la ausencia) y lo que para es el aviso de un asalto o
+la semana que acabaría la partida. **El parte de regreso dice lo pendiente**
+(`pendingLines`): la pregunta que espera, por su título, y el asalto anunciado,
+con las semanas que faltan.
 
 Se ejecutan esos ticks en lotes de 64 dentro de `requestAnimationFrame`, con una
 pantalla de progreso que ya muestra el valle dibujándose. 960 ticks tardan menos
@@ -4952,6 +5051,22 @@ de 2 s.
 Si había una encrucijada pendiente, **sigue pendiente**: la aldea ha vivido esas
 semanas sin decisión, con las consecuencias que eso tenga. No se resuelve sola,
 no caduca y no mata (§1).
+
+**Y ninguna derrota mientras nadie mira** (RD-2, v5.40, 30 sep 2026). El
+letargo avanza cada semana con `restTick` (`engine/save.ts`), que es el mismo
+tick con dos paradas: **el aviso de un asalto** —esa semana se vive y la
+ausencia se detiene, con las semanas de §1b para prepararse por delante— y
+**la semana que acabaría la partida**, que se deshace byte a byte para que el
+final, si llega, llegue con el jugador delante. Las semanas que quedaban
+debidas se perdonan: el reloj, el sol y el calendario se paran juntos. Medido
+antes del cambio con `tools/reports/rest-report.ts`: en el tope de 960
+semanas acababan 4 valles de 24 (3 tomados) y se resolvían 66 asaltos sin
+jugador; con la regla, ninguno. Para no copiar el estado cada semana (cuesta lo
+que un tick en el año 60), sólo se copia cuando la partida puede acabar esa
+semana: 15 habitantes o menos (`TIME.REST_WATCH_POPULATION`), valle menguante,
+peste o asalto en camino. **Lo que el descanso hace además** —si una
+encrucijada planteada también lo para, a qué velocidad corre, si se activa a
+mano— es decisión pendiente del dueño (`docs/medidas/rd2-descanso-2026-09-30.md`).
 
 Al terminar, se abre el **parte de bienvenida** (§9.2).
 
@@ -5915,10 +6030,18 @@ Cuatro reglas, y las cuatro son contrato:
    una decisión encolada, `decide` devuelve `false` y **no sustituye** a la
    anterior. Decidido es decidido: un doble toque no puede cambiar algo que ya va
    camino de `history`.
-2. **Encolar fuerza el tick siguiente de inmediato**, sea cual sea la velocidad.
-   Sin esto, el jugador toca y no pasa nada hasta quince segundos después a ×1, y
-   la decisión más pesada del juego se siente rota. Con esto, el efecto aparece
-   en el acto y sigue habiendo un solo camino de mutación.
+2. **La decisión espera a que cierre su semana** (RD-1, Vera, 30 sep 2026).
+   Hasta ese día encolar forzaba el tick siguiente al momento; con la semana en
+   catorce minutos y ×1 como velocidad normal, cada respuesta hacía saltar el
+   calendario y el sol hasta siete jornadas. Ahora la tarjeta se cierra, no se
+   vuelve a abrir y lo que la opción enseña llega con el tick natural de la
+   semana. Lo mismo vale para todo acto del jugador —dar un medio, la corona,
+   una expedición, contestar una oferta, cobrar una pieza—: se ve al momento lo
+   que la escena enseña (la oferta se retira de la voz, la pieza cae con su
+   «+N» encima del cazador) y el motor lo apunta al cerrar la semana. Si se
+   oculta o se cierra la app con algo en cola, la semana se cierra entonces,
+   con nadie mirando, y la ausencia se cuenta desde su final. Sigue habiendo
+   un solo camino de mutación.
 3. **En pausa la decisión espera.** §8.7 dice que la simulación no se detiene por
    una encrucijada pendiente, no que el jugador no pueda pausar el juego.
 4. **El motor informa; la interfaz enfoca.** `TickReport` devuelve los
@@ -6162,12 +6285,31 @@ riesgo principal del proyecto.
 Dieciséis plantillas, dos por categoría. Los textos van en inglés porque son
 contenido; los comentarios en español porque son diseño.
 
+> **RD-3 (1 oct 2026) · el catálogo vivo son quince, no veintiuna.** Vera aplicó
+> el dictamen de `docs/medidas/rd0-encrucijadas-2026-09-30.md`: **seis salen del
+> sorteo** (A.2 `tithe_demand`, A.6 `plague_blame`, A.9 `chapel_or_granary`,
+> A.10 `relic_pedlar`, A.12 `wolf_winter`, A.14 `bandits`) y pasan a
+> `RETIRED_TEMPLATES`, con sus opciones, semillas y textos intactos para que un
+> guardado que las tenga pendientes o en el registro siga cargando; y **ocho se
+> reescriben** para que el coste anunciado, el efecto ejecutado y lo que se ve
+> coincidan (A.1, A.3, A.4, A.7, A.8, A.11, A.16 y `after_the_raid`). Debajo de
+> cada una hay una nota «RD-3» con lo que cambió; **las tablas de abajo son las
+> del Anexo original**, y donde difieren manda la nota. Las cifras absolutas
+> (+900, +300, −450…) pasaron a proporciones de lo que hay en el almacén
+> (`CROSSROAD_EFFECTS`, `balance.ts`). **`after_the_raid`** (B2, §1b, que no está
+> en este Anexo): `build_up` pide de verdad dos tramos de empalizada (antes sólo
+> ponía una bandera) y `chase` devuelve la mitad del grano que el saqueo se
+> llevó, no +120 fijos; lo que **no** hace —leer el parte de la batalla— no cabe
+> en el DSL de §8.2. Medida: `docs/medidas/rd3-encrucijadas-2026-10-01.md`.
+
 Formato: identificador, condiciones, reparto, texto, y de cada opción el verbo,
 el precio visible, los efectos, el cambio en pantalla y las semillas.
 
 ---
 
 ### A.1 `winter_grain_debt` · lord
+
+> **RD-3 (1 oct 2026).** **Reescrita.** Ahora pide `people ≥ 20` (con 7–23 personas el señor no tiene a quién cobrar) y lo que traen los carros es **proporcional al granero** —`kneel` ×2,2, `take_it_at_night` ×1,8, `tithe_due` ×0,8 del granero de entonces—, no +900/+600/−450 fijos (1,1 a 7,6 veces la despensa medida). «If it is found out» era «siempre» (la semilla no tenía condición): el precio dice «Wealdmere finds out, and comes armed within nine years». `kneel` dice cuándo viene el cobro. `scar felled_wood` → `gather ford` (no talaba nada).
 
 **Peso** 10 · **Reposo** 30 años · **Máx.** 2
 **Requiere** `season = winter`, `seasonWeek ≥ 6`, `grainToHarvest < 0.9`, `flag vassal` sin poner
@@ -6192,6 +6334,8 @@ todo.*
 
 ### A.2 `tithe_demand` · lord
 
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Duplicaba el diezmo automático del motor (`world/road.ts`, cada otoño, a cualquier valle de diez personas) sin señor en pantalla.
+
 **Peso** 6 · **Reposo** 20 años
 **Requiere** `flag vassal` puesto, `season = autumn`, `year > 5`
 **Reparto** `A = reeve`, `B = leader`
@@ -6209,6 +6353,8 @@ todo.*
 ---
 
 ### A.3 `hungry_spring` · famine
+
+> **RD-3 (1 oct 2026).** **Reescrita.** El reparto ya no pide `reeve` y `midwife` (un caserío no los tiene: la pregunta salía de mediana el año 18): basta con dos nombrados, y sale desde el primer invierno. Los efectos de grano son proporciones (`eat_it` ×1,4, `half_and_half` ×1,2). `visible` pasa a reuniones (el `raise field` no levantaba ningún campo; el `douse mill` apagaba un molino que casi nunca existe).
 
 **Peso** 12 · **Reposo** 12 años
 **Requiere** `season = spring`, `grainYears < 0.35`
@@ -6228,6 +6374,8 @@ todo.*
 
 ### A.4 `granary_theft` · famine
 
+> **RD-3 (1 oct 2026).** **Reescrita.** Ahora **falta grano**: el cuerpo dice «a tenth of what was in it is gone» y las tres opciones lo cobran (`grain ×0,9`); `a_new_latch` cuesta además 40 de madera. Los `visible` que no ocurrían (`douse smithy`, `raise palisade`) son reuniones.
+
 **Peso** 7 · **Reposo** 18 años
 **Requiere** `grainYears < 0.5`, `has granary`, `grudge min 40`
 **Reparto** `A = anyNamed`, `B = grudgeAgainst A`
@@ -6245,6 +6393,8 @@ todo.*
 ---
 
 ### A.5 `plague_pit` · plague
+
+> **RD-3 (1 oct 2026).** **Promesas corregidas.** El cuerpo ya no dice «nueve muertos» (era un número fijo); `burn_the_houses` dice lo que hace —**las dos casas más viejas**, la fundadora incluida, y nadie construye allí en veinte años—; `visible` pasa de `scar grave_row` (que el render no dibuja) a reuniones y ruinas reales.
 
 **Peso** 14 · **Reposo** 25 años
 **Requiere** `outbreak active`, `people > 12`
@@ -6264,6 +6414,8 @@ todo.*
 
 ### A.6 `plague_blame` · plague
 
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Casi inalcanzable (una vez en ocho semillas × sesenta años).
+
 **Peso** 8 · **Reposo** 30 años
 **Requiere** `outbreak active`, `faith > 55`, `trait priest devout`
 **Reparto** `A = priest`, `B = anyNamed excluding [A]`
@@ -6281,6 +6433,8 @@ todo.*
 ---
 
 ### A.7 `smith_feud` · feud
+
+> **RD-3 (1 oct 2026).** **Reescrita.** Salía **exactamente cuatro veces por partida** (el reposo mandaba: la condición era ambiental). Ahora B tiene que odiar a A de verdad (`grudgeAgainst` con `min` 55), sólo estalla con el valle de mal humor (`morale < 45`) y el reposo sube a 20 años. El título ya no promete al herrero y al cura («A Hand on a Shoulder»), el cuerpo ya no dice «for years» a quien lo ve a los 21 habitantes, y `side_with_*` dice lo que pasa y cuándo: cuatro años de obra más lenta y B se va **años después con dos más**. Ya no apaga la fragua (`lit smithy off`): era para siempre —nada la vuelve a encender— y dejaba sin picar piedra a la aldea sin que el precio lo dijera.
 
 **Peso** 9 · **Reposo** 15 años
 **Requiere** `grudge min 45`, `people > 20` — con 55 no dispara nunca: la ventana en que alguien odia a otro por más de 55, hay más de veinte personas y el reposo ha vencido, no llega a solaparse en 2 000 años de aldea
@@ -6300,6 +6454,8 @@ todo.*
 
 ### A.8 `feud_inherited` · feud
 
+> **RD-3 (1 oct 2026).** **Reescrita.** B es el que odia a A (`grudgeAgainst`, `min` 45), no un hijo cualquiera: un nombrado, adulto, con nombre antes de plantearse (adiós a la llave `{B}` en la tarjeta). El oficio de herrero sólo se ofrece si hay herrería y **no hay herrero** (medidos dos `smith` a la vez). «One of them will not see the winter» era siempre B: el precio lo dice.
+
 **Peso** 5 · **Reposo** 20 años · **Año mínimo** 25
 **Requiere** existe un nombrado con `memory kind = was_blamed` heredada
 **Reparto** `A = anyNamed`, `B = childOf A`
@@ -6317,6 +6473,8 @@ todo.*
 ---
 
 ### A.9 `chapel_or_granary` · faith
+
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Se planteaba con una iglesia ya en pie en 10 de 10 partidas (`has chapel` no cuenta la iglesia) y sus dos obras fallaban en silencio por el tope.
 
 **Peso** 8 · **Reposo** 40 años · **Máx.** 1
 **Requiere** `people ≥ 30`, `not has chapel`, `wood > 200`, `faith > 45`
@@ -6336,6 +6494,8 @@ todo.*
 
 ### A.10 `relic_pedlar` · faith
 
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Sólo vivía entre la capilla y su mejora, y duplica el medio `relic` y a los sucesos `pedlar`/`pilgrims`.
+
 **Peso** 6 · **Reposo** 25 años
 **Requiere** `has chapel`, `faith > 30`, `grainYears > 0.6` — se retira el tope de 70: la deriva de §5.6 estabiliza la fe por encima de esa cifra en cuanto hay capilla, así que la franja se abandonaba para no volver (§8.1, regla de la aldea madura). Y una aldea próspera y devota es justo donde aparecería un vendedor de reliquias
 **Reparto** `A = priest`, `B = leader`
@@ -6353,6 +6513,8 @@ todo.*
 ---
 
 ### A.11 `forest_cut` · forest
+
+> **RD-3 (1 oct 2026).** **Reescrita.** Pide **sitio para otro campo** (`room field`) y la despensa corta (`grainToHarvest < 1,15`): faltan campos de verdad y se pueden levantar (antes, en 22 de 40 preguntas los campos estaban al tope y la tala se cobraba entera). Ya no sale cuatro veces clavadas. La semilla `the_wood_holds` exigía bosque > 0,5 (el corazón del valle da 0,18–0,26: se marchitaba siempre): ahora > 0,20.
 
 **Peso** 9 · **Reposo** 15 años
 **Requiere** `forestLeft > 0.12`, `neededFields > fields`, `people > 25` — el 0.3 original era **inalcanzable**: la generación de mapa tope en 0.26 (§12.7), así que la plantilla estaba muerta desde el tick cero. El bosque es aquí una **puerta** («queda madera que valga la pena talar»); el disparador episódico es `neededFields > fields`, y por eso `forest_cut` es contenido de la primera mitad **por diseño**: no se roturan más campos que el tope de ocho
@@ -6372,6 +6534,8 @@ todo.*
 ---
 
 ### A.12 `wolf_winter` · forest
+
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Casi inalcanzable (`forestLeft > 0,25`) y los lobos ya existen con cuerpo en el suceso `wolves_at_the_coop`.
 
 **Peso** 7 · **Reposo** 12 años
 **Requiere** `season = winter`, `forestLeft > 0.25`, `people > 15` — y ese 0.25
@@ -6407,6 +6571,8 @@ del episodio, que son el invierno y la gente.
 
 ### A.13 `strangers_at_the_ford` · stranger
 
+> **RD-3 (1 oct 2026).** **Promesa corregida.** `turn_them_away` dice que **nadie sube por el camino en diez años** (`hostile 10`); la semilla `whoever_burned_it` enseña el aviso rojo (`threatened`) y no un camposanto que no se dibuja.
+
 **Peso** 10 · **Reposo** 20 años
 **Requiere** `people ≥ 12`, `housingFree ≥ 2`, `not flag hostile`, `morale ≥ 55`
 **Reparto** `A = leader`, `B = reeve`
@@ -6425,6 +6591,8 @@ del episodio, que son el invierno y la gente.
 
 ### A.14 `bandits` · stranger
 
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Es el clan vecino (`raiders_coming`) sin su batalla ni su cuerpo.
+
 **Peso** 8 · **Reposo** 18 años
 **Requiere** `people > 30`, `not has palisade`, `year > 15`
 **Reparto** `A = leader`, `B = smith`
@@ -6442,6 +6610,8 @@ del episodio, que son el invierno y la gente.
 ---
 
 ### A.15 `succession` · succession
+
+> **RD-3 (1 oct 2026).** `no_one`: `visible` pasa de `douse house` (ninguna casa se apagaba) a la plaza dando voces.
 
 **Peso** 100 · **Reposo** 0 · **Salta el intervalo mínimo**
 **Requiere** `not role leader alive`, `not flag interregnum`
@@ -6499,6 +6669,8 @@ faltaba para que eso se cumpliera de verdad.
 
 ### A.16 `first_stone` · succession
 
+> **RD-3 (1 oct 2026).** **Reescrita.** Llega cuando llega la piedra: exige **la iglesia en pie** (la primera mejora de piedra, año ~4–7) y el cerco sin cerrar (`wall_closed`), no `year > 40` con la muralla de piedra ya levantada (RD-0: 9 de 10). Se quitan `minYear 41` y `year > 40`; `people ≥ 25`. `the_wall` sólo vale mientras el cerco no se ha cerrado (A4 abre la piedra solo al cerrarse); `the_houses` sigue siendo la única vía a la casa de piedra.
+
 **Peso** 6 · **Reposo** 50 años · **Máx.** 1
 **Requiere** `people ≥ 45`, `has smithy`, `year > 40`, sin sitio libre en el mapa
 **Reparto** `A = leader`, `B = smith`
@@ -6516,6 +6688,8 @@ faltaba para que eso se cumpliera de verdad.
 ---
 
 ### A.17 `quiet_years` · reserva
+
+> **RD-3 (1 oct 2026).** `a_free_work`: `visible` pasa a la plaza (con tres graneros el `build` no ocurre).
 
 Plantilla de reserva para la garantía por generación cuando no hay ninguna otra
 elegible. **Está fuera del reparto normal**: `eligible()` la salta siempre y solo
@@ -7368,12 +7542,21 @@ calendario.
 **El coste, con su arreglo.** A ×64 la jornada dura 1,9 s reales: el sol saldría
 y se pondría dos veces cada cuatro segundos y las sombras darían la vuelta al
 valle en ese tiempo. No es una noche, es un parpadeo, y tapa justo lo que uno
-mira a ×64 —que el valle crece, que llega el invierno—. Así que a ×16 y ×64 la
-jornada de **luz** se aplana hacia la de media mañana (`LIGHT_STEADY`, 0,55 y
-0,95): a ×64 la luz deja de contar la hora, porque a ×64 la hora del día no es
-información que nadie pueda seguir (§10.3). A ×1 y ×4 la cuenta entera. Las
-ventanas encendidas van con la misma regla, o serían un render que no sabe qué
-hora es.
+mira a ×64 —que el valle crece, que llega el invierno—. Así que a ×16 y ×64 se
+**suaviza el contraste** de la jornada hacia un gris neutro (`LIGHT_SWING`, 0,7
+y 0,45 de la amplitud de ×1), **y el sol sigue la hora**: la misma dirección,
+la misma puesta, apagado de noche, y las ventanas encendidas cuando es de noche
+a cualquier velocidad. A ×1 y ×4 la jornada va entera.
+
+> **Revisado el 30 sep 2026 (v5.38, RD-0).** Hasta aquí la luz se *aplanaba
+> hacia la media mañana* (`LIGHT_STEADY`, 0,55 a ×16 y 0,95 a ×64): a ×64 el
+> valle estaba a pleno sol con la cabecera diciendo las tres de la madrugada.
+> Vera decidió el 29 sep que el sol, la hora y el calendario van juntos a
+> cualquier velocidad (`plan-ritmo-descanso-y-progresion-2026-09-29.md` §1), y
+> la regla pasa a ser ésta: **lo que se suaviza es la amplitud, nunca la
+> hora**. Lo guarda `tests/fast/graphics-effects.test.ts`: la dirección y el
+> encendido del sol idénticos a los de ×1 en 240 fases y cinco velocidades, el
+> orden de claridad conservado, y a ×64 al menos el 40 % de la jornada.
 
 #### D.6.6 · El suelo no es una cuadricula (v3.58)
 

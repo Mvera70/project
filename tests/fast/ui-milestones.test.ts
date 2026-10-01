@@ -153,6 +153,19 @@ describe('milestonesAt · ni una aldea sin historia ni un teletipo', () => {
     // caos como si fuera un fallo. Así que la cota de arriba se pide a las que
     // llegan, y a las que se rompen se les pide lo que sí prometen: que su
     // historia sea proporcional a lo que vivieron y nunca cero.
+    //
+    // **Y RD-3 (1 oct 2026) la sube de 60 a 80, medida y con su causa.** La
+    // primera piedra llega ahora con la piedra —la iglesia, año 4 a 8— y no al
+    // año 41, y la política prudente contesta «las casas», así que las casas
+    // pasan a piedra dentro de los sesenta años en vez de a partir del cuarenta
+    // y uno. Medido con las cinco semillas de SEEDS (`foundTwenty`, prudent, 60
+    // años): 67, 68, 68, 68 y 67 hitos, y lo único que sube es `work_done`
+    // (12–16 en la medida vieja, 41–42 ahora; `stone_house` no es una clase de
+    // rutina y repite una vez por casa): `first_of_kind` 13, `peak_people` 7–8,
+    // `turn_of_decade` 6. Son los mismos hitos de siempre, ocurren antes. Una
+    // partida que pase de ochenta ha cambiado de comportamiento; si Vera no
+    // quiere ese goteo de «una casa de piedra» el sitio para quitarlo es
+    // `ROUTINE_KINDS` de `src/ui/milestones.ts`, que no es de este carril.
     const full = GAMES.filter(({ state }) => state.tick >= TOTAL_TICKS);
     const broken = GAMES.filter(({ state }) => state.tick < TOTAL_TICKS);
     expect(full.length, 'alguna de las cinco semillas debe llegar a los sesenta años').toBeGreaterThan(0);
@@ -160,14 +173,14 @@ describe('milestonesAt · ni una aldea sin historia ni un teletipo', () => {
       expect(milestones.length, `seed ${seed}: ${milestones.length} hitos`)
         .toBeGreaterThanOrEqual(10);
       expect(milestones.length, `seed ${seed}: ${milestones.length} hitos`)
-        .toBeLessThanOrEqual(60);
+        .toBeLessThanOrEqual(80);
     }
     for (const { seed, state, milestones } of broken) {
       const lived = state.tick / TIME.WEEKS_PER_YEAR;
       expect(milestones.length, `seed ${seed}: ${milestones.length} hitos en ${lived.toFixed(0)} años`)
         .toBeGreaterThan(0);
       expect(milestones.length, `seed ${seed}: ${milestones.length} hitos en ${lived.toFixed(0)} años`)
-        .toBeLessThanOrEqual(60);
+        .toBeLessThanOrEqual(80);
     }
     // turn_of_decade es el mismo reloj para cualquier partida que llegue a los
     // sesenta años: seis décadas, ningún siglo.

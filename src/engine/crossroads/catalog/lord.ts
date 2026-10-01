@@ -9,10 +9,21 @@
 // the mechanics stay with the module that owns them. Each one says who must
 // read it.
 
-import { FATE } from '../../balance';
+import { CROSSROAD_EFFECTS, FATE } from '../../balance';
 import type { CrossroadTemplate } from '../schema';
 
-/** A.1 · The flagship template, the one `valle.md` §3 opens with. */
+/**
+ * A.1 · The flagship template, the one `valle.md` §3 opens with.
+ *
+ * **RD-3 (1 oct 2026) · reescrita contra el dictamen de RD-0.** Tres defectos
+ * medidos: llegaba al primer invierno posible con 7–23 personas y 119–838 de
+ * grano, y `kneel` daba **+900 fijos** (entre 1,1 y 7,6 veces la despensa);
+ * `take_it_at_night` decía «si se descubre» y la semilla `the_reckoning` no
+ * tenía condición (era «siempre»); y su `scar felled_wood` no talaba nada.
+ * Ahora es una pregunta de **aldea** (veinte personas, no un caserío) y lo que
+ * los carros traen es **proporcional a lo que hay en el granero**
+ * (`mul`, no `delta`): vale igual para una despensa de 400 que de 2 500.
+ */
 const WINTER_GRAIN_DEBT: CrossroadTemplate = {
   id: 'winter_grain_debt',
   category: 'lord',
@@ -28,6 +39,12 @@ const WINTER_GRAIN_DEBT: CrossroadTemplate = {
     { k: 'season', season: 'winter', minWeek: 6 },
     { k: 'ratio', ratio: 'grainToHarvest', op: '<', v: 0.9 },
     { k: 'flag', flag: 'vassal', set: false },
+    // RD-6 (Vera, 1 oct 2026) · **llega también al caserío**. RD-3 la limitó a
+    // aldeas de veinte, y medido en 16 semillas a tres años el hambre pasó de
+    // 20 muertes (8 valles) a 39 (13): sin saberlo, era el salvavidas del
+    // caserío en su segundo invierno. Sin el límite, con el préstamo
+    // proporcional de RD-3, quedan 16 (8 valles) y la población media sube de
+    // 13,9 a 19,3.
   ],
   cast: [{ as: 'A', role: 'leader' }],
   title: 'crossroad.winter_grain_debt.title',
@@ -38,7 +55,7 @@ const WINTER_GRAIN_DEBT: CrossroadTemplate = {
       label: 'crossroad.winter_grain_debt.kneel.label',
       cost: 'crossroad.winter_grain_debt.kneel.cost',
       effects: [
-        { k: 'stat', stat: 'grain', delta: 900 },
+        { k: 'stat', stat: 'grain', mul: CROSSROAD_EFFECTS.KNEEL_GRAIN_MUL },
         { k: 'flag', flag: 'vassal', years: 0 },
         { k: 'stat', stat: 'morale', delta: -12 },
       ],
@@ -48,7 +65,9 @@ const WINTER_GRAIN_DEBT: CrossroadTemplate = {
           id: 'tithe_due',
           delayYears: [8, 14],
           effects: [
-            { k: 'stat', stat: 'grain', delta: -450 },
+            // RD-3 · una parte del granero, no 450 fijos: el mismo cobro pesa
+            // lo mismo en una aldea de treinta que en una de ochenta.
+            { k: 'stat', stat: 'grain', mul: CROSSROAD_EFFECTS.TITHE_DUE_MUL },
             { k: 'stat', stat: 'morale', delta: -6 },
           ],
           visible: [{ k: 'gather', where: 'square', days: 2 }],
@@ -86,15 +105,19 @@ const WINTER_GRAIN_DEBT: CrossroadTemplate = {
       traitWeight: { proud: 3, stubborn: 2 },
     },
     {
+      // RD-3 · «Si se descubre» era «siempre»: la semilla no tenía condición y
+      // el cobro llegaba en cualquier caso. Ahora el coste lo dice así.
       id: 'take_it_at_night',
       label: 'crossroad.winter_grain_debt.take_it_at_night.label',
       cost: 'crossroad.winter_grain_debt.take_it_at_night.cost',
       effects: [
-        { k: 'stat', stat: 'grain', delta: 600 },
+        { k: 'stat', stat: 'grain', mul: CROSSROAD_EFFECTS.NIGHT_GRAIN_MUL },
         { k: 'stat', stat: 'faith', delta: -15 },
         { k: 'memory', who: 'A', kind: 'stole', weight: 4 },
       ],
-      visible: [{ k: 'scar', what: 'felled_wood' }],
+      // RD-3 · lo único que se ve de verdad es la aldea en el vado, de noche,
+      // con los carros: la tala que prometía el `scar` no existía.
+      visible: [{ k: 'gather', where: 'ford', days: 2 }],
       seeds: [
         {
           id: 'the_reckoning',
@@ -103,7 +126,8 @@ const WINTER_GRAIN_DEBT: CrossroadTemplate = {
             { k: 'kill', who: 'random', count: 'fraction', fraction: 0.15 },
             { k: 'destroy', kind: 'palisade', count: 3 },
           ],
-          visible: [{ k: 'scar', what: 'grave_row' }],
+          // RD-3 · lo que se ve son las empalizadas que derriban.
+          visible: [{ k: 'ruin', kind: 'palisade' }],
           chronicleKey: 'consequence.the_reckoning',
         },
       ],
@@ -206,4 +230,15 @@ const TITHE_DEMAND: CrossroadTemplate = {
   ],
 };
 
-export const LORD_TEMPLATES: readonly CrossroadTemplate[] = [WINTER_GRAIN_DEBT, TITHE_DEMAND];
+export const LORD_TEMPLATES: readonly CrossroadTemplate[] = [WINTER_GRAIN_DEBT];
+
+/**
+ * RD-3 (1 oct 2026) · **Retirada del sorteo: `tithe_demand`.** Duplicaba el
+ * diezmo que el motor ya cobra solo cada otoño a cualquier valle de diez
+ * personas (`world/road.ts`, `collectTithe`), sin que hubiera un señor en
+ * pantalla, y el recaudador «A» era el aldeano que cuenta el grano y no el
+ * enviado (`docs/medidas/rd0-encrucijadas-2026-09-30.md` §5.1). Se queda aquí
+ * para que un guardado con ella pendiente, o en el registro, siga cargando y
+ * con título (`RETIRED_TEMPLATES`, `templateOf`).
+ */
+export const RETIRED_LORD_TEMPLATES: readonly CrossroadTemplate[] = [TITHE_DEMAND];

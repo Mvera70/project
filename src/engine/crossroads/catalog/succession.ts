@@ -90,7 +90,8 @@ const SUCCESSION: CrossroadTemplate = {
         { k: 'stat', stat: 'faith', delta: -6 },
         { k: 'flag', flag: 'works_slowed_80', years: 2 },
       ],
-      visible: [{ k: 'douse', kind: 'house' }],
+      // RD-3 · ninguna casa se apaga: lo que se ve es la plaza dando voces.
+      visible: [{ k: 'gather', where: 'square', days: 4 }],
       seeds: [
         {
           id: 'the_leaderless_years',
@@ -109,42 +110,41 @@ const SUCCESSION: CrossroadTemplate = {
 };
 
 /**
- * A.16 · The first stone. Nowhere left to build outward, and a quarry on the
- * east slope that will give enough for one of two things.
+ * A.16 · The first stone. The church is up, the quarry on the east slope is
+ * open, and there is enough for one of two things before the leader is old.
  *
  * Annex A gates it on "no free ground on the map", which M-13 owns and the DSL
- * cannot ask. A full valley is what that means in numbers: the population is at
- * the roll of §12.4 and the smithy that makes stone possible is standing.
+ * cannot ask. RD-3 reads it the other way round: what makes stone possible is
+ * the smithy and the first stone already laid (the church), so that is the door.
  */
 const FIRST_STONE: CrossroadTemplate = {
   id: 'first_stone',
   category: 'succession',
-  // **Medido y dejado como estaba, 15 sep 2026.** Estuve a punto de relajar
-  // esto —año 20 en vez de 40, treinta personas en vez de cuarenta y cinco—
-  // porque un informe decía que la piedra «no se desbloqueaba nunca» en las
-  // semillas 7, 11 y 41. El informe estaba roto: avanzaba el mundo con `tick`
-  // sin contestar las encrucijadas, así que la primera planteada se quedaba
-  // pendiente para siempre y ninguna otra podía plantearse.
+  // 15 sep 2026 se midió que esta puerta «sale a su hora» —los años 42 a 45— y
+  // se dejó como estaba, porque se leyó «a su hora» como «cuando el valle está
+  // lleno». RD-0 (30 sep) midió la otra mitad: a esa hora la piedra llevaba
+  // treinta y siete años labrándose. Lo de abajo deshace aquello.
   //
-  // Con la partida jugada de verdad —`run` con la política prudente—, esto
-  // **sale y sale a su hora**: la piedra se desbloquea en los años 42, 42 y 45
-  // de esas mismas tres semillas, y la década de los cuarenta trae entre 16 y
-  // 18 obras. La puerta funciona como está escrita y el texto de A.16 dice la
-  // verdad: «no queda sitio donde construir hacia fuera» pasa de verdad al
-  // final, no al principio.
-  //
-  // Queda escrito porque la conclusión falsa ya se escribió una vez.
-  // v2.8: sus tres condiciones son permanentes una vez ciertas; la primavera
-  // es el disparador — una cantera se abre cuando el suelo deja de estar duro.
+  // **RD-3 (1 oct 2026) · llega cuando llega la piedra.** RD-0 midió que se
+  // planteaba a los años 41–42 (≈ 460 h) con la muralla de piedra de 73–101
+  // tramos ya en pie en 9 de 10 partidas y los bastiones en 8 de 10, cuando la
+  // primera piedra de verdad se labra a las ~54 h (año ~5): la iglesia, la
+  // mejora de la capilla, es la única mejora de piedra que no pide permiso
+  // (`world/upgrade.ts`). «No queda sitio donde construir hacia fuera» era
+  // falso y el dilema, falso también: la muralla se abre sola con el cerco
+  // (`wall_closed`, A4) y `the_wall` sólo vale mientras no se ha cerrado, así
+  // que ahora la pregunta exige **la iglesia en pie** —la primera piedra— y
+  // no tener el cerco cerrado, y sale en cuanto hay primavera y gente que
+  // proteger. Se quitan `minYear 41` y `year > 40`.
   weight: 6,
   cooldownYears: 50,
   maxPerGame: 1,
-  minYear: 41,
   requires: [
     { k: 'season', season: 'spring' },
-    { k: 'stat', stat: 'people', op: '>=', v: 45 },
+    { k: 'stat', stat: 'people', op: '>=', v: 25 },
     { k: 'has', building: 'smithy' },
-    { k: 'year', op: '>', v: 40 },
+    { k: 'has', building: 'church' },
+    { k: 'flag', flag: 'wall_closed', set: false },
   ],
   cast: [
     { as: 'A', role: 'leader' },
@@ -162,7 +162,9 @@ const FIRST_STONE: CrossroadTemplate = {
         { k: 'flag', flag: 'cold_houses', years: 20 },
         { k: 'stat', stat: 'morale', delta: 6 },
       ],
-      visible: [{ k: 'raise', kind: 'wall' }],
+      // RD-3 · la piedra se abre ahora pero la obra llega con la aldea, no
+      // esta semana: lo que se ve es la plaza decidiéndolo.
+      visible: [{ k: 'gather', where: 'square', days: 3 }],
       seeds: [
         {
           id: 'behind_the_wall',
@@ -182,7 +184,7 @@ const FIRST_STONE: CrossroadTemplate = {
         { k: 'flag', flag: 'stone_house_unlocked', years: 0 },
         { k: 'stat', stat: 'morale', delta: 12 },
       ],
-      visible: [{ k: 'raise', kind: 'stone_house' }],
+      visible: [{ k: 'gather', where: 'square', days: 3 }],
       seeds: [
         {
           id: 'worth_taking',

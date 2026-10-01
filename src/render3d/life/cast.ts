@@ -10,6 +10,7 @@
 // función que evaluaba una curva del reloj— ya no existe, y con ella se fue la
 // bandera que permitía volver a ella.
 
+import { lostInSight } from './lost-child';
 import { travelling } from './expeditions';
 import { visiting } from './visitors';
 import { indoors } from './home';
@@ -281,6 +282,36 @@ export function castOf(
       cell: cellZ * width + cellX,
       named: named.has(traveller.villager),
       age: ages.get(traveller.villager) ?? 30,
+      talking: false,
+      arguing: false,
+      occupation: null,
+      role: null,
+    });
+  }
+
+  // RD-4 · Y el niño perdido (`lost-child.ts`): quieto en la linde, o volviendo
+  // a casa. Es un vecino de verdad, con su id y su cara.
+  const lost = life.lostChild ?? null;
+  if (lost !== null && lostInSight(lost)) {
+    const { body } = lost;
+    const moving = Math.hypot(body.vx, body.vz) > 0.05;
+    const clip = moving ? 'walk' : 'idle';
+    const cellX = Math.max(0, Math.min(width - 1, Math.floor(body.x)));
+    const cellZ = Math.max(0, Math.min(life.land.height - 1, Math.floor(body.z)));
+    actors.push({
+      id: lost.villager,
+      x: body.x,
+      z: body.z,
+      facing: body.facing,
+      activity: moving ? 'walking' : 'resting',
+      clip,
+      load: null,
+      poseSeconds: seconds,
+      clipSeconds: clipTime(clip, lost.travelled, seconds, (lost.villager % 11) / 11),
+      travelled: lost.travelled,
+      cell: cellZ * width + cellX,
+      named: named.has(lost.villager),
+      age: ages.get(lost.villager) ?? 8,
       talking: false,
       arguing: false,
       occupation: null,

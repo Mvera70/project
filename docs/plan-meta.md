@@ -10,6 +10,13 @@ Lo pidió el dueño del diseño con estas palabras: «necesito saber qué es
 prioritario, qué va después y la dificultad de la tarea para así poder
 destinarla a diferentes agentes en función de la dificultad».
 
+**Rework de experiencia abierto.** La apertura, las primeras ocho a diez horas,
+las 21 encrucijadas y el contrato de descanso se ordenan en
+`docs/plan-ritmo-descanso-y-progresion-2026-09-29.md` (RD-0 a RD-6).
+Sus cifras del 29 sep son una base histórica; RD-0 remide sobre el juego
+integrado antes de proponer velocidad o cadencia. El sol, la hora y el
+calendario permanecen sincronizados.
+
 **Estado sincronizado el 23 sep 2026.** Las rondas E1–E3 y D6 ya entregaron
 los siete gestos procedurales, siete modelos publicados, armas en mano,
 visibilidad del frente, huida civil, saqueo, transición terminal, ragdolls y
@@ -253,6 +260,73 @@ el orden es del dueño.
 | F-0b · La línea de base en el aparato | En el iPhone y el iPad: `?sandbox=battle&defenders=10&raiders=24` y «Copiar métricas» en el pico de la pelea; después lo mismo con `&shadow=0.12`. Fotogramas, peor fotograma y lo que añaden las sondas como fracción del fotograma. Es lo único de esta línea que no se puede medir aquí | P2 | Baja | Vera (con el aparato) | F-0 |
 | F-1 · La flecha que se clava | **Propuesta, no empezada.** Detrás de una opción `contact` (y `&contact=1` en el banco): decide el barrido de F-0; la altura desde el suelo del blanco; la flecha se para donde toca y se cuelga del segmento del ragdoll; el ragdoll recibe su velocidad y `hit_take`/la caída miran en contra de ella. Medida: veinte batallas o más con y sin contacto como distribuciones (la cifra de balance para Vera), una tira a 390×844 con la caída en la dirección de la flecha en 9 de 10, y el coste de F-0b. **Antes, una decisión del dueño**: aceptar la muralla un tercio menos letal, apuntar con el aire, o separar lo que se ve de lo que decide (diagnóstico §3) | P2 | Media | Claude | F-0, F-0b; decisión del dueño |
 
+### K · El juego entero: lo que Vera dijo el 1 oct 2026 (visión, no brief)
+
+Dicho por Vera, con sus palabras, mientras se cerraba el rework de ritmo: **es
+una mezcla de city builder de recursos, defensa de la aldea, juego narrativo y
+roguelike**. Cada partida enseña algo, y quien ya sabe llega a una aldea estable
+—más fácil de mantener, entre comillas— y su dificultad pasa a ser defenderla
+bien. «Hay un montón de cosas que implementar que se deben ir poco a poco.»
+Y lo de roguelike no va al pie de la letra (ver K7). Esto no es un brief: es el rumbo contra el que se ordenan las rondas que
+vengan. Cada fila se abre con su medida, como todas.
+
+| Punto | Qué pidió | Lo que ya se sabe | Prioridad | Dificultad |
+|---|---|---|---|---|
+| **K1 · El bosque se gasta dentro del cerco** | Cuando se cierre el círculo, el bosque **prácticamente desaparece dentro de la ciudad**: puede quedar algo cerca de la muralla, pero lo de dentro les ha dado tiempo a talarlo | El banco de balance midió **72,7 % del bosque en pie** en una partida larga: no se agota porque la leña nunca es cuello de botella (G2, arriba). Hoy la tala va a la celda más cercana, no a despejar el interior | P1 | Media |
+| **K2 · El bosque se reproduce** | Que el bosque **se extienda por el mapa** y deje **varios focos** donde seguir leñando | Hay rebrote en el sitio (`forest regrowth`), no expansión a celdas nuevas. Es motor (`world/forest.ts`) y luego render | P1 | Media |
+| **K3 · Los materiales, mecánica principal** | El balance de materiales tiene que pesar de verdad, no ser un número que nunca aprieta | Hoy leña, grano, piedra y plata; la leña sobra (K1) y la piedra llega sola. Va con G y con K1–K2: un bosque que se gasta es lo que hace que la madera importe | P1 | Alta |
+| **K4 · La era siguiente: metales** | **Cobre, plata, oro**, y ampliar mucho más | La plata hoy es moneda del camino (M-0), no mineral. Necesita veta en el mapa (la montaña de §7.15), oficio y su cadena | P2 | Alta |
+| **K5 · Más de la caza y la recolección** | **Cuero** de la caza, **lino**, **recolección de plantas** | La caza ya existe con señal en el mapa (RD-1/D1) y paga carne; las setas y la miel salen como sucesos (RD-5). Falta que dejen materia que se use | P2 | Media |
+| **K6 · Las necesidades de una ciudad** | **Medicina, construcción, educación, sanidad, música**, «de todo» | La curandera y la peste existen como sucesos; la capilla y la fe como stat. Cada una sería un oficio con su edificio y su efecto medible | P3, de una en una | Alta |
+| **K7 · Aprender a llevar una aldea (lo «roguelike», no al pie de la letra)** | Matiz de Vera, el mismo día: **no es un roguelike literal**. No hay partidas cortas y durísimas que desbloquean mejoras. La idea es que vas fundando aldeas, **algunas mueren** (no siempre), **aprendes** y poco a poco llegas a «la aldea buena». Habrá mecánicas que aprieten, y queda por decidir si esa aldea buena también puede caer en un asalto: «ya veremos, poco a poco» | Lo que se aprende es **del jugador**, no un sistema de mejoras. Ya existen `foundSuccessor` (un valle nuevo tras el final) y el archivo de partidas. Lo que falta es que morir tenga causas que se entiendan y que la crónica las cuente, para que la siguiente partida se juegue mejor | P2 | Media |
+
+**Y la forma del control, aclarada por Vera el mismo día.** No es un city
+builder intenso: es una mezcla de **sucesos que cambian el rumbo** (lo que ya
+hay), **un control pequeño sobre la ciudad a través de sus edificios** y la
+posibilidad de **inclinar un poco hacia qué recurso tira la aldea**. «Una
+propuesta totalmente diferente de lo que suele haber.»
+
+| Punto | Qué pidió | Lo que ya se sabe | Prioridad | Dificultad |
+|---|---|---|---|---|
+| **K0 · Que de verdad sea bonito de mirar** | Hoy «no es tan bonito ni tan atractivo de ver»: falta contenido para que mirar de fondo enganche | La vida del valle ya tiene oficios, visitas, caza, sucesos con escena y asedio, pero RD-5 midió mesetas (2,6 entradas por valle entre la hora 3 y la 6 a ×1, ahora 3,9). Cada cosa que se añada tiene que **verse**, no sólo contarse en la crónica | P1, transversal | Media |
+| **K8 · Edificios que se tocan** | Cada edificio con sentido y su propio tablón, como el de misiones de la plaza: **la herrería** con encargos o mejoras pagadas, **la iglesia** donde el cura reza o convoca misa y sube la moral | El tablón de §7.15 ya es el patrón: se toca en el mundo, se elige, la aldea actúa y el resultado vuelve. Se reutiliza edificio a edificio, sin pantallas nuevas | P1 | Media |
+| **K9 · Inclinar hacia un recurso** | Poder dirigir «un pelín» hacia qué recurso se tira | Las palancas de órdenes de v2.0 se retiraron porque eran una trampa (sólo vivía la postura de fábrica). Esto tiene que ser otra cosa: una inclinación que se paga y se ve, decidida en los edificios (K8), no un deslizador | P1 | Media |
+| **K10 · La aldea fuerte del final** | La meta sigue siendo la aldea construida y fuerte con toda la muralla, y faltan edificios de defensa: **arquería, armería** | Hoy las armas y los arcos entran como medios (M-2). Con K8 pasarían a edificios con su tablón | P2 | Media |
+| **K11 · Morir se ve, y la enfermería** | Que **el proceso de morir se vea**. En un caserío, el enfermo o el viejo se muere por ahí fuera, apoyado en un árbol o donde le pille. En una aldea grande va a **la enfermería**, que es un edificio que se toca (K8): se ve a cada paciente, y desde allí quizá **la recolección de plantas** (K5) | Hoy la muerte es una línea de crónica y un cuerpo que desaparece al cerrar la semana. El motor ya sabe quién enferma (peste, hambre, frío, vejez) y la vida ya sabe tumbar un cuerpo (caídas y ragdoll del asedio). La curandera es un suceso. Junta K5, K6 y K8 en un sitio, y también sirve a K7: que la muerte se entienda | P2 | Media |
+
+**Los modelos nuevos van por encargo** (regla de Vera, recordada el 1 oct
+2026). Todo modelo 3D que pida K (la enfermería, la arquería, la armería, la
+herrería con su tablón, los cuerpos que se tumban a morir, los puestos de
+recolección) se escribe primero como encargo en `docs/encargos/`, con medidas,
+presupuesto de triángulos y en qué captura se juzga, y se apunta en
+`docs/encargos-3d.md`. **Por omisión lo hace Astra.** Claude puede hacer una
+versión por receta de código (`art/recipes/`), pero sólo como **prueba A/B**:
+el mismo encargo hecho por los dos, juzgado con capturas en partida y en el
+aparato, y que decida Vera. Hasta que una prueba diga otra cosa, Astra hace
+los mejores modelos.
+
+**El orden que propongo**, con el porqué:
+
+1. Cerrar el rework de ritmo (RD-0 a RD-6).
+2. **K1 + K2 + K3 juntos**, porque son la misma mecánica vista desde tres lados:
+   el bosque que se gasta y se mueve es lo que hace que la madera sea un
+   recurso. K1 ya tiene medida en contra. Que funciona se mide así: en la mitad
+   de las partidas la madera escasea alguna vez y el jugador lo ve.
+3. **K8 + K9**: la herrería y la iglesia como primeros edificios con tablón, y
+   desde ellos la inclinación hacia un recurso. Es el control pequeño que Vera
+   describe, con un patrón que ya existe.
+4. **K7**, la parte que no necesita mecánicas nuevas: que la muerte de una aldea
+   tenga causas que se entienden y que la crónica las cuente.
+5. **K5**, luego **K4** y **K10**: un recurso o un edificio cada vez, y sólo si crea
+   un dilema visible.
+6. **K6** a goteo: un oficio sólo cuando haya un problema de la partida que lo
+   pida.
+
+**K0 atraviesa todo:** cada punto se cierra con captura, y lo que no se ve no
+cuenta. **El criterio para todo K:** pocas decisiones con mucho peso, nunca una
+barra más que vigilar. Antes de ampliar mucho, una medida de rendimiento en el
+aparato de Vera.
+
 ### H · Deuda medida (el cuaderno)
 
 Lo que `docs/task-log.md` §4 lleva anotado con su medida y **no bloquea la
@@ -340,6 +414,9 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
 - **Cuánto hay que nivelar** (G): del dueño, con las medidas delante.
 - **Qué encargar a Blender y en qué orden** (E): del dueño con la sesión de
   arte; este plan sólo dice qué hace falta y para cuándo.
+- **Si la aldea buena puede caer en un asalto** y **qué mecánicas aprietan**
+  (K7), y **qué
+  metales y oficios entran, y en qué orden** (K4, K6): del dueño.
 - **Qué es el anillo final en detalle** (A3b): aclarado que existe y cuándo
   llega —al techo de crecimiento del valle—, pero no cómo se ve ni cómo se
   juega. Es del dueño, con D6 delante.

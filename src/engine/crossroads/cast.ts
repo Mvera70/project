@@ -122,7 +122,13 @@ function candidatesFor(
     const target = filled[spec.grudgeAgainst];
     if (target === undefined) return [];
     const enemy = worstEnemyOf(state, target);
-    return enemy === null || taken.has(enemy) ? [] : [enemy];
+    if (enemy === null || taken.has(enemy)) return [];
+    // RD-3 · un rencor de verdad: la opinión de quien odia sobre el odiado.
+    if (spec.min !== undefined) {
+      const view = state.people.villagers.find((v) => v.id === enemy)?.opinions[target] ?? 0;
+      if (view > -spec.min) return [];
+    }
+    return [enemy];
   }
 
   if ('childOf' in spec) {

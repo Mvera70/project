@@ -20,6 +20,8 @@ export interface WoodGainView {
   readonly y: number;
   /** De 0 (acaba de entrar) a 1 (se apaga). */
   readonly age: number;
+  /** RD-1 · el dibujo: la leña (lo de siempre) o el grano de una pieza cobrada. */
+  readonly icon?: 'logs' | 'wheat';
 }
 
 export interface WoodGains {
@@ -50,10 +52,12 @@ export function mountWoodGains(): WoodGains {
             shown.set(gain.id, chip);
           }
           const text = `${gain.count > 0 ? '+' : '−'}${Math.abs(gain.count)}`;
-          if (chip.dataset.text !== text) {
+          const icon = gain.icon ?? 'logs';
+          if (chip.dataset.text !== text || chip.dataset.icon !== icon) {
             chip.dataset.text = text;
+            chip.dataset.icon = icon;
             chip.classList.toggle('wood-gain--out', gain.count < 0);
-            chip.innerHTML = `<svg class="skin-icon" aria-hidden="true" focusable="false"><use href="#logs"/></svg><b>${text}</b>`;
+            chip.innerHTML = `<svg class="skin-icon" aria-hidden="true" focusable="false"><use href="#${icon}"/></svg><b>${text}</b>`;
           }
           // Aparece enseguida, se queda y se apaga en el último tercio.
           const fade = gain.age < 0.1 ? gain.age / 0.1 : gain.age > 0.65 ? (1 - gain.age) / 0.35 : 1;

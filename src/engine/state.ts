@@ -502,6 +502,15 @@ export const HAPPENINGS = [
   'tinker',
   'wise_woman',
   'refugees',
+  // RD-5 (Vera, 1 oct 2026: «sucesos pequeños del caserío») · la vida callada
+  // de un valle de pocos. **No se sortean con los demás**: tienen su propia
+  // tirada, sólo mientras el valle es un caserío (`FATE.HAMLET_PEOPLE`), y
+  // ninguno destruye nada. Llenan la meseta que RD-5 midió entre la hora 3 y
+  // la 6 a ×1, sin sumar catástrofes a una pareja.
+  'wild_honey',
+  'mushrooms_after_rain',
+  'fox_at_the_hens',
+  'first_frost',
 ] as const;
 
 export type HappeningId = (typeof HAPPENINGS)[number];
@@ -592,6 +601,12 @@ export type PlayerAct =
    * **cuántos**; quiénes lo decide la aldea (`world/expeditions.ts`).
    */
   | { kind: 'expedition'; mission: MissionId; count: number }
+  /**
+   * RD-4 · ir a buscar al niño perdido de la semana anterior: el jugador tocó
+   * la señal y la capa de vida mandó al adulto libre más cercano
+   * (`world/lost-child.ts`).
+   */
+  | { kind: 'search'; sourceTick: number; child: VillagerId; searcher: VillagerId }
   | {
     kind: 'battle';
     /** Cuántos del clan quedaron en el suelo. */
@@ -674,6 +689,12 @@ export type Condition =
   // la da `state.threat.comingTick`, que B1 pone ocho semanas antes de que
   // lleguen: ese hueco existe justamente para que se pueda preguntar aquí.
   | { k: 'raid'; coming: boolean }
+  // RD-3 · **Se puede pedir una obra más de esta familia** (`withinCap`: el
+  // tope de §12 contando lo en pie y lo ya reservado; y, para la muralla, que el
+  // anillo esté escrito). Existe porque una opción que pide `build` a un tope
+  // lleno, o a una muralla sin anillo, se cobraba entera y no construía nada
+  // (RD-0, T2): con esto, la opción sólo se ofrece si la obra puede ocurrir.
+  | { k: 'room'; building: BuildingKind }
   | { k: 'not'; c: Condition }
   | { k: 'any'; cs: Condition[] };
 
@@ -1287,4 +1308,11 @@ export interface SaveFile {
   state: GameState; // full snapshot, authoritative
   decisions: DecisionRecord[]; // parallel record, to debug and migrate
   archive: ArchivedGame[]; // chronicles of previous games and their ruins
+  /**
+   * RD-2 (Vera, 30 sep 2026) · la velocidad a la que se dejó el juego. La
+   * ausencia corre a ella por las dos puertas —pestaña oculta y apertura
+   * nueva— y en pausa (0) no se debe nada. Del fichero y no del estado: es
+   * del jugador, no de la partida. Opcional: un guardado viejo vuelve a ×1.
+   */
+  speed?: 0 | 1 | 4 | 16 | 64;
 }

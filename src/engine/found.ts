@@ -10,6 +10,10 @@ import { SCHEMA_VERSION, valleyTraits } from './state';
 import type { BuildingKind, FoundingProfile, GameState } from './state';
 import { generateMap } from './world/mapgen';
 import { placeBuilding } from './world/placement';
+import { FOUNDING_CROSSROAD } from './crossroads/catalog/hamlet';
+import { fillCast } from './crossroads/cast';
+import { population } from './people/demography';
+import { seasonOf, yearOf } from './time';
 import { choosePlaza } from './world/plaza';
 import { seedValleyRoad } from './world/valley-road';
 
@@ -127,6 +131,7 @@ export function foundGame(
   state.plaza = choosePlaza(state);
   // Y la senda por la que llegaron, de los desfiladeros a la plaza, ya pisada.
   seedValleyRoad(state);
+  poseFoundingCrossroad(state);
   if (inherited !== undefined) {
     if (inherited.ruins.length !== state.map.ruins.length) {
       throw new Error('Inherited ruin mask does not fit the valley.');
@@ -134,4 +139,37 @@ export function foundGame(
     state.map.ruins.set(inherited.ruins);
   }
   return state;
+}
+
+/**
+ * RD-1 (Vera, 30 sep 2026) · **La primera elección del valle, planteada al
+ * fundarlo.** A ×1 —la velocidad normal desde ese día— la primera semana del
+ * motor acaba en el minuto 14 y la primera encrucijada del sorteo llegaba en
+ * la semana 15, tres horas y media después. El forastero del vado
+ * (`FOUNDING_CROSSROAD`) queda pendiente desde el tick 0; la capa de vida lo
+ * hace bajar andando al vado hacia el minuto 4–6 y la interfaz no enseña la
+ * pregunta hasta que el jugador toca la señal que lleva encima.
+ *
+ * Sólo en una fundación de caserío (menos de diez personas): es la pregunta
+ * de «un tercero en una casa de dos». Las pruebas que fundan veinte
+ * (`foundTwenty`) siguen empezando sin nada pendiente.
+ */
+function poseFoundingCrossroad(state: GameState): void {
+  if (population(state) >= 10) return;
+  const template = FOUNDING_CROSSROAD;
+  const cast = fillCast(template, state);
+  if (cast === null) return;
+  state.crossroad = {
+    templateId: template.id,
+    posedTick: state.tick,
+    cast,
+    optionIds: template.options.map((option) => option.id),
+  };
+  state.chronicle.push({
+    tick: state.tick,
+    kind: 'crossroad_posed',
+    templateKey: template.title,
+    params: { year: yearOf(state.tick), season: seasonOf(state.tick) },
+    weight: 3,
+  });
 }

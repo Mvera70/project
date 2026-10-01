@@ -29,6 +29,32 @@ describe('presas silvestres', () => {
       expect(createBear(state, land, heart), `${seed}:bear`).not.toBeNull();
     }
   });
+  it('la presa de campo abierto de la fundación está en campo abierto, lejos de las copas', () => {
+    // RD-0 (30 sep 2026), D1: la perdiz nacía en la celda de pradera más
+    // cercana al árbol de tala, que es la linde, y la cámara de apertura la
+    // veía detrás de las copas en 2 de 3 valles: la primera ocasión del mapa
+    // no se podía tocar. Se mide en 24 valles recién fundados.
+    const open = { partridge: 0, rabbit: 0 };
+    const seeds = Array.from({ length: 24 }, (_, i) => i + 1);
+    for (const seed of seeds) {
+      const state = foundGame(seed);
+      const land = terrainOf(state);
+      const core = valleyCore(state);
+      for (const kind of ['partridge', 'rabbit'] as const) {
+        const prey = createWildPrey(state, land, seed, { x: core.x, z: core.y }, kind);
+        if (prey === null) continue;
+        const cx = Math.floor(prey.body.x), cz = Math.floor(prey.body.z);
+        let clear = true;
+        for (let dz = -2; dz <= 2 && clear; dz += 1) for (let dx = -2; dx <= 2; dx += 1) {
+          if (state.map.terrain[(cz + dz) * land.width + cx + dx] === TERRAIN_CODE.forest) { clear = false; break; }
+        }
+        if (clear) open[kind] += 1;
+      }
+    }
+    expect(open.partridge, 'perdices con dos celdas de pradera alrededor').toBeGreaterThanOrEqual(22);
+    expect(open.rabbit, 'conejos con dos celdas de pradera alrededor').toBeGreaterThanOrEqual(22);
+  });
+
   it('elige de forma estable un claro transitable en la zona de caza', () => {
     const state = foundTwenty(7), before = JSON.stringify(state);
     const land = terrainOf(state), heart = { x: 36, z: 56 };

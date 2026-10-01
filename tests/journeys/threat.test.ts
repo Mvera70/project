@@ -224,9 +224,27 @@ describe('B2 · el aviso, y lo que se puede hacer con él', () => {
     const paid = structuredClone(base);
     paid.flags['bought_off'] = paid.tick + TIME.WEEKS_PER_YEAR;
 
-    for (const state of [waited, braced, paid]) run(state, 2, 'prudent', CATALOG);
+    const keysOf = (state: GameState): string[] =>
+      run(state, 2, 'prudent', CATALOG).flatMap((report) => report.entries.map((entry) => entry.templateKey));
+    const waitedKeys = keysOf(waited);
+    keysOf(braced);
+    const paidKeys = keysOf(paid);
 
-    expect(paid.village.silver, 'a quien paga no le saquean').toBe(200);
+    // **No se mira «200 exacto»** (remedido el 1 oct 2026, RD-1: la fundación
+    // mueve la trayectoria y la semana 1442 de la 47 trae al juglar, `fate.minstrel`,
+    // que cobra 2 de plata y no tiene nada que ver con el asalto: 198). Lo que
+    // pagar promete es que la partida da la vuelta sin llevarse nada, y se
+    // mide con lo que el asalto cuenta: ninguna entrada de saqueo, y la plata
+    // que se salva respecto a quien espera —ochenta, la del saqueo— es casi
+    // toda. Los 2 del juglar caben en el margen; el saqueo no.
+    for (const key of ['raid.open', 'raid.walled', 'raid.burnt']) {
+      expect(paidKeys, `a quien paga no le saquean: ${key}`).not.toContain(key);
+    }
+    expect(paidKeys).toContain('raid.turned_back');
+    expect(waitedKeys, 'a quien espera le saquean').toContain('raid.open');
+    expect(paid.village.silver, 'a quien paga no le quitan la plata').toBeGreaterThan(200 - 10);
+    expect(paid.village.silver, 'y conserva lo que el que espera pierde')
+      .toBeGreaterThan(waited.village.silver + 50);
     expect(paid.threat.raids, 'y la partida no cuenta como asalto').toBe(base.threat.raids);
     expect(braced.village.grain, 'prepararse salva grano').toBeGreaterThan(waited.village.grain);
     expect(waited.threat.raids, 'a quien espera le saquean').toBeGreaterThan(base.threat.raids);
@@ -368,6 +386,12 @@ describe('F2 · y el valle lo dice mientras pasa', () => {
   it('los valles la ven, y la víspera cuenta hacia atrás', () => {
     const seeds = [3, 7, 11, 23, 31, 41];
     let sawIt = 0;
+    // RD-3 (1 oct 2026) · un valle que se acaba antes de tener algo que perder
+    // no cuenta: con el catálogo de RD-3 la 31 se extingue en el año 9 por una
+    // peste (de 8 a 2 personas en cinco semanas), y ningún clan baja a un valle
+    // así («nadie baja antes de que la aldea tenga algo que perder», arriba).
+    // La propiedad es la de siempre para los que viven: todos lo ven.
+    let counted = 0;
     const countdowns: number[] = [];
     for (const seed of seeds) {
       const state = foundGame(seed);
@@ -386,9 +410,12 @@ describe('F2 · y el valle lo dice mientras pasa', () => {
           previous = weeks;
         } else previous = null;
       }
+      if (state.ended !== null && state.tick < 15 * TIME.WEEKS_PER_YEAR) continue;
+      counted += 1;
       if (sawHere) sawIt += 1;
     }
-    expect(sawIt, `valles que ven el asedio en la línea: ${sawIt}/${seeds.length}`).toBe(seeds.length);
+    expect(counted, 'casi todos los valles llegan a tener algo que perder').toBeGreaterThanOrEqual(seeds.length - 1);
+    expect(sawIt, `valles que ven el asedio en la línea: ${sawIt}/${counted}`).toBe(counted);
     expect(countdowns.length, 'hay vísperas de más de una semana').toBeGreaterThan(10);
     for (const step of countdowns) expect(step, 'la víspera cuenta hacia atrás').toBe(1);
   });

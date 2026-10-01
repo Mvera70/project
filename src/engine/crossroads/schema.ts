@@ -89,7 +89,12 @@ export type CastSpec =
     * takes the only one there is and the second widens.
     */
   | { as: string; anyNamed: true; excluding?: string[]; agedBetween?: [number, number] }
-  | { as: string; grudgeAgainst: string } // the one who hates them most
+  /**
+   * `min` (RD-3): el rencor tiene que ser real. Sin él, «el que más lo odia»
+   * puede ser alguien con una opinión de −1, y la riña que la tarjeta cuenta
+   * no existe; con él, sólo se reparte si la opinión de B sobre A es ≤ −`min`.
+   */
+  | { as: string; grudgeAgainst: string; min?: number } // the one who hates them most
   | { as: string; childOf: string }
   | { as: string; youngestNamed: true; female?: boolean };
 
@@ -149,6 +154,14 @@ import type { VisualEffect } from '../state';
 interface SeedSpec {
   id: string;
   delayYears: [number, number]; // drawn within the range
+  /**
+   * RD-5 · Un retraso en semanas, para las consecuencias que tienen que volver
+   * dentro de la primera hora de juego a ×1 (una semana son catorce minutos).
+   * Si está, manda sobre `delayYears`, y **no se tira del flujo `crossroads`**:
+   * sale de un hash de la semilla, la plantilla y el tick, así que añadir una
+   * consecuencia corta a una opción no desplaza el resto de la partida.
+   */
+  delayWeeks?: [number, number];
   condition?: Condition; // if it fails when due, the seed withers
   effects: Effect[];
   visible: VisualEffect[];

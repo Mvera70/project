@@ -48,6 +48,8 @@ function nameOf(c: Condition): string {
     case 'season': return `season=${c.season}${c.minWeek === undefined ? '' : `+${c.minWeek}`}`;
     case 'year': return `year ${c.op} ${c.v}`;
     case 'has': return `has ${c.building}`;
+    case 'room': return `room for ${c.building}`;
+    case 'raid': return `raid coming=${String(c.coming)}`;
     case 'flag': return `flag ${c.flag}=${String(c.set)}`;
     case 'outbreak': return `outbreak=${String(c.active)}`;
     case 'role': return `role ${c.role} alive=${String(c.alive)}`;

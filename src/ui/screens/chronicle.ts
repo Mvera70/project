@@ -5,7 +5,7 @@
 // welcome digest of a return from absence (§9.2, §13.2) is M-23's `sinceTick`
 // to spend; today it only decides where the list opens.
 
-import { CATALOG } from '@engine/crossroads/catalog';
+import { CATALOG, templateOf } from '@engine/crossroads/catalog';
 import { namesOf } from '@engine/crossroads/resolve';
 import { renderChronicleYear, renderEntry, renderUiText } from '@engine/chronicle/render';
 import { makeBundle, type RngBundle } from '@engine/rng';
@@ -21,6 +21,7 @@ import {
   ENTRY_DIAMOND, ORNAMENT_VIEWBOX, PAGE_VINE, YEAR_FLOURISH, type OrnamentName,
 } from '../redesign/chronicle-ornaments';
 import type { PanelFactory, UiActions, UiSnapshot } from '../redesign/contracts';
+import { isConcealed } from './crossroad';
 
 const STYLE_ID = 'valley-chronicle-style';
 // UI-V3 · La piel de `docs/ui-redesign/piel/plan-piel.md` §3.2: la página de
@@ -459,7 +460,9 @@ function flatCard(text: string): HTMLElement {
  * puerta a la que ya lleva deslizar hacia abajo para aplazarla.
  */
 function sealedCard(state: GameState, pending: PendingCrossroad, actions: UiActions): HTMLElement | null {
-  const template = CATALOG.find((t) => t.id === pending.templateId);
+  // RD-1 · la pregunta del vado no existe para el jugador hasta que él llega.
+  if (isConcealed(pending)) return null;
+  const template = templateOf(CATALOG, pending.templateId);
   if (template === undefined) return null;
   const params = { year: yearOf(pending.posedTick), ...namesOf(state, pending.cast) };
   const title = renderEntry({ tick: pending.posedTick, kind: 'crossroad_posed', templateKey: template.title, params, weight: 3 }, state.rng);

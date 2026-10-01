@@ -14,6 +14,7 @@ import { evaluate } from './conditions';
 import { applyEffect } from './resolve';
 import type { GameState, PlantedSeed } from '../state';
 import { yearOf } from '../time';
+import { templateOf } from './catalog';
 
 /** A seed that has neither fired nor withered and whose hour has come. */
 function isDue(seed: PlantedSeed, tick: number): boolean {
@@ -76,6 +77,8 @@ export function fireSeeds(state: GameState, catalogue: Catalogue): FiredSeed[] {
           // the decision was taken and which one it was.
           sinceYear: yearOf(seed.plantedTick),
           years: yearOf(state.tick) - yearOf(seed.plantedTick),
+          // RD-5 · las consecuencias cortas (`delayWeeks`) lo cuentan en semanas.
+          weeks: state.tick - seed.plantedTick,
           ...namesInSeed(state, seed),
         },
         weight: 3,
@@ -97,7 +100,7 @@ export function fireSeeds(state: GameState, catalogue: Catalogue): FiredSeed[] {
 
 /** The spec a planted seed came from, looked up in the catalogue. */
 function specOf(catalogue: Catalogue, seed: PlantedSeed) {
-  const template = catalogue.find((t) => t.id === seed.fromTemplateId);
+  const template = templateOf(catalogue, seed.fromTemplateId);
   const option = template?.options.find((o) => o.id === seed.fromOptionId);
   // The id is `template:option:spec:tick`, so the third field names the spec.
   const specId = seed.id.split(':')[2];

@@ -17,6 +17,8 @@
 import { hash32 } from '@engine/rng';
 import type { GameState, HappeningId } from '@engine/state';
 import { valleyRoadCells } from '@engine/world/valley-road';
+import { FOUNDING_CROSSROAD } from '@engine/crossroads/catalog/hamlet';
+import { ford } from '@engine/sim';
 import type { Animal } from '@derive/animals';
 import { NOTICE_BOARD } from '@derive/notice-board';
 import type { Body, Point, Solid, Terrain } from './body';
@@ -35,8 +37,10 @@ export interface Visitor {
   readonly kind: HappeningId;
   /** Por dónde entra y por dónde se va. */
   readonly road: Point;
-  /** Su sitio en la plaza, y el centro al que mira mientras está. */
-  readonly spot: Point;
+  /** Su sitio en la plaza, y el centro al que mira mientras está. RD-1: el del vado cambia de sitio al contestarle. */
+  spot: Point;
+  /** RD-1 · el forastero con el que se funda el valle, que espera en el vado. */
+  readonly scene?: 'ford';
   readonly centre: Point;
   phase: VisitorPhase;
   route: Waypoint[];
@@ -62,8 +66,11 @@ export interface Visitor {
   readonly beast: { readonly kind: 'mule' | 'cow'; x: number; z: number; moving: boolean; home?: boolean } | null;
   /** Por dónde ha pisado, para que la mula lo siga sin atajar por una casa. */
   readonly trail: Point[];
-  /** Si viene a cerrar el trato que el jugador aceptó (`visitsToday`). */
-  readonly dealt: boolean;
+  /**
+   * Si viene a cerrar el trato que el jugador aceptó (`visitsToday`). RD-4:
+   * cambia a media jornada si el jugador toca su señal mientras espera.
+   */
+  dealt: boolean;
   /** Si ya lleva lo que compró a lomos de la mula: se carga al irse. */
   loaded: boolean;
   /** El pasto adonde se lleva la vaca vendida, y la ruta que sigue hasta él. */
@@ -176,6 +183,52 @@ const DEADLINE_SLACK = 240;
 export interface VisitToday {
   readonly kind: HappeningId;
   readonly dealt: boolean;
+  /**
+   * RD-1 · el forastero del vado: `arriving` baja por el camino hoy, `waiting`
+   * ya está en el vado desde que abre la jornada, `in` ya lo acogieron y
+   * espera en la plaza a que cierre la semana.
+   */
+  readonly ford?: 'arriving' | 'waiting' | 'in';
+}
+
+/**
+ * RD-1 (Vera, 30 sep 2026) · **El día y la hora en que el forastero del vado
+ * llega.** La jornada escénica dura dos minutos y la semana 0 empieza a la
+ * fase 0,28 del día 0 (`DAY_START_PHASE`): el día 2 empieza en el minuto 3,4, y
+ * saliendo a la fase 0,4 del camino llega al vado hacia el minuto 4,5–5, que
+ * es lo que Vera pidió (entre el 4 y el 6). TUNE, medido con
+ * `artifacts/rd0/fordscan.mjs`.
+ */
+const FORD_DAY = 2;
+const FORD_ARRIVE = 0.4;
+
+/**
+ * Qué hace hoy el forastero del vado, o `null` si hoy no está. Mientras la
+ * pregunta con la que se funda el valle siga sin contestar, espera en el vado;
+ * `answer` es lo que el jugador ya contestó y el motor aún no ha apuntado
+ * (la decisión espera a su semana, §2.60).
+ */
+export function fordToday(
+  state: GameState, day: number, daysPerWeek: number, answer: 'in' | 'out' | null = null,
+): 'arriving' | 'waiting' | 'in' | null {
+  if (state.crossroad?.templateId !== FOUNDING_CROSSROAD.id) return null;
+  if (answer === 'out') return null;
+  if (answer === 'in') return 'in';
+  const dayOfWeek = day - state.tick * daysPerWeek;
+  if (state.tick === state.crossroad.posedTick && dayOfWeek < FORD_DAY) return null;
+  return state.tick === state.crossroad.posedTick && dayOfWeek === FORD_DAY ? 'arriving' : 'waiting';
+}
+
+/**
+ * RD-4 (Vera, 1 oct 2026) · **El trato que se cerró con él delante**: el
+ * jugador tocó la señal del que espera en la plaza la semana `tick`. El motor
+ * lo apunta al cerrar esa semana (§2.60), pero la aldea ya le ha llevado lo
+ * suyo: los días que le quedan en la plaza son de trato hecho, y la semana
+ * siguiente no vuelve a cerrarlo.
+ */
+export interface LiveDeal {
+  readonly kind: HappeningId;
+  readonly tick: number;
 }
 
 /**
@@ -189,20 +242,27 @@ export interface VisitToday {
  * cambio: se lleva la madera o el grano, deja la sal o la vaca. Es lo que
  * haría quien esperaba respuesta.
  */
-export function visitsToday(state: GameState, day: number, daysPerWeek: number): VisitToday[] {
+export function visitsToday(
+  state: GameState, day: number, daysPerWeek: number, fordAnswer: 'in' | 'out' | null = null,
+  liveDeal: LiveDeal | null = null,
+): VisitToday[] {
   const out: VisitToday[] = [];
   const dayOfWeek = day - state.tick * daysPerWeek;
   if (dayOfWeek < 0) return out;
+  const atFord = fordToday(state, day, daysPerWeek, fordAnswer);
+  if (atFord !== null) out.push({ kind: 'stranger_passes', dealt: false, ford: atFord });
   for (const happening of state.happenings) {
     if (happening.tick !== state.tick) continue;
     const visit = VISITS[happening.id];
     if (visit === undefined || dayOfWeek >= visit.days) continue;
-    out.push({ kind: happening.id, dealt: false });
+    out.push({ kind: happening.id, dealt: liveDeal?.kind === happening.id && liveDeal.tick === state.tick });
   }
   if (dayOfWeek === 0) {
     for (const entry of state.chronicle) {
       if (entry.tick !== state.tick || !entry.templateKey.startsWith('offer.') || !entry.templateKey.endsWith('.taken')) continue;
       const kind = entry.templateKey.slice('offer.'.length, -'.taken'.length) as HappeningId;
+      // RD-4 · el trato ya se cerró delante de él: no vuelve a cerrarlo.
+      if (liveDeal?.kind === kind && liveDeal.tick === state.tick - 1) continue;
       if (VISITS[kind] !== undefined && !out.some((visit) => visit.kind === kind)) out.push({ kind, dealt: true });
     }
   }
@@ -251,7 +311,12 @@ export function createVisitors(
   const entry = along?.entry ?? entryOf(land, shore, plaza, road);
   if (entry === null) return [];
   const visitors: Visitor[] = [];
-  for (const { kind, dealt } of visits) {
+  for (const { kind, dealt, ford: atFord } of visits) {
+    if (atFord !== undefined) {
+      const stranger = fordStranger(state, land, shore, plaza, along, entry, seed, visitors.length, atFord);
+      if (stranger !== null) visitors.push(stranger);
+      continue;
+    }
     const visit = VISITS[kind]!;
     for (let n = 0; n < visit.people; n += 1) {
       const index = visitors.length;
@@ -400,6 +465,94 @@ function entryOf(land: Terrain, shore: Uint8Array, plaza: Point, road: Point | n
     }
   }
   return best;
+}
+
+/**
+ * RD-1 · El forastero del vado: baja por el camino del valle, como cualquiera
+ * que llega, pero su sitio es **la orilla del vado** (`ford`, la misma que la
+ * ficción de §7.3 nombra) y no la plaza, y se queda allí mirando al agua
+ * hasta que le contesten. Si ya estaba, abre la jornada en su sitio; si ya lo
+ * acogieron, espera en la plaza a que cierre la semana y sea vecino.
+ */
+function fordStranger(
+  state: GameState, land: Terrain, shore: Uint8Array, plaza: Point,
+  along: { entry: Point; road: Waypoint[] } | null, entry: Point, seed: number, index: number,
+  atFord: NonNullable<VisitToday['ford']>,
+): Visitor | null {
+  const bank = ford(state);
+  const water = { x: bank.x, z: bank.y };
+  const spot = atFord === 'in'
+    ? nearestReachable(land, shore, { x: plaza.x + 1.6, z: plaza.z + 0.6 }, VISITOR_RADIUS)
+    : nearestReachable(land, shore, water, VISITOR_RADIUS);
+  if (spot === null) return null;
+  let from: Point | null = null;
+  let route: Waypoint[] | null = null;
+  if (atFord === 'arriving') {
+    if (along !== null) {
+      const start = nearestReachable(land, shore, along.entry, VISITOR_RADIUS);
+      const last = along.road[along.road.length - 1]!;
+      const tail = start === null ? null : pathTo(land, last, spot);
+      if (start !== null && tail !== null) { from = start; route = [...along.road, ...tail]; }
+    }
+    if (route === null) {
+      from = nearestReachable(land, shore, entry, VISITOR_RADIUS);
+      if (from !== null) route = pathTo(land, from, spot);
+    }
+    if (from === null || route === null) return null;
+  }
+  const placed = atFord !== 'arriving';
+  const at = placed ? spot : from!;
+  return {
+    body: {
+      id: -(VISITOR_ID_BASE + index), x: at.x, z: at.z,
+      vx: 0, vz: 0, facing: Math.atan2(water.x - at.x, water.z - at.z), radius: VISITOR_RADIUS, pace: VISITOR_PACE,
+    },
+    kind: 'stranger_passes',
+    scene: 'ford',
+    road: from ?? entry,
+    spot,
+    centre: atFord === 'in' ? plaza : water,
+    phase: placed ? 'staying' : 'waiting',
+    route: placed ? [] : route!,
+    arrive: FORD_ARRIVE + unit(seed, `${index}:arrive`) * JITTER,
+    leave: Number.POSITIVE_INFINITY,
+    deadline: 0,
+    travelled: 0,
+    stalled: 0,
+    pack: false,
+    stays: true,
+    beast: null,
+    trail: [{ x: at.x, z: at.z }],
+    dealt: false,
+    loaded: false,
+    pasture: plaza,
+    beastRoute: null,
+  };
+}
+
+/**
+ * RD-1 · Lo que hace el forastero del vado en cuanto el jugador contesta, sin
+ * esperar a que el motor lo apunte al cerrar la semana: acogido, sube a la
+ * plaza; despedido o echado, vuelve por donde vino.
+ */
+export function answerFordStranger(visitor: Visitor, land: Terrain, plaza: Point, answer: 'in' | 'out', step: number): void {
+  if (visitor.scene !== 'ford' || visitor.phase === 'gone') return;
+  if (answer === 'in') {
+    const spot = { x: plaza.x + 1.6, z: plaza.z + 0.6 };
+    const route = pathTo(land, visitor.body, spot);
+    if (route === null) return;
+    visitor.spot = spot;
+    (visitor as { centre: Point }).centre = plaza;
+    visitor.route = route;
+    visitor.phase = 'coming';
+    visitor.deadline = deadlineFor(visitor.body, spot, step, route);
+    return;
+  }
+  (visitor as { stays: boolean }).stays = false;
+  visitor.leave = 0;
+  visitor.phase = 'leaving';
+  visitor.route = routeOut(land, visitor.body, visitor.road);
+  visitor.deadline = deadlineFor(visitor.body, visitor.road, step, visitor.route);
 }
 
 /** Si alguno está a la vista: fuera de `waiting` y de `gone`. */

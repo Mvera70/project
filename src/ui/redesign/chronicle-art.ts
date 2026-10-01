@@ -50,6 +50,12 @@ const HAPPENING_ART: Readonly<Record<HappeningId, string>> = {
   tinker: 'pedlar.png',
   wise_woman: 'road.png',
   refugees: 'means-hand.png',
+  // RD-5 · los sucesos pequeños del caserío. Provisionales: los suyos están
+  // pedidos en `docs/plan-arte-pendiente.md`.
+  wild_honey: 'harvest.png',
+  mushrooms_after_rain: 'harvest.png',
+  fox_at_the_hens: 'wolf.png',
+  first_frost: 'season-winter.png',
 };
 
 /** Los medios estables de M-2: una ilustración por cosa entregada al valle. */
@@ -104,6 +110,18 @@ const RAID_ART: Readonly<Record<string, string>> = {
   'raid.arrows.saved': 'raid-held.png',
 };
 
+/**
+ * RD-4 · las líneas de un suceso que no se escriben la semana del suceso: el
+ * niño perdido se cierra la semana siguiente, y el registro de ese tick no es
+ * el suyo. Provisionales: las suyas están pedidas en
+ * `docs/plan-arte-pendiente.md` («child-found.png», «child-dusk.png»).
+ */
+const HAPPENING_KEY_ART: Readonly<Record<string, string>> = {
+  'child.found_by': 'child.png',
+  'child.found_by.named': 'child.png',
+  'child.found_at_dusk': 'child.png',
+};
+
 /** A1, A2, A4 y C3 · obras que antes compartían el grabado genérico. */
 const BUILD_ART: Readonly<Record<string, string>> = {
   'wall.closed': 'wall-closed.png',
@@ -149,6 +167,8 @@ export function illustrationFor(
     case 'consequence':
       return null;
     case 'happening': {
+      const keyed = HAPPENING_KEY_ART[entry.templateKey];
+      if (keyed !== undefined) return keyed;
       const record = happenings.find((h) => h.tick === entry.tick);
       return record === undefined ? null : HAPPENING_ART[record.id];
     }

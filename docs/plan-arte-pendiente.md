@@ -9,6 +9,30 @@ tanda de aldeanos. Sirve como lista de trabajo para las siguientes rondas y
 separa las ilustraciones de crónica, los adornos de interfaz y el arte 3D del
 mundo.
 
+## RD-3 · encrucijadas reescritas (1 oct 2026): ninguna imagen nueva que pedir
+
+La regla del dueño del diseño («cada vez que creas una crónica hay que ir
+creando la tarea de pedir las imágenes») se comprobó contra las ocho
+reescrituras y las seis retiradas, y **no genera ninguna tarea**:
+
+- **No se ha creado ninguna clave de crónica.** Cambian los textos de pantalla
+  (`crossroad.*.title/body/label/cost`) y dos líneas de la crónica de decisión
+  (`crossroad.feud_inherited.let_it_be_settled`,
+  `crossroad.winter_grain_debt.kneel`), pero las claves, los ids de opción y los
+  ids de semilla son los mismos.
+- **Y las entradas de decisión y de consecuencia no llevan grabado propio:**
+  llevan el «documento sellado» (`src/ui/redesign/chronicle-art.ts`:
+  `crossroad_posed`/`crossroad_taken`/`consequence` devuelven `null`), así que
+  ni una clave nueva habría caído al respaldo por `kind`, que es la trampa que
+  esa regla vigila (`wall.closed`, que es un `kind` con grabado). Lo que sí
+  tiene grabado por clave son los sucesos del valle (`HAPPENING_ART`), y este
+  carril no toca ninguno.
+- Dos consecuencias que antes casi no ocurrían ahora pueden verse, y se dejan
+  anotadas por si algún día las consecuencias llevan dibujo:
+  `consequence.the_wood_holds` (la semilla pedía bosque > 0,5, que el corazón del
+  valle no alcanza nunca; ahora > 0,20) y `crossroad.first_stone.*` (sale a los
+  ~6 años, con la iglesia recién levantada, no a los 41).
+
 ## Propuesta pendiente · portada del menú y apertura del libro
 
 **Estado:** cubierta estática con pergamino, lomo, cuero y canto de páginas
@@ -404,3 +428,37 @@ Líneas nuevas de crónica que hoy caen en un grabado prestado
 | `expedition-mountain.png` | `expedition.wolf_den.*`, `expedition.high_seam.*`, `expedition.*.mountain` | Una fila de tres subiendo una ladera de roca con cuerda, picos y lanzas |
 | `expedition-road.png` | `expedition.market.*`, `expedition.*.road` | Dos con fardos a la espalda bajando el camino del desfiladero |
 | `expedition-lost.png` | `expedition.lost.*` | Una cesta volcada en el suelo del bosque, sin nadie |
+
+## RD-4 · El niño perdido, en dos tiempos (1 oct 2026) — **pedidas por la regla de la crónica**
+
+El suceso `child_lost` ya no se pierde y se encuentra en la misma línea: la
+semana del suceso el niño espera en la linde con una señal encima, y la
+siguiente lo trae quien fue a buscarlo o lo encuentra el valle al anochecer
+(`world/lost-child.ts`). Mientras no lleguen, las tres claves nuevas usan
+`child.png`, y las de la semana del suceso (`fate.child_missing*`) siguen con
+`child.png` por el registro del suceso. 640 × 512, por `public/ui/art/index.json`
+y `src/ui/redesign/chronicle-art.ts` (`HAPPENING_KEY_ART`).
+
+| Fichero | Clave | Qué tiene que enseñar |
+|---|---|---|
+| `child-missing.png` | `fate.child_missing`, `fate.child_missing.named` | **La linde vacía a la hora de cenar.** Los primeros troncos del bosque con la luz baja, un zapato pequeño o un juguete de madera en la hierba, y al fondo, lejos, las casas con humo |
+| `child-found.png` | `child.found_by`, `child.found_by.named` | **Uno solo que vuelve con el niño.** Un adulto saliendo de entre los árboles con el crío a hombros o de la mano, la última luz detrás; nadie más en el cuadro |
+| `child-dusk.png` | `child.found_at_dusk` | **El valle entero buscando.** Antorchas a lo largo de la orilla del vado al anochecer, siluetas en fila, y una de ellas agachada junto a un bulto pequeño bajo los alisos |
+
+## RD-5 · Los sucesos pequeños del caserío (1 oct 2026) — **pedidas por la regla de la crónica**
+
+Cuatro sucesos que sólo salen mientras el valle tiene menos de diez personas
+(`FATE.HAMLET_PEOPLE`). Mientras no lleguen usan un grabado prestado
+(`HAPPENING_ART` en `chronicle-art.ts`). 640 × 512.
+
+| Fichero | Clave | Qué tiene que enseñar |
+|---|---|---|
+| `wild-honey.png` | `fate.wild_honey` | **Un roble hueco con panal.** Dos aldeanos con un paño en la cara sacando panal de un tronco viejo, abejas alrededor, un cuenco de madera en el suelo |
+| `mushrooms.png` | `fate.mushrooms_after_rain` | **La linde blanca de setas tras la lluvia.** Hierba mojada, setas en corro bajo los primeros árboles y un delantal recogido lleno |
+| `fox-hens.png` | `fate.fox_at_the_hens` | **El zorro en el gallinero, de noche.** Plumas en el barro junto a la cerca de varas y las huellas del zorro hacia la oscuridad |
+| `first-frost.png` | `fate.first_frost` | **La primera helada.** Hierba blanca al amanecer, el humo de las casas subiendo recto y la gente alrededor de una hoguera en la plaza |
+
+Y las tres consecuencias cortas del vado (`consequence.he_knew_the_axe`,
+`consequence.he_came_back_with_fish`, `consequence.tracks_from_the_ford`) **no
+llevan imagen**: son `kind: 'consequence'` y llevan la tarjeta sellada de §3.2,
+como cualquier consecuencia.

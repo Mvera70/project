@@ -22,6 +22,8 @@ import { eraOf, uiMaterialOf } from '@derive/era';
 import { vitalsOf } from './vitals';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { offerLine } from './offer-line';
+import { goalOf } from '@derive/goal';
+import { canAccept } from '@engine/world/road';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
 import { tick, type TickReport } from '@engine/sim';
@@ -44,7 +46,7 @@ import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom, type BackendHandle } from './backend';
 import { persistSave } from './idb';
 import { recogniseGesture, type Point } from './gestures';
-import { checkpointSavedAtMs, runLethargy } from './lethargy';
+import { checkpointSavedAtMs, finished as lethargyFinished, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
 import { readGraphicsSettings } from './graphics-settings';
 import { startStormedTransition, type StormedTransition } from './stormed-transition';
@@ -52,7 +54,8 @@ import { milestonesAt } from './milestones';
 import { doingNow, gateNow } from './doing';
 import { noticeText } from './notice';
 import { chroniclePanel, closeChronicle } from './screens/chronicle';
-import { closeCrossroad, isDeferred, openCrossroad, openDeferred } from './screens/crossroad';
+import { closeCrossroad, conceal, isConcealed, isDeferred, openCrossroad, openDeferred, reveal } from './screens/crossroad';
+import { FOUNDING_CROSSROAD } from '@engine/crossroads/catalog/hamlet';
 import { openEpitaph } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
 import { accentFor, playerAnswer, routeCue, sound, speedCue } from './sound';
@@ -96,7 +99,6 @@ export interface App {
 
 export interface DecisionAttempt {
   accepted: boolean;
-  forceTick: boolean;
 }
 
 /**
@@ -108,16 +110,18 @@ export interface DecisionAttempt {
  *
  * Rule 1: an option is accepted only if a crossroad is pending and nothing is
  * already queued — decided is decided, a second tap cannot replace it.
- * Rules 2–3: accepting forces a tick unless the game is paused; paused, §8.7
- * still lets the decision wait rather than making the player unable to pause.
+ * Rule 2 (RD-1, 30 sep 2026, Vera): **the decision waits for its week.** It
+ * used to force the next tick at once, and at ×1 —the normal speed since that
+ * day— every answer jumped the calendar and the sun up to seven days. What the
+ * choice shows happens now; the engine writes it down when the week closes.
  */
 export function attemptDecision(
   hasPendingCrossroad: boolean,
   alreadyQueued: boolean,
   speed: Speed,
 ): DecisionAttempt {
-  const accepted = hasPendingCrossroad && !alreadyQueued;
-  return { accepted, forceTick: accepted && speed !== 0 };
+  void speed;
+  return { accepted: hasPendingCrossroad && !alreadyQueued };
 }
 
 export interface Resumption {
@@ -214,7 +218,9 @@ export function boot(
 ): App {
   let state = save?.state ?? foundGame(freshSeed());
   const archive: ArchivedGame[] = save !== undefined ? [...save.archive] : [];
-  let speed: Speed = 1;
+  // RD-2 (Vera, 30 sep 2026) · se vuelve a la velocidad a la que se dejó,
+  // también la pausa: la ausencia ya corrió a ella.
+  let speed: Speed = save?.speed ?? 1;
   // El banco de batallas (`?sandbox=battle`): la cámara lenta. El juego, 1.
   let timeScale = 1;
   // Y la semana congelada: el motor no avanza, así que la partida no se acaba
@@ -383,15 +389,15 @@ export function boot(
      * hacía que las palancas no se entendieran.
      */
     give(means): void {
+      // RD-1 · como todo acto, espera a que cierre su semana (Vera, 30 sep
+      // 2026): a ×1 cerrarla ya hacía saltar el calendario y el sol.
       pendingActs.push({ kind: 'means', means });
-      if (speed !== 0) { runTick(); paint(lastFraction); }
     },
     // K-5 · la corona. Va por el mismo conducto que un medio —la cola de actos
     // que el paso 1b consume— porque es el mismo verbo: el jugador da algo y la
     // aldea decide qué hacer con ello. Aquí lo que da es **a alguien**.
     crown(who): void {
       pendingActs.push({ kind: 'crown', who });
-      if (speed !== 0) { runTick(); paint(lastFraction); }
     },
     // §7.15 · mandar gente del tablón: la misma cola de actos que un medio.
     expedition(mission, count): void {
@@ -399,7 +405,6 @@ export function boot(
       // que el envío ya es la respuesta: suena al tocar.
       sound.tap('ui_action_success', Date.now());
       pendingActs.push({ kind: 'expedition', mission, count });
-      if (speed !== 0) { runTick(); paint(lastFraction); }
     },
     setSpeed(value): void {
       // El jugador, y sólo él: la caza y el final también cambian la
@@ -610,7 +615,11 @@ export function boot(
   });
   /** La señal sigue a su presa: se coloca después de pintar, con la cámara de ese fotograma. */
   const placeHuntSign = (): void => {
-    const at = huntInProgress || currentRoute.kind !== 'valley' || state.crossroad !== null
+    // Con la tarjeta de una encrucijada en pantalla no; con una pendiente que
+    // espera (aplazada, o el forastero del vado aún sin llegar), sí: si no, la
+    // pregunta con la que se funda el valle se comía la primera caza (RD-1).
+    const crossroadOnScreen = document.documentElement.classList.contains('crossroad-open');
+    const at = huntInProgress || currentHuntOffer === null || currentRoute.kind !== 'valley' || crossroadOnScreen
       || state.ended !== null || backend.live.kind !== 'pilot3d' ? null : backend.live.huntSign();
     huntSign.hidden = at === null;
     if (at === null) return;
@@ -626,6 +635,123 @@ export function boot(
     }
   };
 
+  // RD-1 (Vera, 30 sep 2026) · **El forastero del vado, como señal en el
+  // mapa** (skill `senales-en-el-mapa`). La pregunta con la que se funda el
+  // valle está planteada desde el tick 0, pero no se enseña hasta que él baja
+  // por el camino y espera en la orilla (`fordToday`, hacia el minuto 4–6 a
+  // ×1); entonces queda aplazada —el sello— y encima de él aparece su rastro:
+  // unas pisadas, lo que deja quien llega andando. Tocarlas abre la pregunta.
+  const fordSign = document.createElement('button');
+  fordSign.type = 'button';
+  fordSign.className = 'hunt-sign ford-sign';
+  fordSign.hidden = true;
+  fordSign.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="#footprints"/></svg>';
+  fordSign.setAttribute('aria-label', renderUiText('ford.sign'));
+  let fordRevealed: string | null = null;
+  fordSign.addEventListener('click', () => {
+    const pending = state.crossroad;
+    if (pending === null || pending.templateId !== FOUNDING_CROSSROAD.id || fordSign.classList.contains('hunt-sign--covered')) return;
+    if (currentRoute.kind !== 'valley') navigate({ kind: 'valley' });
+    openDeferred(app, pending);
+  });
+  /** La pregunta del vado: escondida hasta que él llega, y su señal mientras espera. */
+  const placeFordSign = (): void => {
+    const pending = state.crossroad;
+    const founding = pending !== null && pending.templateId === FOUNDING_CROSSROAD.id && state.ended === null
+      && pendingDecision === undefined;
+    const key = founding ? `${pending.templateId}:${pending.posedTick}` : null;
+    const at = founding && backend.live.kind === 'pilot3d' ? backend.live.fordSign() : null;
+    if (founding && fordRevealed !== key) {
+      // Sin escena que enseñarlo (Canvas), o si ya pasó su semana, la pregunta
+      // se ve como cualquier otra aplazada; si no, espera a que él llegue.
+      const noScene = backend.wanted !== 'pilot3d' || backend.failure !== null;
+      if (noScene || state.tick > pending.posedTick || at !== null) {
+        reveal(pending);
+        fordRevealed = key;
+      } else {
+        conceal(pending);
+      }
+    }
+    const show = at !== null && founding && isDeferred(pending!) && currentRoute.kind === 'valley'
+      && !document.documentElement.classList.contains('crossroad-open');
+    fordSign.hidden = !show;
+    if (!show) return;
+    const box = backend.live.surface.getBoundingClientRect();
+    fordSign.style.transform = `translate(${Math.round(box.left + at.x)}px, ${Math.round(box.top + at.y)}px) translate(-50%, -50%)`;
+    fordSign.classList.toggle('hunt-sign--covered', at.hidden);
+    fordSign.tabIndex = at.hidden ? -1 : 0;
+  };
+
+  // RD-4 (Vera, 1 oct 2026) · **La visita, como señal en el mapa.** El que
+  // sube a vender espera en la plaza sus tres días con unas monedas encima;
+  // tocarlas es cerrar el trato, y la aldea sale ya, desde donde esté, a
+  // llevarle la leña o el grano o a pagarle (`dealVisit`). El motor lo apunta
+  // al cerrar la semana, como cualquier acto (§2.60). Cuando él no está a la
+  // vista —ya se fue, o no hay escena— la voz conserva sus dos toques: la
+  // oferta vive sus dos semanas igual que antes.
+  const visitSign = document.createElement('button');
+  visitSign.type = 'button';
+  visitSign.className = 'hunt-sign visit-sign';
+  visitSign.hidden = true;
+  visitSign.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="#silver"/></svg>';
+  let visitSignShown = false;
+  visitSign.addEventListener('click', () => {
+    const offer = state.offer;
+    if (offer === null || visitSign.classList.contains('hunt-sign--covered') || backend.live.kind !== 'pilot3d') return;
+    if (pendingActs.some((act) => act.kind === 'offer') || !canAccept(state, offer)) return;
+    if (!backend.live.dealVisit(offer.id, state.tick)) return;
+    pendingActs.push({ kind: 'offer', accept: true });
+    visitSign.hidden = true;
+    visitSignShown = false;
+  });
+  /** La señal sigue al vendedor mientras espera en la plaza con el trato sin cerrar. */
+  const placeVisitSign = (): void => {
+    const offer = state.offer;
+    const open = offer !== null && state.ended === null && currentRoute.kind === 'valley'
+      && !pendingActs.some((act) => act.kind === 'offer') && canAccept(state, offer)
+      && !document.documentElement.classList.contains('crossroad-open');
+    const at = open && backend.live.kind === 'pilot3d' ? backend.live.visitSign(offer!.id) : null;
+    visitSignShown = at !== null;
+    visitSign.hidden = at === null;
+    if (at === null) return;
+    const box = backend.live.surface.getBoundingClientRect();
+    visitSign.style.transform = `translate(${Math.round(box.left + at.x)}px, ${Math.round(box.top + at.y)}px) translate(-50%, -50%)`;
+    visitSign.setAttribute('aria-label', offerLine(offer!));
+    visitSign.classList.toggle('hunt-sign--covered', at.hidden);
+    visitSign.tabIndex = at.hidden ? -1 : 0;
+  };
+
+  // RD-4 (Vera, 1 oct 2026) · **El niño perdido, como señal en el mapa.** Los
+  // dos primeros días de la semana del suceso el niño espera en la linde con
+  // una señal encima; tocarla manda al adulto libre más cercano a por él, desde
+  // donde esté, y el motor lo apunta al cerrar la semana (`search`, §2.60). Sin
+  // toque, el valle lo encuentra al anochecer, como antes.
+  const lostSign = document.createElement('button');
+  lostSign.type = 'button';
+  lostSign.className = 'hunt-sign lost-sign';
+  lostSign.hidden = true;
+  lostSign.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="#people"/></svg>';
+  lostSign.setAttribute('aria-label', renderUiText('lost.sign'));
+  lostSign.addEventListener('click', () => {
+    if (lostSign.classList.contains('hunt-sign--covered') || backend.live.kind !== 'pilot3d') return;
+    if (pendingActs.some((act) => act.kind === 'search')) return;
+    const sent = backend.live.searchChild(state.tick);
+    if (sent === null) return;
+    pendingActs.push({ kind: 'search', sourceTick: state.tick, child: sent.child, searcher: sent.searcher });
+    lostSign.hidden = true;
+  });
+  const placeLostSign = (): void => {
+    const open = state.ended === null && currentRoute.kind === 'valley'
+      && !document.documentElement.classList.contains('crossroad-open');
+    const at = open && backend.live.kind === 'pilot3d' ? backend.live.lostSign() : null;
+    lostSign.hidden = at === null;
+    if (at === null) return;
+    const box = backend.live.surface.getBoundingClientRect();
+    lostSign.style.transform = `translate(${Math.round(box.left + at.x)}px, ${Math.round(box.top + at.y)}px) translate(-50%, -50%)`;
+    lostSign.classList.toggle('hunt-sign--covered', at.hidden);
+    lostSign.tabIndex = at.hidden ? -1 : 0;
+  };
+
   const hudRight = document.createElement('div');
   // UI-V2b · la segunda clase es la que sube el rincón por encima de la
   // bandeja (`skin.css`): la regla de `index.html` lo dejaba a 60 px del
@@ -636,7 +762,7 @@ export function boot(
   cameraControls = mountCameraControls(() => backend.live, () => backend.live.surface);
   hudRight.append(bareToggle, soundToggle, hud.speedControls, hud.speedBadge);
 
-  root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, woodGains.element, shell.element);
+  root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, fordSign, visitSign, lostSign, woodGains.element, shell.element);
 
   /**
    * **UI-R1 · la pila del mensaje, y el fallo concreto que esta ronda tiene
@@ -948,6 +1074,11 @@ export function boot(
     // es lo mismo que hace el reloj de la cabecera — una era dura años y esto
     // se llama sesenta veces por segundo.
     shell.setEra(renderUiText(`era.${eraOf(state)}`));
+    // RD-5 · y hacia dónde va (`derive/goal.ts`). La obra que espera se nombra
+    // con su palabra del banco, que es otra clave.
+    const goal = goalOf(state);
+    shell.setGoal(goal === null ? null : renderUiText(goal.key, typeof goal.params['what'] === 'string'
+      ? { ...goal.params, what: renderUiText(goal.params['what']) } : goal.params));
     // UI-W · y la materia de la interfaz: madera hasta la primera obra de
     // piedra, piedra desde ella (`derive/era.ts`, `wood.css`). Se escribe sólo
     // cuando cambia, que es una vez en la vida de una aldea.
@@ -1018,7 +1149,11 @@ export function boot(
     // le da—, así que se ofrece mientras esté en el estado y se retira cuando el
     // motor la quita: aceptada, dejada pasar o ida. Un suceso la tapa sus cinco
     // segundos y vuelve sola (`voice.ts`).
-    const waiting = state.offer;
+    // RD-1 · contestada, la oferta se retira ya aunque el motor la apunte al
+    // cerrar la semana: quien la aceptó no tiene que ver al tratante esperando
+    // catorce minutos más.
+    const answeredOffer = pendingActs.some((act) => act.kind === 'offer');
+    const waiting = answeredOffer ? null : state.offer;
     if (waiting === null) {
       if (spokenOffer !== null) { voice = clearOffer(voice); spokenOffer = null; }
     } else if (spokenOffer !== waiting.postedTick) {
@@ -1048,29 +1183,36 @@ export function boot(
     shell.voice.dataset.role = now?.role ?? '';
     // Los dos toques sólo cuando lo que se lee **es** la oferta: si un suceso la
     // está tapando, contestar a ciegas sería contestar a otra cosa.
-    shell.setOffer(now?.role === 'offer', (accept) => {
+    // RD-4 · mientras el vendedor espera con su señal encima, el trato se
+    // cierra tocándolo a él; los dos toques de la voz quedan para cuando no
+    // está a la vista.
+    shell.setOffer(now?.role === 'offer' && !visitSignShown, (accept) => {
+      // Como una decisión (§2.60, regla 2): espera a que cierre su semana
+      // (RD-1, Vera, 30 sep 2026: a ×1 nada salta).
       pendingActs.push({ kind: 'offer', accept });
-      // Como una decisión (§2.60, regla 2): se contesta ahora, no en catorce
-      // minutos. En pausa se queda en la cola, que es lo que §8.7 hace con una
-      // decisión tomada con el reloj parado.
-      if (speed !== 0) { runTick(); paint(lastFraction); }
     });
     // VZ-4 · la cámara va detrás de quien se sigue, fotograma a fotograma.
     if (trackedId !== null) renderer.track(trackedId);
     renderer.paint(state, fraction);
     placeHuntSign();
+    placeFordSign();
+    placeVisitSign();
+    placeLostSign();
     woodGains.paint(
       currentRoute.kind === 'valley' && backend.live.kind === 'pilot3d' ? backend.live.woodGains() : [],
       backend.live.kind === 'pilot3d' ? backend.live.surface.getBoundingClientRect() : null,
     );
-    // El resultado físico llega en un fotograma, no al cabo de otra semana
-    // de reloj real. Se entrega al motor justo después de pintar el impacto.
+    // El resultado físico queda en la cola en cuanto la escena acaba, y el
+    // motor lo apunta al cerrar la semana (RD-1, Vera, 30 sep 2026: a ×1
+    // forzar el tick adelantaba el calendario hasta catorce minutos). Lo que
+    // el jugador ve ya es la pieza y su «+N» (`woodGains`). Y la ocasión de
+    // esta semana está gastada: la señal no vuelve hasta la siguiente.
     if (huntInProgress) {
       const completed = backend.live.hunt();
       if (completed !== null) {
         pendingActs.push({ kind: 'hunt', ...completed });
         endHunt();
-        queueMicrotask(() => { runTick(); paint(lastFraction); });
+        currentHuntOffer = null;
       }
     }
     // §11.2's third screen opens itself the moment there is something to
@@ -1093,8 +1235,15 @@ export function boot(
     // texto asomando por debajo del panel, opciones y precio incluidos.
     // Volver al valle es lo mismo que ya hace deslizar hacia abajo para
     // aplazarla (S-05, U-14): la decisión se queda pendiente, no se pierde.
-    if (state.crossroad !== null && state.ended === null) {
+    // RD-1 · con la decisión ya en cola (espera a que cierre su semana), la
+    // encrucijada sigue en el estado pero está contestada: ni se vuelve a abrir
+    // ni sella la bandeja.
+    if (state.crossroad !== null && state.ended === null && pendingDecision === undefined) {
       const pending = state.crossroad;
+      // RD-1 · la del vado, mientras él no ha llegado, no existe todavía.
+      if (isConcealed(pending)) {
+        shell.setOrnament('leaf');
+      } else
       // VZ-03 · si el jugador la aplazó, **la marca es el sello del ornamento**
       // y no se le vuelve a plantear hasta que lo toque (§8.6: espera, no
       // caduca). Antes esto era una píldora `position: fixed`, la tercera pieza
@@ -1424,7 +1573,7 @@ export function boot(
     // opens could otherwise let the final dead-village write land after the
     // successor write and resurrect the epitaph on reload.
     const snapshot = structuredClone(serialize(
-      state, state.history, archive, savedAtOverride ?? Date.now(),
+      state, state.history, archive, savedAtOverride ?? Date.now(), speed,
     ));
     saveQueue = saveQueue.then(() => persistSave(snapshot));
   };
@@ -1434,7 +1583,16 @@ export function boot(
   // ordinary thing a player does. Hiding notes the hour; coming back owes it.
   let hiddenAtMs: number | null = null;
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { hiddenAtMs = Date.now(); persist(); return; }
+    if (document.hidden) {
+      // RD-1 · lo que el jugador dejó en cola se apunta antes de irse: la
+      // semana se cierra ahora, con nadie mirando, y la ausencia se cuenta
+      // desde donde habría acabado esa semana para no regalar el resto.
+      const ahead = flushQueued();
+      hiddenAtMs = Date.now() + ahead;
+      persist();
+      if (ahead > 0) savedAtOverride = null;
+      return;
+    }
     const since = hiddenAtMs;
     hiddenAtMs = null;
     if (since === null || catchingUp || state.ended !== null) return;
@@ -1446,6 +1604,7 @@ export function boot(
     if (resumption.ticks > 0) catchUpFor(Date.now() - since, resumption.welcome, speed);
   });
   window.addEventListener('pagehide', () => {
+    flushQueued();
     persist();
     loop?.stop();
     endingTransition?.cancel();
@@ -1468,6 +1627,24 @@ export function boot(
    * un acto, aunque hoy sólo haya una clase de acto.
    */
   let pendingActs: PlayerAct[] = [];
+  /**
+   * RD-1 (30 sep 2026) · **Lo que espera a su semana no se pierde al irse.**
+   * Desde que los actos y las decisiones esperan al cierre de la semana (Vera:
+   * a ×1 nada salta), la cola vive en memoria hasta catorce minutos; cerrar u
+   * ocultar la app en ese rato la perdía. Aquí se cierra la semana con nadie
+   * mirando y el guardado se fecha en el fin de esa semana, así que la ausencia
+   * no regala lo que quedaba de ella. Devuelve cuántos ms de semana se
+   * adelantaron (0 si no había nada en cola o el juego está en pausa: en pausa
+   * la decisión espera, §2.60 regla 3).
+   */
+  const flushQueued = (): number => {
+    if (speed === 0 || state.ended !== null || catchingUp) return 0;
+    if (pendingDecision === undefined && pendingActs.length === 0 && !huntInProgress) return 0;
+    const ahead = Math.max(0, (1 - lastFraction) * TIME.REAL_MS_PER_TICK / speed);
+    runTick();
+    savedAtOverride = Date.now() + ahead;
+    return ahead;
+  };
   const finish = (): void => {
     if (state.ended === null || finishing) return;
     finishing = true;
@@ -1756,7 +1933,7 @@ export function boot(
     runLethargy(state, elapsedMs, (progress) => {
       savedAtOverride = checkpointSavedAtMs(Date.now(), progress);
       paint(0);
-      if (progress.done >= progress.total || progress.ended) {
+      if (lethargyFinished(progress)) {
         catchingUp = false;
         if (state.ended !== null) finish();
         else {
@@ -1783,7 +1960,8 @@ export function boot(
       const attempt = attemptDecision(state.crossroad !== null, pendingDecision !== undefined, speed);
       if (!attempt.accepted || state.crossroad === null) return false;
       pendingDecision = { templateId: state.crossroad.templateId, optionId };
-      if (attempt.forceTick) { runTick(); paint(lastFraction); }
+      // RD-1 · el forastero contesta ya en la escena: sube a la plaza o se va.
+      if (state.crossroad.templateId === FOUNDING_CROSSROAD.id) backend.live.answerFord(optionId);
       return true;
     },
     look(x: number, y: number): void {
@@ -1797,7 +1975,10 @@ export function boot(
   paint(0);
   document.documentElement.dataset.appReady = 'true';
 
-  const owed = save !== undefined ? ticksOwed(Date.now() - save.savedAtMs) : 0;
+  // RD-2 · la ausencia corre a la velocidad a la que se dejó, como con la
+  // pestaña oculta (`resumeAfterHidden`): la misma ausencia, el mismo valle,
+  // por las dos puertas. En pausa no se debe nada.
+  const owed = save !== undefined ? ticksOwed(Date.now() - save.savedAtMs, save.speed ?? 1) : 0;
   if (state.ended !== null) {
     finish();
   } else if (save !== undefined && owed > 0) {
@@ -1811,7 +1992,7 @@ export function boot(
     // stamped `Date.now()` at boot) owes zero ticks, and a "welcome back,
     // nothing happened" screen over every debug route would be worse than
     // the screen it is supposed to replace.
-    catchUpFor(Date.now() - save.savedAtMs, true);
+    catchUpFor(Date.now() - save.savedAtMs, true, save.speed ?? 1);
   } else {
     beginLoop();
   }

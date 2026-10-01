@@ -631,6 +631,10 @@ test('alguien sube por el camino y el trato se cierra con un toque (M-0)', async
   await page.getByRole('button', { name: 'Take it' }).click();
   // Y la oferta se va de la voz: ya no hay nadie esperando.
   await test.expect(voice).toHaveCount(0);
+  // RD-1 (Vera, 30 sep 2026): el trato espera a que cierre su semana —a ×1
+  // cerrarla al momento hacía saltar el calendario y el sol—, así que la plata
+  // sube cuando la semana acaba, no en el toque.
+  await advanceWeeks(page, 1, 1);
   await test.expect.poll(async () => Number((await plata.innerText()).replace(/[^\d]/gu, '')))
     .toBeGreaterThan(antes);
   await page.screenshot({ path: 'artifacts/m0-offer-taken.png', fullPage: true });
@@ -778,6 +782,76 @@ test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ p
   test.expect(['storm', 'rain', 'overcast', 'clear']).toContain(sky);
 });
 
+test('la primera ocasión del mapa se puede tocar y el tablón queda en el encuadre (RD-0, D1 y D7)', async ({ page }) => {
+  // RD-0 (30 sep 2026). En la semilla 7 la perdiz de la fundación nacía pegada
+  // a la linde y las copas la tapaban desde la cámara de apertura: la señal
+  // estaba apagada en 368 de 368 muestras y la primera ocasión del mapa no se
+  // podía tocar. Y el tablón de la plaza se salía del encuadre a la tercera
+  // semana (x = −23 px de 390). Se mira como lo ve el dedo: la señal visible,
+  // sin tapar, encima de todo en su punto; el tablón dentro de la pantalla.
+  test.setTimeout(300_000);
+  await lowGraphics(page);
+  // El camino del jugador, no la ruta de depuración: el menú, la semilla 7 y
+  // un valle nuevo, con su vuelo de entrada y la cámara de apertura.
+  await page.goto('/');
+  await page.locator('.title-scrim').waitFor();
+  await page.locator('#valley-seed').fill('7');
+  await page.locator('.title-new').click();
+  await page.waitForFunction(() => ['hints', 'done'].includes(document.documentElement.dataset.intro ?? ''),
+    null, { timeout: 180_000 });
+  const sign = page.locator('.hunt-sign');
+  await test.expect.poll(async () => {
+    return sign.evaluate((el) => {
+      const button = el as HTMLButtonElement;
+      if (button.hidden || button.classList.contains('hunt-sign--covered')) return false;
+      const box = button.getBoundingClientRect();
+      const top = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+      return top === button || button.contains(top);
+    });
+  }, { timeout: 120_000, intervals: [500] }).toBe(true);
+  const board = await page.evaluate(() => window.__valleyBoardScreen?.() ?? null);
+  const view = page.viewportSize()!;
+  test.expect(board, 'el tablón existe en la escena').not.toBeNull();
+  test.expect(board!.x).toBeGreaterThan(0);
+  test.expect(board!.x).toBeLessThan(view.width);
+  await page.screenshot({ path: 'artifacts/rd0-first-sign.png', fullPage: true });
+});
+
+test('el forastero del vado: llega andando, su señal abre la primera pregunta y contestarla no la reabre (RD-1)', async ({ page }) => {
+  // RD-1 (Vera, 30 sep 2026). La primera elección del valle está planteada
+  // desde la fundación, pero no existe para el jugador hasta que el forastero
+  // baja por el camino y espera en el vado (a ×1, hacia el minuto 4,6–5,1):
+  // antes, ni tarjeta ni sello. Entonces, unas pisadas encima de él; tocarlas
+  // abre la pregunta. Se corre a ×16 para no esperar cinco minutos: la escena
+  // va por el reloj de la jornada, no por el de pared.
+  test.setTimeout(300_000);
+  await lowGraphics(page);
+  await page.goto('/');
+  await page.locator('.title-scrim').waitFor();
+  await page.locator('#valley-seed').fill('7');
+  await page.locator('.title-new').click();
+  await page.waitForFunction(() => ['hints', 'done'].includes(document.documentElement.dataset.intro ?? ''),
+    null, { timeout: 180_000 });
+  await page.evaluate(() => window.__valleySpeed?.(16));
+  const sign = page.locator('.ford-sign');
+  const scrim = page.locator('.crossroad-scrim:not([inert])');
+  await test.expect.poll(async () => {
+    // Mientras él no ha llegado, la pregunta no se ve.
+    if (await sign.isHidden()) test.expect(await scrim.count()).toBe(0);
+    return sign.isVisible();
+  }, { timeout: 180_000, intervals: [400] }).toBe(true);
+  await page.screenshot({ path: 'artifacts/rd1-ford-sign.png', fullPage: true });
+  await sign.click();
+  await test.expect(scrim).toHaveCount(1);
+  await test.expect(scrim).toContainText('One at the Ford');
+  await page.locator('.crossroad-options button').first().click();
+  await test.expect(scrim).toHaveCount(0);
+  // Contestada, no vuelve a abrirse ni vuelve la señal mientras la semana acaba.
+  await page.waitForTimeout(3_000);
+  await test.expect(scrim).toHaveCount(0);
+  await test.expect(sign).toBeHidden();
+});
+
 test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {
   await page.clock.install();
   await page.goto('/?debug=1&live=1&render=canvas&hunger=1&seed=7&year=80&season=summer');
@@ -835,6 +909,9 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
   const centroAntes = await page.evaluate(() => document.documentElement.dataset.viewCentre ?? '');
   await page.locator('.crossroad-options button').first().click();
   await test.expect(scrim).toBeHidden();
+  // RD-1 (Vera, 30 sep 2026): la decisión espera a que cierre su semana, y
+  // con ella lo que enseña; el enfoque llega entonces, sin saltar el reloj.
+  await advanceWeeks(page, 1, 1);
   await test.expect
     .poll(async () => {
       await page.clock.runFor(100);
@@ -931,25 +1008,35 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
   // write, closing on the welcome screen can reload the pre-catch-up state;
   // a partial visibility save used to make that loss permanent.
   const persistedCatchUp = (): Promise<{
-    savedAtMs: number | undefined; tick: number | undefined;
+    savedAtMs: number | undefined; tick: number | undefined; warned: boolean;
   } | undefined> => page.evaluate(async () => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open('the-valley', 1);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
-    const save = await new Promise<{ savedAtMs?: number; state?: { tick?: number } } | undefined>((resolve, reject) => {
+    type Saved = { savedAtMs?: number; state?: { tick?: number; threat?: { comingTick?: number | null } } };
+    const save = await new Promise<Saved | undefined>((resolve, reject) => {
       const request = db.transaction('saves', 'readonly').objectStore('saves').get('current');
-      request.onsuccess = () => resolve(request.result as { savedAtMs?: number; state?: { tick?: number } } | undefined);
+      request.onsuccess = () => resolve(request.result as Saved | undefined);
       request.onerror = () => reject(request.error);
     });
     db.close();
-    return save === undefined ? undefined : { savedAtMs: save.savedAtMs, tick: save.state?.tick };
+    return save === undefined ? undefined : {
+      savedAtMs: save.savedAtMs, tick: save.state?.tick,
+      warned: (save.state?.threat?.comingTick ?? null) !== null,
+    };
   });
   const returnAt = t0 + TIME.LETHARGY_CAP_MS;
   await test.expect.poll(async () => (await persistedCatchUp())?.savedAtMs ?? 0)
     .toBeGreaterThanOrEqual(returnAt);
-  await test.expect.poll(async () => (await persistedCatchUp())?.tick ?? 0).toBeGreaterThan(900);
+  // RD-2 (30 sep 2026): la ausencia se paga entera **o se para en el aviso de
+  // un asalto**, que queda pendiente para que el jugador lo vea venir. Nunca
+  // se queda a medias sin motivo.
+  await test.expect.poll(async () => {
+    const saved = await persistedCatchUp();
+    return (saved?.tick ?? 0) > 900 || saved?.warned === true;
+  }).toBe(true);
   // Y eso **con el parte todavía en pantalla**, que es lo que la propiedad
   // pide: cerrar sobre la bienvenida no puede devolver el estado de antes.
   // Aquí había además un «menos de dos segundos después de volver», que era un
@@ -964,7 +1051,9 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
   // partida real que haya tocado esta vez.
   await welcome.click();
   await test.expect(welcome).toBeHidden();
-  await test.expect(page.locator('.valley-date')).not.toContainText('Year 1');
+  // «Year 1 ·» y no «Year 1»: desde RD-2 la ausencia puede pararse en el aviso
+  // de un asalto en el año 10–19, y «Year 13» contiene «Year 1» (CI, PR #21).
+  await test.expect(page.locator('.valley-date')).not.toContainText('Year 1 ·');
 });
 
 test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruinas (§13.3)', async ({ page }) => {
