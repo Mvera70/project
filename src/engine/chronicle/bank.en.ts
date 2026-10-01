@@ -991,7 +991,7 @@ export const BANK: Record<string, string[]> = {
   'lost.found_at_dusk': [
     'The lost child was found at dusk by the ford, cold and whole, after the whole valley had searched the river.',
     'They found the child at nightfall that {season}, asleep under the alders. Nobody slept much.',
-    'Found by the ford at last, in year {year}, cold and frightened. The valley had looked everywhere else first.',
+    'Found by the ford in year {year}, cold and frightened. The valley had looked everywhere else first.',
   ],
   'fate.stranger_passes': [
     'A stranger came through the valley in {season}, stayed one night, and left {silver} silver for the bed.',

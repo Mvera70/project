@@ -291,7 +291,7 @@ export function castOf(
 
   // RD-4 · Y el niño perdido (`lost-child.ts`): quieto en la linde, o volviendo
   // a casa. Es un vecino de verdad, con su id y su cara.
-  const lost = life.lostChild;
+  const lost = life.lostChild ?? null;
   if (lost !== null && lostInSight(lost)) {
     const { body } = lost;
     const moving = Math.hypot(body.vx, body.vz) > 0.05;

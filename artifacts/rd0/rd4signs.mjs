@@ -12,6 +12,10 @@ const sel = which === 'lost' ? '.lost-sign' : '.visit-sign';
 const exe = browserExe();
 const browser = await chromium.launch({ ...(exe ? { executablePath: exe } : {}), args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
 const tab = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
+const quality = opt('quality', 'low');
+await tab.addInitScript((level) => {
+  try { localStorage.setItem('valley.graphics', JSON.stringify({ quality: level, frameRate: 60 })); } catch { /* sin almacenamiento */ }
+}, quality);
 await tab.goto(`file://${page}`);
 await tab.locator('.title-scrim').waitFor({ timeout: 20000 });
 await tab.locator('#valley-seed').fill(seed);
@@ -22,6 +26,21 @@ await tab.evaluate(() => document.querySelector('.title-new').click());
 await tab.waitForFunction(() => typeof window.__valleyLife === 'function', null, { timeout: 240000 });
 const t0 = Date.now();
 const row = { seed, year, which };
+// `--advance N`: el navegador de pruebas va a ~3 fps y cada fotograma da tres
+// pasos de vida (el delta está acotado), así que la aldea anda a un tercio y el
+// que viene a vender no llega antes de irse. Con el reloj parado y la vida a
+// pasos fijos (`__valleyAdvance`) se ve lo que vería un móvil a 30 fps.
+const advance = Number(opt('advance', '0'));
+if (advance > 0) {
+  await tab.waitForTimeout(3000);
+  await tab.evaluate(() => window.__valleySpeed?.(0));
+  for (let k = 0; k < advance; k += 1) {
+    await tab.evaluate(() => window.__valleyAdvance?.(150));
+    await tab.waitForTimeout(400);
+    const seen = await tab.evaluate((s) => { const g = document.querySelector(s); return g !== null && !g.hidden; }, sel);
+    if (seen) { row.advancedSteps = (k + 1) * 150; break; }
+  }
+}
 let sign = null;
 while (Date.now() - t0 < 240000) {
   sign = await tab.evaluate((s) => {

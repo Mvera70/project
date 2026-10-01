@@ -1,5 +1,19 @@
 # Cuaderno de tareas — el rework
 
+## 1 oct 2026 · RD-4: niño perdido y visita, como señales (v5.46–v5.47)
+
+Rama `claude/rd4-senales` (sobre `claude/rd1-vado`). Hecho: la visita (señal
+sobre el vendedor en la plaza, trato cerrado con él delante) y el niño perdido
+(dos días en la linde con señal, acto `search`, cierre la semana siguiente).
+Medido: en Node el tratante espera en la plaza de la fase 0,30 a la 0,60
+(semillas 28 y 33), así que la señal se ve unos 36 s por día a ×1 durante sus
+tres días; el niño, en la semilla 23 año 6, señal visible y sin tapar a los
+8 s, y quien va a buscarlo llega entre la fase 0,35 y la 0,75 en las semillas
+7, 23 y 41. **Sin captura de la visita**: Chromium por software va a ~3 fps, el
+delta está acotado y la vida anda a un tercio, así que el tratante no llega a
+la plaza antes de irse; en un móvil a 30 fps no pasa. Queda: lectura humana y
+medida en dispositivo.
+
 ## 30 sep 2026 · RD-1b: el forastero del vado (v5.44)
 
 La primera elección del valle llega a ×1 entre el minuto 4,6 y el 5,1: el

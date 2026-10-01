@@ -1,5 +1,23 @@
 # The Valley — Registro de cambios
 
+## v5.47 · 1 oct 2026 · RD-4: el niño perdido, en dos tiempos y con señal
+
+Decisión de Vera tras RD-0 («niño perdido + visita»). El suceso `child_lost`
+ya no se pierde y se encuentra en la misma línea: la semana del suceso el niño
+espera en la linde con una señal; tocarla manda al adulto libre más cercano
+(acto `search`), y la semana siguiente quien fue lo trae —el ánimo vuelve y el
+niño se lo debe— o lo encuentra el valle al anochecer. Sin azar nuevo; las
+claves viejas siguen en el banco. Tres líneas nuevas con su imagen pedida en
+`plan-arte-pendiente.md`. §7.10 al día. Pruebas: `lost-child.test.ts`,
+`life-lost-child.test.ts`.
+
+## v5.46 · 1 oct 2026 · RD-4: la visita como señal
+
+El que sube a vender espera en la plaza con unas monedas encima; tocarlas
+cierra el trato con él delante (`dealVisit`, `LiveDeal`) y el motor lo apunta
+al cerrar la semana. La voz conserva sus botones cuando él no está a la vista.
+Prueba: `visit-sign.test.ts`.
+
 ## v5.44 · 30 sep 2026 · RD-1: el forastero del vado, la primera elección antes del minuto diez
 
 Decisión de Vera tras RD-0: la primera elección es «Uno en el vado», desde la
