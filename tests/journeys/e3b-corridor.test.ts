@@ -5,7 +5,7 @@ import { TERRAIN_CODE } from '../../src/engine/state';
 import { run } from '../../src/engine/sim';
 import { CATALOG } from '../../src/engine/crossroads/catalog';
 import { elevatedRingOf, type ElevatedRingVariant } from '../../src/derive/elevated-ring';
-import { planRingCorridorMoves } from '../../src/engine/world/placement';
+import { planRingCorridorMoves, ringCorridorConflicts } from '../../src/engine/world/placement';
 import { sceneRingOf } from '../../src/render3d/world/plan';
 import { createVillage } from '../../src/render3d/life/village';
 import { forestLooks } from '../../src/render3d/world/forest-state';
@@ -123,14 +123,14 @@ describe('E3b · pasillo interior de una villa real', () => {
       .toBe(false);
   });
 
-  // RD-3 (1 oct 2026) · con su catálogo, **ninguna villa de las semillas 1 a 26**
-  // tiene un anillo cerrado que sólo los árboles bloquean y que al talarlos
-  // quede listo: medidas a los 3846 ticks, las que el bosque bloquea (3, 4, 22)
-  // destapan otro defecto al despejarlo (`interior` o `variant`), y el resto
-  // ni siquiera tiene árboles en el anillo (12 `variant`, 8 `interior`, 2 con
-  // hueco, una lista). La propiedad se queda intacta y la prueba declarada,
-  // hasta que una trayectoria vuelva a dar una villa así.
-  it.fails('una villa bloquea los árboles reales y reabre la ruta al despejarlos', () => {
+  // RD-3 (1 oct 2026) · con su catálogo, en su rama, **ninguna villa de las
+  // semillas 1 a 26** tenía un anillo cerrado que sólo los árboles bloquean y que
+  // al talarlos quedara listo, y la prueba se declaró. **Con RD-0 a RD-6 juntos
+  // en `main` (v5.52, 1 oct 2026) una de las candidatas vuelve a darla** —la CI
+  // de `main` lo dijo con «Expect test to fail»—, así que vuelve a ser una
+  // prueba. K1 (el bosque de dentro del cerco se tala antes) la puede volver a
+  // mover: si ninguna candidata la da, se declara otra vez con lo medido.
+  it('una villa bloquea los árboles reales y reabre la ruta al despejarlos', () => {
     // Precondición: un anillo cerrado que sólo los árboles impiden —al talarlos
     // la geometría queda lista—. La talla se hace sobre una copia, para no
     // gastar una partida entera por candidata.
@@ -276,7 +276,41 @@ describe('E3b · pasillo interior de una villa real', () => {
     expect(bastion).toBeDefined();
     const ring = elevatedRingOf(village, bastion!, { approvedVariants: all, lane: 'center' });
     expect(ring.topologyClosed).toBe(true);
-    expect(ring.segments.some(segment => segment.reason === 'interior')).toBe(false);
-    expect(ring.geometryReady).toBe(true);
+    // Lo que el traslado promete: **nada de lo que había** vuelve a estar en el
+    // pasillo. Lo que se levante después es el hueco del motor de arriba, y va
+    // aparte (la prueba siguiente). Con RD-0 a RD-6 juntos (v5.52) la primera
+    // candidata con plan es justo una de ésas, y la CI de `main` se puso roja
+    // mirando el adarve entero.
+    const before = new Set(beforeBuildings.map(building => building.id));
+    expect(ringCorridorConflicts(village).filter(building => before.has(building.id)).map(building => building.id))
+      .toEqual([]);
+  });
+
+  // El hueco del motor, medido y declarado (1 oct 2026): el traslado aparta lo
+  // que hay, pero no reserva el pasillo para lo que venga, y una casa de piedra
+  // levantada después vuelve a cortar el adarve (la 35 y la 39 con RD-1; con
+  // RD-0 a RD-6 juntos, la primera candidata con plan). La propiedad entera
+  // —toda villa que planifica su traslado acaba con el adarve libre— se queda
+  // escrita hasta que el motor reserve el pasillo.
+  it.fails('y el adarve queda libre también de lo que se levanta después', () => {
+    let measured = 0;
+    for (const seed of [31, 32, 37, 39, 20, 12, 26, 15, 19, 33]) {
+      const village = played(seed, 2000);
+      const moves = planRingCorridorMoves(village);
+      if (moves === null || moves.length === 0) continue;
+      for (const move of moves) {
+        const building = village.buildings.find(item => item.id === move.buildingId)!;
+        building.x = move.to.x;
+        building.y = move.to.y;
+      }
+      run(village, 1846, 'prudent', CATALOG);
+      const bastion = ringOf(village);
+      if (bastion === undefined) continue;
+      measured += 1;
+      const ring = elevatedRingOf(village, bastion, { approvedVariants: all, lane: 'center' });
+      expect(ring.segments.some(segment => segment.reason === 'interior'), `semilla ${seed}`).toBe(false);
+      expect(ring.geometryReady, `semilla ${seed}`).toBe(true);
+    }
+    expect(measured).toBeGreaterThan(0);
   });
 });
