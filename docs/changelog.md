@@ -1,8 +1,8 @@
 # The Valley — Registro de cambios
 
-## v5.54 · 2 oct 2026 · Lo que Vera vio en la tablet: laderas, piedras y crónica
+## v5.54 · 2 oct 2026 · Lo que Vera vio en la tablet: laderas, piedras, crónica y encrucijada
 
-Tres cosas que Vera marcó jugando la versión publicada, en la tablet.
+Cuatro cosas que Vera marcó jugando la versión publicada, en la tablet.
 
 - **Las laderas desde arriba** («no se mezclan los colores; desde arriba es
   muy feo»). La causa era el dibujo y no el color: la piel facetada de la
@@ -23,6 +23,16 @@ Tres cosas que Vera marcó jugando la versión publicada, en la tablet.
   era una franja de 130 px y los grabados son 5:4. Ahora es 2:1, hasta 260 px,
   con el recorte al 28 % de alto en vez de al centro. El óvalo de respaldo
   sigue como estaba.
+
+- **La encrucijada, como la hoja del carro** («similar a estas», viendo las
+  dos en la tablet). Era papel de documento a todo el ancho con el canto
+  rasgado de Codex estirado encima, que en la tablet se leía como un recuadro
+  vacío sobre el título; y el texto se iba al canto izquierdo porque el atajo
+  `margin: 12px 0 18px` de `wood.css` pisaba el `margin-inline: auto` de la
+  columna de 390. Ahora lleva el pergamino de loseta de las hojas de la
+  carcasa, sus esquinas de 14 px, su sombra y su tirador (deslizar la cabecera
+  aparca la decisión, §11.2), y título, texto y opciones van en la misma
+  columna. Capturado a 390, 750 y 1024 px.
 
 Pruebas nuevas: «el suelo no asoma por la piel de la montaña»
 (`graphics-mountains`) y «las piedras de la calzada son cantos bajos y no hay
