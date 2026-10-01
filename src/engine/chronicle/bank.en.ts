@@ -2355,10 +2355,12 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
   'welcome.pending.crossroad': [
     'A question is still waiting: {title}.',
     'Still unanswered: {title}.',
+    'The valley has not forgotten the question: {title}.',
   ],
   'welcome.pending.raid': [
     'Riders were seen on the far ridge. They come in {weeks} weeks.',
     'The valley woke to a warning: raiders, {weeks} weeks off.',
+    'Smoke on the ridge road: the clan is {weeks} weeks away.',
   ],
 
   // --- the founding (U-04) ---
