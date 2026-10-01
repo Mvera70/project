@@ -2599,19 +2599,19 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
   ],
   // RD-5 · lo que vuelve del vado en la primera hora (`hamlet.ts`).
   'consequence.he_knew_the_axe': [
-    'The man taken in at the ford knew his way round an axe. By the end of the month the woodpile had grown by a stack.',
-    'Whatever else he was, the man from the ford could split wood. The valley had a winter\'s start of it in a few weeks.',
-    'In year {year} the stranger from the ford earned his bread at the woodpile, and the others stopped watching him.',
+    'The man taken in at the ford knew an axe. {weeks} weeks on, the woodpile had grown by a stack.',
+    'Whatever else he was, the man from the ford could split wood: {weeks} weeks, and a winter\'s start of it.',
+    '{weeks} weeks after the ford, the stranger earned his bread at the woodpile. The others stopped watching him.',
   ],
   'consequence.he_came_back_with_fish': [
-    'The man fed at the ford and sent on came back down the road a few weeks later with a string of trout, and would not stay for supper.',
-    'A string of fish left on the stone at the ford in year {year}. Nobody saw who left it, and everyone knew.',
-    'He came back once, the man they had fed and sent on, with fish from upriver. Then the road had him again.',
+    'The man fed at the ford came back {weeks} weeks later with a string of trout, and would not stay.',
+    'A string of fish on the stone at the ford, {weeks} weeks after the bread. Nobody saw who left it.',
+    'He came back once, {weeks} weeks on, the man they had fed and sent away, with fish from upriver.',
   ],
   'consequence.tracks_from_the_ford': [
-    'Grain went missing from the store a few weeks after the man was turned away at the ford. The tracks went back to the water.',
-    'In year {year} someone emptied a sack in the night. The footprints led to the ford and stopped there.',
-    'The man turned away at the ford had not gone far. A sack of grain went with him when he finally did.',
+    '{weeks} weeks after the man was turned away, grain went missing. The tracks went back to the ford.',
+    'Someone emptied a sack in the night, {weeks} weeks after the ford. The footprints stopped at the water.',
+    'The man turned away at the ford had not gone far. {weeks} weeks on, a sack of grain went with him.',
   ],
   'consequence.what_he_was_running_from': [
     'Riders asked after the man taken in at the ford in year {sinceYear}, {years} years on.',

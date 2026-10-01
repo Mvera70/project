@@ -1,5 +1,21 @@
 # Cuaderno de tareas — el rework
 
+## 1 oct 2026 · RD-5: el primer año (v5.49–v5.51)
+
+Rama `claude/rd5-primer-ano` (sobre `claude/rd4-senales`). Medido antes y
+después con 8 semillas, primer año a ×1 (una hora ≈ 4 semanas), entradas de
+crónica por valle sin contar estaciones:
+
+| Tramo a ×1 | Antes | Después |
+|---|---|---|
+| 0–1 h | 6,75 | 7,50 |
+| 1–3 h | 5,13 | 6,38 |
+| 3–6 h (la meseta) | 2,75 | 3,88 (11 claves) |
+| 6–10 h | 10,4 | 11,75 |
+
+Ningún valle acabado en el primer año, antes ni después. Capturas de la meta
+en `docs/medidas/rd0-img/rd5-meta-*.jpg`. Queda: el recorrido humano.
+
 ## 1 oct 2026 · RD-4: niño perdido y visita, como señales (v5.46–v5.47)
 
 Rama `claude/rd4-senales` (sobre `claude/rd1-vado`). Hecho: la visita (señal

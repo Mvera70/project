@@ -1,5 +1,16 @@
 # The Valley — Registro de cambios
 
+## v5.49–v5.51 · 1 oct 2026 · RD-5: el primer año, con cosas entre medias
+
+Lo que eligió Vera para RD-5: consecuencias que vuelven, sucesos pequeños del
+caserío y metas a la vista. **v5.49**: las tres respuestas del vado plantan una
+consecuencia a las 2–3 semanas (`delayWeeks`, por hash). **v5.50**: miel,
+setas, zorro y primera helada, con su propia tirada sólo en caseríos de menos
+de diez, sin azar del motor; la prueba de cadencia de R-1 excluye estos
+cuatro con su motivo. **v5.51**: la meta a la vista bajo la era
+(`derive/goal.ts`, `shell.setGoal`). Siete líneas nuevas de crónica, cuatro
+imágenes pedidas. Pruebas: `founding-ford` (RD-5), `hamlet-happenings`, `goal`.
+
 ## v5.47 · 1 oct 2026 · RD-4: el niño perdido, en dos tiempos y con señal
 
 Decisión de Vera tras RD-0 («niño perdido + visita»). El suceso `child_lost`

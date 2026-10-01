@@ -2345,6 +2345,29 @@ esa misma jornada, y la semana siguiente no vuelve a cerrarlo (`LiveDeal`).
 Cuando no está a la vista —ya se fue, o no hay escena— la voz conserva sus dos
 toques y la oferta vive sus dos semanas como antes.
 
+**Y desde v5.49–v5.51 (1 oct 2026, RD-5) el primer año tiene cosas entre
+medias.** A ×1 una hora real es un mes de juego y el primer año son doce
+horas; RD-5 midió en ocho semillas una meseta de la hora 3 a la 6 (2,75
+entradas de crónica por valle en tres horas) y ninguna consecuencia que
+volviera. Tres piezas, pedidas por Vera:
+
+- **Lo que se contestó en el vado vuelve en la primera hora.** Cada respuesta
+  planta una consecuencia corta (`delayWeeks: [2, 3]`, §8.5), sorteada con un
+  hash y no con el flujo `crossroads`: acogido, sabe de hacha (leña);
+  alimentado y despedido, vuelve con pescado; echado, falta grano y las
+  huellas van al vado.
+- **Los sucesos pequeños del caserío** —miel silvestre, setas tras la lluvia,
+  el zorro en las gallinas, la primera helada— tienen **su propia tirada**:
+  sólo si el sorteo de la semana no trajo nada, sólo con menos de
+  `FATE.HAMLET_PEOPLE` (10), con `FATE.HAMLET_CHANCE` (0,3), y de un hash, sin
+  consumir azar del motor. Ninguno destruye nada. Una miel por verano y un
+  zorro cada doce semanas como mucho. Medido: la meseta pasa a 3,88 entradas
+  por valle y 11 claves distintas, sin ningún valle acabado en el primer año.
+- **La meta a la vista** (`derive/goal.ts`): una línea bajo la era de la
+  bandeja —la primera cosecha con su cuenta atrás, las diez almas, la obra que
+  espera leña con lo que le falta, la fragua, la muralla—. Nace del estado y
+  se cumple sola; el jugador la acerca o la aleja.
+
 **Y desde v4.63 (26 sep 2026) la riada se ve en el río, no sólo en el vado.**
 Hasta entonces `river_flood` sólo se enseñaba con gente reunida en el vado; el
 agua no subía. `derive/flood.ts` (`floodOf`) dice, puro y sin tocar el estado,

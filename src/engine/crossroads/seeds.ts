@@ -76,6 +76,8 @@ export function fireSeeds(state: GameState, catalogue: Catalogue): FiredSeed[] {
           // the decision was taken and which one it was.
           sinceYear: yearOf(seed.plantedTick),
           years: yearOf(state.tick) - yearOf(seed.plantedTick),
+          // RD-5 · las consecuencias cortas (`delayWeeks`) lo cuentan en semanas.
+          weeks: state.tick - seed.plantedTick,
           ...namesInSeed(state, seed),
         },
         weight: 3,

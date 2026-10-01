@@ -184,8 +184,11 @@ describe('el catálogo · forma', () => {
     for (const t of CATALOG) {
       for (const o of t.options) {
         for (const s of o.seeds) {
-          expect(s.delayYears[0], `${t.id}.${o.id}.${s.id}`).toBeGreaterThan(0);
-          expect(s.delayYears[1], `${t.id}.${o.id}.${s.id}`).toBeGreaterThanOrEqual(s.delayYears[0]);
+          // RD-5 · una consecuencia corta lleva su retraso en semanas, y entonces
+          // es ése el que tiene que ser creciente y no nulo.
+          const delay = s.delayWeeks ?? s.delayYears;
+          expect(delay[0], `${t.id}.${o.id}.${s.id}`).toBeGreaterThan(0);
+          expect(delay[1], `${t.id}.${o.id}.${s.id}`).toBeGreaterThanOrEqual(delay[0]);
           expect(s.chronicleKey, `${t.id}.${o.id}.${s.id}`).toMatch(/^consequence\./);
         }
       }
@@ -236,7 +239,9 @@ describe('el catálogo · los textos', () => {
       for (const o of t.options) {
         for (const s of o.seeds) {
           for (const variant of BANK[s.chronicleKey] ?? []) {
-            const cites = variant.includes('{years}') || variant.includes('{sinceYear}');
+            // RD-5 · y una corta lo cita en semanas (`{weeks}`, `fireSeeds`).
+            const cites = variant.includes('{years}') || variant.includes('{sinceYear}')
+              || (s.delayWeeks !== undefined && variant.includes('{weeks}'));
             expect(cites, `${s.chronicleKey}: ${variant}`).toBe(true);
           }
         }
