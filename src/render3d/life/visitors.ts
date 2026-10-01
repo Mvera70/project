@@ -66,8 +66,11 @@ export interface Visitor {
   readonly beast: { readonly kind: 'mule' | 'cow'; x: number; z: number; moving: boolean; home?: boolean } | null;
   /** Por dónde ha pisado, para que la mula lo siga sin atajar por una casa. */
   readonly trail: Point[];
-  /** Si viene a cerrar el trato que el jugador aceptó (`visitsToday`). */
-  readonly dealt: boolean;
+  /**
+   * Si viene a cerrar el trato que el jugador aceptó (`visitsToday`). RD-4:
+   * cambia a media jornada si el jugador toca su señal mientras espera.
+   */
+  dealt: boolean;
   /** Si ya lleva lo que compró a lomos de la mula: se carga al irse. */
   loaded: boolean;
   /** El pasto adonde se lleva la vaca vendida, y la ruta que sigue hasta él. */
@@ -217,6 +220,18 @@ export function fordToday(
 }
 
 /**
+ * RD-4 (Vera, 1 oct 2026) · **El trato que se cerró con él delante**: el
+ * jugador tocó la señal del que espera en la plaza la semana `tick`. El motor
+ * lo apunta al cerrar esa semana (§2.60), pero la aldea ya le ha llevado lo
+ * suyo: los días que le quedan en la plaza son de trato hecho, y la semana
+ * siguiente no vuelve a cerrarlo.
+ */
+export interface LiveDeal {
+  readonly kind: HappeningId;
+  readonly tick: number;
+}
+
+/**
  * Quién viene hoy por el camino: el suceso de esta semana, si trae a alguien y
  * hoy es uno de sus días; y **el que vuelve a cerrar el trato**.
  *
@@ -229,6 +244,7 @@ export function fordToday(
  */
 export function visitsToday(
   state: GameState, day: number, daysPerWeek: number, fordAnswer: 'in' | 'out' | null = null,
+  liveDeal: LiveDeal | null = null,
 ): VisitToday[] {
   const out: VisitToday[] = [];
   const dayOfWeek = day - state.tick * daysPerWeek;
@@ -239,12 +255,14 @@ export function visitsToday(
     if (happening.tick !== state.tick) continue;
     const visit = VISITS[happening.id];
     if (visit === undefined || dayOfWeek >= visit.days) continue;
-    out.push({ kind: happening.id, dealt: false });
+    out.push({ kind: happening.id, dealt: liveDeal?.kind === happening.id && liveDeal.tick === state.tick });
   }
   if (dayOfWeek === 0) {
     for (const entry of state.chronicle) {
       if (entry.tick !== state.tick || !entry.templateKey.startsWith('offer.') || !entry.templateKey.endsWith('.taken')) continue;
       const kind = entry.templateKey.slice('offer.'.length, -'.taken'.length) as HappeningId;
+      // RD-4 · el trato ya se cerró delante de él: no vuelve a cerrarlo.
+      if (liveDeal?.kind === kind && liveDeal.tick === state.tick - 1) continue;
       if (VISITS[kind] !== undefined && !out.some((visit) => visit.kind === kind)) out.push({ kind, dealt: true });
     }
   }

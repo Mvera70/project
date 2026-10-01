@@ -2,7 +2,7 @@
 
 import type { GraphicsSettings } from './profile';
 import type { SkyKind } from '../derive/weather';
-import type { GameState, PlayerAct, Role, VillagerId } from '../engine/state';
+import type { GameState, HappeningId, PlayerAct, Role, VillagerId } from '../engine/state';
 import type { ClipName } from './clips';
 import type { Occupation } from './world/models';
 import type { Era } from '../derive/era';
@@ -275,6 +275,13 @@ export interface GraphicsRenderer {
   fordSign(): { x: number; y: number; hidden: boolean } | null;
   /** RD-1 · Contestar al forastero del vado en la escena, antes de que el motor lo apunte. */
   answerFord(optionId: string): void;
+  /**
+   * RD-4 · Dónde va la señal del que vino a vender —sólo mientras espera en la
+   * plaza con el trato sin cerrar—, o `null`.
+   */
+  visitSign(kind: HappeningId): { x: number; y: number; hidden: boolean } | null;
+  /** RD-4 · Cerrar el trato en la escena, la semana `tick`, antes de que el motor lo apunte. */
+  dealVisit(kind: HappeningId, tick: number): boolean;
   /** Esquema 12 · los «+1» y «−N» de la leñera, proyectados; `age` va de 0 a 1. */
   woodGains(): readonly { id: number; count: number; x: number; y: number; age: number; icon?: 'logs' | 'wheat' }[];
   /** Parte de la cacería, entregado una sola vez al motor. */

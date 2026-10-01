@@ -12,7 +12,7 @@
 
 import { readGraphicsSettings } from './graphics-settings';
 import { WORLD } from '@engine/balance';
-import type { GameState } from '@engine/state';
+import type { GameState, HappeningId } from '@engine/state';
 import type { HuntSpecies, HuntWeapon } from '@engine/world/hunting';
 import type { ActorDoing, BattleReport, GraphicsStats } from '../render3d/contracts';
 import type { InspectTarget } from './inspect';
@@ -69,6 +69,10 @@ interface ValleyBackend {
   fordSign(): { x: number; y: number; hidden: boolean } | null;
   /** RD-1 · Contestar al forastero del vado en la escena. */
   answerFord(optionId: string): void;
+  /** RD-4 · Dónde va la señal del que vino a vender y espera en la plaza, o `null`. */
+  visitSign(kind: HappeningId): { x: number; y: number; hidden: boolean } | null;
+  /** RD-4 · Cerrar el trato en la escena: la aldea sale a llevarle lo suyo. */
+  dealVisit(kind: HappeningId, tick: number): boolean;
   /** Esquema 12 · los «+1» y «−N» de la leñera, proyectados; `age` va de 0 a 1. */
   woodGains(): readonly { id: number; count: number; x: number; y: number; age: number; icon?: 'logs' | 'wheat' }[];
   /** Completed hunt report, consumed once by the UI and forwarded to the engine. */
@@ -190,6 +194,8 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     huntSign() { return null; },
     fordSign() { return null; },
     answerFord() { /* Canvas: sin escena, la tarjeta basta. */ },
+    visitSign() { return null; },
+    dealVisit() { return false; },
     woodGains() { return []; },
     hunt() { return null; },
     siege() { return null; },
@@ -424,6 +430,8 @@ export function attachBackend(
         huntSign() { return renderer.huntSign(); },
         fordSign() { return renderer.fordSign(); },
         answerFord(optionId) { renderer.answerFord(optionId); },
+        visitSign(kind) { return renderer.visitSign(kind); },
+        dealVisit(kind, tick) { return renderer.dealVisit(kind, tick); },
         woodGains() { return renderer.woodGains(); },
         hunt() { return renderer.hunt(); },
         siege() { return renderer.siege(); },

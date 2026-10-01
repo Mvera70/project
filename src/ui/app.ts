@@ -22,6 +22,7 @@ import { eraOf, uiMaterialOf } from '@derive/era';
 import { vitalsOf } from './vitals';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { offerLine } from './offer-line';
+import { canAccept } from '@engine/world/road';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
 import { tick, type TickReport } from '@engine/sim';
@@ -678,6 +679,45 @@ export function boot(
     fordSign.tabIndex = at.hidden ? -1 : 0;
   };
 
+  // RD-4 (Vera, 1 oct 2026) · **La visita, como señal en el mapa.** El que
+  // sube a vender espera en la plaza sus tres días con unas monedas encima;
+  // tocarlas es cerrar el trato, y la aldea sale ya, desde donde esté, a
+  // llevarle la leña o el grano o a pagarle (`dealVisit`). El motor lo apunta
+  // al cerrar la semana, como cualquier acto (§2.60). Cuando él no está a la
+  // vista —ya se fue, o no hay escena— la voz conserva sus dos toques: la
+  // oferta vive sus dos semanas igual que antes.
+  const visitSign = document.createElement('button');
+  visitSign.type = 'button';
+  visitSign.className = 'hunt-sign visit-sign';
+  visitSign.hidden = true;
+  visitSign.innerHTML = '<svg aria-hidden="true" focusable="false"><use href="#silver"/></svg>';
+  let visitSignShown = false;
+  visitSign.addEventListener('click', () => {
+    const offer = state.offer;
+    if (offer === null || visitSign.classList.contains('hunt-sign--covered') || backend.live.kind !== 'pilot3d') return;
+    if (pendingActs.some((act) => act.kind === 'offer') || !canAccept(state, offer)) return;
+    if (!backend.live.dealVisit(offer.id, state.tick)) return;
+    pendingActs.push({ kind: 'offer', accept: true });
+    visitSign.hidden = true;
+    visitSignShown = false;
+  });
+  /** La señal sigue al vendedor mientras espera en la plaza con el trato sin cerrar. */
+  const placeVisitSign = (): void => {
+    const offer = state.offer;
+    const open = offer !== null && state.ended === null && currentRoute.kind === 'valley'
+      && !pendingActs.some((act) => act.kind === 'offer') && canAccept(state, offer)
+      && !document.documentElement.classList.contains('crossroad-open');
+    const at = open && backend.live.kind === 'pilot3d' ? backend.live.visitSign(offer!.id) : null;
+    visitSignShown = at !== null;
+    visitSign.hidden = at === null;
+    if (at === null) return;
+    const box = backend.live.surface.getBoundingClientRect();
+    visitSign.style.transform = `translate(${Math.round(box.left + at.x)}px, ${Math.round(box.top + at.y)}px) translate(-50%, -50%)`;
+    visitSign.setAttribute('aria-label', offerLine(offer!));
+    visitSign.classList.toggle('hunt-sign--covered', at.hidden);
+    visitSign.tabIndex = at.hidden ? -1 : 0;
+  };
+
   const hudRight = document.createElement('div');
   // UI-V2b · la segunda clase es la que sube el rincón por encima de la
   // bandeja (`skin.css`): la regla de `index.html` lo dejaba a 60 px del
@@ -688,7 +728,7 @@ export function boot(
   cameraControls = mountCameraControls(() => backend.live, () => backend.live.surface);
   hudRight.append(bareToggle, soundToggle, hud.speedControls, hud.speedBadge);
 
-  root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, fordSign, woodGains.element, shell.element);
+  root.append(canvas, hud.header, hudRight, cameraControls.compass, huntSign, fordSign, visitSign, woodGains.element, shell.element);
 
   /**
    * **UI-R1 · la pila del mensaje, y el fallo concreto que esta ronda tiene
@@ -1104,7 +1144,10 @@ export function boot(
     shell.voice.dataset.role = now?.role ?? '';
     // Los dos toques sólo cuando lo que se lee **es** la oferta: si un suceso la
     // está tapando, contestar a ciegas sería contestar a otra cosa.
-    shell.setOffer(now?.role === 'offer', (accept) => {
+    // RD-4 · mientras el vendedor espera con su señal encima, el trato se
+    // cierra tocándolo a él; los dos toques de la voz quedan para cuando no
+    // está a la vista.
+    shell.setOffer(now?.role === 'offer' && !visitSignShown, (accept) => {
       // Como una decisión (§2.60, regla 2): espera a que cierre su semana
       // (RD-1, Vera, 30 sep 2026: a ×1 nada salta).
       pendingActs.push({ kind: 'offer', accept });
@@ -1114,6 +1157,7 @@ export function boot(
     renderer.paint(state, fraction);
     placeHuntSign();
     placeFordSign();
+    placeVisitSign();
     woodGains.paint(
       currentRoute.kind === 'valley' && backend.live.kind === 'pilot3d' ? backend.live.woodGains() : [],
       backend.live.kind === 'pilot3d' ? backend.live.surface.getBoundingClientRect() : null,

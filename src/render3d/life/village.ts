@@ -58,7 +58,7 @@ import {
 } from './raiders';
 import type { HappeningId } from '@engine/state';
 import { createTravellers, returningToday, stepTraveller, travelling, type Traveller } from './expeditions';
-import { answerFordStranger, arrivingToday, beastOf, createVisitors, stallOf, stallSiteOf, stayForGoods, stepVisitor, visiting, visitsToday, type Visitor } from './visitors';
+import { answerFordStranger, arrivingToday, beastOf, createVisitors, stallOf, stallSiteOf, stayForGoods, stepVisitor, visiting, visitsToday, type LiveDeal, type Visitor } from './visitors';
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
@@ -382,6 +382,11 @@ export interface Village {
   /** RD-1 · contestar al forastero del vado ahora: sube a la plaza o se va por donde vino. */
   answerFord(answer: 'in' | 'out'): void;
   /**
+   * RD-4 · cerrar ahora el trato con el que espera en la plaza: `false` si
+   * hoy no hay nadie de esa visita esperando.
+   */
+  dealVisit(kind: HappeningId): boolean;
+  /**
    * §7.15 · Los que salen de expedición, están en el bosque o vuelven hoy
    * (`expeditions.ts`). Son vecinos de verdad —llevan su `VillagerId`— pero
    * ese día no viven en casa, así que van por su lista.
@@ -507,6 +512,8 @@ export interface DayOptions {
    * plaza; despedido, ya se fue.
    */
   readonly fordAnswer?: 'in' | 'out' | null;
+  /** RD-4 · el trato que el jugador cerró con el vendedor delante (`LiveDeal`). */
+  readonly liveDeal?: LiveDeal | null;
   /** Gancho de observación: el cielo de hoy, en vez del de `skyAt` (`window.__valleyHoldSky`). */
   readonly sky?: SkyKind;
   /**
@@ -1211,7 +1218,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const visitors: Visitor[] = createVisitors(state, land, heart,
     { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 }, seed,
     options.visits?.map((kind) => ({ kind, dealt: options.dealt === true }))
-      ?? visitsToday(state, day, TIME.DAYS_PER_WEEK, options.fordAnswer ?? null), pastureHeart);
+      ?? visitsToday(state, day, TIME.DAYS_PER_WEEK, options.fordAnswer ?? null, options.liveDeal ?? null), pastureHeart);
   // El valle más vivo · **lo que se vende, a la vista.** Con el trato cerrado,
   // dos o tres vecinos llevan la leña (buhonero) o el grano (factor) desde la
   // leñera o el granero hasta el sitio del puesto, por la misma maquinaria de
@@ -1223,10 +1230,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const payments: Payment[] = [];
   // Los tratos en que la aldea compra (vaca, sal) y quién va a pagar.
   const buyers = new Map<number, { payer: VillagerId | null; paid: boolean }>();
-  for (const visitor of visitors) {
-    if (!visitor.dealt || (visitor.kind !== 'pedlar' && visitor.kind !== 'factor_visit')) continue;
+  const planTrade = (visitor: Visitor): void => {
+    if (!visitor.dealt || (visitor.kind !== 'pedlar' && visitor.kind !== 'factor_visit')) return;
     const site = stallSiteOf(visitor);
-    if (site === null) continue;
+    if (site === null) return;
     const sites = tradeSites(state, land, mine, visitor.kind === 'pedlar' ? 'bundle' : 'grain', site.front, String(visitor.body.id));
     const busy = new Set(preparationByVillager.keys());
     const trips = planCarry(state, land, dwellers.filter((dweller) => !busy.has(dweller.villager)
@@ -1238,7 +1245,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     // en el paso): la jornada se abre de noche, y un encargo puesto a esa hora
     // lo borraba la vuelta a casa —medido en tres semillas: cero bultos—.
     tradeStarts.push({ visitor, trips });
-  }
+  };
+  for (const visitor of visitors) planTrade(visitor);
   // D5 · el portón, como cosa que se rompe. Sólo existe en un asalto: en un
   // saqueo nadie lo toca.
   const gate: Gate | null = assault ? gateNow(state, heart) : null;
@@ -1600,6 +1608,17 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       for (const visitor of visitors) {
         answerFordStranger(visitor, land, { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 }, answer, steps);
       }
+    },
+    dealVisit(kind: HappeningId): boolean {
+      // RD-4 · el trato se cierra con él delante: la aldea sale ahora a
+      // llevarle la leña o el grano, o a pagarle la vaca o la sal, desde donde
+      // esté cada uno (`tradeStarts` y el pago, en el paso).
+      const visitor = visitors.find((one) => one.kind === kind && one.scene === undefined && !one.dealt
+        && (one.phase === 'coming' || one.phase === 'staying'));
+      if (visitor === undefined) return false;
+      for (const one of visitors) if (one.kind === kind && one.scene === undefined) one.dealt = true;
+      planTrade(visitor);
+      return true;
     },
     get travellers(): readonly Traveller[] { return travellers; },
     get payments(): readonly Payment[] { return payments; },

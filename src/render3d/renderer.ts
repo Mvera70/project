@@ -62,7 +62,7 @@ import { createYards } from './effects/yards';
 import { createBarks } from './effects/barks';
 import { createCoins } from './effects/coins';
 import { createStalls, STALL_ASSETS, type MuleLoad, type Stall } from './effects/stalls';
-import { stallOf } from './life/visitors';
+import { stallOf, type LiveDeal } from './life/visitors';
 import { yardsOf, type Yard } from '../derive/yards';
 import { festivityOf } from '@derive/festivity';
 import { buildGreatOak, type GreatOak } from './world/great-oak';
@@ -787,6 +787,12 @@ export async function createGraphicsRenderer(
    * escena ya lo enseña, también en las jornadas que se rehacen.
    */
   let fordAnswer: 'in' | 'out' | null = null;
+  /**
+   * RD-4 · el trato que el jugador cerró con el vendedor delante: vale para
+   * los días que le quedan en la plaza y para que la semana siguiente no
+   * vuelva a cerrarlo (`LiveDeal`).
+   */
+  let liveDeal: LiveDeal | null = null;
   let observedFrame: GraphicsFrame | null = null;
   let sampling = false;
   let observing = false;
@@ -2155,6 +2161,7 @@ export async function createGraphicsRenderer(
           ragdollSeed: (id, bornAt, placement) => cast.captureRagdoll(id, bornAt, placement),
           ...(forcedVisits === null ? {} : { visits: forcedVisits, dealt: forcedDeal }),
           fordAnswer: shown.crossroad?.templateId === FOUNDING_CROSSROAD.id ? fordAnswer : null,
+          liveDeal,
           ...(heldSky === null ? {} : { sky: heldSky }),
           ...(battleChoice === null ? {} : { battle: {
             raiders: battleChoice.raiders, garrison: garrisonAs(shown, battleChoice.hands, battleChoice.arm),
@@ -2805,6 +2812,24 @@ export async function createGraphicsRenderer(
     answerFord(optionId: string): void {
       fordAnswer = optionId === 'take_him_in' ? 'in' : 'out';
       life?.answerFord(fordAnswer);
+    },
+    visitSign(kind: HappeningId): { x: number; y: number; hidden: boolean } | null {
+      if (life === null) return null;
+      const seller = life.visitors.find((visitor) => visitor.kind === kind && visitor.scene === undefined
+        && !visitor.dealt && visitor.phase === 'staying');
+      if (seller === undefined) return null;
+      const at = seller.body;
+      const point = new Vector3(at.x, groundFloor(at.x, at.z) + HUNT_SIGN_LIFT + ACTOR_VISUAL_HEIGHT * 0.6, at.z).project(camera);
+      if (point.z > 1 || point.x < -1.05 || point.x > 1.05 || point.y < -1.05 || point.y > 1.05) return null;
+      const hidden = forest !== null && forest.hides(camera, {
+        x: at.x, y: groundFloor(at.x, at.z) + ACTOR_VISUAL_HEIGHT / 2, z: at.z, radius: HUNT_SIGN_COVER,
+      });
+      return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, hidden };
+    },
+    dealVisit(kind: HappeningId, tick: number): boolean {
+      if (life === null || !life.dealVisit(kind)) return false;
+      liveDeal = { kind, tick };
+      return true;
     },
     attackHunt(precision?: number): boolean { return huntScene?.attack(precision) ?? false; },
     hunt(): HuntReport | null {
