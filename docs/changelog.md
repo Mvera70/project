@@ -11,7 +11,7 @@ cuatro con su motivo. **v5.51**: la meta a la vista bajo la era
 (`derive/goal.ts`, `shell.setGoal`). Siete líneas nuevas de crónica, cuatro
 imágenes pedidas. Pruebas: `founding-ford` (RD-5), `hamlet-happenings`, `goal`.
 
-## v5.47 · 1 oct 2026 · RD-4: el niño perdido, en dos tiempos y con señal
+## v5.48 · 1 oct 2026 · RD-4: el niño perdido, en dos tiempos y con señal
 
 Decisión de Vera tras RD-0 («niño perdido + visita»). El suceso `child_lost`
 ya no se pierde y se encuentra en la misma línea: la semana del suceso el niño
@@ -22,59 +22,13 @@ claves viejas siguen en el banco. Tres líneas nuevas con su imagen pedida en
 `plan-arte-pendiente.md`. §7.10 al día. Pruebas: `lost-child.test.ts`,
 `life-lost-child.test.ts`.
 
-## v5.46 · 1 oct 2026 · RD-4: la visita como señal
+## v5.47 · 1 oct 2026 · RD-4: la visita como señal
 
 El que sube a vender espera en la plaza con unas monedas encima; tocarlas
 cierra el trato con él delante (`dealVisit`, `LiveDeal`) y el motor lo apunta
 al cerrar la semana. La voz conserva sus botones cuando él no está a la vista.
 Prueba: `visit-sign.test.ts`.
 
-## v5.44 · 30 sep 2026 · RD-1: el forastero del vado, la primera elección antes del minuto diez
-
-Decisión de Vera tras RD-0: la primera elección es «Uno en el vado», desde la
-fundación, con el forastero llegando andando y una señal encima. `foundGame`
-la deja planteada en el tick 0 en toda fundación de caserío (`maxPerGame: 1`).
-La capa de vida lo hace bajar por el camino del valle el tercer día escénico y
-esperar en la orilla del vado (`fordToday`, `fordStranger`): **a ×1 llega
-entre el minuto 4,6 y el 5,1** en ocho semillas. Hasta entonces la pregunta no
-se ve (ni tarjeta, ni sello, ni crónica); al llegar, unas pisadas encima de él
-la abren. Contestada, él sube a la plaza o se va en el acto, y el motor lo
-apunta al cerrar la semana. La caza ya no se esconde por una encrucijada
-pendiente, sólo por una abierta en pantalla. Pruebas:
-`tests/fast/founding-ford.test.ts` y un recorrido de navegador nuevo. Texto:
-«A third mouth before the first harvest». §8.6 y la skill `senales-en-el-mapa`
-al día.
-
-## v5.43 · 30 sep 2026 · RD-1: a ×1 nada salta — los actos esperan a su semana
-
-Decisión de Vera tras RD-0: **×1 es la velocidad normal** y «la aldea debe
-moverse a un ritmo normal, que se vea todo normal». Hasta hoy cada acto del
-jugador —contestar una encrucijada, dar un medio, la corona, mandar una
-expedición, contestar una oferta, cobrar una pieza— forzaba el tick al
-momento, y a ×1 eso adelantaba el calendario y el sol hasta siete jornadas
-(RD-0, D4). Ahora todos esperan a que cierre su semana (§2.60, regla 2
-reescrita). Lo que se ve, se ve ya: la oferta se retira de la voz, la
-encrucijada contestada no se vuelve a abrir y **la pieza cobrada deja un «+N»
-de grano encima del cazador** (el mismo aviso que la leña, D5). Si se oculta o
-se cierra la app con algo en cola, la semana se cierra entonces y la ausencia
-se cuenta desde su final (`flushQueued`). `attemptDecision` ya no devuelve
-`forceTick`. Recorridos de la oferta (M-0) y del enfoque de la encrucijada
-adaptados: esperan una semana antes de mirar la plata y el enfoque.
-## v5.38 · 30 sep 2026 · El sol vuelve a decir la hora a ×16 y ×64
-
-Primer arreglo del rework de ritmo (`plan-ritmo-descanso-y-progresion` §6,
-«bloqueo de coherencia»). `LIGHT_STEADY` aplanaba la luz hacia la media mañana
-(55 % a ×16, 95 % a ×64): a ×64 el valle estaba a pleno sol con la cabecera
-diciendo las dos de la madrugada. Vera decidió el 29 sep que sol, hora y
-calendario van juntos a cualquier velocidad. Ahora se suaviza la **amplitud**
-(`LIGHT_SWING`, 0,7 y 0,45 hacia un gris neutro) y el sol sigue la hora: misma
-dirección, apagado de noche, ventanas encendidas de noche a cualquier
-velocidad (`tells.ts` lee la hora entera). La duración del tick no cambia.
-Pruebas nuevas en `graphics-effects.test.ts` (dirección y encendido del sol
-iguales a ×1 en 240 fases; orden de claridad; a ×64 al menos el 40 % de la
-jornada). Evidencia: `docs/medidas/sol-sincronia-2026-09-30.md`. D.6.5, §10.7 y
-§10.8 de `design.md`, al día. **Abierto:** que Vera juzgue la comodidad a ×64
-en la tablet.
 ## v5.46 · 1 oct 2026 · RD-3: seis encrucijadas retiradas, ocho reescritas contra el dictamen de RD-0
 
 Vera aplicó el dictamen de `docs/medidas/rd0-encrucijadas-2026-09-30.md`. El
@@ -130,20 +84,51 @@ antes y después en `docs/medidas/rd3-encrucijadas-2026-10-01.md`.
   `docs/historico/rework.md` §2.7). Detalle en
   `docs/medidas/rd3-encrucijadas-2026-10-01.md` §7b.
 
-## v5.39 · 30 sep 2026 · Una encrucijada retirada pendiente vuelve a ser una pregunta
+## v5.45 · 30 sep 2026 · RD-2: volver a la velocidad que se dejó, y un parte que dice lo que espera
 
-La auditoría de RD-0 (`docs/medidas/rd0-encrucijadas-2026-09-30.md` §6) midió
-que una pendiente retirada en un guardado de esquema 12 **carga pero no se ve
-ni se resuelve**: la tarjeta, la crónica y `tick` buscaban la plantilla sólo en
-`CATALOG`, y como hay una pregunta a la vez (§8.6) el valle no volvía a
-preguntar (303 semanas sin ninguna). Hoy no se alcanzaba —las tres retiradas lo
-son desde antes de M-0—, pero el rework de ritmo va a retirar plantillas vivas.
-`templateOf(catalogue, id)` busca en el catálogo vivo y, si no está, en
-`RETIRED_TEMPLATES`; lo usan resolver, semillas, la política de `run`, marcas,
-reuniones, la tarjeta y la crónica. **Qué se plantea no cambia**: la selección
-sigue leyendo sólo el catálogo vivo. Prueba: `tests/fast/retired-pending.test.ts`
-(en tres semillas, la pendiente retirada se enseña, se contesta y el valle
-vuelve a preguntar sin plantear nunca una retirada).
+Decisión de Vera: descanso **A′**, automático al ocultar o cerrar, a la
+velocidad que se dejó. La pestaña oculta ya recuperaba a esa velocidad; la
+apertura en frío recuperaba a ×1 porque el guardado no la llevaba (deuda de
+§13.2), y la pausa no sobrevivía a cerrar. Ahora `SaveFile.speed` (opcional,
+del fichero y no del estado; sin subir el esquema) viaja con la partida: la
+misma ausencia debe las mismas semanas por las dos puertas, se vuelve a esa
+velocidad y en pausa no se debe nada. Y el parte de regreso añade **lo que
+espera**: la pregunta sin contestar, por su título, y el asalto anunciado, con
+sus semanas (`pendingLines`, claves `welcome.pending.*`). Prueba:
+`tests/fast/rest-return.test.ts`. Sobre la #21 (`restTick`).
+
+## v5.44 · 30 sep 2026 · RD-1: el forastero del vado, la primera elección antes del minuto diez
+
+Decisión de Vera tras RD-0: la primera elección es «Uno en el vado», desde la
+fundación, con el forastero llegando andando y una señal encima. `foundGame`
+la deja planteada en el tick 0 en toda fundación de caserío (`maxPerGame: 1`).
+La capa de vida lo hace bajar por el camino del valle el tercer día escénico y
+esperar en la orilla del vado (`fordToday`, `fordStranger`): **a ×1 llega
+entre el minuto 4,6 y el 5,1** en ocho semillas. Hasta entonces la pregunta no
+se ve (ni tarjeta, ni sello, ni crónica); al llegar, unas pisadas encima de él
+la abren. Contestada, él sube a la plaza o se va en el acto, y el motor lo
+apunta al cerrar la semana. La caza ya no se esconde por una encrucijada
+pendiente, sólo por una abierta en pantalla. Pruebas:
+`tests/fast/founding-ford.test.ts` y un recorrido de navegador nuevo. Texto:
+«A third mouth before the first harvest». §8.6 y la skill `senales-en-el-mapa`
+al día.
+
+## v5.43 · 30 sep 2026 · RD-1: a ×1 nada salta — los actos esperan a su semana
+
+Decisión de Vera tras RD-0: **×1 es la velocidad normal** y «la aldea debe
+moverse a un ritmo normal, que se vea todo normal». Hasta hoy cada acto del
+jugador —contestar una encrucijada, dar un medio, la corona, mandar una
+expedición, contestar una oferta, cobrar una pieza— forzaba el tick al
+momento, y a ×1 eso adelantaba el calendario y el sol hasta siete jornadas
+(RD-0, D4). Ahora todos esperan a que cierre su semana (§2.60, regla 2
+reescrita). Lo que se ve, se ve ya: la oferta se retira de la voz, la
+encrucijada contestada no se vuelve a abrir y **la pieza cobrada deja un «+N»
+de grano encima del cazador** (el mismo aviso que la leña, D5). Si se oculta o
+se cierra la app con algo en cola, la semana se cierra entonces y la ausencia
+se cuenta desde su final (`flushQueued`). `attemptDecision` ya no devuelve
+`forceTick`. Recorridos de la oferta (M-0) y del enfoque de la encrucijada
+adaptados: esperan una semana antes de mirar la plata y el enfoque.
+
 ## v5.42 · 30 sep 2026 · La primera ocasión del mapa se puede tocar, y el tablón no se sale del encuadre
 
 Dos defectos de RD-0 (`docs/medidas/rd0-apertura-visible-2026-09-30.md`, D1 y
@@ -164,18 +149,16 @@ Pruebas: `life-wild-prey.test.ts` (24 valles, perdiz y conejo con dos celdas
 de pradera alrededor: antes 1 de 24) y un recorrido de navegador nuevo que
 toca la señal y mira el tablón en la semilla 7 (falla sin el arreglo). Skill
 `senales-en-el-mapa` al día.
-## v5.45 · 30 sep 2026 · RD-2: volver a la velocidad que se dejó, y un parte que dice lo que espera
 
-Decisión de Vera: descanso **A′**, automático al ocultar o cerrar, a la
-velocidad que se dejó. La pestaña oculta ya recuperaba a esa velocidad; la
-apertura en frío recuperaba a ×1 porque el guardado no la llevaba (deuda de
-§13.2), y la pausa no sobrevivía a cerrar. Ahora `SaveFile.speed` (opcional,
-del fichero y no del estado; sin subir el esquema) viaja con la partida: la
-misma ausencia debe las mismas semanas por las dos puertas, se vuelve a esa
-velocidad y en pausa no se debe nada. Y el parte de regreso añade **lo que
-espera**: la pregunta sin contestar, por su título, y el asalto anunciado, con
-sus semanas (`pendingLines`, claves `welcome.pending.*`). Prueba:
-`tests/fast/rest-return.test.ts`. Sobre la #21 (`restTick`).
+## v5.41 · 30 sep 2026 · RD-0: la apertura y el catálogo, medidos sobre el juego integrado
+
+Primera ronda del rework de ritmo, descanso y progresión: trae el plan
+(`docs/plan-ritmo-descanso-y-progresion-2026-09-29.md`, de la rama
+`docs/ritmo-integraciones`) y lo mide sobre `main` posterior a la PR #17. Cuatro
+informes en `docs/medidas/` —motor, apertura visible, encrucijadas y descanso—
+y su síntesis (`rd0-sintesis-2026-09-30.md`), con la tabla de §3 del plan
+marcada. Herramienta nueva: `tools/reports/rest-report.ts`. Los arreglos que
+salieron de aquí van en PR aparte (v5.38–v5.40 y D1).
 
 ## v5.40 · 30 sep 2026 · Ninguna derrota mientras nadie mira
 
@@ -192,15 +175,37 @@ medida). Pruebas: `rest-no-defeat.test.ts`; `lethargy.test.ts` y
 `save.test.ts` dicen ahora «960 semanas, o menos si paró con motivo». **Lo
 que no decide este cambio:** si una encrucijada planteada también para el
 descanso, a qué velocidad corre y si se activa a mano; es de Vera.
-## v5.41 · 30 sep 2026 · RD-0: la apertura y el catálogo, medidos sobre el juego integrado
 
-Primera ronda del rework de ritmo, descanso y progresión: trae el plan
-(`docs/plan-ritmo-descanso-y-progresion-2026-09-29.md`, de la rama
-`docs/ritmo-integraciones`) y lo mide sobre `main` posterior a la PR #17. Cuatro
-informes en `docs/medidas/` —motor, apertura visible, encrucijadas y descanso—
-y su síntesis (`rd0-sintesis-2026-09-30.md`), con la tabla de §3 del plan
-marcada. Herramienta nueva: `tools/reports/rest-report.ts`. Los arreglos que
-salieron de aquí van en PR aparte (v5.38–v5.40 y D1).
+## v5.39 · 30 sep 2026 · Una encrucijada retirada pendiente vuelve a ser una pregunta
+
+La auditoría de RD-0 (`docs/medidas/rd0-encrucijadas-2026-09-30.md` §6) midió
+que una pendiente retirada en un guardado de esquema 12 **carga pero no se ve
+ni se resuelve**: la tarjeta, la crónica y `tick` buscaban la plantilla sólo en
+`CATALOG`, y como hay una pregunta a la vez (§8.6) el valle no volvía a
+preguntar (303 semanas sin ninguna). Hoy no se alcanzaba —las tres retiradas lo
+son desde antes de M-0—, pero el rework de ritmo va a retirar plantillas vivas.
+`templateOf(catalogue, id)` busca en el catálogo vivo y, si no está, en
+`RETIRED_TEMPLATES`; lo usan resolver, semillas, la política de `run`, marcas,
+reuniones, la tarjeta y la crónica. **Qué se plantea no cambia**: la selección
+sigue leyendo sólo el catálogo vivo. Prueba: `tests/fast/retired-pending.test.ts`
+(en tres semillas, la pendiente retirada se enseña, se contesta y el valle
+vuelve a preguntar sin plantear nunca una retirada).
+
+## v5.38 · 30 sep 2026 · El sol vuelve a decir la hora a ×16 y ×64
+
+Primer arreglo del rework de ritmo (`plan-ritmo-descanso-y-progresion` §6,
+«bloqueo de coherencia»). `LIGHT_STEADY` aplanaba la luz hacia la media mañana
+(55 % a ×16, 95 % a ×64): a ×64 el valle estaba a pleno sol con la cabecera
+diciendo las dos de la madrugada. Vera decidió el 29 sep que sol, hora y
+calendario van juntos a cualquier velocidad. Ahora se suaviza la **amplitud**
+(`LIGHT_SWING`, 0,7 y 0,45 hacia un gris neutro) y el sol sigue la hora: misma
+dirección, apagado de noche, ventanas encendidas de noche a cualquier
+velocidad (`tells.ts` lee la hora entera). La duración del tick no cambia.
+Pruebas nuevas en `graphics-effects.test.ts` (dirección y encendido del sol
+iguales a ×1 en 240 fases; orden de claridad; a ×64 al menos el 40 % de la
+jornada). Evidencia: `docs/medidas/sol-sincronia-2026-09-30.md`. D.6.5, §10.7 y
+§10.8 de `design.md`, al día. **Abierto:** que Vera juzgue la comodidad a ×64
+en la tablet.
 
 ## v5.37 · 30 sep 2026 · Las 21 jornadas rojas viejas, una a una
 

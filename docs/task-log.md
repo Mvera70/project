@@ -16,7 +16,7 @@ crónica por valle sin contar estaciones:
 Ningún valle acabado en el primer año, antes ni después. Capturas de la meta
 en `docs/medidas/rd0-img/rd5-meta-*.jpg`. Queda: el recorrido humano.
 
-## 1 oct 2026 · RD-4: niño perdido y visita, como señales (v5.46–v5.47)
+## 1 oct 2026 · RD-4: niño perdido y visita, como señales (v5.47–v5.48)
 
 Rama `claude/rd4-senales` (sobre `claude/rd1-vado`). Hecho: la visita (señal
 sobre el vendedor en la plaza, trato cerrado con él delante) y el niño perdido

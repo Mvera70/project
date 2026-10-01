@@ -2322,10 +2322,10 @@ con los números, es §12.10; y el código que la lee es `weightOf` en
 | La fiesta de la cosecha | rito: la semana después de la siega | ánimo y fe | la capilla, dos días |
 | La riña en la plaza | dos nombrados | los dos que peor se llevan, peor todavía | la plaza |
 | El oso en el bosque | verano u otoño, bosque | una bandera dos semanas, ánimo | — |
-| El niño perdido | hay niños | ánimo; si es nombrado, con su nombre; **desde v5.47, en dos tiempos** (abajo) | el vado, y el niño en la linde |
+| El niño perdido | hay niños | ánimo; si es nombrado, con su nombre; **desde v5.48, en dos tiempos** (abajo) | el vado, y el niño en la linde |
 | El forastero | salvo valle hostil | ánimo | la plaza |
 
-**Y desde v5.47 (1 oct 2026, RD-4) el niño perdido es una señal en el mapa.**
+**Y desde v5.48 (1 oct 2026, RD-4) el niño perdido es una señal en el mapa.**
 La semana del suceso la crónica dice que se perdió (`fate.child_missing*`) y la
 capa de vida lo deja los dos primeros días escénicos en la linde más cercana a
 su casa, quieto y con una señal encima (`life/lost-child.ts`); las copas que lo
@@ -2338,7 +2338,7 @@ anochecer (`child.found_at_dusk`) y el ánimo perdido no vuelve. Ninguna tirada
 nueva. `who` lleva siempre el `id` del niño; las claves viejas
 `fate.child_lost*` se quedan en el banco por los guardados.
 
-**Y la visita, también (v5.46).** El que sube a vender espera en la plaza con
+**Y la visita, también (v5.47).** El que sube a vender espera en la plaza con
 unas monedas encima mientras el trato se puede pagar; tocarlas lo cierra con él
 delante (`Village.dealVisit`): la aldea le lleva la leña o el grano, o le paga,
 esa misma jornada, y la semana siguiente no vuelve a cerrarlo (`LiveDeal`).
