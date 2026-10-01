@@ -95,6 +95,7 @@ prueba, y saltársela es lo que costó la auditoría del 15 sep 2026:
 | Comentarios del código | Español, y es deliberado (§2.2) |
 | Contenido del juego (crónica, UI, nombres) | Inglés |
 | Documentación y conversación | Español |
+| Horas que se le dan al dueño del diseño | **Hora de Madrid** (`TZ=Europe/Madrid date`; el contenedor va en UTC) |
 
 ---
 
@@ -151,6 +152,10 @@ arriba:** «hay que evitar a toda costa estar separado más de media hora hacien
 pruebas; si las pruebas no son posibles, hay que cambiar cómo las hacemos».
 Durante una ronda de trabajo la verificación es **typecheck, lint y los ficheros
 que se tocan**, y nada más; la suite entera se deja para el cierre de una tanda.
+**Con una excepción: si la ronda toca el motor** (una constante de `balance.ts`,
+el tick, la economía), la suite rápida entera pasa en local una vez antes de
+abrir la PR, porque mueve la trayectoria de todas las partidas (K1–K3, 1 oct
+2026: seis rápidas y trece jornadas en rojo descubiertas en tres vueltas de CI).
 Y si una prueba no cabe en la suite rápida, **se muda a las jornadas** —donde los
 minutos están permitidos por diseño— en vez de dejar que la suite rápida deje de
 serlo: las cuatro partidas largas del motor (un siglo de bosque, cien años de
