@@ -287,6 +287,17 @@ propuesta totalmente diferente de lo que suele haber.»
 | **K10 · La aldea fuerte del final** | La meta sigue siendo la aldea construida y fuerte con toda la muralla, y faltan edificios de defensa: **arquería, armería** | Hoy las armas y los arcos entran como medios (M-2). Con K8 pasarían a edificios con su tablón | P2 | Media |
 | **K11 · Morir se ve, y la enfermería** | Que **el proceso de morir se vea**. En un caserío, el enfermo o el viejo se muere por ahí fuera, apoyado en un árbol o donde le pille. En una aldea grande va a **la enfermería**, que es un edificio que se toca (K8): se ve a cada paciente, y desde allí quizá **la recolección de plantas** (K5) | Hoy la muerte es una línea de crónica y un cuerpo que desaparece al cerrar la semana. El motor ya sabe quién enferma (peste, hambre, frío, vejez) y la vida ya sabe tumbar un cuerpo (caídas y ragdoll del asedio). La curandera es un suceso. Junta K5, K6 y K8 en un sitio, y también sirve a K7: que la muerte se entienda | P2 | Media |
 
+**Los modelos nuevos van por encargo** (regla de Vera, recordada el 1 oct
+2026). Todo modelo 3D que pida K (la enfermería, la arquería, la armería, la
+herrería con su tablón, los cuerpos que se tumban a morir, los puestos de
+recolección) se escribe primero como encargo en `docs/encargos/`, con medidas,
+presupuesto de triángulos y en qué captura se juzga, y se apunta en
+`docs/encargos-3d.md`. **Por omisión lo hace Astra.** Claude puede hacer una
+versión por receta de código (`art/recipes/`), pero sólo como **prueba A/B**:
+el mismo encargo hecho por los dos, juzgado con capturas en partida y en el
+aparato, y que decida Vera. Hasta que una prueba diga otra cosa, Astra hace
+los mejores modelos.
+
 **El orden que propongo**, con el porqué:
 
 1. Cerrar el rework de ritmo (RD-0 a RD-6).
