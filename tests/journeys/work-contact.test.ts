@@ -41,7 +41,14 @@ const head = (b: { x: number; z: number; facing: number }, clip: 'chop' | 'mine'
 // golpeando, así que el número de muestras se cumple y lo que falla es la cota:
 // es el defecto de llegada del corro de la 11 de antes (0,44), con otra cifra.
 // Cuando una ronda lo arregle, esto se pone rojo y se quita el `.fails`.
-it.fails('la cabeza de la herramienta queda a menos de 0,2 de la superficie que golpea', () => {
+//
+// **Y K1–K3 la vuelve a mover (1 oct 2026, v5.53): `it` otra vez.** El bosque
+// que se tala más deprisa y se extiende cambia dónde talan todas las villas;
+// con las mismas seis semillas y tres instantes salen 10 muestras golpeando,
+// la peor a 0,19 y el resto a 0,14 o menos. No es un arreglo del corro: es
+// otra trayectoria. Si vuelve a salir un cuerpo a más de 0,2, se declara otra
+// vez con su cifra.
+it('la cabeza de la herramienta queda a menos de 0,2 de la superficie que golpea', () => {
   const gaps: number[] = [];
   for (const seed of [1, 2, 7, 9, 11, 12]) for (const ticks of [21 * 48, 30 * 48, 1418]) {
     const st = foundGame(seed); run(st, ticks, 'prudent', CATALOG);
