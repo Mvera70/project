@@ -26,17 +26,31 @@ const all: ElevatedRingVariant[] = ['straight', 'turn', 'diagonal', 'mixed',
 // traslado planificable); si ninguna la cumple, la prueba lo dice y cuántas miró.
 // Los números de una semilla (104 tramos, 103 piezas, la iglesia 20, el tramo
 // 163) se han ido: eran la huella, no la propiedad. Remedido el 1 oct 2026 en las
-// semillas 1 a 39 a los 3846 ticks:
-//   · casa anterior en el pasillo (`interior`): la 20, la 35 y la 39;
-//   · cerrado sólo por árboles que al talarlos se reabre: la 2, la 36 y la 37;
-//   · listo para el guardia (geometría lista y una pieza por tramo): la 38;
-//   · traslado planificable a los 2000 ticks: la 20, la 35 y la 39; y sólo en la
-//     20 el adarve queda libre después (ver la última prueba).
+// semillas 1 a 39 a los 3846 ticks (con RD-1 solo, y otra vez con RD-5 encima,
+// que mueve la trayectoria otra vez: las listas llevan primero las que salen con
+// RD-1 y luego las que salen con RD-5, para que una u otra ronda encuentre villa):
+//   · casa anterior en el pasillo (`interior`): RD-1 la 39, la 35 y la 20; RD-5
+//     la 39, la 11, la 15, la 21, la 25, la 31, la 34;
+//   · cerrado sólo por árboles que al talarlos se reabre: RD-1 la 2, la 36 y la
+//     37; RD-5 la 36, la 37, la 22, la 12 y la 1;
+//   · geometría lista para el guardia: RD-1 la 38 y la 33; RD-5 la 13, la 14 y
+//     la 40 (las piezas candidatas por tramo, `ringCandidateAssetsOf`, sólo
+//     salen en la 38: no se exigen aquí, el guardia no las necesita);
+//   · traslado planificable a los 2000 ticks, y adarve libre después: RD-1 la 20;
+//     RD-5 la 12, la 26, la 15, la 19 y la 33.
 const ringOf = (state: GameState) => state.buildings.find(item => item.kind === 'bastion' && item.lostTick === null);
+// Cada villa se juega una vez por fichero y se entrega copiada: las pruebas
+// la tocan (rasgos, talas, traslados) y la búsqueda de candidatas repite semillas.
+const grown = new Map<string, GameState>();
 const played = (seed: number, ticks = 3846): GameState => {
-  const state = foundGame(seed);
-  run(state, ticks, 'prudent', CATALOG);
-  return state;
+  const key = `${seed}:${ticks}`;
+  let base = grown.get(key);
+  if (base === undefined) {
+    base = foundGame(seed);
+    run(base, ticks, 'prudent', CATALOG);
+    grown.set(key, base);
+  }
+  return structuredClone(base);
 };
 /** La primera candidata de la lista cuya villa cumple la precondición. */
 function firstVilla<T>(seeds: readonly number[], what: string,
@@ -51,7 +65,7 @@ function firstVilla<T>(seeds: readonly number[], what: string,
 
 describe('E3b · pasillo interior de una villa real', () => {
   it('no acredita una casa existente anterior a la reserva del adarve', () => {
-    const { state, found } = firstVilla([39, 35, 20, 9], 'un anillo cerrado con una casa anterior en el pasillo', (candidate) => {
+    const { state, found } = firstVilla([39, 35, 20, 11, 15, 21], 'un anillo cerrado con una casa anterior en el pasillo', (candidate) => {
       const bastion = ringOf(candidate);
       if (bastion === undefined) return null;
       const ring = elevatedRingOf(candidate, bastion, { approvedVariants: all, lane: 'center' });
@@ -125,7 +139,7 @@ describe('E3b · pasillo interior de una villa real', () => {
       }
       return { blocked, copy };
     };
-    const { state, found } = firstVilla([2, 37, 36, 1], 'un anillo cerrado que sólo los árboles bloquean', (candidate) => {
+    const { state, found } = firstVilla([2, 37, 36, 22, 12, 1], 'un anillo cerrado que sólo los árboles bloquean', (candidate) => {
       const bastion = ringOf(candidate);
       if (bastion === undefined) return null;
       const scene = sceneRingOf(candidate, bastion, all, 'center');
@@ -157,17 +171,17 @@ describe('E3b · pasillo interior de una villa real', () => {
   });
 
   it('un guardia asignado sube, recorre y regresa por el anillo candidato de una villa lista', () => {
-    // Precondición: un anillo cerrado con la geometría lista y una pieza para
-    // cada tramo. Era la semilla 91 y luego la 23, que cerraron en retorno 132
-    // y en nada al moverse la trayectoria; hoy sale la 38 (88 tramos, 87
-    // piezas); la 33 tiene la geometría lista pero no pieza para cada tramo.
+    // Precondición: un anillo cerrado con la geometría lista. Era la semilla 91
+    // y luego la 23, que cerraron en retorno 132 y en nada al moverse la
+    // trayectoria; hoy salen las de la lista (con RD-1, la 38 y la 33; con RD-5
+    // encima, la 13, la 14 y la 40).
     // El guardia sube, da la vuelta y baja: en la 23 eran 8 206 pasos para 88
     // tramos, de ahí el tope de abajo, con holgura para anillos mayores.
-    const { state, found: ring } = firstVilla([38, 33, 23], 'un anillo candidato con la geometría lista', (candidate) => {
+    const { state, found: ring } = firstVilla([38, 33, 13, 14, 40], 'un anillo candidato con la geometría lista', (candidate) => {
       const bastion = ringOf(candidate);
       if (bastion === undefined) return null;
       const scene = sceneRingOf(candidate, bastion, all, 'center');
-      return scene.geometryReady && ringCandidateAssetsOf(scene) !== null ? scene : null;
+      return scene.geometryReady ? scene : null;
     });
     (state.traits as string[]).push('arms', 'bows');
     state.threat.comingTick = state.tick + 1;
@@ -207,8 +221,8 @@ describe('E3b · pasillo interior de una villa real', () => {
     // pasillo y, jugada la villa después, el adarve ya no la tiene encima. La
     // precondición es un plan con movimientos, que se busca: antes era la
     // iglesia 20 de la semilla 9, de (34,44) a (34,45); hoy es la 20 (granero,
-    // iglesia y herrería, tres casas apartadas). La 35 y la 39 también planifican
-    // su traslado, pero **no** se cuentan: medido el 1 oct 2026, en ellas una casa
+    // iglesia y herrería, tres casas apartadas); con RD-5 encima, la 12, la 26,
+    // la 15, la 19 y la 33. La 35 y la 39 también planifican su traslado, pero **no** se cuentan: medido el 1 oct 2026, en ellas una casa
     // de piedra levantada después del plan (ticks 2204 y 2255, tras el traslado)
     // vuelve a ocupar el pasillo interior y el adarve sigue cortado. Es un
     // hueco del motor —el traslado aparta lo que hay, no reserva el pasillo para
@@ -218,12 +232,12 @@ describe('E3b · pasillo interior de una villa real', () => {
     // donde nada se construye encima después, deja el adarve listo.
     let state: GameState | null = null;
     let moves: ReturnType<typeof planRingCorridorMoves> = null;
-    for (const seed of [20, 9]) {
+    for (const seed of [20, 12, 26, 15, 19, 33]) {
       const candidate = played(seed, 2000);
       const plan = planRingCorridorMoves(candidate);
       if (plan !== null && plan.length > 0) { state = candidate; moves = plan; break; }
     }
-    expect(state, 'ninguna de las villas 20 y 9 tiene un traslado que planificar').not.toBeNull();
+    expect(state, 'ninguna de las villas 20, 12, 26, 15, 19 y 33 tiene un traslado que planificar').not.toBeNull();
     const village = state!;
     const beforeTerrain = village.map.terrain.slice();
     const beforeBuildings = structuredClone(village.buildings);
