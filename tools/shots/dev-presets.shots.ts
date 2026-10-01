@@ -14,7 +14,7 @@ test('Dev ofrece partidas preparadas y abre la villa con un toque', async ({ pag
   await page.locator('.title-dev').click();
   await test.expect(presets.first()).toBeVisible();
   await test.expect(presets.first()).toContainText('Year 1');
-  await test.expect(presets.nth(1)).toContainText('Year 21');
+  await test.expect(presets.nth(1)).toContainText('Year 12');
   await test.expect(presets.nth(2)).toContainText('Year 60');
   await page.screenshot({ path: 'artifacts/dev-presets-title.png', fullPage: true });
   await presets.nth(2).click();
