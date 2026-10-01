@@ -2576,6 +2576,22 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'They watched him go and did not offer. Year {year}.',
     'In year {year} the valley kept its grain and said nothing about it after.',
   ],
+  // RD-5 · lo que vuelve del vado en la primera hora (`hamlet.ts`).
+  'consequence.he_knew_the_axe': [
+    'The man taken in at the ford knew his way round an axe. By the end of the month the woodpile had grown by a stack.',
+    'Whatever else he was, the man from the ford could split wood. The valley had a winter\'s start of it in a few weeks.',
+    'In year {year} the stranger from the ford earned his bread at the woodpile, and the others stopped watching him.',
+  ],
+  'consequence.he_came_back_with_fish': [
+    'The man fed at the ford and sent on came back down the road a few weeks later with a string of trout, and would not stay for supper.',
+    'A string of fish left on the stone at the ford in year {year}. Nobody saw who left it, and everyone knew.',
+    'He came back once, the man they had fed and sent on, with fish from upriver. Then the road had him again.',
+  ],
+  'consequence.tracks_from_the_ford': [
+    'Grain went missing from the store a few weeks after the man was turned away at the ford. The tracks went back to the water.',
+    'In year {year} someone emptied a sack in the night. The footprints led to the ford and stopped there.',
+    'The man turned away at the ford had not gone far. A sack of grain went with him when he finally did.',
+  ],
   'consequence.what_he_was_running_from': [
     'Riders asked after the man taken in at the ford in year {sinceYear}, {years} years on.',
     '{years} years after he came up the road alone, somebody came up it after him.',

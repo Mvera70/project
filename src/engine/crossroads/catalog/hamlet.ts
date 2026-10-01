@@ -153,6 +153,21 @@ const ONE_AT_THE_FORD: CrossroadTemplate = {
       // malo en ninguna parte. Es la forma de A.13 a escala de caserío: se gana
       // un par de manos ahora y se hereda lo que ese hombre traía detrás.
       seeds: [
+        // RD-5 (Vera, 1 oct 2026: «consecuencias que vuelven») · lo que se
+        // nota pronto. A ×1 una semana son catorce minutos: dos o tres semanas
+        // después de contestar es la primera hora de juego, que es cuando el
+        // plan pide que una elección anterior regrese (§3, 10–60 min).
+        {
+          id: 'he_knew_the_axe',
+          delayYears: [0, 0],
+          delayWeeks: [2, 3],
+          effects: [
+            { k: 'stat', stat: 'wood', delta: 25 },
+            { k: 'stat', stat: 'morale', delta: 2 },
+          ],
+          visible: [{ k: 'gather', where: 'square', days: 1 }],
+          chronicleKey: 'consequence.he_knew_the_axe',
+        },
         {
           id: 'what_he_was_running_from',
           delayYears: [3, 8],
@@ -173,7 +188,20 @@ const ONE_AT_THE_FORD: CrossroadTemplate = {
         { k: 'stat', stat: 'morale', delta: 2 },
       ],
       visible: [{ k: 'gather', where: 'ford', days: 1 }],
-      seeds: [],
+      // RD-5 · el pan que se le dio vuelve por el mismo camino.
+      seeds: [
+        {
+          id: 'he_came_back_with_fish',
+          delayYears: [0, 0],
+          delayWeeks: [2, 3],
+          effects: [
+            { k: 'stat', stat: 'grain', delta: 10 },
+            { k: 'stat', stat: 'faith', delta: 1 },
+          ],
+          visible: [{ k: 'gather', where: 'ford', days: 1 }],
+          chronicleKey: 'consequence.he_came_back_with_fish',
+        },
+      ],
       traitWeight: { devout: 2, cunning: 1 },
     },
     {
@@ -185,7 +213,20 @@ const ONE_AT_THE_FORD: CrossroadTemplate = {
         { k: 'stat', stat: 'faith', delta: -4 },
       ],
       visible: [{ k: 'gather', where: 'ford', days: 1 }],
-      seeds: [],
+      // RD-5 · y el que se fue con hambre no se fue lejos.
+      seeds: [
+        {
+          id: 'tracks_from_the_ford',
+          delayYears: [0, 0],
+          delayWeeks: [2, 3],
+          effects: [
+            { k: 'stat', stat: 'grain', delta: -12 },
+            { k: 'stat', stat: 'morale', delta: -2 },
+          ],
+          visible: [{ k: 'gather', where: 'ford', days: 1 }],
+          chronicleKey: 'consequence.tracks_from_the_ford',
+        },
+      ],
       traitWeight: { craven: 2, secretive: 2, generous: 0.4 },
     },
   ],

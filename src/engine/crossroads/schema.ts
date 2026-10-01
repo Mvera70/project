@@ -149,6 +149,14 @@ import type { VisualEffect } from '../state';
 interface SeedSpec {
   id: string;
   delayYears: [number, number]; // drawn within the range
+  /**
+   * RD-5 · Un retraso en semanas, para las consecuencias que tienen que volver
+   * dentro de la primera hora de juego a ×1 (una semana son catorce minutos).
+   * Si está, manda sobre `delayYears`, y **no se tira del flujo `crossroads`**:
+   * sale de un hash de la semilla, la plantilla y el tick, así que añadir una
+   * consecuencia corta a una opción no desplaza el resto de la partida.
+   */
+  delayWeeks?: [number, number];
   condition?: Condition; // if it fails when due, the seed withers
   effects: Effect[];
   visible: VisualEffect[];

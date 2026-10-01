@@ -9,7 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { ford, run } from '@engine/sim';
+import { ford, run, tick } from '@engine/sim';
 import { foundGame } from '@engine/found';
 import { foundTwenty } from '../helpers/founding';
 import { createVillage } from '../../src/render3d/life/village';
@@ -39,6 +39,40 @@ describe('RD-1 · la pregunta con la que se funda el valle', () => {
       run(state, TIME.WEEKS_PER_YEAR * 3, 'prudent', CATALOG);
       expect(state.history.filter((d) => d.templateId === 'one_at_the_ford'), `semilla ${seed}`).toHaveLength(1);
     }
+  });
+});
+
+describe('RD-5 · lo que se contestó en el vado vuelve en la primera hora', () => {
+  // A ×1 una semana son catorce minutos: la consecuencia corta llega dos o tres
+  // semanas después de contestar, entre el minuto 28 y el 56 si se contesta en
+  // la primera semana (§3 del plan de ritmo: «una consecuencia de una elección
+  // anterior regresa» en los primeros sesenta minutos).
+  const ECHO: Record<string, string> = {
+    take_him_in: 'consequence.he_knew_the_axe',
+    feed_him_and_send_him_on: 'consequence.he_came_back_with_fish',
+    turn_him_away: 'consequence.tracks_from_the_ford',
+  };
+  it('cada respuesta trae la suya, a las dos o tres semanas, y en la crónica', () => {
+    for (const seed of SEEDS) {
+      for (const [optionId, key] of Object.entries(ECHO)) {
+        const state = foundGame(seed);
+        tick(state, CATALOG, { templateId: 'one_at_the_ford', optionId });
+        const answered = state.history[0]!.tick;
+        for (let n = 0; n < 4; n += 1) tick(state, CATALOG);
+        const echo = state.chronicle.find((entry) => entry.templateKey === key);
+        expect(echo, `semilla ${seed}, ${optionId}`).toBeDefined();
+        expect(echo!.tick - answered, `semilla ${seed}, ${optionId}`).toBeGreaterThanOrEqual(2);
+        expect(echo!.tick - answered, `semilla ${seed}, ${optionId}`).toBeLessThanOrEqual(3);
+      }
+    }
+  });
+
+  it('no tira del azar de las encrucijadas: el retraso sale de un hash', () => {
+    const a = foundGame(7);
+    const b = foundGame(7);
+    tick(a, CATALOG, { templateId: 'one_at_the_ford', optionId: 'feed_him_and_send_him_on' });
+    tick(b, CATALOG, { templateId: 'one_at_the_ford', optionId: 'turn_him_away' });
+    expect(a.rng).toEqual(b.rng);
   });
 });
 
