@@ -21,8 +21,8 @@
 // avance rápido**. Una jornada dura 120 s a ×1 y 1,9 s a ×64, así que el cielo
 // puede cambiar tres veces en lo que tarda una capa en cruzarse. Ahí quedan
 // sólo los lechos, apagados (`SOUND.AMBIENCE_FAST_GAIN`). Es lo mismo que el
-// renderer hace con la luz (`daylight.ts`, `LIGHT_STEADY`) y por el mismo
-// motivo: a esa velocidad, lo fiel parpadea.
+// renderer hace con la luz (`daylight.ts`, `LIGHT_SWING`): a esa velocidad se
+// baja la amplitud, pero lo que suena sigue siendo lo de esta hora.
 
 import { SOUND } from '@engine/balance';
 import type { Season } from '@engine/state';
