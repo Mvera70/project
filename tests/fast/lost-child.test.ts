@@ -35,9 +35,9 @@ describe('RD-4 · el niño perdido', () => {
       const before = opinionOf(state, child, searcher);
       tick(state, CATALOG, undefined, [{ kind: 'search', sourceTick: state.tick, child, searcher }]);
       tick(plain, CATALOG);
-      const line = state.chronicle.find((e) => e.tick === state.tick && e.templateKey.startsWith('lost.found_by'));
+      const line = state.chronicle.find((e) => e.tick === state.tick && e.templateKey.startsWith('child.found_by'));
       expect(line, `semilla ${seed}`).toBeDefined();
-      expect(plain.chronicle.some((e) => e.tick === plain.tick && e.templateKey === 'lost.found_at_dusk'), `semilla ${seed}`).toBe(true);
+      expect(plain.chronicle.some((e) => e.tick === plain.tick && e.templateKey === 'child.found_at_dusk'), `semilla ${seed}`).toBe(true);
       expect(state.acts.at(-1)!.done).toBe(true);
       expect(opinionOf(state, child, searcher)).toBeGreaterThan(before);
       expect(opinionOf(state, child, searcher) - opinionOf(plain, child, searcher)).toBeGreaterThanOrEqual(OPINION.WAS_SAVED - 1);
@@ -54,7 +54,7 @@ describe('RD-4 · el niño perdido', () => {
     const { state, child, searcher } = lostThisWeek(7);
     tick(state, CATALOG, undefined, [{ kind: 'search', sourceTick: state.tick - 1, child, searcher }]);
     expect(state.acts.at(-1)!.done).toBe(false);
-    expect(state.chronicle.some((e) => e.tick === state.tick && e.templateKey === 'lost.found_at_dusk')).toBe(true);
+    expect(state.chronicle.some((e) => e.tick === state.tick && e.templateKey === 'child.found_at_dusk')).toBe(true);
   });
 
   it('una partida con una búsqueda se guarda y se carga', () => {

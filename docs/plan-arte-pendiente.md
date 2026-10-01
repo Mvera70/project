@@ -418,5 +418,5 @@ y `src/ui/redesign/chronicle-art.ts` (`HAPPENING_KEY_ART`).
 | Fichero | Clave | Qué tiene que enseñar |
 |---|---|---|
 | `child-missing.png` | `fate.child_missing`, `fate.child_missing.named` | **La linde vacía a la hora de cenar.** Los primeros troncos del bosque con la luz baja, un zapato pequeño o un juguete de madera en la hierba, y al fondo, lejos, las casas con humo |
-| `child-found.png` | `lost.found_by`, `lost.found_by.named` | **Uno solo que vuelve con el niño.** Un adulto saliendo de entre los árboles con el crío a hombros o de la mano, la última luz detrás; nadie más en el cuadro |
-| `child-dusk.png` | `lost.found_at_dusk` | **El valle entero buscando.** Antorchas a lo largo de la orilla del vado al anochecer, siluetas en fila, y una de ellas agachada junto a un bulto pequeño bajo los alisos |
+| `child-found.png` | `child.found_by`, `child.found_by.named` | **Uno solo que vuelve con el niño.** Un adulto saliendo de entre los árboles con el crío a hombros o de la mano, la última luz detrás; nadie más en el cuadro |
+| `child-dusk.png` | `child.found_at_dusk` | **El valle entero buscando.** Antorchas a lo largo de la orilla del vado al anochecer, siluetas en fila, y una de ellas agachada junto a un bulto pequeño bajo los alisos |
