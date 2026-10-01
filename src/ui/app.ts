@@ -724,8 +724,13 @@ export function boot(
   // RD-4 (Vera, 1 oct 2026) · **El niño perdido, como señal en el mapa.** Los
   // dos primeros días de la semana del suceso el niño espera en la linde con
   // una señal encima; tocarla manda al adulto libre más cercano a por él, desde
-  // donde esté, y el motor lo apunta al cerrar la semana (`search`, §2.60). Sin
-  // toque, el valle lo encuentra al anochecer, como antes.
+  // donde esté. Sin toque, el valle lo encuentra al anochecer, como antes.
+  //
+  // Parte 0 (1 oct 2026) · **el toque no apunta nada: lo apunta la llegada.**
+  // El acto `search` entra en la cola cuando la escena dice que alguien llegó
+  // hasta el niño (`childFound`, en `placeLostSign`), igual que el parte de la
+  // caza. Si el buscador no llega —la noche, una huida, una jornada que no se
+  // vio—, la crónica dice que lo encontró el valle, que es lo que se vio.
   const lostSign = document.createElement('button');
   lostSign.type = 'button';
   lostSign.className = 'hunt-sign lost-sign';
@@ -735,12 +740,14 @@ export function boot(
   lostSign.addEventListener('click', () => {
     if (lostSign.classList.contains('hunt-sign--covered') || backend.live.kind !== 'pilot3d') return;
     if (pendingActs.some((act) => act.kind === 'search')) return;
-    const sent = backend.live.searchChild(state.tick);
-    if (sent === null) return;
-    pendingActs.push({ kind: 'search', sourceTick: state.tick, child: sent.child, searcher: sent.searcher });
+    if (backend.live.searchChild() === null) return;
     lostSign.hidden = true;
   });
   const placeLostSign = (): void => {
+    const found = backend.live.kind === 'pilot3d' ? backend.live.childFound() : null;
+    if (found !== null && found.sourceTick === state.tick && !pendingActs.some((act) => act.kind === 'search')) {
+      pendingActs.push({ kind: 'search', ...found });
+    }
     const open = state.ended === null && currentRoute.kind === 'valley'
       && !document.documentElement.classList.contains('crossroad-open');
     const at = open && backend.live.kind === 'pilot3d' ? backend.live.lostSign() : null;

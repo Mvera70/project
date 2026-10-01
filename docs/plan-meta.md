@@ -17,6 +17,34 @@ Sus cifras del 29 sep son una base histórica; RD-0 remide sobre el juego
 integrado antes de proponer velocidad o cadencia. El sol, la hora y el
 calendario permanecen sincronizados.
 
+**Lo que el rework de ritmo deja pendiente de Vera (anotado el 1 oct 2026, sin
+resolver).** RD-0 a RD-6 están en `main` (v5.38–v5.51) y no se reabren; tres
+cosas quedan escritas para que decida ella:
+
+- **RD-4 no cumple aún todo su brief (Plan · interfaz).** El brief
+  (`plan-ritmo-…` §6) pedía una *selección común* de señales «sin iconos
+  simultáneos» y «tres desenlaces legibles». Lo entregado: **las cuatro
+  señales —caza, vado, visita y niño perdido— se pintan con cuatro llamadas
+  independientes** (`placeHuntSign`, `placeFordSign`, `placeVisitSign`,
+  `placeLostSign` en `ui/app.ts`), sin nada que impida dos a la vez; y **la
+  búsqueda del niño sólo distingue entre tocar y no tocar** (desde v5.52, entre
+  *llegar* y no llegar: dos líneas, `child.found_by*` y `child.found_at_dusk`).
+  **Lo que costaría completarlo:** la selección, una función pura que elija
+  una señal por vez (prioridad y distancia a cámara) con su prueba de «nunca
+  dos a la vez» y captura — una ronda media de interfaz, sin motor. Los tres
+  desenlaces, un tercer final del niño (p. ej. llegar tarde, o volver herido)
+  decidido por el parte de la llegada, sin azar nuevo, con una o dos líneas de
+  crónica y sus imágenes pedidas — motor pequeño, pero **el contenido
+  narrativo es de Vera**. **Decisión pendiente: si la simplificación se acepta.**
+- **Las primeras 8–10 horas necesitan valoración humana.** Entre las horas 3 y
+  6 hay 3,88 entradas de crónica por valle (RD-5); la piedra llega hacia las 60
+  horas y el primer asalto hacia las 114. El informe final de RD-6 reconoce que
+  falta jugarlo en un dispositivo.
+- **Los objetivos de transformación y defensa** que la tabla de tramos del plan
+  de ritmo (§3, filas 3–6 h y 6–10 h) aún sitúa entre las horas 3 y 10 se
+  pusieron **antes de elegir ×1**: a ×1 la piedra cae hacia la hora 60 y el
+  asalto hacia la 114. Hay que revisarlos; **la revisión es de Vera**.
+
 **Estado sincronizado el 23 sep 2026.** Las rondas E1–E3 y D6 ya entregaron
 los siete gestos procedurales, siete modelos publicados, armas en mano,
 visibilidad del frente, huida civil, saqueo, transición terminal, ragdolls y

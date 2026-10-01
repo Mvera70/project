@@ -333,8 +333,13 @@ describe('A2c · el cerco tiene una capa y dos puertas que sirven', () => {
    * encuentra sitio (49,55) si se la pidieran.
    */
   const paidFor = new Set<number>();
+  // Cada valle se juega una vez: las tres pruebas de aquí lo leen y no lo tocan.
+  const played = new Map<number, GameState>();
   function valley(seed: number): GameState {
+    const had = played.get(seed);
+    if (had !== undefined) return had;
     const state = foundGame(seed);
+    played.set(seed, state);
     for (let year = 0; year < 60 && state.ended === null; year += 1) {
       run(state, TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
       if (canGive(state, 'gate')) {
@@ -367,32 +372,49 @@ describe('A2c · el cerco tiene una capa y dos puertas que sirven', () => {
   /** Funcional quiere decir las dos cosas a la vez: desde la puerta se llega a
    * donde vive la gente **y** a campo abierto de fuera del cerco. Una puerta
    * que da del campo al campo, o de una bolsa a otra bolsa, no es una puerta. */
-  function gatesServe(seed: number, state: GameState): void {
+  /**
+   * Las casas a las que llega cada puerta, y **las que no tienen ninguna**: ésas
+   * están en una bolsa que levantó el motor (`placeBuilding`), no detrás de una
+   * puerta mal puesta —las dos fallan en las mismas—, y se miden aparte.
+   */
+  function gateReach(state: GameState): { gates: Building[]; homes: Building[]; reach: Uint8Array[]; pocketed: number } {
     const gates = state.buildings.filter((b) => b.lostTick === null && b.kind === 'gate');
-    expect(gates.length, `semilla ${seed}: ${gates.length} portones`).toBe(2);
     const land = terrainOf(state);
     const homes = state.buildings.filter((b) => b.lostTick === null
       && (b.kind === 'house' || b.kind === 'stone_house'));
+    const reach = gates.map((gate) => reachableFrom(land, { x: gate.x + 0.5, z: gate.y + 0.5 }));
+    const touches = (r: Uint8Array, h: Building): boolean => ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => {
+      const x = h.x + dx; const y = h.y + dy;
+      return x >= 0 && y >= 0 && x < land.width && y < land.height && r[y * land.width + x] === 1;
+    });
+    const pocketed = homes.filter((h) => !reach.some((r) => touches(r, h))).length;
+    return { gates, homes: homes.filter((h) => reach.some((r) => touches(r, h))), reach, pocketed };
+  }
+
+  function gatesServe(seed: number, state: GameState): void {
+    const { gates, homes, reach } = gateReach(state);
+    expect(gates.length, `semilla ${seed}: ${gates.length} portones`).toBe(2);
+    const land = terrainOf(state);
     const centre = { x: state.plaza.x + 0.5, y: state.plaza.y + 0.5 };
-    for (const gate of gates) {
-      const reach = reachableFrom(land, { x: gate.x + 0.5, z: gate.y + 0.5 });
+    gates.forEach((gate, n) => {
+      const r = reach[n]!;
       const reached = homes.filter((h) => ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => {
         const x = h.x + dx; const y = h.y + dy;
         return x >= 0 && y >= 0 && x < land.width && y < land.height
-          && reach[y * land.width + x] === 1;
+          && r[y * land.width + x] === 1;
       })).length;
       expect(reached / Math.max(1, homes.length),
         `semilla ${seed}, portón ${gate.x},${gate.y}: llega a ${reached} de ${homes.length} casas`)
         .toBeGreaterThanOrEqual(0.8);
       let outside = 0;
-      for (let i = 0; i < reach.length; i += 1) {
-        if (reach[i] !== 1) continue;
+      for (let i = 0; i < r.length; i += 1) {
+        if (r[i] !== 1) continue;
         const x = i % land.width; const y = (i - x) / land.width;
         if (Math.hypot(x + 0.5 - centre.x, y + 0.5 - centre.y) > (state.ring ?? 0) + 3) outside += 1;
       }
       expect(outside, `semilla ${seed}, portón ${gate.x},${gate.y}: campo abierto`)
         .toBeGreaterThan(200);
-    }
+    });
     // Y en otro lado del cerco, no la de al lado: dos puertas son dos por
     // dónde entrar. Medido: de 12 a 16 celdas de separación.
     const [a, b] = gates as [Building, Building];
@@ -401,22 +423,18 @@ describe('A2c · el cerco tiene una capa y dos puertas que sirven', () => {
   }
 
   /**
-   * **La semilla 3 con el catálogo de RD-3 (1 oct 2026)** tiene cuatro casas de
-   * piedra al este de la plaza (45,52 · 45,56 · 43,44 · 42,64), dentro del
-   * cerco y en una bolsa —una de ellas linda con agua, otra con la muralla y
-   * el bastión—, a las que no llega **ninguna** de las dos
-   * puertas: 12 de 16 desde 26,47 y las mismas 12 desde 34,63. No es dónde se
-   * puso la puerta —las dos fallan en las mismas cuatro— sino dónde se
-   * levantaron las casas, que es del motor (`placeBuilding`) y no de esta
-   * ronda. Se mide aparte, con la propiedad intacta, para que las otras nueve
-   * sigan guardándola.
+   * **Las casas en una bolsa se cuentan aparte, y se detectan en vez de
+   * fijarse** (1 oct 2026). Con el catálogo de RD-3, en su rama, la semilla 3
+   * tenía cuatro casas de piedra en una bolsa a las que no llegaba ninguna de
+   * las dos puertas (12 de 16 desde cada una), y se apartó por su número. Con
+   * RD-0 a RD-6 juntos en `main` la 3 ya no la tiene y la 36 sí (el portón
+   * 13,54 llega a 11 de 14): la lista fija se rompía con cada trayectoria. Lo
+   * que dice si una puerta sirve se mide sobre las casas a las que llega alguna;
+   * la bolsa, que es de dónde levanta casas el motor, va en la prueba de abajo.
    */
-  const POCKETED = new Set([3]);
-
   it('y las dos puertas llevan de las casas al campo, cada una por su lado', () => {
     let measured = 0;
     for (const seed of TEN) {
-      if (POCKETED.has(seed)) continue;
       const state = valley(seed);
       if (state.ended !== null) continue;
       // Un valle que nunca pudo pagar la segunda no es una muestra de dónde se
@@ -428,15 +446,16 @@ describe('A2c · el cerco tiene una capa y dos puertas que sirven', () => {
     }
     // Y la prueba no se puede quedar vacía por la puerta de atrás: si un día
     // cayeran todos los valles, esto lo diría en vez de pasar sin medir nada.
-    expect(measured, `valles en pie que se pudieron medir: ${measured} de ${TEN.length - POCKETED.size}`)
-      .toBeGreaterThanOrEqual((TEN.length - POCKETED.size) / 2);
+    expect(measured, `valles en pie que se pudieron medir: ${measured} de ${TEN.length}`)
+      .toBeGreaterThanOrEqual(TEN.length / 2);
   });
 
-  it.fails('y en la semilla 3 también, con cuatro casas en una bolsa', () => {
-    for (const seed of POCKETED) {
+  it.fails('y ninguna casa queda en una bolsa a la que no llega ninguna puerta', () => {
+    for (const seed of TEN) {
       const state = valley(seed);
-      expect(state.ended).toBeNull();
-      gatesServe(seed, state);
+      if (state.ended !== null || !paidFor.has(seed)) continue;
+      const { homes, pocketed } = gateReach(state);
+      expect(pocketed, `semilla ${seed}: ${pocketed} casas en una bolsa de ${homes.length + pocketed}`).toBe(0);
     }
   });
 });

@@ -75,8 +75,10 @@ interface ValleyBackend {
   dealVisit(kind: HappeningId, tick: number): boolean;
   /** RD-4 · Dónde va la señal del niño perdido, o `null`. */
   lostSign(): { x: number; y: number; hidden: boolean } | null;
-  /** RD-4 · Mandar a buscarlo: quién es y quién va, o `null`. */
-  searchChild(tick: number): { child: VillagerId; searcher: VillagerId } | null;
+  /** RD-4 · Mandar a buscarlo: quién es y quién va, o `null`. No apunta nada todavía. */
+  searchChild(): { child: VillagerId; searcher: VillagerId } | null;
+  /** Parte 0 · Quién llegó hasta el niño perdido, una sola vez: el rescate que el motor apunta. */
+  childFound(): { sourceTick: number; child: VillagerId; searcher: VillagerId } | null;
   /** Esquema 12 · los «+1» y «−N» de la leñera, proyectados; `age` va de 0 a 1. */
   woodGains(): readonly { id: number; count: number; x: number; y: number; age: number; icon?: 'logs' | 'wheat' }[];
   /** Completed hunt report, consumed once by the UI and forwarded to the engine. */
@@ -202,6 +204,7 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     dealVisit() { return false; },
     lostSign() { return null; },
     searchChild() { return null; },
+    childFound() { return null; },
     woodGains() { return []; },
     hunt() { return null; },
     siege() { return null; },
@@ -439,7 +442,8 @@ export function attachBackend(
         visitSign(kind) { return renderer.visitSign(kind); },
         dealVisit(kind, tick) { return renderer.dealVisit(kind, tick); },
         lostSign() { return renderer.lostSign(); },
-        searchChild(tick) { return renderer.searchChild(tick); },
+        searchChild() { return renderer.searchChild(); },
+        childFound() { return renderer.childFound(); },
         woodGains() { return renderer.woodGains(); },
         hunt() { return renderer.hunt(); },
         siege() { return renderer.siege(); },

@@ -1,5 +1,39 @@
 # The Valley — Registro de cambios
 
+## v5.52 · 1 oct 2026 · Parte 0: el niño perdido, sin rescates que nadie hizo
+
+**El fallo, en `main`:** `life-lost-child` fallaba en la semilla 23 —también
+ejecutada sola—. El toque apuntaba el acto `search` y el motor contaba el
+rescate, pero el buscador nunca llegaba: el asiento de la búsqueda cae encima
+del niño, que es un cuerpo; el buscador se quedaba a 0,9–1,1 m, su viaje se
+daba por atascado y la jornada se lo llevaba a misa (`church:21`). La crónica
+decía «lo encontró» y la escena enseñaba a alguien que se iba.
+
+**El contrato, elegido:** el rescate es una **llegada**, y la llegada entra al
+motor **como dato** por `PlayerAct`, como el parte de la caza y el de la
+batalla (§1b). No «el motor decide y la escena obedece», porque la escena no
+siempre corre (pestaña oculta, descanso, ×64, un relevo de jornada) y una ruta
+que siempre llega no se promete sin teletransportar a nadie. El motor no
+cambia de reglas: `search` pasa a significar «llegó hasta él».
+
+- `life/lost-child.ts`: `reachedBy` y `reachChild` (al alcance, `REACH` = 1,2 m,
+  TUNE medido en la semilla 23).
+- `life/village.ts`: el encargo de búsqueda se rehace en vez de abandonarse
+  (como un porte); se llega al alcance, no al asiento; si el buscador lo deja
+  (la noche, una huida), la búsqueda se deshace y la señal vuelve.
+- `renderer.ts` / `contracts.ts` / `backend.ts`: `childFound()`, el parte de la
+  llegada entregado una vez; `lostFound` se apunta al llegar, no al tocar.
+- `ui/app.ts`: el toque sólo manda; el acto entra en la cola con el parte.
+
+**Medido:** mandado a media mañana, llega en **8 de 8 semillas** (3, 7, 11, 19,
+23, 29, 41, 53) entre la fase 0,35 y la 0,42; en `main` la 23 no llegaba.
+Prueba: `life-lost-child.test.ts` busca sus semillas entre candidatas y añade
+«el rescate sólo existe si alguien llegó al alcance» (mandado justo antes del
+anochecer del último día). Sin claves de crónica nuevas. §7.10 al día. **Y
+anotado sin resolver** (`plan-meta.md`, arriba): RD-4 no cumple aún todo su
+brief —cuatro señales sin selección común, el niño con dos finales—, y las
+dos revisiones del ritmo que son de Vera.
+
 ## v5.49–v5.51 · 1 oct 2026 · RD-5: el primer año, con cosas entre medias
 
 Lo que eligió Vera para RD-5: consecuencias que vuelven, sucesos pequeños del

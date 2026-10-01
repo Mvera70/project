@@ -604,7 +604,9 @@ export type PlayerAct =
   /**
    * RD-4 · ir a buscar al niño perdido de la semana anterior: el jugador tocó
    * la señal y la capa de vida mandó al adulto libre más cercano
-   * (`world/lost-child.ts`).
+   * (`world/lost-child.ts`). Parte 0 (1 oct 2026): **es el parte de una
+   * llegada**, no de un toque: la escena sólo lo entrega cuando `searcher`
+   * llegó hasta el niño, como el parte de la caza o de la batalla.
    */
   | { kind: 'search'; sourceTick: number; child: VillagerId; searcher: VillagerId }
   | {

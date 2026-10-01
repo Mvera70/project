@@ -58,7 +58,7 @@ import {
 } from './raiders';
 import type { HappeningId } from '@engine/state';
 import { createTravellers, returningToday, stepTraveller, travelling, type Traveller } from './expeditions';
-import { bringHome, createLostChild, lostChildToday, lostInSight, stepLostChild, type LostChild } from './lost-child';
+import { bringHome, createLostChild, lostChildToday, lostInSight, reachChild, stepLostChild, type LostChild } from './lost-child';
 import { answerFordStranger, arrivingToday, beastOf, createVisitors, stallOf, stallSiteOf, stayForGoods, stepVisitor, visiting, visitsToday, type LiveDeal, type Visitor } from './visitors';
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
@@ -2117,8 +2117,13 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // a la vuelta: la leñera queda lejos de la plaza y, sin esto, medido en
         // la semilla 7, los dos porteadores lo dejaban a mediodía con la leña
         // en la mano.
+        // Parte 0 (1 oct 2026) · y quien va a por el niño perdido: el asiento
+        // cae encima de él, el viaje se daba por atascado a un metro y la
+        // jornada se lo llevaba a misa (semilla 23). Sigue hasta tenerlo al
+        // alcance (`reachChild`, abajo).
         const trading = dweller.doing?.place.id.startsWith('trade:') === true
-          || dweller.doing?.place.id.startsWith('prepare-source:trade:') === true;
+          || dweller.doing?.place.id.startsWith('prepare-source:trade:') === true
+          || dweller.doing?.place.id.startsWith('search:') === true;
         const delivering = trading || (dweller.holding !== null && dweller.holding < 0
           && dweller.doing?.offer.id.startsWith('deliver') === true);
         if (tooLong && delivering && dweller.doing !== null) {
@@ -2315,7 +2320,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             dweller.holding = null;
           }
           // RD-4 · quien fue a buscar al niño perdido ha llegado: vuelven.
-          if (dweller.doing.place.id.startsWith('search:') && lost !== null) bringHome(lost, land);
+          if (dweller.doing.place.id.startsWith('search:') && lost !== null
+            && reachChild(lost, dweller.villager, body)) bringHome(lost, land);
           // El vecino que ha ido a pagar al tratante o al salinero acaba de
           // contar: pasan las monedas a la mano del que vende.
           if (dweller.doing.offer.id === 'pay' && dweller.doing.place.id.startsWith('pay:')) {
@@ -2777,6 +2783,20 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // Y los del camino, a su hora.
       for (const visitor of visitors) stepVisitor(visitor, land, phase, steps);
       for (const traveller of travellers) stepTraveller(traveller, land, phase, steps);
+      // Parte 0 · el niño perdido se encuentra **al alcance de la mano**, no al
+      // llegar a un asiento que su propio cuerpo tapa. Y si quien iba a por él
+      // tuvo que dejarlo —se hizo de noche, huye, cayó—, la búsqueda se deshace
+      // y la señal vuelve: no se cuenta un rescate que nadie hizo.
+      if (lost !== null && lost.phase === 'lost' && lost.searcher !== null) {
+        const searcher = dwellers.find((one) => one.villager === lost.searcher);
+        if (searcher !== undefined && reachChild(lost, searcher.villager, searcher.body)) {
+          bringHome(lost, land);
+          searcher.doing = null;
+          searcher.rethinkAt = steps;
+        } else if (searcher === undefined || searcher.doing?.place.id !== `search:${lost.villager}`) {
+          lost.searcher = null;
+        }
+      }
       if (lost !== null) stepLostChild(lost, land, phase);
       // Al tratante y al salinero, que venden a la aldea, les paga un vecino:
       // el adulto libre más cercano va a él cuando ya está en la plaza, habla

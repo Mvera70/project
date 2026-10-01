@@ -1,5 +1,21 @@
 # Cuaderno de tareas — el rework
 
+## 1 oct 2026 · Parte 0: el niño perdido, sin rescates que nadie hizo (v5.52)
+
+Rama `ccr-372e1786-k4brcp`. Reproducido en `main`: semilla 23, el buscador se
+queda a 0,9 m, se va a misa, y el motor ya había apuntado el rescate en el
+toque. **Contrato:** la llegada entra al motor como dato (`childFound` →
+acto `search`), como la caza y la batalla; el porqué, en §7.10 y el changelog.
+Medido: llega en 8 de 8 semillas. **Abierto, de Vera** (escrito en
+`plan-meta.md`, arriba): (1) **RD-4 no cumple aún todo su brief** —las cuatro
+señales se pintan con llamadas independientes, sin la selección común; la
+búsqueda del niño sólo distingue entre llegar y no llegar— y si la
+simplificación se acepta lo decide ella (completarlo: una ronda media de
+interfaz para la selección; un tercer final del niño con su texto, que es
+suyo); (2) las primeras 8–10 horas piden valoración humana en un dispositivo;
+(3) los objetivos de transformación y defensa de las horas 3–10 se fijaron
+antes de ×1 y hay que revisarlos. Siguiente: K1+K2+K3.
+
 ## 1 oct 2026 · RD-5: el primer año (v5.49–v5.51)
 
 Rama `claude/rd5-primer-ano` (sobre `claude/rd4-senales`). Medido antes y

@@ -799,7 +799,9 @@ test('la primera ocasión del mapa se puede tocar y el tablón queda en el encua
   await page.locator('.title-new').click();
   await page.waitForFunction(() => ['hints', 'done'].includes(document.documentElement.dataset.intro ?? ''),
     null, { timeout: 180_000 });
-  const sign = page.locator('.hunt-sign');
+  // La de caza y sólo ella: desde RD-4 el vado, la visita y el niño perdido
+  // también llevan `.hunt-sign` (para la forma) y el localizador dejó de ser único.
+  const sign = page.locator('.hunt-sign:not(.ford-sign):not(.visit-sign):not(.lost-sign)');
   await test.expect.poll(async () => {
     return sign.evaluate((el) => {
       const button = el as HTMLButtonElement;
