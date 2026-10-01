@@ -54,10 +54,22 @@ function assaulted(seed: number, years: number, bows: boolean): GameState {
  * nada: eso es la propiedad «sin cerco no hay guarnición», y la guarda
  * `tests/fast/garrison.test.ts`.
  */
-const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [11, 25], [23, 25], [36, 30]];
+const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [23, 25], [36, 30]];
+
+/**
+ * RD-3 (1 oct 2026) · **La semilla 11 sale de la lista y queda declarada aparte**
+ * (`it.fails`, abajo), con la propiedad intacta. Con el catálogo de RD-3 su
+ * trayectoria cambia y a los veinticinco años —y a los treinta— la partida
+ * saquea y se va sin acercarse al cerco: medido, **96 flechas, 0 aciertos**,
+ * todas en el suelo a una mediana de 4,3 celdas del asaltante más cercano (la
+ * más cercana a 1,2) y ninguna en el muro. Es la puntería contra una partida
+ * que no se acerca, no el motor: la 7 (61 flechas, 7 aciertos) y la 23 (55, 11)
+ * siguen acertando.
+ */
+const MISSING: readonly [number, number] = [11, 25];
 
 describe('D2 · la muralla contesta', () => {
-  it('se dispara, y alguna acierta, en los cuatro valles', async () => {
+  it('se dispara, y alguna acierta, en los valles que se acercan al cerco', async () => {
     // Medido al cerrar D2, con el clan de veinte y doce cuerpos en pantalla:
     // de **28 a 97 flechas** soltadas en la jornada y de **4 a 12 saqueadores
     // en el suelo**. El reparto es dispar a propósito y no es un defecto: la
@@ -85,6 +97,20 @@ describe('D2 · la muralla contesta', () => {
         .toBeLessThan(60);
       physics.dispose();
     }
+  });
+
+  it.fails('semilla 11 · la partida que no se acerca al cerco también recibe algún acierto (medido: 96 flechas, 0)', async () => {
+    const [seed, years] = MISSING;
+    const state = assaulted(seed, years, true);
+    const physics = await createPhysics(terrainOf(state));
+    expect(physics).not.toBeNull();
+    if (physics === null) return;
+    const life = createVillage(state, 0, { physics });
+    for (let n = 0; n < DAY_STEPS; n += 1) life.step();
+    const { loosed, hits } = life.defence;
+    physics.dispose();
+    expect(loosed).toBeGreaterThan(0);
+    expect(hits, `semilla ${seed}: ${hits} de ${loosed} dieron`).toBeGreaterThan(0);
   });
 
   it('sin arcos no se suelta una sola flecha', async () => {

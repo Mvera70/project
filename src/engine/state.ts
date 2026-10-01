@@ -689,6 +689,12 @@ export type Condition =
   // la da `state.threat.comingTick`, que B1 pone ocho semanas antes de que
   // lleguen: ese hueco existe justamente para que se pueda preguntar aquí.
   | { k: 'raid'; coming: boolean }
+  // RD-3 · **Se puede pedir una obra más de esta familia** (`withinCap`: el
+  // tope de §12 contando lo en pie y lo ya reservado; y, para la muralla, que el
+  // anillo esté escrito). Existe porque una opción que pide `build` a un tope
+  // lleno, o a una muralla sin anillo, se cobraba entera y no construía nada
+  // (RD-0, T2): con esto, la opción sólo se ofrece si la obra puede ocurrir.
+  | { k: 'room'; building: BuildingKind }
   | { k: 'not'; c: Condition }
   | { k: 'any'; cs: Condition[] };
 

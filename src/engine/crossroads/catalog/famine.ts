@@ -1,6 +1,6 @@
 // M-08 · Hunger. design.md Annex A.3, A.4.
 
-import { FATE } from '../../balance';
+import { CROSSROAD_EFFECTS, FATE } from '../../balance';
 import type { CrossroadTemplate } from '../schema';
 
 /**
@@ -9,6 +9,15 @@ import type { CrossroadTemplate } from '../schema';
  *
  * Harvest promises use §8.4's harvest effect and are spent by the next reaping.
  * `forced_hunger` remains a short flag because it changes eight weekly meals.
+ *
+ * **RD-3 (1 oct 2026) · reescrita contra el dictamen de RD-0.** Era el dilema
+ * más auténtico del catálogo y llegaba tarde (mediana: el año 18) porque el
+ * reparto pedía a la vez un `reeve` y una `midwife`, que un caserío no tiene:
+ * ahora basta con dos nombrados, y el caserío —que es donde más hambre hay— la
+ * ve. Y las cifras eran fijas (+300 son cuatro semanas para setenta personas y
+ * setenta y cinco para cuatro): ahora son proporciones de lo que hay. Sus dos
+ * `visible` falsos (`raise field` sin obra, `douse mill` sin molino) son
+ * reuniones, que sí ocurren.
  */
 const HUNGRY_SPRING: CrossroadTemplate = {
   id: 'hungry_spring',
@@ -20,8 +29,8 @@ const HUNGRY_SPRING: CrossroadTemplate = {
     { k: 'ratio', ratio: 'grainYears', op: '<', v: 0.35 },
   ],
   cast: [
-    { as: 'A', role: 'reeve' },
-    { as: 'B', role: 'midwife' },
+    { as: 'A', anyNamed: true },
+    { as: 'B', anyNamed: true, excluding: ['A'] },
   ],
   title: 'crossroad.hungry_spring.title',
   body: 'crossroad.hungry_spring.body',
@@ -34,7 +43,9 @@ const HUNGRY_SPRING: CrossroadTemplate = {
         { k: 'flag', flag: 'forced_hunger', years: 8 / 48 },
         { k: 'stat', stat: 'morale', delta: -8 },
       ],
-      visible: [{ k: 'raise', kind: 'field' }],
+      // RD-3 · la siembra es lo que se ve: toda la aldea al campo. El `raise
+      // field` de antes no levantaba ningún campo.
+      visible: [{ k: 'gather', where: 'square', days: 3 }],
       seeds: [],
       traitWeight: { stubborn: 2, hardy: 2 },
     },
@@ -43,10 +54,10 @@ const HUNGRY_SPRING: CrossroadTemplate = {
       label: 'crossroad.hungry_spring.eat_it.label',
       cost: 'crossroad.hungry_spring.eat_it.cost',
       effects: [
-        { k: 'stat', stat: 'grain', delta: 300 },
+        { k: 'stat', stat: 'grain', mul: CROSSROAD_EFFECTS.EAT_SEED_GRAIN_MUL },
         { k: 'harvest', factor: 0.55, harvests: 1 },
       ],
-      visible: [{ k: 'douse', kind: 'mill' }],
+      visible: [{ k: 'gather', where: 'square', days: 2 }],
       seeds: [
         {
           id: 'lean_autumn',
@@ -63,7 +74,7 @@ const HUNGRY_SPRING: CrossroadTemplate = {
       label: 'crossroad.hungry_spring.half_and_half.label',
       cost: 'crossroad.hungry_spring.half_and_half.cost',
       effects: [
-        { k: 'stat', stat: 'grain', delta: 140 },
+        { k: 'stat', stat: 'grain', mul: CROSSROAD_EFFECTS.HALF_SEED_GRAIN_MUL },
         { k: 'harvest', factor: 0.78, harvests: 1 },
         { k: 'stat', stat: 'morale', delta: -4 },
       ],
@@ -74,7 +85,17 @@ const HUNGRY_SPRING: CrossroadTemplate = {
   ],
 };
 
-/** A.4 · The broken latch. Nobody saw anything, and everybody is sure. */
+/**
+ * A.4 · The broken latch. Nobody saw anything, and everybody is sure.
+ *
+ * **RD-3 (1 oct 2026) · reescrita contra el dictamen de RD-0.** Ninguna de las
+ * tres opciones tocaba el grano ni el granero: se decidía a quién creer sobre
+ * un robo que no dejaba huella. Ahora **falta grano** —el cuerpo lo dice y las
+ * tres opciones lo cobran, que es lo que hace que el robo sea un hecho y no un
+ * rumor— y el cerrojo nuevo cuesta madera de verdad. Los `visible` que no
+ * ocurrían (`douse smithy` sin relación con el robo, `raise palisade` sin obra)
+ * son reuniones.
+ */
 const GRANARY_THEFT: CrossroadTemplate = {
   id: 'granary_theft',
   category: 'famine',
@@ -114,6 +135,7 @@ const GRANARY_THEFT: CrossroadTemplate = {
       label: 'crossroad.granary_theft.believe_b.label',
       cost: 'crossroad.granary_theft.believe_b.cost',
       effects: [
+        { k: 'stat', stat: 'grain', mul: CROSSROAD_EFFECTS.THEFT_GRAIN_MUL },
         { k: 'role', who: 'A', role: null },
         { k: 'leave', who: 'A' },
         { k: 'stat', stat: 'morale', delta: -6 },
@@ -140,10 +162,11 @@ const GRANARY_THEFT: CrossroadTemplate = {
       label: 'crossroad.granary_theft.believe_a.label',
       cost: 'crossroad.granary_theft.believe_a.cost',
       effects: [
+        { k: 'stat', stat: 'grain', mul: CROSSROAD_EFFECTS.THEFT_GRAIN_MUL },
         { k: 'opinion', from: 'B', to: 'A', delta: -45 },
         { k: 'memory', who: 'B', kind: 'was_blamed', about: 'A', weight: 5 },
       ],
-      visible: [{ k: 'douse', kind: 'smithy' }],
+      visible: [{ k: 'gather', where: 'square', days: 2 }],
       seeds: [
         {
           id: 'the_feud',
@@ -161,10 +184,12 @@ const GRANARY_THEFT: CrossroadTemplate = {
       label: 'crossroad.granary_theft.a_new_latch.label',
       cost: 'crossroad.granary_theft.a_new_latch.cost',
       effects: [
+        { k: 'stat', stat: 'grain', mul: CROSSROAD_EFFECTS.THEFT_GRAIN_MUL },
+        { k: 'stat', stat: 'wood', delta: -CROSSROAD_EFFECTS.LATCH_WOOD },
         { k: 'stat', stat: 'morale', delta: -10 },
         { k: 'stat', stat: 'faith', delta: -5 },
       ],
-      visible: [{ k: 'raise', kind: 'palisade' }],
+      visible: [{ k: 'gather', where: 'square', days: 1 }],
       seeds: [
         {
           id: 'rot_within',

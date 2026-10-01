@@ -139,7 +139,7 @@ describe('E3b · pasillo interior de una villa real', () => {
       }
       return { blocked, copy };
     };
-    const { state, found } = firstVilla([2, 37, 36, 22, 12, 1], 'un anillo cerrado que sólo los árboles bloquean', (candidate) => {
+    const { state, found } = firstVilla([2, 37, 36, 22, 12, 1, 9], 'un anillo cerrado que sólo los árboles bloquean', (candidate) => {
       const bastion = ringOf(candidate);
       if (bastion === undefined) return null;
       const scene = sceneRingOf(candidate, bastion, all, 'center');
@@ -177,6 +177,8 @@ describe('E3b · pasillo interior de una villa real', () => {
     }
   });
 
+  // RD-3 (1 oct 2026) · con su catálogo ninguna de las de RD-1 y RD-5 queda
+  // lista; sí la 47 (medido en las semillas 1 a 60), que va al final.
   it('un guardia asignado sube, recorre y regresa por el anillo candidato de una villa lista', () => {
     // Precondición: un anillo cerrado con la geometría lista. Era la semilla 91
     // y luego la 23, que cerraron en retorno 132 y en nada al moverse la
@@ -184,7 +186,7 @@ describe('E3b · pasillo interior de una villa real', () => {
     // encima, la 13, la 14 y la 40).
     // El guardia sube, da la vuelta y baja: en la 23 eran 8 206 pasos para 88
     // tramos, de ahí el tope de abajo, con holgura para anillos mayores.
-    const { state, found: ring } = firstVilla([38, 33, 13, 14, 40], 'un anillo candidato con la geometría lista', (candidate) => {
+    const { state, found: ring } = firstVilla([38, 33, 13, 14, 40, 47], 'un anillo candidato con la geometría lista', (candidate) => {
       const bastion = ringOf(candidate);
       if (bastion === undefined) return null;
       const scene = sceneRingOf(candidate, bastion, all, 'center');
@@ -239,12 +241,16 @@ describe('E3b · pasillo interior de una villa real', () => {
     // donde nada se construye encima después, deja el adarve listo.
     let state: GameState | null = null;
     let moves: ReturnType<typeof planRingCorridorMoves> = null;
-    for (const seed of [20, 12, 26, 15, 19, 33]) {
+    // RD-3 · con su catálogo, la primera con plan de la lista de antes lo
+    // planifica pero el adarve vuelve a quedar cortado (el hueco del motor de
+    // arriba). Planifican traslado y dejan el adarve libre la 31, la 32, la 37
+    // y la 39 (medido el 1 oct 2026 en las semillas 1 a 40): van delante.
+    for (const seed of [31, 32, 37, 39, 20, 12, 26, 15, 19, 33]) {
       const candidate = played(seed, 2000);
       const plan = planRingCorridorMoves(candidate);
       if (plan !== null && plan.length > 0) { state = candidate; moves = plan; break; }
     }
-    expect(state, 'ninguna de las villas 20, 12, 26, 15, 19 y 33 tiene un traslado que planificar').not.toBeNull();
+    expect(state, 'ninguna de las villas 31, 32, 37, 39, 20, 12, 26, 15, 19 y 33 tiene un traslado que planificar').not.toBeNull();
     const village = state!;
     const beforeTerrain = village.map.terrain.slice();
     const beforeBuildings = structuredClone(village.buildings);

@@ -1,5 +1,6 @@
 // M-08 · The wood. design.md Annex A.11, A.12.
 
+import { CROSSROAD_EFFECTS } from '../../balance';
 import type { CrossroadTemplate } from '../schema';
 
 /**
@@ -10,6 +11,18 @@ import type { CrossroadTemplate } from '../schema';
  * arithmetic and not a condition the §8.2 DSL can ask. The population floor
  * plus a full-ish granary is the closest the DSL gets, and it fires in the same
  * situations: a village big enough to be short of ground.
+ *
+ * **RD-3 (1 oct 2026) · reescrita contra el dictamen de RD-0.** La premisa
+ * («los campos no alimentan otro invierno») no se comprobaba: en 22 de 40
+ * preguntas medidas los campos estaban en el tope de 8, la tala se cobraba
+ * entera (+900 de madera) y los dos campos de `fell_it` fallaban en silencio.
+ * Y salía **exactamente cuatro veces por partida**, porque `forestLeft > 0,12`
+ * y `people > 25` son ciertas siempre y sólo mandaba el reposo. Ahora (1) sólo
+ * sale si **hay sitio para otro campo** (`room field`) y (2) **la despensa no
+ * llega bien a la cosecha** (`grainToHarvest < FOREST_CUT_PANTRY`): faltan
+ * campos de verdad y se pueden levantar. La semilla de `leave_it_standing`
+ * exigía más de la mitad de bosque, que el corazón del valle no alcanza nunca
+ * (0,18–0,26 medido): se marchitaba siempre.
  */
 const FOREST_CUT: CrossroadTemplate = {
   id: 'forest_cut',
@@ -19,6 +32,9 @@ const FOREST_CUT: CrossroadTemplate = {
   requires: [
     { k: 'ratio', ratio: 'forestLeft', op: '>', v: 0.12 },
     { k: 'stat', stat: 'people', op: '>', v: 25 },
+    // RD-3 · faltan campos y se pueden levantar.
+    { k: 'ratio', ratio: 'grainToHarvest', op: '<', v: CROSSROAD_EFFECTS.FOREST_CUT_PANTRY },
+    { k: 'room', building: 'field' },
   ],
   cast: [{ as: 'A', role: 'woodward' }],
   title: 'crossroad.forest_cut.title',
@@ -41,7 +57,8 @@ const FOREST_CUT: CrossroadTemplate = {
           id: 'bare_slopes',
           delayYears: [20, 40],
           effects: [{ k: 'flag', flag: 'flood_prone', years: 0 }],
-          visible: [{ k: 'scar', what: 'burnt_field' }],
+          // RD-3 · ningún campo ardía: lo que se ve es el cartel del valle.
+          visible: [{ k: 'banner', colour: 'grey', years: 5 }],
           chronicleKey: 'consequence.bare_slopes',
         },
       ],
@@ -75,7 +92,7 @@ const FOREST_CUT: CrossroadTemplate = {
         {
           id: 'the_wood_holds',
           delayYears: [15, 35],
-          condition: { k: 'ratio', ratio: 'forestLeft', op: '>', v: 0.5 },
+          condition: { k: 'ratio', ratio: 'forestLeft', op: '>', v: CROSSROAD_EFFECTS.WOOD_HOLDS_FOREST },
           effects: [
             { k: 'arrive', count: 3 },
             { k: 'stat', stat: 'morale', delta: 10 },
@@ -188,4 +205,13 @@ const WOLF_WINTER: CrossroadTemplate = {
   ],
 };
 
-export const FOREST_TEMPLATES: readonly CrossroadTemplate[] = [FOREST_CUT, WOLF_WINTER];
+export const FOREST_TEMPLATES: readonly CrossroadTemplate[] = [FOREST_CUT];
+
+/**
+ * RD-3 (1 oct 2026) · **Retirada del sorteo: `wolf_winter`.** Casi
+ * inalcanzable (`forestLeft > 0,25`: 0,26 % de los ticks cumplían condiciones)
+ * y los lobos ya existen como cuerpo en el suceso `wolves_at_the_coop`
+ * (`world/fate.ts`, `life/wildlife.ts`): la plantilla no sacaba ninguno a
+ * escena. Se queda para los guardados (`RETIRED_TEMPLATES`).
+ */
+export const RETIRED_FOREST_TEMPLATES: readonly CrossroadTemplate[] = [WOLF_WINTER];

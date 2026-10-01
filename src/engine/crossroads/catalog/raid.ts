@@ -99,10 +99,25 @@ const RAIDERS_COMING: CrossroadTemplate = {
  * aldea acaba de perder grano y ganado, y lo que decide ahora dice qué clase de
  * valle es. Ir detrás de ellos puede recuperar lo robado o dejar viudas; encajar
  * el golpe y levantar cerco cuesta lo que cuesta la madera.
+ *
+ * **RD-3 (1 oct 2026) · reescrita contra el dictamen de RD-0.** `build_up`
+ * prometía «levantar el muro» y sólo ponía una bandera (`threatened`) que la
+ * aldea lee para adelantar la empalizada: no construía nada. Ahora **pide dos
+ * tramos de empalizada** (`build palisade`, gratis de materiales y trabajo de la
+ * aldea) y lo que se ve es esa obra. `chase` devolvía **+120 fijos** pasara lo
+ * que pasara con el saqueo: ahora devuelve la mitad de lo que el saqueo se
+ * llevó del grano (`mul`, calculado contra `THREAT.SACK_SHARE`). **Lo que no
+ * hace, y queda dicho:** leer el parte de la batalla —quién murió, qué se
+ * perdió— no cabe en el DSL de §8.2, que no sabe preguntar por `threat`; la
+ * pregunta sigue saliendo tras cada saqueo, haya sido el que fuera.
  */
 const AFTER_THE_RAID: CrossroadTemplate = {
   id: 'after_the_raid',
   category: 'raid',
+  // RD-3 · se probó 14 → 8 y **no movió ni una pregunta** en 10 semillas × 60
+  // años (las trayectorias salieron idénticas byte a byte): el peso no es la
+  // palanca de su frecuencia. Se queda en 14; lo que la limita es el reposo y
+  // que la marca `just_sacked` dura un año.
   weight: 14,
   cooldownYears: 3,
   requires: [
@@ -119,7 +134,7 @@ const AFTER_THE_RAID: CrossroadTemplate = {
       label: 'crossroad.after_the_raid.chase.label',
       cost: 'crossroad.after_the_raid.chase.cost',
       effects: [
-        { k: 'stat', stat: 'grain', delta: 120 },
+        { k: 'stat', stat: 'grain', mul: 1 + THREAT.SACK_SHARE / (2 * (1 - THREAT.SACK_SHARE)) },
         { k: 'kill', who: 'random', count: 1 },
         { k: 'stat', stat: 'morale', delta: 6 },
       ],
@@ -133,11 +148,17 @@ const AFTER_THE_RAID: CrossroadTemplate = {
       label: 'crossroad.after_the_raid.build_up.label',
       cost: 'crossroad.after_the_raid.build_up.cost',
       effects: [
+        // RD-3 · la obra de verdad: dos tramos de empalizada.
+        { k: 'build', kind: 'palisade', free: true },
+        { k: 'build', kind: 'palisade', free: true },
         { k: 'stat', stat: 'wood', delta: -80 },
         { k: 'flag', flag: 'threatened', years: 3 },
         { k: 'stat', stat: 'morale', delta: -3 },
       ],
-      visible: [{ k: 'gather', where: 'square', days: 2 }],
+      // RD-3 · sólo si hay anillo (A2c): sin él la estaca se rechaza y la opción
+      // cobraba la madera sin levantar nada.
+      requires: [{ k: 'room', building: 'palisade' }],
+      visible: [{ k: 'raise', kind: 'palisade' }],
       seeds: [],
       traitWeight: { cunning: 1.5, proud: 0.7 },
     },

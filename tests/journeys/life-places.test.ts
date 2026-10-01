@@ -174,26 +174,31 @@ describe('V-10 · sitios con vida', () => {
     // mirar la conectividad, tres de seis semillas no ofrecían plaza ni claro
     // en absoluto.
     //
-    // Las seis; la 37 va aparte, con su historia, en la prueba de abajo.
+    // Cinco aquí y la sexta, la 37, aparte en la prueba de abajo.
     for (const seed of [7, 11, 23, 31, 41]) expectCommons(seed);
   });
 
-  // **La sexta era `it.fails` y vuelve a la lista** (1 oct 2026, RD-1). Se
-  // declaró en rojo el 30 sep porque la aldea de la semilla 37 quedaba
-  // **encerrada**: su único portón (el 29, en 30,56) perdía el camino desde la
-  // plaza en el tick 1067, cuando el motor abría la obra de la iglesia en
-  // (31,61), en la franja entre la muralla y el río (`placeBuilding` comprueba
-  // que el edificio nuevo se alcance desde la plaza, no que el portón siga
-  // alcanzándose). RD-1 deja planteada la encrucijada del vado desde el tick 0
-  // y mueve la trayectoria de toda villa jugada con `run`: la 37 ya no
-  // queda sin sitios comunes (medido por sus consecuencias, no por la obra
-  // concreta): tiene plaza, vado y claro. Remedido el 1 oct 2026, a los 1 920 ticks: las tres en
-  // las seis semillas de arriba (37 incluida) y en las quince de la 50 a la 64.
-  // **El defecto del motor sigue
-  // sin arreglar**: la regla de colocación no se ha tocado, sólo esta
-  // trayectoria no lo provoca. Si otra ronda lo vuelve a sacar, la semilla que
-  // lo muestre se declara aparte, otra vez con `it.fails`.
-  it('semilla 37 · la aldea tiene plaza, vado y claro a los que ir', () => {
+  // **La sexta, declarada en rojo con la propiedad intacta** (`CLAUDE.md`). No
+  // es el claro: es la aldea, que en la semilla 37 queda **encerrada**. Medido
+  // el 30 sep 2026: su único portón (el 29, en 30,56, puesto en el tick 266)
+  // deja de tener camino desde la plaza en el tick 1067, cuando el motor abre
+  // la obra de la iglesia en (31,61), en la franja entre la muralla y el río.
+  // Desde la plaza se llega a 299 celdas (a 3 650 un tick antes), y los dos
+  // prados con bosque alrededor se quedan fuera. `placeBuilding` comprueba que
+  // el edificio nuevo se alcance desde la plaza, pero no que el portón se siga
+  // alcanzando. Es un defecto del motor, sin arreglar en esta tanda porque
+  // cambiar la regla de colocación mueve todas las villas fijadas en las
+  // jornadas; cuando se arregle, esto se pone rojo y la 37 vuelve arriba.
+  //
+  // **Y vuelve a verde (RD-3, 1 oct 2026), sin que nadie toque la regla de
+  // colocación.** Retirar seis encrucijadas y reescribir ocho movió el flujo
+  // `crossroads` y con él la trayectoria de la 37: la iglesia ya no se abre en
+  // la franja que cierra el portón, y el `it.fails` de abajo pasa («Expect test
+  // to fail»; medido en la jornada completa del 1 oct). El defecto del motor
+  // —`placeBuilding` no comprueba que el portón se siga alcanzando— sigue
+  // intacto y le puede tocar a cualquier otra semilla: cuando vuelva, esto se
+  // pone de nuevo en `it.fails` con la semilla que lo muestre.
+  it('semilla 37 · la aldea no queda encerrada por una obra (desde RD-3)', () => {
     expectCommons(37);
   });
 

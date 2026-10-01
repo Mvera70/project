@@ -75,6 +75,61 @@ iguales a ×1 en 240 fases; orden de claridad; a ×64 al menos el 40 % de la
 jornada). Evidencia: `docs/medidas/sol-sincronia-2026-09-30.md`. D.6.5, §10.7 y
 §10.8 de `design.md`, al día. **Abierto:** que Vera juzgue la comodidad a ×64
 en la tablet.
+## v5.46 · 1 oct 2026 · RD-3: seis encrucijadas retiradas, ocho reescritas contra el dictamen de RD-0
+
+Vera aplicó el dictamen de `docs/medidas/rd0-encrucijadas-2026-09-30.md`. El
+catálogo vivo pasa de **21 a 15** plantillas y las retiradas de **3 a 9**; medida
+antes y después en `docs/medidas/rd3-encrucijadas-2026-10-01.md`.
+
+- **Retiradas del sorteo** (a `RETIRED_TEMPLATES`, con opciones, semillas y
+  textos intactos: un guardado con una pendiente, o con ellas en el registro,
+  sigue cargando, enseñando título y contestándose; `templateOf` ya lo resolvía
+  desde v5.39): `plague_blame` (casi inalcanzable), `tithe_demand` (el motor ya
+  cobra el diezmo cada otoño), `chapel_or_granary` (se planteaba con la iglesia
+  ya en pie), `relic_pedlar` (duplica el medio `relic`), `wolf_winter` (los lobos
+  ya son un suceso con cuerpo) y `bandits` (es el clan vecino sin su batalla). La
+  categoría `faith` se queda sin plantillas vivas.
+- **Reescritas** para que coste anunciado, efecto y pantalla coincidan:
+  `winter_grain_debt` (pide veinte personas; los carros traen ×2,2 de lo que hay,
+  no +900), `hungry_spring` (sin `reeve` ni `midwife`: sale desde el primer
+  invierno; efectos proporcionales), `granary_theft` (falta grano de verdad en las
+  tres opciones), `smith_feud` (B odia a A a −55 o peor y sólo estalla con el
+  ánimo < 45: ya no sale exactamente cuatro veces por partida), `feud_inherited`
+  (B es el que odia a A: un nombrado adulto, sin llave `{B}` en la tarjeta ni
+  oficios a un menor), `forest_cut` (sólo con sitio para un campo y la despensa
+  corta), `after_the_raid` (`build_up` pide dos tramos de empalizada; `chase`
+  devuelve la mitad del grano saqueado) y `first_stone` (llega con la iglesia en
+  pie y el cerco sin cerrar —año ~6—, no al 41 con la muralla ya levantada).
+- **Promesas corregidas** (dictamen T-lista): `take_it_at_night` ya no dice «si
+  se descubre» (era siempre), `plague_pit.burn_the_houses` dice que arden **las
+  dos casas más viejas**, `strangers_at_the_ford.turn_them_away` avisa de los diez
+  años sin visitas, `smith_feud.side_with_*` dice cuándo se va B y **ya no apaga la fragua para siempre** (`lit smithy off`: nada la volvía a encender, y una fragua apagada deja sin picar piedra; con `build_together` oculto hasta que hay anillo, `side_with_*` sale más y habría retrasado la piedra y la villa); y toda `visible`
+  sin respaldo (un `raise` sin `build`, un `scar` sin `fell`, un `douse` sin `lit`,
+  `scar grave_row`, que el render no dibuja) pasa a algo que ocurre.
+- **Dos extensiones mínimas del DSL**, fuera de `catalog/` y declaradas aquí
+  porque la reescritura las necesita: la condición `{ k: 'room', building }`
+  (`withinCap`: cabe una obra más; `state.ts`, `conditions.ts`, validador de
+  `save.ts`) y `min` en el reparto `grudgeAgainst` (la opinión de B sobre A ≤
+  −min; `schema.ts`, `cast.ts`). Sin campos nuevos de estado ni subida de
+  esquema; las letras de reparto y los ids de opción de las reescritas no
+  cambian, así que una pendiente de un guardado anterior sigue siendo válida.
+- Las cifras de las reescritas viven en `CROSSROAD_EFFECTS` (`balance.ts`, con
+  `// TUNE:`). **Pruebas:** `tests/fast/catalog.test.ts` (21 → 15 y 3 → 9,
+  explicado; semillas de las retiradas disparables; ninguna `visible` sin
+  respaldo), `tests/fast/rd3-catalogue.test.ts` (nuevo) y la sección RD-3 de
+  `tests/journeys/catalogue-coverage.test.ts`. `chapel_or_granary` dejó de servir
+  de plantilla de ejemplo en `sim.test.ts` (ahora `forest_cut.take_the_edge`); se
+  quitó de `pressure.test.ts` el test del requires de `tithe_demand`.
+- **La ronda movió las trayectorias** (cambia el flujo `crossroads` y la primera
+  piedra llega al año ~8): se ajustaron, con su causa escrita, `era`,
+  `fire-brigade`, `life-companions`, `marks`, `reactions`, `crown`,
+  `ui-milestones` (cota 60 → 80, medida), `daylife`, `scars`, `quarrels`,
+  `life-places`, `life-props` y `life-beasts`. **Quedan rojas, sin remedir, para
+  la CI:** `archery` (semilla 11), `e3b-corridor` ×4 y `e3b-rampart` ×2 (huellas
+  de villas concretas: se remiden en 60 semillas, como en
+  `docs/historico/rework.md` §2.7). Detalle en
+  `docs/medidas/rd3-encrucijadas-2026-10-01.md` §7b.
+
 ## v5.39 · 30 sep 2026 · Una encrucijada retirada pendiente vuelve a ser una pregunta
 
 La auditoría de RD-0 (`docs/medidas/rd0-encrucijadas-2026-09-30.md` §6) midió

@@ -9,7 +9,7 @@
 // actualmente como líder».
 
 import { describe, expect, it } from 'vitest';
-import { CROWN, TIME } from '@engine/balance';
+import { CROWN, OPINION, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { run, tick } from '@engine/sim';
 import { population } from '@engine/people/demography';
@@ -105,7 +105,10 @@ describe('K-1 · la corona se da, y se paga', () => {
     const out = crownKing(state, who.id, 'spring', 3);
     expect(out.setAside).toBe(old.id);
     expect(old.role).toBeNull();
-    expect(old.opinions[who.id] ?? 0).toBeCloseTo(before + CROWN.SET_ASIDE_OPINION, 6);
+    // **Con el suelo de §6.4**: la opinión no baja de `OPINION.MIN`. Con una
+    // aldea de ocho años (RD-3 movió las trayectorias) el desplazado ya podía
+    // odiarlo a −94, y `before + (−45)` es −139, que el motor acota a −100.
+    expect(old.opinions[who.id] ?? 0).toBeCloseTo(Math.max(OPINION.MIN, before + CROWN.SET_ASIDE_OPINION), 6);
     expect(old.memories.some((m) => m.kind === 'was_passed_over' && m.aboutId === who.id)).toBe(true);
     expect(out.entries.some((e) => e.templateKey === 'crown.set_aside')).toBe(true);
   });

@@ -195,18 +195,8 @@ describe('quien prospera a la vista se hace interesante · M-1', () => {
     expect(poor).toBe(false);
   });
 
-  it('y el señor visita a quien tiene plata, no sólo a su vasallo', () => {
-    const state = foundTwenty(7);
-    run(state, TIME.WEEKS_PER_YEAR * 8, 'prudent', CATALOG);
-    state.tick = TIME.WEEKS_PER_YEAR * 8 + 35; // otoño entrado
-    delete state.flags['vassal'];
-    delete state.flags['watched'];
-    const template = CATALOG.find((t) => t.id === 'tithe_demand');
-    if (template === undefined) throw new Error('falta tithe_demand');
-    state.village.silver = 0;
-    const unknown = all(template.requires, state);
-    state.village.silver = FATE.RICH_SILVER + 10;
-    expect(all(template.requires, state)).toBe(true);
-    expect(unknown).toBe(false);
-  });
+  // RD-3 (1 oct 2026) · aquí vivía «el señor visita a quien tiene plata, no sólo
+  // a su vasallo», que leía el `requires` de `tithe_demand`. Esa plantilla se
+  // retiró del sorteo (duplicaba el diezmo automático de `world/road.ts`) y
+  // con ella la propiedad: la plata ya no llama a una encrucijada del señor.
 });

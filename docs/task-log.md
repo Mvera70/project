@@ -54,6 +54,42 @@ aplana hacia la media mañana a ×16/×64: se suaviza la amplitud y el sol sigue
 la hora (`LIGHT_SWING`). Evidencia: `docs/medidas/sol-sincronia-2026-09-30.md`.
 **Versiones reservadas para este rework: v5.38–v5.49.** **Abierto:** la
 comodidad a ×64 en la tablet.
+## 1 oct 2026 · RD-3: el catálogo de encrucijadas, de 21 a 15 (v5.46)
+
+Rama `claude/rd3-encrucijadas`. Seis retiradas del sorteo y ocho reescritas
+contra el dictamen de RD-0; antes y después medidos en
+`docs/medidas/rd3-encrucijadas-2026-10-01.md` (10 semillas × 60 años con `run`
+y la política prudente: **46,8 → 36,0 preguntas por partida**, `smith_feud` y
+`forest_cut` dejan de ser «exactamente 4», `hungry_spring` sale desde el año 1 y
+`first_stone` desde el 8). **Abierto:** (1) `raiders_coming` + `after_the_raid`
+pasan del 31 % al 36 % de las preguntas —al quitar seis plantillas pesan más—;
+el peso de `after_the_raid` no es la palanca (probado, trayectorias idénticas
+byte a byte); (2) `after_the_raid` sigue ciega al parte de la batalla (el DSL no
+pregunta por `threat`); (3) la semilla `the_cleared_strip` de `hamlet.ts` levanta
+un campo sin `room` y `raise field` sin respaldo —no es de este carril—; (4) la
+migración anterior a M-0 sigue borrando una pendiente retirada (`save.ts`),
+inalcanzable; (5) **la primera piedra llega con la iglesia (año 4–8) y la
+política prudente contesta «las casas»**, así que las dieciséis casas pasan a
+piedra dentro de los primeros veinte años y no a partir del 41: eso destapa dos
+cosas de otros carriles —`life/companions.ts:129` busca el hogar del perro sólo
+entre `kind === 'house'` (un valle de casas de piedra se queda **sin perro**) y
+`ui/milestones.ts` cuenta un `work_done` por cada casa de piedra (60 años dan 67
+hitos, no 28–36; la cota de `ui-milestones.test.ts` sube de 60 a 80 con su
+causa)—; (6) `granary_theft` sale ahora **exactamente 3 veces en cada semilla**:
+el mismo bloqueo por reposo que `smith_feud`, sin tocar; (7) `side_with_*` de
+`smith_feud` apagaba la fragua **para siempre** (`lit smithy off`; nada la
+enciende) y dejaba sin piedra a la aldea: quitado. **Para el jugador, nada nuevo
+en crónica:** no hay claves de crónica nuevas (`docs/plan-arte-pendiente.md`).
+**Jornadas que esta ronda movió y que quedan rojas, sin remedir** (la suite entera
+y las jornadas las pasa la CI; aquí sólo se verificó lo tocado, por orden del
+coordinador): `archery` (semilla 11 a los 25 años: 96 flechas, 0 aciertos),
+`e3b-corridor` (4) y `e3b-rampart` (2), que son huellas de villas concretas y
+hay que remedir en 60 semillas como en `docs/historico/rework.md` §2.7, y
+`life-beasts` (se cambió la 7 por la 1, medida). Vuelven a verde `life-places`
+(37) y `life-props` (las seis semillas juegan): sus `it.fails` pasaron a `it`.
+`life-decide` y los cronómetros de `save` y `life-perf` fallan igual en la base
+cuando la máquina va cargada.
+
 ## 30 sep 2026 · RD-0: una encrucijada retirada pendiente vuelve a ser una pregunta (v5.39)
 
 Prerrequisito de RD-3, que va a retirar plantillas vivas: `templateOf` resuelve

@@ -9,6 +9,7 @@
 
 import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
+import type { Catalogue } from '@engine/crossroads/schema';
 import { foundGame, type InheritedValley } from '@engine/found';
 import { run } from '@engine/sim';
 import { foundPeople } from '@engine/people/villagers';
@@ -65,18 +66,19 @@ export function villageWhere(
   years: number,
   wants: (state: GameState) => boolean,
   seeds: readonly number[] = [7, 11, 23, 41, 97, 3, 53, 67],
+  catalogue: Catalogue = CATALOG,
 ): GameState | null {
   for (const seed of seeds) {
     // Jugada una vez por semilla y por número de años dentro del módulo: el
     // primer intento de esto jugaba hasta ochocientos años de aldea por
     // fichero de pruebas y **tiró un trabajador de vitest por memoria**. Se
     // devuelve una copia, para que quien la reciba pueda ensuciarla.
-    const key = `${seed}:${years}`;
+    const key = `${seed}:${years}:${catalogue.length}`;
     let base = PLAYED.get(key);
     if (base === undefined) {
       base = foundTwenty(seed);
       for (let y = 0; y < years && base.ended === null; y += 1) {
-        run(base, TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
+        run(base, TIME.WEEKS_PER_YEAR, 'prudent', catalogue);
       }
       PLAYED.set(key, base);
     }

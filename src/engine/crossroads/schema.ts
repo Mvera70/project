@@ -89,7 +89,12 @@ export type CastSpec =
     * takes the only one there is and the second widens.
     */
   | { as: string; anyNamed: true; excluding?: string[]; agedBetween?: [number, number] }
-  | { as: string; grudgeAgainst: string } // the one who hates them most
+  /**
+   * `min` (RD-3): el rencor tiene que ser real. Sin él, «el que más lo odia»
+   * puede ser alguien con una opinión de −1, y la riña que la tarjeta cuenta
+   * no existe; con él, sólo se reparte si la opinión de B sobre A es ≤ −`min`.
+   */
+  | { as: string; grudgeAgainst: string; min?: number } // the one who hates them most
   | { as: string; childOf: string }
   | { as: string; youngestNamed: true; female?: boolean };
 

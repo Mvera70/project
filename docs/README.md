@@ -82,6 +82,7 @@ Las herramientas que las produjeron están en `tools/reports/`.
 | `medidas/spatial-plaza.md` | Desfase plaza/vida y visitas al claro al separar los dos lugares |
 | `medidas/dead-code-audit-2026-09-17.md` | El código muerto que se encontró al auditar |
 | `medidas/catalogo-historias-y-encrucijadas.md` | Qué historias tiene el catálogo y cuáles no salen |
+| `medidas/rd3-encrucijadas-2026-10-01.md` | **RD-3: antes y después de aplicar el dictamen de las encrucijadas** (1 oct): 21 → 15 plantillas vivas, seis retiradas, ocho reescritas; preguntas por partida 46,8 → 36,0; qué quedó abierto (asalto 36 %, `after_the_raid` ciega al parte, piedra y casas al año 8) |
 | `medidas/letalidad-por-decision-2026-09-19.md` | **Qué decisiones acumulan la caída (G4)**, por contrafactual: lo que mata es no prepararse para el asedio, y es lo que elige la política prudente |
 | `medidas/banco-de-balance-2026-09-19.md` | **El banco remedido (G2)**: 11 rojas de 37 y 31 minutos, no 19 y 45; las cuatro rojas con su causa; y que el catálogo no tenía contenido muerto, lo tenía el banco que lo medía |
 | `medidas/rendimiento-piel-v9-2026-09-29.md` | **¿La piel v9 hunde el rendimiento?** No por fotograma; `?debug=1` no sirve para medir el 3D; la adaptativa medía un delta recortado. Lo que falta: el reparto del fotograma leído en la tablet |

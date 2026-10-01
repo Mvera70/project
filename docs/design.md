@@ -2628,11 +2628,24 @@ export type Condition =
   | { k: 'role';    role: Role; alive: boolean }
   | { k: 'grudge';  min: number }            // existe una opinión ≤ −N (no el registro)
   | { k: 'trait';   role: Role; trait: Trait }
+  | { k: 'room';    building: BuildingKind }  // RD-3: cabe una obra más de esa familia (`withinCap`)
   | { k: 'not';     c: Condition }
   | { k: 'any';     cs: Condition[] };
 
 export type Op = '<' | '<=' | '>' | '>=' | '==' ;
 ```
+
+**`room` (RD-3, 1 oct 2026).** `build` a un tope lleno se cobraba entera y no
+construía nada (RD-0, T2: campos al tope de 8 desde el año ~18, graneros a 3,
+camposanto a 1). `{ k: 'room', building }` pregunta lo mismo que la aldea
+antes de levantar algo —el tope de §12 contando lo en pie y lo ya reservado— y
+sirve para `requires` de plantilla y de opción: una opción que anuncia una obra
+sólo se ofrece si la obra puede ocurrir. Para la empalizada y la muralla
+pregunta además si **el anillo ya está escrito** (A2c: la aldea lo decide con
+once casas y `placeBuilding` rechaza la estaca antes; medido, `build_together`
+y `build_up` no construían nada en las semillas 7 y 11 hasta el año 12). Un
+`raise` de algo con tope —o de una estaca— sin su `room` es un fallo de forma, y
+`tests/fast/catalog.test.ts` lo caza.
 
 **Trampa de estación: el invierno es el momento MÁS lleno del granero.** La
 cosecha cae en la semana 35 y el invierno empieza en la 36, así que `season =
@@ -2653,7 +2666,7 @@ plantilla no es elegible.
 export type CastSpec =
   | { as: string; role: Role }
   | { as: string; anyNamed: true; excluding?: string[] }
-  | { as: string; grudgeAgainst: string }        // el que más le odia
+  | { as: string; grudgeAgainst: string; min?: number } // el que más le odia (RD-3: con `min`, ≤ −min)
   | { as: string; childOf: string }
   | { as: string; youngestNamed: true; female?: boolean };
 ```
@@ -2677,6 +2690,17 @@ muestras. Es la trampa que `docs/historico/handover.md` §4 ya tenía escrita �
 elegibilidad de una sola plantilla mueve el balance entero*— y por eso va con
 el carril del ritmo de decisión, donde el recalibrado está presupuestado, y no
 de propina en una ronda de texto. Queda declarado en `tests/fast/chronicle.test.ts`.
+
+**Resuelto en RD-3 (1 oct 2026), y no con `named?: true`.** `feud_inherited` ya
+no usa `childOf`: su B es `grudgeAgainst` A con `min` —el que de verdad lo odia—,
+que por construcción es un **nombrado, vivo y adulto** (`worstEnemyOf` sólo
+mira a los nombrados, y los nombrados lo son por un oficio con edad mínima). La
+llave `{B}` literal de la tarjeta pendiente (medida en RD-0 con `fi.ts`: en el
+tick 1200 B era una chica de catorce años sin nombre, y `give_b_the_smithy` le
+dio el oficio de herrero) desaparece sin tocar la lista de candidatos de
+`childOf`. `min` (la opinión de B sobre A ≤ −min) es lo que hace real la riña de
+`smith_feud` y `feud_inherited`: sin él «el que más le odia» podía tener un −1.
+`childOf` queda en el DSL, sin ninguna plantilla que lo use.
 
 El reparto se resuelve **en orden de dependencia, no de declaración**: una
 plantilla puede escribir `{as:'B', grudgeAgainst:'A'}` antes que `A` sin fallar
@@ -6261,12 +6285,31 @@ riesgo principal del proyecto.
 Dieciséis plantillas, dos por categoría. Los textos van en inglés porque son
 contenido; los comentarios en español porque son diseño.
 
+> **RD-3 (1 oct 2026) · el catálogo vivo son quince, no veintiuna.** Vera aplicó
+> el dictamen de `docs/medidas/rd0-encrucijadas-2026-09-30.md`: **seis salen del
+> sorteo** (A.2 `tithe_demand`, A.6 `plague_blame`, A.9 `chapel_or_granary`,
+> A.10 `relic_pedlar`, A.12 `wolf_winter`, A.14 `bandits`) y pasan a
+> `RETIRED_TEMPLATES`, con sus opciones, semillas y textos intactos para que un
+> guardado que las tenga pendientes o en el registro siga cargando; y **ocho se
+> reescriben** para que el coste anunciado, el efecto ejecutado y lo que se ve
+> coincidan (A.1, A.3, A.4, A.7, A.8, A.11, A.16 y `after_the_raid`). Debajo de
+> cada una hay una nota «RD-3» con lo que cambió; **las tablas de abajo son las
+> del Anexo original**, y donde difieren manda la nota. Las cifras absolutas
+> (+900, +300, −450…) pasaron a proporciones de lo que hay en el almacén
+> (`CROSSROAD_EFFECTS`, `balance.ts`). **`after_the_raid`** (B2, §1b, que no está
+> en este Anexo): `build_up` pide de verdad dos tramos de empalizada (antes sólo
+> ponía una bandera) y `chase` devuelve la mitad del grano que el saqueo se
+> llevó, no +120 fijos; lo que **no** hace —leer el parte de la batalla— no cabe
+> en el DSL de §8.2. Medida: `docs/medidas/rd3-encrucijadas-2026-10-01.md`.
+
 Formato: identificador, condiciones, reparto, texto, y de cada opción el verbo,
 el precio visible, los efectos, el cambio en pantalla y las semillas.
 
 ---
 
 ### A.1 `winter_grain_debt` · lord
+
+> **RD-3 (1 oct 2026).** **Reescrita.** Ahora pide `people ≥ 20` (con 7–23 personas el señor no tiene a quién cobrar) y lo que traen los carros es **proporcional al granero** —`kneel` ×2,2, `take_it_at_night` ×1,8, `tithe_due` ×0,8 del granero de entonces—, no +900/+600/−450 fijos (1,1 a 7,6 veces la despensa medida). «If it is found out» era «siempre» (la semilla no tenía condición): el precio dice «Wealdmere finds out, and comes armed within nine years». `kneel` dice cuándo viene el cobro. `scar felled_wood` → `gather ford` (no talaba nada).
 
 **Peso** 10 · **Reposo** 30 años · **Máx.** 2
 **Requiere** `season = winter`, `seasonWeek ≥ 6`, `grainToHarvest < 0.9`, `flag vassal` sin poner
@@ -6291,6 +6334,8 @@ todo.*
 
 ### A.2 `tithe_demand` · lord
 
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Duplicaba el diezmo automático del motor (`world/road.ts`, cada otoño, a cualquier valle de diez personas) sin señor en pantalla.
+
 **Peso** 6 · **Reposo** 20 años
 **Requiere** `flag vassal` puesto, `season = autumn`, `year > 5`
 **Reparto** `A = reeve`, `B = leader`
@@ -6308,6 +6353,8 @@ todo.*
 ---
 
 ### A.3 `hungry_spring` · famine
+
+> **RD-3 (1 oct 2026).** **Reescrita.** El reparto ya no pide `reeve` y `midwife` (un caserío no los tiene: la pregunta salía de mediana el año 18): basta con dos nombrados, y sale desde el primer invierno. Los efectos de grano son proporciones (`eat_it` ×1,4, `half_and_half` ×1,2). `visible` pasa a reuniones (el `raise field` no levantaba ningún campo; el `douse mill` apagaba un molino que casi nunca existe).
 
 **Peso** 12 · **Reposo** 12 años
 **Requiere** `season = spring`, `grainYears < 0.35`
@@ -6327,6 +6374,8 @@ todo.*
 
 ### A.4 `granary_theft` · famine
 
+> **RD-3 (1 oct 2026).** **Reescrita.** Ahora **falta grano**: el cuerpo dice «a tenth of what was in it is gone» y las tres opciones lo cobran (`grain ×0,9`); `a_new_latch` cuesta además 40 de madera. Los `visible` que no ocurrían (`douse smithy`, `raise palisade`) son reuniones.
+
 **Peso** 7 · **Reposo** 18 años
 **Requiere** `grainYears < 0.5`, `has granary`, `grudge min 40`
 **Reparto** `A = anyNamed`, `B = grudgeAgainst A`
@@ -6344,6 +6393,8 @@ todo.*
 ---
 
 ### A.5 `plague_pit` · plague
+
+> **RD-3 (1 oct 2026).** **Promesas corregidas.** El cuerpo ya no dice «nueve muertos» (era un número fijo); `burn_the_houses` dice lo que hace —**las dos casas más viejas**, la fundadora incluida, y nadie construye allí en veinte años—; `visible` pasa de `scar grave_row` (que el render no dibuja) a reuniones y ruinas reales.
 
 **Peso** 14 · **Reposo** 25 años
 **Requiere** `outbreak active`, `people > 12`
@@ -6363,6 +6414,8 @@ todo.*
 
 ### A.6 `plague_blame` · plague
 
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Casi inalcanzable (una vez en ocho semillas × sesenta años).
+
 **Peso** 8 · **Reposo** 30 años
 **Requiere** `outbreak active`, `faith > 55`, `trait priest devout`
 **Reparto** `A = priest`, `B = anyNamed excluding [A]`
@@ -6380,6 +6433,8 @@ todo.*
 ---
 
 ### A.7 `smith_feud` · feud
+
+> **RD-3 (1 oct 2026).** **Reescrita.** Salía **exactamente cuatro veces por partida** (el reposo mandaba: la condición era ambiental). Ahora B tiene que odiar a A de verdad (`grudgeAgainst` con `min` 55), sólo estalla con el valle de mal humor (`morale < 45`) y el reposo sube a 20 años. El título ya no promete al herrero y al cura («A Hand on a Shoulder»), el cuerpo ya no dice «for years» a quien lo ve a los 21 habitantes, y `side_with_*` dice lo que pasa y cuándo: cuatro años de obra más lenta y B se va **años después con dos más**. Ya no apaga la fragua (`lit smithy off`): era para siempre —nada la vuelve a encender— y dejaba sin picar piedra a la aldea sin que el precio lo dijera.
 
 **Peso** 9 · **Reposo** 15 años
 **Requiere** `grudge min 45`, `people > 20` — con 55 no dispara nunca: la ventana en que alguien odia a otro por más de 55, hay más de veinte personas y el reposo ha vencido, no llega a solaparse en 2 000 años de aldea
@@ -6399,6 +6454,8 @@ todo.*
 
 ### A.8 `feud_inherited` · feud
 
+> **RD-3 (1 oct 2026).** **Reescrita.** B es el que odia a A (`grudgeAgainst`, `min` 45), no un hijo cualquiera: un nombrado, adulto, con nombre antes de plantearse (adiós a la llave `{B}` en la tarjeta). El oficio de herrero sólo se ofrece si hay herrería y **no hay herrero** (medidos dos `smith` a la vez). «One of them will not see the winter» era siempre B: el precio lo dice.
+
 **Peso** 5 · **Reposo** 20 años · **Año mínimo** 25
 **Requiere** existe un nombrado con `memory kind = was_blamed` heredada
 **Reparto** `A = anyNamed`, `B = childOf A`
@@ -6416,6 +6473,8 @@ todo.*
 ---
 
 ### A.9 `chapel_or_granary` · faith
+
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Se planteaba con una iglesia ya en pie en 10 de 10 partidas (`has chapel` no cuenta la iglesia) y sus dos obras fallaban en silencio por el tope.
 
 **Peso** 8 · **Reposo** 40 años · **Máx.** 1
 **Requiere** `people ≥ 30`, `not has chapel`, `wood > 200`, `faith > 45`
@@ -6435,6 +6494,8 @@ todo.*
 
 ### A.10 `relic_pedlar` · faith
 
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Sólo vivía entre la capilla y su mejora, y duplica el medio `relic` y a los sucesos `pedlar`/`pilgrims`.
+
 **Peso** 6 · **Reposo** 25 años
 **Requiere** `has chapel`, `faith > 30`, `grainYears > 0.6` — se retira el tope de 70: la deriva de §5.6 estabiliza la fe por encima de esa cifra en cuanto hay capilla, así que la franja se abandonaba para no volver (§8.1, regla de la aldea madura). Y una aldea próspera y devota es justo donde aparecería un vendedor de reliquias
 **Reparto** `A = priest`, `B = leader`
@@ -6452,6 +6513,8 @@ todo.*
 ---
 
 ### A.11 `forest_cut` · forest
+
+> **RD-3 (1 oct 2026).** **Reescrita.** Pide **sitio para otro campo** (`room field`) y la despensa corta (`grainToHarvest < 1,15`): faltan campos de verdad y se pueden levantar (antes, en 22 de 40 preguntas los campos estaban al tope y la tala se cobraba entera). Ya no sale cuatro veces clavadas. La semilla `the_wood_holds` exigía bosque > 0,5 (el corazón del valle da 0,18–0,26: se marchitaba siempre): ahora > 0,20.
 
 **Peso** 9 · **Reposo** 15 años
 **Requiere** `forestLeft > 0.12`, `neededFields > fields`, `people > 25` — el 0.3 original era **inalcanzable**: la generación de mapa tope en 0.26 (§12.7), así que la plantilla estaba muerta desde el tick cero. El bosque es aquí una **puerta** («queda madera que valga la pena talar»); el disparador episódico es `neededFields > fields`, y por eso `forest_cut` es contenido de la primera mitad **por diseño**: no se roturan más campos que el tope de ocho
@@ -6471,6 +6534,8 @@ todo.*
 ---
 
 ### A.12 `wolf_winter` · forest
+
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Casi inalcanzable (`forestLeft > 0,25`) y los lobos ya existen con cuerpo en el suceso `wolves_at_the_coop`.
 
 **Peso** 7 · **Reposo** 12 años
 **Requiere** `season = winter`, `forestLeft > 0.25`, `people > 15` — y ese 0.25
@@ -6506,6 +6571,8 @@ del episodio, que son el invierno y la gente.
 
 ### A.13 `strangers_at_the_ford` · stranger
 
+> **RD-3 (1 oct 2026).** **Promesa corregida.** `turn_them_away` dice que **nadie sube por el camino en diez años** (`hostile 10`); la semilla `whoever_burned_it` enseña el aviso rojo (`threatened`) y no un camposanto que no se dibuja.
+
 **Peso** 10 · **Reposo** 20 años
 **Requiere** `people ≥ 12`, `housingFree ≥ 2`, `not flag hostile`, `morale ≥ 55`
 **Reparto** `A = leader`, `B = reeve`
@@ -6524,6 +6591,8 @@ del episodio, que son el invierno y la gente.
 
 ### A.14 `bandits` · stranger
 
+> **RD-3 (1 oct 2026).** **RETIRADA del sorteo.** Es el clan vecino (`raiders_coming`) sin su batalla ni su cuerpo.
+
 **Peso** 8 · **Reposo** 18 años
 **Requiere** `people > 30`, `not has palisade`, `year > 15`
 **Reparto** `A = leader`, `B = smith`
@@ -6541,6 +6610,8 @@ del episodio, que son el invierno y la gente.
 ---
 
 ### A.15 `succession` · succession
+
+> **RD-3 (1 oct 2026).** `no_one`: `visible` pasa de `douse house` (ninguna casa se apagaba) a la plaza dando voces.
 
 **Peso** 100 · **Reposo** 0 · **Salta el intervalo mínimo**
 **Requiere** `not role leader alive`, `not flag interregnum`
@@ -6598,6 +6669,8 @@ faltaba para que eso se cumpliera de verdad.
 
 ### A.16 `first_stone` · succession
 
+> **RD-3 (1 oct 2026).** **Reescrita.** Llega cuando llega la piedra: exige **la iglesia en pie** (la primera mejora de piedra, año ~4–7) y el cerco sin cerrar (`wall_closed`), no `year > 40` con la muralla de piedra ya levantada (RD-0: 9 de 10). Se quitan `minYear 41` y `year > 40`; `people ≥ 25`. `the_wall` sólo vale mientras el cerco no se ha cerrado (A4 abre la piedra solo al cerrarse); `the_houses` sigue siendo la única vía a la casa de piedra.
+
 **Peso** 6 · **Reposo** 50 años · **Máx.** 1
 **Requiere** `people ≥ 45`, `has smithy`, `year > 40`, sin sitio libre en el mapa
 **Reparto** `A = leader`, `B = smith`
@@ -6615,6 +6688,8 @@ faltaba para que eso se cumpliera de verdad.
 ---
 
 ### A.17 `quiet_years` · reserva
+
+> **RD-3 (1 oct 2026).** `a_free_work`: `visible` pasa a la plaza (con tres graneros el `build` no ocurre).
 
 Plantilla de reserva para la garantía por generación cuando no hay ninguna otra
 elegible. **Está fuera del reparto normal**: `eligible()` la salta siempre y solo

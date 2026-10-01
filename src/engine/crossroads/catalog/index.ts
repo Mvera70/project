@@ -1,6 +1,7 @@
 // M-08 · The catalogue. design.md Annex A, §17 M-08.
 //
-// Sixteen templates, two per category, plus the reserve. Data and nothing else:
+// Fifteen live templates, the reserve included (RD-3: six retired, see
+// `RETIRED_TEMPLATES`). Data and nothing else:
 // not a function and not an if in this folder.
 //
 // Effects that need to remain active across ticks are carried as flags. Every
@@ -25,16 +26,16 @@
 // hostile — are read by the templates themselves and need nobody else.
 
 import type { Catalogue } from '../schema';
-import { FAITH_TEMPLATES } from './faith';
+import { FAITH_TEMPLATES, RETIRED_FAITH_TEMPLATES } from './faith';
 import { FAMINE_TEMPLATES } from './famine';
 import { FEUD_TEMPLATES } from './feud';
-import { FOREST_TEMPLATES } from './forest';
+import { FOREST_TEMPLATES, RETIRED_FOREST_TEMPLATES } from './forest';
 import { HAMLET_TEMPLATES } from './hamlet';
-import { LORD_TEMPLATES } from './lord';
-import { PLAGUE_TEMPLATES } from './plague';
+import { LORD_TEMPLATES, RETIRED_LORD_TEMPLATES } from './lord';
+import { PLAGUE_TEMPLATES, RETIRED_PLAGUE_TEMPLATES } from './plague';
 import { RAID_TEMPLATES } from './raid';
 import { RESERVE_TEMPLATES } from './reserve';
-import { STRANGER_TEMPLATES } from './stranger';
+import { RETIRED_STRANGER_TEMPLATES, STRANGER_TEMPLATES } from './stranger';
 import { TRADE_TEMPLATES } from './trade';
 import { SUCCESSION_TEMPLATES } from './succession';
 
@@ -72,8 +73,22 @@ export { TRADE_TEMPLATES } from './trade';
  * M-0 · Plantillas que ya no se plantean pero que una partida guardada puede
  * nombrar en su registro o tener pendiente. Sólo las leen el guardado y quien
  * busque el título de una decisión pasada.
+ *
+ * RD-3 (1 oct 2026) · a los tres comerciantes se suman seis del catálogo vivo
+ * que Vera mandó retirar tras la auditoría de RD-0 (`docs/medidas/
+ * rd3-encrucijadas-2026-10-01.md`): `tithe_demand`, `chapel_or_granary`,
+ * `relic_pedlar`, `wolf_winter`, `bandits` y `plague_blame`. Conservan sus
+ * opciones, semillas y textos tal cual: una pendiente se contesta y una
+ * semilla plantada se dispara como siempre (`templateOf`).
  */
-export const RETIRED_TEMPLATES: Catalogue = [...TRADE_TEMPLATES];
+export const RETIRED_TEMPLATES: Catalogue = [
+  ...TRADE_TEMPLATES,
+  ...RETIRED_LORD_TEMPLATES,
+  ...RETIRED_FAITH_TEMPLATES,
+  ...RETIRED_FOREST_TEMPLATES,
+  ...RETIRED_STRANGER_TEMPLATES,
+  ...RETIRED_PLAGUE_TEMPLATES,
+];
 
 /**
  * La plantilla de una decisión **ya planteada**: la del catálogo vivo y, si ya

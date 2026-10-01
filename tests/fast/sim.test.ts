@@ -229,7 +229,7 @@ describe('el orden del tick · §4.2', () => {
 
   it('el paso 3 aplica exactamente la decisión pendiente, y no antes (§2.60)', () => {
     const s = foundTwenty(7);
-    const template = CATALOG.find((t) => t.id === 'chapel_or_granary') as CrossroadTemplate;
+    const template = CATALOG.find((t) => t.id === 'forest_cut') as CrossroadTemplate;
     s.crossroad = {
       templateId: template.id,
       posedTick: s.tick,
@@ -242,14 +242,14 @@ describe('el orden del tick · §4.2', () => {
     expect(untouched.decided).toBeNull();
     expect(s.crossroad?.templateId).toBe(template.id);
 
-    const report = tick(s, CATALOG, { templateId: template.id, optionId: 'the_chapel' });
-    expect(report.decided?.optionId).toBe('the_chapel');
+    const report = tick(s, CATALOG, { templateId: template.id, optionId: 'take_the_edge' });
+    expect(report.decided?.optionId).toBe('take_the_edge');
     expect(s.crossroad).toBeNull(); // resuelta: deja de estar pendiente (§8.1)
   });
 
   it('el TickReport trae coordenadas válidas para el efecto visible decidido', () => {
     const s = foundTwenty(7);
-    const template = CATALOG.find((t) => t.id === 'chapel_or_granary') as CrossroadTemplate;
+    const template = CATALOG.find((t) => t.id === 'forest_cut') as CrossroadTemplate;
     s.crossroad = {
       templateId: template.id,
       posedTick: s.tick,
@@ -257,17 +257,19 @@ describe('el orden del tick · §4.2', () => {
       optionIds: template.options.map((o) => o.id),
     };
 
-    // `the_chapel` levanta una capilla (build chapel + visible: raise chapel):
-    // la coordenada tiene que ser la de la obra que el propio tick acaba de
-    // abrir, no una al azar.
-    const report = tick(s, CATALOG, { templateId: template.id, optionId: 'the_chapel' });
-    expect(report.visualEffects).toEqual([{ effect: { k: 'raise', kind: 'chapel' }, x: expect.any(Number), y: expect.any(Number) }]);
+    // `take_the_edge` abre un campo (build field + visible: raise field; RD-3
+    // retiró `chapel_or_granary`, que servía aquí antes, y la estaca de
+    // `build_up` pide un anillo que una aldea recién fundada aún no tiene): la
+    // coordenada tiene que ser la de la obra que el propio tick acaba de abrir,
+    // no una al azar.
+    const report = tick(s, CATALOG, { templateId: template.id, optionId: 'take_the_edge' });
+    expect(report.visualEffects).toEqual([{ effect: { k: 'raise', kind: 'field' }, x: expect.any(Number), y: expect.any(Number) }]);
     const [placed] = report.visualEffects;
     expect(placed?.x).toBeGreaterThanOrEqual(0);
     expect(placed?.x).toBeLessThan(s.map.width);
     expect(placed?.y).toBeGreaterThanOrEqual(0);
     expect(placed?.y).toBeLessThan(s.map.height);
-    const work = s.works.find((w) => w.kind === 'chapel' && w.startedTick === s.tick);
+    const work = s.works.find((w) => w.kind === 'field' && w.startedTick === s.tick);
     expect(work).toBeDefined();
     expect(placed?.x).toBeCloseTo((work?.x ?? 0) + (work?.w ?? 0) / 2);
     expect(placed?.y).toBeCloseTo((work?.y ?? 0) + (work?.h ?? 0) / 2);

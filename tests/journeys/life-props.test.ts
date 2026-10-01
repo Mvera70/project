@@ -364,7 +364,16 @@ describe('V-09 · trastos', () => {
   // de la trayectoria del valle. Por la regla séptima de E.3 no se arregla
   // ajustando otra vez sin tocar el motor, así que queda `it.fails` con la
   // propiedad del brief intacta, como manda `CLAUDE.md`.
-  it.fails('y en todas las semillas, sin una sola aldea muda', () => {
+  //
+  // **Y vuelve a verde (RD-3, 1 oct 2026), como este mismo comentario avisaba
+  // que podía pasar en cualquier sentido.** Retirar seis encrucijadas y
+  // reescribir ocho movió la trayectoria de cuarenta años y con ella el valle de
+  // cada semilla: en la jornada completa del 1 oct las seis juegan al menos una
+  // vez en diez jornadas («Expect test to fail»). La causa 1 sigue ahí —ninguna
+  // primera recogida del día gana el concurso de utilidad de `worth()` contra el
+  // trabajo— y la próxima trayectoria puede tumbar otra semilla; entonces vuelve
+  // a `it.fails` con la propiedad del brief intacta.
+  it('y en todas las semillas, sin una sola aldea muda', () => {
     const DAYS = 10;
     for (const seed of SEEDS) {
       const state = village(seed);
