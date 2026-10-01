@@ -171,8 +171,20 @@ function sayWhat(state: GameState): Doing | null {
   // Que eso **no** significa una aldea que no construye: las mismas semillas
   // levantan de 67 a 99 obras en sesenta años. Una obra cada vez (§7.3) y
   // semanas enteras sin nada pendiente son la misma cosa vista de dos maneras.
+  //
+  // K3a (1 oct 2026) · **y «nada que levantar» sólo cuando es verdad.**
+  // `nextProject` se salta lo que no se puede pagar, así que con la leñera
+  // corta la aldea decía `doing.nothing` y nunca `doing.waiting_wood`: medido
+  // en 12 partidas de `main`, cientos de semanas con una obra esperando por
+  // madera y la tira diciendo que no había nada que hacer
+  // (`docs/medidas/k1-k3-madera-2026-10-01.md` §4). Se pregunta otra vez con
+  // madera de sobra —sobre una copia, porque elegir sitio puede fijar el
+  // anillo y la interfaz no escribe en el motor—: si entonces hay obra, es que
+  // espera madera.
   if (nextProject(state) === null) {
-    return { key: 'doing.nothing', params: {} };
+    return nextProject({ ...state }, Number.POSITIVE_INFINITY) === null
+      ? { key: 'doing.nothing', params: {} }
+      : { key: 'doing.waiting_wood', params: {} };
   }
 
   // 5 · Y si hay algo que empezar y no ha empezado, es que falta madera: la

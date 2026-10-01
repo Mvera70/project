@@ -15,6 +15,7 @@ import { count, has, smithyWorking, standing } from '../subsistence/building-cou
 import { housingCapacity, population } from '../people/demography';
 import { kingOf, will } from '../people/crown';
 import { storageCapacity } from '../subsistence/harvest';
+import { winterReserve } from '../subsistence/consumption';
 import { TERRAIN_CODE } from '../state';
 import type { BuildingKind, ConstructionWork, GameState } from '../state';
 import { familyOf, houseHomeless, withinCap } from './buildings';
@@ -64,10 +65,20 @@ function threatenedNow(state: GameState): boolean {
   return until !== undefined && (until === 0 || until > state.tick);
 }
 
+/**
+ * K3a · La madera que la aldea puede gastar en obra: la leñera menos el
+ * invierno que queda (`winterReserve`). Lo que un regalo de §8.4 trae no pasa
+ * por aquí (`open(…, free)`).
+ */
+export function woodForWorks(state: GameState): number {
+  return state.village.wood - winterReserve(state);
+}
+
 function affordableMask(state: GameState): number {
   let mask = 0;
+  const wood = woodForWorks(state);
   for (let i = 0; i < AUTOMATIC_KINDS.length; i += 1) {
-    if (state.village.wood >= BUILDINGS[AUTOMATIC_KINDS[i]!].wood) mask |= 1 << i;
+    if (wood >= BUILDINGS[AUTOMATIC_KINDS[i]!].wood) mask |= 1 << i;
   }
   return mask;
 }
@@ -196,6 +207,10 @@ export function woodCostOf(state: GameState, kind: BuildingKind): number {
 /**
  * §7.3, in order. Returns what to start next, or null.
  *
+ * K3a · `budget` is the wood it may spend: by default what is left once the
+ * winter is put aside (`woodForWorks`). The interface asks with an endless
+ * budget to tell «nothing to raise» from «waiting for timber».
+ *
  * Point 9 — the stone upgrades — is exactly what its wording says: it applies
  * *when there is no room left*. So a wanted building that has nowhere to stand
  * does not block the queue; it falls through to the upgrades, which is what
@@ -206,7 +221,7 @@ export function woodCostOf(state: GameState, kind: BuildingKind): number {
  * §8 (the module graph puts crossroads at the top). The semantics are the
  * flag's own — set, and either permanent or not yet expired.
  */
-export function nextProject(state: GameState): Project | null {
+export function nextProject(state: GameState, budget: number = woodForWorks(state)): Project | null {
   const people = population(state);
   const threatened = threatenedNow(state);
 
@@ -364,7 +379,7 @@ export function nextProject(state: GameState): Project | null {
 
   for (const kind of ordered) {
     if (!withinCap(state, kind)) continue;
-    if (state.village.wood < woodCostOf(state, kind)) continue;
+    if (budget < woodCostOf(state, kind)) continue;
     if (placeBuilding(state, kind) !== null) return kind;
   }
 
@@ -401,7 +416,7 @@ function open(state: GameState, project: Project, free = false): ConstructionWor
 
   if (!free) {
     const cost = woodCostOf(state, kind);
-    if (state.village.wood < cost) return null;
+    if (woodForWorks(state) < cost) return null;
     state.village.wood -= cost;
   }
 

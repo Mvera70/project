@@ -79,6 +79,9 @@ describe('rng · reproducibilidad', () => {
       // §7.15: y `expeditions`, cómo vuelven los que salen. Detrás de todos y
       // sin mover ninguno: las partidas viejas siguen dando lo mismo.
       expeditions: 4132758830,
+      // K2 (1 oct 2026): y `forest`, dónde se extiende el bosque. Detrás de
+      // todos, y los de arriba siguen dando lo mismo.
+      forest: 4072058396,
     });
   });
 

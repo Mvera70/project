@@ -27,7 +27,8 @@ export type RngStream =
   | 'minds'
   | 'fate' // R-1: los sucesos del valle (§7.10)
   | 'raid' // B1: el clan del valle vecino (§1b)
-  | 'expeditions'; // §7.15: cómo vuelven los que salen
+  | 'expeditions' // §7.15: cómo vuelven los que salen
+  | 'forest'; // K2: dónde se extiende el bosque
 
 /**
  * The 32-bit state of every stream. Part of GameState, so it is flat and
@@ -59,6 +60,9 @@ export const RNG_STREAMS: readonly RngStream[] = [
   // §7.15 · las expediciones. Su propio flujo: mandar gente no mueve ninguna
   // otra tirada del mundo.
   'expeditions',
+  // K2 · el bosque que se extiende a celdas nuevas. Su propio flujo: una semilla
+  // de árbol no puede mover el tiempo, los sucesos ni el clan.
+  'forest',
 ] as const;
 
 /**
@@ -107,6 +111,7 @@ export function makeBundle(seed: number): RngBundle {
     minds: hash32(seed, 'minds'),
     raid: hash32(seed, 'raid'),
     expeditions: hash32(seed, 'expeditions'),
+    forest: hash32(seed, 'forest'),
   };
 }
 

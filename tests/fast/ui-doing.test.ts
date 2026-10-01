@@ -61,6 +61,12 @@ describe('doingNow · la aldea dice qué está haciendo', () => {
         if (said.key === 'doing.nothing') {
           expect(state.works.length, `semilla ${seed}, semana ${week}`).toBe(0);
           expect(nextProject(state), `semilla ${seed}: hay algo que empezar`).toBeNull();
+          // K3a · ni algo que empezaría si tuviera madera: eso es esperar madera.
+          expect(nextProject({ ...state }, Number.POSITIVE_INFINITY), `semilla ${seed}, semana ${week}: espera madera`)
+            .toBeNull();
+        }
+        if (said.key === 'doing.waiting_wood') {
+          expect(state.works.length, `semilla ${seed}, semana ${week}`).toBe(0);
         }
         if (said.key.startsWith('doing.raising.')) {
           const kind = said.key.slice('doing.raising.'.length);

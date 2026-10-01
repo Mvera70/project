@@ -2,6 +2,7 @@
 import { LIFE, TIME } from '@engine/balance';
 import { ageOf } from '@engine/people/villagers';
 import { allocateLabour } from '@engine/subsistence/labour';
+import { woodHaul } from '@engine/world/forest';
 import type { GameState, Role } from '@engine/state';
 import { seasonOf, weekOf } from '@engine/time';
 import { gap, fitsCircle, type Terrain, type Point } from './body';
@@ -95,7 +96,7 @@ export function dayPlans(
     }
     return null;
   };
-  const hands = allocateLabour(state);
+  const hands = allocateLabour(state, woodHaul(state));
   const adults = alive.filter(v => {
     const age = ageOf(v, state.tick);
     return age >= LIFE.ADULT[0] && age <= LIFE.ADULT[1];
