@@ -223,6 +223,14 @@ pantalla todavía no enseña del todo:
 | **La entrega sin leñadores** | Entra igual, a su hora | El «+1» sale sin nadie delante los días en que el reparto no pone a nadie en el bosque (3 de 38 entregas medidas) | Que el reparto de la jornada (`life/day.ts`) ponga un leñador los días con entregas |
 | **La piedra y el grano** | Siguen entrando por semanas enteras | La piedra se acarrea sin «+1»; el grano sube de golpe | Lo mismo que la madera: entregas con hora, porteador y aviso. Pedido por el dueño del diseño el 28 sep 2026, para después de probar la madera |
 
+## El bosque que se aleja (1 oct 2026, K1–K3, v5.53)
+
+| Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
+|---|---|---|---|
+| **Talar lejos cuesta** | Más allá de 10 celdas de la plaza cada leñador trae menos (`woodHaul`) y la aldea manda más | Los leñadores van al foco lejano (`fellingTarget`) y la tira dice «esperando madera» si la obra espera | Que se vea el viaje: el haz al hombro de vuelta desde lejos, y quizá un carro o una pila de leña junto al foco. **Ningún modelo nuevo sin encargo en `docs/encargos/`** (Astra) |
+| **El bosque que brota** | Plantones de 1 a 7 años junto al bosque | Se pintan con la malla del rebrote, a escala de su edad | Medir en el observatorio que se lee como bosque joven y no como hierba alta (falta la toma) |
+| **El último foco** | Nunca se talan las últimas 24 celdas | Nada lo distingue | Nada por ahora: es una garantía, no un suceso |
+
 ## El roble del valle (24 sep 2026)
 
 **G-42:** `great-oak.glb` sustituye las primitivas cuando está publicado. Toma

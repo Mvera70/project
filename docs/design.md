@@ -1364,6 +1364,22 @@ fuera, deja un borde irregular y rebrota por detrás si se deja de talar. Con lo
 números de §12, un valle pierde la mitad de su bosque en unos cien años: visible
 sin ser brusco.
 
+**Desde v5.53 (1 oct 2026, K1–K3) el bosque se gasta, se reproduce y pesa**
+(`docs/medidas/k1-k3-madera-2026-10-01.md`). La regla de tala sigue siendo «lo
+más cercano»; la celda guarda 100 y no 300, y así al cerrarse la villa queda el
+9 % del bosque de dentro (antes el 58 %). Dentro del cerco lo talado no rebrota.
+Cada año, cada prado o claro que linda con bosque, en el corazón y a más de
+`FOREST_SPREAD_CLEAR` celdas de la plaza, brota con `FOREST_SPREAD` por vecina
+arbolada (flujo `forest`); lo que brota es un **plantón** (edad 1 a 7) que gana
+su madera de año en año, no se tala hasta hacerse y no para a nadie. Por debajo
+de `FOREST_FLOOR_CELLS` celdas no se tala: un valle no se queda sin bosque
+(Vera). **Talar lejos cuesta**: más allá de `HAUL_NEAR` celdas de la plaza un
+leñador trae `HAUL_NEAR / distancia` (nunca menos de `HAUL_MIN`), y la aldea
+manda más leñadores hasta `CUTTER_CAP_SHARE`. Y **la aldea guarda la leña del
+invierno**: en otoño y en invierno no abre una obra que la deje sin el invierno
+que queda (`winterReserve`). La escasez que queda es la del bosque lejos: en 8
+de 12 partidas, y se ve en la tira («The next work is waiting on timber»).
+
 ### 7.6 Caminos emergentes
 
 **Desde la revisión espacial del 21 sep:** las rutas de desgaste parten de
@@ -4608,7 +4624,9 @@ export const FOOD = {
 } as const;
 
 export const LABOUR = {
-  WOOD_PER_CUTTER: 3.0,         // por semana
+  WOOD_PER_CUTTER: 3.5,         // por semana; 3,0 hasta K3 (v5.53)
+  HAUL_NEAR: 10,                // K3: celdas de la plaza sin coste de acarreo
+  HAUL_MIN: 0.35,               // K3: lo mínimo que trae un leñador lejos
   BP_PER_BUILDER: 2.0,          // puntos de obra por semana
   WORKS_RESERVE: 0.15,          // fracción mínima de W dedicada a obras
   CUTTER_SHARE: 0.40,           // del sobrante tras el campo
@@ -4732,9 +4750,12 @@ export const MOOD = {
 export const WORLD = {
   WIDTH: 36, HEIGHT: 56,
   FOREST_TARGET: [0.18, 0.30],
-  WOOD_PER_FOREST_TILE: 300,
-  FOREST_REGROWTH_YEARS: 8,
+  WOOD_PER_FOREST_TILE: 100,    // 300 hasta K1 (v5.53)
+  FOREST_REGROWTH_YEARS: 8,     // y lo que tarda en hacerse un plantón (K2)
   FOREST_REGROWTH_NEIGHBOURS: 3,
+  FOREST_SPREAD: 0.004,         // K2: por vecina arbolada y año
+  FOREST_SPREAD_CLEAR: 18,      // K2: no brota a menos de esto de la plaza
+  FOREST_FLOOR_CELLS: 24,       // K2: el foco que nunca se tala
   BARREN_CLEARING: 254,         // una tala de encrucijada no rebrota
   FLOOD_PRONE_SHIFT: 0.05,      // de clima justo a ruinoso
   PATH_T1: 400, PATH_T2: 1600, PATH_T3: 6000,

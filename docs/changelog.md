@@ -1,5 +1,36 @@
 # The Valley — Registro de cambios
 
+## v5.53 · 1 oct 2026 · K1–K3: el bosque se gasta, se reproduce y la madera pesa
+
+**Medido antes, en `main`** (`docs/medidas/k1-k3-madera-2026-10-01.md`, informe
+nuevo `tools/reports/wood-report.ts`): la madera **ya** apretaba en 11 de 12
+partidas, pero no por el bosque. 37 de 50 rachas las abría el pago de una obra
+a las puertas del invierno (302 semanas de frío en 12 partidas), el bosque
+daba lo mismo a 2 celdas que a 17, al cerrarse la villa quedaba el 58 % del
+bosque de dentro, y la tira decía «nada que levantar» con la obra esperando
+madera. **Vera decidió:** la mitad de las partidas, y por el bosque; y un
+valle no se queda nunca sin bosque.
+
+- **K3a**: `winterReserve` (la aldea no abre en otoño ni en invierno una obra
+  que la deje sin el invierno que queda) y `doing.waiting_wood` cuando es verdad.
+- **K1**: la regla de tala sigue siendo «lo más cercano» (Vera); la celda baja
+  de 300 a 100 y lo talado dentro del cerco no rebrota.
+- **K2**: el bosque brota en prados y claros vecinos, lejos del pueblo, con su
+  flujo `forest` (migración en `save.ts` sin subir el esquema); el plantón no
+  se tala, se pinta creciendo y no es obstáculo; nunca se tala el último foco.
+- **K3**: `woodHaul` (más allá de 10 celdas, `10 / distancia`, nunca menos de
+  0,35), la aldea manda más leñadores hasta el techo, `WOOD_PER_CUTTER` de 3 a
+  3,5, y **el hacha llega a la leñera** (`produce` no la contaba y el medio daba
+  menos leña de la que la aldea pedía).
+
+**Después**: escasea en serio 8 de 12, las 8 con el bosque lejos; 57 semanas de
+frío; bosque interior al cerrarse 9 %; en pie al año 60, 64 % (antes 85 %).
+La escalera a ×1 (12 semillas): capilla 48 → 33 h, primera piedra 55 → 40 h,
+villa cerrada 319 → 292 h pero 11 de 12, población final 34–69 → 19–78.
+Capturas en `docs/medidas/k-img/`. Sin crónica nueva. Pruebas:
+`forest-moves.test.ts`, `winter-reserve.test.ts`, y las de bosque, azar y tira
+ajustadas a la propiedad nueva.
+
 ## v5.52 · 1 oct 2026 · Parte 0: el niño perdido, sin rescates que nadie hizo
 
 **El fallo, en `main`:** `life-lost-child` fallaba en la semilla 23 —también
