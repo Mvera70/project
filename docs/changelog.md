@@ -13,6 +13,10 @@ piedra con su tono (`setColorAt`). Sigue siendo una malla instanciada, una
 llamada de dibujo, y la prueba pone el techo de triángulos en 40 000.
 Captura: `docs/medidas/k-img/piedras-grupos.png`.
 
+Y las dos tomas que K1–K3 dejó pendientes en `encargos-3d.md`: los plantones
+(`k2-plantones.png`, se leen como bosque joven) y el frente de tala lejano
+(`k3-tala-lejos.png`, sin haz al hombro: sigue en encargo).
+
 ## v5.54 · 2 oct 2026 · Lo que Vera vio en la tablet: laderas, piedras, crónica y encrucijada
 
 Cuatro cosas que Vera marcó jugando la versión publicada, en la tablet.
