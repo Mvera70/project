@@ -587,7 +587,32 @@ export const FATE = {
     tinker: 1,
     wise_woman: 0.5,
     refugees: 0.4,
+    // RD-5 · los del caserío no entran en este sorteo (`HAMLET_WEIGHT`).
+    wild_honey: 0,
+    mushrooms_after_rain: 0,
+    fox_at_the_hens: 0,
+    first_frost: 0,
   },
+  // RD-5 (1 oct 2026) · **la tirada del caserío.** Si el sorteo de la semana no
+  // trae nada y el valle tiene menos de `HAMLET_PEOPLE`, se tira otra vez, sólo
+  // entre los sucesos pequeños y con esta probabilidad. Sale de un hash de la
+  // semilla y la semana (`rollHamlet`), no de un flujo: un flujo nuevo cambiaba
+  // la forma del guardado. TUNE, medido con el informe de RD-5: con 0,3 la
+  // meseta de la hora 3 a la 6 a ×1 pasa de 2,75 entradas por valle a ~5.
+  HAMLET_PEOPLE: 10,
+  HAMLET_CHANCE: 0.3,
+  HAMLET_WEIGHT: { wild_honey: 1, mushrooms_after_rain: 1.5, fox_at_the_hens: 1, first_frost: 2 },
+  // TUNE: lo que deja cada uno. Escala: la buena pesca da 10–30 de grano y 2
+  // de ánimo; éstos son más pequeños, que para eso son del caserío.
+  HONEY_GRAIN: 4,
+  HONEY_MORALE: 2,
+  MUSHROOM_GRAIN: [5, 10] as [number, number],
+  MUSHROOM_WET_DAYS: 2,
+  FOX_MORALE: -1,
+  FOX_AGAIN_WEEKS: 12,
+  FROST_WOOD: 6,
+  // Desde qué semana del otoño (de doce) puede helar.
+  FROST_FROM_WEEK: 8,
   // La fiesta de la cosecha no es suerte: si hay grano y hay gente, la semana
   // después de la siega se celebra. Medido sin esto: una vez cada veinte años,
   // porque una sola semana al año casi nunca coincidía con el sorteo.

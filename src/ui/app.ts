@@ -22,6 +22,7 @@ import { eraOf, uiMaterialOf } from '@derive/era';
 import { vitalsOf } from './vitals';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { offerLine } from './offer-line';
+import { goalOf } from '@derive/goal';
 import { canAccept } from '@engine/world/road';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
@@ -1071,6 +1072,11 @@ export function boot(
     // es lo mismo que hace el reloj de la cabecera — una era dura años y esto
     // se llama sesenta veces por segundo.
     shell.setEra(renderUiText(`era.${eraOf(state)}`));
+    // RD-5 · y hacia dónde va (`derive/goal.ts`). La obra que espera se nombra
+    // con su palabra del banco, que es otra clave.
+    const goal = goalOf(state);
+    shell.setGoal(goal === null ? null : renderUiText(goal.key, typeof goal.params['what'] === 'string'
+      ? { ...goal.params, what: renderUiText(goal.params['what']) } : goal.params));
     // UI-W · y la materia de la interfaz: madera hasta la primera obra de
     // piedra, piedra desde ella (`derive/era.ts`, `wood.css`). Se escribe sólo
     // cuando cambia, que es una vez en la vida de una aldea.

@@ -420,3 +420,21 @@ y `src/ui/redesign/chronicle-art.ts` (`HAPPENING_KEY_ART`).
 | `child-missing.png` | `fate.child_missing`, `fate.child_missing.named` | **La linde vacía a la hora de cenar.** Los primeros troncos del bosque con la luz baja, un zapato pequeño o un juguete de madera en la hierba, y al fondo, lejos, las casas con humo |
 | `child-found.png` | `lost.found_by`, `lost.found_by.named` | **Uno solo que vuelve con el niño.** Un adulto saliendo de entre los árboles con el crío a hombros o de la mano, la última luz detrás; nadie más en el cuadro |
 | `child-dusk.png` | `lost.found_at_dusk` | **El valle entero buscando.** Antorchas a lo largo de la orilla del vado al anochecer, siluetas en fila, y una de ellas agachada junto a un bulto pequeño bajo los alisos |
+
+## RD-5 · Los sucesos pequeños del caserío (1 oct 2026) — **pedidas por la regla de la crónica**
+
+Cuatro sucesos que sólo salen mientras el valle tiene menos de diez personas
+(`FATE.HAMLET_PEOPLE`). Mientras no lleguen usan un grabado prestado
+(`HAPPENING_ART` en `chronicle-art.ts`). 640 × 512.
+
+| Fichero | Clave | Qué tiene que enseñar |
+|---|---|---|
+| `wild-honey.png` | `fate.wild_honey` | **Un roble hueco con panal.** Dos aldeanos con un paño en la cara sacando panal de un tronco viejo, abejas alrededor, un cuenco de madera en el suelo |
+| `mushrooms.png` | `fate.mushrooms_after_rain` | **La linde blanca de setas tras la lluvia.** Hierba mojada, setas en corro bajo los primeros árboles y un delantal recogido lleno |
+| `fox-hens.png` | `fate.fox_at_the_hens` | **El zorro en el gallinero, de noche.** Plumas en el barro junto a la cerca de varas y las huellas del zorro hacia la oscuridad |
+| `first-frost.png` | `fate.first_frost` | **La primera helada.** Hierba blanca al amanecer, el humo de las casas subiendo recto y la gente alrededor de una hoguera en la plaza |
+
+Y las tres consecuencias cortas del vado (`consequence.he_knew_the_axe`,
+`consequence.he_came_back_with_fish`, `consequence.tracks_from_the_ford`) **no
+llevan imagen**: son `kind: 'consequence'` y llevan la tarjeta sellada de §3.2,
+como cualquier consecuencia.

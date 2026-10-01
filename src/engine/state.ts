@@ -502,6 +502,15 @@ export const HAPPENINGS = [
   'tinker',
   'wise_woman',
   'refugees',
+  // RD-5 (Vera, 1 oct 2026: «sucesos pequeños del caserío») · la vida callada
+  // de un valle de pocos. **No se sortean con los demás**: tienen su propia
+  // tirada, sólo mientras el valle es un caserío (`FATE.HAMLET_PEOPLE`), y
+  // ninguno destruye nada. Llenan la meseta que RD-5 midió entre la hora 3 y
+  // la 6 a ×1, sin sumar catástrofes a una pareja.
+  'wild_honey',
+  'mushrooms_after_rain',
+  'fox_at_the_hens',
+  'first_frost',
 ] as const;
 
 export type HappeningId = (typeof HAPPENINGS)[number];

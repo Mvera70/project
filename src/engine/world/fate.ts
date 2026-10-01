@@ -26,11 +26,11 @@ import { isHere, population } from '../people/demography';
 import { adjustOpinion, opinionOf } from '../people/opinions';
 import { scarFire } from '../people/scars';
 import { ageOf } from '../people/villagers';
-import { int, next, weighted } from '../rng';
+import { hash32, int, next, weighted } from '../rng';
 import type { Building, ChronicleEntry, GameState, HappeningId, HappeningRecord, VillagerId } from '../state';
 import { HAPPENINGS } from '../state';
 import { count, has, standing } from '../subsistence/building-counts';
-import { seasonOf, weekOf } from '../time';
+import { seasonOf, weekOf, yearOf } from '../time';
 import { burnBuilding } from './buildings';
 import { herdCapacity, herdDensity } from '../subsistence/herd';
 import { storageCapacity } from '../subsistence/harvest';
@@ -512,6 +512,37 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
       visible.push({ k: 'gather', where: 'square', days: 1 });
       break;
     }
+    // ------------------------------------------------------ RD-5 · el caserío
+    // Las cifras salen de `hamletUnit`, no del flujo `fate`: la tirada del
+    // caserío no consume azar del motor (`rollHamlet`).
+    case 'wild_honey': {
+      state.village.grain += FATE.HONEY_GRAIN;
+      moraleBy(state, FATE.HONEY_MORALE);
+      visible.push({ k: 'gather', where: 'square', days: 1 });
+      weight = 1;
+      break;
+    }
+    case 'mushrooms_after_rain': {
+      const [lo, hi] = FATE.MUSHROOM_GRAIN;
+      const grain = lo + Math.floor(hamletUnit(state, 'mushrooms') * (hi - lo + 1));
+      state.village.grain += grain;
+      params['grain'] = grain;
+      visible.push({ k: 'gather', where: 'ford', days: 1 });
+      weight = 1;
+      break;
+    }
+    case 'fox_at_the_hens': {
+      state.herd.hens = Math.max(0, state.herd.hens - 1);
+      moraleBy(state, FATE.FOX_MORALE);
+      weight = 1;
+      break;
+    }
+    case 'first_frost': {
+      state.village.wood = Math.max(0, state.village.wood - FATE.FROST_WOOD);
+      visible.push({ k: 'gather', where: 'square', days: 1 });
+      weight = 1;
+      break;
+    }
     case 'stranger_passes': {
       moraleBy(state, FATE.STRANGER_MORALE);
       // M-0 · y paga la cama: la primera plata de un valle joven.
@@ -613,6 +644,53 @@ export function weightNow(state: GameState, id: HappeningId): number {
   });
 }
 
+/** RD-5 · un número de 0 a 1 del caserío, puro: semilla, semana y para qué. */
+function hamletUnit(state: GameState, what: string): number {
+  return hash32(state.seed, `hamlet:${what}:${state.tick}`) / 0x1_0000_0000;
+}
+
+type HamletId = keyof typeof FATE.HAMLET_WEIGHT;
+
+/** RD-5 · si cada suceso del caserío puede pasar esta semana. */
+function hamletFits(state: GameState, id: HamletId, ctx: Context): boolean {
+  switch (id) {
+    case 'wild_honey':
+      // Un panal por verano: dos en la misma estación ya no es un hallazgo.
+      return ctx.season === 'summer' && ratioOf(state, 'forestLeft') > 0
+        && !state.happenings.some((h) => h.id === 'wild_honey' && yearOf(h.tick) === yearOf(state.tick));
+    case 'mushrooms_after_rain':
+      return ctx.season === 'autumn' && ctx.sky.wet >= FATE.MUSHROOM_WET_DAYS;
+    case 'fox_at_the_hens':
+      // Y el zorro no vuelve hasta que se le olvida el camino.
+      return state.herd.hens > 0 && !state.happenings.some((h) => h.id === 'fox_at_the_hens'
+        && state.tick - h.tick < FATE.FOX_AGAIN_WEEKS);
+    case 'first_frost':
+      // La primera helada: el último mes del otoño, una vez al año.
+      return ctx.season === 'autumn' && ctx.week % TIME.WEEKS_PER_SEASON >= FATE.FROST_FROM_WEEK
+        && !state.happenings.some((h) => h.id === 'first_frost' && yearOf(h.tick) === yearOf(state.tick));
+  }
+}
+
+/**
+ * RD-5 · **La tirada del caserío.** Sólo si el sorteo de la semana no trajo
+ * nada y el valle tiene menos de `FATE.HAMLET_PEOPLE`. No consume azar del
+ * motor: la probabilidad y la elección salen de un hash de la semilla y la
+ * semana, así que no desplaza ninguna otra tirada de la partida.
+ */
+function rollHamlet(state: GameState, ctx: Context): FateOutcome | null {
+  if (ctx.people >= FATE.HAMLET_PEOPLE || state.ended !== null) return null;
+  if (hamletUnit(state, 'chance') >= FATE.HAMLET_CHANCE) return null;
+  const ids = (Object.keys(FATE.HAMLET_WEIGHT) as HamletId[]).filter((id) => hamletFits(state, id, ctx));
+  if (ids.length === 0) return null;
+  const total = ids.reduce((sum, id) => sum + FATE.HAMLET_WEIGHT[id], 0);
+  let at = hamletUnit(state, 'pick') * total;
+  for (const id of ids) {
+    at -= FATE.HAMLET_WEIGHT[id];
+    if (at < 0) return happen(state, id, ctx);
+  }
+  return happen(state, ids[ids.length - 1]!, ctx);
+}
+
 export function rollFate(state: GameState): FateOutcome | null {
   const ctx: Context = {
     season: seasonOf(state.tick),
@@ -638,9 +716,9 @@ export function rollFate(state: GameState): FateOutcome | null {
     FATE.FATED_LEAST_SHARE,
     Math.min(1, ctx.people / FATE.FATED_FULL_PEOPLE),
   );
-  if (next(state.rng, 'fate') >= FATE.WEEKLY_CHANCE * share) return null;
+  if (next(state.rng, 'fate') >= FATE.WEEKLY_CHANCE * share) return rollHamlet(state, ctx);
   const candidates = HAPPENINGS.filter((id) => weightOf(state, id, ctx) > 0);
-  if (candidates.length === 0) return null;
+  if (candidates.length === 0) return rollHamlet(state, ctx);
   const id = weighted(state.rng, 'fate', candidates, (c) => weightOf(state, c, ctx));
   return happen(state, id, ctx);
 }

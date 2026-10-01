@@ -398,7 +398,17 @@ export function createShell(actions: UiActions): ShellHandle {
     if (era.textContent !== text) era.textContent = text;
   };
 
-  message.append(trayEdge, ornament, era, voice);
+  // RD-5 · la meta a la vista (`derive/goal.ts`): una línea bajo la era, en la
+  // misma tinta apagada, que dice hacia dónde va el valle.
+  const goal = document.createElement('div');
+  goal.className = 'valley-goal';
+  goal.hidden = true;
+  const setGoal = (text: string | null): void => {
+    goal.hidden = text === null;
+    if (text !== null && goal.textContent !== text) goal.textContent = text;
+  };
+
+  message.append(trayEdge, ornament, era, goal, voice);
 
   const nav = document.createElement('nav');
   // `ui-shell-nav` sólo aporta ya el respiro del área segura (`shell.css`);
@@ -531,6 +541,7 @@ export function createShell(actions: UiActions): ShellHandle {
     voiceLine,
     setOrnament,
     setEra,
+    setGoal,
     setOffer,
     setRoute: paintRoute,
     // Los botones no llevan más que `addEventListener`: quitar `element` del

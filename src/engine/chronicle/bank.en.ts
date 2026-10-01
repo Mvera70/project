@@ -993,6 +993,27 @@ export const BANK: Record<string, string[]> = {
     'They found the child at nightfall that {season}, asleep under the alders. Nobody slept much.',
     'Found by the ford in year {year}, cold and frightened. The valley had looked everywhere else first.',
   ],
+  // RD-5 · los sucesos pequeños del caserío.
+  'fate.wild_honey': [
+    'Someone found a hollow oak full of comb in the {season} of year {year}. Everyone had sticky hands for a day.',
+    'Wild honey from the wood that {season}, shared out on the green with the bread.',
+    'A swarm in a dead tree, and honey for the whole valley in year {year}. Two of them were stung for it.',
+  ],
+  'fate.mushrooms_after_rain': [
+    'After the rain the wood edge was white with mushrooms, and {grain} measures of them came home in aprons.',
+    'Mushrooms by the basket in the {season} of year {year}: {grain} measures dried on the roofs.',
+    'Three wet days and then the mushrooms. The valley ate well for a week in year {year}.',
+  ],
+  'fate.fox_at_the_hens': [
+    'A fox got into the hens one night that {season}. Feathers in the yard and one fewer at the morning count.',
+    'The fox came in year {year} and took a hen. Nobody heard a thing.',
+    'One hen gone in the {season} of year {year}, and a fox\'s tracks in the mud by the coop.',
+  ],
+  'fate.first_frost': [
+    'The first frost came in the {season} of year {year}. The woodpile went down faster than anyone had reckoned.',
+    'White grass at dawn, the first of year {year}. They burned the green wood first and regretted it.',
+    'The first hard frost of the year, and everyone round one fire on the green until the sun was up.',
+  ],
   'fate.stranger_passes': [
     'A stranger came through the valley in {season}, stayed one night, and left {silver} silver for the bed.',
     'Someone passed along the road in the {season} of year {year}, stopped at the square, paid {silver} silver, and went on.',
@@ -2653,6 +2674,14 @@ export const UI_BANK: Record<string, string> = {
   //
   // «Walled town» y no «town» a secas: lo que la fase 3 nombra no es un tamaño
   // de pueblo, es un pueblo **cerrado**, que es de lo que va la meta del juego.
+  // RD-5 · la meta a la vista, bajo la era (`derive/goal.ts`).
+  'goal.first_harvest': 'Next: the first harvest, in {weeks} weeks',
+  'goal.first_harvest.one': 'Next: the first harvest, next week',
+  'goal.first_harvest.now': 'Next: the first harvest, this week',
+  'goal.souls': 'Next: {of} souls in the valley — {people} so far',
+  'goal.next': 'Next: a {what} — {wood} of {cost} wood',
+  'goal.forge': 'Next: a smithy, and the hamlet becomes a village',
+  'goal.wall': 'Next: a closed wall, and the village becomes a town',
   'era.hamlet': 'Hamlet',
   'era.village': 'Village',
   'era.town': 'Walled town',

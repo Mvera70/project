@@ -50,6 +50,12 @@ const HAPPENING_ART: Readonly<Record<HappeningId, string>> = {
   tinker: 'pedlar.png',
   wise_woman: 'road.png',
   refugees: 'means-hand.png',
+  // RD-5 · los sucesos pequeños del caserío. Provisionales: los suyos están
+  // pedidos en `docs/plan-arte-pendiente.md`.
+  wild_honey: 'harvest.png',
+  mushrooms_after_rain: 'harvest.png',
+  fox_at_the_hens: 'wolf.png',
+  first_frost: 'season-winter.png',
 };
 
 /** Los medios estables de M-2: una ilustración por cosa entregada al valle. */
