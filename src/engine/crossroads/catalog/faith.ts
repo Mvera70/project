@@ -159,4 +159,17 @@ const RELIC_PEDLAR: CrossroadTemplate = {
   ],
 };
 
-export const FAITH_TEMPLATES: readonly CrossroadTemplate[] = [CHAPEL_OR_GRANARY, RELIC_PEDLAR];
+/**
+ * RD-3 (1 oct 2026) · **La categoría `faith` se retira entera.**
+ *
+ * `chapel_or_granary` se planteaba con una iglesia ya en pie en 10 de 10
+ * partidas medidas (`has chapel` no cuenta la iglesia, y la aldea levanta su
+ * capilla sola a las 12 personas) y sus dos obras fallaban en silencio por el
+ * tope. `relic_pedlar` sólo vivía entre la capilla y su mejora, y duplica el
+ * medio `relic` (30 de plata → fe) y a los sucesos `pedlar`/`pilgrims`, que sí
+ * llegan por el camino con cuerpo. Una sola vía hacia la fe
+ * (`docs/medidas/rd0-encrucijadas-2026-09-30.md` §5.5). Siguen aquí para que
+ * un guardado con una pendiente, o con ellas en el registro, cargue y se lea.
+ */
+export const FAITH_TEMPLATES: readonly CrossroadTemplate[] = [];
+export const RETIRED_FAITH_TEMPLATES: readonly CrossroadTemplate[] = [CHAPEL_OR_GRANARY, RELIC_PEDLAR];

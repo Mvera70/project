@@ -5,7 +5,17 @@
 
 import type { CrossroadTemplate } from '../schema';
 
-/** A.5 · Where the dead go. Nine in eleven days and the ground is hard. */
+/**
+ * A.5 · Where the dead go. The ground is hard and the dead do not wait.
+ *
+ * **RD-3 (1 oct 2026) · promesas corregidas** (RD-0, §5.3): el cuerpo decía
+ * «nueve muertos en once días», un número fijo que no era la mortalidad del
+ * brote; `burn_the_houses` decía «las casas de los muertos» y el motor quema
+ * las dos más viejas (`carryOutBuildings` toma las primeras por id, la casa
+ * fundadora incluida), así que ahora lo dice; y `visible` enseñaba un
+ * camposanto (`scar grave_row`) que el render no dibuja, cuando lo que sí
+ * ocurre son la capilla reunida y las casas en ruinas.
+ */
 const PLAGUE_PIT: CrossroadTemplate = {
   id: 'plague_pit',
   category: 'plague',
@@ -35,7 +45,9 @@ const PLAGUE_PIT: CrossroadTemplate = {
         { k: 'outbreak', weeks: 3 },
         { k: 'build', kind: 'grave_yard', free: true },
       ],
-      visible: [{ k: 'raise', kind: 'grave_yard' }],
+      // RD-3 · el camposanto se levanta si hay sitio, pero lo que siempre pasa
+      // es la bendición.
+      visible: [{ k: 'gather', where: 'chapel', days: 3 }],
       seeds: [],
       traitWeight: { devout: 3, kind: 2 },
     },
@@ -49,7 +61,7 @@ const PLAGUE_PIT: CrossroadTemplate = {
         { k: 'opinion', from: 'A', to: 'B', delta: -40 },
         { k: 'memory', who: 'A', kind: 'was_blamed', about: 'B', weight: 4 },
       ],
-      visible: [{ k: 'scar', what: 'grave_row' }],
+      visible: [{ k: 'gather', where: 'square', days: 2 }],
       seeds: [
         {
           id: 'unquiet_ground',
@@ -82,7 +94,7 @@ const PLAGUE_PIT: CrossroadTemplate = {
           id: 'the_burnt_row',
           delayYears: [3, 10],
           effects: [],
-          visible: [{ k: 'scar', what: 'burnt_field' }],
+          visible: [{ k: 'gather', where: 'square', days: 1 }],
           chronicleKey: 'consequence.the_burnt_row',
         },
       ],
@@ -182,4 +194,12 @@ export const PLAGUE_BLAME: CrossroadTemplate = {
   ],
 };
 
-export const PLAGUE_TEMPLATES: readonly CrossroadTemplate[] = [PLAGUE_PIT, PLAGUE_BLAME];
+export const PLAGUE_TEMPLATES: readonly CrossroadTemplate[] = [PLAGUE_PIT];
+
+/**
+ * RD-3 (1 oct 2026) · **Retirada del sorteo: `plague_blame`.** Casi
+ * inalcanzable (brote + fe > 55 + sacerdote devoto: salió una vez en ocho
+ * semillas × sesenta años) y su «B» era un nombrado cualquiera, no el que el
+ * pueblo señala. Se queda para los guardados (`RETIRED_TEMPLATES`).
+ */
+export const RETIRED_PLAGUE_TEMPLATES: readonly CrossroadTemplate[] = [PLAGUE_BLAME];

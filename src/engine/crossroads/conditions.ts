@@ -12,6 +12,7 @@ import { TERRAIN_CODE } from '../state';
 import type { Condition, GameState, Op, Role } from '../state';
 import { seasonOf, weekOf, yearOf } from '../time';
 import { count } from '../subsistence/building-counts';
+import { withinCap } from '../world/buildings';
 
 function compare(a: number, op: Op, b: number): boolean {
   switch (op) {
@@ -131,6 +132,15 @@ export function evaluate(c: Condition, state: GameState): boolean {
     // `threat.comingTick` ocho semanas antes de que llegue.
     case 'raid':
       return (state.threat.comingTick !== null) === c.coming;
+    // RD-3 · ¿se puede **pedir** una obra más de esta familia? Lo mismo que se
+    // pregunta `requestBuild` antes de abrirla: el tope de §12 (`withinCap`) y,
+    // para la muralla, que el anillo ya esté escrito —sin él, `placeBuilding`
+    // rechaza la estaca (A2c: la aldea decide su anillo con once casas)—. Medido:
+    // sin esa segunda mitad, las cuatro empalizadas de `build_together` y las de
+    // `build_up` se rechazaban en silencio en las semillas 7 y 11 hasta el año 12.
+    case 'room':
+      return withinCap(state, c.building)
+        && ((c.building !== 'palisade' && c.building !== 'wall') || state.ring !== null);
     case 'outbreak':
       return outbreakRunning(state) === c.active;
     case 'role':

@@ -2038,6 +2038,46 @@ export const CROSSROADS = {
   DEFAULT_COOLDOWN_YEARS: 25,
 } as const;
 
+/**
+ * RD-3 (1 oct 2026) · Las cifras de las encrucijadas reescritas, que hasta aquí
+ * eran literales en el catálogo y **absolutas** (+900, +300, −450…): pensadas
+ * para 40–80 personas y heredadas por aldeas de 7 (RD-0, T5). Ahora son
+ * proporciones de lo que haya en el almacén —`mul`—, y viven aquí.
+ * Medidas contra las despensas a las que llega cada pregunta en
+ * `docs/medidas/rd3-encrucijadas-2026-10-01.md`.
+ */
+export const CROSSROAD_EFFECTS = {
+  // TUNE: `winter_grain_debt.kneel`, múltiplo de lo que hay en el granero.
+  KNEEL_GRAIN_MUL: 2.2,
+  // TUNE: `winter_grain_debt.take_it_at_night`.
+  NIGHT_GRAIN_MUL: 1.8,
+  // TUNE: `winter_grain_debt` → `tithe_due`: una quinta parte del granero.
+  TITHE_DUE_MUL: 0.8,
+  // TUNE: `hungry_spring.eat_it` y `.half_and_half`: lo que se come de la
+  // semilla, como múltiplo de lo que hay (eran +300 y +140 fijos).
+  EAT_SEED_GRAIN_MUL: 1.4,
+  HALF_SEED_GRAIN_MUL: 1.2,
+  // TUNE: `granary_theft`: lo que falta del granero esa noche.
+  THEFT_GRAIN_MUL: 0.9,
+  // TUNE: `granary_theft.a_new_latch`: la madera y el hierro de un cerrojo y
+  // una puerta nuevos, que es lo que cuesta el «y todos lo saben».
+  LATCH_WOOD: 40,
+  // TUNE: `smith_feud`: la opinión de B sobre A a partir de la cual la riña es
+  // real (la condición ambiental era `grudge ≥ 45` de *cualquiera* con
+  // cualquiera), y el ánimo por debajo del cual estalla.
+  SMITH_FEUD_MIN_OPINION: 55,
+  SMITH_FEUD_MORALE: 45,
+  // TUNE: `feud_inherited`: el rencor mínimo de B hacia A, el de la condición.
+  FEUD_INHERITED_MIN_OPINION: 45,
+  // TUNE: `forest_cut`: la despensa a partir de la cual «faltan campos», contra
+  // las semanas que quedan hasta la cosecha (`grainToHarvest`).
+  FOREST_CUT_PANTRY: 1.15,
+  // TUNE: `forest_cut.leave_it_standing` → `the_wood_holds`: el bosque del
+  // corazón que cuenta como «aguanta» (medido 0,18–0,26; antes 0,5, que no se
+  // alcanza nunca).
+  WOOD_HOLDS_FOREST: 0.2,
+} as const;
+
 // ---------------------------------------------------------------------------
 // §7.2 · Buildings
 //

@@ -48,7 +48,8 @@ const STRANGERS_AT_THE_FORD: CrossroadTemplate = {
             { k: 'flag', flag: 'threatened', years: 3 },
             { k: 'kill', who: 'random', count: 'fraction', fraction: 0.1 },
           ],
-          visible: [{ k: 'scar', what: 'grave_row' }],
+          // RD-3 · el camposanto no se dibuja; el aviso rojo (`threatened`) sí.
+          visible: [{ k: 'banner', colour: 'red', years: 3 }],
           chronicleKey: 'consequence.whoever_burned_it',
         },
       ],
@@ -193,4 +194,13 @@ const BANDITS: CrossroadTemplate = {
   ],
 };
 
-export const STRANGER_TEMPLATES: readonly CrossroadTemplate[] = [STRANGERS_AT_THE_FORD, BANDITS];
+export const STRANGER_TEMPLATES: readonly CrossroadTemplate[] = [STRANGERS_AT_THE_FORD];
+
+/**
+ * RD-3 (1 oct 2026) · **Retirada del sorteo: `bandits`.** Duplicaba al clan
+ * vecino (`raiders_coming`, B1–D6) sin su batalla ni su cuerpo: los «seis
+ * hombres y un caballo» no aparecían, «cada primavera» disparaba en otoño y
+ * `fight_them` escondía el 10 % de muertos. Se queda para los guardados
+ * (`RETIRED_TEMPLATES`).
+ */
+export const RETIRED_STRANGER_TEMPLATES: readonly CrossroadTemplate[] = [BANDITS];

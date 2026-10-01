@@ -34,7 +34,9 @@ const QUIET_YEARS: CrossroadTemplate = {
         { k: 'build', kind: 'granary', free: true },
         { k: 'stat', stat: 'grain', mul: 0.94 },
       ],
-      visible: [{ k: 'raise', kind: 'granary' }],
+      // RD-3 · con tres graneros el `build` no ocurre: lo que siempre se ve son
+      // los que cavan.
+      visible: [{ k: 'gather', where: 'square', days: 3 }],
       seeds: [],
       traitWeight: { cunning: 2, greedy: 2 },
     },

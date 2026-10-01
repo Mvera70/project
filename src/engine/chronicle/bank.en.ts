@@ -1436,20 +1436,20 @@ export const CROSSROAD_BANK: Record<string, string> = {
   'crossroad.after_the_raid.body':
     'Year {year}. The raiders are a day gone and the tracks are still fresh in the mud by the ford. {B} wants to go after them. {A} has to say.',
   'crossroad.after_the_raid.chase.label': 'Go after them',
-  'crossroad.after_the_raid.chase.cost': 'Some of what was taken comes back, and somebody does not',
-  'crossroad.after_the_raid.build_up.label': 'Raise the wall higher',
-  'crossroad.after_the_raid.build_up.cost': 'Timber that was going to be houses',
+  'crossroad.after_the_raid.chase.cost': 'About half the grain they took comes back, and somebody does not',
+  'crossroad.after_the_raid.build_up.label': 'Add to the palisade',
+  'crossroad.after_the_raid.build_up.cost': 'Two more lengths, timber that was going to be houses, and the wall comes first for three years',
   'crossroad.after_the_raid.bear_it.label': 'Bear it',
   'crossroad.after_the_raid.bear_it.cost': 'Nothing, and everyone will remember that',
   'crossroad.winter_grain_debt.title': 'The Lord of Wealdmere Sends Carts',
   'crossroad.winter_grain_debt.body':
-    'Year {year}. The granary is bare and the frost has not broken. Riders from Wealdmere wait at the ford with three carts of rye. Their captain will not unload them until {A} kneels.',
+    'Year {year}. The granary is bare and the frost has not broken. Riders from Wealdmere wait at the ford with carts of rye. Their captain will not unload them until {A} kneels.',
   'crossroad.winter_grain_debt.kneel.label': 'Kneel',
-  'crossroad.winter_grain_debt.kneel.cost': 'The valley is no longer its own',
+  'crossroad.winter_grain_debt.kneel.cost': 'The carts unload now, and in ten years or so Wealdmere comes for a fifth of the granary',
   'crossroad.winter_grain_debt.refuse.label': 'Refuse',
   'crossroad.winter_grain_debt.refuse.cost': 'People will die this winter',
   'crossroad.winter_grain_debt.take_it_at_night.label': 'Take it at night',
-  'crossroad.winter_grain_debt.take_it_at_night.cost': 'If it is found out, they come armed',
+  'crossroad.winter_grain_debt.take_it_at_night.cost': 'Wealdmere finds out, and comes armed within nine years',
 
   // --- A.2 tithe_demand ---
   'crossroad.tithe_demand.title': 'The Ledger and the Sheaves',
@@ -1476,24 +1476,24 @@ export const CROSSROAD_BANK: Record<string, string> = {
   // --- A.4 granary_theft ---
   'crossroad.granary_theft.title': 'The Broken Latch',
   'crossroad.granary_theft.body':
-    'Someone has been at the granary in the night. {B} says it was {A}. {A} says nothing at all.',
+    'Someone has been at the granary in the night, and a tenth of what was in it is gone. {B} says it was {A}. {A} says nothing at all.',
   'crossroad.granary_theft.believe_b.label': 'Believe {B}',
   'crossroad.granary_theft.believe_b.cost': '{A} is cast out',
   'crossroad.granary_theft.believe_a.label': 'Believe {A}',
   'crossroad.granary_theft.believe_a.cost': '{B} will not forget',
   'crossroad.granary_theft.a_new_latch.label': 'Hang a new latch and say nothing',
-  'crossroad.granary_theft.a_new_latch.cost': 'Everyone stays, and everyone knows',
+  'crossroad.granary_theft.a_new_latch.cost': 'Everyone stays, everyone knows, and the new latch costs timber',
 
   // --- A.5 plague_pit ---
   'crossroad.plague_pit.title': 'Where the Dead Go',
   'crossroad.plague_pit.body':
-    'Nine dead in eleven days. The churchyard is small and the ground is hard. {A} wants them blessed one by one. {B} wants a pit and lime, dug today.',
+    'The dead are falling faster than they can be buried. The churchyard is small and the ground is hard. {A} wants them blessed one by one. {B} wants a pit and lime, dug today.',
   'crossroad.plague_pit.bless_them.label': 'Bless them',
   'crossroad.plague_pit.bless_them.cost': 'The sickness has more days to work',
   'crossroad.plague_pit.the_pit.label': 'The pit',
   'crossroad.plague_pit.the_pit.cost': 'No one will forget who chose it',
-  'crossroad.plague_pit.burn_the_houses.label': 'Burn the houses of the dead',
-  'crossroad.plague_pit.burn_the_houses.cost': 'Roofs for ash',
+  'crossroad.plague_pit.burn_the_houses.label': 'Burn two houses',
+  'crossroad.plague_pit.burn_the_houses.cost': 'The two oldest roofs for ash, and nobody builds there for twenty years',
 
   // --- A.6 plague_blame ---
   'crossroad.plague_blame.title': 'A Reason for It',
@@ -1507,22 +1507,22 @@ export const CROSSROAD_BANK: Record<string, string> = {
   'crossroad.plague_blame.say_nothing.cost': 'It will find its own end',
 
   // --- A.7 smith_feud ---
-  'crossroad.smith_feud.title': 'The Anvil and the Altar',
+  'crossroad.smith_feud.title': 'A Hand on a Shoulder',
   'crossroad.smith_feud.body':
-    'It has been building for years. This morning {A} put a hand on {B} in front of the whole village, and now both are waiting to see what happens.',
+    'Whatever it began over, it has been going on a long time. This morning {A} put a hand on {B} in front of the whole village, and now both are waiting to see what happens.',
   'crossroad.smith_feud.side_with_a.label': 'Side with {A}',
-  'crossroad.smith_feud.side_with_a.cost': '{B} withdraws',
+  'crossroad.smith_feud.side_with_a.cost': 'Four slower years of building, and some years on {B} leaves with two more',
   'crossroad.smith_feud.side_with_b.label': 'Side with {B}',
-  'crossroad.smith_feud.side_with_b.cost': '{A} withdraws',
+  'crossroad.smith_feud.side_with_b.cost': 'Four slower years of building, and some years on {A} leaves with two more',
   'crossroad.smith_feud.build_together.label': 'Make them build something together',
   'crossroad.smith_feud.build_together.cost': 'Neither forgives it, and the wall goes up',
 
   // --- A.8 feud_inherited ---
-  'crossroad.feud_inherited.title': 'What the Father Left',
+  'crossroad.feud_inherited.title': 'The Old Quarrel',
   'crossroad.feud_inherited.body':
-    '{B} was four years old when it happened and has never spoken of it. {B} is not four years old now.',
+    '{A} and {B} have carried it for years and have never said what it was. This morning {B} said it out loud, in front of the whole village.',
   'crossroad.feud_inherited.let_it_be_settled.label': 'Let it be settled',
-  'crossroad.feud_inherited.let_it_be_settled.cost': 'One of them will not see the winter',
+  'crossroad.feud_inherited.let_it_be_settled.cost': '{B} will not see the winter',
   'crossroad.feud_inherited.send_b_away.label': 'Send {B} away',
   'crossroad.feud_inherited.send_b_away.cost': 'The valley loses a pair of hands and a name',
   'crossroad.feud_inherited.give_b_the_smithy.label': 'Give {B} the smithy',
@@ -1580,11 +1580,11 @@ export const CROSSROAD_BANK: Record<string, string> = {
   // --- A.11 forest_cut ---
   'crossroad.forest_cut.title': 'The Old Wood',
   'crossroad.forest_cut.body':
-    'The fields will not feed another winter of children. The nearest flat ground is under three hundred years of oak. {A} has walked it twice and come back with nothing to say.',
+    'The fields will not feed another winter of children, and there is room to plough more if the wood goes. The nearest flat ground is under three hundred years of oak. {A} has walked it twice and come back with nothing to say.',
   'crossroad.forest_cut.fell_it.label': 'Fell it',
   'crossroad.forest_cut.fell_it.cost': 'The wood does not come back in a lifetime',
   'crossroad.forest_cut.take_the_edge.label': 'Take only the edge',
-  'crossroad.forest_cut.take_the_edge.cost': 'Slower, and the children are hungry now',
+  'crossroad.forest_cut.take_the_edge.cost': 'Slower, one field, and a week of short bread now',
   'crossroad.forest_cut.leave_it_standing.label': 'Leave it standing',
   'crossroad.forest_cut.leave_it_standing.cost': '{A} sleeps well; nobody else does',
 
@@ -1609,7 +1609,7 @@ export const CROSSROAD_BANK: Record<string, string> = {
   'crossroad.strangers_at_the_ford.feed_them_and_send_them_on.cost':
     'Sixty bushels, and they leave before nightfall',
   'crossroad.strangers_at_the_ford.turn_them_away.label': 'Turn them away',
-  'crossroad.strangers_at_the_ford.turn_them_away.cost': 'The road will hear of it',
+  'crossroad.strangers_at_the_ford.turn_them_away.cost': 'The road will hear of it, and for ten years no one comes up it',
 
   // --- A.14 bandits ---
   'crossroad.bandits.title': 'Six Men and a Horse',
@@ -1640,7 +1640,7 @@ export const CROSSROAD_BANK: Record<string, string> = {
   // --- A.16 first_stone ---
   'crossroad.first_stone.title': 'The First Stone',
   'crossroad.first_stone.body':
-    'There is nowhere left to build outward. {B} says the quarry on the east slope will give stone for a wall, or for houses, and that {A} will not live to see both finished.',
+    'The church is up, and its stone came from the quarry on the east slope. {B} says there is stone left for a wall, or for houses, and not enough for both in {A}’s lifetime.',
   'crossroad.first_stone.the_wall.label': 'The wall',
   'crossroad.first_stone.the_wall.cost': 'Cold houses for a generation',
   'crossroad.first_stone.the_houses.label': 'The houses',
@@ -1697,7 +1697,7 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
   'crossroad.winter_grain_debt.kneel': [
     '{A} knelt at the ford in year {year}, and the carts came up the road behind.',
     'In year {year} the valley took the rye and gave its name for it.',
-    '{A} knelt. Three carts of rye, and Wealdmere had a new tenant.',
+    '{A} knelt. The rye came up the road, and Wealdmere had a new tenant.',
   ],
   'crossroad.winter_grain_debt.refuse': [
     '{A} sent the carts back down the road in year {year}.',
@@ -1894,7 +1894,7 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
 
   // --- A.8 feud_inherited ---
   'crossroad.feud_inherited.let_it_be_settled': [
-    'They let it be settled in year {year}, and one of them was buried for it.',
+    'They let it be settled in year {year}, and {B} was buried for it.',
     'In year {year} the village stood back and let the old business end.',
     'It ended in year {year}, the way it had been going to for twenty years.',
   ],
