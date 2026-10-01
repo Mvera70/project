@@ -151,6 +151,9 @@ describe('A4 · la muralla de piedra tiene dos puertas', () => {
     // Una mejora necesita su origen (§7.3 punto 9). Sin esto, «abrir la piedra»
     // sonaría a que la muralla se levanta de la nada, y no: se dobla la que hay.
     const state = quarrying();
+    // K1–K3 (1 oct 2026): con el leñador trayendo 3,5 la aldea de doce años ya
+    // tiene empalizada, y esta prueba es «sin estacada»: se dice, no se supone.
+    for (const b of state.buildings) if (b.kind === 'palisade' && b.lostTick === null) b.lostTick = state.tick;
     state.flags['wall_closed'] = 0;
     expect(nextUpgrade(state), 'sin estacada, nada que doblar').toBe(null);
   });

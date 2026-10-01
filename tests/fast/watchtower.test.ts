@@ -54,7 +54,15 @@ describe('C3 · la atalaya que la aldea se levanta sola', () => {
   });
 
   it('y uno saqueado sí, si ya tiene su anillo decidido', () => {
-    const state = quarrying();
+    // **Cuando no hay nada antes en la cola de §7.3.** K1–K3 (1 oct 2026): con el
+    // leñador trayendo 3,5, la semilla 7 a los doce años ya ha trazado su propio
+    // cerco y está levantando la empalizada, que va antes que la torre por
+    // diseño (`works.ts`: primero el cerco). Se toma el primer año candidato en
+    // que, sin saqueos, la aldea no tiene nada que levantar.
+    const state = [12, 9, 6].map((years) => quarrying(7, years))
+      .find((s) => { const calm = { ...s, threat: { ...s.threat, raids: 0 } }; return nextProject(calm) === null; });
+    expect(state, 'ningún año candidato sin obra pendiente').toBeDefined();
+    if (state === undefined) return;
     state.threat.raids = BUILDING_RULES.WATCHTOWER_AFTER_RAIDS;
     // Con fragua, piedra, anillo y un saqueo encima: es lo que la puerta pide.
     const smithy = state.buildings.some((b) => b.kind === 'smithy' && b.lostTick === null);

@@ -201,7 +201,9 @@ describe('grafo de módulos del motor', () => {
     // sabe quién va a dónde, así que mira a people/ y a subsistence/; forest.ts
     // le avisa de que los árboles se han movido, y la flecha no vuelve.
     expect(importsOf('world/astar.ts')).toEqual(['balance', 'state', 'tiles']);
-    expect(importsOf('world/forest.ts')).toEqual(['balance', 'paths', 'state', 'tiles']);
+    // K1–K3 (1 oct 2026): y mira a `plaza` —el acarreo se mide desde la plaza— y a
+    // `rng`, por el flujo `forest` del bosque que se extiende.
+    expect(importsOf('world/forest.ts')).toEqual(['balance', 'paths', 'plaza', 'rng', 'state', 'tiles']);
     const pathDependencies = new Set(['valley-road', 
       'astar',
       'balance',
@@ -228,6 +230,8 @@ describe('grafo de módulos del motor', () => {
       'placement',
       'state',
       'subsistence/building-counts',
+      // K3a (1 oct 2026): la leña del invierno que no se gasta en obra.
+      'subsistence/consumption',
       'subsistence/harvest',
       'upgrade',
     ]);
