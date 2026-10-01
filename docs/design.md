@@ -2330,13 +2330,25 @@ La semana del suceso la crónica dice que se perdió (`fate.child_missing*`) y l
 capa de vida lo deja los dos primeros días escénicos en la linde más cercana a
 su casa, quieto y con una señal encima (`life/lost-child.ts`); las copas que lo
 tapan se atenúan. Tocarla manda al adulto libre más cercano a por él desde
-donde esté y deja el acto `search` en la cola. La semana siguiente, en el paso
+donde esté; **el acto `search` entra en la cola cuando ese adulto llega hasta
+el niño** (a 1,2 m, `REACH`), no al tocar (v5.52, abajo). La semana siguiente, en el paso
 1b, `settleLostChild` (`world/lost-child.ts`) lo cierra: con búsqueda, quien
 fue lo trae (`child.found_by*`, `FATE.CHILD_FOUND_MORALE` de ánimo de vuelta y
 `OPINION.WAS_SAVED` del niño hacia él); sin ella, lo encuentra el valle al
 anochecer (`child.found_at_dusk`) y el ánimo perdido no vuelve. Ninguna tirada
 nueva. `who` lleva siempre el `id` del niño; las claves viejas
 `fate.child_lost*` se quedan en el banco por los guardados.
+
+**El contrato de la llegada (v5.52, 1 oct 2026).** Lo que dice el motor y lo
+que enseña la escena no se contradicen: **el rescate es una llegada, y la
+llegada entra al motor como dato** por `PlayerAct`, como el parte de la caza y
+el de la batalla (§1b). Se eligió así y no «el motor decide y la escena
+obedece» porque la escena no siempre corre —pestaña oculta, descanso, ×64 con
+la vida a un tercio, un relevo de jornada— y una ruta que «siempre llega» no se
+puede prometer sin teletransportar a nadie. Si el buscador deja el encargo (la
+noche, una huida), la búsqueda se deshace y la señal vuelve; si nadie llega, la
+línea es la del valle al anochecer. Que el motor confíe en el parte es la misma
+frontera que ya cruza la batalla: sigue siendo determinista dadas sus entradas.
 
 **Y la visita, también (v5.47).** El que sube a vender espera en la plaza con
 unas monedas encima mientras el trato se puede pagar; tocarlas lo cierra con él

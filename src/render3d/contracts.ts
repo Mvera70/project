@@ -284,8 +284,13 @@ export interface GraphicsRenderer {
   dealVisit(kind: HappeningId, tick: number): boolean;
   /** RD-4 · Dónde va la señal del niño perdido —mientras espera en la linde—, o `null`. */
   lostSign(): { x: number; y: number; hidden: boolean } | null;
-  /** RD-4 · Mandar a buscarlo, la semana `tick`: quién es y quién va, o `null`. */
-  searchChild(tick: number): { child: VillagerId; searcher: VillagerId } | null;
+  /** RD-4 · Mandar a buscarlo: quién es y quién va, o `null`. No apunta nada todavía. */
+  searchChild(): { child: VillagerId; searcher: VillagerId } | null;
+  /**
+   * Parte 0 · Quién llegó hasta el niño perdido y en qué semana, entregado una
+   * sola vez. Es el único rescate que el motor apunta (acto `search`).
+   */
+  childFound(): { sourceTick: number; child: VillagerId; searcher: VillagerId } | null;
   /** Esquema 12 · los «+1» y «−N» de la leñera, proyectados; `age` va de 0 a 1. */
   woodGains(): readonly { id: number; count: number; x: number; y: number; age: number; icon?: 'logs' | 'wheat' }[];
   /** Parte de la cacería, entregado una sola vez al motor. */

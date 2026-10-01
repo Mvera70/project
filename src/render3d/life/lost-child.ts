@@ -9,6 +9,14 @@
 // llega, el niño vuelve andando a su casa. Si nadie la toca, al anochecer del
 // segundo día vuelve solo: lo encontró el valle, que es lo que la crónica dirá.
 //
+// **Parte 0 (1 oct 2026): el rescate es lo que se ve llegar, no el toque.** En
+// `main` el toque ya apuntaba el acto `search` y el motor contaba un rescate
+// aunque el buscador no llegara nunca (semilla 23: se quedó a 0,9 m, su viaje
+// se dio por atascado y se fue a misa). Ahora quien llega hasta el niño queda
+// en `reachedBy` (`reachChild`), y sólo eso cruza al motor, por la misma
+// puerta que el parte de la caza y el de la batalla (`renderer.ts`,
+// `childFound`). Si nadie llega, no hay rescate que contar.
+//
 // Ese día el niño no tiene cuerpo de vecino (como los que vuelven de una
 // expedición, `expeditions.ts`): lleva su `VillagerId` y el render le pone su
 // cara (`cast.ts`). Al día siguiente vuelve a ser un vecino más.
@@ -35,8 +43,10 @@ export interface LostChild {
   readonly home: Point;
   route: Waypoint[];
   travelled: number;
-  /** Quien fue a buscarlo, si el jugador tocó la señal. */
+  /** Quien va a buscarlo, si el jugador tocó la señal y sigue en ello. */
   searcher: VillagerId | null;
+  /** Quien llegó hasta él: lo único que el motor apunta como rescate. */
+  reachedBy: VillagerId | null;
   /** Si hoy es el último día perdido: al anochecer vuelve solo. */
   readonly lastDay: boolean;
 }
@@ -54,6 +64,13 @@ const FOREST_REACH = 30;
 const OUTSIDE = 1.5;
 const PACE = 1;
 const RADIUS = 0.24;
+/**
+ * TUNE: a qué distancia, de centro a centro, quien lo busca ya lo tiene al
+ * alcance de la mano. El asiento de la búsqueda cae encima del niño, que es un
+ * cuerpo: medido en la semilla 23 (1 oct 2026), el buscador se para entre 0,9
+ * y 1,1 m y nunca «llega» al asiento. 1,2 m es un brazo más los dos radios.
+ */
+export const REACH = 1.2;
 /** Id de cuerpo del niño perdido: fuera de los rangos de vecinos, visitantes, viajeros y partida. */
 const LOST_ID = 61_000_000;
 
@@ -110,7 +127,7 @@ export function createLostChild(
   return {
     villager: today.villager,
     body: { id: LOST_ID, x: at.x, z: at.z, vx: 0, vz: 0, facing: Math.atan2(near.x - at.x, near.z - at.z), radius: RADIUS, pace: PACE },
-    phase: 'lost', home, route: [], travelled: 0, searcher: null, lastDay: today.lastDay,
+    phase: 'lost', home, route: [], travelled: 0, searcher: null, reachedBy: null, lastDay: today.lastDay,
   };
 }
 
@@ -124,6 +141,19 @@ export function bringHome(child: LostChild, land: Terrain): void {
   if (child.phase !== 'lost') return;
   child.phase = 'home';
   child.route = pathTo(land, { x: child.body.x, z: child.body.z }, child.home) ?? [];
+}
+
+/**
+ * Si quien fue a buscarlo ya lo tiene al alcance, lo ha encontrado: queda
+ * apuntado quién (`reachedBy`) y vuelven. Sólo cuenta el que se mandó, y sólo
+ * mientras el niño sigue perdido: al anochecer del último día ya no hay a quién
+ * encontrar.
+ */
+export function reachChild(child: LostChild, villager: VillagerId, at: Point): boolean {
+  if (child.phase !== 'lost' || child.searcher !== villager) return false;
+  if (Math.hypot(at.x - child.body.x, at.z - child.body.z) > REACH) return false;
+  child.reachedBy = villager;
+  return true;
 }
 
 /** Un paso del niño perdido. Siempre acaba (E.7): al anochecer del último día vuelve solo. */

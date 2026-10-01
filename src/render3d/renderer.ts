@@ -795,8 +795,14 @@ export async function createGraphicsRenderer(
    * vuelva a cerrarlo (`LiveDeal`).
    */
   let liveDeal: LiveDeal | null = null;
-  /** RD-4 · el niño que el jugador ya mandó buscar: no vuelve a la linde en los días que se rehacen. */
+  /**
+   * RD-4 · el niño que ya encontraron: no vuelve a la linde en los días que se
+   * rehacen. Parte 0 (1 oct 2026): se apunta cuando alguien **llega** hasta él,
+   * no cuando se toca la señal.
+   */
   let lostFound: { villager: VillagerId; tick: number } | null = null;
+  /** Parte 0 · la llegada hasta el niño, entregada una sola vez a la interfaz y de ahí al motor. */
+  let lostReport: { sourceTick: number; child: VillagerId; searcher: VillagerId } | null = null;
   /** Dónde está el tablón de la plaza, para que el encuadre lo incluya (D7). */
   let boardSpot: { x: number; z: number } | null = null;
   let observedFrame: GraphicsFrame | null = null;
@@ -2351,6 +2357,15 @@ export async function createGraphicsRenderer(
         life.setWoodClock(run !== null && run.tick === state.tick ? run.at : NO_WOOD,
           frame.tickFraction - (lifeCarry - LIFE_STEP) / WEEK_SECONDS);
         life.step(stepPhase);
+        // Parte 0 · quien fue a por el niño perdido ha llegado hasta él: eso, y
+        // sólo eso, es el rescate que el motor apuntará (`childFound`). Se mira
+        // en cada paso para que un relevo de jornada no se lo lleve.
+        const reached = life.lostChild;
+        if (reached !== null && reached.reachedBy !== null && lifeState !== null
+          && (lostFound === null || lostFound.villager !== reached.villager || lostFound.tick !== lifeState.tick)) {
+          lostFound = { villager: reached.villager, tick: lifeState.tick };
+          lostReport = { sourceTick: lifeState.tick, child: reached.villager, searcher: reached.reachedBy };
+        }
         if (huntScene !== null) {
           huntScene.step(life.wildlife);
           // AN-5a · El parte espera a que la escena acabe de verse: la pieza
@@ -2890,13 +2905,17 @@ export async function createGraphicsRenderer(
       // se atenúan (`encounterTargets`): la señal no se apaga nunca.
       return { x: (point.x + 1) * viewport.widthCss / 2, y: (1 - point.y) * viewport.heightCss / 2, hidden: false };
     },
-    searchChild(tick: number): { child: VillagerId; searcher: VillagerId } | null {
+    searchChild(): { child: VillagerId; searcher: VillagerId } | null {
       const child = life?.lostChild ?? null;
       if (child === null) return null;
       const searcher = life!.searchChild();
       if (searcher === null) return null;
-      lostFound = { villager: child.villager, tick };
       return { child: child.villager, searcher };
+    },
+    childFound(): { sourceTick: number; child: VillagerId; searcher: VillagerId } | null {
+      const report = lostReport;
+      lostReport = null;
+      return report;
     },
     dealVisit(kind: HappeningId, tick: number): boolean {
       if (life === null || !life.dealVisit(kind)) return false;

@@ -10,6 +10,15 @@
 // fue a por él lo trae, el ánimo se recupera y el niño le debe algo; sin él,
 // lo encuentra el valle al anochecer, como antes, y el ánimo perdido no vuelve.
 //
+// **Parte 0 (1 oct 2026): el acto es el parte de una llegada.** En RD-4 lo
+// apuntaba el toque, y en la semilla 23 la crónica contaba un rescate que la
+// escena no enseñó: el buscador se quedó a un metro y se fue a misa. El motor
+// no puede saber si alguien llegó —la llegada es de la capa de vida, que no
+// corre si nadie mira—, así que la llegada entra como dato por `PlayerAct`,
+// la misma frontera que la caza y la batalla (§1b): el motor sigue siendo
+// determinista dadas sus entradas. Mandado y no llegado, no hay acto, y la
+// línea es la del valle al anochecer, que es lo que se vio.
+//
 // No consume ninguna tirada: un acto no puede desplazar la partida.
 
 import { FATE, LIFE, OPINION } from '../balance';
