@@ -253,6 +253,34 @@ el orden es del dueño.
 | F-0b · La línea de base en el aparato | En el iPhone y el iPad: `?sandbox=battle&defenders=10&raiders=24` y «Copiar métricas» en el pico de la pelea; después lo mismo con `&shadow=0.12`. Fotogramas, peor fotograma y lo que añaden las sondas como fracción del fotograma. Es lo único de esta línea que no se puede medir aquí | P2 | Baja | Vera (con el aparato) | F-0 |
 | F-1 · La flecha que se clava | **Propuesta, no empezada.** Detrás de una opción `contact` (y `&contact=1` en el banco): decide el barrido de F-0; la altura desde el suelo del blanco; la flecha se para donde toca y se cuelga del segmento del ragdoll; el ragdoll recibe su velocidad y `hit_take`/la caída miran en contra de ella. Medida: veinte batallas o más con y sin contacto como distribuciones (la cifra de balance para Vera), una tira a 390×844 con la caída en la dirección de la flecha en 9 de 10, y el coste de F-0b. **Antes, una decisión del dueño**: aceptar la muralla un tercio menos letal, apuntar con el aire, o separar lo que se ve de lo que decide (diagnóstico §3) | P2 | Media | Claude | F-0, F-0b; decisión del dueño |
 
+### K · El juego entero: lo que Vera dijo el 1 oct 2026 (visión, no brief)
+
+Dicho por Vera, con sus palabras, mientras se cerraba el rework de ritmo: **es
+una mezcla de city builder de recursos, defensa de la aldea, juego narrativo y
+roguelike**. Cada partida enseña algo, y quien ya sabe llega a una aldea estable
+—más fácil de mantener, entre comillas— y su dificultad pasa a ser defenderla
+bien. «Hay un montón de cosas que implementar que se deben ir poco a poco.»
+Esto no es un brief: es el rumbo contra el que se ordenan las rondas que
+vengan. Cada fila se abre con su medida, como todas.
+
+| Punto | Qué pidió | Lo que ya se sabe | Prioridad | Dificultad |
+|---|---|---|---|---|
+| **K1 · El bosque se gasta dentro del cerco** | Cuando se cierre el círculo, el bosque **prácticamente desaparece dentro de la ciudad**: puede quedar algo cerca de la muralla, pero lo de dentro les ha dado tiempo a talarlo | El banco de balance midió **72,7 % del bosque en pie** en una partida larga: no se agota porque la leña nunca es cuello de botella (G2, arriba). Hoy la tala va a la celda más cercana, no a despejar el interior | P1 | Media |
+| **K2 · El bosque se reproduce** | Que el bosque **se extienda por el mapa** y deje **varios focos** donde seguir leñando | Hay rebrote en el sitio (`forest regrowth`), no expansión a celdas nuevas. Es motor (`world/forest.ts`) y luego render | P1 | Media |
+| **K3 · Los materiales, mecánica principal** | El balance de materiales tiene que pesar de verdad, no ser un número que nunca aprieta | Hoy leña, grano, piedra y plata; la leña sobra (K1) y la piedra llega sola. Va con G y con K1–K2: un bosque que se gasta es lo que hace que la madera importe | P1 | Alta |
+| **K4 · La era siguiente: metales** | **Cobre, plata, oro**, y ampliar mucho más | La plata hoy es moneda del camino (M-0), no mineral. Necesita veta en el mapa (la montaña de §7.15), oficio y su cadena | P2 | Alta |
+| **K5 · Más de la caza y la recolección** | **Cuero** de la caza, **lino**, **recolección de plantas** | La caza ya existe con señal en el mapa (RD-1/D1) y paga carne; las setas y la miel salen como sucesos (RD-5). Falta que dejen materia que se use | P2 | Media |
+| **K6 · Las necesidades de una ciudad** | **Medicina, construcción, educación, sanidad, música**, «de todo» | La curandera y la peste existen como sucesos; la capilla y la fe como stat. Cada una sería un oficio con su edificio y su efecto medible | P3, de una en una | Alta |
+| **K7 · El roguelike** | Cada intento enseña; quien ya sabe llega a una aldea estable y su reto pasa a ser la defensa | Hoy hay `foundSuccessor` (un valle nuevo tras el final) y el archivo de partidas. Falta lo que se lleva de una partida a otra —conocimiento, desbloqueos o el valle vecino— y decidir qué es: del dueño | P2 | Alta |
+
+**El orden que propongo**, con el porqué: primero **K1 + K2 + K3 juntos**, porque son
+la misma mecánica vista desde tres lados (el bosque que se gasta y se mueve es
+lo que hace que la madera sea un recurso) y porque K1 ya tiene medida en contra.
+Después **K5** (materias que la caza y la recolección ya casi dan) y **K7** (que
+cambia cómo se juega todo lo demás). **K4** abre la era siguiente cuando el
+balance de K3 sostenga un recurso nuevo. **K6** va a goteo, un oficio por
+ronda, cada uno con su medida.
+
 ### H · Deuda medida (el cuaderno)
 
 Lo que `docs/task-log.md` §4 lleva anotado con su medida y **no bloquea la
@@ -340,6 +368,8 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
 - **Cuánto hay que nivelar** (G): del dueño, con las medidas delante.
 - **Qué encargar a Blender y en qué orden** (E): del dueño con la sesión de
   arte; este plan sólo dice qué hace falta y para cuándo.
+- **Qué se lleva de una partida a la siguiente** (K7, el roguelike) y **qué
+  metales y oficios entran, y en qué orden** (K4, K6): del dueño.
 - **Qué es el anillo final en detalle** (A3b): aclarado que existe y cuándo
   llega —al techo de crecimiento del valle—, pero no cómo se ve ni cómo se
   juega. Es del dueño, con D6 delante.
