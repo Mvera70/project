@@ -680,7 +680,8 @@ function hamletFits(state: GameState, id: HamletId, ctx: Context): boolean {
 function rollHamlet(state: GameState, ctx: Context): FateOutcome | null {
   if (ctx.people >= FATE.HAMLET_PEOPLE || state.ended !== null) return null;
   if (hamletUnit(state, 'chance') >= FATE.HAMLET_CHANCE) return null;
-  const ids = (Object.keys(FATE.HAMLET_WEIGHT) as HamletId[]).filter((id) => hamletFits(state, id, ctx));
+  const ids = (Object.keys(FATE.HAMLET_WEIGHT) as HamletId[])
+    .filter((id) => FATE.HAMLET_WEIGHT[id] > 0 && hamletFits(state, id, ctx));
   if (ids.length === 0) return null;
   const total = ids.reduce((sum, id) => sum + FATE.HAMLET_WEIGHT[id], 0);
   let at = hamletUnit(state, 'pick') * total;
