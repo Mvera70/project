@@ -39,6 +39,31 @@ describe('RD-2 · la ausencia no acaba la partida ni resuelve un asalto', () => 
     expect(warned).toBeGreaterThan(0);
   });
 
+  it('un asalto anunciado antes de irse tampoco se pelea en la ausencia: se para en la víspera', () => {
+    // RD-6 · el aviso ya estaba dado cuando el jugador se fue. Medido en la
+    // integración del 1 oct 2026 con cuatro ausencias seguidas: 9 asaltos
+    // resueltos sin nadie delante antes de este arreglo.
+    let checked = 0;
+    for (const seed of [3, 5, 8]) {
+      const state = foundGame(seed);
+      run(state, 48, 'prudent', CATALOG);
+      catchUp(state, TIME.LETHARGY_CAP_MS);
+      if (state.threat.comingTick === null) continue;
+      checked += 1;
+      for (const door of ['catchUp', 'runBatch'] as const) {
+        const away = structuredClone(state);
+        const from = away.chronicle.length;
+        const halted = door === 'catchUp'
+          ? catchUp(away, TIME.LETHARGY_CAP_MS).halted
+          : runBatch(away, 0, 960).halted;
+        expect(halted, `semilla ${seed}, ${door}`).toBe('raid');
+        expect(away.chronicle.slice(from).some((entry) => RESOLVED.includes(entry.templateKey)), `semilla ${seed}, ${door}`).toBe(false);
+        expect(away.tick + 1, `semilla ${seed}, ${door}: se paró en la víspera`).toBe(away.threat.comingTick);
+      }
+    }
+    expect(checked).toBeGreaterThan(0);
+  });
+
   it('la semana que acabaría la partida se deshace entera, por las dos puertas', () => {
     for (const door of ['catchUp', 'runBatch'] as const) {
       const state = foundGame(11);
