@@ -299,8 +299,9 @@ describe('catchUp · §13.2', () => {
     const report = catchUp(state, TIME.LETHARGY_CAP_MS);
     const elapsedMs = performance.now() - start;
 
-    expect(report.ticks).toBe(960);
-    expect(state.tick).toBe(960);
+    // RD-2: un aviso de asalto puede parar antes; si no para, son las 960.
+    expect(report.halted === null ? report.ticks === 960 : report.ticks < 960).toBe(true);
+    expect(state.tick).toBe(report.ticks);
     expect(report.capped).toBe(false); // justo en el tope, no por encima
     // §13.2: dos segundos en el aparato del jugador (`helpers/timing.ts`).
     expect(elapsedMs).toBeLessThan(budgetMs(2_000));
@@ -331,7 +332,8 @@ describe('catchUp · §13.2', () => {
     const generation = TIME.GENERATION_YEARS * TIME.WEEKS_PER_YEAR;
     const state = foundTwenty(7);
     const report = catchUp(state, 2 * TIME.LETHARGY_CAP_MS);
-    expect(report.ticks).toBe(generation);
+    expect(report.ticks).toBeLessThanOrEqual(generation);
+    expect(report.halted === null ? report.ticks === generation : true).toBe(true);
     expect(report.capped).toBe(true);
     expect(ticksOwed(2 * TIME.LETHARGY_CAP_MS)).toBe(generation);
     expect(generation).toBe(960);

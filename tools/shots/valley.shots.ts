@@ -1008,25 +1008,35 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
   // write, closing on the welcome screen can reload the pre-catch-up state;
   // a partial visibility save used to make that loss permanent.
   const persistedCatchUp = (): Promise<{
-    savedAtMs: number | undefined; tick: number | undefined;
+    savedAtMs: number | undefined; tick: number | undefined; warned: boolean;
   } | undefined> => page.evaluate(async () => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open('the-valley', 1);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
-    const save = await new Promise<{ savedAtMs?: number; state?: { tick?: number } } | undefined>((resolve, reject) => {
+    type Saved = { savedAtMs?: number; state?: { tick?: number; threat?: { comingTick?: number | null } } };
+    const save = await new Promise<Saved | undefined>((resolve, reject) => {
       const request = db.transaction('saves', 'readonly').objectStore('saves').get('current');
-      request.onsuccess = () => resolve(request.result as { savedAtMs?: number; state?: { tick?: number } } | undefined);
+      request.onsuccess = () => resolve(request.result as Saved | undefined);
       request.onerror = () => reject(request.error);
     });
     db.close();
-    return save === undefined ? undefined : { savedAtMs: save.savedAtMs, tick: save.state?.tick };
+    return save === undefined ? undefined : {
+      savedAtMs: save.savedAtMs, tick: save.state?.tick,
+      warned: (save.state?.threat?.comingTick ?? null) !== null,
+    };
   });
   const returnAt = t0 + TIME.LETHARGY_CAP_MS;
   await test.expect.poll(async () => (await persistedCatchUp())?.savedAtMs ?? 0)
     .toBeGreaterThanOrEqual(returnAt);
-  await test.expect.poll(async () => (await persistedCatchUp())?.tick ?? 0).toBeGreaterThan(900);
+  // RD-2 (30 sep 2026): la ausencia se paga entera **o se para en el aviso de
+  // un asalto**, que queda pendiente para que el jugador lo vea venir. Nunca
+  // se queda a medias sin motivo.
+  await test.expect.poll(async () => {
+    const saved = await persistedCatchUp();
+    return (saved?.tick ?? 0) > 900 || saved?.warned === true;
+  }).toBe(true);
   // Y eso **con el parte todavía en pantalla**, que es lo que la propiedad
   // pide: cerrar sobre la bienvenida no puede devolver el estado de antes.
   // Aquí había además un «menos de dos segundos después de volver», que era un
@@ -1041,7 +1051,9 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
   // partida real que haya tocado esta vez.
   await welcome.click();
   await test.expect(welcome).toBeHidden();
-  await test.expect(page.locator('.valley-date')).not.toContainText('Year 1');
+  // «Year 1 ·» y no «Year 1»: desde RD-2 la ausencia puede pararse en el aviso
+  // de un asalto en el año 10–19, y «Year 13» contiene «Year 1» (CI, PR #21).
+  await test.expect(page.locator('.valley-date')).not.toContainText('Year 1 ·');
 });
 
 test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruinas (§13.3)', async ({ page }) => {

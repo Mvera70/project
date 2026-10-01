@@ -1302,4 +1302,11 @@ export interface SaveFile {
   state: GameState; // full snapshot, authoritative
   decisions: DecisionRecord[]; // parallel record, to debug and migrate
   archive: ArchivedGame[]; // chronicles of previous games and their ruins
+  /**
+   * RD-2 (Vera, 30 sep 2026) · la velocidad a la que se dejó el juego. La
+   * ausencia corre a ella por las dos puertas —pestaña oculta y apertura
+   * nueva— y en pausa (0) no se debe nada. Del fichero y no del estado: es
+   * del jugador, no de la partida. Opcional: un guardado viejo vuelve a ×1.
+   */
+  speed?: 0 | 1 | 4 | 16 | 64;
 }

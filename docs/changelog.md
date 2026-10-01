@@ -109,6 +109,34 @@ Pruebas: `life-wild-prey.test.ts` (24 valles, perdiz y conejo con dos celdas
 de pradera alrededor: antes 1 de 24) y un recorrido de navegador nuevo que
 toca la señal y mira el tablón en la semilla 7 (falla sin el arreglo). Skill
 `senales-en-el-mapa` al día.
+## v5.45 · 30 sep 2026 · RD-2: volver a la velocidad que se dejó, y un parte que dice lo que espera
+
+Decisión de Vera: descanso **A′**, automático al ocultar o cerrar, a la
+velocidad que se dejó. La pestaña oculta ya recuperaba a esa velocidad; la
+apertura en frío recuperaba a ×1 porque el guardado no la llevaba (deuda de
+§13.2), y la pausa no sobrevivía a cerrar. Ahora `SaveFile.speed` (opcional,
+del fichero y no del estado; sin subir el esquema) viaja con la partida: la
+misma ausencia debe las mismas semanas por las dos puertas, se vuelve a esa
+velocidad y en pausa no se debe nada. Y el parte de regreso añade **lo que
+espera**: la pregunta sin contestar, por su título, y el asalto anunciado, con
+sus semanas (`pendingLines`, claves `welcome.pending.*`). Prueba:
+`tests/fast/rest-return.test.ts`. Sobre la #21 (`restTick`).
+
+## v5.40 · 30 sep 2026 · Ninguna derrota mientras nadie mira
+
+El letargo de §13.2 dejaba que un asalto se resolviera por la cuenta de B3 y
+que la partida acabara en ausencia: en el tope de 960 semanas, 4 valles de 24
+acabados (3 tomados) y 66 asaltos resueltos sin jugador
+(`tools/reports/rest-report.ts`, `docs/medidas/rd2-descanso-2026-09-30.md` en
+la rama `claude/ritmo-rd0`). Incumple un invariante del rework de ritmo.
+`restTick` (`engine/save.ts`) es el mismo tick con dos paradas, comunes a las
+dos reglas de descanso medidas: el aviso de un asalto y la semana que acabaría
+la partida, que se deshace. Lo usan las dos puertas del letargo (`catchUp` y
+`runBatch`). Nueva constante `TIME.REST_WATCH_POPULATION` (TUNE, 15, con su
+medida). Pruebas: `rest-no-defeat.test.ts`; `lethargy.test.ts` y
+`save.test.ts` dicen ahora «960 semanas, o menos si paró con motivo». **Lo
+que no decide este cambio:** si una encrucijada planteada también para el
+descanso, a qué velocidad corre y si se activa a mano; es de Vera.
 
 ## v5.37 · 30 sep 2026 · Las 21 jornadas rojas viejas, una a una
 
