@@ -121,7 +121,19 @@ reciente arriba; nunca se reescribe la entrada de otro.
 - **Nada de `pkill -f <palabra>` a la ligera.** Si la palabra va en el propio
   comando, se mata a sí mismo; y un patrón corto se lleva lo ajeno: `vite`
   casa con `vitest`, que puede ser la suite de otro agente. Se mata por PID
-  (`pgrep -f 'node_modules/.bin/vite$'`) o se deja el servidor vivo.
+  (`pgrep -f 'node_modules/.bin/vite$'`) o se deja el servidor vivo. **Y
+  `pgrep`/`pkill -f` con un patrón que esté en tu propio comando también te
+  encuentra a ti**: el 1 oct 2026 un `kill $(pgrep -f "vitest run …")` mató la
+  medida y su propia terminal. Primero se listan los PID, después se mata cada
+  uno por número.
+- **Cada `push` a una rama cancela la CI que esa rama tenga en marcha**
+  (`cancel-in-progress` en `ci.yml`). Subir un arreglo a media vuelta tira los
+  minutos que llevaba y lo que iban a decir los otros trabajos. Se espera a que
+  la vuelta acabe, se juntan **todos** los arreglos que pidió y se sube una
+  vez. Medido el 1 oct 2026: dos vueltas canceladas y unos 25 minutos perdidos
+  en una sola PR.
+- **Las horas que se le dan a Vera, en hora de Madrid** (lo pidió el 1 oct
+  2026). El reloj del contenedor va en UTC: `TZ=Europe/Madrid date`.
 
 ### 3.3 · Integrar: de una en una
 
@@ -135,7 +147,12 @@ reciente arriba; nunca se reescribe la entrada de otro.
    que quien lo consume (modelos antes que caza; el contrato de sucesos antes
    que los sonidos).
 4. **La CI tiene que terminar.** Si un trabajo se corta por tiempo, se trocea
-   (`--shard`), no se ignora: un trabajo cortado no dice nada.
+   (`--shard`), no se ignora: un trabajo cortado no dice nada. **Y una vuelta
+   cancelada sin que nadie empujara** (pasó el 1 oct 2026) se relanza tal cual
+   (`rerun_workflow_run`): no es un fallo de la PR ni un motivo para un commit.
+5. **Se fusiona con los cinco trabajos en verde sobre el último commit**, no
+   con el primero que acaba. Las jornadas van en tres trozos y cada uno puede
+   traer lo suyo.
 
 ### 3.4 · Cerrar la tanda
 

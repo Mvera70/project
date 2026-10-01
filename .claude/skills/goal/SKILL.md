@@ -54,10 +54,38 @@ Una fase no está cerrada sin las cuatro cosas:
    Si tarda minutos, va a `tests/journeys/`. Si algo no llega, se escribe lo
    medido y se deja `it.fails` con la propiedad intacta.
 3. **La puerta**: `npm run typecheck`, `npm run lint` y los ficheros tocados.
-   La suite entera sólo al cerrar una tanda.
+   La suite entera sólo al cerrar una tanda. **Salvo si la ronda toca el
+   motor** —una constante de `balance.ts`, el tick, la economía, el mapa—:
+   entonces la trayectoria de todas las partidas se mueve, y antes de abrir la
+   PR se pasa **la suite rápida entera en local, una vez**. Lo que costó no
+   hacerlo (K1–K3, 1 oct 2026): seis pruebas rápidas y trece jornadas rojas
+   descubiertas en tres vueltas de CI de 35 minutos cada una, y una noche de
+   «falta poco» para quien esperaba probarlo.
 4. **El papel**: la fila de `docs/plan-meta.md` tachada con lo medido, la
    entrada en `docs/changelog.md` con el porqué, y `docs/task-log.md` al día.
    Commit por rutas explícitas —nunca `git add -A`— y el motivo en el mensaje.
+
+## 4a · Lo que ya costó en una ronda (K1–K3, 1 oct 2026)
+
+- **Comprobar que el supuesto del plan sigue siendo cierto antes de diseñar.**
+  K3 partía de «la leña nunca aprieta»; medido en `main`, apretaba en 11 de 12
+  partidas, pero por otra causa. Sin esa medida se habría construido la
+  solución a un problema que no existía. Si la medida cambia la pregunta, se le
+  lleva a Vera **con las cifras** antes de tocar el motor.
+- **El criterio se mide con su causa, no sólo con su frecuencia.** «Escasea en
+  la mitad de las partidas» se cumplía ya, por el motivo equivocado; lo que
+  Vera quería era «por el bosque». El informe tiene que poder decir por qué.
+- **Una prueba que fija «semilla N al año M» se rompe con cada cambio del
+  motor.** Cuando se cae por la trayectoria, no se cambia el número por otro:
+  se busca la semilla entre candidatas por su precondición (`garrison`,
+  `assault`, `life-beasts`, `e3b-corridor`), y si la propiedad no llega, se
+  declara `it.fails` con lo medido. Un récord de una sola semilla (el roce más
+  estrecho, cuántas jornadas devuelven un pase) va en su propia prueba
+  declarada, para no tumbar los asertos de al lado.
+- **Una regla más simple que mida igual gana.** Vera preguntó si bastaba con
+  «talar lo más cercano»; se midió con y sin la regla extra y la diferencia
+  era de dos valles de doce: se quitó. Ante una propuesta de simplificar, se
+  mide antes de defender lo propio.
 
 ## 4b · Y lo que la pantalla no cuenta
 
