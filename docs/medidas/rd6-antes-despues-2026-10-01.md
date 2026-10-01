@@ -3,9 +3,9 @@
 Lo que mide este informe es **la integración de todas las ramas de la ronda**,
 juntas en la rama local `claude/rd6-integracion` sin fusionar ningún PR:
 #19 sol, #20 retiradas pendientes, #21 descanso sin derrota, #22 RD-0, #23 caza
-a la vista, #24 y #25 RD-1, #26 regreso, #27 RD-4 y #28 RD-5. «Antes» es `main`
-en `3cab2b97`. RD-3 (las encrucijadas reescritas) **no está dentro todavía**: la
-lleva un agente aparte y su medida se añadirá cuando llegue.
+a la vista, #24 y #25 RD-1, #26 regreso, #27 RD-4, #28 RD-5 y #29 RD-3 (las
+encrucijadas reescritas, con el préstamo del señor devuelto al caserío; ver §2b).
+«Antes» es `main` en `3cab2b97`.
 
 Velocidad de referencia: **×1** (decisión de Vera tras RD-0). A ×1 una semana
 son 14 min, una hora real es un mes de juego y el primer año son unas 11 h.
@@ -39,6 +39,21 @@ En 16 semillas, las **muertes de hambre del primer año** bajan de 15 (en 8
 valles) a 8 (en 5). A los tres años quedan igual (20 contra 19), con más
 población (18,3 contra 21,3).
 
+## 2b. Lo que RD-3 movió, y la decisión de Vera
+
+Al meter RD-3 en la integración, **el hambre a tres años se duplicó** (16
+semillas): de 20 muertes en 8 valles a 39 en 13, con la población media de 18,3
+a 13,9. Medido en la rama de RD-3 sola, la causa era el límite de veinte
+personas que RD-3 puso a `winter_grain_debt`: el préstamo del señor era el
+salvavidas del caserío en su segundo invierno. Vera eligió devolverlo al
+caserío, con el préstamo proporcional de RD-3 (`a5e9e87`, en la #29).
+
+| 16 semillas, a tres años | Hambre | Población media |
+|---|---|---|
+| `main` | 20 (8 valles) | 18,3 |
+| Integración con RD-3 tal cual | 46 (12 valles) | 15,6 |
+| **Integración final** | **14 (8 valles)** | **20,9** |
+
 ## 3. El descanso
 
 | Medida | Antes | Después |
@@ -54,17 +69,20 @@ en la víspera (`restTick`, #21, `59694ec`).
 
 ## 4. La escalera larga (`pace-report`, 24 semillas × 60 años)
 
-| Peldaño, mediana a ×1 | `main` | Tras RD-1 | Tras RD-4 | Tras RD-5 (= integración) |
-|---|---|---|---|---|
-| 10 personas | 10 h | 11 h | 11 h | 12 h |
-| Edad de piedra | 54 h | 55 h | 55 h | 58 h |
-| Primer asalto | 114 h | 114 h | 114 h | 125 h |
-| Villa cerrada | 264 h | 330 h | 330 h | 320 h |
-| Partidas acabadas | 0/24 | 0/24 | 0/24 | **2/24** |
+| Peldaño, mediana a ×1 | `main` | Tras RD-1 | Tras RD-4 | Tras RD-5 | **Integración final (con RD-3)** |
+|---|---|---|---|---|---|
+| Primer suceso | 1,2 h | — | — | 28 min | **28 min** |
+| Primera decisión | 3,5 h | — | — | 14 min | **14 min** |
+| 10 personas | 10 h | 11 h | 11 h | 12 h | 12 h |
+| Edad de piedra | 54 h | 55 h | 55 h | 58 h | **60 h** |
+| Primer asalto | 114 h | 114 h | 114 h | 125 h | **114 h** |
+| Villa cerrada | 264 h | 330 h | 330 h | 320 h | 291 h |
+| Población al final | 57 | 50 | 50 | 48 | **59** |
+| Partidas acabadas | 0/24 | 0/24 | 0/24 | 2/24 | 2/24 |
 
 La escalera que Vera pidió mantener (la piedra hacia las 54–60 h y el primer
-asalto hacia las 100 h) se mantiene. **Los dos finales de la última columna no
-los trae RD-5.** Se cambia la respuesta de la política de referencia:
+asalto hacia las 100 h) se mantiene en la integración final: **60 h y 114 h**.
+**Los dos finales no los trae RD-5.** Se cambia la respuesta de la política de referencia:
 `prudentScore` suma 10 a las opciones sin consecuencia plantada, y al darles RD-5
 una corta a las tres respuestas del vado, la política pasa de «darle de comer y
 despedirlo» a «acogerlo».
@@ -96,7 +114,9 @@ Con la misma respuesta forzada, RD-5 no empeora nada:
 
 - Suite rápida, por ramas: en verde salvo el cronómetro de 960 ticks de
   `save.test.ts`, que también falla en `main` con la máquina cargada.
-- Jornadas sobre la integración: en curso; el resultado va al cuaderno.
+- Jornadas: en la CI de cada PR. Las que fijaban una villa concreta ahora
+  buscan su semilla entre candidatas, con su causa escrita (#25, #27, #28, #29).
+  El tiro con arco de la semilla 11 queda declarado (`it.fails`) en RD-3.
 - Typecheck y lint, limpios en cada rama.
 
 ## Qué lo refutaría
