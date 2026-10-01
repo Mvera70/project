@@ -2332,9 +2332,9 @@ su casa, quieto y con una señal encima (`life/lost-child.ts`); las copas que lo
 tapan se atenúan. Tocarla manda al adulto libre más cercano a por él desde
 donde esté y deja el acto `search` en la cola. La semana siguiente, en el paso
 1b, `settleLostChild` (`world/lost-child.ts`) lo cierra: con búsqueda, quien
-fue lo trae (`lost.found_by*`, `FATE.CHILD_FOUND_MORALE` de ánimo de vuelta y
+fue lo trae (`child.found_by*`, `FATE.CHILD_FOUND_MORALE` de ánimo de vuelta y
 `OPINION.WAS_SAVED` del niño hacia él); sin ella, lo encuentra el valle al
-anochecer (`lost.found_at_dusk`) y el ánimo perdido no vuelve. Ninguna tirada
+anochecer (`child.found_at_dusk`) y el ánimo perdido no vuelve. Ninguna tirada
 nueva. `who` lleva siempre el `id` del niño; las claves viejas
 `fate.child_lost*` se quedan en el banco por los guardados.
 
