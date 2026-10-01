@@ -177,18 +177,23 @@ const STYLE = `
    papel de dentro tapa el filete que pasa por detrás, que es lo que le da el
    relieve. */
 .chronicle-entry-dot { display: none; }
-.chronicle-entry-art { width: 100%; height: 130px; overflow: hidden; border-radius: 3px; }
+/* Dos de ancho por uno de alto, no una franja de 130 px: los grabados son 5:4
+   y en la franja se quedaban sin cabezas ni caras (Vera, 2 oct 2026: «la
+   crónica está cortando partes importantes, como las caras; darle más
+   altura»). Y el recorte, más cerca de arriba que del centro, que es donde
+   las figuras llevan la cara; lo que se pierde es suelo. */
+.chronicle-entry-art { width: 100%; aspect-ratio: 2 / 1; max-height: 260px; overflow: hidden; border-radius: 3px; }
 /* La viñeta va **sobre el papel, sin marco y sin recuadro**, como en el
    prototipo: es un aguado a pluma, no una foto en una tarjeta. Se recorta con
    \`tools/ui/cut-art.py\` en modo \`wash\`, que tira el papel del prototipo y
    guarda el dibujo como alfa — así se compone encima de nuestro pergamino sin
    que se vea un rectángulo de otro tono. */
-.chronicle-entry-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.chronicle-entry-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; }
 .chronicle-entry-art--fallback img { object-fit: contain; }
 /* Sin dibujo listado en \`public/ui/art/index.json\` (hoy, siempre): la hoja de
    roble del sprite sobre un óvalo — el respaldo obligatorio del plan §3.2.
    Una entrada nunca se queda sin su hueco. */
-.chronicle-entry-art--fallback { border-radius: 50%; background-color: var(--skin-parchment-aged);
+.chronicle-entry-art--fallback { aspect-ratio: auto; height: 130px; border-radius: 50%; background-color: var(--skin-parchment-aged);
   display: flex; align-items: center; justify-content: center; color: var(--skin-ink-soft); }
 .chronicle-entry-art--fallback .skin-icon { width: 24px; height: 24px; }
 .chronicle-entry-text { flex: 1 1 auto; margin: 0; }

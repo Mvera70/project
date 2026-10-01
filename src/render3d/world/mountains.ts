@@ -31,7 +31,7 @@ import { TERRAIN_CODE, type ValleyMap } from '@engine/state';
 import { roadMouths } from '@engine/world/valley-road';
 import type { Palette } from '@derive/palette';
 import { GROUND_BIAS } from '../visual-config';
-import { elevationAt, floodReach, groundColourAt, groundSurfaceAt } from './ground';
+import { elevationAt, floodReach, groundColourAt, groundSurfaceAt, skinnedCell, underSkin } from './ground';
 import { riverExtensionAt } from './river-extension';
 import { valleyAxis } from './valley-profile';
 
@@ -151,8 +151,6 @@ export function sharedUps(geometry: BufferGeometry): Float32Array {
 
 /** Cuánto por encima del suelo va la piel, para no pelearse con él. */
 const SKIN_LIFT = 0.012;
-/** A partir de qué altura hay piel: el pie de la montaña se deja al suelo, que lo funde con el prado. */
-const SKIN_FROM = 0.35;
 /** Hasta qué altura la piel lleva el color del suelo que tapa, en celdas. */
 const SKIN_OWN = 1.6;
 
@@ -164,16 +162,20 @@ export function mountainSurfaceAt(map: ValleyMap, x: number, z: number): number 
   const col = Math.floor(x), row = Math.floor(z);
   if (col < 0 || row < 0 || col >= map.width || row >= map.height
     || map.terrain[row * map.width + col] !== TERRAIN_CODE.mountain) return floor;
+  if (!skinnedCell(map, col, row)) return floor;
   const a = elevationAt(map, col, row), b = elevationAt(map, col + 1, row);
   const c = elevationAt(map, col, row + 1), d = elevationAt(map, col + 1, row + 1);
-  if (Math.max(a, b, c, d) < SKIN_FROM) return floor;
   const u = x - col, v = z - row;
   const skin = (col + row) % 2 === 0
     ? (u + v <= 1 ? a + (b - a) * u + (c - a) * v
       : d + (c - d) * (1 - u) + (b - d) * (1 - v))
     : (u >= v ? a + (b - a) * u + (d - b) * v
       : a + (d - c) * u + (c - a) * v);
-  return Math.max(floor, skin + SKIN_LIFT);
+  // Con las cuatro esquinas hundidas (`underSkin`) el suelo no se ve: lo que
+  // se pisa es la piel, aunque el suelo sin hundir quedara por encima.
+  const buried = underSkin(map, col, row) && underSkin(map, col + 1, row)
+    && underSkin(map, col, row + 1) && underSkin(map, col + 1, row + 1);
+  return buried ? skin + SKIN_LIFT : Math.max(floor, skin + SKIN_LIFT);
 }
 
 export interface MountainSkin {
@@ -187,10 +189,9 @@ export function buildMountainSkin(map: ValleyMap, palette: Palette, snow = 0): M
   const points: number[] = [];
   for (let z = 0; z < map.height; z += 1) {
     for (let x = 0; x < map.width; x += 1) {
-      if (map.terrain[z * map.width + x] !== TERRAIN_CODE.mountain) continue;
+      if (!skinnedCell(map, x, z)) continue;
       const a = elevationAt(map, x, z), b = elevationAt(map, x + 1, z);
       const c = elevationAt(map, x, z + 1), d = elevationAt(map, x + 1, z + 1);
-      if (Math.max(a, b, c, d) < SKIN_FROM) continue;
       const lift = GROUND_BIAS + SKIN_LIFT;
       // La diagonal alterna por celda, que es lo que da el facetado irregular.
       if ((x + z) % 2 === 0) {

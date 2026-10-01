@@ -64,8 +64,8 @@ contradiga: **sólo madera** (Vera: la piedra «este dije que no me gustaba»),
 | La navegación | **Correa de cuero** con costura; cada pestaña un medallón de latón con su icono; la activa, elevada y encendida (Vera prefirió el cuero al metal y a la madera: la de madera era «muy pobre») | `--nav-leather`, `--nav-medal`, `--nav-medal-on` · `.skin-nav` |
 | El tablón | Ventana entre la cabecera y la barra: loseta de tablas, avisos de pergamino clavados (clavo recto y torcido alternando), −/+ de marfil, SEND en placa. El velo se cierra en `pointerdown` | `--wood-board`, `--nail`, `--nail-bent` · `board.ts` |
 | La etiqueta A1 | Pergamino pequeño con punta hacia la cosa, que la sigue cada fotograma por `screenOf` | `--frame-parchment` · `label.ts` |
-| La crónica | Hoja a toda altura; por entrada, la fecha «Anno 50 · Spring» (años en cifras, **nunca romanos**) y una viñeta apaisada de 130 px. **Las 44 escenas del índice están a color** desde `79e7270` (Codex, `cronica-color-v9-2026-09-29`); cae al respaldo por `kind` lo que no esté en `public/ui/art/index.json` | `screens/chronicle.ts`, `chronicle-art.ts` |
-| La encrucijada | El valle arriba; abajo papel de documento con el título en tinta oscura, sin sello, y cada opción en la **tira rasgada** con el verbo en Cinzel arriba y el precio en Garamond debajo. La brújula y los mandos se esconden | `--paper-document`, `--strip-status` · `screens/crossroad.ts` + `wood.css` |
+| La crónica | Hoja a toda altura; por entrada, la fecha «Anno 50 · Spring» (años en cifras, **nunca romanos**) y una viñeta 2:1 de hasta 260 px, recortada al 28 % de alto (era una franja de 130 px y cortaba caras: Vera, 2 oct 2026). **Las 44 escenas del índice están a color** desde `79e7270` (Codex, `cronica-color-v9-2026-09-29`); cae al respaldo por `kind` lo que no esté en `public/ui/art/index.json` | `screens/chronicle.ts`, `chronicle-art.ts` |
+| La encrucijada | El valle arriba; abajo **la misma hoja que el carro** —pergamino de loseta, esquinas de 14 px, sombra y tirador (deslizar aparca la decisión)— con el título en tinta oscura, sin sello, y cada opción en la **tira rasgada** con el verbo en Cinzel arriba y el precio en Garamond debajo; título, texto y opciones en la columna de 390. La brújula y los mandos se esconden. Era papel de documento a sangre con el canto rasgado encima, y en la tablet se leía como otra pantalla (Vera, 2 oct 2026: «similar a estas») | `--parchment-sheet`, `--strip-status` · `screens/crossroad.ts` + `wood.css` |
 | Bienvenida, epitafio, anales | El mismo papel de documento | `--paper-document` |
 | La portada | **El cuadro 04 «Luces en la garganta»** a sangre (elegido por Vera entre cinco), el logotipo encima, el número en la placa de marfil con el dado suelto, fundar en la placa de madera, los anales y «Graphics» como rótulos sin caja | `--title-dusk` · `screens/title.ts` + `wood.css` |
 | «Graphics» | Documento de papel desde la portada con dos preguntas —calidad Auto/High/Medium/Low, 30 o 60 fps— y «Done»; **la opción elegida va en la placa de madera** (madera = decidir) y las demás en el botón de pergamino. Se guarda en el aparato y se aplica al abrir el valle | `--paper-document`, `--plaque-wood`, `--button-parchment` · `screens/graphics.ts`, `render3d/profile.ts` |
@@ -82,7 +82,7 @@ placas; **EB Garamond (`--skin-font-story`) para todo lo que se lee** en un
 documento (la crónica, la decisión, los avisos del tablón); la sans para
 cifras y rótulos de la carcasa.
 
-**Cuatro trampas de esta piel, cada una cazada en captura:**
+**Cinco trampas de esta piel, cada una cazada en captura:**
 
 - **En el sitio publicado, un token de imagen no sirve dentro de una hoja
   inyectada.** Los tokens son `url(./x.png)` relativos a `assets/`, y Chrome
@@ -99,6 +99,12 @@ cifras y rótulos de la carcasa.
 - **Un comentario con acentos graves dentro de un CSS en plantilla rompe el
   build en silencio** y el bundle usa el CSS viejo. Después de tocar `board.ts`
   se mira `bundle.log` por «Build failed».
+- **Un atajo `margin` en la capa de madera saca a un hijo de la columna.**
+  `.crossroad > *` se centra con `margin-inline: auto` (`skin.css`), y
+  `margin: 12px 0 18px` en `wood.css` lo pisaba: a 390 px no se nota porque la
+  columna es la pantalla, y a 750 el texto se iba al canto izquierdo mientras
+  el título y las opciones seguían centrados. Dentro de la columna, sólo
+  `margin-block`.
 - **Un icono a color que se pierde es una regla `background:` genérica.** El
   atajo a mayor especificidad pisaba la imagen: se escriben las propiedades
   largas y se dobla `[data-res][data-res]`.
@@ -110,8 +116,9 @@ integran **por rutas** (la rama va detrás de `main`: nunca se mezcla su
 `src/`). Vera: «los diseños complicados pídelos, o pregunta si no puedes esa
 calidad; muchas veces crees que sí, pero no».
 
-**De la auditoría de Codex (29 sep):** la encrucijada ya lleva el canto
-rasgado (`parchment-sheet-edge.png`, una tira de 24 px sobre el papel) y en
+**De la auditoría de Codex (29 sep):** la encrucijada llevó el canto
+rasgado (`parchment-sheet-edge.png`, una tira de 24 px sobre el papel; retirado
+el 2 oct por la hoja del carro) y en
 pantallas de 640 px o menos el rincón de mandos se hace columna a la derecha,
 bajo la cabecera, para no tapar el cartel de la plaza (`a056659`). Queda
 abierto, y es de Vera: fundar en la portada usa `plaque-wood` donde la

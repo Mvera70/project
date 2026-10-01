@@ -1,5 +1,43 @@
 # The Valley — Registro de cambios
 
+## v5.54 · 2 oct 2026 · Lo que Vera vio en la tablet: laderas, piedras, crónica y encrucijada
+
+Cuatro cosas que Vera marcó jugando la versión publicada, en la tablet.
+
+- **Las laderas desde arriba** («no se mezclan los colores; desde arriba es
+  muy feo»). La causa era el dibujo y no el color: la piel facetada de la
+  montaña iba 0,012 de celda por encima del suelo, y los dos cortan la celda
+  por diagonales distintas, además de que el suelo mueve sus esquinas. En la
+  ladera el suelo asomaba a trozos: manchas dentadas y verde colándose entre
+  la roca. Ahora el suelo se hunde bajo la piel donde ella lo tapa entera, más
+  hondo cuanto más empinado (`skinSink`, `ground.ts`). La prueba nueva la
+  pidió en las paredes de la garganta, donde medio metro fijo no bastaba.
+  Antes y después de cerca: `docs/medidas/k-img/laderas-{antes,despues}.png`.
+- **Las piedras de la calzada** («muy para arriba, puntiagudas»). Usaban el
+  peñasco de Astra, que está hecho para ir de pie, escalado igual en los tres
+  ejes. Ahora son cantos: el ancho sale de la planta del modelo, el alto es de
+  0,38 a 0,55 de ese ancho, y van medio hundidos. **Y fuera del pueblo** («hay
+  también que quitarlas del pueblo»): ninguna a tres celdas o menos de algo
+  construido, ni en la plaza con ese margen (`townCells`, `road.ts`).
+- **La crónica cortaba caras** («darle más altura»). El hueco de la viñeta
+  era una franja de 130 px y los grabados son 5:4. Ahora es 2:1, hasta 260 px,
+  con el recorte al 28 % de alto en vez de al centro. El óvalo de respaldo
+  sigue como estaba.
+
+- **La encrucijada, como la hoja del carro** («similar a estas», viendo las
+  dos en la tablet). Era papel de documento a todo el ancho con el canto
+  rasgado de Codex estirado encima, que en la tablet se leía como un recuadro
+  vacío sobre el título; y el texto se iba al canto izquierdo porque el atajo
+  `margin: 12px 0 18px` de `wood.css` pisaba el `margin-inline: auto` de la
+  columna de 390. Ahora lleva el pergamino de loseta de las hojas de la
+  carcasa, sus esquinas de 14 px, su sombra y su tirador (deslizar la cabecera
+  aparca la decisión, §11.2), y título, texto y opciones van en la misma
+  columna. Capturado a 390, 750 y 1024 px.
+
+Pruebas nuevas: «el suelo no asoma por la piel de la montaña»
+(`graphics-mountains`) y «las piedras de la calzada son cantos bajos y no hay
+ninguna en el pueblo» (`valley-road`).
+
 ## v5.53 · 1 oct 2026 · K1–K3: el bosque se gasta, se reproduce y la madera pesa
 
 **Medido antes, en `main`** (`docs/medidas/k1-k3-madera-2026-10-01.md`, informe
