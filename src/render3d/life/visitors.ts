@@ -16,7 +16,7 @@
 
 import { hash32 } from '@engine/rng';
 import type { GameState, HappeningId } from '@engine/state';
-import { valleyRoadCells } from '@engine/world/valley-road';
+import { roadMouths, valleyRoadCells } from '@engine/world/valley-road';
 import { FOUNDING_CROSSROAD } from '@engine/crossroads/catalog/hamlet';
 import { ford } from '@engine/sim';
 import type { Animal } from '@derive/animals';
@@ -28,6 +28,7 @@ import { clearBetween, pathTo } from './navigate';
 import type { Waypoint } from './navigate';
 import { approachOf } from './raiders';
 import { nearestReachable, reachableFrom } from './terrain';
+import { gorgeRoadPaths } from '../world/mountains';
 
 export type VisitorPhase = 'waiting' | 'coming' | 'staying' | 'leaving' | 'gone';
 
@@ -76,6 +77,15 @@ export interface Visitor {
   /** El pasto adonde se lleva la vaca vendida, y la ruta que sigue hasta él. */
   readonly pasture: Point;
   beastRoute: Waypoint[] | null;
+  /**
+   * La senda de la garganta que le queda por andar (2 oct 2026): al venir, de
+   * donde salió hasta la boca; al irse, de la boca a donde salió. Se anda sin
+   * navegar —fuera del mapa no hay rejilla, y en la garganta la marisma corta
+   * la orilla—: es la senda misma, y por ella no anda nadie más.
+   */
+  lane: Point[];
+  /** La senda al revés, para irse por donde vino; vacía si no vino por ella o si ya la ha tomado. */
+  exit: Point[];
 }
 
 /**
@@ -143,12 +153,32 @@ const JITTER = 0.05;
 const STAY_FOR_GOODS = 0.3;
 const LEAVE_LATEST = 0.7;
 
+/**
+ * **Por la senda de la garganta** (2 oct 2026; Vera: «no sé cómo llegan las
+ * visitas al valle»). Quien viene de fuera baja por la senda que sale del valle
+ * (`gorgeRoadPaths`), entra por la boca y sigue el camino pintado hasta la
+ * plaza. El camino entero no cabe en una jornada —de la boca a la plaza hay de
+ * 39 a 71 celdas, medido en ocho semillas, y la garganta añade otras 15 a 25—,
+ * así que cada uno sale **lo más lejos que le deje llegar a su hora**: de la
+ * senda si le da tiempo, del camino pintado si no. TUNE: en la plaza a 0,32 y
+ * hasta 0,37 —lo de antes, medido de 0,29 a 0,36— para que el trato tenga su
+ * tarde; y sale de noche si hace falta (0), como quien va a un mercado.
+ */
+const ARRIVE_BY = 0.32;
+const SET_OFF = 0;
+
 /** El vendedor que compró espera a que le lleven lo suyo, hasta donde da la luz. */
 export function stayForGoods(visitor: Visitor, phase: number): void {
   visitor.leave = Math.min(LEAVE_LATEST, Math.max(visitor.leave, phase + STAY_FOR_GOODS));
 }
-/** Lo que anda un visitante, en celdas por segundo: sin prisa, como un vecino (`body.ts`). */
-const VISITOR_PACE = 1.1;
+/**
+ * Lo que anda un visitante, en celdas por segundo. TUNE: a buen paso, el de
+ * quien viene de camino y con hora —el de la partida, y dentro de lo que anda
+ * un vecino, de 1,05 a 1,65—. Era 1,1, sin prisa; desde que bajan por la senda
+ * de la garganta (2 oct 2026), con 1,1 sólo le daba tiempo a uno de cada doce
+ * valles, con 1,3 a siete y con 1,4 a nueve.
+ */
+const VISITOR_PACE = 1.4;
 const VISITOR_RADIUS = 0.32;
 /** Identificadores negativos y lejos de la partida (−9 000) y de la cabaña (−10 000). */
 const VISITOR_ID_BASE = 8_500;
@@ -310,6 +340,8 @@ export function createVisitors(
   const along = roadInto(state, land, shore, plaza);
   const entry = along?.entry ?? entryOf(land, shore, plaza, road);
   if (entry === null) return [];
+  const way = gorgeWay(state, plaza);
+  const onShore = (p: Point): boolean => shore[Math.floor(p.z) * land.width + Math.floor(p.x)] === 1;
   const visitors: Visitor[] = [];
   for (const { kind, dealt, ford: atFord } of visits) {
     if (atFord !== undefined) {
@@ -341,7 +373,32 @@ export function createVisitors(
       // desde el que la plaza se alcanza andando.
       let from: Point | null = null;
       let route: Waypoint[] | null = null;
-      if (along !== null) {
+      // Por la senda de la garganta y el camino pintado, saliendo lo más lejos
+      // que le deje llegar a su hora (`setOff`), y de ahí al puesto.
+      let lane: Point[] = [];
+      let exit: Point[] = [];
+      let gate: Point | null = null;
+      let departure: number | null = null;
+      if (way !== null) {
+        const last = way.road[way.road.length - 1]!;
+        const tail = pathTo(land, last, spot);
+        if (tail !== null) {
+          const target = ARRIVE_BY + unit(seed, `${index}:arrive`) * JITTER;
+          const budget = (target - SET_OFF) * DAY_SECONDS * VISITOR_PACE - lengthOf([last, ...tail]);
+          const plan = setOff(way, budget, onShore);
+          const fromLane = plan.gorge;
+          const start = fromLane ? plan.from : nearestReachable(land, shore, plan.from, VISITOR_RADIUS);
+          if (start !== null) {
+            from = start;
+            route = fromLane ? [...plan.road, ...tail] : [...plan.road.slice(1), ...tail];
+            lane = plan.lane;
+            // Se va por donde vino: hasta la boca andando, y senda arriba.
+            if (fromLane) { gate = way.road[0]!; exit = [...lane].reverse().concat({ x: start.x, z: start.z }); }
+            departure = Math.max(SET_OFF, target - lengthOf([start, ...lane, ...route]) / VISITOR_PACE / DAY_SECONDS);
+          }
+        }
+      }
+      if (route === null && along !== null) {
         // Por el camino hasta el último tramo, y de ahí al puesto.
         const start = nearestReachable(land, shore, along.entry, VISITOR_RADIUS);
         const last = along.road[along.road.length - 1]!;
@@ -373,12 +430,12 @@ export function createVisitors(
           vx: 0, vz: 0, facing: 0, radius: VISITOR_RADIUS, pace: VISITOR_PACE,
         },
         kind,
-        road: from,
+        road: gate ?? from,
         spot,
         centre: plaza,
         phase: 'waiting',
         route,
-        arrive: Math.max(EARLIEST, ARRIVE + unit(seed, `${index}:arrive`) * JITTER - early),
+        arrive: departure ?? Math.max(EARLIEST, ARRIVE + unit(seed, `${index}:arrive`) * JITTER - early),
         leave: LEAVE + unit(seed, `${index}:leave`) * JITTER,
         deadline: 0,
         travelled: 0,
@@ -393,6 +450,8 @@ export function createVisitors(
         loaded: false,
         pasture,
         beastRoute: null,
+        lane,
+        exit,
       });
     }
   }
@@ -447,6 +506,85 @@ export function roadInto(
     if (best === null || road.length > best.road.length) best = { entry: points[start]!, road };
   }
   return best;
+}
+
+/**
+ * El camino de fuera a la plaza: la senda de la garganta, **de fuera a la
+ * boca** (`lane`, sin la boca), y el camino pintado de la boca a la plaza
+ * (`road`, hasta tres celdas antes, como `roadInto`). Por la garganta cuyo
+ * camino pintado es más corto: cada visita viene por la entrada más cercana.
+ */
+export function gorgeWay(state: GameState, plaza: Point): { lane: Point[]; road: Waypoint[] } | null {
+  const { map, terrainSeed } = state;
+  const mouths = roadMouths(map, terrainSeed);
+  const paths = gorgeRoadPaths(map, terrainSeed);
+  let best: { lane: Point[]; road: Waypoint[]; length: number } | null = null;
+  for (const cells of valleyRoadCells(map, terrainSeed, state.plaza)) {
+    const mouth = mouths.find((one) => one.cell === cells[0]);
+    if (mouth === undefined) continue;
+    const at = { x: mouth.cell % map.width + 0.5, z: Math.floor(mouth.cell / map.width) + 0.5 };
+    const path = paths.find((one) => one.length > 1 && Math.hypot(one[0]!.x - at.x, one[0]!.z - at.z) < 0.5);
+    if (path === undefined) continue;
+    const points = cells.map((cell) => ({ x: cell % map.width + 0.5, z: Math.floor(cell / map.width) + 0.5 }));
+    let stop = -1;
+    for (let i = 0; i < points.length; i += 1) {
+      if (Math.hypot(points[i]!.x - plaza.x, points[i]!.z - plaza.z) <= 3) break;
+      stop = i;
+    }
+    if (stop < 1) continue;
+    const road = points.slice(0, stop + 1);
+    const length = lengthOf(road);
+    if (best === null || length < best.length) best = { lane: path.slice(1).reverse(), road, length };
+  }
+  return best === null ? null : { lane: best.lane, road: best.road };
+}
+
+/** Lo que mide una línea de puntos. */
+function lengthOf(points: readonly Point[]): number {
+  let total = 0;
+  for (let i = 1; i < points.length; i += 1) total += Math.hypot(points[i]!.x - points[i - 1]!.x, points[i]!.z - points[i - 1]!.z);
+  return total;
+}
+
+/**
+ * Dónde se pone en camino quien tiene `budget` celdas de andar hasta el final
+ * del camino pintado: en la senda de la garganta si le alcanza, y si no en el
+ * camino pintado, hacia atrás desde su final, en el primer punto que sea suelo
+ * de la aldea.
+ */
+function setOff(
+  way: { lane: readonly Point[]; road: readonly Waypoint[] }, budget: number, onShore: (p: Point) => boolean,
+): { from: Point; lane: Point[]; road: Waypoint[]; gorge: boolean } {
+  const roadLength = lengthOf(way.road);
+  if (budget >= roadLength) {
+    // Desde la boca hacia fuera por la senda, lo que sobre.
+    let left = budget - roadLength;
+    const lane: Point[] = [];
+    let at: Point = way.road[0]!;
+    for (let i = way.lane.length - 1; i >= 0 && left > 0; i -= 1) {
+      const next = way.lane[i]!;
+      const span = Math.hypot(next.x - at.x, next.z - at.z);
+      if (span <= left) { lane.unshift(next); left -= span; at = next; continue; }
+      const cut = { x: at.x + ((next.x - at.x) / span) * left, z: at.z + ((next.z - at.z) / span) * left };
+      lane.unshift(cut);
+      left = 0;
+    }
+    return { from: lane[0] ?? way.road[0]!, lane: lane.slice(1), road: [...way.road], gorge: lane.length > 0 };
+  }
+  // Hacia atrás por el camino pintado lo que dé el tiempo; y de ahí, al punto
+  // de suelo de la aldea más cercano hacia fuera. El camino del motor no mira
+  // las casas: cortar en la primera celda tapada dejaba salir al buhonero a
+  // cinco celdas de la plaza (semillas 11 y 23, con veinte vecinos).
+  let start = way.road.length - 1;
+  let walked = 0;
+  for (let i = way.road.length - 1; i > 0; i -= 1) {
+    const step = Math.hypot(way.road[i]!.x - way.road[i - 1]!.x, way.road[i]!.z - way.road[i - 1]!.z);
+    if (walked + step > budget) break;
+    walked += step;
+    start = i - 1;
+  }
+  while (start < way.road.length - 1 && !onShore(way.road[start]!)) start += 1;
+  return { from: way.road[start]!, lane: [], road: way.road.slice(start), gorge: false };
 }
 
 /** Por dónde entra: del suelo de la aldea, lejos de la plaza y lo más cerca posible de la entrada de fuera. */
@@ -527,6 +665,8 @@ function fordStranger(
     loaded: false,
     pasture: plaza,
     beastRoute: null,
+    lane: [],
+    exit: [],
   };
 }
 
@@ -579,7 +719,16 @@ function moveVisitor(visitor: Visitor, land: Terrain, phase: number, step: numbe
     if (phase >= visitor.leave) { visitor.phase = 'gone'; return; }
     if (phase < visitor.arrive) return;
     visitor.phase = 'coming';
+    visitor.deadline = deadlineFor(body, visitor.spot, step, [...visitor.lane, ...visitor.route]);
+  }
+  // La senda de la garganta, sin navegar: al venir, hasta la boca, y desde ahí
+  // el plazo cuenta lo que queda; al irse, hasta donde salió, y se va.
+  if (visitor.lane.length > 0 && (visitor.phase === 'coming' || visitor.phase === 'leaving')) {
+    walkLane(visitor);
+    if (visitor.lane.length > 0) return;
+    if (visitor.phase === 'leaving') { visitor.phase = 'gone'; body.vx = 0; body.vz = 0; return; }
     visitor.deadline = deadlineFor(body, visitor.spot, step, visitor.route);
+    return;
   }
   if (visitor.phase === 'staying') {
     body.vx = 0;
@@ -605,6 +754,10 @@ function moveVisitor(visitor: Visitor, land: Terrain, phase: number, step: numbe
       visitor.phase = 'staying';
       // Mira hacia el centro de la plaza, que es donde está la aldea.
       body.facing = Math.atan2(visitor.centre.x - body.x, visitor.centre.z - body.z);
+    } else if (visitor.exit.length > 0) {
+      // En la boca: senda arriba, por donde vino.
+      visitor.lane = visitor.exit;
+      visitor.exit = [];
     } else {
       visitor.phase = 'gone';
     }
@@ -655,6 +808,26 @@ function moveVisitor(visitor: Visitor, land: Terrain, phase: number, step: numbe
     }
     visitor.route = routeOut(land, body, goal);
   }
+}
+
+/** Un paso por la senda: derecho al siguiente punto, al paso de visitante. */
+function walkLane(visitor: Visitor): void {
+  const { body, lane } = visitor;
+  const before = { x: body.x, z: body.z };
+  let left = VISITOR_PACE * LIFE_STEP;
+  while (left > 0 && lane.length > 0) {
+    const to = lane[0]!;
+    const gap = Math.hypot(to.x - body.x, to.z - body.z);
+    if (gap <= left) { body.x = to.x; body.z = to.z; left -= gap; lane.shift(); continue; }
+    body.x += ((to.x - body.x) / gap) * left;
+    body.z += ((to.z - body.z) / gap) * left;
+    left = 0;
+  }
+  body.vx = (body.x - before.x) / LIFE_STEP;
+  body.vz = (body.z - before.z) / LIFE_STEP;
+  const moved = Math.hypot(body.x - before.x, body.z - before.z);
+  if (moved > 1e-6) turnTo(body, Math.atan2(body.vx, body.vz), LIFE_STEP);
+  visitor.travelled += moved;
 }
 
 /** Pasos sin avanzar antes de rehacer la ruta: medio segundo escénico. */

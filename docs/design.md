@@ -7791,8 +7791,38 @@ no se lean como puntas (v4.62).
 cada garganta (`buildGorgeRoads`, `world/mountains.ts`): arranca en la ribera
 dentro del mapa, sigue **la orilla real del río** —no el eje del valle, que la
 hacía zigzaguear y subir por la pared— y se funde con la pedrera al perderse
-en la sierra. Cruza la marisma en vez de rodearla, y va a una cota suavizada y
-plana de lado a lado, como una plataforma.
+en la sierra. Cruza la marisma en vez de rodearla.
+
+**Pegada a lo que se dibuja, y por donde entran los de fuera (v5.70, 2 oct
+2026).** Vera: «el camino sigue flotando… no sé cómo llegan las visitas al
+valle». Iba a una cota suavizada, como una plataforma, leída de la fórmula de
+la sierra y no de su malla, con una rampa que sólo subía; y fuera del mapa el
+cañón iba recto mientras el río se curvaba, así que la senda no cabía en el
+fondo y trepaba por la pared: el 76 % de sus vértices flotaba más de 0,35
+celdas, el peor a 30. Desde entonces:
+
+- **el cañón sigue al río** (`canyonX`, `world/ridge.ts`): el perfil del borde
+  que se prolonga y el hombro de la garganta se miden desde donde va el río, y
+  la sierra mueve sus vértices con la misma curva y lleva una columna por celda
+  a lo ancho del cañón, así que el fondo es plano también en la malla;
+- **la senda va por la orilla**, a unas nueve décimas del agua, en una banda
+  por fila que no pisa el agua ni sube a la roca, desde la boca del camino
+  pintado (`roadMouths`) hasta perderse en la sierra; si la boca queda lejos de
+  la orilla —en 31 de 80 gargantas, porque la marisma corta la orilla para el
+  A* del motor—, la cruza por donde menos sube. Dentro de la garganta se moja
+  con la riada, como el camino pintado: fuera de la riada no cabía;
+- **cada vértice se apoya en la malla dibujada** (`meshSurface`,
+  `world/mesh-surface.ts`), cinco por sección, y sólo se levanta el triángulo
+  donde asome una arista del suelo; la luz se reparte por la cinta para que no
+  se lea en losas;
+- **el puente** salva la cascada con un tablero de una pieza, recto de estribo
+  a estribo y en arco con la flecha justa (Vera: «se ve roto el puente», «sigo
+  viendo baldosas de madera mal puestas»: eran cajas sueltas, una por tramo);
+- y **quien viene de fuera baja por ella**: ver «el valle más vivo», Anexo E.
+
+Medido en dieciséis semillas (`tools/reports/gorge-road-report.ts`): ningún
+vértice por encima de 0,35 celdas, el peor a 0,25, ninguno enterrado, y los dos
+extremos de cada valle en la boca del camino pintado.
 
 **Cascadas (v4.64).** Una baja por la pared de cada garganta hasta el río, y
 otra al lago cuando haya roca, recorrido despejado y una caída visible desde
@@ -7809,8 +7839,9 @@ Nace en una **boca**: un hueco oscuro en la roca con una visera de piedra,
 para que no empiece en mitad de la ladera. Al pie, una **poza de espuma** con
 anillos que se abren y **neblina** que sube del choque; en las gargantas, dos
 velos más a media caída. Y donde la senda de la garganta cruza una cascada,
-**un puente de tablas** con baranda y rampas, y el agua pasa por debajo. La
-caída al lago exige el mismo salto mínimo que la de garganta (`LEAST_DROP`).
+**un puente de tablas** con baranda, y el agua pasa por debajo (de una pieza y
+en arco desde v5.70). La caída al lago exige el mismo salto mínimo que la de
+garganta (`LEAST_DROP`).
 
 Todo esto es decorado: no cambia el motor ni una celda jugable.
 
@@ -8583,7 +8614,14 @@ número** (v4.49–v4.57, 25 sep 2026): visitas que hasta entonces sólo existí
 en la crónica —el buhonero, el forastero y las visitas de M-0— llegan andando
 por el camino a la plaza, se quedan hasta media tarde y muestran a qué vienen
 —el tenderete, la mesa del factor, los sacos del salinero— y se van
-(`life/visitors.ts`); un trato cerrado se ve pagar, con monedas que saltan en
+(`life/visitors.ts`). **Desde v5.70 (2 oct 2026) bajan por la senda de la
+garganta**: el camino entero —la senda y el camino pintado de la boca a la
+plaza— no cabe en una jornada, así que cada uno sale lo más lejos que le deje
+estar en la plaza a su hora (0,32–0,37), de noche si hace falta y al paso de
+quien viene de camino (1,4 celdas por segundo); por la senda andan sin navegar,
+porque fuera del mapa no hay rejilla y en la garganta la marisma corta la
+orilla, y se van por donde vinieron. Medido en doce valles de veinte vecinos,
+nueve bajan por la garganta, hacia el alba; el resto sale del camino pintado; un trato cerrado se ve pagar, con monedas que saltan en
 arco de una mano a la otra (`effects/coins.ts`); conejos salen a la linde del
 bosque al alba y al atardecer y huyen de quien se acerca (`life/rabbits.ts`);
 ropa tendida y huertos junto a las casas con un lado libre, que siguen la
