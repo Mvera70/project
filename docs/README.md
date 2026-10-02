@@ -106,7 +106,7 @@ adarve.
 | Documento | Qué pide |
 |---|---|
 | `encargos/encargo-astra-modelos.md` | **Los modelos 3D para Astra**, con el prompt listo para pegar. Entregados la sala del líder, los puestos, la cantera, las rocas y la golondrina; **quedan el roble y la casa quemada**, a la espera de que Vera decida |
-| `encargos/encargo-astra-tanda-larga-2026-10-02.md` | **La tanda larga de Astra** (2 oct): 35 modelos en ocho bloques —tablones, sastrería, las cuatro armaduras, la mina con su vagoneta, visitantes, fauna de estación, bancos y carro— con el prompt listo para pegar |
+| `encargos/encargo-astra-tanda-larga-2026-10-02.md` | **La tanda larga de modelos para Codex** (2 oct; dirige Sol 6, modela Astra con agentes): más objetos por la aldea y el valle con presupuesto de rendimiento, y 35 modelos en ocho bloques —tablones, sastrería, las cuatro armaduras, la mina con su vagoneta, visitantes, fauna de estación, bancos y carro— con el prompt listo para pegar |
 | `encargos/animacion-integral-goal.md` | **El encargo de la ronda AN de animación, de Astra** (29 sep): el bloque `/goal` completo, tal como se recibió |
 | `encargos/opciones-graficas-v10.md` | **La pantalla «Graphics» para Codex**: lámina de revisión, un estado «elegido» del botón de pergamino si hace falta, y un grabado de cabecera |
 | `encargos/profundidad-visual-movil-2026-09-29.md` | **La profundidad visual del valle en móvil** (encargo de Astra, `art/astra-modelos` `15b4f84`), **ejecutado el 29 sep 2026** con su resultado al final: el pie de los edificios, el prado hondo, el seguido a la vista bajo el bosque y el experimento de suavizado (sin cambiar el valor por omisión). Pendiente de verlo en un iPhone o iPad |

@@ -1,18 +1,59 @@
-# Encargo a Astra · la tanda larga de modelos (2 oct 2026)
+# Encargo para Codex · la tanda larga de modelos (2 oct 2026)
 
-Lo pidió Vera el 2 oct: «una sesión larga de encargos de modelos 3D a Astra; se
-acaban mañana los créditos y hay que gastarlo todo». Es **una sola sesión, larga
-y ordenada**: Astra va de arriba abajo y, si se le acaba el tiempo, lo hecho
-queda entregado y lo demás sigue en la lista.
+Lo pidió Vera el 2 oct, en dos mensajes: «una sesión larga de encargos de
+modelos 3D a Astra; se acaban mañana los créditos y hay que gastarlo todo», y
+después, al precisar a quién va: **«Esto es para Codex. Me gustaría que la
+aldea tuviese más artículos, un poco más de variedad, sin sobrecargar el
+rendimiento, siempre teniendo cuidado. Pero en general faltan elementos 3D a
+todo el valle. La sesión la dirige Sol 6 como director y Astra va a hacer
+todos los modelos con agentes. Importante usar las skills.»**
+
+**Cómo se reparte:**
+
+- **Sol 6 dirige.** Escribe la hoja de reparto en `docs/task-log.md` antes de
+  mandar el primer encargo (skill `director` §3), reparte los bloques entre los
+  agentes de Astra, revisa cada hoja de capturas contra la cámara de reposo e
+  integra en el juego, de una PR en una, lo que la tabla marca como
+  «se integra en esta tanda».
+- **Astra modela, con agentes**, un bloque por agente cuando no compartan
+  receta: receta, GLB candidato, hoja de capturas y README.
+- **Versiones reservadas: v5.90 a v5.99.** Las sesiones de Claude que siguen
+  abiertas tienen hasta la v5.89; no se cruzan.
 
 Sale de `docs/encargos-3d.md`, de los encargos sueltos de `docs/encargos/` que
 nadie había hecho todavía y de las rondas de hoy (K5 cuero y sastrería, la
 ronda del daño, la fauna por estaciones). Lo que ya está hecho no se repite
 (abajo, «No se encarga»).
 
-**Como siempre, Astra hace sólo el modelo**: receta, GLB candidato, hoja de
-capturas y README. La integración en el juego, el catálogo y la publicación los
-hace después otra sesión.
+## Las skills, que no son opcionales
+
+Viven en `.claude/skills/<nombre>/SKILL.md`. Se leen **antes** del trabajo que
+gobiernan, no después:
+
+| Skill | Cuándo |
+|---|---|
+| `director` | Sol 6, al empezar: hoja de reparto, versiones, integración de una en una con `main` verde, informe de fusión al cerrar |
+| `goal` | Al abrir la tanda: leer `docs/plan-meta.md`, medir, escribir el porqué y dejar `task-log.md` al día |
+| `performance` | **Antes de integrar cualquier malla.** Medir antes y después con `gl-probe.mjs` y `scene-report.mjs`, y escribir las cifras en la PR |
+| `animacion` | Las piezas que se cuelgan de un hueso (armaduras, accesorios) y todo lo que se mueve (ruedas, alas, el mineral que se vuelca) |
+| `observe-valley-life` | Al integrar objetos en el suelo: que nadie los atraviese ni se quede atascado contra ellos |
+| `press-kit` | Al cerrar: las capturas del valle con lo nuevo, a escala de móvil |
+
+## El presupuesto de rendimiento, que manda sobre la lista
+
+Vera: «sin sobrecargar el rendimiento, siempre teniendo cuidado». Las cifras de
+referencia están en la skill `performance` (27 sep: **villa grande 421 llamadas
+de dibujo y 586 mil triángulos; aldea 335 y 482 mil**). Para esta tanda:
+
+- **Todo lo que se repite va instanciado**, con una `InstancedMesh` por tipo
+  como los trastos de `src/render3d/world/steading.ts`, y **sin sombra
+  proyectada** salvo lo que pase de 1 celda de alto.
+- **El bloque entero de objetos del valle no puede sumar más de 30 llamadas ni
+  60 mil triángulos** en la villa grande. Si no cabe, se quitan tipos, no se
+  sube el tope.
+- Cada pieza suelta, **≤ 150 triángulos** salvo que la fila diga otra cosa.
+- Se mide antes y después de cada PR de integración, y la cifra va en la PR.
+  Una subida de más del 10 % en llamadas se explica o no se fusiona.
 
 ---
 
@@ -21,6 +62,44 @@ hace después otra sesión.
 Una celda son 3 m y un aldeano mide 0,65 celdas (1,95 m). Estilo facetado, sin
 texturas, color por material de `palette.json`. Origen en la base y frente a
 +Z, salvo que se diga otra cosa.
+
+**Qué se integra en esta tanda y qué sólo se modela:**
+
+| Bloques | Qué hace Sol 6 con el modelo |
+|---|---|
+| 0 (objetos del valle) | **Se integra**, con el presupuesto de arriba |
+| 1 (lo que hoy son cajas) | **Se integra**: es cambiar la pieza provisional por el GLB, uno por uno, midiendo |
+| 2 (sastrería) | Se integra **cuando la PR de K5 (sastrería y lino) esté en `main`**; la lleva otra sesión hoy, no se toca antes |
+| 5, 6, 7 | Se integra lo que tenga ya un sitio en el código (accesorios de visitantes, cigüeña, polluelo, mariposa, banco, carro); lo demás, sólo modelo |
+| 3 y 4 (armaduras, mina) | **Sólo modelo**: la mecánica todavía no existe (`docs/plan-meta.md`, AR). El peto de cuero (12) sí se integra, porque ya existe en el juego |
+| 8 | Sólo si Vera lo pide |
+
+### Bloque 0 · La aldea y el valle con más cosas — lo primero
+
+Es lo que Vera pide de verdad: **más artículos y más variedad**, entre una casa
+y la siguiente y por todo el valle. Se pintan como los trastos de
+`steading.ts` (G-15): se deducen del estado —edificios, terreno, estación,
+era—, no entran en el motor ni en el guardado, y **se integran en esta
+tanda**, midiendo con `performance`. Ninguno se coloca donde la vida necesite
+pasar (skill `observe-valley-life`).
+
+| # | `id` | Dónde aparece | Qué es |
+|---|---|---|---|
+| 0a | `barrel`, `crate`, `sack-pile` | Junto al granero, la herrería, el molino y las casas con oficio | Tonel, caja y sacos apilados, cada uno en dos o tres variantes de tamaño |
+| 0b | `tool-rack` | Contra la pared de las casas de oficio | Herramientas apoyadas (horca, rastrillo, pala) |
+| 0c | `washing-line` | Entre dos casas cercanas, en buen tiempo | Dos postes con ropa tendida (colores de la paleta) |
+| 0d | `flower-pot`, `herb-bed` | A la puerta de las casas y junto a la curandera | Maceta y un bancal de hierbas |
+| 0e | `beehive` | Dos o tres en el prado junto a los campos | Colmena de paja (skep) sobre una tabla |
+| 0f | `scarecrow` | Uno por campo grande, en verano | Espantapájaros con sombrero |
+| 0g | `trough` | Junto al ganado y al pozo | Abrevadero de madera |
+| 0h | `chicken-coop` | Si hay gallinas | Gallinero pequeño sobre patas |
+| 0i | `wood-chopping` | Junto a la leñera | Tocón con el hacha clavada y astillas |
+| 0j | `stump`, `fallen-log` | En la linde del bosque y donde se taló | Tocón suelto y tronco caído con musgo |
+| 0k | `bush`, `wildflowers`, `mushrooms` | Por el prado y la linde, según estación | Arbusto, mata de flores y un corro de setas en otoño |
+| 0l | `stone-wall` | Entre campos vecinos, desde la era de aldea | Murete de piedra seca de 1 celda, que se repite |
+| 0m | `wayside-shrine` | En el camino de cada entrada | Hornacina de piedra con una cruz |
+| 0n | `lantern-post` | En la plaza, desde la villa | Farol en un poste (de noche, una luz falsa: **ninguna luz real nueva**) |
+| 0o | `market-awning` | En la plaza los días de visita | Toldo suelto con dos cestos |
 
 ### Bloque 1 · Lo que el juego ya pinta con cajas y está esperando el modelo
 
@@ -122,56 +201,72 @@ y fuego no están autorizados**: nada de este encargo los lleva.
 
 ---
 
-## El prompt para Astra
+## El prompt para Codex
 
 Se pega tal cual:
 
 ````text
-Eres Astra y vas a modelar en 3D para The Valley, un juego idle de una aldea
-medieval en Three.js (repositorio en D:\DESARROLLO\PROYECTOS\VALLEY\project;
-trae main antes de empezar). Es una SESIÓN LARGA: hay 35 modelos en la lista y
-la idea es hacer todos los que puedas, de arriba abajo, sin parar a preguntar.
+Sesión de Codex para The Valley, un juego idle de una aldea medieval en
+Three.js (repositorio en D:\DESARROLLO\PROYECTOS\VALLEY\project; trae main
+antes de empezar). Es una SESIÓN LARGA: hay que gastar el crédito que queda
+haciendo todos los modelos que se pueda.
 
-Tu trabajo es SÓLO el modelo: recetas, GLB candidatos y capturas de revisión.
-No toques src/, tests/, el motor, public/assets/ ni art/catalog.json; no
-publiques ni integres nada. La integración la hace otra sesión después.
+Papeles:
+- SOL 6 dirige. Reparte, revisa e integra en el juego.
+- ASTRA hace todos los modelos, con agentes en paralelo (un bloque por agente
+  cuando no compartan receta).
 
-Lee primero:
-1. docs/encargos/encargo-astra-tanda-larga-2026-10-02.md: la lista, medidas,
-   presupuestos y el bloque en que va cada modelo. Es tu brief.
-2. Los encargos que cita cada fila (visitantes-y-expediciones.md,
-   ilustraciones-k8-k9.md, ilustraciones-k5-cuero.md, cartel-del-camino.md).
-3. tools/README.md, sección «art/», y una receta hecha como ejemplo
-   (art/recipes/bear-den, art/recipes/axe, art/recipes/stall-pedlar-candidate).
-4. public/assets/models/palette.json: los únicos colores que valen.
+Lo primero, y no es opcional: usad las skills de .claude/skills/. Sol 6 lee
+director/SKILL.md y goal/SKILL.md antes de repartir; antes de integrar
+cualquier malla, performance/SKILL.md; para piezas colgadas de un hueso o
+que se mueven, animacion/SKILL.md; al poner objetos en el suelo,
+observe-valley-life/SKILL.md; al cerrar, press-kit/SKILL.md. Y CLAUDE.md
+entero, que vale igual para Codex.
 
-Por cada modelo, en el orden de la lista:
-- La receta en art/recipes/<id>-candidate/<id>.json, reproducible.
-- El GLB en artifacts/graphics/astra/<id>/<id>.glb, dentro del presupuesto.
-- Una hoja de capturas en artifacts/graphics/astra/<id>/sheet.png: tres
-  cuartos desde arriba (la cámara del juego), frente y perfil, y al lado de
-  villager.glb y house.glb para la escala. Las piezas de armadura y los
-  accesorios, puestos sobre villager.glb.
-- Un README.md corto: medidas reales, triángulos, nombres de las mallas y
-  orígenes, y lo que no llegó y por qué.
-Y al acabar cada BLOQUE, commit y push (así, si la sesión se corta, lo hecho
-queda entregado).
+El brief es docs/encargos/encargo-astra-tanda-larga-2026-10-02.md: la lista
+por bloques (del 0 al 8), medidas, presupuestos, el presupuesto de
+rendimiento y qué se integra en esta tanda y qué sólo se modela. Lo que pide
+Vera por encima de todo es el Bloque 0: más artículos y más variedad en la
+aldea y por todo el valle, SIN sobrecargar el rendimiento.
+
+ASTRA, por cada modelo:
+- Receta en art/recipes/<id>-candidate/<id>.json, reproducible (ver
+  tools/README.md, sección «art/», y recetas hechas como bear-den, axe o
+  stall-pedlar-candidate).
+- GLB en artifacts/graphics/astra/<id>/<id>.glb, dentro del presupuesto.
+- Hoja de capturas en artifacts/graphics/astra/<id>/sheet.png: tres cuartos
+  desde arriba (la cámara del juego), frente y perfil, junto a villager.glb y
+  house.glb. Armaduras y accesorios, puestos sobre villager.glb.
+- README.md corto: medidas, triángulos, nombres de mallas y orígenes, y lo que
+  no llegó.
+- Commit y push al acabar cada bloque, para que nada se pierda si se corta.
+
+SOL 6:
+- Escribe la hoja de reparto en docs/task-log.md antes del primer encargo
+  (ramas, versiones v5.90–v5.99, quién hace qué).
+- Revisa cada hoja de capturas: si no se lee desde la cámara de reposo, vuelve.
+- Integra de una PR en una, con main verde, lo que el brief marca como
+  integrable; mide antes y después con
+  tools/graphics/performance/gl-probe.mjs y scene-report.mjs y pon las cifras
+  en la PR. El Bloque 0 entero no pasa de +30 llamadas ni +60 mil triángulos en
+  la villa grande; si no cabe, se quitan tipos.
+- La puerta de cada PR: npm run typecheck, npm run lint y las pruebas de lo que
+  toca; y una captura (npm run shot).
 
 Reglas que no se negocian:
-- Una celda son 3 m; un aldeano mide 0,65 celdas (1,95 m). Se mide, no a ojo.
-- Low-poly facetado como el resto del valle: caras planas, sin texturas, color
-  por material de la paleta. Sin texto legible. Nada de sangre ni fuego.
-- Las piezas que se mueven o se cuelgan van en mallas separadas, con el
-  nombre y el origen que dice la fila (bisagras, ruedas, alas, el mineral de
-  la vagoneta, las pieles del bastidor, el hueso de cada pieza de armadura).
-- Todo tiene que leerse desde la cámara de reposo del juego, lejos y desde
-  arriba: silueta y color antes que detalle.
-- Si te falta un dato, no lo inventes ni pares: apúntalo en el README como
-  pregunta para Vera y sigue con el siguiente modelo.
-- Rama propia art/astra-tanda-larga, commits por rutas explícitas, nunca
-  git add -A, y no toques ficheros sin seguimiento que no sean tuyos.
+- Una celda son 3 m; un aldeano mide 0,65 celdas (1,95 m).
+- Low-poly facetado, sin texturas, color por material de
+  public/assets/models/palette.json. Sin texto legible. Nada de sangre ni
+  fuego.
+- El motor (src/engine/) no se toca: los objetos se deducen del estado, como
+  los trastos de src/render3d/world/steading.ts.
+- La sastrería no se integra hasta que la PR de K5 (otra sesión, hoy) esté en
+  main. Las armaduras y la mina, sólo modelo.
+- Si falta un dato, no se inventa ni se para: se apunta como pregunta para
+  Vera y se sigue.
+- Commits por rutas explícitas, nunca git add -A.
 
-Al acabar (o cuando se te acabe el tiempo), di en español qué modelos están,
-cuántos triángulos tiene cada uno, dónde están las capturas, cuáles faltan y
-qué preguntas quedan para Vera.
+Al acabar, en español: qué modelos están, cuáles se integraron, las cifras de
+rendimiento antes y después, dónde están las capturas, qué falta y qué
+preguntas quedan para Vera.
 ````
