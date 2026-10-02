@@ -1,0 +1,30 @@
+{
+  "node": "hand_r",
+  "connector": "grip",
+  "space": "glTF Y-up, cells",
+  "matrixColumnMajor": [
+    3.000000476837158,
+    6.946505095584143e-07,
+    -3.285660739038576e-07,
+    0.0,
+    -1.0765504043774854e-07,
+    3.0000007152557373,
+    2.2332264393298829e-07,
+    0.0,
+    1.033163698593853e-06,
+    -4.3035242924815975e-08,
+    3.0000007152557373,
+    0.0,
+    -2.3684116001732036e-08,
+    4.227743488627311e-08,
+    -5.329070518200751e-15,
+    1.0
+  ],
+  "restAnchorWorld": [
+    0.14666667580604553,
+    0.2200000137090683,
+    -4.7407051617653906e-09
+  ],
+  "pivotErrorCells": 1.4901161193847656e-08,
+  "note": "Aplicar matrixColumnMajor al grupo del GLB como hijo del nodo; compensaci\u00f3n de escala y rotaci\u00f3n de reposo incluidas. No aplicar adem\u00e1s el grip del hacha. Sigue el hueso al animarse. Validado en reposo, no en los gestos vivos."
+}

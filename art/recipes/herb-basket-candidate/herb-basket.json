@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "id": "herb-basket",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "foliage",
+      "role": "foliage",
+      "color": "#62864F",
+      "roughness": 0.94
+    },
+    {
+      "name": "foliagelight",
+      "role": "foliageLight",
+      "color": "#7F9F64",
+      "roughness": 0.94
+    },
+    {
+      "name": "timber",
+      "role": "timber",
+      "color": "#9A744C",
+      "roughness": 0.94
+    },
+    {
+      "name": "timberdark",
+      "role": "timberDark",
+      "color": "#6B4C32",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "grip",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "connectors": [
+    "grip"
+  ],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "herb-basket",
+    "footprint": [
+      1,
+      1
+    ],
+    "attachment": "hand_r",
+    "note": "Bloque 5. Metros fuente a celdas; frente +Z glTF. Origen en enganche, NO en base. Ajuste de montaje medido contra el nodo publicado en attachment.json; escala inversa del padre para evitar escala doble. Recurso est\u00e1tico preview-only."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 1,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Basket",
+      "location": [
+        0,
+        0,
+        -0.29
+      ],
+      "radius": 0.2,
+      "depth": 0.26,
+      "vertices": 6,
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Rim",
+      "location": [
+        0,
+        0,
+        -0.16
+      ],
+      "radius": 0.213,
+      "depth": 0.042,
+      "vertices": 6,
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "HandleSide0",
+      "location": [
+        -0.18,
+        0,
+        -0.08
+      ],
+      "dimensions": [
+        0.025,
+        0.035,
+        0.16
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "HandleSide1",
+      "location": [
+        0.18,
+        0,
+        -0.08
+      ],
+      "dimensions": [
+        0.025,
+        0.035,
+        0.16
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "HandleGrip",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "dimensions": [
+        0.38,
+        0.035,
+        0.025
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Herb0",
+      "location": [
+        -0.1,
+        0.08,
+        -0.09
+      ],
+      "radius": 0.105,
+      "depth": 0.31,
+      "vertices": 5,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Herb1",
+      "location": [
+        0.09,
+        0.09,
+        -0.09
+      ],
+      "radius": 0.105,
+      "depth": 0.31,
+      "vertices": 5,
+      "material": "foliage",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Herb2",
+      "location": [
+        0,
+        -0.085,
+        -0.09
+      ],
+      "radius": 0.105,
+      "depth": 0.31,
+      "vertices": 5,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

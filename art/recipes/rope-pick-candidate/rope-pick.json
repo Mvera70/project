@@ -1,0 +1,361 @@
+{
+  "schemaVersion": 1,
+  "id": "rope-pick",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "eldergrey",
+      "role": "elderGrey",
+      "color": "#77796F",
+      "roughness": 0.94
+    },
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.94
+    },
+    {
+      "name": "timber",
+      "role": "timber",
+      "color": "#9A744C",
+      "roughness": 0.94
+    },
+    {
+      "name": "trunk",
+      "role": "trunk",
+      "color": "#735338",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "mount",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "connectors": [
+    "mount"
+  ],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "rope-pick",
+    "footprint": [
+      1,
+      1
+    ],
+    "attachment": "spine",
+    "note": "Bloque 5. Metros fuente a celdas; frente +Z glTF. Origen en enganche, NO en base. Ajuste de montaje medido contra el nodo publicado en attachment.json; escala inversa del padre para evitar escala doble. Recurso est\u00e1tico preview-only."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 1,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Rope0",
+      "location": [
+        0.3,
+        0.3,
+        0.42
+      ],
+      "dimensions": [
+        0.156,
+        0.065,
+        0.065
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        -90,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Rope1",
+      "location": [
+        0.24727922061357854,
+        0.3,
+        0.5472792206135786
+      ],
+      "dimensions": [
+        0.156,
+        0.065,
+        0.065
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        -135,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Rope2",
+      "location": [
+        0.12000000000000001,
+        0.3,
+        0.6
+      ],
+      "dimensions": [
+        0.156,
+        0.065,
+        0.065
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        -180,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Rope3",
+      "location": [
+        -0.007279220613578552,
+        0.3,
+        0.5472792206135786
+      ],
+      "dimensions": [
+        0.156,
+        0.065,
+        0.065
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        -225,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Rope4",
+      "location": [
+        -0.06,
+        0.3,
+        0.42
+      ],
+      "dimensions": [
+        0.156,
+        0.065,
+        0.065
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        -270,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Rope5",
+      "location": [
+        -0.00727922061357858,
+        0.3,
+        0.29272077938642144
+      ],
+      "dimensions": [
+        0.156,
+        0.065,
+        0.065
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        -315,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Rope6",
+      "location": [
+        0.11999999999999997,
+        0.3,
+        0.24
+      ],
+      "dimensions": [
+        0.156,
+        0.065,
+        0.065
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        -360,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Rope7",
+      "location": [
+        0.24727922061357852,
+        0.3,
+        0.2927207793864214
+      ],
+      "dimensions": [
+        0.156,
+        0.065,
+        0.065
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        -405,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "PickHandle",
+      "location": [
+        -0.19,
+        0.36,
+        0.16
+      ],
+      "radius": 0.027,
+      "depth": 0.99,
+      "vertices": 4,
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "PickArm0",
+      "location": [
+        -0.31,
+        0.36,
+        0.63
+      ],
+      "dimensions": [
+        0.29,
+        0.065,
+        0.055
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        20,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "PickArm1",
+      "location": [
+        -0.07,
+        0.36,
+        0.63
+      ],
+      "dimensions": [
+        0.29,
+        0.065,
+        0.055
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        -20,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Lashing",
+      "location": [
+        -0.15,
+        0.395,
+        0.31
+      ],
+      "dimensions": [
+        0.12,
+        0.025,
+        0.045
+      ],
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

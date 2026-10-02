@@ -1,0 +1,30 @@
+{
+  "node": "spine",
+  "connector": "mount",
+  "space": "glTF Y-up, cells",
+  "matrixColumnMajor": [
+    3.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    3.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    3.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "restAnchorWorld": [
+    0.0,
+    0.35333332419395447,
+    0.0
+  ],
+  "pivotErrorCells": 0.0,
+  "note": "Aplicar matrixColumnMajor al grupo del GLB como hijo del nodo; compensaci\u00f3n de escala y rotaci\u00f3n de reposo incluidas. No aplicar adem\u00e1s el grip del hacha. Sigue el hueso al animarse. Validado en reposo, no en los gestos vivos."
+}
