@@ -19,11 +19,24 @@ import { TERRAIN_CODE } from '@engine/state';
 import { riverExtensionAt, riverSection } from './river-extension';
 import { waterfallCorridorAt, waterfallSites } from './waterfalls';
 import { veilMaterial } from '../effects/mountain-veil';
+import { meshSurface, type Surface } from './mesh-surface';
 
 export interface Backdrop {
   readonly group: Group;
   readonly ridge: Mesh;
   readonly treeCount: number;
+  /**
+   * La cota de lo que se dibuja en un punto, en coordenadas de mundo: el suelo
+   * y la piel dentro del mapa, la malla de la sierra fuera. Es donde pisa quien
+   * anda por la senda de la garganta (`life/visitors.ts`).
+   */
+  surfaceAt(x: number, z: number): number;
+  /**
+   * La cota de la senda de la garganta y de sus puentes en un punto, en
+   * coordenadas de mundo, o −∞ fuera de ellos: quien anda por la senda la pisa
+   * a ella y no al suelo que tiene debajo.
+   */
+  roadAt(x: number, z: number): number;
   /** La nieve de las cumbres baja con el invierno (`snowCover`, de 0 a 1). */
   season(palette: Palette, snow?: number): void;
   light(daylight: number): void;
@@ -264,6 +277,18 @@ function outerFloodMouth(map: ValleyMap, seed: number, material: MeshStandardMat
   return mesh;
 }
 
+/**
+ * Lo que se dibuja en cada punto, en coordenadas de mundo: dentro del mapa el
+ * suelo y la piel de la montaña (`mountainSurfaceAt`, los triángulos que se
+ * pintan); fuera, la malla de la sierra (`meshSurface`).
+ */
+function drawnSurface(map: ValleyMap, ridge: Mesh): Surface {
+  const outside = meshSurface(ridge.geometry);
+  return (x, z) => (x >= 0 && z >= 0 && x <= map.width && z <= map.height
+    ? GROUND_BIAS + mountainSurfaceAt(map, x, z)
+    : outside(x, z));
+}
+
 /** Cuántos peñascos, dentro del cinturón del mapa y en la sierra de fuera. TUNE visual. */
 const CRAGS_INSIDE = 260;
 const CRAGS_OUTSIDE = 700;
@@ -306,24 +331,23 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
   const cairns = buildCairns(map, palette, (x, z) => ridgeAt(map, seed, x, z),
     (x, z) => exteriorWaterAt(map, seed, x, z, 1.8), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))), rocks?.cairn);
   group.add(cairns);
-  // La senda va por donde no se inunda: dentro del mapa, fuera del alcance de
-  // la riada. Si no, con el río crecido asomaban trozos de senda entre el agua
-  // (capturas de Vera, 27 sep).
-  const reach = floodReach(map);
-  const flooded = (x: number, z: number): boolean => {
-    const cx = Math.floor(x), cz = Math.floor(z);
-    return cx >= 0 && cz >= 0 && cx < map.width && cz < map.height && reach[cz * map.width + cx]! >= 0;
-  };
-  // La cota de la senda es la de la piel de la sierra donde la hay: dentro del
-  // mapa la piel facetada va por encima de la cota del relieve.
-  const roadFloor = (x: number, z: number): number => {
-    const inside = x >= 0 && z >= 0 && x < map.width && z < map.height;
-    return inside ? Math.max(ridgeAt(map, seed, x, z), mountainSurfaceAt(map, x, z)) : ridgeAt(map, seed, x, z);
-  };
-  const roads = buildGorgeRoads(map, seed, palette, roadFloor,
-    (x, z) => exteriorWaterAt(map, seed, x, z, 1.4) || flooded(x, z), (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))),
-    (x, z) => waterfallCorridorAt(falls, x, z));
+  // La senda se apoya en lo que se dibuja (2 oct 2026): dentro del mapa, el
+  // suelo y la piel de la montaña; fuera, la malla de la sierra, que no es su
+  // fórmula entre vértices. Y por la orilla de la garganta, como el camino
+  // pintado del valle: con riada se moja igual que él. Fuera de la riada iba
+  // por la pared, y eso era la cinta flotando de las capturas de Vera.
+  const surfaceAt = drawnSurface(map, ridge);
+  const roads = buildGorgeRoads(map, seed, palette, surfaceAt, (x, z) => waterfallCorridorAt(falls, x, z));
   group.add(roads.mesh, roads.bridges);
+  // Lo que se pisa de la senda: la cinta y el tablero de cada puente.
+  const walkways = [roads.mesh, ...roads.bridges.children.flatMap((bridge) => bridge.children
+    .filter((piece): piece is Mesh => piece instanceof Mesh && piece.name === 'Valley_Gorge_Bridge_Deck'))]
+    .map((mesh) => meshSurface(mesh.geometry));
+  const roadAt = (x: number, z: number): number => {
+    let top = Number.NEGATIVE_INFINITY;
+    for (const at of walkways) top = Math.max(top, at(x, z));
+    return top;
+  };
   const water = outerWater(map, seed, palette);
   const floodMouth = water === null ? null : outerFloodMouth(map, seed, water.material as MeshStandardMaterial);
   if (water !== null) {
@@ -333,7 +357,7 @@ export function buildBackdrop(map: ValleyMap, seed: number, palette: Palette, tr
   const forest = tree === undefined ? null : outerTrees(map, seed, tree, palette);
   if (forest !== null) group.add(forest.group);
   return {
-    group, ridge, treeCount: forest?.count ?? 0,
+    group, ridge, treeCount: forest?.count ?? 0, surfaceAt, roadAt,
     season(next, cover = 0): void {
       (ground.material as MeshStandardMaterial).color.copy(distantColour(next));
       seasonRidge(ridge, map, next, cover);

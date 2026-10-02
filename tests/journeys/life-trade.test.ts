@@ -127,10 +127,17 @@ describe('El valle más vivo · el puesto y el trato', () => {
   // salir de una plaza cerrada; la propiedad se queda intacta hasta arreglarlo.
   // **Y desde el camino del valle (v4.94) sale**: entra y se va por el camino,
   // que el motor mantiene pisado, y ya no se queda contra el granero.
+  // **Y desde el 2 oct 2026 se va por la garganta**: anda el camino pintado
+  // hasta la boca y sube por la senda por la que vino, y a medianoche puede ir
+  // todavía senda arriba. Lo que se guarda es que se va, no que llegue.
   it('semilla 23 · el salinero se va de una plaza que la aldea ha cerrado', () => {
-    const market = createVillage(dealing(SALT_BLOCKED, 'salt_visit'), dealing(SALT_BLOCKED, 'salt_visit').tick * TIME.DAYS_PER_WEEK);
+    const state = dealing(SALT_BLOCKED, 'salt_visit');
+    const market = createVillage(state, state.tick * TIME.DAYS_PER_WEEK);
     for (let n = 0; n < STEPS_PER_DAY; n += 1) market.step(n / STEPS_PER_DAY);
-    expect(market.visitors[0]!.phase).toBe('gone');
+    const salter = market.visitors[0]!;
+    const plaza = { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 };
+    const away = Math.hypot(salter.body.x - plaza.x, salter.body.z - plaza.z);
+    expect(salter.phase === 'gone' || (salter.phase === 'leaving' && away > 20), `${salter.phase}, a ${away.toFixed(1)} de la plaza`).toBe(true);
   });
 
   it('en cada trato cerrado pasan monedas de mano, del que compra al que vende', () => {
@@ -158,15 +165,15 @@ describe('El valle más vivo · el puesto y el trato', () => {
     }
   });
 
-  // **El factor de grano en la semilla 7, declarado** (1 oct 2026, K1–K3, v5.53).
-  // Con la trayectoria nueva, la aldea de ocho años de la semilla 7 saca el grano
-  // del granero de (28, 57), en el otro extremo de la plaza: de los tres
-  // porteadores, dos cogen la carga y no salen de la puerta del granero, y el
-  // tercero llega al puesto en la fase 0,65; el factor se va en la 0,66, antes de
-  // que la carga cuente, y no pasan monedas. Es la capa de vida —un porte que se
-  // queda sin ruta desde la puerta del granero—, no la madera. La propiedad se
-  // queda escrita, intacta, hasta que una ronda de vida lo arregle.
-  it.fails('y también con el factor de grano, en todas las semillas', () => {
+  // **El factor de grano en la semilla 7** (1 oct 2026, K1–K3, v5.53): el
+  // grano sale del granero de (28, 57), en el otro extremo de la plaza, y el
+  // factor se iba en la fase 0,66 antes de que la carga contara. Estuvo
+  // declarado con `it.fails`. **Desde el 2 oct 2026 pasa**: quien viene por la
+  // senda de la garganta sale a la hora que le hace estar en la plaza a su
+  // hora, así que el factor llega antes (0,32–0,36) y los porteadores con él.
+  // Medido en las semillas 7, 23 y 41: la moneda pasa entre 0,49 y 0,61, y el
+  // factor se va entre 0,62 y 0,66.
+  it('y también con el factor de grano, en todas las semillas', () => {
     for (const seed of SEEDS) {
       for (const kind of ['factor_visit'] as Trade[]) {
         const state = dealing(seed, kind);

@@ -52,6 +52,77 @@ Encargos: las ilustraciones de las ocho líneas nuevas de crónica, las cinco
 tarjetas y los dos tablones de verdad, en `docs/encargos/ilustraciones-k8-k9.md`.
 Va ahí y no en `plan-arte-pendiente.md` mientras Codex trabaja en ese fichero.
 Lo que aún no se ve está en `docs/encargos-3d.md`.
+
+## v5.70 · 2 oct 2026 · La senda de la garganta, pegada al suelo, y los de fuera bajan por ella
+
+Vera: «el camino sigue flotando… no sé cómo llegan las visitas al valle». Y con
+la ronda a la vista: «se ve roto el puente» y «la unión con el puente es rara y
+sigo viendo baldosas de madera mal puestas».
+
+- **Medido antes**, contra las mallas tal como se dibujan y no contra sus
+  fórmulas (`tools/reports/gorge-road-report.ts`, nuevo: un rayo por vértice):
+  en ocho semillas el 75,8 % de los vértices de la cinta iba más de 0,35
+  celdas por encima de lo que se ve, el peor a 30,2 (semilla 5); en 7, 11 y 23,
+  el 61, 87 y 96 %, el peor a 22, como traía el diagnóstico. Y el extremo de
+  dentro quedaba hasta a 7,1 celdas del camino pintado.
+- **El cañón sigue al río** (`canyonX`, `ridge.ts`). Fuera del mapa el suelo
+  iba recto y el río se curvaba hasta 2,8 celdas: la senda, en seco junto al
+  agua, no cabía y subía por la pared; en la semilla 11 una muestra rozaba un
+  cortado de veinte celdas. Ahora el perfil del borde que se prolonga y el
+  hombro de la garganta se miden desde donde va el río, y **la sierra mueve
+  sus vértices con la misma curva** y lleva una columna por celda a ±7 del río
+  (`CANYON_FINE`): de 18 268 a entre 19 180 y 19 294 triángulos, un 5 %, en la
+  misma llamada de dibujo.
+- **La cinta se apoya en lo que se dibuja** (`meshSurface`, nuevo: los
+  triángulos de la malla real, por cubos de una celda). Cinco vértices por
+  sección, cada uno en el suelo de debajo, y donde una arista asoma entre
+  vértices se sube **ese** triángulo y nada más (`ROAD_SEAM`). Se van la
+  plataforma, el promedio de cotas y `ROAD_GRADE`, la rampa que sólo subía y
+  levantaba decenas de celdas de calzada. La luz se reparte por la cinta para
+  que no se lea en losas.
+- **El trazado, por la orilla**: a 0,9 del agua, en una banda por fila que no
+  pisa el agua ni sube a la roca, con las muestras a un cuarto de celda de la
+  frontera entre filas (el río de la garganta salta una celda de una fila a la
+  otra) y un suavizado que no se sale de la banda. **De la boca del camino
+  pintado hacia fuera**: si la boca del motor queda lejos de la orilla —31 de
+  80 gargantas en cuarenta semillas, porque la marisma corta la orilla para el
+  A*—, la senda la busca por donde menos sube (`turnToMouth`). Dentro de la
+  garganta se moja con la riada, como el camino pintado: fuera de la riada no
+  cabía, y por eso trepaba.
+- **El puente, de una pieza y en arco.** Las tablas eran cajas sueltas, una
+  por tramo y girada a su tramo; con la senda ya apoyada en el suelo copiaban
+  cada bache, y donde el puente doblaba se montaban en escalón. Ahora el
+  tablero es una malla que va recta de estribo a estribo, en arco con la flecha
+  justa para salvar la cascada (de 0,12 a 0,6 celdas) y las tablas se marcan
+  por el color.
+- **Los de fuera bajan por ella** (`life/visitors.ts`, `gorgeWay`, `setOff`).
+  El camino entero no cabe en una jornada —de la boca a la plaza hay de 39 a
+  71 celdas y la garganta suma otras 15 a 25—, así que cada visita sale lo más
+  lejos que le deje estar en la plaza a su hora (0,32 a 0,37, la de antes), de
+  noche si hace falta, por la garganta cuyo camino pintado es más corto. Por la
+  senda anda sin navegar —fuera del mapa no hay rejilla y la marisma corta la
+  orilla— y se va por donde vino. **El paso de los visitantes sube de 1,1 a
+  1,4** celdas por segundo (TUNE: el de la partida; los vecinos van de 1,05 a
+  1,65): con 1,1 sólo bajaba por la garganta 1 de cada 12, con 1,3 siete y con
+  1,4 nueve. Quien anda por la senda, persona o animal, la pisa: el render les
+  da su cota y, fuera del mapa, la de la sierra dibujada.
+- **Medido después**: dieciséis semillas, ningún vértice por encima de 0,35,
+  el peor a 0,25; ninguno bajo el suelo; los 32 extremos en la boca del camino
+  pintado. Visitas: en doce valles de veinte vecinos con buhonero, en la plaza
+  entre 0,30 y 0,37; bajan por la garganta hacia el alba (la boca, de 0,01 a
+  0,08) y vuelven a subirla al atardecer.
+- **Pruebas.** Nuevas, en las jornadas porque pesan seis y diez segundos (el
+  criterio de la #38): `journeys/gorge-road-ground.test.ts` (la cinta no flota
+  ni se entierra, fuera del mapa no trepa, empieza en la boca y el puente sube y
+  baja una vez; las tres primeras caen en `main`) y
+  `journeys/visitors-gorge.test.ts`. Las
+  que se mueven, cada una con su causa: el eje del cañón de `graphics-ridge` se
+  mide en el río y no en la recta; `valley-road` y `graphics-mountains` llaman
+  a la cinta con su firma nueva; el salinero de la semilla 23 y el buhonero de
+  `life-visitors` acaban la jornada yéndose por la senda, no «idos»; y **los dos
+  `it.fails` del factor de grano pasan**: llega antes (0,32–0,36), los
+  porteadores con él, y la moneda pasa entre 0,49 y 0,61.
+
 ## v5.65 · 2 oct 2026 · Dientes de sierra en la tablet: la resolución sólo baja si bajar sirve
 
 Vera, con su tablet (iPlay 70 mini Ultra, Adreno 725, Medium @60): «se ve muy
