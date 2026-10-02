@@ -1,5 +1,37 @@
 # The Valley — Registro de cambios
 
+## v5.71 · 2 oct 2026 · Que una obra no tire todas las rutas
+
+El diagnóstico de la CI (`docs/medidas/ci-lentitud-2026-10-02.md`) encontró el
+escalón: desde `6fa7fda1` cada casa u obra que aparecía o desaparecía tiraba la
+caché de rutas entera y A\* volvía a correr para la aldea entera; con las
+sendas que se asientan, 9,5 búsquedas por semana y la mitad del tick. Proponía
+guardar una ruta si ninguna celda suya quedaba bajo la casa nueva: −31 %, pero
+`map.traffic` distinto en dos semillas de tres, porque el recálculo total
+aprovechaba de paso los árboles talados desde la última vez.
+
+- **Una ruta guardada se guarda mientras A\* daría la misma**
+  (`stillCheapest` en `paths.ts`): su coste no ha cambiado, sus extremos salen
+  de las mismas parcelas, y ninguna celda abaratada desde entonces —tala,
+  senda mejorada— cae en lo que su búsqueda miró. A\* dice ahora qué rectángulo
+  miró (`lastSearchBounds`). Vale igual para las obras (`BLOCKS`) y para las
+  sendas (`upgradePaths`), que también lo tiraban todo.
+- **A\* sin *getters* ni arrays en el bucle**: una tabla de costes por
+  terreno hecha con el propio `stepCost` y los vecinos en línea, en el mismo
+  orden. Bajo vitest cada `TERRAIN_CODE.x` es un *getter* de módulo.
+- **El camino del valle, una vez por suelo**: lanzaba dos A\* de punta a punta
+  del mapa cada semana.
+
+Medido bajo vitest, cinco semillas a 40 años: **6,81 → 3,80 ms por semana
+(−44 %)**, y la partida **idéntica byte a byte** —crónica, gente, edificios,
+tráfico, sendas, el estado entero— en 7, 23, 41, 11 y 99. No mueve ninguna
+trayectoria. Prueba nueva: `tests/fast/route-invalidation.test.ts` (tras cada
+cambio de casas, obras o sendas, las rutas son las de un cálculo desde cero;
+una obra lejos de toda ruta no lanza ni un A\*). Herramienta nueva:
+`tools/reports/tick-bench.ts`, y la regla en `CLAUDE.md` de pasarla al tocar
+`paths`, `astar`, `placement` o `works`. Medidas y perfil:
+`docs/medidas/rutas-tick-2026-10-02.md`.
+
 ## v5.65 · 2 oct 2026 · Dientes de sierra en la tablet: la resolución sólo baja si bajar sirve
 
 Vera, con su tablet (iPlay 70 mini Ultra, Adreno 725, Medium @60): «se ve muy

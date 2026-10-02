@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · Rutas: que una obra no tire todas las rutas (v5.71)
+
+Rama `claude/rutas-tick`, carril del motor de la tanda nocturna, el último en
+integrarse. Hecho el arreglo de rutas del diagnóstico de CI, más fino: una ruta
+guardada se conserva mientras A\* daría la misma (coste igual, mismas
+parcelas en los extremos, nada abaratado en lo que su búsqueda miró), y A\*
+sin *getters* en el bucle. **−44 % del tick bajo vitest** (6,81 → 3,80 ms por
+semana, cinco semillas a 40 años) y la partida **idéntica byte a byte**, tráfico
+incluido: no mueve ninguna jornada. `docs/medidas/rutas-tick-2026-10-02.md`.
+**Abierto:** lo que queda del tick es la población (un A\* por origen y no por
+pareja sería un brief) y `placeBuilding` (16 % del perfil).
+
 ## 2 oct 2026 · Dientes de sierra en la tablet (v5.65)
 
 Rama `ccr-2befdb3e-qwp7lu`. La tablet de Vera es una **iPlay 70 mini Ultra**

@@ -242,6 +242,14 @@ sigue valiendo; el plan de arreglarla, no** (ver arriba: el rework).
 
 **Reglas que cuestan tiempo cada vez que se olvidan:**
 
+- **Un cambio del motor que toque `paths.ts`, `astar.ts`, `placement.ts` o
+  `works.ts` mide el tick antes y después** con
+  `npx tsx tools/reports/tick-bench.ts` (40 años, semillas 7, 23 y 41: ms por
+  semana, vivos y el resumen de la partida). Una subida de más del 20 % con
+  aldeas del mismo tamaño se explica en la PR o no se fusiona. `6fa7fda1`
+  multiplicó el tick por 2,3 y nadie lo vio en nueve días, porque lo que se
+  notaba era «la CI tarda», no «el motor es más lento»
+  (`docs/medidas/ci-lentitud-2026-10-02.md`, `docs/medidas/rutas-tick-2026-10-02.md`).
 - **Un umbral que decide *cuándo* pasa algo se mira en horas de reloj, no en
   años de juego.** `npx tsx tools/reports/pace-report.ts` imprime la escalera del juego
   en horas a ×1, que es la velocidad por omisión y la unidad en la que el dueño
