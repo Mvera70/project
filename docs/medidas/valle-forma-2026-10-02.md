@@ -147,6 +147,17 @@ diagnosticaron en tres tandas, cada una contra `main` con la misma sonda:
     medía en línea recta y el río o el cerco alargan la ruta. En cinco valles
     de 28 (también en `main`) llegaba al tope y desaparecía de golpe. Ahora va
     por la ruta.
+  - **La partida, en la orilla del portón** (`life/raiders.ts`): `outsideOf`
+    cogía el campo más grande del valle y no el de la puerta. El río parte el
+    valle, la orilla del portón puede ser la pequeña, y entonces la partida
+    se plantaba al otro lado del agua: cero golpes a la puerta en un asalto y
+    cero aciertos de las flechas en la 11 y la 23. En 24 semillas a los 25 y
+    35 años, partidas a más de diez celdas del portón o sin montarse:
+    - en `main`, 5 de 44 (11 %);
+    - con el contorno, 10 de 39 (26 %), porque la orilla de la puerta queda
+      más corta;
+    - con la cara de fuera del propio portón por delante (`fieldOutside`), 0
+      de 44 y 2 de 39.
 - **De trayectoria, cada una con su causa escrita en la prueba:**
   - el récord de 0,15 vuelve a `it` (0,162);
   - el devoto, a `it.fails` (1,35× en la muestra de seis; en doce semillas,
@@ -157,7 +168,10 @@ diagnosticaron en tres tandas, cada una contra `main` con la misma sonda:
   - el claro de la 7, a `it.fails` (su cerco la deja en 1 039 celdas), y la
     37 sube a la lista;
   - las visitas por la garganta se cuentan en doce valles: 9 de 12, y 10 en
-    `main`.
+    `main`;
+  - la 11 vuelve a la lista del arco (29 flechas, 11 aciertos), y el asalto,
+    el pasillo de E3b y la excepción de ribera buscan su villa o su celda por
+    lo que necesitan, no por un número que el mapa movió.
 
 **Y el tick.** La regla de `CLAUDE.md` pide medirlo al tocar `placement.ts`
 (`tools/reports/tick-bench.ts`, semillas 7, 23 y 41, cuarenta años). Contra el

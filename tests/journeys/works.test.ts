@@ -19,6 +19,7 @@ import { TERRAIN_CODE } from '@engine/state';
 import type { Building, BuildingKind, GameState } from '@engine/state';
 import { destroyBuilding, familyOf } from '@engine/world/buildings';
 import { canPlace, placeBuilding } from '@engine/world/placement';
+import { inHeart } from '@engine/world/tiles';
 import { nextUpgrade, upgradeSpot } from '@engine/world/upgrade';
 import { advanceWorks, bpCostOf, nextProject, requestBuild } from '@engine/world/works';
 
@@ -357,10 +358,20 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
 describe('colocación · §7.4', () => {
   it('la excepción de ribera sólo admite defensas de una celda y no permite solapamientos', () => {
     const state = foundTwenty(0);
-    const cell = 40 * state.map.width + 34;
-    // La celda del fallo medido gate#96 es marisma desde la generación, no agua.
+    // Con el valle de forma natural (v5.73) la celda (34, 40) de la semilla 0 ya
+    // no es marisma: el contorno cambia el mapa entero y con él dónde queda cada
+    // charca. La prueba fijaba una coordenada del mapa viejo, y lo único que
+    // necesita es **una celda de marisma de la generación** (la del fallo
+    // medido, gate#96, lo era, y no era agua). Se busca la primera de dentro del
+    // valle: es una propiedad del mapa generado y no de una semilla, y el mapa
+    // de la fundación siempre trae (155 celdas en la semilla 0, de ellas 120
+    // dentro; 134 a 181 en las siete que se midieron).
+    const cell = state.map.terrain.findIndex((tile, i) => tile === TERRAIN_CODE.marsh
+      && inHeart(state.map, i % state.map.width, Math.floor(i / state.map.width)));
+    expect(cell, 'la fundación trae marisma dentro del valle').toBeGreaterThanOrEqual(0);
     expect(state.map.terrain[cell]).toBe(TERRAIN_CODE.marsh);
-    const template: Building = { id: 96, kind: 'gate', x: 34, y: 40, w: 1, h: 1,
+    const template: Building = { id: 96, kind: 'gate', x: cell % state.map.width,
+      y: Math.floor(cell / state.map.width), w: 1, h: 1,
       builtTick: 0, lostTick: null, tier: 1, lit: true, blockedUntil: null };
     state.works = [];
     for (const kind of ['palisade', 'wall', 'gate', 'bastion'] as const) {

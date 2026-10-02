@@ -44,13 +44,15 @@ bosque de ladera y cantera como vida, sin tocar el balance (eso va en v5.74).
   plantones; la prueba de rutas absorbe lo abaratado antes de medir; y
   `module-graph` aprende los dos módulos nuevos del mapa. Suite rápida entera en
   local: 213 ficheros, 2 107 pruebas.
-- **Y las jornadas de la CI** (diecinueve rojas en trece ficheros): tres
+- **Y las jornadas de la CI** (diecinueve rojas en trece ficheros): cuatro
   regresiones de verdad, arregladas en el código. El corro de las reuniones
   pedía un claro libre de doce celdas de lado y se plantaba a 14 de la capilla
   (`MEETING_CLEARING` = 3,5). Las cascadas: la falda ensancha las gargantas y
   once de 120 se quedaban sin la suya; se busca hasta 14 celdas por la
-  pendiente, 120 de 120. Y el zorro al amanecer, cuyo tope se medía en línea
-  recta. Lo demás es trayectoria y va con su causa escrita en cada prueba
+  pendiente, 120 de 120. El zorro al amanecer, cuyo tope se medía en línea
+  recta. Y la partida que asalta, que se plantaba en la otra orilla del río
+  cuando la del portón era la pequeña (de 10 de 39 a 2 de 39). Lo demás es
+  trayectoria y va con su causa escrita en cada prueba
   (`docs/medidas/valle-forma-2026-10-02.md` §5).
 - **El tick**, medido como pide `CLAUDE.md` al tocar `placement.ts`. Salía un
   26 % más lento que `main` (de 8,8 a 11,1 ms por semana), y lo pagaban las

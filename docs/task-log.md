@@ -16,9 +16,10 @@ arreglado: `reachableNear` se quedaba en un rincón y la aldea se quedaba sin
 presas. Suite rápida entera en local, 2 107 en verde; las jornadas, en CI.
 
 **Las jornadas de la CI** (19 rojas en 13 ficheros), diagnosticadas en tres
-tandas contra `main`: tres regresiones arregladas (el corro de las reuniones,
-las cascadas de las gargantas, el zorro al amanecer) y el resto de trayectoria,
-cada una con su causa en la prueba (`valle-forma-2026-10-02.md` §5).
+tandas contra `main`: cuatro regresiones arregladas (el corro de las
+reuniones, las cascadas de las gargantas, el zorro al amanecer y la partida que
+asalta desde la otra orilla) y el resto de trayectoria, cada una con su causa
+en la prueba (`valle-forma-2026-10-02.md` §5).
 
 **Abierto:** (1) **la cantera lejana**: con la roca a más de catorce celdas al
 albañil se le acaba la jornada antes de cargar (15 de 60 valles en `main`, 20
@@ -30,16 +31,12 @@ portón da a la montaña. Es la regla del portón (`placeBuilding` no mira adón
 da) y va en su propia ronda, porque mueve todas las trayectorias. (4) Cerca de
 la plaza queda la mitad de sitio para campos (unos 245 → 144 sitios de 3×2):
 avisado K5, por el lino.
-**Pausa por crédito (2 oct, 14:25 de Madrid).** Lo que queda de #48: las
-jornadas de defensa (asalto, arco, obras, E3b), que estaba diagnosticando un
-agente parado a medias; lo que hiciera vive en su árbol de trabajo
-(`.claude/worktrees/agent-a489572e6a39341a5`) y en el informe que no llegó a
-entregar. **v5.74, los usos del cinturón, está hecha y sin subir**: el commit
+**v5.74, los usos del cinturón, está hecha y sin subir**: el commit
 `9bf57322`, sobre `5575f1f5`, guardado en un `git bundle` y un `format-patch` en
-el scratchpad de la sesión (código, pruebas y papel: bosque de ladera, pasto de
-la falda, cantera al pie de la montaña y la senda a 0,02). Entra como PR propia
-cuando #48 esté en `main`.
-**Siguiente:** las jornadas de defensa de #48; después, v5.74.
+el scratchpad de la sesión (bosque de ladera, pasto de la falda, cantera al pie
+de la montaña y la senda a 0,02). Entra como PR propia cuando #48 esté en
+`main`.
+**Siguiente:** v5.74, los usos del cinturón.
 
 ## 2 oct 2026 · La ronda del daño (v5.81, carril de combate)
 
