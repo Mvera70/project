@@ -22,6 +22,10 @@ type HuntWeapon = HuntAct['weapon'];
  */
 export type Activity = 'home' | 'leaving' | 'walking' | 'working' | 'returning' | 'resting';
 
+/** Accesorios escénicos deducidos por la vida; no se guardan en el motor. */
+export type AccessoryId = 'fiddle' | 'pilgrim-hat' | 'pilgrim-staff' | 'grindstone-pack'
+  | 'herb-basket' | 'bundle-pack' | 'forage-basket' | 'rope-pick' | 'trade-pack' | 'hide-bundle';
+
 /**
  * Una figura en la escena, lista para pintarse. design.md D.5, Anexo E.
  *
@@ -46,6 +50,7 @@ export interface Actor {
   readonly clip: ClipName;
   /** Carga profesional visible durante `carry_walk`; no forma parte del guardado. */
   readonly load?: 'bundle' | 'stone' | 'grain' | null;
+  readonly accessories?: readonly AccessoryId[];
   /**
    * Armamento que la escena sabe que lleva ahora. Es efímero: la guarnición lo
    * deriva de lo que se le dio al valle y el asaltante lo recibe del renderer;

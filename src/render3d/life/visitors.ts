@@ -34,6 +34,8 @@ export type VisitorPhase = 'waiting' | 'coming' | 'staying' | 'leaving' | 'gone'
 
 export interface Visitor {
   readonly body: Body;
+  /** Lugar dentro de su grupo; el tercero de la familia que huye es menor. */
+  readonly member?: number;
   /** El suceso que lo trajo: el buhonero no es el forastero. */
   readonly kind: HappeningId;
   /** Por dónde entra y por dónde se va. */
@@ -430,6 +432,7 @@ export function createVisitors(
           vx: 0, vz: 0, facing: 0, radius: VISITOR_RADIUS, pace: VISITOR_PACE,
         },
         kind,
+        member: n,
         road: gate ?? from,
         spot,
         centre: plaza,

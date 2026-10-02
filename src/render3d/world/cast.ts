@@ -14,7 +14,7 @@ import {
   Vector3, type AnimationClip, type BufferGeometry, type Material, type Object3D,
 } from 'three';
 import type { VillagerId } from '@engine/state';
-import type { Actor, RagdollPose, RagdollSeed, RagdollSeedPart } from '../contracts';
+import type { AccessoryId, Actor, RagdollPose, RagdollSeed, RagdollSeedPart } from '../contracts';
 import type { LoadedAsset } from '../assets';
 import { actionClips } from '../action-clips';
 import { clipTime, combatClip, STRIKE_AT, STRIKE_HEAD, VILLAGER_CLIPS, type ClipName } from '../clips';
@@ -145,6 +145,13 @@ const HELD: Readonly<Record<string, Omit<HeldSpec, 'key'>>> = {
   // E4 · el cubo de la brigada contra el fuego.
   douse: { asset: 'bucket', hand: 'hand_r', scale: 0.8 },
   drink: { asset: 'cup', hand: 'hand_r', fallback: true },
+};
+
+/** B5: matrices de `attachment.json` son escala 3 en el hueso, sin giro de hacha. */
+const ACCESSORY_BONE: Readonly<Record<AccessoryId, string>> = {
+  fiddle: 'hand_r', 'pilgrim-hat': 'head', 'pilgrim-staff': 'hand_r',
+  'grindstone-pack': 'spine', 'herb-basket': 'hand_r', 'bundle-pack': 'spine',
+  'forage-basket': 'hand_r', 'rope-pick': 'spine', 'trade-pack': 'spine', 'hide-bundle': 'spine',
 };
 
 /**
@@ -560,7 +567,7 @@ export class Cast {
       ? { asset: 'rock', hand: 'hand_l', scale: 0.18 }
       : key === 'carry_grain' ? { asset: 'bundle', hand: 'hand_l', scale: 0.8 }
         : HELD[actor.clip];
-    if (action !== undefined) wanted.push({ key, ...action });
+    if (action !== undefined && !(actor.clip === 'carry_walk' && (actor.accessories?.length ?? 0) > 0)) wanted.push({ key, ...action });
     if (actor.weapon !== null && actor.weapon !== undefined) {
       wanted.push({ key: `weapon_${actor.weapon}`, asset: actor.weapon,
         hand: actor.weapon === 'bow' || actor.weapon === 'sling' ? 'hand_l' : 'hand_r' });
@@ -604,6 +611,18 @@ export class Cast {
         player.held.set(item.key, tool);
       }
     }
+    for (const id of actor.accessories ?? []) {
+      const key = `accessory_${id}`;
+      if (player.held.has(key)) continue;
+      const bone = player.object.getObjectByName(ACCESSORY_BONE[id]);
+      const piece = this.prop?.(id);
+      if (bone === undefined || piece === undefined) continue;
+      piece.name = `Held_${key}`;
+      piece.scale.multiplyScalar(3);
+      piece.traverse((child) => { child.userData.villagerId = player.object.userData.villagerId; });
+      bone.add(piece);
+      player.held.set(key, piece);
+    }
     // K5 · El peto no va en la mano: cuelga del tronco, y es del valle.
     if (actor.jerkin === true && !player.held.has('jerkin')) {
       const spine = player.object.getObjectByName('spine');
@@ -616,6 +635,7 @@ export class Cast {
     }
     const visible = new Set(wanted.map(item => item.key));
     if (actor.jerkin === true) visible.add('jerkin');
+    for (const id of actor.accessories ?? []) visible.add(`accessory_${id}`);
     for (const [name, tool] of player.held) tool.visible = visible.has(name);
   }
 

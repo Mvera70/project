@@ -1,0 +1,328 @@
+{
+  "schemaVersion": 1,
+  "id": "grindstone-pack",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "eldergrey",
+      "role": "elderGrey",
+      "color": "#77796F",
+      "roughness": 0.94
+    },
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.94
+    },
+    {
+      "name": "stone",
+      "role": "stone",
+      "color": "#9B958A",
+      "roughness": 0.94
+    },
+    {
+      "name": "timberdark",
+      "role": "timberDark",
+      "color": "#6B4C32",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "mount",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "connectors": [
+    "mount"
+  ],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "grindstone-pack",
+    "footprint": [
+      1,
+      1
+    ],
+    "attachment": "spine",
+    "note": "Bloque 5. Metros fuente a celdas; frente +Z glTF. Origen en enganche, NO en base. Ajuste de montaje medido contra el nodo publicado en attachment.json; escala inversa del padre para evitar escala doble. Recurso est\u00e1tico preview-only."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 1,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Stone",
+      "location": [
+        0,
+        0.35,
+        0.33
+      ],
+      "radius": 0.3,
+      "depth": 0.14,
+      "vertices": 8,
+      "material": "stone",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Axle",
+      "location": [
+        0,
+        0.44,
+        0.33
+      ],
+      "radius": 0.045,
+      "depth": 0.11,
+      "vertices": 4,
+      "material": "eldergrey",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Frame0",
+      "location": [
+        -0.25,
+        0.28,
+        0.22
+      ],
+      "dimensions": [
+        0.065,
+        0.09,
+        0.76
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Frame1",
+      "location": [
+        0.25,
+        0.28,
+        0.22
+      ],
+      "dimensions": [
+        0.065,
+        0.09,
+        0.76
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Crossbar",
+      "location": [
+        0,
+        0.29,
+        -0.1
+      ],
+      "dimensions": [
+        0.6,
+        0.08,
+        0.07
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pot0",
+      "location": [
+        -0.39,
+        0.31,
+        -0.085
+      ],
+      "radius": 0.115,
+      "depth": 0.23,
+      "vertices": 5,
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "PotMouth0",
+      "location": [
+        -0.39,
+        0.31,
+        0.032
+      ],
+      "radius": 0.095,
+      "depth": 0.003,
+      "vertices": 5,
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pot1",
+      "location": [
+        0.39,
+        0.31,
+        -0.085
+      ],
+      "radius": 0.115,
+      "depth": 0.23,
+      "vertices": 5,
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "PotMouth1",
+      "location": [
+        0.39,
+        0.31,
+        0.032
+      ],
+      "radius": 0.095,
+      "depth": 0.003,
+      "vertices": 5,
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Strap0",
+      "location": [
+        -0.19,
+        0.145,
+        0.24
+      ],
+      "dimensions": [
+        0.045,
+        0.025,
+        0.64
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Strap1",
+      "location": [
+        0.19,
+        0.145,
+        0.24
+      ],
+      "dimensions": [
+        0.045,
+        0.025,
+        0.64
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "id": "trade-pack",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "cloth",
+      "role": "cloth",
+      "color": "#71885E",
+      "roughness": 0.94
+    },
+    {
+      "name": "eldergrey",
+      "role": "elderGrey",
+      "color": "#77796F",
+      "roughness": 0.94
+    },
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.94
+    },
+    {
+      "name": "trunk",
+      "role": "trunk",
+      "color": "#735338",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "mount",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "connectors": [
+    "mount"
+  ],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "trade-pack",
+    "footprint": [
+      1,
+      1
+    ],
+    "attachment": "spine",
+    "note": "Bloque 5. Metros fuente a celdas; frente +Z glTF. Origen en enganche, NO en base. Ajuste de montaje medido contra el nodo publicado en attachment.json; escala inversa del padre para evitar escala doble. Recurso est\u00e1tico preview-only."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 1,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Bale",
+      "location": [
+        0,
+        0.35,
+        0.24
+      ],
+      "dimensions": [
+        0.6,
+        0.4,
+        0.7
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "BackStrap0",
+      "location": [
+        -0.19,
+        0.561,
+        0.24
+      ],
+      "dimensions": [
+        0.055,
+        0.025,
+        0.71
+      ],
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "ShoulderStrap0",
+      "location": [
+        -0.19,
+        0.137,
+        0.24
+      ],
+      "dimensions": [
+        0.055,
+        0.025,
+        0.71
+      ],
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "BackStrap1",
+      "location": [
+        0.19,
+        0.561,
+        0.24
+      ],
+      "dimensions": [
+        0.055,
+        0.025,
+        0.71
+      ],
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "ShoulderStrap1",
+      "location": [
+        0.19,
+        0.137,
+        0.24
+      ],
+      "dimensions": [
+        0.055,
+        0.025,
+        0.71
+      ],
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Belt",
+      "location": [
+        0,
+        0.578,
+        0.16
+      ],
+      "dimensions": [
+        0.61,
+        0.025,
+        0.055
+      ],
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bedroll",
+      "location": [
+        0,
+        0.35,
+        0.69
+      ],
+      "radius": 0.12,
+      "depth": 0.66,
+      "vertices": 6,
+      "material": "cloth",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Buckle",
+      "location": [
+        0.19,
+        0.593,
+        0.16
+      ],
+      "dimensions": [
+        0.08,
+        0.019,
+        0.09
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

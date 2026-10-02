@@ -244,6 +244,8 @@ export const WANTED = [
   // publicadas, como el barril, para que aparezcan al llegar.
   ...MINE_ASSETS,
   'jerkin',
+  'fiddle', 'pilgrim-hat', 'pilgrim-staff', 'grindstone-pack', 'herb-basket',
+  'bundle-pack', 'forage-basket', 'rope-pick', 'trade-pack', 'hide-bundle',
   'notice-board', 'smithy-board', 'chapel-board', 'signpost', 'hide-rack', 'hammer',
   'burnt-house', 'great-oak',
   ...FAUNA,
@@ -2504,7 +2506,7 @@ export async function createGraphicsRenderer(
         if (defender !== undefined && post.jerkin) jerkins.add(defender.villager);
       }
       lastActors = castOf(life, frame.presentationSeconds, ages, named).map(actor => {
-        if (actor.id < 0) return { ...actor, weapon: 'spear' as const, shield: true };
+        if (actor.visualIdentity === 'neighbor') return { ...actor, weapon: 'spear' as const, shield: true };
         const weapon = arms.get(actor.id);
         return weapon === undefined ? actor
           : { ...actor, weapon, shield: weapon === 'spear', ...(jerkins.has(actor.id) ? { jerkin: true } : {}) };
