@@ -28,8 +28,14 @@ function villa(seed: number) {
  * portón, giros, dos torres que rondan, sondeo limpio, paso por el portón— y no
  * un número de tramos de una semilla: se toma la primera candidata que cumpla la
  * precondición, y si ninguna la cumple la prueba dice cuántas miró.
+ *
+ * **K5 (v5.76, 2 oct 2026) · y se vuelven a buscar.** Con la sastrería, el
+ * valle de forma natural y el cerco sin salida (#60) juntos, ninguna de esas
+ * cinco cierra la vuelta con dos torres a los 3846 ticks. Remedido en las
+ * semillas 1 a 44: la cumplen la 8, la 12, la 26 y la 44 (87 a 119 tramos). Van
+ * delante; las de antes se quedan detrás por si otra trayectoria las devuelve.
  */
-const CANDIDATES = [17, 19, 33, 38, 91];
+const CANDIDATES = [8, 12, 26, 44, 17, 19, 33, 38, 91];
 
 function twoTowerVilla(): { seed: number; state: GameState } {
   for (const seed of CANDIDATES) {
