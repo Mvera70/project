@@ -17,6 +17,14 @@
 //   npx tsx tools/reports/k5-report.ts                 # 12 semillas × 60 años
 //   npx tsx tools/reports/k5-report.ts --seeds 6 --years 40
 //   npx tsx tools/reports/k5-report.ts --after         # el cuero ya hecho (v5.75)
+//   npx tsx tools/reports/k5-report.ts --flax          # antes del lino (v5.76)
+//
+// Con `--flax` mide lo que decide un campo de lino: cuántos campos tiene la
+// aldea y si está en el tope, cuánto sobra de cada cosecha sobre lo que se
+// come, cuántas veces sube el factor a comprar grano sobrante, cuánto sitio
+// libre para un campo queda cerca de la plaza, y **qué pasa si un campo deja de
+// dar grano** (el contrafactual: en cada siega se quita la parte de un campo,
+// desde que hay cuatro): hambre, muertos de hambre y valles acabados.
 //
 // Con `--after` mide el cuero: un jugador que dio arco y lanza y toca una de
 // cada `--tap` señales (1 = todas, la cota de arriba), y que **guarda** las
@@ -34,7 +42,8 @@ import { ringClosed } from '../../src/engine/world/placement';
 import { nextProject } from '../../src/engine/world/works';
 import { huntOpportunity, type HuntOpportunity, type HuntSpecies } from '../../src/engine/world/hunting';
 import { missionsOpen } from '../../src/engine/world/expeditions';
-import { BOARDS } from '../../src/engine/balance';
+import { BOARDS, FOOD } from '../../src/engine/balance';
+import { canPlace } from '../../src/engine/world/placement';
 import { hash32 } from '../../src/engine/rng';
 import { alive } from './ladder';
 
@@ -129,6 +138,79 @@ function play(seed: number, hunter: Hunter): { tallies: Map<Phase, Tally>; first
 }
 
 const AFTER = process.argv.includes('--after');
+const FLAX = process.argv.includes('--flax');
+
+interface FlaxTally {
+  weeks: number; hours: number; hungry: number; hungerDeaths: number; atCap: number; factor: number;
+  fields: number[]; margin: number[]; sites: number[]; people: number[];
+}
+const flaxBlank = (): FlaxTally => ({ weeks: 0, hours: 0, hungry: 0, hungerDeaths: 0, atCap: 0, factor: 0, fields: [], margin: [], sites: [], people: [] });
+
+/** Sitios libres para un campo a menos de `SITE_RADIUS` celdas de la plaza. */
+const SITE_RADIUS = 18;
+function fieldSites(state: GameState): number {
+  let n = 0;
+  const { x: px, y: py } = state.plaza;
+  for (let y = Math.floor(py - SITE_RADIUS); y <= py + SITE_RADIUS; y += 1) {
+    for (let x = Math.floor(px - SITE_RADIUS); x <= px + SITE_RADIUS; x += 1) {
+      if (Math.hypot(x - px, y - py) > SITE_RADIUS) continue;
+      if (canPlace(state, 'field', x, y)) n += 1;
+    }
+  }
+  return n;
+}
+
+/** Un valle, con o sin un campo que no da grano (`lose`). */
+function flaxRun(seed: number, lose: boolean): { tallies: Map<Phase, FlaxTally>; ended: boolean } {
+  const tallies = new Map(PHASES.map((p) => [p, flaxBlank()]));
+  const state = foundGame(seed);
+  for (let t = 1; t <= WEEKS && state.ended === null; t += 1) {
+    const tally = tallies.get(phaseOf(state))!;
+    const [report] = run(state, 1, 'prudent', CATALOG);
+    if (report === undefined) break;
+    const pop = population(state);
+    const fields = alive(state, 'field');
+    if (report.harvested > 0) {
+      if (lose && fields >= 4) state.village.grain = Math.max(0, state.village.grain - report.harvested / fields);
+      if (pop > 0) tally.margin.push(report.harvested / (pop * TIME.WEEKS_PER_YEAR));
+    }
+    tally.weeks += 1;
+    if (state.village.grain < pop) tally.hungry += 1;
+    tally.hungerDeaths += report.deaths.filter((d) => d.cause === 'hunger').length;
+    if (fields >= FOOD.MAX_FIELDS) tally.atCap += 1;
+    if (report.entries.some((e) => e.templateKey.startsWith('fate.factor_visit'))) tally.factor += 1;
+    tally.fields.push(fields);
+    tally.people.push(pop);
+    if (!lose && state.tick % TIME.WEEKS_PER_YEAR === 0) tally.sites.push(fieldSites(state));
+  }
+  for (const t of tallies.values()) t.hours = hours(t.weeks);
+  return { tallies, ended: state.ended !== null };
+}
+
+if (FLAX) {
+  for (const lose of [false, true]) {
+    const total = new Map(PHASES.map((p) => [p, flaxBlank()]));
+    let ended = 0;
+    for (const seed of SEEDS) {
+      const r = flaxRun(seed, lose);
+      if (r.ended) ended += 1;
+      for (const p of PHASES) {
+        const a = total.get(p)!; const b = r.tallies.get(p)!;
+        for (const k of ['weeks', 'hours', 'hungry', 'hungerDeaths', 'atCap', 'factor'] as const) a[k] += b[k];
+        a.fields.push(...b.fields); a.margin.push(...b.margin); a.sites.push(...b.sites); a.people.push(...b.people);
+      }
+    }
+    console.log(`\n# Lino · ${lose ? 'un campo sin grano (contrafactual)' : 'el valle de hoy'} · ${SEEDS.length} semillas × ${YEARS} años · prudent · horas a ×1\n`);
+    console.log(`partidas acabadas: ${ended}/${SEEDS.length}\n`);
+    console.log(`| tramo | gente | campos | en el tope (${FOOD.MAX_FIELDS}) | cosecha / lo que se come | hambre (sem.) | muertos de hambre por 100 h | factor por 10 h | sitios libres para un campo a ${SITE_RADIUS} de la plaza |`);
+    console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|');
+    for (const p of PHASES) {
+      const t = total.get(p)!;
+      const per = (x: number, h: number): string => (t.hours === 0 ? '—' : (h * x / t.hours).toFixed(1));
+      console.log(`| ${p} | ${median(t.people)} | ${median(t.fields)} | ${pct(t.atCap, t.weeks)} | ${Number.isNaN(median(t.margin)) ? '—' : median(t.margin).toFixed(2)} | ${pct(t.hungry, t.weeks)} | ${per(t.hungerDeaths, 100)} | ${per(t.factor, 10)} | ${lose ? '—' : median(t.sites)} |`);
+    }
+  }
+}
 
 /** K5 · el cuero, ya hecho: ¿hay petos a tiempo, y cuánto da venderlo? */
 function leather(seed: number, tap: number, sell: boolean): {
@@ -176,7 +258,7 @@ if (AFTER) {
   }
 }
 
-for (const hunter of AFTER ? [] : (['sling', 'armed'] as const)) {
+for (const hunter of AFTER || FLAX ? [] : (['sling', 'armed'] as const)) {
   const total = new Map(PHASES.map((p) => [p, blank()]));
   const hides: number[] = [];
   let ended = 0;

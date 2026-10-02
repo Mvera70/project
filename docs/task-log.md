@@ -15,9 +15,12 @@ mueve byte a byte.
 
 **Abierto:**
 
-- **De Vera:** el lino y las plantas (no empezados); el nivelado del cuero
-  (`HIDES`, `JERKIN_SAVE`): quien toca todas las señales tiene pieles para las
-  dos cosas.
+- **De Vera:** el lino y las plantas (no empezados).
+
+**Decidido por Vera (2 oct, por el director):** el nivelado del cuero **se
+queda como está**: cazar mucho es esfuerzo del jugador y se premia; se revisa
+cuando se nivele todo al final. Los petos en la escena del asalto los lleva una
+sesión nueva de combate. Lo siguiente de K5 es **el lino** (v5.76–v5.79).
 - **Sin medir:** cuántos asaltos de más trae la plata del cuero vendido.
 - **De otros carriles:** la escena del asalto no sabe del peto (combate); el
   bastidor, el fardo y el peto en el torso (Astra); las seis ilustraciones y la

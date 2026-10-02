@@ -125,3 +125,34 @@ dilema que Vera eligió.
   probada con el parte (`tests/fast/k5-hides.test.ts`).
 - **Una partida sin caza no se mueve**: idéntica byte a byte (SHA-1 del estado
   a 30 años, semillas 7, 23 y 41) contra `main` en `02b7a87`.
+
+## 7 · El lino, antes de proponerlo (v5.76)
+
+`npx tsx tools/reports/k5-report.ts --flax`: 12 semillas × 60 años, prudente,
+horas a ×1, sobre `main` con el cuero (`ea97cc5`). **El valle de hoy** y **el
+contrafactual**: en cada siega se quita la parte de un campo (cosecha ÷ campos)
+desde que la aldea tiene cuatro, que es lo que costaría un campo sembrado de
+lino en vez de trigo.
+
+| tramo | gente hoy → sin un campo | campos | en el tope (8) | cosecha / lo que se come | hambre (sem.) hoy → sin | muertos de hambre por 100 h hoy → sin | sitios libres para un campo a 18 de la plaza |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| caserío (< 12) | 6 → 6 | 1 | 0 % | 1,37 | 7 % → 7 % | 3,7 → 4,0 | 470 |
+| aldea, sin herrería | 22 → 21 | 3 | 16 % | 1,11 | 5 % → 9 % | **12,7 → 21,1** | 405 |
+| herrería, sin cerco | 41 → 36 | 6 | 22 % | 1,36 | 5 % → 7 % | 16,0 → 18,5 | 355 |
+| villa cerrada | **61 → 49** | 8 | **93 %** | 1,38 | 4 % → 5 % | 19,8 → 22,1 | 229 |
+
+**Lo que dice:**
+
+- **El grano no sobra nunca.** El factor, que sólo sube con más de dos años de
+  grano en el granero, no subió **ni una vez** en 12 valles de 60 años. Cada
+  cosecha da entre 1,1 y 1,4 veces lo que se come, y es todo el margen.
+- **Un campo de lino cuesta gente, no sólo grano**: la villa cerrada se queda
+  en 49 personas en vez de 61 (−20 %), y en la aldea los muertos de hambre
+  pasan de 12,7 a 21,1 por cada 100 h. Ningún valle se acaba por ello.
+- **La villa vive en el tope de campos** (8 de 8 el 93 % de las semanas): ahí
+  un campo de lino o es uno de los ocho de trigo, o es un noveno que pide sitio
+  y manos.
+- **Sitio hay, hoy**: entre 229 y 470 celdas libres para un campo a menos de 18
+  de la plaza. Con la forma natural del valle (otra sesión, v5.60–v5.64) eso
+  puede cambiar: si el lino necesita sitio nuevo, se mide de nuevo sobre su
+  contorno antes de fusionar.
