@@ -21,7 +21,9 @@ import { TERRAIN_CODE } from '@engine/state';
 import type { Palette } from '@derive/palette';
 import { forestLooks, type ForestState } from './forest-state';
 import { elevationAt } from './ground';
-import { clearsGorgeRoad, gorgeRoadPaths, mountainSurfaceAt } from './mountains';
+import { clearsGorgeRoad, gorgeRoadPaths, mountainSurfaceAt, type RoadPoint } from './mountains';
+import { gorgeAt } from './valley-profile';
+import { distanceOutside } from '@engine/world/valley-shape';
 import {
   forestOccluders, type ForestOccluder, type ForestRevealTarget,
 } from './forest-occlusion';
@@ -87,6 +89,7 @@ export function scatterTransform(width: number, cell: number, extra = 0): { x: n
 }
 
 export interface Piece {
+  readonly name: string;
   readonly geometry: BufferGeometry;
   readonly material: Material;
 }
@@ -102,7 +105,7 @@ export function piecesOf(source: Object3D): Piece[] {
     // la instancia sólo tenga que colocar el árbol entero.
     const geometry = mesh.geometry.clone();
     geometry.applyMatrix4(mesh.matrixWorld);
-    pieces.push({ geometry, material: mesh.material });
+    pieces.push({ name: mesh.name, geometry, material: mesh.material });
   });
   return pieces;
 }
@@ -294,6 +297,101 @@ function selectedPineCells(map: ValleyMap, pine: Object3D, terrainSeed?: number)
   });
 }
 
+// ---------------------------------------------------------------------------
+// El bosque de ladera (2 oct 2026, v5.74).
+//
+// Con el valle de forma natural delante, Vera eligió que lo que era cinturón
+// muerto tuviera uso, y uno de ellos fue éste: «árboles en las laderas bajas
+// alrededor del valle, que hoy son roca desnuda con algún pino suelto». Y lo
+// eligió **como vida y sin tocar el balance**: es decorado, como los pinos de
+// la loma. No da madera, no se tala y no cuenta en `forestLeft`. Lo único que
+// hace en la vida del valle es estorbar: en el prado del pie sus troncos paran
+// a quien anda, como los del bosque (`solidTerrain`, `obstacles.ts`).
+//
+// Se planta en arboledas y no salpicado: un árbol por celda con la misma
+// probabilidad en toda la ladera se lee como moho. La arboleda sale de un ruido
+// suave de celdas de `GROVE_SCALE`, y fuera de ella casi no hay nada.
+// ---------------------------------------------------------------------------
+
+/** Desde y hasta dónde, contado desde el borde del valle, en celdas. Lo de más
+ * cerca es la falda del pasto; lo de más lejos, la roca alta que se ve pelada. */
+const SLOPE_WOOD_REACH: readonly [number, number] = [3, 13];
+/** Hasta qué cota de la ladera agarra un árbol: la banda baja, más ancha que la loma de los pinos sueltos. */
+const SLOPE_WOOD_HIGH = 2.4;
+/** El tamaño de una arboleda, en celdas, y desde qué valor del ruido lo es. */
+const GROVE_SCALE = 6;
+const GROVE_FROM = 0.52;
+/** Qué parte de las celdas lleva árbol dentro de una arboleda, y fuera de ellas. */
+const GROVE_DENSITY = 0.75;
+const LOOSE_DENSITY = 0.04;
+/** Por debajo de esta cota, en el prado del pie, el árbol es de hoja; arriba, pino. */
+const LEAFY_BELOW = 0.35;
+/**
+ * Y en el prado, sólo a partir de aquí, en celdas desde el borde: lo de más
+ * cerca es la falda donde pasta el rebaño (v5.74), y lo dejan libre. Los de
+ * hoja van sólo en arboleda y a la mitad de densidad: el roble pesa cinco
+ * veces lo que el pino, y un pie de prado tapizado de robles no es pasto.
+ */
+const LEAFY_FROM = 6;
+const LEAFY_SHARE = 0.5;
+
+/** Un ruido de valor suave sobre la rejilla de las arboledas, de 0 a 1. */
+function groveAt(x: number, z: number): number {
+  const fx = x / GROVE_SCALE, fz = z / GROVE_SCALE;
+  const x0 = Math.floor(fx), z0 = Math.floor(fz);
+  const ease = (t: number): number => t * t * (3 - 2 * t);
+  const tx = ease(fx - x0), tz = ease(fz - z0);
+  const knot = (gx: number, gz: number): number => stable(gz * 1_009 + gx, 6_101);
+  const top = knot(x0, z0) * (1 - tx) + knot(x0 + 1, z0) * tx;
+  const bottom = knot(x0, z0 + 1) * (1 - tx) + knot(x0 + 1, z0 + 1) * tx;
+  return top * (1 - tz) + bottom * tz;
+}
+
+/**
+ * Las celdas del bosque de ladera: pinos en la ladera baja y árboles de hoja
+ * en el prado del pie, fuera del valle y en arboledas.
+ *
+ * Nada encima de lo construido (la muralla se levanta en la falda desde
+ * v5.73), de una senda, del agua ni de su orilla; nada en las gargantas, que
+ * son de las cascadas; y nada sobre la senda de la garganta, que es por donde
+ * bajan las visitas. Ni dos árboles en una celda: lo que ya es pino de la loma
+ * se queda como está.
+ */
+export function slopeWoodCells(
+  map: ValleyMap, taken: ReadonlySet<number>, paths: readonly (readonly RoadPoint[])[],
+): { pines: number[]; leafy: number[] } {
+  const away = distanceOutside(map.heart);
+  const loose = pineCells(map);
+  const wet = (cell: number): boolean => {
+    const kind = map.terrain[cell];
+    return kind === TERRAIN_CODE.water || kind === TERRAIN_CODE.lake || kind === TERRAIN_CODE.ford
+      || kind === TERRAIN_CODE.marsh;
+  };
+  const pines: number[] = [];
+  const leafy: number[] = [];
+  for (let cell = 0; cell < map.terrain.length; cell += 1) {
+    if (map.heart[cell] === 1 || loose.has(cell) || taken.has(cell) || (map.path[cell] ?? 0) > 0) continue;
+    const reach = away[cell]!;
+    if (reach < SLOPE_WOOD_REACH[0] || reach > SLOPE_WOOD_REACH[1]) continue;
+    const kind = map.terrain[cell];
+    if (kind !== TERRAIN_CODE.meadow && kind !== TERRAIN_CODE.mountain) continue;
+    const x = cell % map.width, z = Math.floor(cell / map.width);
+    if (gorgeAt(map, z + 0.5) > 0.15) continue;
+    if ([cell - 1, cell + 1, cell - map.width, cell + map.width].some((n) => n >= 0 && n < map.terrain.length && wet(n))) continue;
+    const height = elevationAt(map, x + 0.5, z + 0.5);
+    if (height > SLOPE_WOOD_HIGH) continue;
+    const meadow = kind === TERRAIN_CODE.meadow && height < LEAFY_BELOW;
+    if (meadow && reach < LEAFY_FROM) continue;
+    const grove = groveAt(x, z) >= GROVE_FROM;
+    const density = meadow ? (grove ? GROVE_DENSITY * LEAFY_SHARE : 0) : grove ? GROVE_DENSITY : LOOSE_DENSITY;
+    if (stable(cell, 6_203) >= density) continue;
+    const at = scatterTransform(map.width, cell);
+    if (!clearsGorgeRoad(paths, at.x, at.z, 0.7)) continue;
+    (meadow ? leafy : pines).push(cell);
+  }
+  return { pines, leafy };
+}
+
 /**
  * Planta un árbol en cada celda de bosque del mapa.
  *
@@ -306,6 +404,8 @@ export function buildForest(
   palette?: Palette,
   suppressed: ReadonlySet<number> = new Set(),
   pine?: Object3D,
+  /** v5.74 · el bosque de ladera alrededor del valle, que es lo que planta el juego. */
+  slopeWood = false,
 ): Forest {
   const looks = forestLooks(state, suppressed);
   const byCell = new Map(looks.map(look => [look.cell, look]));
@@ -333,8 +433,23 @@ export function buildForest(
   const conifers = pine === undefined ? null : scatterCells(state.map, pine,
     selectedPineCells(state.map, pine, state.terrainSeed), palette, false, false,
     (cell) => pineScaleAt(cell));
-  const group = conifers === null ? scattered.group : new Group();
-  if (conifers !== null) { group.name = 'Valley_Forest'; group.add(scattered.group, conifers.group); }
+  // Y el bosque de ladera (v5.74): sin sombra, como los pinos de la sierra de
+  // fuera (`backdrop.ts`), porque son cientos y la sombra es lo más caro de
+  // un árbol en la tablet; de cerca la ladera ya está en sombra propia.
+  const slope = slopeWood && pine !== undefined
+    ? slopeWoodCells(state.map, builtCells(state), gorgeRoadPaths(state.map, state.terrainSeed ?? 0))
+    : null;
+  const slopePines = slope === null || pine === undefined ? null
+    : scatterCells(state.map, pine, slope.pines, palette, false, false, (cell) => pineScaleAt(cell));
+  const slopeLeafy = slope === null ? null : scatterCells(state.map, tree, slope.leafy, palette);
+  for (const wood of [slopePines, slopeLeafy]) {
+    if (wood === null) continue;
+    wood.group.name = 'Valley_SlopeWood';
+    wood.group.traverse((piece) => { piece.castShadow = false; });
+  }
+  const extras = [conifers, slopePines, slopeLeafy].filter((one): one is Forest => one !== null);
+  const group = extras.length === 0 ? scattered.group : new Group();
+  if (extras.length > 0) { group.name = 'Valley_Forest'; group.add(scattered.group, ...extras.map((one) => one.group)); }
   const stumpCells = looks.filter(look => look.stage === 'stump').map(look => look.cell);
   const stumpGeometry = new CylinderGeometry(0.16, 0.2, 0.22, 8);
   stumpGeometry.translate(0, 0.11, 0);
@@ -374,13 +489,13 @@ export function buildForest(
     sway(cell, x, z, angle): boolean { return scattered.sway(cell, x, z, angle); },
     season(palette): void {
       scattered.season(palette);
-      conifers?.season(palette);
+      for (const one of extras) one.season(palette);
       stumpMaterial.color.set(palette.wood);
     },
     dispose(): void {
       scattered.dispose();
-      conifers?.dispose();
-      if (conifers !== null) group.remove(scattered.group, conifers.group);
+      for (const one of extras) one.dispose();
+      if (extras.length > 0) group.remove(scattered.group, ...extras.map((one) => one.group));
       if (stumpCells.length > 0) group.remove(stumps);
       stumps.dispose();
       stumpGeometry.dispose();

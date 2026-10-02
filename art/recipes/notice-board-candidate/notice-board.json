@@ -1,0 +1,557 @@
+{
+  "schemaVersion": 1,
+  "id": "notice-board",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros Blender; Z arriba, frente -Y; glTF Y arriba, frente +Z. Una celda = 3 m.",
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": false,
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.92
+    },
+    {
+      "name": "dark",
+      "role": "timberDark",
+      "roughness": 0.92
+    },
+    {
+      "name": "paper",
+      "role": "saltWhite",
+      "roughness": 0.92
+    },
+    {
+      "name": "linen",
+      "role": "neighborLinen",
+      "roughness": 0.92
+    },
+    {
+      "name": "iron",
+      "role": "elderGrey",
+      "roughness": 0.92
+    },
+    {
+      "name": "hide",
+      "role": "soil",
+      "roughness": 0.92
+    },
+    {
+      "name": "hideLight",
+      "role": "trunk",
+      "roughness": 0.92
+    },
+    {
+      "name": "accent",
+      "role": "clothAccent",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "note_1",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    },
+    {
+      "name": "note_2",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    },
+    {
+      "name": "note_3",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    },
+    {
+      "name": "note_4",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "post_-1",
+      "location": [
+        -1.02,
+        0,
+        1.77
+      ],
+      "dimensions": [
+        0.195,
+        0.22499999999999998,
+        3.54
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "foot_-1",
+      "location": [
+        -1.02,
+        0,
+        0.10500000000000001
+      ],
+      "dimensions": [
+        0.39,
+        0.63,
+        0.21000000000000002
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "post_1",
+      "location": [
+        1.02,
+        0,
+        1.77
+      ],
+      "dimensions": [
+        0.195,
+        0.22499999999999998,
+        3.54
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "foot_1",
+      "location": [
+        1.02,
+        0,
+        0.10500000000000001
+      ],
+      "dimensions": [
+        0.39,
+        0.63,
+        0.21000000000000002
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "plank_0",
+      "location": [
+        -0.855,
+        0,
+        2.4000000000000004
+      ],
+      "dimensions": [
+        0.552,
+        0.21000000000000002,
+        1.83
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "plank_1",
+      "location": [
+        -0.2849999999999999,
+        0,
+        2.4000000000000004
+      ],
+      "dimensions": [
+        0.552,
+        0.21000000000000002,
+        1.83
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "plank_2",
+      "location": [
+        0.2850000000000001,
+        0,
+        2.4000000000000004
+      ],
+      "dimensions": [
+        0.552,
+        0.21000000000000002,
+        1.83
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "plank_3",
+      "location": [
+        0.8550000000000002,
+        0,
+        2.4000000000000004
+      ],
+      "dimensions": [
+        0.552,
+        0.21000000000000002,
+        1.83
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "lower_rail",
+      "location": [
+        0,
+        0.156,
+        1.59
+      ],
+      "dimensions": [
+        2.4899999999999998,
+        0.12,
+        0.15000000000000002
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "roof_-1",
+      "location": [
+        -0.6487499999999999,
+        0,
+        3.5921120140105582
+      ],
+      "dimensions": [
+        1.3993988286241645,
+        0.8999999999999999,
+        0.10500000000000001
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        -22,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "roof_1",
+      "location": [
+        0.6487499999999999,
+        0,
+        3.5921120140105582
+      ],
+      "dimensions": [
+        1.3993988286241645,
+        0.8999999999999999,
+        0.10500000000000001
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        22,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "paper_1",
+      "location": [
+        -0.6000000000000001,
+        -0.159,
+        2.64
+      ],
+      "dimensions": [
+        0.48,
+        0.024,
+        0.8699999999999999
+      ],
+      "material": "paper",
+      "parent": "note_1",
+      "rotationDegrees": [
+        0,
+        0,
+        -3
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "paper_1_pin",
+      "location": [
+        -0.6000000000000001,
+        -0.183,
+        2.9619
+      ],
+      "radius": 0.026999999999999996,
+      "depth": 0.039,
+      "vertices": 6,
+      "material": "iron",
+      "parent": "note_1",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "paper_2",
+      "location": [
+        0.07500000000000001,
+        -0.159,
+        2.7
+      ],
+      "dimensions": [
+        0.6000000000000001,
+        0.024,
+        0.75
+      ],
+      "material": "paper",
+      "parent": "note_2",
+      "rotationDegrees": [
+        0,
+        0,
+        3
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "paper_2_pin",
+      "location": [
+        0.07500000000000001,
+        -0.183,
+        2.9775
+      ],
+      "radius": 0.026999999999999996,
+      "depth": 0.039,
+      "vertices": 6,
+      "material": "iron",
+      "parent": "note_2",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "paper_3",
+      "location": [
+        0.72,
+        -0.159,
+        2.58
+      ],
+      "dimensions": [
+        0.39,
+        0.024,
+        0.96
+      ],
+      "material": "paper",
+      "parent": "note_3",
+      "rotationDegrees": [
+        0,
+        0,
+        3
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "paper_3_pin",
+      "location": [
+        0.72,
+        -0.183,
+        2.9352
+      ],
+      "radius": 0.026999999999999996,
+      "depth": 0.039,
+      "vertices": 6,
+      "material": "iron",
+      "parent": "note_3",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "paper_4",
+      "location": [
+        0.07500000000000001,
+        -0.159,
+        1.8900000000000001
+      ],
+      "dimensions": [
+        0.42000000000000004,
+        0.024,
+        0.51
+      ],
+      "material": "paper",
+      "parent": "note_4",
+      "rotationDegrees": [
+        0,
+        0,
+        3
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "paper_4_pin",
+      "location": [
+        0.07500000000000001,
+        -0.183,
+        2.0787
+      ],
+      "radius": 0.026999999999999996,
+      "depth": 0.039,
+      "vertices": 6,
+      "material": "iron",
+      "parent": "note_4",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "notice-board",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Candidato Bloque 1. Exportaci\u00f3n por build.py: color de v\u00e9rtice, material \u00fanico; m\u00e1ximo 400 tri\u00e1ngulos."
+  },
+  "referenceRender": {
+    "width": 600,
+    "height": 600,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.6
+    ],
+    "orthoScale": 2,
+    "worldRole": "sky"
+  },
+  "triangleBudget": 400
+}

@@ -95,6 +95,13 @@ import {
 const GIVE_UP = 600;
 
 /**
+ * Hasta qué hora acaba el cantero su porte antes de volver a casa (v5.74).
+ * TUNE: 0,68, diez segundos escénicos antes del ocaso (0,78): lo justo para
+ * que quien entrega tarde todavía llegue a su puerta con luz.
+ */
+const QUARRY_LAST = 0.68;
+
+/**
  * A qué distancia se coge un pase sin pasar por `decide`. V-09b.
  *
  * El número lo da el brief tal cual («a menos de dos celdas de ese cuerpo»),
@@ -2181,7 +2188,18 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // dos porteadores dejaban la leña a mitad de camino justo a las doce.
         const carryingTrade = !isNight(phase) && (dweller.doing?.place.id.startsWith('trade:') === true
           || dweller.doing?.place.id.startsWith('prepare-source:trade:') === true);
-        if (!carryingTrade && stepHome(dweller, phase, steps, land, around, dwellers)) {
+        // v5.74 · **y el cantero acaba su porte**, por lo mismo. La cantera está
+        // al pie de la montaña, a quince o veinticinco celdas de la obra, y la
+        // llamada del hogar le llegaba a mitad de picar: medido con la hora
+        // corriendo, el de la semilla 19 (la roca a 24 celdas) se volvía a casa
+        // a las 0,50 y no entregaba ni una piedra en toda la jornada. Quien pica
+        // en su cantera sigue hasta `QUARRY_LAST`; quien ya lleva la piedra la
+        // entrega antes del ocaso. Después, la casa manda.
+        const quarryRun = dweller.dayPlan?.job?.place.startsWith('quarry:') === true
+          && ((phase < QUARRY_LAST && dweller.doing?.place.id.startsWith('quarry:') === true)
+            || (!isNight(phase) && dweller.doing?.offer.id === 'deliver-stone'
+              && dweller.holding !== null && dweller.holding <= -1_000_000));
+        if (!carryingTrade && !quarryRun && stepHome(dweller, phase, steps, land, around, dwellers)) {
           // Un haz es parte de la jornada, no de la persona: al volver a casa
           // se considera descargado y no entra con él por la puerta.
           if (dweller.holding !== null && dweller.holding < 0) dweller.holding = null;

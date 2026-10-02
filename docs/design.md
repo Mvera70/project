@@ -1220,6 +1220,22 @@ y abren el valle grande:
    ladera subía en dos paredes paralelas a él estuviera donde estuviera el
    valle.
 
+**Lo que hay en el cinturón** (v5.74, `docs/medidas/cinturon-2026-10-02.md`).
+Vera eligió tres usos para lo que quedaba fuera del contorno, y los tres **son
+vida y no economía**: no dan madera, piedra ni carne, y el motor no los conoce.
+Son las bases de lo que un día den, con su nivelado.
+
+- **Bosque de ladera** (render, `forest.ts`): pinos en la ladera baja y robles
+  en el prado del pie, en arboledas, de 3 a 13 celdas fuera del contorno, nunca
+  en las gargantas ni sobre lo construido. En suelo de andar sus troncos son
+  obstáculo para la capa de vida (`solidTerrain`).
+- **Pasto** (capa de vida, `beasts.ts`): el rebaño se ancla junto en la falda,
+  a una o dos celdas del borde, en el trozo más cercano andando a los campos.
+  Las vacas siguen siendo las de `state.herd`.
+- **Cantera** (capa de vida, `resource-sites.ts`): el albañil pica primero en
+  las caras de la montaña, en la de menor ruta andando, y no suelta la carga
+  hasta dejarla en la obra.
+
 **Sitio de fundación.** Se puntúa cada celda candidata por: distancia al río
 (óptimo 3–6 celdas), pradera contigua libre en 12×12, distancia al centro del
 mapa, y no adyacente a marisma. Gana la de mayor puntuación; empate por índice

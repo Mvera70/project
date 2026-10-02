@@ -22,7 +22,7 @@
 // villa, calzada. Y desde la aldea, un **cartel** en cada entrada, a unas
 // celdas de la plaza, mirando a quien llega. Puro salvo `buildSignposts`.
 
-import { BoxGeometry, type BufferGeometry, Color, Group, IcosahedronGeometry, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, Quaternion, Vector3 } from 'three';
+import { BoxGeometry, type BufferGeometry, Color, Group, IcosahedronGeometry, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, Quaternion, Vector3, type Object3D } from 'three';
 import { stepCost } from '@engine/world/astar';
 import { hash32 } from '@engine/rng';
 import type { Building, ValleyMap } from '@engine/state';
@@ -232,11 +232,10 @@ function unit(seed: number, key: string): number {
 }
 
 /**
- * Los carteles, provisionales: un poste y una tablilla de madera. El modelo de
- * verdad está pedido a Astra (`docs/encargos/cartel-del-camino.md`); cuando
- * llegue se instancia aquí con el mismo `yaw`.
+ * Road signs use Astra's single-mesh model when published; the two boxes
+ * remain as a fallback for older asset manifests.
  */
-export function buildSignposts(signs: readonly Signpost[], ground: (x: number, z: number) => number): Group {
+export function buildSignposts(signs: readonly Signpost[], ground: (x: number, z: number) => number, model?: Object3D): Group {
   const group = new Group();
   group.name = 'Valley_Signposts';
   if (signs.length === 0) return group;
@@ -246,6 +245,13 @@ export function buildSignposts(signs: readonly Signpost[], ground: (x: number, z
   const boardShape = new BoxGeometry(0.56, 0.2, 0.04);
   for (const sign of signs) {
     const y = ground(sign.x, sign.z);
+    if (model !== undefined) {
+      const instance = model.clone();
+      instance.position.set(sign.x, y, sign.z);
+      instance.rotation.y = sign.yaw;
+      group.add(instance);
+      continue;
+    }
     const post = new Mesh(postShape, timber);
     post.position.set(sign.x, y + 0.55, sign.z);
     post.castShadow = true;
