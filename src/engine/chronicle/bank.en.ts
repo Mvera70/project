@@ -1365,7 +1365,7 @@ export const BANK: Record<string, string[]> = {
   // K5 · los que el peto levantó: sólo en un asalto aguantado, con el
   // encargo de la herrería en marcha.
   'raid.held.jerkins': [
-    '{count} took blows on the wall that should have felled them. The leather had taken it.',
+    '{count} took blows on the wall that would have felled a bare man. The leather had taken it.',
     'In year {year} the jerkins earned their hides: {count} who fell on the wall walked home.',
     'The blades found leather that {season}, and {count} of ours lived who should not have.',
   ],
