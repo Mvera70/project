@@ -1776,6 +1776,78 @@ export const EXPEDITION = {
   },
 } as const;
 
+/**
+ * K8+K9 · **Los tablones de la herrería y de la iglesia** (2 oct 2026).
+ *
+ * Vera: «cada edificio con sentido y su propio tablón, como el de misiones de
+ * la plaza: la herrería con encargos o mejoras pagadas; la iglesia, donde el
+ * cura reza o convoca misa y sube la moral». Y K9: «inclinar un pelín hacia
+ * qué recurso se tira», que no puede ser un deslizador —las palancas de v2.0
+ * eran una trampa— sino **una inclinación que se paga y se ve**.
+ *
+ * Lo que se midió antes de poner un solo número
+ * (`docs/medidas/k8-k9-edificios-2026-10-02.md`, 12 semillas × 60 años): la
+ * herrería llega a las 40 h a ×1 con 22 personas; la capilla, a las 33 h con
+ * 20; la madera espera la obra el 38 % de las semanas justo cuando llega la
+ * herrería; la plata es escasa toda la partida (mediana de 2 a 9); la piedra y
+ * la fe sobran (210 y ~89). Por eso los encargos inclinan hacia **madera,
+ * grano y plata**, y la rogativa se paga con **fe**.
+ *
+ * Decisiones de Vera del 2 oct: encargos de temporada (no mejoras para
+ * siempre), y el hacha y el arado salen del carro cuando hay herrería; misa y
+ * rogativa; la misa **no sale mal nunca**: lo que cuesta es el día de trabajo.
+ */
+export const BOARDS = {
+  /**
+   * Lo que dura un encargo de la herrería, en semanas: un año, una temporada
+   * de cada. TUNE: con menos, la inclinación no llega a una cosecha.
+   */
+  ORDER_WEEKS: 48,
+  /**
+   * Los tres encargos. Cuestan plata —lo que de verdad limita (MEANS)— y
+   * madera, que es el carbón de la fragua y lo que K1–K3 volvió escaso. Los
+   * efectos son los del hacha y el arado del carro (`MEANS.AXE_WOOD`,
+   * `AXE_WORKS`, `PLOUGH_CREW`), por un año y no para siempre. TUNE: precios
+   * por debajo de los del carro (18 y 20 de plata) porque duran un año.
+   */
+  ORDERS: {
+    axes: { wood: 25, silver: 8 },
+    ploughshares: { wood: 25, silver: 8 },
+    /**
+     * Los herrajes para vender: no cuestan plata, la dan. TUNE: 4 de plata
+     * cada `WARES_EVERY` semanas son 24 en el año, la que el camino trae en una
+     * década (M-0), a cambio de 60 de madera de carbón cuando la madera es lo
+     * que espera la obra. Es la única forma de convertir madera en plata.
+     */
+    ironware: { wood: 60, silver: 0 },
+  },
+  /** Cada cuántas semanas vende la herrería un lote de herrajes. */
+  WARES_EVERY: 8,
+  /** Lo que da cada lote. TUNE (ver `ORDERS.ironware`). */
+  WARES_SILVER: 4,
+  /**
+   * La misa: ánimo que sube con la fe llena (escala con `faith / 100`). TUNE:
+   * el doble de una boda (`FATE.WEDDING_MORALE`, 5) —es la aldea entera
+   * reunida— y no más, porque se puede convocar cada temporada.
+   */
+  MASS_MORALE: 10,
+  /**
+   * Lo que cuesta: **el día de trabajo**. La semana de la misa la obra y la
+   * leña rinden esta parte menos (un día de siete).
+   */
+  MASS_WORK_LOSS: 1 / 7,
+  /** Una misa por temporada, como mucho: semanas hasta poder convocar otra. */
+  MASS_EVERY: 12,
+  /**
+   * La rogativa: la procesión por los campos. Cuesta fe, que sobra en cuanto
+   * hay capilla (~89 en mediana), y la próxima cosecha rinde esta proporción
+   * más. TUNE: 1,15, lo mismo que el molino (`FOOD.MILL_BONUS`), por una sola
+   * cosecha. Una por año: hasta la siega no se puede repetir.
+   */
+  ROGATION_FAITH: 20,
+  ROGATION_YIELD: 1.15,
+} as const;
+
 export const HUNT = {
   // TUNE: probabilidad semanal sobre cien cuando la especie ya está abierta.
   chance: { partridge: 70, rabbit: 48, deer: 18, boar: 12, bear: 0 },

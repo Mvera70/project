@@ -233,12 +233,19 @@ export function arriveToStay(
 }
 
 /** Por qué no se puede dar algo, o `null` si se puede. */
-export type MeansRefusal = 'cost' | 'already' | 'room' | 'feasting';
+export type MeansRefusal = 'cost' | 'already' | 'room' | 'feasting' | 'smithy';
 
 export function refusalFor(state: GameState, id: MeansId): MeansRefusal | null {
   const spec = MEANS_SPEC[id];
   if (spec.trait !== undefined && (state.traits as readonly string[]).includes(spec.trait)) {
     return 'already';
+  }
+  // K8 · **con herrería, el hacha y el arado se encargan allí** (Vera, 2 oct
+  // 2026): el carro trae de fuera lo que el valle no sabe hacer, y en cuanto
+  // tiene fragua, eso lo hace el herrero —por un año y más barato
+  // (`world/boards.ts`)—. Dos sitios para lo mismo es lo que no se quiere.
+  if ((id === 'axe' || id === 'plough') && state.buildings.some((b) => b.kind === 'smithy' && b.lostTick === null)) {
+    return 'smithy';
   }
   // El sitio se mide **después** de lo que el propio medio trae: una pocilga
   // sube el techo, así que preguntarle si cabe en el corral de antes sería

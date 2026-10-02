@@ -205,7 +205,9 @@ describe('grafo de módulos del motor', () => {
     // M-15. astar.ts es hoja: el coste del suelo y nada más. paths.ts es quien
     // sabe quién va a dónde, así que mira a people/ y a subsistence/; forest.ts
     // le avisa de que los árboles se han movido, y la flecha no vuelve.
-    expect(importsOf('world/astar.ts')).toEqual(['balance', 'state', 'tiles']);
+    // v5.71: ya ni a `tiles` —los cuatro vecinos van en línea en el bucle de
+    // A*, con la misma topología y el mismo orden que `neighbours4`—.
+    expect(importsOf('world/astar.ts')).toEqual(['balance', 'state']);
     // K1–K3 (1 oct 2026): y mira a `plaza` —el acarreo se mide desde la plaza— y a
     // `rng`, por el flujo `forest` del bosque que se extiende.
     expect(importsOf('world/forest.ts')).toEqual(['balance', 'paths', 'plaza', 'rng', 'state', 'tiles']);

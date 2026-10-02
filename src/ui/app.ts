@@ -56,7 +56,7 @@ import { noticeText } from './notice';
 import { chroniclePanel, closeChronicle } from './screens/chronicle';
 import { closeCrossroad, conceal, isConcealed, isDeferred, openCrossroad, openDeferred, reveal } from './screens/crossroad';
 import { FOUNDING_CROSSROAD } from '@engine/crossroads/catalog/hamlet';
-import { openEpitaph } from './screens/epitaph';
+import { openEpitaph, rememberFall } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
 import { accentFor, playerAnswer, routeCue, sound, speedCue } from './sound';
 import { cellsBetween, mixFor, nearness, riverCellsFrom, thunderFor, type WorldSound } from './ambience';
@@ -354,6 +354,8 @@ export function boot(
       cart.update(snapshot());
     } else if (route.kind === 'board') {
       // §7.15 · la ventana del tablón, encima del valle y fuera de la bandeja.
+      // K8 · el mismo tablón para la plaza, la herrería y la capilla.
+      board.show(route.which ?? 'plaza');
       shell.element.append(board.element);
       board.update(snapshot());
     }
@@ -405,6 +407,16 @@ export function boot(
       // que el envío ya es la respuesta: suena al tocar.
       sound.tap('ui_action_success', Date.now());
       pendingActs.push({ kind: 'expedition', mission, count });
+    },
+    // K8 · los tablones de la herrería y de la capilla: la misma cola de actos.
+    // El tablón sólo deja pedir lo que se puede (`board.ts`), así que suena al tocar.
+    smithy(order): void {
+      sound.tap('ui_action_success', Date.now());
+      pendingActs.push({ kind: 'smithy', order });
+    },
+    rite(rite): void {
+      sound.tap('ui_action_success', Date.now());
+      pendingActs.push({ kind: 'rite', rite });
     },
     setSpeed(value): void {
       // El jugador, y sólo él: la caza y el final también cambian la
@@ -918,9 +930,9 @@ export function boot(
     if (handle.failure !== null) document.documentElement.dataset.renderFailure = handle.failure;
   };
 
-  // G-07 · Canvas pinta desde el primer fotograma, siempre. El 3D —que desde
-  // G-12 es el juego— se carga por detrás y releva cuando esté; si falla, el
-  // valle sigue en 2D en vez de quedarse en un error.
+  // G-07 · El 3D —que desde G-12 es el juego— se carga detrás de la placa y
+  // releva cuando esté; si falla, se descarga el 2D en vez de quedarse en un
+  // error. Desde v5.69 el 2D no pinta mientras tanto: ni viaja en el paquete.
   /**
    * U-11 · El inicio guiado. Al fundar un valle la vista baja desde la sierra
    * hasta la aldea (`flyIn`), que es lo que el dueño pidió: «la aldea al
@@ -1524,7 +1536,7 @@ export function boot(
       // hacía que la selección no tuviera salida.
       if (target === null || target.kind === 'terrain') actions.navigate({ kind: 'valley' });
       // §7.15 · el tablón de la plaza abre su propia ventana, no una ficha.
-      else if (target.kind === 'board') actions.navigate({ kind: 'board' });
+      else if (target.kind === 'board') actions.navigate(target.which === undefined ? { kind: 'board' } : { kind: 'board', which: target.which });
       else {
         actions.navigate({ kind: 'inspect', target, from: 'valley' });
         if (gesture === 'hold' && target.kind === 'villager') actions.track(target.id);
@@ -1687,6 +1699,10 @@ export function boot(
       persist();
       finishing = false;
       beginLoop();
+      // K7 · **y el valle nuevo se acuerda del anterior**, en una línea: cómo
+      // cayó y lo que más pesó. Ni una mejora ni un desbloqueo; lo aprendido es
+      // de quien juega, y esto sólo se lo recuerda donde están las ruinas.
+      say('milestone', rememberFall(game!));
     });
 
     // D6 · sólo una derrota `stormed` nacida en esta sesión puede tener una
@@ -1727,7 +1743,10 @@ export function boot(
    * comprobar que su cierre suena una vez. Por `navigate` y no por
    * `actions.navigate`: abrirlo así no es un toque y no suena.
    */
-  window.__valleyOpenBoard = (): void => { navigate({ kind: 'board' }); };
+  // K8 · y el de la herrería o la capilla, con `which`.
+  window.__valleyOpenBoard = (which?: 'smithy' | 'church'): void => {
+    navigate(which === undefined ? { kind: 'board' } : { kind: 'board', which });
+  };
 
   window.__valleyEnd = (cause: string): void => {
     if (state.ended !== null) return;
@@ -2044,7 +2063,7 @@ declare global {
     __valleyTimeScale?: (value: number) => void;
     __valleyLook?: (x: number, y: number) => void;
     __valleyHoldTicks?: (on: boolean) => void;
-    __valleyOpenBoard?: () => void;
+    __valleyOpenBoard?: (which?: 'smithy' | 'church') => void;
     __valleyHouseOnScreen?: (look?: boolean) => { x: number; y: number } | null;
   }
 }

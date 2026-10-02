@@ -1,6 +1,8 @@
 // M-25 · The end of one village and the door into the next. design.md §13.3.
 
-import { renderUiText } from '@engine/chronicle/render';
+import { renderEntry, renderUiText } from '@engine/chronicle/render';
+import { makeBundle } from '@engine/rng';
+import { fallOf, heaviestOf } from '@derive/fall';
 import { ledgerFromChronicle } from '@engine/chronicle/ledger';
 import type { ArchivedGame, Ledger } from '@engine/state';
 import { yearOf } from '@engine/time';
@@ -152,6 +154,20 @@ const STYLE = `
   font: 13.5px/1.45 var(--skin-font-read); }
 .epitaph-ledger-rows dt { margin: 0; opacity: .85; }
 .epitaph-ledger-rows dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; }
+/* K7 · **Por qué.** Entre la causa y las cuentas, en la voz de la crónica: el
+   mejor momento, lo que se lo llevó y la decisión que se apuntó cerca, citada
+   tal como la crónica la escribió. Corto a propósito —tres cosas como mucho—
+   para que la lección la saque quien lo lee. */
+.epitaph-why { margin-top: 18px; }
+.epitaph-why ul { margin: 8px 0 0; padding: 0 0 0 18px; }
+.epitaph-why li { margin: 4px 0 0; font: 400 15px/1.45 var(--skin-font-read); }
+.epitaph-why li::marker { color: var(--skin-red-ink); }
+.epitaph .epitaph-why-peak { margin-top: 0; font-size: 15px; }
+.epitaph .epitaph-why-said { margin-top: 10px; font-size: 14px; opacity: .85; }
+.epitaph-why blockquote { margin: 6px 0 0; padding: 2px 0 2px 12px;
+  border-left: 2px solid color-mix(in srgb, var(--skin-gold) 70%, transparent);
+  font: italic 400 15px/1.45 var(--skin-font-read); }
+.epitaph .epitaph-why-end { margin-top: 10px; font-size: 15px; }
 @keyframes epitaph-sheet-arrive {
   from { opacity: .7; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
@@ -258,6 +274,71 @@ function reckoning(ledger: Ledger): HTMLElement {
   return box;
 }
 
+/**
+ * K7 · **Por qué cayó**, contado con lo que la crónica ya dijo
+ * (`derive/fall.ts`). Lo que no se sabe no se cuenta: sin mejor momento ni
+ * nada que se lo llevara —una crónica podada de una partida vieja— la sección
+ * no sale.
+ */
+function why(game: ArchivedGame): HTMLElement | null {
+  const story = fallOf(game);
+  if (story.peak === 0 && story.links.length === 0) return null;
+  const box = document.createElement('div');
+  box.className = 'epitaph-why';
+  const head = document.createElement('div');
+  head.className = 'epitaph-ledger-head';
+  const title = document.createElement('h2');
+  title.textContent = renderUiText('epitaph.why.title');
+  head.append(title);
+  const peak = document.createElement('p');
+  peak.className = 'epitaph-why-peak';
+  peak.textContent = renderUiText('epitaph.why.peak', { year: yearOf(story.peakTick), peak: story.peak });
+  box.append(head, peak);
+  if (story.links.length > 0) {
+    const list = document.createElement('ul');
+    for (const link of story.links) {
+      const item = document.createElement('li');
+      item.textContent = renderUiText(`epitaph.why.${link.kind}${link.count === 1 ? '.one' : ''}`, {
+        count: link.count, year: yearOf(link.tick), silver: link.silver, grain: link.grain,
+      });
+      list.append(item);
+    }
+    box.append(list);
+  }
+  const said = story.decision === null ? undefined : game.chronicle[story.decision];
+  if (said !== undefined && story.decision !== null) {
+    const lead = document.createElement('p');
+    lead.className = 'epitaph-why-said';
+    lead.textContent = renderUiText('epitaph.why.decision', { year: yearOf(said.tick) });
+    const quote = document.createElement('blockquote');
+    // §13.3: la voz de una partida archivada sale de su semilla, y la
+    // posición en la crónica es el mismo discriminante que usa la crónica.
+    quote.textContent = renderEntry(said, makeBundle(game.seed), story.decision);
+    box.append(lead, quote);
+  }
+  const end = document.createElement('p');
+  end.className = 'epitaph-why-end';
+  end.textContent = renderUiText(`epitaph.why.end.${game.cause}${game.cause === 'abandoned' && story.left <= 1 ? '.one' : ''}`, {
+    band: story.band ?? 0, left: story.left,
+  });
+  box.append(end);
+  return box;
+}
+
+/**
+ * K7 · La línea con la que el valle siguiente se acuerda de éste: cómo cayó y,
+ * si la crónica lo sabe, lo que más pesó. La dice `app.ts` al fundarlo.
+ */
+export function rememberFall(game: ArchivedGame): string {
+  const fell = renderUiText(`successor.fell.${game.cause}`, { year: yearOf(game.endedTick) });
+  const link = heaviestOf(fallOf(game));
+  if (link === null) return fell;
+  const why = renderUiText(`epitaph.why.${link.kind}${link.count === 1 ? '.one' : ''}`, {
+    count: link.count, year: yearOf(link.tick), silver: link.silver, grain: link.grain,
+  });
+  return `${fell} ${why}`;
+}
+
 export function openEpitaph(app: App, game: ArchivedGame, beginAgain: () => void): void {
   if (shown !== null) return;
   ensureStyle();
@@ -317,7 +398,9 @@ export function openEpitaph(app: App, game: ArchivedGame, beginAgain: () => void
   // crónica, y lo que no se puede saber sale vacío y no se enseña.
   const ledger = game.ledger
     ?? ledgerFromChronicle(game.chronicle, game.endedTick, game.peakPeople);
-  card.append(head, cause, reckoning(ledger), actions);
+  // K7 · y entre la causa y las cuentas, **por qué**.
+  const story = why(game);
+  card.append(head, cause, ...(story === null ? [] : [story]), reckoning(ledger), actions);
   scrim.append(fade, card);
 
   // F3c · **la lápida primero, y la hoja después.** El valle se queda a la

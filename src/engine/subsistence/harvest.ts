@@ -1,7 +1,7 @@
 // M-06 · Steps 9 and 10 of the tick: the harvest and the granary.
 // design.md §5.3.
 
-import { FOOD, TRAITS, TIME } from '../balance';
+import { BOARDS, FOOD, TRAITS, TIME } from '../balance';
 import { hasTrait } from '../state';
 import type { Allocation, GameState, HarvestResult } from '../state';
 import { weekOf } from '../time';
@@ -66,7 +66,12 @@ export function harvest(state: GameState, a: Allocation): HarvestResult {
   // antes de que llegara nadie.
   const soil = hasTrait(state, 'thin_soil') ? TRAITS.THIN_SOIL_YIELD : 1;
 
+  // K8 · la rogativa: la procesión por los campos bendice esta siega
+  // (`world/boards.ts`, `BOARDS.ROGATION_YIELD`) y se gasta en ella.
+  const blessed = state.flags['rite:rogation'] === state.tick ? BOARDS.ROGATION_YIELD : 1;
+
   const yielded =
+    blessed *
     a.workedFields *
     FOOD.FIELD_YIELD *
     soil *

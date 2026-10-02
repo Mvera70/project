@@ -9,7 +9,8 @@
 // Nadie más define estos tipos: un consumidor que necesite otra ruta reabre
 // §11.2 con el coordinador en vez de añadirla en silencio (UI-R0 §8).
 
-import type { ArchivedGame, GameState, MeansId, MissionId, VillagerId } from '@engine/state';
+import type { BoardWhich } from '@derive/building-boards';
+import type { ArchivedGame, GameState, MeansId, MissionId, Rite, SmithyOrder, VillagerId } from '@engine/state';
 import type { InspectTarget } from '../inspect';
 import type { Speed } from '../speed';
 import type { ActorDoing } from '../../render3d/contracts';
@@ -35,7 +36,7 @@ export type SheetRoute =
   // §7.15 · **el tablón de misiones.** Es la primera ventana que abre un
   // objeto del valle al tocarlo, y no es una hoja: se monta encima del valle
   // (`board.ts`), que sigue a la vista detrás.
-  | { kind: 'board' };
+  | { kind: 'board'; which?: BoardWhich };
 
 /**
  * Lo único que un panel puede pedirle a la aplicación.
@@ -85,6 +86,10 @@ export interface UiActions {
    * decide el motor.
    */
   expedition(mission: MissionId, count: number): void;
+  /** K8 · un encargo del tablón de la herrería. Lo decide el motor. */
+  smithy(order: SmithyOrder): void;
+  /** K8 · un rito del tablón de la capilla. Lo decide el motor. */
+  rite(rite: Rite): void;
 }
 
 /**

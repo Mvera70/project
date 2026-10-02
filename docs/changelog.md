@@ -1,5 +1,158 @@
 # The Valley — Registro de cambios
 
+## v5.72 · 2 oct 2026 · K7: el epitafio dice por qué cayó el valle
+
+**Medido antes** (`docs/medidas/k7-caidas-2026-10-02.md`, informe nuevo
+`tools/reports/fall-report.ts`, 30 semillas × 100 años): con la política
+prudente caen **2 de 30**, las dos en el arranque y de hambre, y **ninguna
+asaltada**; pidiendo herrajes sin parar, 19 (17 asaltadas); con la adversa, 10
+(8 asaltadas). La cadena se repite —el mejor momento, el hambre, la peste o el
+clan que baja a por la plata, y el último asalto contra lo que queda—, y la
+decisión que la crónica apunta cerca es `raiders_coming` en 20 de las 25
+asaltadas.
+
+**Lo que cambia.** El epitafio gana «How it came to this» (`derive/fall.ts`,
+§13.3b): el mejor momento, hasta tres cosas que se lo llevaron, la decisión
+citada tal como la escribió la crónica y el último golpe. Todo sale de la
+crónica archivada: ni un campo en el guardado ni una tirada, así que no toca el
+motor. Y al fundar el valle siguiente, una línea recuerda cómo cayó el
+anterior. Para fotografiarlo, la ruta de depuración gana `&policy=worst`, que
+juega el valle con la política adversa desde la fundación.
+
+**Por qué la ventana es la que es**: contando desde el mejor momento salían
+mesetas de décadas («158 murieron de hambre desde el año 34»); con cinco años
+fijos se cortaba el hambre del primer otoño de un caserío; con la mitad del
+mejor momento, siete valles fuertes tomados de golpe no tenían nada que contar.
+Lo que antes llegue de las dos cuenta los 29 (`FALL`, con su `TUNE`).
+
+**Abierto, de Vera**: el aviso en vida al cruzar el punto sin vuelta. En un
+asalto llega 5–8 h de reloj antes del final, con el valle ya vaciado, y pediría
+una marca en el motor.
+
+Sin ilustraciones que pedir: K7 no añade líneas de crónica, sólo textos de
+pantalla (`epitaph.why.*`, `successor.fell.*`).
+
+## v5.71 · 2 oct 2026 · Que una obra no tire todas las rutas
+
+El diagnóstico de la CI (`docs/medidas/ci-lentitud-2026-10-02.md`) encontró el
+escalón: desde `6fa7fda1` cada casa u obra que aparecía o desaparecía tiraba la
+caché de rutas entera y A\* volvía a correr para la aldea entera; con las
+sendas que se asientan, 9,5 búsquedas por semana y la mitad del tick. Proponía
+guardar una ruta si ninguna celda suya quedaba bajo la casa nueva: −31 %, pero
+`map.traffic` distinto en dos semillas de tres, porque el recálculo total
+aprovechaba de paso los árboles talados desde la última vez.
+
+- **Una ruta guardada se guarda mientras A\* daría la misma**
+  (`stillCheapest` en `paths.ts`): su coste no ha cambiado, sus extremos salen
+  de las mismas parcelas, y ninguna celda abaratada desde entonces —tala,
+  senda mejorada— cae en lo que su búsqueda miró. A\* dice ahora qué rectángulo
+  miró (`lastSearchBounds`). Vale igual para las obras (`BLOCKS`) y para las
+  sendas (`upgradePaths`), que también lo tiraban todo.
+- **A\* sin *getters* ni arrays en el bucle**: una tabla de costes por
+  terreno hecha con el propio `stepCost` y los vecinos en línea, en el mismo
+  orden. Bajo vitest cada `TERRAIN_CODE.x` es un *getter* de módulo.
+- **El camino del valle, una vez por suelo**: lanzaba dos A\* de punta a punta
+  del mapa cada semana.
+
+Medido bajo vitest, cinco semillas a 40 años: **6,81 → 3,80 ms por semana
+(−44 %)**, y la partida **idéntica byte a byte** —crónica, gente, edificios,
+tráfico, sendas, el estado entero— en 7, 23, 41, 11 y 99. No mueve ninguna
+trayectoria. Prueba nueva: `tests/fast/route-invalidation.test.ts` (tras cada
+cambio de casas, obras o sendas, las rutas son las de un cálculo desde cero;
+una obra lejos de toda ruta no lanza ni un A\*). El banco del tick de v5.68
+(`tools/reports/tick-bench.ts`) imprime además un resumen de la partida, y la
+regla de `CLAUDE.md` junta la de v5.68 con la de pasarlo antes y después de
+tocar `paths`, `astar`, `placement` o `works`. Medidas y perfil:
+`docs/medidas/rutas-tick-2026-10-02.md`.
+
+## v5.69 · 2 oct 2026 · El 2D deja de viajar en el paquete del juego
+
+Vera, 2 oct: «si podemos evitar que se cargue [el 2D] mejor; si no se puede
+eliminar, no pasa nada». No se elimina —lo usan los recorridos de interfaz en
+un runner sin GPU (`?render=canvas`) y es la reserva si el 3D no llega—, pero
+el juego en 3D ya no lo descarga ni lo monta. Hasta hoy `src/ui/backend.ts` y
+`src/ui/debug.ts` lo importaban de entrada, y el 2D pintaba cada fotograma
+escondido detrás de la placa de carga.
+
+- **`backend.ts`:** `live` arranca como un render vacío `kind: 'loading'`
+  (`idleBackend`); `src/render/renderer` llega por `import()` sólo con
+  `?render=canvas` o en el `catch` del 3D. `data-render` dice `loading` hasta
+  el relevo, y en Canvas `onSwap` se llama también al llegar el 2D.
+- **`debug.ts`:** la pintura 2D de la página de diagnóstico y `auditSprites` se
+  mudan a `src/ui/debug-canvas.ts`, bajo demanda; `data-debug-ready` llega
+  después de pintar.
+- `src/render/crowd.ts` y `reactions.ts` se quedan en la entrada a propósito:
+  son lógica del inspector (`inspect.ts`), no dibujo.
+- **Medido** (`vite build`): el trozo de entrada baja de **611,05 a 593,11 kB**
+  (gzip 194,96 → 188,07). Los diez módulos de dibujo de `src/render/` y
+  `derive/palette` salen de él y viven en cinco trozos aparte (~19,7 kB) que el
+  juego en 3D no pide. Remedido tras traer #41 y #42 a la rama: **626,00 →
+  608,06 kB** (gzip 201,68 → 195,03), la misma diferencia.
+- El recorrido «la ruta viva abre un valle maduro…» medía `#valley` a 360 px en
+  3D, cierto sólo porque el 2D pintaba escondido: ahora comprueba lo contrario,
+  que tras el relevo el 2D no ha pintado nunca.
+- **Y la tormenta deja de depender del runner** (encargo del director, tras
+  fallar a ratos en la CI de #42 con `data-bolts` a 0 tras 120 s). La ruta abre
+  a ×1, donde una jornada son unos 120 s de reloj falso, y en la semilla 7 el
+  primer rayo pendiente cae en la fase 0,595 de una jornada que el 3D empieza
+  a pintar en 0,28–0,33: unos 38 s falsos, más de mil fotogramas por CPU con
+  el paso máximo del reloj de presentación. Ahora el reloj falso se para antes
+  de cargar y, comprobada la tormenta, el valle va a ×64. Mismo listón; 3/3 en
+  serie y 4/4 con cuatro a la vez, unos 36 s cada uno (antes 2,7 min).
+
+## v5.57 · 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón, y desde ellas inclinar hacia un recurso
+
+**Medido antes, en `main`** (`docs/medidas/k8-k9-edificios-2026-10-02.md`,
+informe nuevo `tools/reports/k8-report.ts`): la capilla llega a las 33 h a ×1
+con 20 personas, la herrería a las 40 h con 22 y la iglesia de piedra a las
+65 h. Las tres llegan antes de la edad de piedra en los doce valles, así que
+ninguna llega tarde para que su tablón importe. La madera espera la obra el
+38 % de las semanas justo al llegar la herrería, la plata escasea siempre
+(2–9) y la piedra y la fe sobran (210 y ~89).
+
+**Decisiones de Vera:** encargos de temporada en la herrería, y el hacha y el
+arado salen del carro cuando hay fragua; misa y rogativa en la capilla; la misa
+no sale mal nunca, cuesta el día de trabajo; y la cara mala de los herrajes
+(la plata amontonada tienta al clan) se queda.
+
+- **El tablón de la herrería** (`world/boards.ts`, `BOARDS`): hachas (25
+  madera, 8 plata), rejas de arado (lo mismo) y herrajes para vender (60
+  madera, 24 de plata en el año). Uno cada vez, un año, con herrería encendida y
+  herrero. Las hachas y las rejas valen lo que el hacha y el arado del carro
+  (`toolInHand`), que con fragua dice «Ask at the forge» (`'smithy'`). Ningún
+  encargo quema la leña del invierno (`winterReserve`).
+- **El tablón de la capilla:**
+  - **Misa:** ánimo `10 · fe/100` por un séptimo del trabajo de esa semana, una
+    por temporada. La aldea se junta en la capilla un día.
+  - **Rogativa:** 20 de fe para que la próxima siega rinda 1,15. La aldea va
+    detrás del cura al campo.
+- **Por la puerta de los actos** (`{kind:'smithy'}`, `{kind:'rite'}`), sin
+  tirada, guardado en `state.flags`, sin subir el esquema. La crónica lo cuenta
+  como `means`.
+- **Se tocan en el mundo:**
+  - Dos tablones provisionales, como el de la plaza, a 0,72, clavados en la
+    fachada que mira a la plaza (`derive/building-boards.ts`).
+  - La misma ventana de madera (`ui/redesign/board.ts`) pinta los avisos de
+    cada uno.
+  - Capturas a 390 y 750 px en `docs/medidas/k-img/k8-*`.
+
+**K9, medido contra la trampa de v2.0** (`tools/reports/tilt-report.ts`, cada
+opción pedida siempre que se pueda, 8 semillas × 40 años):
+- **Cada opción gana en lo suyo:**
+  - rejas: la menor espera de madera;
+  - rogativa: la menor hambre y el mayor grano;
+  - herrajes: la plata;
+  - misa: el ánimo y la gente;
+  - hachas: cerrar la villa antes, en las 8 semillas, y los 8 valles la
+    cierran frente a 6 sin hachas.
+- **Los herrajes acaban 2 de 8 aldeas asaltadas**, por la plata amontonada.
+- **La misa es fuerte:** el ánimo medio pasa de 59 a 80. Nivelarla es de Vera.
+
+Encargos: las ilustraciones de las ocho líneas nuevas de crónica, las cinco
+tarjetas y los dos tablones de verdad, en `docs/encargos/ilustraciones-k8-k9.md`.
+Va ahí y no en `plan-arte-pendiente.md` mientras Codex trabaja en ese fichero.
+Lo que aún no se ve está en `docs/encargos-3d.md`.
+
 ## v5.70 · 2 oct 2026 · La senda de la garganta, pegada al suelo, y los de fuera bajan por ella
 
 Vera: «el camino sigue flotando… no sé cómo llegan las visitas al valle». Y con
@@ -69,6 +222,39 @@ sigo viendo baldosas de madera mal puestas».
   `life-visitors` acaban la jornada yéndose por la senda, no «idos»; y **los dos
   `it.fails` del factor de grano pasan**: llega antes (0,32–0,36), los
   porteadores con él, y la moneda pasa entre 0,49 y 0,61.
+
+## v5.68 · 2 oct 2026 · Por qué la CI tardaba 36 minutos, y lo que se arregla sin tocar el motor
+
+**El diagnóstico** (`docs/medidas/ci-lentitud-2026-10-02.md`). El servidor de
+CI no es más lento que local: `ledger.test.ts` tarda 689 s allí y 666 s aquí,
+en un hilo. Lo que pasó fue que **el tick se encareció unas diez veces** entre
+el 16 sep y el 1 oct (de 0,78 a 8,3 ms por semana de juego) y que **los
+ficheros de `tests/fast/` que juegan décadas pasaron de 15 a 58**. El escalón
+mayor del tick está en un solo commit, `6fa7fda1` (21 sep): ×2,3 con aldeas
+del mismo tamaño, porque `walkingGround()` tira todas las rutas con cada obra
+que se abre o se cierra. Con eso salen 9,5 búsquedas A\* por semana, y bajo
+vitest A\* es el 54 % del tick. La v5.56 (#38) arregló lo segundo; lo primero
+lo lleva la rama `claude/rutas-tick` (v5.71), con el parche medido aquí:
+−31 % del tick, misma crónica.
+
+**Lo arreglado, sin tocar el motor:**
+
+- **La suite rápida, sin aislar cada fichero** (`isolate: false`): de 249 a
+  180 s en local. Cada fichero volvía a importar Three, Rapier y el motor y lo
+  corría con el JIT en frío. Las 2079 pruebas pasan en tres órdenes distintos.
+- **Un tope por fichero en la suite rápida**: 30 s × `VALLEY_TIMING_SCALE`,
+  contando la recogida (`tests/helpers/fast-budget-reporter.ts`). Un fichero
+  que se pase sale rojo con su nombre el día que llega; se muda a las
+  jornadas, no se sube el tope. El más lento de hoy tarda 21 s.
+- **Cada partida una vez por fichero** en `ledger` (677 → 161 s) y `threat`
+  (1167 → 470 s), con los mismos asertos. Sus pesos en `shard-weights.ts`,
+  al día.
+- **`tools/reports/tick-bench.ts`**: el banco del tick en ms por semana, con
+  los vivos al final de cada valle. Se pasa antes de subir un tope de CI.
+- **`ci.yml`** ya no dice que el servidor va cinco veces más lento.
+
+**Abierto:** `catchUp` (960 ticks en menos de 2 s) da 2,05–2,26 s en local a
+escala 1. Es el tick caro; lo arregla el parche de rutas, no un umbral.
 
 ## v5.65 · 2 oct 2026 · Dientes de sierra en la tablet: la resolución sólo baja si bajar sirve
 

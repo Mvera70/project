@@ -244,6 +244,17 @@ sigue valiendo; el plan de arreglarla, no** (ver arriba: el rework).
 
 **Reglas que cuestan tiempo cada vez que se olvidan:**
 
+- **El tick se mide antes de subir un tope de la CI, y antes y después de
+  tocar `paths.ts`, `astar.ts`, `placement.ts` o `works.ts`**, con
+  `npx tsx tools/reports/tick-bench.ts` (40 años, semillas 7, 23 y 41: ms por
+  semana, vivos al final y el resumen de la partida). Una subida de más del
+  20 % con aldeas del mismo tamaño se explica en la PR o no se fusiona.
+  `6fa7fda1` multiplicó el tick por 2,3 y la CI llegó a 36 minutos sin que
+  nadie lo viera en nueve días: lo que se notaba era «la CI tarda», no «el
+  motor es más lento», y el servidor no era más lento
+  (`docs/medidas/ci-lentitud-2026-10-02.md`, `docs/medidas/rutas-tick-2026-10-02.md`).
+  Y **ningún fichero de `tests/fast/` pasa de 30 s** contando la recogida: el
+  reportero de la suite lo tumba con su nombre, y se muda a las jornadas.
 - **Un umbral que decide *cuándo* pasa algo se mira en horas de reloj, no en
   años de juego.** `npx tsx tools/reports/pace-report.ts` imprime la escalera del juego
   en horas a ×1, que es la velocidad por omisión y la unidad en la que el dueño

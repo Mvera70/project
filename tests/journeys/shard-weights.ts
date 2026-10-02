@@ -24,14 +24,17 @@
 // un poco peor, no mal. Si una jornada nueva pasa de unos cien segundos,
 // apúntala aquí con su medida.
 export const JOURNEY_WEIGHTS: Readonly<Record<string, number>> = {
-  'threat': 1167,
+  // v5.68: cada partida una vez por fichero (18 → 6). Medido en local, que por
+  // núcleo va como el servidor (ledger: 666 s local, 689 s CI).
+  'threat': 470,
   'life-props': 1041,
   'wall-rings-gates-era': 953,
   'e3b-corridor': 894,
   'threat-defence': 825,
   'sim-long': 752,
   'catalogue-coverage': 700,
-  'ledger': 677,
+  // v5.68: 11 partidas de ochenta años → 3. Medido en local, como `threat`.
+  'ledger': 161,
   'wall-rings': 573,
   'plaza-long': 507,
   'works': 445,
