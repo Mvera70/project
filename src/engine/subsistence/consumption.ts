@@ -11,6 +11,7 @@ import { ageOf } from '../people/villagers';
 import { next, weighted } from '../rng';
 import type { GameState, Villager, VillagerId } from '../state';
 import { seasonOf, weekOf } from '../time';
+import { clothed } from './building-counts';
 import { feedAndSlaughter, type HerdReport } from './herd';
 import { scarHunger } from '../people/scars';
 
@@ -115,15 +116,6 @@ export function consume(state: GameState): {
  * queda. No es un número de gusto: es la misma cuenta que `overwinter` quema,
  * con el calendario de §3.2.
  */
-/**
- * K5 · Si la aldea va abrigada: el encargo de ropa de la sastrería está en
- * marcha (§7.18). Se lee de la bandera y no de `world/tailor.ts`, por la misma
- * regla que la rogativa en la siega: `subsistence/` no mira a `world/`.
- */
-export function clothed(state: GameState): boolean {
-  return (state.flags['tailor:clothes'] ?? -1) > state.tick;
-}
-
 export function winterReserve(state: GameState): number {
   const season = seasonOf(state.tick);
   if (season !== 'autumn' && season !== 'winter') return 0;

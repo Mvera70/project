@@ -122,8 +122,10 @@ describe('grafo de módulos del motor', () => {
     ]);
     // Y las entregas son una hoja de la subsistencia: horas con `hash32`, sin azar.
     expect(importsOf('subsistence/wood-run.ts')).toEqual(['balance', 'rng', 'state']);
+    // K5 · `building-counts`: la ropa de la sastrería abriga (`clothed`).
     expect(importsOf('subsistence/consumption.ts')).toEqual([
       'balance',
+      'building-counts',
       'herd',
       'people/demography',
       'people/scars',

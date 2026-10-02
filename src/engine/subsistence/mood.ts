@@ -15,8 +15,7 @@ import { will } from '../people/crown';
 import { hasTrait } from '../state';
 import type { DeathCause, GameState, TickContext } from '../state';
 import { seasonOf, weekOf } from '../time';
-import { has } from './building-counts';
-import { clothed } from './consumption';
+import { clothed, has } from './building-counts';
 
 /**
  * A death with no worldly explanation, which §5.6 charges to faith: someone
