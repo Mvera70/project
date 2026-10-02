@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-02T15:18:23.023Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids notice-board,smithy-board,chapel-board,signpost,hide-rack,hammer",
+  "generatedAt": "2026-10-02T15:49:58.698Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids jerkin",
   "assets": [
     {
       "id": "axis-marker",
@@ -1880,6 +1880,17 @@
       "provenance": {
         "kind": "original",
         "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/hammer.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "jerkin",
+      "file": "jerkin.glb",
+      "sha256": "6B44D4963ECEEFE9ACFDC15498E0B76806D5F913E0622E84F81AF0860A369876",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/jerkin-candidate/jerkin.json",
         "license": "project-original"
       }
     }

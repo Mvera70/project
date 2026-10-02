@@ -236,6 +236,7 @@ export const WANTED = [
   // M-3 · el arado ya tiene GLB; el barril sigue usando el respaldo procedural.
   // `WANTED` puede incluirlo antes de publicarlo para que aparezca al llegar.
   'barrel', 'plough',
+  'jerkin',
   'notice-board', 'smithy-board', 'chapel-board', 'signpost', 'hide-rack', 'hammer',
   'burnt-house', 'great-oak',
   ...FAUNA,

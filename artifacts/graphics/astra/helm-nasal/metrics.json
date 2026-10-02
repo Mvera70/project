@@ -1,0 +1,33 @@
+{
+  "id": "helm-nasal",
+  "triangles": 50,
+  "budget": 120,
+  "mount": {
+    "helm-nasal_head": "head"
+  },
+  "materials": 1,
+  "textures": 0,
+  "rigSha256": "cbc336551f462700a5ba04e94b76504718ee42a6a4b90864eebbeca6a6ef6d66",
+  "mountBoundsError": 5.960464477539063e-08,
+  "mountedBoundsBlender": [
+    [
+      -0.09666666388511658,
+      -0.10216667503118515,
+      0.5483333468437195
+    ],
+    [
+      0.09666666388511658,
+      0.09333333373069763,
+      0.7166667580604553
+    ]
+  ],
+  "localUnits": "metres: use the bone scale, no extra scale",
+  "status": "candidate, metal model only",
+  "sha256": "da154043d0c22bfcdb63cad11f40023238e4099764bf91af64de14a49ac50961",
+  "bytes": 5860,
+  "mountedSizeGltfCells": [
+    0.19333332777023315,
+    0.16833341121673584,
+    0.19550000876188278
+  ]
+}
