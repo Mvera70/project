@@ -414,6 +414,11 @@ export function boot(
       sound.tap('ui_action_success', Date.now());
       pendingActs.push({ kind: 'smithy', order });
     },
+    // K5 · y el de la sastrería.
+    tailor(order): void {
+      sound.tap('ui_action_success', Date.now());
+      pendingActs.push({ kind: 'tailor', order });
+    },
     rite(rite): void {
       sound.tap('ui_action_success', Date.now());
       pendingActs.push({ kind: 'rite', rite });
@@ -1744,7 +1749,7 @@ export function boot(
    * `actions.navigate`: abrirlo así no es un toque y no suena.
    */
   // K8 · y el de la herrería o la capilla, con `which`.
-  window.__valleyOpenBoard = (which?: 'smithy' | 'church'): void => {
+  window.__valleyOpenBoard = (which?: 'smithy' | 'church' | 'tailor'): void => {
     navigate(which === undefined ? { kind: 'board' } : { kind: 'board', which });
   };
 
@@ -2069,7 +2074,7 @@ declare global {
     __valleyTimeScale?: (value: number) => void;
     __valleyLook?: (x: number, y: number) => void;
     __valleyHoldTicks?: (on: boolean) => void;
-    __valleyOpenBoard?: (which?: 'smithy' | 'church') => void;
+    __valleyOpenBoard?: (which?: 'smithy' | 'church' | 'tailor') => void;
     __valleyHouseOnScreen?: (look?: boolean) => { x: number; y: number } | null;
   }
 }

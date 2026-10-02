@@ -49,6 +49,9 @@ export const VILLAGER_BY_ROLE: Readonly<Record<Exclude<Role, 'stranger'>, string
   woodward: 'villager-woodward',
   reeve: 'villager-reeve',
   herbalist: 'villager-herbalist',
+  // K5 · la tejedora: sin malla entregada todavía, cae a la del aldeano base
+  // (`docs/encargos/ilustraciones-k5-cuero.md`, lino).
+  weaver: 'villager-weaver',
 };
 
 /**

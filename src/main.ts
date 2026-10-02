@@ -167,6 +167,9 @@ if (root) {
     // de los petos de la herrería y el buhonero que las pide.
     const hides = Number(query.get('hides'));
     if (Number.isFinite(hides) && hides > 0) state.village.hides = Math.floor(hides);
+    // K5 · y `&linen=6` pone lienzo en la sastrería, para fotografiar la ropa.
+    const linen = Number(query.get('linen'));
+    if (Number.isFinite(linen) && linen > 0) state.village.linen = Math.floor(linen);
     // K5 · `&jerkins=1` deja el encargo de los petos en marcha un año, para
     // fotografiar el cerco con ellos puestos (`Garrison.jerkins`).
     if (query.get('jerkins') === '1') state.flags['smithy:jerkins'] = state.tick + TIME.WEEKS_PER_YEAR;

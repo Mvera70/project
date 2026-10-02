@@ -73,6 +73,18 @@ export interface VillageStats {
    */
   hides: number;
   /**
+   * K5 · **El lienzo**: la tela del lino (v5.76).
+   *
+   * Sale de un campo sembrado de lino en vez de trigo (el encargo `flax` de la
+   * sastrería), así que cada pieza es grano que no se cosechó. Hoy sólo se
+   * gasta en una cosa, **ropa** (`clothes`, ánimo), por decisión de Vera; es
+   * una existencia y no un efecto para que mañana sirva para más —las vendas
+   * de la enfermería de K11— sin migrar nada.
+   *
+   * Sin subir el esquema: una partida guardada sin él carga con cero.
+   */
+  linen: number;
+  /**
    * AR-2 · **El mineral de hierro de la mina** (2 oct 2026).
    *
    * Sale de la veta al pie de la montaña cuando hay mina en pie y mineros en
@@ -88,8 +100,8 @@ export interface VillageStats {
   ore: number;
 }
 
-/** The statistics an effect can move. design.md §8.4; stone and silver since M-0, hides since K5, ore since AR-2. */
-export type StatName = 'grain' | 'wood' | 'morale' | 'faith' | 'stone' | 'silver' | 'hides' | 'ore';
+/** The statistics an effect can move. design.md §8.4; stone and silver since M-0, hides since K5, linen since K5, ore since AR-2. */
+export type StatName = 'grain' | 'wood' | 'morale' | 'faith' | 'stone' | 'silver' | 'hides' | 'linen' | 'ore';
 
 /**
  * The village's animals, as counts. design.md §7.7.
@@ -122,7 +134,10 @@ export type Role =
   | 'woodward'
   | 'reeve'
   | 'herbalist'
-  | 'stranger';
+  | 'stranger'
+  // K5 · la tejedora de la sastrería: hila el lino y cose la ropa. Se nombra
+  // sola en cuanto hay sastrería, como el cura con la capilla (§6.2).
+  | 'weaver';
 
 /**
  * K-1 · **La corona del valle**: quién la lleva, desde cuándo, y qué era antes.
@@ -392,6 +407,10 @@ export type BuildingKind =
   // `upgradeOf` sólo da de baja uno, dejando `ringClosed` diciendo que el
   // anillo sigue cerrado cuando en realidad tiene un hueco detrás de la torre.
   | 'bastion'
+  // K5 · **la sastrería**: el taller de la tejedora, con su tablón (§7.18). Es
+  // donde se pide sembrar lino y coser ropa, por la regla de Vera: los encargos
+  // se piden en el edificio del oficio que los hace.
+  | 'tailor'
   // AR-2 · **la mina**: la boca en la veta, al pie de la montaña y fuera del
   // pueblo (`world/mine.ts`). Una por valle; la primera abre la Edad del Hierro.
   | 'mine';
@@ -656,6 +675,8 @@ export type PlayerAct =
   | { kind: 'smithy'; order: SmithyOrder }
   /** K8 · un rito del tablón de la iglesia: convocar misa o una rogativa. */
   | { kind: 'rite'; rite: Rite }
+  /** K5 · un encargo del tablón de la sastrería: sembrar lino o coser ropa, por un año. */
+  | { kind: 'tailor'; order: TailorOrder }
   | {
     kind: 'battle';
     /** Cuántos del clan quedaron en el suelo. */
@@ -677,6 +698,10 @@ export type PlayerAct =
 // K5 · los petos de cuero, al final: se pagan con las pieles de la caza.
 export const SMITHY_ORDERS = ['axes', 'ploughshares', 'ironware', 'jerkins'] as const;
 export type SmithyOrder = (typeof SMITHY_ORDERS)[number];
+
+/** K5 · los encargos de la sastrería, en orden estable (el tablón los pinta así). */
+export const TAILOR_ORDERS = ['flax', 'clothes'] as const;
+export type TailorOrder = (typeof TAILOR_ORDERS)[number];
 
 /** K8 · los ritos de la iglesia, en orden estable. */
 export const RITES = ['mass', 'rogation'] as const;
@@ -924,6 +949,10 @@ export interface HarvestResult {
   workedFields: number;
   weatherFactor: number;
   labourFactor: number;
+  /** K5 · el lienzo que dio el campo de lino en esta siega, si lo había. */
+  linen?: number;
+  /** K5 · y el grano que ese campo habría dado. */
+  flaxGrain?: number;
 }
 
 /**
@@ -1004,7 +1033,7 @@ export const PRIORITY_FAMILIES: Readonly<Record<Exclude<PriorityName, 'none'>, r
   food: ['field', 'granary'],
   shelter: ['house', 'stone_house'],
   faith: ['chapel', 'church'],
-  craft: ['smithy', 'mill', 'well'],
+  craft: ['smithy', 'mill', 'well', 'tailor'],
   defence: ['palisade', 'wall', 'watchtower'],
   // K-4 · la sala del rey. Una familia de una sola cosa, porque es una sola
   // cosa: la casa del que manda, y la quiere quien la quiere por eso.

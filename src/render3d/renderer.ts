@@ -6,6 +6,7 @@ import { createNoticeBoard } from './world/notice-board';
 import { noticeBoardOf } from '@derive/notice-board';
 import { buildingBoardsOf } from '@derive/building-boards';
 import { ritesOpen, smithyOrdersOpen } from '@engine/world/boards';
+import { tailorOrdersOpen } from '@engine/world/tailor';
 import { missionsOpen } from '@engine/world/expeditions';
 // G-06 · The renderer. design.md D.5, D.6.
 //
@@ -630,14 +631,19 @@ export async function createGraphicsRenderer(
   // (`derive/building-boards.ts`): la misma pieza provisional, más pequeña.
   const smithyBoard = library.instance('smithy-board');
   const chapelBoard = library.instance('chapel-board');
-  const buildingBoards = { smithy: createNoticeBoard(smithyBoard), church: createNoticeBoard(chapelBoard) } as const;
+  // K5 · y el de la sastrería, todavía con la pieza provisional (sin malla
+  // propia: `docs/encargos/ilustraciones-k5-lino.md`).
+  const buildingBoards = {
+    smithy: createNoticeBoard(smithyBoard), church: createNoticeBoard(chapelBoard), tailor: createNoticeBoard(),
+  } as const;
+  const boardModels = { smithy: smithyBoard, church: chapelBoard, tailor: undefined } as const;
   for (const [which, mesh] of Object.entries(buildingBoards)) {
     mesh.group.name = `Valley_NoticeBoard_${which}`;
     mesh.group.userData['board'] = which;
-    mesh.group.scale.setScalar((which === 'smithy' ? smithyBoard : chapelBoard) === undefined ? BUILDING_BOARD_SCALE : 1);
+    mesh.group.scale.setScalar(boardModels[which as keyof typeof boardModels] === undefined ? BUILDING_BOARD_SCALE : 1);
   }
   /** Cuántos avisos se pueden atender en cada uno: tantos papeles. */
-  const buildingNotes = { smithy: 0, church: 0 };
+  const buildingNotes = { smithy: 0, church: 0, tailor: 0 };
   // El valle más vivo · la ropa tendida y el huerto de cada casa.
   const yards = createYards();
   // Y el ladrido del perro, que se dibuja porque no hay sonido.
@@ -655,7 +661,7 @@ export async function createGraphicsRenderer(
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, quarry.group, mineWorks.group, coins.mesh, fauna.group, seasonalFauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group, noticeBoard.group, buildingBoards.smithy.group, buildingBoards.church.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, quarry.group, mineWorks.group, coins.mesh, fauna.group, seasonalFauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group, noticeBoard.group, buildingBoards.smithy.group, buildingBoards.church.group, buildingBoards.tailor.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1711,7 +1717,7 @@ export async function createGraphicsRenderer(
   window.__valleyTrampleAt = (x: number, z: number) => trample?.at(x, z) ?? null;
   // §7.15 · dónde cae el tablón en la pantalla, en píxeles CSS del lienzo, para
   // que un recorrido lo toque de verdad (`shot.mjs --open board`).
-  window.__valleyBoardScreen = (which?: 'smithy' | 'church') => {
+  window.__valleyBoardScreen = (which?: 'smithy' | 'church' | 'tailor') => {
     const mesh = which === undefined ? noticeBoard : buildingBoards[which];
     if (!mesh.group.visible) return null;
     const at = new Vector3(0, 0.85, 0).applyMatrix4(mesh.group.matrixWorld).project(camera);
@@ -2217,6 +2223,7 @@ export async function createGraphicsRenderer(
         boardNotes = missionsOpen(shown).filter((m) => m.refusal === null).length;
         buildingNotes.smithy = smithyOrdersOpen(shown).filter((o) => o.refusal === null).length;
         buildingNotes.church = ritesOpen(shown).filter((r) => r.refusal === null).length;
+        buildingNotes.tailor = tailorOrdersOpen(shown).filter((o) => o.refusal === null).length;
         grass.plant(shown, groundFloor, plazaOf(shown), roadWear ?? undefined);
         grass.season(appearancePalette ?? paletteFor(live.season, live.seasonWeek),
           snowCover(live.season, live.seasonWeek));
@@ -2549,7 +2556,7 @@ export async function createGraphicsRenderer(
       steading.setHides(shown.village.hides);
       // K8 · los de la herrería y la capilla, sólo si el edificio está en pie.
       const onFacades = buildingBoardsOf(shown);
-      for (const which of ['smithy', 'church'] as const) {
+      for (const which of ['smithy', 'church', 'tailor'] as const) {
         const spot = onFacades.find((one) => one.which === which);
         if (spot === undefined) { buildingBoards[which].group.visible = false; continue; }
         buildingBoards[which].place(spot.x, groundFloor(spot.x, spot.z), spot.z, spot.yaw, buildingNotes[which]);
@@ -2842,7 +2849,7 @@ export async function createGraphicsRenderer(
         let node: Object3D | null = hit.object;
         while (node !== null && node.userData['noticeBoard'] !== true) node = node.parent;
         if (node === null) continue;
-        const which = node.userData['board'] as 'smithy' | 'church' | undefined;
+        const which = node.userData['board'] as 'smithy' | 'church' | 'tailor' | undefined;
         return which === undefined ? { kind: 'board' } : { kind: 'board', which };
       }
       for (const hit of hits) {
@@ -2874,7 +2881,7 @@ export async function createGraphicsRenderer(
           at = new Vector3(cx, groundFloor(cx, cz) + 1.5, cz);
         }
       } else if (target.kind === 'board') {
-        const mesh = target.which === 'smithy' || target.which === 'church' ? buildingBoards[target.which] : noticeBoard;
+        const mesh = target.which === 'smithy' || target.which === 'church' || target.which === 'tailor' ? buildingBoards[target.which] : noticeBoard;
         at = new Vector3(0, 1.2, 0).applyMatrix4(mesh.group.matrixWorld);
       }
       if (at === null) return null;
@@ -3308,7 +3315,7 @@ declare global {
     __valleyContactShade?: (tune: { ambient?: number; direct?: number; reach?: number }) => void;
     __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];
     __valleyTrampleAt?: (x: number, z: number) => { grass: number; snow: number } | null;
-    __valleyBoardScreen?: (which?: 'smithy' | 'church') => { x: number; y: number } | null;
+    __valleyBoardScreen?: (which?: 'smithy' | 'church' | 'tailor') => { x: number; y: number } | null;
     __valleyShadowStats?: () => { moves: number; redraws: number; frames: number };
   }
 }

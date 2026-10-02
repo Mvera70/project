@@ -874,6 +874,10 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
       // in a corner of the map — where a 3×3 church can no longer replace it.
       case 'chapel': case 'church': score = [Math.round(rimOffset(p, BUILDING_RULES.CHAPEL_SET_BACK)), Number(!rock), distance(p, centre)]; break;
       case 'smithy': score = [rimOffset(p, 0), -houseDistance]; break;
+      // K5 · la sastrería, como la herrería: un taller en el borde del núcleo
+      // y no pegado a la plaza. Por el caso por omisión (lo más cerca de la
+      // plaza) se ponía donde el buhonero monta su puesto y la aldea hace corro.
+      case 'tailor': score = [rimOffset(p, 0), -houseDistance]; break;
       // A4 · **la torre va contra el cerco, por dentro.** Es la tercera parte
       // de la fila A4 («las torres como mejora del anillo») y el defecto que
       // arregla se ve desde C2: `watchtower` no tenía caso propio, así que

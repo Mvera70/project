@@ -1,6 +1,6 @@
 // AR-2 · La mina, vista: el minero entra por la boca, desaparece dentro y
 // vuelve a salir, y la vagoneta sale llena, descarga en el acopio y vuelve a
-// entrar vacía. docs/plan-meta.md AR-2, docs/design.md §7.18.
+// entrar vacía. docs/plan-meta.md AR-2, docs/design.md §7.20.
 //
 // Vera: «que la mina tuviese una entrada que se viese como la cueva del oso,
 // más grande, y que entrasen y se viesen entrar, desaparecer y salir;

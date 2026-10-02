@@ -775,7 +775,7 @@ export interface Payment {
 }
 
 /** Lo que tiene tejado con alero: casas y obradores, no murallas ni campos. */
-const EAVED: ReadonlySet<string> = new Set(['house', 'stone_house', 'granary', 'smithy', 'mill', 'hall', 'chapel', 'church']);
+const EAVED: ReadonlySet<string> = new Set(['house', 'stone_house', 'granary', 'smithy', 'mill', 'hall', 'chapel', 'church', 'tailor']);
 function eavesOf(state: GameState, land: Terrain): Point[] {
   const out: Point[] = [];
   for (const b of state.buildings) {

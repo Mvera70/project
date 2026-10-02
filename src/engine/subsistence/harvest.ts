@@ -1,7 +1,7 @@
 // M-06 · Steps 9 and 10 of the tick: the harvest and the granary.
 // design.md §5.3.
 
-import { BOARDS, FOOD, TRAITS, TIME } from '../balance';
+import { BOARDS, FOOD, TAILOR, TRAITS, TIME } from '../balance';
 import { hasTrait } from '../state';
 import type { Allocation, GameState, HarvestResult } from '../state';
 import { weekOf } from '../time';
@@ -82,9 +82,26 @@ export function harvest(state: GameState, a: Allocation): HarvestResult {
     pecked *
     (has(state, 'mill') ? FOOD.MILL_BONUS : 1);
 
-  state.village.grain += yielded;
+  // K5 · **el campo de lino** (§7.18): si la sastrería tiene el encargo en
+  // marcha, uno de los campos trabajados no da grano sino lienzo, en la misma
+  // proporción que habría dado de grano. Es comida contra tela, y por eso se
+  // descuenta aquí y no en otro sitio: el lino se siembra, se cuida y se siega
+  // con el trigo, con los mismos brazos y el mismo cielo.
+  // **Y sólo si se trabajan bastantes campos.** Una aldea que menguó puede
+  // tener cuatro campos y brazos para dos: entonces el lino se queda sin
+  // sembrar y el trigo entero, porque si no, el campo de lino se lleva media
+  // cosecha y la aldea entra en la espiral del hambre (medido: pidiendo lino
+  // siempre, sin esta regla, caían 7 de 12 valles en 60 años).
+  const flaxLive = (state.flags['tailor:flax'] ?? -1) > state.tick && a.workedFields >= TAILOR.FLAX_MIN_FIELDS;
+  const flaxGrain = flaxLive ? yielded / a.workedFields : 0;
+  const linen = flaxLive ? Math.round(TAILOR.LINEN_PER_FIELD * (flaxGrain / FOOD.FIELD_YIELD)) : 0;
+  state.village.grain += yielded - flaxGrain;
+  state.village.linen += linen;
 
-  return { happened: true, yielded, workedFields: a.workedFields, weatherFactor, labourFactor: a.labourFactor };
+  return {
+    happened: true, yielded: yielded - flaxGrain, workedFields: a.workedFields, weatherFactor, labourFactor: a.labourFactor,
+    ...(flaxLive ? { linen, flaxGrain } : {}),
+  };
 }
 
 /**

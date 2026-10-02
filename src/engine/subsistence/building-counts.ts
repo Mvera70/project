@@ -36,3 +36,13 @@ export function has(state: GameState, kind: BuildingKind): boolean {
 export function smithyWorking(state: GameState): boolean {
   return standing(state, 'smithy').some((b) => b.lit);
 }
+
+/**
+ * K5 · Si la aldea va abrigada: el encargo de ropa de la sastrería está en
+ * marcha (§7.18). Se lee de la bandera y no de `world/tailor.ts`, por la misma
+ * regla que la rogativa en la siega: `subsistence/` no mira a `world/`. Vive
+ * aquí, en la hoja, porque lo leen la leña del invierno y el ánimo.
+ */
+export function clothed(state: GameState): boolean {
+  return (state.flags['tailor:clothes'] ?? -1) > state.tick;
+}

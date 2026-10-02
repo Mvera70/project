@@ -33,19 +33,25 @@ La tabla de v5.81 ya está preparada: cada pieza dice qué zona cubre (`COVERS`
 en `render3d/life/wounds.ts`) y `strike` recibe la zona del golpe; hoy todo es
 torso.
 
+## Repartidas
+
 ### 2 oct 2026 · La ropa abriga
 > «La ropa no es que sea el ánimo, sino también la ropa te calienta en
 > invierno, ese tipo de cosas. Por eso sí sube el ánimo, claro, a la ropa.»
 
-**Encargado** a K5 (lino y sastrería): que la ropa pese más en invierno, o
-apuntarlo como siguiente paso.
+**Repartida → hecha en v5.76** (K5): la ropa abriga; mientras dura el
+encargo, el invierno quema un cuarto menos de leña y el ánimo sube en invierno
+(`TAILOR.CLOTHES_WOOD`, `CLOTHES_WINTER_MORALE`; `docs/design.md` §7.18). El
+frío de hoy no mata a nadie, así que se engancha a la leña, sin castigo nuevo.
 
 ### 2 oct 2026 · Los encargos, en el edificio de su oficio
 > «Las cosas se deberían encargar desde la sastrería igual que la herrería,
 > igual que todas las profesiones que tengan este tipo de encargos, no la plaza
 > del pueblo; ahí habrá cosas excepcionales.»
 
-**Encargado** a K5 para `design.md`/`plan-meta.md`.
+**Repartida → `docs/design.md` §7.19 y la cabecera K de `docs/plan-meta.md`**
+(v5.76). Lo que hoy vive en la plaza y la regla mudaría (hierbas, veta alta,
+lobera) no se ha movido: es de Vera (`docs/task-log.md`).
 
 ### 2 oct 2026 · Los recursos son bases, y el nivelado va después
 > «Los recursos y todo eso para un futuro se podrán usar para muchas más cosas.
@@ -54,9 +60,9 @@ apuntarlo como siguiente paso.
 > creando sistemas. Después se nivelará todo junto.»
 
 Es un principio, no una tarea. El lino servirá también para las vendas de la
-enfermería («no está nada mal»).
-
-## Repartidas
+enfermería («no está nada mal»). **Repartida → la cabecera K de
+`docs/plan-meta.md`** (v5.76); el lienzo es una existencia (`village.linen`)
+que otro sistema puede gastar.
 
 ### 2 oct 2026 · La fauna, por estaciones
 > «¿Ahora mismo los animales salen por temporada? … Esta es un poco la idea.»
@@ -152,7 +158,7 @@ empujar y descargar.
 `docs/encargos-3d.md` una fila por pieza: la boca, entrar y salir como el oso,
 la vagoneta, el montón y los tres gestos (v5.81).
 **Y hecha en v5.86** (rama `claude/ar2-mineria`): la veta, la mina, el
-mineral y la Edad del Hierro en el motor (`docs/design.md` §7.18); el minero
+mineral y la Edad del Hierro en el motor (`docs/design.md` §7.20); el minero
 que entra, desaparece y sale, y la vagoneta que sale llena y vuelve vacía, en
 la vida; los modelos, con respaldo procedural hasta que lleguen los de Astra.
 **Queda** el buhonero como fuente secundaria (espera a AR-1, que es quien

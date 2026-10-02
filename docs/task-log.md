@@ -1,5 +1,31 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · K5: la sastrería y el lino (v5.76)
+
+Rama `claude/k5-caza-recoleccion`, desde `main` con el cuero (`ea97cc5`).
+Medido antes (`docs/medidas/k5-caza-recoleccion-2026-10-02.md` §7): el grano no
+sobra nunca y un campo sin grano deja la villa en 49 personas en vez de 61.
+Vera decidió: la tela sólo es ropa (de momento), se pide en una sastrería con
+tablón, y el lino ocupa un campo de trigo. Hecho: el edificio `tailor` (70 h a
+×1, con el cuarto campo), la tejedora (`weaver`), `village.linen`, los encargos
+`flax` y `clothes` (`world/tailor.ts`), el lino en la siega y la ropa que
+abriga (menos leña en invierno y ánimo de estar abrigado). Medido después (§8):
+pidiéndolos siempre, la villa en 45 personas en vez de 57, el ánimo en 68 en
+vez de 61 y la obra esperando madera del 36 al 26 % de las semanas en la aldea;
+ningún valle cae (sin la regla de los cuatro campos trabajados caían 7 de 12). La sastrería mueve la escalera: la
+villa cerrada de 331 a 350 h. Pruebas: `tests/fast/k5-linen.test.ts` (4 s).
+Captura: `docs/medidas/k-img/k5-tablon-sastreria-390.png`.
+
+**Abierto:**
+
+- **De Vera:** qué encargos de la plaza se mudan a su oficio según su regla
+  (§7.19): las hierbas (herbolaria o la enfermería de K11), la veta alta (el
+  herrero), la lobera (el guardabosques o la caza). No se ha movido nada.
+- **De Vera:** las plantas, el tercer material de K5 (no empezado).
+- **De otros carriles:** el modelo de la sastrería y de la tejedora, el campo
+  azul, las gavillas y el lienzo blanqueando (Astra); las seis ilustraciones y
+  las dos tarjetas (Codex, `docs/encargos/ilustraciones-k5-lino.md`).
+
 ## 2 oct 2026 · Los animales rehechos (v5.100)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
@@ -36,7 +62,7 @@ el gasto de la fragua, la Edad del Hierro con la primera mina
 (`flags['age:iron']`, `mine.opened`); en la vida, entrar, desaparecer, salir
 con la vagoneta llena, volcar y volver vacía, y picar la ladera (`life/mine.ts`,
 clip `push`); respaldos procedurales con los nombres del encargo de Astra
-(`world/mine-works.ts`). Diseño en `design.md` §7.18; medidas en
+(`world/mine-works.ts`). Diseño en `design.md` §7.20; medidas en
 `docs/medidas/ar2-mina-2026-10-02.md`: **Edad del Hierro a las 71 h a ×1**
 (24 semillas), villa cerrada 329 → 362 h, población final 56 → 50, letalidad
 igual. Suite rápida entera en local: 219 ficheros, 2 141 pruebas; las
@@ -58,6 +84,7 @@ jornadas, en local antes de la PR, con sus 18 rojas resueltas o declaradas
 - **Sin ver:** los GLB de Astra (`mine-mouth`, `minecart`/`-full`, `ore-pile`,
   `rails`); el marco del respaldo a un lado del hueco de la cueva; las ruedas
   que no giran; un gesto propio de volcar; la mina en el aparato.
+
 ## 2 oct 2026 · Tanda larga de modelos (dirección Sol 6)
 
 Base: `origin/main` en `aba7889b` (brief #55). Trabajo aislado de la copia local `art/astra-modelos`. Prioridad: Bloque 0 completo dentro de +30 llamadas y +60 000 triángulos en la villa grande. El motor queda fuera del alcance. Cada carril trae `main` antes de su PR y hace commit y push al acabar su bloque.
@@ -226,9 +253,12 @@ mueve byte a byte.
 
 **Abierto:**
 
-- **De Vera:** el lino y las plantas (no empezados); el nivelado del cuero
-  (`HIDES`, `JERKIN_SAVE`): quien toca todas las señales tiene pieles para las
-  dos cosas.
+- **De Vera:** el lino y las plantas (no empezados).
+
+**Decidido por Vera (2 oct, por el director):** el nivelado del cuero **se
+queda como está**: cazar mucho es esfuerzo del jugador y se premia; se revisa
+cuando se nivele todo al final. Los petos en la escena del asalto los lleva una
+sesión nueva de combate. Lo siguiente de K5 es **el lino** (v5.76–v5.79).
 - **Sin medir:** cuántos asaltos de más trae la plata del cuero vendido.
 - **De otros carriles:** la escena del asalto no sabe del peto (combate); el
   bastidor, el fardo y el peto en el torso (Astra); las seis ilustraciones y la

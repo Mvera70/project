@@ -19,6 +19,7 @@ import { BOARDS, TIME } from '@engine/balance';
 import { seasonOf } from '@engine/time';
 import type { MissionId, Rite, SmithyOrder } from '@engine/state';
 import { liveOrder, ritesOpen, smithyOrdersOpen } from '@engine/world/boards';
+import { tailorOrdersOpen } from '@engine/world/tailor';
 import type { BoardWhich } from '@derive/building-boards';
 import { missionsOpen, outNow, type MissionOpen } from '@engine/world/expeditions';
 import type { UiActions, UiPanel, UiSnapshot } from './contracts';
@@ -96,7 +97,7 @@ const CSS = `
   background-image: var(--res-silver); background-position: center; background-size: contain; background-repeat: no-repeat; }
 /* K8 · el precio de un encargo en madera lleva su icono; el de la fe, ninguno. */
 .valley-cost-chip.wood::before { background-image: var(--res-wood); }
-.valley-cost-chip.faith::before, .valley-cost-chip.hides::before { display: none; }
+.valley-cost-chip.faith::before, .valley-cost-chip.hides::before, .valley-cost-chip.linen::before { display: none; }
 .valley-note-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .valley-step { display: flex; align-items: center; gap: 6px; }
 .valley-step button { width: 40px; height: 40px; padding: 0; color: #3d3020; font: 700 22px/1 var(--skin-font-voice); cursor: pointer;
@@ -126,14 +127,15 @@ function riskKey(open: MissionOpen): string {
 }
 
 /** Un precio en su ficha: plata o madera con su icono, y la fe y las pieles en letra. */
-function chip(kind: 'silver' | 'wood' | 'faith' | 'hides', amount: number): HTMLSpanElement {
+function chip(kind: 'silver' | 'wood' | 'faith' | 'hides' | 'linen', amount: number): HTMLSpanElement {
   const cost = document.createElement('span');
   cost.className = `valley-cost-chip ${kind}`;
   const text = kind === 'silver' ? renderUiText('board.silver', { silver: amount })
     : kind === 'wood' ? renderUiText('board.cost.wood', { wood: amount })
       : kind === 'faith' ? renderUiText('board.cost.faith', { faith: amount })
-        : renderUiText('board.cost.hides', { hides: amount });
-  cost.textContent = kind === 'faith' || kind === 'hides' ? text : String(amount);
+        : kind === 'hides' ? renderUiText('board.cost.hides', { hides: amount })
+          : renderUiText('board.cost.linen', { linen: amount });
+  cost.textContent = kind === 'silver' || kind === 'wood' ? String(amount) : text;
   cost.setAttribute('aria-label', text);
   return cost;
 }
@@ -190,7 +192,8 @@ export function boardPanel(actions: UiActions): UiPanel & { show(which: BoardWhi
   ensureStyle();
   /** K8 · qué tablón se está mirando: el de la plaza, la fragua o la capilla. */
   let which: BoardWhich = 'plaza';
-  const titleKey = (): string => (which === 'smithy' ? 'board.smithy.title' : which === 'church' ? 'board.church.title' : 'board.title');
+  const titleKey = (): string => (which === 'smithy' ? 'board.smithy.title' : which === 'church' ? 'board.church.title'
+    : which === 'tailor' ? 'board.tailor.title' : 'board.title');
   const element = document.createElement('div');
   element.className = 'valley-board-veil';
   element.setAttribute('role', 'dialog');
@@ -241,6 +244,25 @@ export function boardPanel(actions: UiActions): UiPanel & { show(which: BoardWhi
           racks.className = 'valley-note-why';
           racks.textContent = renderUiText('board.hides.have', { hides: Math.floor(state.village.hides) });
           note.querySelector('.valley-note-facts')?.after(racks);
+        }
+        nodes.push(note);
+      }
+      board.replaceChildren(...nodes);
+      return;
+    }
+    // K5 · la sastrería: sembrar lino y coser ropa, por un año cada uno. El
+    // lienzo se cuenta aquí, como las pieles en la fragua: nunca en la cabecera.
+    if (which === 'tailor') {
+      for (const order of tailorOrdersOpen(state)) {
+        const costs = order.cost.linen !== undefined && order.cost.linen > 0 ? [chip('linen', order.cost.linen)] : [];
+        const facts = order.until !== null ? untilText(order.until) : renderUiText('board.lasts');
+        const note = buildingNote(`tailor.${order.id}`, costs, facts, order.refusal === 'busy' ? 'tailor.busy' : order.refusal,
+          'board.order', () => actions.tailor(order.id));
+        if (order.id === 'clothes') {
+          const bolts = document.createElement('p');
+          bolts.className = 'valley-note-why';
+          bolts.textContent = renderUiText('board.linen.have', { linen: Math.floor(state.village.linen) });
+          note.querySelector('.valley-note-facts')?.after(bolts);
         }
         nodes.push(note);
       }
@@ -358,7 +380,7 @@ export function boardPanel(actions: UiActions): UiPanel & { show(which: BoardWhi
   let key = '';
   const update = (snapshot: UiSnapshot): void => {
     const { state } = snapshot;
-    const next = `${which}:${state.tick}:${state.expeditions.length}:${Math.floor(state.village.silver)}:${Math.floor(state.village.wood)}:${Math.floor(state.village.faith)}:${Math.floor(state.village.hides)}:${liveOrder(state)?.order ?? ''}:${state.flags['rite:mass'] ?? ''}:${state.flags['rite:rogation'] ?? ''}:${[...wanted].join(',')}`;
+    const next = `${which}:${state.tick}:${state.expeditions.length}:${Math.floor(state.village.silver)}:${Math.floor(state.village.wood)}:${Math.floor(state.village.faith)}:${Math.floor(state.village.hides)}:${Math.floor(state.village.linen)}:${state.flags['tailor:flax'] ?? ''}:${state.flags['tailor:clothes'] ?? ''}:${liveOrder(state)?.order ?? ''}:${state.flags['rite:mass'] ?? ''}:${state.flags['rite:rogation'] ?? ''}:${[...wanted].join(',')}`;
     if (next === key && last !== null) { last = snapshot; return; }
     key = next;
     paint(snapshot);

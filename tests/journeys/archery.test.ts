@@ -76,6 +76,16 @@ const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [97, 25], [23,
  * cara de fuera del portón por delante (`fieldOutside`) la partida llega, y en
  * esta misma jornada la 11 suelta 29 flechas y acierta 11, la 23 suelta 13 y
  * acierta 6 y la 36 suelta 7 y acierta 6.
+ *
+ * **Con la sastrería (K5, v5.76) la lista vuelve a moverse.** Medido con arcos
+ * y el clan de veinte: la 7 a los 25 suelta 34 y acierta 12; la 23 a los 25,
+ * 39 y 9; la 11 **a los 25 ya no tiene cerco** (cero arqueros) y a los 30
+ * suelta 21 y acierta 10; la 3 a los 25, 14 y 4. La 36 a los 30 suelta 8 y no
+ * acierta ninguna: queda aparte, con su `it.fails`.
+ *
+ * **Con la mina encima (AR-2 + K5, 2 oct 2026) la 36 a los treinta vuelve a
+ * acertar** («Expect test to fail» en local) y entra en la lista de main, que
+ * ya la llevaba; la 11 a los veinticinco queda aparte, declarada por AR-2.
  */
 
 describe('D2 · la muralla contesta', () => {

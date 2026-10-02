@@ -42,7 +42,8 @@ function buildingPanel(building: Building, state: GameState): PanelModel {
       people: residents.length, names: named.join(', '),
     }));
   }
-  const role = building.kind === 'smithy' ? 'smith' : building.kind === 'chapel' || building.kind === 'church' ? 'priest' : null;
+  const role = building.kind === 'smithy' ? 'smith' : building.kind === 'tailor' ? 'weaver'
+    : building.kind === 'chapel' || building.kind === 'church' ? 'priest' : null;
   if (role !== null) {
     const holder = state.people.villagers.find((person) => isHere(person) && person.role === role);
     const roleName = renderUiText(`role.${role}`);

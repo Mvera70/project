@@ -268,6 +268,16 @@ enseña:
   oscuras, puertas atrancadas y huertos sin cuidar contarían la bajada (se
   cruza con K11, que la muerte se vea).
 
+## La sastrería y el lino (2 oct 2026, K5, v5.76)
+
+| Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
+|---|---|---|---|
+| **La sastrería** | Edificio `tailor`, con su tablón y su tejedora (`weaver`) | Una caja de taller con pared de lienzo crudo (`BUILDING_LOOKS.tailor`), su tablón provisional clavado en la fachada y la tejedora trabajando en la puerta con el aldeano base | `tailor.glb` y `villager-weaver.glb` (Astra, `docs/encargos/ilustraciones-k5-lino.md` §3) |
+| **El campo de lino** | Un año, el campo más lejano de la plaza (`tailor:flax:field`) da lienzo en vez de trigo en la siega | El campo se pinta como cualquier otro de trigo, col o puerros: **no se distingue** | `field-flax.glb`, azul en flor a principios de verano; y que `plan.ts` lo elija para el campo de `tailor:flax:field` |
+| **El lino segado** | La siega cuenta el lienzo (`tailor.flax.harvest`) | Sólo la línea de crónica | Gavillas en remojo en el río y tiras de lienzo blanqueando sobre la hierba unas semanas |
+| **La ropa nueva** | +0,2 de ánimo por semana durante un año | La cara del ánimo sube, sin causa a la vista | Camisas blancas en la gente un año, o la colada tendida (`yards`) más blanca |
+| **El lienzo guardado** | `village.linen` | Sólo la cuenta en el aviso de la ropa del tablón | Piezas de lienzo apiladas en la puerta de la sastrería |
+
 ## El cuero de la caza (2 oct 2026, K5, v5.75)
 
 | Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |

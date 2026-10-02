@@ -307,6 +307,10 @@ describe('IA-3 · aldeanos con hábitos', () => {
   // 1,58× y 2,72× en las seis. No se toca la cuenta ni el listón aquí; una prueba
   // que no baile tendría que medir personas, y en más de seis aldeas.
   //
+  // **Y con K5 (v5.76, 2 oct 2026) llega** («Expect test to fail» en la CI): con
+  // la sastrería y el contorno juntos la muestra cambia y el devoto reza el doble.
+  // Sale de `it.fails`; la cuenta y el listón siguen sin tocar, y si otra
+  // trayectoria lo vuelve a dejar corto, se declara otra vez con su cifra.
   // **Y vuelve a pasar con la mina (AR-2, v5.86, 2 oct 2026)**: la trayectoria
   // se mueve desde el año ~5 y la muestra de seis vuelve a dar el doble en la
   // jornada local («Expect test to fail»). Es el mismo baile de la muestra; si

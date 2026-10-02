@@ -5,12 +5,13 @@
 // harvest is eaten first and reaped afterwards, which is what makes a bad
 // autumn show up in the granary before the winter rather than after it.
 
-import { CHARACTER, FOOD, LABOUR, TIME } from '../balance';
+import { CHARACTER, FOOD, LABOUR, TAILOR, TIME } from '../balance';
 import { isHere, population } from '../people/demography';
 import { ageOf } from '../people/villagers';
 import { next, weighted } from '../rng';
 import type { GameState, Villager, VillagerId } from '../state';
 import { seasonOf, weekOf } from '../time';
+import { clothed } from './building-counts';
 import { feedAndSlaughter, type HerdReport } from './herd';
 import { scarHunger } from '../people/scars';
 
@@ -124,7 +125,8 @@ export function winterReserve(state: GameState): number {
   const coldUntil = state.flags['cold_houses'];
   const coldHouses = coldUntil !== undefined && (coldUntil === 0 || coldUntil > state.tick);
   return population(state) * LABOUR.WINTER_WOOD * weeks
-    * (coldHouses ? LABOUR.COLD_HOUSES_WOOD_MULTIPLIER : 1);
+    * (coldHouses ? LABOUR.COLD_HOUSES_WOOD_MULTIPLIER : 1)
+    * (clothed(state) ? TAILOR.CLOTHES_WOOD : 1);
 }
 
 /**
@@ -140,7 +142,7 @@ export function overwinter(state: GameState): { cold: boolean } {
   const coldHouses = coldUntil !== undefined && (coldUntil === 0 || coldUntil > state.tick);
   const need = population(state) * LABOUR.WINTER_WOOD * (
     coldHouses ? LABOUR.COLD_HOUSES_WOOD_MULTIPLIER : 1
-  );
+  ) * (clothed(state) ? TAILOR.CLOTHES_WOOD : 1); // K5 · la ropa abriga
   if (state.village.wood >= need) {
     state.village.wood -= need;
     return { cold: false };

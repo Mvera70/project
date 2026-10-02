@@ -9,13 +9,13 @@
 // endures disasters that would sink a faithless one — which is exactly why the
 // priest is dangerous.
 
-import { CROWN, MOOD, TIME, MEANS } from '../balance';
+import { CROWN, MOOD, TAILOR, TIME, MEANS } from '../balance';
 import { housingCapacity, isHere, population } from '../people/demography';
 import { will } from '../people/crown';
 import { hasTrait } from '../state';
 import type { DeathCause, GameState, TickContext } from '../state';
-import { weekOf } from '../time';
-import { has } from './building-counts';
+import { seasonOf, weekOf } from '../time';
+import { clothed, has } from './building-counts';
 
 /**
  * A death with no worldly explanation, which §5.6 charges to faith: someone
@@ -94,6 +94,9 @@ export function updateMood(state: GameState, ctx: TickContext): void {
   if (church) morale += MOOD.MORALE_CHURCH;
   if (mill) morale += MOOD.MORALE_MILL;
   if (outbreak) morale += MOOD.MORALE_OUTBREAK;
+  // K5 · **la ropa nueva** de la sastrería abriga, y el ánimo sube por eso:
+  // sólo en invierno, mientras dura el encargo (§7.18).
+  if (clothed(state) && seasonOf(state.tick) === 'winter') morale += TAILOR.CLOTHES_WINTER_MORALE;
   // §5.3's harvest bonus, on the harvest week only.
   if (weekOf(state.tick) === TIME.HARVEST_WEEK) {
     morale += (state.weather.factor - 1) * MOOD.MORALE_HARVEST;

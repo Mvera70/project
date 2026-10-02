@@ -1,5 +1,5 @@
 // AR-2 · La mina en el motor: la veta, cuándo se abre, la Edad del Hierro y el
-// acopio. docs/plan-meta.md AR-2, docs/design.md §7.18.
+// acopio. docs/plan-meta.md AR-2, docs/design.md §7.20.
 import { describe, expect, it } from 'vitest';
 import { MINE, TIME } from '../../src/engine/balance';
 import { CATALOG } from '../../src/engine/crossroads/catalog';

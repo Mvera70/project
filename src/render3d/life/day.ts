@@ -141,7 +141,8 @@ export function dayPlans(
     const age = ageOf(v, state.tick); let job: DayJob | null = null;
     if (from !== undefined && age >= LIFE.ADULT[0] && age <= LIFE.ADULT[1]) {
       const role = v.role;
-      const target = role === 'smith' ? ['smithy:', 'work'] : role === 'priest' ? ['church:|chapel:', 'pray']
+      const target = role === 'smith' ? ['smithy:', 'work'] : role === 'weaver' ? ['tailor:', 'work']
+        : role === 'priest' ? ['church:|chapel:', 'pray']
         : role === 'woodward' ? ['felling', 'work'] : role === 'reeve' ? ['granary:', 'work']
           // En una aldea ya formada el líder conserva la plaza. Cuando sólo
           // quedan dos adultos, sus catorce jornadas hacen falta para comer,

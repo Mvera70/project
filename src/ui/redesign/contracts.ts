@@ -10,7 +10,7 @@
 // §11.2 con el coordinador en vez de añadirla en silencio (UI-R0 §8).
 
 import type { BoardWhich } from '@derive/building-boards';
-import type { ArchivedGame, GameState, MeansId, MissionId, Rite, SmithyOrder, VillagerId } from '@engine/state';
+import type { ArchivedGame, GameState, MeansId, MissionId, Rite, SmithyOrder, TailorOrder, VillagerId } from '@engine/state';
 import type { InspectTarget } from '../inspect';
 import type { Speed } from '../speed';
 import type { ActorDoing } from '../../render3d/contracts';
@@ -90,6 +90,8 @@ export interface UiActions {
   smithy(order: SmithyOrder): void;
   /** K8 · un rito del tablón de la capilla. Lo decide el motor. */
   rite(rite: Rite): void;
+  /** K5 · un encargo del tablón de la sastrería. Lo decide el motor. */
+  tailor(order: TailorOrder): void;
 }
 
 /**

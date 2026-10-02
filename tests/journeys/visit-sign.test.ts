@@ -64,8 +64,23 @@ describe('RD-4 · la visita como señal', () => {
   // `it.fails`. **Desde el 2 oct 2026 pasa**: viene por la senda de la
   // garganta saliendo a la hora que le hace estar en la plaza a la suya, llega
   // antes y los porteadores con él (lo mide `life-trade.test.ts`).
+  // **K5 (v5.76, 2 oct 2026) · el factor en la semilla 7, aparte.** Con la
+  // sastrería y el contorno juntos, el grano llega cuando él ya se va: cero
+  // monedas, igual que en `life-trade.test.ts`. La propiedad no cambia.
+  it.fails('semilla 7 · tocar al factor también cierra el trato con monedas (medido con K5: ninguna)', () => {
+    const state = visiting(7, 'factor_visit');
+    const life = createVillage(state, state.tick * TIME.DAYS_PER_WEEK);
+    let dealt = false;
+    for (let n = 0; n < STEPS_PER_DAY; n += 1) {
+      life.step(n / STEPS_PER_DAY);
+      if (!dealt && life.visitors.some((v) => v.kind === 'factor_visit' && v.phase === 'staying')) dealt = life.dealVisit('factor_visit');
+      if (life.payments.length > 0) break;
+    }
+    expect(life.payments.length).toBeGreaterThan(0);
+  });
+
   it('y con el factor de grano también, en todas las semillas', () => {
-    for (const seed of SEEDS) {
+    for (const seed of SEEDS.filter((one) => one !== 7)) {
       for (const kind of ['factor_visit'] as const) {
         // AR-2 · la semilla 7, declarada en `life-trade.test.ts` (la leñera tapada).
         if (seed === 7) continue;

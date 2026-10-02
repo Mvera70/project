@@ -59,6 +59,8 @@ const AUTOMATIC_KINDS = [
   // caché de «nada que hacer» no se enteraría de que la aldea ya tiene madera
   // para levantarla.
   'hall',
+  // K5 · la sastrería.
+  'tailor',
 ] as const;
 
 function threatenedNow(state: GameState): boolean {
@@ -356,6 +358,13 @@ export function nextProject(state: GameState, budget: number = woodForWorks(stat
     && withinCap(state, 'watchtower') && canQuarry(state)) {
     wanted.push('watchtower');
   }
+
+  // 9 · K5 · la sastrería, el último de los oficios: es el taller de la
+  // tejedora y el sitio donde se pide el lino (§7.18). **Detrás de la muralla,
+  // el portón y la atalaya**: un taller no corre, y un valle amenazado levanta
+  // antes su cerco (medido: delante de la empalizada, la cola la pedía antes
+  // que la estacada con el clan a la vista, `works.test.ts`).
+  if (!has(state, 'tailor') && has(state, 'smithy') && people >= BUILDING_RULES.TAILOR_PEOPLE) wanted.push('tailor');
 
   // **E3 · lo que el jugador quiere antes va antes.**
   //

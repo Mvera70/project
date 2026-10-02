@@ -11,7 +11,7 @@ import { plazaOf } from './plaza';
 import { visibleBuildings } from './visible-buildings';
 
 /** De qué es cada tablón: el de misiones de la plaza, el de la fragua y el de la capilla. */
-export type BoardWhich = 'plaza' | 'smithy' | 'church';
+export type BoardWhich = 'plaza' | 'smithy' | 'church' | 'tailor';
 
 export interface BuildingBoardPlace {
   readonly which: Exclude<BoardWhich, 'plaza'>;
@@ -37,7 +37,7 @@ function onFacade(b: Building, plaza: { x: number; y: number }): { x: number; z:
   return { x: cx, z, yaw: dz >= 0 ? 0 : Math.PI };
 }
 
-/** Los tablones de los edificios que los tienen en pie: la herrería y la capilla (o iglesia). */
+/** Los tablones de los edificios que los tienen en pie: la herrería, la capilla (o iglesia) y la sastrería. */
 export function buildingBoardsOf(state: Pick<GameState, 'buildings' | 'map' | 'plaza'>): BuildingBoardPlace[] {
   const plaza = plazaOf(state as GameState);
   const standing = visibleBuildings(state);
@@ -46,5 +46,8 @@ export function buildingBoardsOf(state: Pick<GameState, 'buildings' | 'map' | 'p
   if (smithy !== undefined) out.push({ which: 'smithy', buildingId: smithy.id, ...onFacade(smithy, plaza) });
   const chapel = standing.find((b) => b.kind === 'church') ?? standing.find((b) => b.kind === 'chapel');
   if (chapel !== undefined) out.push({ which: 'church', buildingId: chapel.id, ...onFacade(chapel, plaza) });
+  // K5 · y la sastrería, con el mismo tablón (§7.18).
+  const tailor = standing.find((b) => b.kind === 'tailor');
+  if (tailor !== undefined) out.push({ which: 'tailor', buildingId: tailor.id, ...onFacade(tailor, plaza) });
   return out;
 }

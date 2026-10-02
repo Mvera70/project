@@ -91,6 +91,7 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
       stone: 0,
       silver: 0,
       hides: 0,
+      linen: 0,
       ore: 0,
     },
     people,

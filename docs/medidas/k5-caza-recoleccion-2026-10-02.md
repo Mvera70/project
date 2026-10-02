@@ -125,3 +125,84 @@ dilema que Vera eligió.
   probada con el parte (`tests/fast/k5-hides.test.ts`).
 - **Una partida sin caza no se mueve**: idéntica byte a byte (SHA-1 del estado
   a 30 años, semillas 7, 23 y 41) contra `main` en `02b7a87`.
+
+## 7 · El lino, antes de proponerlo (v5.76)
+
+`npx tsx tools/reports/k5-report.ts --flax`: 12 semillas × 60 años, prudente,
+horas a ×1, sobre `main` con el cuero (`ea97cc5`). **El valle de hoy** y **el
+contrafactual**: en cada siega se quita la parte de un campo (cosecha ÷ campos)
+desde que la aldea tiene cuatro, que es lo que costaría un campo sembrado de
+lino en vez de trigo.
+
+| tramo | gente hoy → sin un campo | campos | en el tope (8) | cosecha / lo que se come | hambre (sem.) hoy → sin | muertos de hambre por 100 h hoy → sin | sitios libres para un campo a 18 de la plaza |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| caserío (< 12) | 6 → 6 | 1 | 0 % | 1,37 | 7 % → 7 % | 3,7 → 4,0 | 470 |
+| aldea, sin herrería | 22 → 21 | 3 | 16 % | 1,11 | 5 % → 9 % | **12,7 → 21,1** | 405 |
+| herrería, sin cerco | 41 → 36 | 6 | 22 % | 1,36 | 5 % → 7 % | 16,0 → 18,5 | 355 |
+| villa cerrada | **61 → 49** | 8 | **93 %** | 1,38 | 4 % → 5 % | 19,8 → 22,1 | 229 |
+
+**Lo que dice:**
+
+- **El grano no sobra nunca.** El factor, que sólo sube con más de dos años de
+  grano en el granero, no subió **ni una vez** en 12 valles de 60 años. Cada
+  cosecha da entre 1,1 y 1,4 veces lo que se come, y es todo el margen.
+- **Un campo de lino cuesta gente, no sólo grano**: la villa cerrada se queda
+  en 49 personas en vez de 61 (−20 %), y en la aldea los muertos de hambre
+  pasan de 12,7 a 21,1 por cada 100 h. Ningún valle se acaba por ello.
+- **La villa vive en el tope de campos** (8 de 8 el 93 % de las semanas): ahí
+  un campo de lino o es uno de los ocho de trigo, o es un noveno que pide sitio
+  y manos.
+- **Sitio hay, hoy**: entre 229 y 470 celdas libres para un campo a menos de 18
+  de la plaza. Con la forma natural del valle (otra sesión, v5.60–v5.64) eso
+  puede cambiar: si el lino necesita sitio nuevo, se mide de nuevo sobre su
+  contorno antes de fusionar.
+
+## 8 · El lino, después (v5.76)
+
+Decidido por Vera (2 oct): la tela sólo es ropa, de momento; se pide en una
+sastrería con su tablón; el lino ocupa uno de los campos de trigo.
+
+**Cuándo llega la sastrería** (`pace-report.ts`, 24 semillas × 60 años,
+prudente): **70 h a ×1** (39–103 h, 22 de 24 valles), con el cuarto campo a las
+68 h. Mueve la escalera, porque se come 90 de madera: la villa cerrada pasa de
+331 a 350 h, la muralla de 157 a 165 h y la atalaya de 199 a 227 h; la
+población final no cambia (mediana 52).
+
+**La ropa abriga** (Vera, 2 oct, después de la primera versión: «no es sólo
+ánimo; abriga en invierno, y por eso sube el ánimo»). El frío de hoy: ninguna
+semana de invierno sin leña en 12 × 60 años, así que la mortalidad del frío no
+se dispara nunca; lo que pesa es la leña que se quema (0,4 por persona y semana
+de invierno). Con ropa, un cuarto menos, y +0,6 de ánimo por semana de
+invierno.
+
+**El dilema** (`k5-report.ts --linen`, 12 semillas × 60 años; «pide» encarga
+lino y ropa cada vez que el tablón lo deja, «no pide» nunca):
+
+| tramo | gente: no pide → pide | ánimo (mediana) | ánimo en invierno | ánimo < 40 | obra esperando madera | muertos de hambre por 100 h | lienzo por 10 h |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| caserío (< 12) | 6 → 6 | 36 → 36 | 33 → 33 | 55 % → 55 % | 1 % → 1 % | 3,7 → 3,7 | 0 |
+| aldea, sin herrería | 21 → 21 | 44 → 43 | 43 → 43 | 38 % → 40 % | **36 % → 26 %** | 10,6 → 10,1 | 2,7 |
+| herrería, sin cerco | 41 → 34 | 62 → **67** | 63 → 68 | 10 % → 10 % | 15 % → 10 % | 12,7 → 16,8 | 6,8 |
+| villa cerrada | **57 → 45** | 61 → **68** | 63 → **70** | 12 % → **7 %** | 5 % → 1 % | 20,5 → 21,6 | 8,5 |
+
+(Con la primera ropa —+0,2 de ánimo todo el año, sin tocar la leña— la villa
+se quedaba en 41 y el ánimo en 71, y la aldea doblaba sus muertos de hambre.)
+
+Primer lienzo a las 75 h. **Ningún valle cae** en ninguna de las dos columnas.
+
+**La primera versión mataba, y la medida lo dijo.** Con el lino quitando un
+campo de los **trabajados** cuando había cuatro **construidos**, pidiéndolo
+siempre caían **7 de 12 valles**: aldeas que habían menguado, con cuatro campos
+y brazos para dos, donde el lino se llevaba media cosecha y entraban en la
+espiral del hambre. Ahora el tablón sólo deja pedirlo si la aldea **necesita**
+cuatro campos, y en la siega el lino sólo se siembra si **trabaja** cuatro; si
+no, se queda sin sembrar y el trigo entero.
+
+**Lo que no llega o no se mide todavía:**
+
+- El campo de lino **no se distingue en pantalla**: se pinta como uno de trigo
+  (`docs/encargos-3d.md`). El dilema se ve en el tablón, en la crónica y en el
+  ánimo, no en el campo.
+- El «pide siempre» es la cota de arriba: no se ha medido un jugador que pida
+  el lino sólo los años de buena cosecha, que es lo que el dilema invita a
+  hacer.

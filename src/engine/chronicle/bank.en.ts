@@ -405,6 +405,11 @@ export const BANK: Record<string, string[]> = {
     'They raised {count} smithies that year.',
     'Year {year} gave the valley {count} more anvils.',
   ],
+  'built.tailor.year': [
+    'A tailor’s workshop was raised in year {year}.',
+    'They built {count} workshops for the loom that year.',
+    'Year {year} gave the valley a loom under a roof.',
+  ],
   'built.mill.year': [
     '{count} mills began turning in year {year}.',
     'They finished {count} mills that year.',
@@ -1111,6 +1116,32 @@ export const BANK: Record<string, string[]> = {
     'A year of leather on the wall ended in the {season}.',
     'By the {season} of year {year} the jerkins had done their year. The wall went back to plain wool.',
   ],
+  // K5 · la sastrería: el lino y la ropa (§7.18). `kind: 'means'`, como la herrería.
+  'tailor.flax.ordered': [
+    'In the {season} of year {year} the weaver asked for a field of flax. One field fewer of wheat.',
+    'They gave a field to flax that {season}, the one furthest from the square.',
+    'Year {year}: a field of wheat went to flax, for the loom.',
+  ],
+  'tailor.flax.harvest': [
+    'The flax came in with the wheat: {linen} bolts of linen, and {grain} bushels that were never sown.',
+    'The blue field was pulled in year {year}. {linen} bolts for the loom; the granary was {grain} the poorer.',
+    'Flax in the river to rot and on the grass to whiten: {linen} bolts in year {year}, instead of {grain} of grain.',
+  ],
+  'tailor.flax.done': [
+    'The flax field went back to wheat in the {season} of year {year}.',
+    'A year of flax ended in the {season}. The field was ploughed for grain again.',
+    'By the {season} of year {year} the blue field was wheat again.',
+  ],
+  'tailor.clothes.ordered': [
+    'In the {season} of year {year} the weaver cut {linen} bolts into clothes. People walked differently in them.',
+    'New clothes in year {year}, from the valley’s own linen. The winter would bite less.',
+    'That {season} the loom went quiet and the needles took over: new clothes for whoever needed them.',
+  ],
+  'tailor.clothes.done': [
+    'The clothes of year {year} were patched and faded by the {season}.',
+    'A year of new linen ended in the {season}.',
+    'By the {season} of year {year} the new shirts were old ones.',
+  ],
   'rite.mass.held': [
     'The priest called them to mass in the {season} of year {year}. Nobody worked that day, and nobody minded.',
     'A mass in year {year}, with the whole valley in the chapel and the fields empty.',
@@ -1264,6 +1295,12 @@ export const BANK: Record<string, string[]> = {
     'The forge was lit for the first time in the {season} of year {year}.',
     'They finished the smithy that {season}.',
     'A smithy went up in year {year}, and the work went faster after.',
+  ],
+  // K5 · la sastrería (§7.18).
+  'built.tailor': [
+    'The tailor’s workshop was finished in the {season} of year {year}. There was a loom in it before the roof was on.',
+    'They raised a workshop for the weaver that {season}, by the forge.',
+    'In year {year} the valley got a loom and a door to hang its cloth on.',
   ],
   'built.mill': [
     'The mill turned for the first time in the {season} of year {year}.',
@@ -2555,6 +2592,11 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'There is a smith at work in the valley.',
     'The first smithy stands, and the hammer carries.',
   ],
+  'milestone.first_of_kind.tailor': [
+    'There is a loom in the valley, and a weaver at it.',
+    'The tailor’s workshop opens its door.',
+    'The first bolt of the valley’s own cloth is on the loom.',
+  ],
   'milestone.first_of_kind.mill': [
     'The mill is turning.',
     'The first mill stands over the water.',
@@ -2611,6 +2653,11 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'Another forge is lit.',
     'A second smithy stands.',
     'There is more than one hammer in the valley.',
+  ],
+  'milestone.work_done.tailor': [
+    'Another workshop for the loom.',
+    'A second tailor’s workshop stands.',
+    'One more loom clacks in the valley.',
   ],
   'milestone.work_done.well': [
     'Another well is dug.',
@@ -2899,6 +2946,7 @@ export const UI_BANK: Record<string, string> = {
   // plaza (`ui/redesign/board.ts`), con sus avisos.
   'board.smithy.title': 'The forge',
   'board.church.title': 'The chapel',
+  'board.tailor.title': 'The tailor',
   'board.order': 'Commission',
   'board.rite': 'Ask the priest',
   'board.lasts': 'For a year',
@@ -2907,6 +2955,16 @@ export const UI_BANK: Record<string, string> = {
   'board.cost.faith': '{faith} faith',
   'board.cost.hides': '{hides} hides',
   'board.hides.have': '{hides} hides on the racks.',
+  'board.cost.linen': '{linen} linen',
+  'board.linen.have': '{linen} bolts of linen on the shelf.',
+  'board.why.tailor': 'There is no tailor’s workshop standing.',
+  'board.why.weaver': 'The loom is idle: there is no weaver.',
+  'board.why.tailor.busy': 'The weaver is still at that one.',
+  'board.why.fields': 'Not enough fields to spare one for flax.',
+  'tailor.flax.name': 'A field of flax',
+  'tailor.flax.what': 'One field of wheat is sown with flax for a year. Linen for the loom, and that much less bread.',
+  'tailor.clothes.name': 'New clothes',
+  'tailor.clothes.what': 'The weaver turns linen into warm clothes for a year: less firewood in winter, and better spirits.',
   'board.why.smithy': 'There is no forge standing.',
   'board.why.smith': 'The forge is cold: no smith at the anvil.',
   'board.why.busy': 'The smith is still at the last commission.',
@@ -3301,6 +3359,7 @@ export const UI_BANK: Record<string, string> = {
   'role.woodward': 'woodward',
   'role.reeve': 'reeve',
   'role.herbalist': 'herbalist',
+  'role.weaver': 'weaver',
   'role.stranger': 'stranger',
   'terrain.meadow': 'meadow',
   'terrain.forest': 'forest',
@@ -3314,6 +3373,7 @@ export const UI_BANK: Record<string, string> = {
   'building.granary': 'granary',
   'building.chapel': 'chapel',
   'building.smithy': 'smithy',
+  'building.tailor': 'tailor',
   'building.well': 'well',
   'building.mill': 'mill',
   'building.hall': 'leader’s hall',

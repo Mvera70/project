@@ -85,6 +85,10 @@ export const BUILDING_LOOKS: Readonly<Record<BuildingKind, BuildingLook>> = {
   // único color de la paleta que sólo lleva él. Cuando exista `hall.glb` esto
   // deja de usarse; el encargo de arte está en `docs/historico/plan-rey.md` §8.
   hall: { walls: 0.93, roof: 0.62, wallColour: PLASTER, roofColour: '#773B42', roofed: true },
+  // K5 · **la sastrería**, sin malla todavía (encargo en `docs/encargos-3d.md`):
+  // la caja de un taller con la pared de lienzo crudo, para que no se lea como
+  // una casa. Cuando exista `tailor.glb` esto deja de usarse.
+  tailor: { walls: 0.6, roof: 0.38, wallColour: '#D8D0BC', roofColour: THATCH, roofed: true },
   // AR-2 · **la mina no es una caja**: la boca, los raíles, la vagoneta y el
   // acopio los pinta `world/mine-works.ts` (con los GLB del encargo de Astra o
   // su respaldo procedural). Esto es sólo la losa oscura de la huella, a ras

@@ -1,5 +1,42 @@
 # The Valley — Registro de cambios
 
+## v5.76 · 2 oct 2026 · K5: la sastrería y el lino, comida contra tela
+
+**Medido antes** (`docs/medidas/k5-caza-recoleccion-2026-10-02.md` §7,
+`k5-report.ts --flax`, 12 semillas × 60 años): el grano no sobra nunca —el
+factor no subió ni una vez— y un campo sin grano desde que hay cuatro deja la
+villa cerrada en 49 personas en vez de 61. **Decidido por Vera**: la tela, de
+momento, sólo es ropa; se pide en una sastrería con su tablón; el lino ocupa
+uno de los campos de trigo. Y una **regla general** suya: los encargos se piden
+en el edificio del oficio que los hace, y la plaza queda para lo excepcional
+(§7.19).
+
+**Lo que cambia.** La aldea levanta sola **la sastrería** (`tailor`) con
+herrería y 24 personas: llega a las 70 h a ×1, con el cuarto campo. La trabaja
+**la tejedora** (`weaver`), que se nombra sola. Su tablón tiene dos encargos de
+un año: **un campo de lino** —en la siega, el campo más lejano de la plaza da
+lienzo en vez de trigo— y **ropa nueva** —6 de lienzo; abriga—. El lienzo es una existencia (`village.linen`, sin subir el
+esquema) para que mañana sirva para más.
+
+**Por qué el lino pide cuatro campos trabajados**: pidiéndolo siempre, sin esa
+regla caían 7 de 12 valles en 60 años —aldeas menguadas con cuatro campos y
+brazos para dos, donde el lino se llevaba media cosecha—. Con ella, ninguno.
+**La ropa abriga** (Vera: «por eso sube el ánimo»): mientras dura, el invierno
+quema un cuarto menos de leña y el ánimo sube en invierno. El frío de hoy no
+mata a nadie (ninguna semana sin leña en 12 × 60 años); lo que pesa es la leña,
+y ahí se engancha. **Medido después** (`--linen`): pidiendo lino y ropa siempre,
+la villa cerrada queda en 45 personas en vez de 57, con el ánimo en 68 en vez de
+61, y la obra espera madera menos (del 36 al 26 % de las semanas en la aldea). **La sastrería mueve
+la escalera** (`pace-report.ts`, 24 semillas): la villa cerrada de 331 a 350 h,
+la atalaya de 199 a 227.
+
+**Y de paso**: §7.17 (el cuero) se había quedado colgado bajo el encabezado de
+§8 en `design.md`; vuelve a su sitio.
+
+**Abierto, de Vera**: qué encargos de la plaza se mudan a su oficio, y las
+plantas. Lo que no se ve —el taller, la tejedora, el campo azul, el lienzo
+blanqueando—, en `docs/encargos-3d.md` y `docs/encargos/ilustraciones-k5-lino.md`.
+
 ## v5.100 · 2 oct 2026 · Los animales rehechos: de la receta de los del valle
 
 **Por qué.** Vera, 2 oct 2026: «los modelos de Astra de los animales no me
@@ -103,7 +140,7 @@ Lo pidió Vera: el metal sale «sobre todo de la minería», que tiene que ser
 una entrada que se viese como la cueva del oso, más grande, y que entrasen y
 se viesen entrar, desaparecer y salir; carruajes con el mineral: que lleguen
 llenos, se descarguen y salgan vacíos para adentro». **La primera mina abre la
-Edad del Hierro** (`plan-meta.md` AR). Diseño en `docs/design.md` §7.18 y
+Edad del Hierro** (`plan-meta.md` AR). Diseño en `docs/design.md` §7.20 y
 medidas en `docs/medidas/ar2-mina-2026-10-02.md`.
 
 **Motor.** La veta es una función pura del terreno (`world/mine.ts`,

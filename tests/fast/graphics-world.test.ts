@@ -713,7 +713,10 @@ describe('G-10 · el reparto no son clones', () => {
  * ninguna: la sala del líder de K-4, la última, llegó el 27 sep 2026 (la casa
  * larga de Astra, `art/recipes/hall-candidate`).
  */
-const PENDING_MESH: ReadonlySet<string> = new Set([]);
+// K5 (2 oct 2026) · la sastrería: encargada a Astra en
+// `docs/encargos/ilustraciones-k5-lino.md` §3 (`tailor.glb`). Mientras, la caja
+// de `BUILDING_LOOKS.tailor`.
+const PENDING_MESH: ReadonlySet<string> = new Set(['tailor']);
 
 describe('G-10 · cobertura del catálogo', () => {
   it('ningún tipo de edificio se queda en la caja de reserva', () => {
@@ -727,6 +730,7 @@ describe('G-10 · cobertura del catálogo', () => {
       // acopio y la vagoneta los pone `world/mine-works.ts`, con los GLB del
       // encargo de Astra (bloque 4) o su respaldo procedural.
       if (kind === 'mine') continue;
+      if (PENDING_MESH.has(kind)) continue;
       expect(BUILDING_ASSETS[kind], `${kind} no tiene recurso`).toBeDefined();
     }
   });

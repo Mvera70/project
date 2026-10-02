@@ -1,5 +1,5 @@
 // AR-2 · La mina: la veta al pie de la montaña, cuándo la abre la aldea y lo
-// que saca cada semana. docs/plan-meta.md AR-2, docs/design.md §7.18.
+// que saca cada semana. docs/plan-meta.md AR-2, docs/design.md §7.20.
 //
 // **La veta no es una capa del mapa.** Es una función pura del terreno y de lo
 // construido: la celda al pie de la montaña, con roca seguida detrás y sitio

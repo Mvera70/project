@@ -49,7 +49,13 @@ describe('el año se nota · §11.9', () => {
         if (last === undefined) continue;
         const x = last % s.map.width;
         const y = Math.floor(last / s.map.width);
-        if (s.buildings.some((b) => b.kind === 'field' && b.lostTick === null
+        // K5 (v5.76, 2 oct 2026) · quien va a una obra pegada al campo no ara:
+        // la casilla desde la que se trabaja la obra puede caer en el campo de
+        // al lado. Con la trayectoria de la sastrería, la semilla 7 levanta en
+        // invierno del año 20 un granero junto a dos campos y tres albañiles
+        // se contaban como labradores.
+        const atWork = s.works.some((w) => x >= w.x - 1 && x <= w.x + w.w && y >= w.y - 1 && y <= w.y + w.h);
+        if (!atWork && s.buildings.some((b) => b.kind === 'field' && b.lostTick === null
           && x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h)) n += 1;
       }
       return n;
