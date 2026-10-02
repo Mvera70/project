@@ -1,5 +1,25 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · La tanda del día, cerrada (director)
+
+Veintiuna PR en `main` entre las 12:11 y las 19:53 de Madrid. La última es K5,
+la sastrería y el lino (#56, `71ee2ed4`). Siete de ellas son de la tanda de
+modelos de Codex y las fusionó Codex. El informe, con el orden, cómo combinan,
+lo que costó y lo que queda por dueño, está en
+`docs/medidas/fusion-2026-10-02-dia.md`.
+
+**Regla nueva:** una PR del arte de Codex que entra en `main` entre la CI de
+otra y su fusión no obliga a repetir esa CI, siempre que sólo traiga
+`art/recipes/`, `artifacts/` o documentos y que GitHub dé la PR como limpia.
+Se comprueba con `git diff` y se escribe en el informe.
+
+**Abierto, de Vera:** el rey y la Edad de los Caballeros; el precio de la mina
+(villa cerrada de 329 a 362 h); los encargos de la plaza que se mudan a su
+oficio; las cinco preguntas de K12; `?aa=msaa` en la tablet.
+
+**Abierto, de la vida:** la jornada de 80 agentes va justa (se mide la mejor de
+tres jornadas); la leñera bloqueada en la semilla 7.
+
 ## 2 oct 2026 · K5: la sastrería y el lino (v5.76)
 
 Rama `claude/k5-caza-recoleccion`, desde `main` con el cuero (`ea97cc5`).
@@ -287,7 +307,7 @@ más piedra): bases puestas, nada construido. (3) Que los usos entren como usos
 de un mismo cinturón, sin código aparte para cada uno (principio de Vera del
 2 oct): hoy cada uno lee el contorno con `distanceOutside` y ninguno depende de
 su tamaño exacto; juntarlos en una tabla de bandas es de la ronda de los
-recursos. PR #58.
+recursos. PR #58, **fusionada** (`36c71897`).
 
 ## 2 oct 2026 · El valle con forma natural (v5.73)
 
