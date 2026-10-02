@@ -1,0 +1,19 @@
+{
+  "id": "hammer",
+  "triangles": 56,
+  "budget": 120,
+  "meshes": [
+    "hammer"
+  ],
+  "materials": 1,
+  "textures": 0,
+  "sizeGltf": [
+    0.10249999538064003,
+    0.21699999645352364,
+    0.053999997675418854
+  ],
+  "origin": "hand_r grip",
+  "front": "+Z",
+  "glbBytes": 6420,
+  "sha256": "91ea37d6b90e5d537e953b479ff7366858b217b909b1de13d6d5210f7359c2f8"
+}

@@ -7995,6 +7995,210 @@
       }
     },
     {
+      "id": "notice-board",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/notice-board.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/notice-board.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/notice-board"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 5,
+        "meshes": 5,
+        "materials": 1,
+        "triangles": 260
+      },
+      "hashes": {
+        "notice-board.glb": "FBD8D6AC2B4D12467FFB77BF276C3B4099A433C037711191B4BB11B1EEF969F3"
+      }
+    },
+    {
+      "id": "smithy-board",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/smithy-board.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/smithy-board.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/smithy-board"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 204
+      },
+      "hashes": {
+        "smithy-board.glb": "CF9226069E39F7378C06C07E2EEF263D2F72FE285706A2EFFE92D4AE4313D44E"
+      }
+    },
+    {
+      "id": "chapel-board",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/chapel-board.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/chapel-board.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/chapel-board"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 184
+      },
+      "hashes": {
+        "chapel-board.glb": "9C70EEB3E8479451023809E438B5EC6F92C46550EEF1931CB10B94F425357C30"
+      }
+    },
+    {
+      "id": "signpost",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/signpost.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/signpost.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/signpost"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 96
+      },
+      "hashes": {
+        "signpost.glb": "9B355379E5C7F6A3867108C590D995E18220FE4F55DCF4E7CB5F91081E931C44"
+      }
+    },
+    {
+      "id": "hide-rack",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/hide-rack.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/hide-rack.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/hide-rack"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 5,
+        "meshes": 5,
+        "materials": 1,
+        "triangles": 384
+      },
+      "hashes": {
+        "hide-rack.glb": "150FA21996C9027FA4556256B8C9EF4A1A37990FB27E93FCD92D3C39D9EE87D2"
+      }
+    },
+    {
+      "id": "hammer",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/hammer.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/hammer.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/hammer"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 56
+      },
+      "hashes": {
+        "hammer.glb": "91EA37D6B90E5D537E953B479FF7366858B217B909B1DE13D6D5210F7359C2F8"
+      }
+    },
+    {
       "id": "jerkin",
       "blenderVersion": "5.2.1 LTS",
       "provenance": {

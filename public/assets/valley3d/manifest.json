@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-02T15:41:48.375Z",
+  "generatedAt": "2026-10-02T15:49:58.698Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts --ids jerkin",
   "assets": [
     {
@@ -1814,6 +1814,72 @@
       "provenance": {
         "kind": "original",
         "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/market-awning-candidate/market-awning.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "notice-board",
+      "file": "notice-board.glb",
+      "sha256": "FBD8D6AC2B4D12467FFB77BF276C3B4099A433C037711191B4BB11B1EEF969F3",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/notice-board.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "smithy-board",
+      "file": "smithy-board.glb",
+      "sha256": "CF9226069E39F7378C06C07E2EEF263D2F72FE285706A2EFFE92D4AE4313D44E",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/smithy-board.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "chapel-board",
+      "file": "chapel-board.glb",
+      "sha256": "9C70EEB3E8479451023809E438B5EC6F92C46550EEF1931CB10B94F425357C30",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/chapel-board.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "signpost",
+      "file": "signpost.glb",
+      "sha256": "9B355379E5C7F6A3867108C590D995E18220FE4F55DCF4E7CB5F91081E931C44",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/signpost.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "hide-rack",
+      "file": "hide-rack.glb",
+      "sha256": "150FA21996C9027FA4556256B8C9EF4A1A37990FB27E93FCD92D3C39D9EE87D2",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/hide-rack.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "hammer",
+      "file": "hammer.glb",
+      "sha256": "91EA37D6B90E5D537E953B479FF7366858B217B909B1DE13D6D5210F7359C2F8",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/hammer.json",
         "license": "project-original"
       }
     },

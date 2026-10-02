@@ -38,6 +38,7 @@ export const STEADING_ASSETS = [
   'barrel', 'crate', 'sack-pile', 'tool-rack', 'washing-line', 'flower-pot', 'herb-bed',
   'beehive', 'scarecrow', 'trough', 'chicken-coop', 'wood-chopping', 'stump', 'fallen-log',
   'bush', 'wildflowers', 'mushrooms', 'stone-wall', 'wayside-shrine', 'lantern-post', 'market-awning',
+  'hide-rack',
 ] as const;
 export type SteadingAsset = (typeof STEADING_ASSETS)[number];
 const SMALL_SCENIC = new Set<SteadingAsset>([
@@ -63,7 +64,7 @@ export const MOST_STEADED: Readonly<Record<SteadingAsset, number>> = {
   'flower-pot': 4, 'herb-bed': 2, beehive: 3, scarecrow: 2, trough: 2,
   'chicken-coop': 2, 'wood-chopping': 2, stump: 5, 'fallen-log': 3,
   bush: 6, wildflowers: 6, mushrooms: 4, 'stone-wall': 3,
-  'wayside-shrine': 2, 'lantern-post': 2, 'market-awning': 1,
+  'wayside-shrine': 2, 'lantern-post': 2, 'market-awning': 1, 'hide-rack': 1,
 };
 
 /**
@@ -170,6 +171,11 @@ export function steadingOf(state: GameState, seed: number): Steaded[] {
   const place = (asset: SteadingAsset, candidates: readonly number[], limit = MOST_STEADED[asset]): void => {
     for (const cell of candidates) {
       if (out.filter((one) => one.asset === asset).length >= limit) return;
+      if (asset === 'hide-rack') {
+        const x = cell % map.width + 0.5, z = Math.floor(cell / map.width) + 0.5;
+        // A drying rack belongs by a workshop, outside the busy square.
+        if (Math.hypot(x - square.x, z - square.y) <= PLAZA.RADIUS + 1) continue;
+      }
       if (asset === 'shed') {
         const x = cell % map.width + 0.5, z = Math.floor(cell / map.width) + 0.5;
         // El cobertizo ocupa una parcela entera y no pertenece a la plaza:
@@ -306,6 +312,8 @@ export function steadingOf(state: GameState, seed: number): Steaded[] {
     }
   }
 
+  // Added last so the established homes and paths keep their scenic places.
+  place('hide-rack', around('smithy', 'house', 'stone_house'));
   return out;
 }
 
@@ -319,6 +327,7 @@ export function steadingOf(state: GameState, seed: number): Steaded[] {
 export class Steading {
   readonly group = new Group();
   private readonly owned: InstancedMesh[] = [];
+  private readonly hideParts: { mesh: InstancedMesh; number: number }[] = [];
 
   constructor() {
     this.group.name = 'Valley_Steading';
@@ -353,6 +362,10 @@ export class Steading {
         piece.geometry.computeBoundingBox();
         const instanced = new InstancedMesh(piece.geometry, piece.material, mine.length);
         instanced.name = `Steading_${asset}`;
+        if (asset === 'hide-rack') {
+          const match = /^hide_([1-4])$/u.exec(piece.name);
+          if (match !== null) this.hideParts.push({ mesh: instanced, number: Number(match[1]) });
+        }
         instanced.castShadow = asset === 'haystack' || asset === 'log-pile' || asset === 'handcart'
           || asset === 'shed' || (!SMALL_SCENIC.has(asset) && piece.geometry.boundingBox?.max.y !== undefined
             && piece.geometry.boundingBox.max.y > 1);
@@ -374,6 +387,12 @@ export class Steading {
     this.placed = places.length;
   }
 
+  /** The frame stays out; hides follow the four inventory ranges. */
+  setHides(hides: number): void {
+    const visible = hides <= 0 ? 0 : hides <= 2 ? 1 : hides <= 5 ? 2 : 4;
+    for (const part of this.hideParts) part.mesh.visible = part.number <= visible;
+  }
+
   clear(): void {
     for (const instanced of this.owned) {
       this.group.remove(instanced);
@@ -381,6 +400,7 @@ export class Steading {
       instanced.geometry.dispose();
     }
     this.owned.length = 0;
+    this.hideParts.length = 0;
     this.placed = 0;
   }
 
