@@ -1,5 +1,37 @@
 # The Valley — Registro de cambios
 
+## v5.65 · 2 oct 2026 · Dientes de sierra en la tablet: la resolución sólo baja si bajar sirve
+
+Vera, con su tablet (iPlay 70 mini Ultra, Adreno 725, Medium @60): «se ve muy
+mal y con dientes de sierra todo», con el panel en «resolución 50 %». Medium
+dibuja a 1,5 de densidad sin MSAA, y la adaptativa lo bajaba a la mitad: 0,75
+píxeles por píxel CSS, cada uno tapando 2,7 de la pantalla. El estiramiento ya
+era lineal; faltaba resolución. Y la adaptativa bajaba **sin mirar si bajar
+servía**: en un aparato al que le pesa la CPU el fotograma tarda lo mismo a
+cualquier escala, y en ocho segundos estaba en el suelo sin ganar nada.
+
+- **Una bajada tiene que pagarse** (`adaptive-scale.ts`): la ventana siguiente
+  la juzga, y si el fotograma no se acortó la mitad de lo que se acortaría con
+  todo en píxeles, se deshace y no se reintenta hasta que empeore un 25 %. Los
+  8 primeros segundos del valle no deciden. En vivo, con un aparato limitado
+  por la CPU: antes 0,5 a los 8 s; ahora prueba 0,85, la deshace y se queda en
+  1, tres de tres.
+- **El suelo de Medium, un píxel por píxel CSS** (`profile.ts`, de 0,5 a
+  1/1,5), como ya tenía High.
+- **El panel de taller dice «(CPU)»** cuando bajar no pagó.
+
+Descartado con medida: FXAA (GV-3, sigue valiendo); alpha-to-coverage (las
+briznas son geometría sin alfa: no hay borde que suavizar); bajar sombras o
+hierba (ya van a cada 4 fotogramas y aligeradas en Medium, y no es lo que se
+ve dentado). **MSAA en Medium se decide en la tablet** con `?aa=msaa`: en
+SwiftShader cuesta un 33–36 % de fotogramas, en Adreno se espera menos de 1 ms.
+Medidas y hojas antes/después a 390 y 750:
+`docs/medidas/dientes-de-sierra-tablet-2026-10-02.md`.
+
+Pruebas: la adaptativa con un modelo de aparato (CPU, GPU y a medias, y con
+ruido de ±10 % en doce semillas) y el suelo de High y Medium
+(`adaptive-scale`, `graphics-profile`).
+
 ## v5.56 · 1 oct 2026 · La suite rápida vuelve a ser rápida: lo lento, a las jornadas
 
 **Medido antes, en CI** (vuelta 36930779436 del 1 oct 2026): el trabajo `fast`

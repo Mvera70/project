@@ -1909,6 +1909,9 @@ export async function createGraphicsRenderer(
     calls: renderer.info.render.calls,
     triangles: renderer.info.render.triangles,
     scale: renderScale,
+    // v5.65 · si la adaptativa probó a bajar y no acortó el fotograma: en el
+    // aparato, la señal de que lo que pesa es la CPU y no los píxeles.
+    scaleUnpaid: adapt.unpaidAt !== null,
     level: profile.level,
     targetFps: profile.targetFps,
     renderMs: lastRenderMs,
@@ -3219,7 +3222,7 @@ declare global {
     __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm; shadow?: number } | null) => void;
     __valleyBattleStats?: () => BattleStats;
     __valleyRenderStats?: () => {
-      calls: number; triangles: number; scale: number; level: string; targetFps: number;
+      calls: number; triangles: number; scale: number; scaleUnpaid: boolean; level: string; targetFps: number;
       renderMs: number; lifeMs: number; lifeSteps: number; paintMs: number;
       aa: string; aaBytes: number; revealed: number; trackedHidden: boolean | null;
     };
