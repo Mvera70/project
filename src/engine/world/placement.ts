@@ -724,8 +724,26 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   if (kind === 'gate' && gateRing !== null) {
     const blocked = Uint8Array.from(state.map.terrain, (tile, cell) =>
       Number(!walkableTerrain(tile) || planned.occupied[cell] !== 0));
+    // v5.89 · **Fuera es lo que llega a las gargantas**, no todo lo que queda
+    // más allá del anillo. Sembrar en cualquier celda lejana contaba como
+    // campo abierto la bolsa de prado que el cerco deja contra la montaña: en
+    // la semilla 13 el único portón daba a tres celdas de prado y luego a la
+    // sierra, y la aldea entera alcanzaba 448 celdas de las 8 064 del mapa. Las
+    // gargantas son las filas de los dos extremos, por donde entra el río y por
+    // donde llega cualquiera de fuera —el forastero, el buhonero, la partida—:
+    // lo que comunica con ellas es el resto del valle, con sus campos, su
+    // bosque y sus caminos.
+    const gorges: number[] = [];
+    const last = (state.map.height - 1) * state.map.width;
+    for (let x = 0; x < state.map.width; x++) {
+      if (blocked[x] === 0) gorges.push(x);
+      if (blocked[last + x] === 0) gorges.push(last + x);
+    }
     const starts: number[] = [];
-    for (let cell = 0; cell < blocked.length; cell++) {
+    if (gorges.length > 0) starts.push(...gorges);
+    // Un mapa sin garganta transitable no lo genera el valle de hoy; si llegara,
+    // vale lo de antes, que al menos no deja al pueblo sin portón.
+    else for (let cell = 0; cell < blocked.length; cell++) {
       if (blocked[cell] === 0 && Math.hypot(cell % state.map.width + 0.5 - centre.x,
         Math.floor(cell / state.map.width) + 0.5 - centre.y) > gateRing + BUILDING_RULES.GATE_CLEAR) starts.push(cell);
     }
