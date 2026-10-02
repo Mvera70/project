@@ -74,7 +74,7 @@ import { bearPosition, createBear, stepBear } from './bear';
 import { beginFlight, stepFlight, type Flight } from './flee';
 import { createSackScene, sackSnapshot, type SackScene, type SackSnapshot } from './sack';
 import { aftermathProps } from './aftermath';
-import { abandonShift, createMineScene, mineSiteOf, SHIFT_END, startShift, stepShift, type MineScene, type Shaft } from './mine';
+import { abandonShift, createMineScene, mineSiteOf, SHIFT_END, startShift, stepShift, underground, type MineScene, type Shaft } from './mine';
 import type { Animal } from '@derive/animals';
 import {
   carryAt, drop, findMate, fling, given, LOFT, PLAYED_OUT, propPlaces, PROP_PLACE_PREFIX,
@@ -1283,7 +1283,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     const sites = tradeSites(state, land, mine, visitor.kind === 'pedlar' ? 'bundle' : 'grain', site.front, String(visitor.body.id));
     const busy = new Set(preparationByVillager.keys());
     const trips = planCarry(state, land, dwellers.filter((dweller) => !busy.has(dweller.villager)
-      && dweller.ageGroup === undefined && !isPost(dweller.dayPlan?.job?.place ?? ''))
+      && dweller.ageGroup === undefined && !isPost(dweller.dayPlan?.job?.place ?? '')
+      // AR-2 · el minero puede estar dentro de la roca cuando el vendedor
+      // llega, y desde allí no hay ruta: el porte se perdía y nadie pagaba.
+      && dweller.dayPlan?.job?.place.startsWith('mine:') !== true)
       .map((dweller) => ({ villager: dweller.villager, at: dweller.body, radius: dweller.body.radius, guarding: false })),
     sites, seed, TRADE_PORTERS);
     tradeLoads.set(`trade:${visitor.body.id}`, []);
@@ -2090,6 +2093,18 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // quien ha llegado a la boca entra, desaparece y vuelve a salir hasta
         // que se le acaba la jornada (`SHIFT_END`), y entonces sale a pie y
         // la rutina de casa le recupera. No se empieza un turno a última hora.
+        // Si otra rutina le ha dado otro encargo (el porte de un trato, la
+        // víspera de un asalto), el turno se suelta: sale a la boca, su
+        // vagoneta vuelve adentro, y el encargo nuevo manda.
+        if (dweller.shaft !== undefined && mineScene !== null
+          && dweller.doing?.place.id.startsWith('mine:') !== true) {
+          abandonShift(dweller.shaft, mineScene);
+          if (underground(dweller.shaft, mineScene.site, body)) {
+            body.x = mineScene.site.stand.x;
+            body.z = mineScene.site.stand.z;
+          }
+          delete dweller.shaft;
+        }
         if (mineScene !== null && (dweller.shaft !== undefined || (dweller.doing?.there === true
           && dweller.doing.place.id.startsWith('mine:') && phase < SHIFT_END))) {
           dweller.shaft ??= startShift(steps);

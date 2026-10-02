@@ -54,7 +54,8 @@ function assaulted(seed: number, years: number, bows: boolean): GameState {
  * nada: eso es la propiedad «sin cerco no hay guarnición», y la guarda
  * `tests/fast/garrison.test.ts`.
  */
-const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [11, 25], [23, 25], [36, 30]];
+// AR-2 (v5.86) · la 11 sale de la lista, otra vez, y entra la 97 (ver abajo).
+const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [97, 25], [23, 25], [36, 30]];
 
 /**
  * RD-3 (1 oct 2026) · **La semilla 11 salió de la lista y quedó declarada aparte**
@@ -106,6 +107,25 @@ describe('D2 · la muralla contesta', () => {
         .toBeLessThan(60);
       physics.dispose();
     }
+  });
+
+  // **AR-2 (v5.86, 2 oct 2026) · la semilla 11 vuelve a salir de la lista,
+  // declarada.** Con la mina la trayectoria se mueve desde el año ~5 y a los
+  // veinticinco años la 11 tiene el anillo cerrado (85 piezas, el portón en
+  // (23, 55), los mismos que sin mina), seis arcos en el cerco y **cero
+  // flechas en la jornada**; lo mismo la 41. No es la mina: con la escena de
+  // la mina apagada y con su celda abierta da igual, cero. La partida no se
+  // pone a tiro de un cerco cerrado, que es la precondición de la prueba de
+  // arriba; entra la 97, que sí (18 flechas, 6 aciertos). La propiedad se
+  // queda intacta aquí.
+  it.fails('semilla 11 · se dispara y se acierta también a los veinticinco años', async () => {
+    const state = assaulted(11, 25, true);
+    const physics = await createPhysics(terrainOf(state));
+    if (physics === null) return;
+    const life = createVillage(state, 0, { physics });
+    for (let n = 0; n < DAY_STEPS; n += 1) life.step();
+    expect(life.defence.loosed, 'semilla 11: flechas soltadas').toBeGreaterThan(0);
+    physics.dispose();
   });
 
   it('sin arcos no se suelta una sola flecha', async () => {

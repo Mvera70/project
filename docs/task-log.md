@@ -14,9 +14,16 @@ clip `push`); respaldos procedurales con los nombres del encargo de Astra
 (`world/mine-works.ts`). Diseño en `design.md` §7.18; medidas en
 `docs/medidas/ar2-mina-2026-10-02.md`: **Edad del Hierro a las 71 h a ×1**
 (24 semillas), villa cerrada 329 → 362 h, población final 56 → 50, letalidad
-igual. Suite rápida entera en local: 219 ficheros, 2 141 pruebas.
+igual. Suite rápida entera en local: 219 ficheros, 2 141 pruebas; las
+jornadas, en local antes de la PR, con sus 18 rojas resueltas o declaradas
+(changelog v5.86).
 
 **Abierto:**
+
+- **De vida (avisado al director):** en la semilla 7 a los ocho años dos
+  leñeros que esperan la hora de su entrega tapan las plazas de la leñera, y
+  los porteadores del buhonero y del factor no cargan (`life-trade.test.ts`,
+  declarada).
 
 - **De Vera:** el precio de la mina (la villa 33 h más tarde, la población
   final −6) es nivelado; y si el rey se queda sin traer con `age:iron`

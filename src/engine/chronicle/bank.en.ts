@@ -2595,6 +2595,12 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'The first bastion stands in the wall.',
     'Part of the wall stands higher than the rest now.',
   ],
+  // AR-2 · la boca de la mina, al pie de la montaña.
+  'milestone.first_of_kind.mine': [
+    'There is a mine in the mountain now.',
+    'The first cart of ore has come out of the hillside.',
+    'The valley digs its own iron.',
+  ],
 
   'milestone.work_done.chapel': [
     'A second chapel stands.',
@@ -3030,6 +3036,7 @@ export const UI_BANK: Record<string, string> = {
   'doing.raising.church': 'They are raising the church.',
   'doing.raising.watchtower': 'They are raising the watchtower.',
   'doing.raising.bastion': 'They are raising a bastion into the wall.',
+  'doing.raising.mine': 'They are timbering a mine into the mountain.',
   // U-06 · la línea de estación bajo el año (`src/ui/app.ts`, `seasonLabel`):
   // una clave por estación, nunca un literal junto a `seasonOf`.
   'app.season.spring': 'Spring',

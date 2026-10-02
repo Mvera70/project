@@ -47,7 +47,22 @@ tamaños), y la hierba se aparta de la vía. Unas siete llamadas de dibujo.
 **Crónica:** `mine.opened` y `built.mine`, con sus dos ilustraciones pedidas en
 `docs/plan-arte-pendiente.md`. **Pruebas:** `tests/fast/mine.test.ts` y
 `tests/fast/life-mine.test.ts`; la suite rápida entera pasa en local (219
-ficheros, 2 141 pruebas). **Abierto:** el buhonero como fuente secundaria (con
+ficheros, 2 141 pruebas). **Las jornadas, pasadas en local antes de la PR**
+(476 pruebas, 34 min): 18 rojas, y cada una con su causa. **De la mina**, tres
+arreglos de verdad: el turno se suelta si otra rutina reasigna al minero, el
+minero no entra en el reparto de portes de un trato (podía estar dentro de la
+roca), y la `drop()` de los trastos busca por celdas cuando su espiral no
+encuentra suelo (una iglesia 3×3 entre casas); y tres de cobertura (la ficha
+`milestone.first_of_kind.mine`, `doing.raising.mine` y que los cuerpos del
+turno no cuentan en «nadie dentro de un muro», como el oso en su cueva). **De
+trayectoria**, con la propiedad intacta: el herrero sin casa de la semilla 7
+(la precondición pide casa), la semilla 11 que no se acerca al cerco
+(declarada, entra la 97), la 7 del buhonero y del factor (dos leñeros esperando
+su hora tapan la leñera y nadie carga: declarada, y avisado a vida), la muestra
+de la leñera (tres jornadas, como decía su medida) y tres `it.fails` que ahora
+se cumplen y pasan a `it`. Queda roja en local la del coste de una jornada,
+que también lo está en `main` en este contenedor (2,8 s contra 2,5): es la
+máquina. **Abierto:** el buhonero como fuente secundaria (con
 AR-1, que es quien gastará el mineral); lo que no se ve bien, en
 `encargos-3d.md`; y, de Vera, que `age:iron` **no** trae al rey («leader hasta
 la Edad del Hierro» en `design.md`, y la del Hierro ya es la segunda).

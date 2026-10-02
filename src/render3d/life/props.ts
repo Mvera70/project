@@ -159,6 +159,21 @@ function standableNear(land: Terrain, at: Point): Point {
     const z = at.z + Math.cos(angle) * reach;
     if (standable(land, x, z)) return { x, z };
   }
+  // AR-2 · la espiral muestrea 39 puntos hasta 3,5 celdas, y en un rincón de
+  // iglesia 3×3 apretada entre casas (la semilla 7 al año 40 desde la mina) no
+  // cae en ninguno libre. Antes de rendirse, el centro de la celda libre más
+  // cercana, por anillos de celdas hasta seis de distancia.
+  const cx = Math.floor(at.x), cz = Math.floor(at.z);
+  for (let r = 1; r <= 6; r += 1) {
+    let best: Point | null = null, bestGap = Number.POSITIVE_INFINITY;
+    for (let dz = -r; dz <= r; dz += 1) for (let dx = -r; dx <= r; dx += 1) {
+      if (Math.max(Math.abs(dx), Math.abs(dz)) !== r) continue;
+      const x = cx + dx + 0.5, z = cz + dz + 0.5;
+      const gapTo = Math.hypot(x - at.x, z - at.z);
+      if (gapTo < bestGap && standable(land, x, z)) { best = { x, z }; bestGap = gapTo; }
+    }
+    if (best !== null) return best;
+  }
   return at;
 }
 

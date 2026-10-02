@@ -26,8 +26,11 @@ describe('los porteadores van con el reloj de las entregas · esquema 12', () =>
       const state = foundTwenty(seed);
       run(state, TIME.WEEKS_PER_YEAR * 3, 'prudent', CATALOG);
       const at = state.woodRun?.at ?? [];
-      // El segundo y el tercer día de la semana: la jornada entera con sus horas.
-      for (const weekDay of [1, 2]) {
+      // El segundo, el tercero y el cuarto día de la semana: la jornada entera
+      // con sus horas. **Tres, como dice la medida de abajo** (AR-2, v5.86): con
+      // dos la muestra era de catorce entregas y una sola de menos —la mina
+      // movía el reparto del día en la semilla 11— la ponía en 0,71.
+      for (const weekDay of [1, 2, 3]) {
         const life = createVillage(state, state.tick * TIME.DAYS_PER_WEEK + weekDay);
         // La jornada de vida empieza a medianoche (fase 0) y la semana del motor a
         // media mañana (`DAY_START_PHASE`): la hora de la semana de cada paso es
