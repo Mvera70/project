@@ -1724,7 +1724,7 @@ export async function createGraphicsRenderer(
   // cuántos asaltantes y qué guarnición, y se rehace la jornada con ellos. Es
   // la capa de vida la que los pone —`garrisonAs`, sin el tope de §12—; el
   // motor sigue sin saber nada. `null` vuelve a lo que diga el motor.
-  let battleChoice: { raiders: number; hands: number; arm: Arm; shadow?: number; jerkins?: boolean; jerkinBlows?: number } | null = null;
+  let battleChoice: { raiders: number; hands: number; arm: Arm; shadow?: number; jerkins?: boolean } | null = null;
   window.__valleyBattle = (choice) => { battleChoice = choice; life = null; };
   // Y lo que el banco enseña en directo, en una llamada ligera: sin posiciones
   // en pantalla, que es lo caro de `__valleyLife`.
@@ -2255,8 +2255,6 @@ export async function createGraphicsRenderer(
           ...(battleChoice === null ? {} : { battle: {
             raiders: battleChoice.raiders,
             garrison: garrisonAs(shown, battleChoice.hands, battleChoice.arm, battleChoice.jerkins),
-            // K5 · el peto sólo decide en la escena si el banco lo pide.
-            ...(battleChoice.jerkinBlows === undefined ? {} : { jerkinBlows: battleChoice.jerkinBlows }),
           } }),
           // F-0 · la flecha que toca, en sombra: sólo el banco la pide.
           ...(battleChoice?.shadow === undefined ? {} : { shadow: { radius: battleChoice.shadow, height: DRAWN_BODY.height } }),
@@ -2864,7 +2862,7 @@ export async function createGraphicsRenderer(
     // apunte (§1b). Sale de la capa de vida tal cual: aquí no se interpreta.
     battle(): BattleReport | null {
       if (life === null) return null;
-      const { loosed, fallen, lost, gate } = life.defence;
+      const { loosed, fallen, lost, gate, jerkins } = life.defence;
       // Hay algo que contar si alguien disparó, si alguien cayó, o si la puerta
       // ha recibido un golpe: las tres son cosas que pasaron en la muralla.
       if (loosed === 0 && fallen === 0 && (gate === null || gate.hits === 0)) return null;
@@ -2881,6 +2879,9 @@ export async function createGraphicsRenderer(
         // aguantó. Esto es lo que hace que la pelea pueda perder una partida que
         // los números daban por salvada, que es §1b: la batalla decide.
         breached: gate?.entered ?? false,
+        // v5.81 · y los que el peto dejó en pie: la escena ya aplicó la
+        // armadura, así que el motor sólo los cuenta (`settle`).
+        spared: jerkins.spared,
       };
     },
     startHunt(state: Readonly<GameState>, species: HuntSpecies, weapon: HuntWeapon): boolean {
@@ -3261,7 +3262,7 @@ declare global {
     __valleyHoldScale?: (scale: number | null) => void;
     __valleyHoldFlood?: (level: number | null) => void;
     __valleyVisit?: (kind?: HappeningId, dealt?: boolean) => void;
-    __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm; shadow?: number; jerkins?: boolean; jerkinBlows?: number } | null) => void;
+    __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm; shadow?: number; jerkins?: boolean } | null) => void;
     __valleyBattleStats?: () => BattleStats;
     __valleyRenderStats?: () => {
       calls: number; triangles: number; scale: number; scaleUnpaid: boolean; level: string; targetFps: number;

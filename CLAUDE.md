@@ -301,8 +301,10 @@ el motor sigue siendo determinista *dadas sus entradas* y la batalla no lo es.
 Si nadie mira la pelea, decide la cuenta de B3. Si el portón cede y alguien
 entra y sigue en pie, `ended.cause = 'stormed'` y la partida se acaba.
 
-**Tres reglas de esa maquinaria que cuesta tiempo olvidar:** una flecha basta y
-un golpe de mano no (tres); un portón roto con la partida entera en el suelo
+**Tres reglas de esa maquinaria que cuesta tiempo olvidar:** desde v5.81 lo que
+tumba es la vida, no la cuenta de golpes —a cuerpo descubierto una flecha tumba y
+una lanza quita el 34 %; la armadura protege una parte (el cuero, un 15 % de la
+flecha) o hace rebotar el golpe (`life/wounds.ts`)—; un portón roto con la partida entera en el suelo
 **no** es un valle tomado; y el parte de la batalla **no salva por existir**,
 salva si adelgazó la partida —si no, mirar la pantalla volvería al valle
 inmortal. Medido: sin dar defensa caen 3 de 12 valles en ochenta años; con la

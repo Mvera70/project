@@ -1,0 +1,35 @@
+semilla 7 jornada 0: sin peto 5 caídos, 2 asaltantes · con peto 5 caídos, 3 asaltantes (20 golpes al cuero, 0 en pie gracias a él)
+semilla 7 jornada 1: sin peto 5 caídos, 5 asaltantes · con peto 4 caídos, 5 asaltantes (21 golpes al cuero, 1 en pie gracias a él)
+semilla 7 jornada 2: sin peto 5 caídos, 3 asaltantes · con peto 4 caídos, 4 asaltantes (17 golpes al cuero, 0 en pie gracias a él)
+semilla 7 jornada 3: sin peto 5 caídos, 3 asaltantes · con peto 4 caídos, 4 asaltantes (20 golpes al cuero, 1 en pie gracias a él)
+semilla 7 jornada 4: sin peto 4 caídos, 3 asaltantes · con peto 4 caídos, 4 asaltantes (16 golpes al cuero, 0 en pie gracias a él)
+semilla 11 jornada 0: sin peto 7 caídos, 3 asaltantes · con peto 7 caídos, 7 asaltantes (30 golpes al cuero, 0 en pie gracias a él)
+semilla 11 jornada 1: sin peto 7 caídos, 4 asaltantes · con peto 5 caídos, 5 asaltantes (25 golpes al cuero, 1 en pie gracias a él)
+semilla 11 jornada 2: sin peto 6 caídos, 3 asaltantes · con peto 5 caídos, 4 asaltantes (23 golpes al cuero, 1 en pie gracias a él)
+semilla 11 jornada 3: sin peto 8 caídos, 6 asaltantes · con peto 9 caídos, 7 asaltantes (36 golpes al cuero, 0 en pie gracias a él)
+semilla 11 jornada 4: sin peto 9 caídos, 5 asaltantes · con peto 9 caídos, 10 asaltantes (36 golpes al cuero, 0 en pie gracias a él)
+semilla 21 jornada 0: sin peto 3 caídos, 1 asaltantes · con peto 3 caídos, 2 asaltantes (12 golpes al cuero, 0 en pie gracias a él)
+semilla 21 jornada 1: sin peto 3 caídos, 2 asaltantes · con peto 4 caídos, 5 asaltantes (17 golpes al cuero, 0 en pie gracias a él)
+semilla 21 jornada 2: sin peto 4 caídos, 3 asaltantes · con peto 1 caídos, 2 asaltantes (8 golpes al cuero, 0 en pie gracias a él)
+semilla 21 jornada 3: sin peto 3 caídos, 2 asaltantes · con peto 3 caídos, 3 asaltantes (12 golpes al cuero, 0 en pie gracias a él)
+semilla 21 jornada 4: sin peto 4 caídos, 2 asaltantes · con peto 4 caídos, 5 asaltantes (16 golpes al cuero, 0 en pie gracias a él)
+semilla 42 jornada 0: sin peto 1 caídos, 1 asaltantes · con peto 4 caídos, 4 asaltantes (16 golpes al cuero, 0 en pie gracias a él)
+semilla 42 jornada 1: sin peto 4 caídos, 3 asaltantes · con peto 4 caídos, 5 asaltantes (17 golpes al cuero, 0 en pie gracias a él)
+semilla 42 jornada 2: sin peto 4 caídos, 1 asaltantes · con peto 4 caídos, 4 asaltantes (16 golpes al cuero, 0 en pie gracias a él)
+semilla 42 jornada 3: sin peto 5 caídos, 4 asaltantes · con peto 3 caídos, 5 asaltantes (16 golpes al cuero, 1 en pie gracias a él)
+semilla 42 jornada 4: sin peto 4 caídos, 2 asaltantes · con peto 4 caídos, 3 asaltantes (16 golpes al cuero, 0 en pie gracias a él)
+
+flecha: quita 1 de vida
+
+K5 · el peto en la pelea: 20 jornadas (4 semillas × 5), 10 en el cerco (spear) contra 24, año 60, suelo con el relieve del juego
+  sin peto
+    caídos en la escena (lost): media 4.80 · mediana 5 · p90 8 · máx 9
+    asaltantes caídos: media 2.90 · mediana 3 · p90 5 · máx 6 · heridos en pie al final media 1.10 · mediana 1 · p90 3 · máx 4 · entraron en 20 de 20
+    flechas soltadas media 0.00 · mediana 0 · p90 0 · máx 0; aciertos media 0.00 · mediana 0 · p90 0 · máx 0
+    el motor: entierra media 6.50 · mediana 7 · p90 7 · máx 7; tomado en 20 de 20
+  con peto (decide la escena, v5.81)
+    caídos en la escena (lost): media 4.50 · mediana 4 · p90 9 · máx 9
+    asaltantes caídos: media 4.55 · mediana 4 · p90 7 · máx 10 · heridos en pie al final media 0.80 · mediana 1 · p90 2 · máx 3 · entraron en 20 de 20
+    flechas soltadas media 0.00 · mediana 0 · p90 0 · máx 0; aciertos media 0.00 · mediana 0 · p90 0 · máx 0
+    el motor con el encargo: entierra media 6.50 · mediana 7 · p90 7 · máx 7; tomado en 20 de 20; la crónica cuenta 0 en pie gracias al peto
+    el peto: golpes al cuero media 19.50 · mediana 17 · p90 36 · máx 36; rebotes 0; caídos con peto 90; en pie gracias a él 5

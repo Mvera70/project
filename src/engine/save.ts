@@ -145,7 +145,8 @@ function actRecord(value: unknown): boolean {
       && HUNT_WEAPONS.has(act['weapon'] as string) && tickValue(act['hits']) && typeof act['killed'] === 'boolean';
   }
   if (act['kind'] === 'battle') {
-    return tickValue(act['slain']) && tickValue(act['lost']) && typeof act['breached'] === 'boolean';
+    return tickValue(act['slain']) && tickValue(act['lost']) && typeof act['breached'] === 'boolean'
+      && (act['spared'] === undefined || tickValue(act['spared']));
   }
   // RD-4 · ir a buscar al niño perdido.
   if (act['kind'] === 'search') {

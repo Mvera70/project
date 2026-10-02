@@ -35,6 +35,7 @@ import type { GameState } from '@engine/state';
 import type { Body, Point, Terrain } from './body';
 import { reachableFrom, nearestReachable } from './terrain';
 import { blockedAt, integrate, turnTo } from './body';
+import type { Armour } from './wounds';
 import { LIFE_STEP } from './clock';
 import { pathTo } from './navigate';
 import type { MeleeGesture } from './melee';
@@ -95,6 +96,15 @@ export interface Raider extends MeleeGesture {
    * entonces vive aquí, que es donde pasó.
    */
   hits: number;
+  /**
+   * v5.81 · La vida, de 1 a 0 (`wounds.ts`): **ya no cae al primer flechazo**.
+   * Lo que tumba es la vida, y `hits` sólo cuenta. Sin campo, entero.
+   */
+  health?: number;
+  /** v5.81 · Lo que lleva puesto el del clan. Nada, hoy; la tabla ya sabe del metal. */
+  readonly armour?: Armour;
+  /** v5.81 · Flechas o golpes que rebotaron enteros en lo que lleva puesto. */
+  ricochets?: number;
   /** De esos golpes, los de flecha: el banco de batallas mide el acierto con ellos. */
   arrowHits?: number;
   /**

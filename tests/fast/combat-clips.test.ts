@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { DAMAGE } from '../../src/render3d/life/wounds';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { Box3, type AnimationClip, type Object3D, Vector3 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -222,8 +223,11 @@ describe('E1 · el hecho decide la pose', () => {
   });
 
   it('el golpe fatal llega al reparto en el mismo fotograma y se queda al final', () => {
-    const enemy = raider(); enemy.hits = 2;
-    const defender = { at: { x: 12, z: 10.5 }, post: { post: { arm: 'spear' } } as Manned, hits: 2, down: false, downAt: -1 };
+    // Dos lanzazos encima de cada uno: al tercero, los dos al suelo (`wounds.ts`).
+    const left = 1 - 2 * DAMAGE.spear;
+    const enemy = raider(); enemy.hits = 2; enemy.health = left;
+    const defender = { at: { x: 12, z: 10.5 }, post: { post: { arm: 'spear' } } as Manned, hits: 2, health: left,
+      down: false, downAt: -1 };
     stepMelee([enemy], [defender], 30);
     expect(defender.downAt).toBe(30); expect(enemy.downAt).toBe(30);
     const life = { land: { width: 32, height: 32 }, dwellers: [], raiders: [enemy], visitors: [], travellers: [], steps: 31 } as unknown as Village;

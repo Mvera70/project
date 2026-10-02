@@ -641,6 +641,13 @@ export type PlayerAct =
     lost: number;
     /** Si llegaron a entrar. Lo único que decide si la partida acaba. */
     breached: boolean;
+    /**
+     * v5.81 · Los nuestros que siguen en pie gracias a lo que llevaban puesto
+     * (el peto): la escena ya les aplicó la armadura, así que el motor no la
+     * vuelve a aplicar y sólo lo cuenta. Sin campo, un parte que no sabía de
+     * armaduras: el motor aplica la suya (`BOARDS.JERKIN_SAVE`).
+     */
+    spared?: number;
   };
 
 /** K8 · los encargos de la herrería, en orden estable (el tablón los pinta así). */
