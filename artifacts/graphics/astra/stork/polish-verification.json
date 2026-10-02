@@ -1,0 +1,30 @@
+{
+  "stork": {
+    "before": 158,
+    "after": 230,
+    "limit": 250,
+    "unchangedPivots": true,
+    "unchangedDrawPrimitives": true
+  },
+  "chick": {
+    "before": 70,
+    "after": 78,
+    "limit": 80,
+    "unchangedPivots": true,
+    "unchangedDrawPrimitives": true
+  },
+  "crane": {
+    "before": 88,
+    "after": 148,
+    "limit": 150,
+    "unchangedPivots": true,
+    "unchangedDrawPrimitives": true
+  },
+  "butterfly": {
+    "before": 16,
+    "after": 16,
+    "limit": 16,
+    "unchangedPivots": true,
+    "unchangedDrawPrimitives": true
+  }
+}

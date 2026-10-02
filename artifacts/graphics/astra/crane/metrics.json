@@ -1,12 +1,12 @@
 {
-  "triangles": 88,
+  "triangles": 148,
   "limit": 150,
   "meshCount": 3,
   "primitives": 3,
   "dimensionsCells": [
     0.6666666865348816,
-    0.0683333333581686,
-    0.5236309766769409
+    0.06999999843537807,
+    0.5219643115997314
   ],
   "pivotsMetres": {
     "bird_body": [
