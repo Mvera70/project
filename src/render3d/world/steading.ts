@@ -39,6 +39,7 @@ export const STEADING_ASSETS = [
   'beehive', 'scarecrow', 'trough', 'chicken-coop', 'wood-chopping', 'stump', 'fallen-log',
   'bush', 'wildflowers', 'mushrooms', 'stone-wall', 'wayside-shrine', 'lantern-post', 'market-awning',
   'hide-rack',
+  'bench', 'log-seat', 'cart',
 ] as const;
 export type SteadingAsset = (typeof STEADING_ASSETS)[number];
 const SMALL_SCENIC = new Set<SteadingAsset>([
@@ -65,6 +66,7 @@ export const MOST_STEADED: Readonly<Record<SteadingAsset, number>> = {
   'chicken-coop': 2, 'wood-chopping': 2, stump: 5, 'fallen-log': 3,
   bush: 6, wildflowers: 6, mushrooms: 4, 'stone-wall': 3,
   'wayside-shrine': 2, 'lantern-post': 2, 'market-awning': 1, 'hide-rack': 1,
+  bench: 3, 'log-seat': 2, cart: 1,
 };
 
 /**
@@ -176,6 +178,8 @@ export function steadingOf(state: GameState, seed: number): Steaded[] {
         // A drying rack belongs by a workshop, outside the busy square.
         if (Math.hypot(x - square.x, z - square.y) <= PLAZA.RADIUS + 1) continue;
       }
+      if (asset === 'cart' && [cell - 1, cell + 1, cell - map.width, cell + map.width]
+        .some(next => (map.path[next] ?? 0) > 0)) continue;
       if (asset === 'shed') {
         const x = cell % map.width + 0.5, z = Math.floor(cell / map.width) + 0.5;
         // El cobertizo ocupa una parcela entera y no pertenece a la plaza:
@@ -314,6 +318,17 @@ export function steadingOf(state: GameState, seed: number): Steaded[] {
 
   // Added last so the established homes and paths keep their scenic places.
   place('hide-rack', around('smithy', 'house', 'stone_house'));
+  place('bench', homes);
+  place('cart', around('granary', 'mill'));
+  const px = Math.floor(square.x), pz = Math.floor(square.y);
+  const seatRing: number[] = [];
+  for (let dz = -3; dz <= 3; dz += 1) for (let dx = -3; dx <= 3; dx += 1) {
+    const distance = Math.hypot(dx, dz);
+    const x = px + dx, z = pz + dz;
+    if (distance < 2.5 || distance > 3.5 || x < 0 || z < 0 || x >= map.width || z >= map.height) continue;
+    seatRing.push(z * map.width + x);
+  }
+  place('log-seat', seatRing);
   return out;
 }
 
@@ -366,7 +381,7 @@ export class Steading {
           const match = /^hide_([1-4])$/u.exec(piece.name);
           if (match !== null) this.hideParts.push({ mesh: instanced, number: Number(match[1]) });
         }
-        instanced.castShadow = asset === 'haystack' || asset === 'log-pile' || asset === 'handcart'
+        instanced.castShadow = asset === 'haystack' || asset === 'log-pile' || asset === 'handcart' || asset === 'cart'
           || asset === 'shed' || (!SMALL_SCENIC.has(asset) && piece.geometry.boundingBox?.max.y !== undefined
             && piece.geometry.boundingBox.max.y > 1);
         instanced.receiveShadow = true;
