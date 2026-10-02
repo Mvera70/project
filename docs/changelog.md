@@ -44,9 +44,21 @@ bosque de ladera y cantera como vida, sin tocar el balance (eso va en v5.74).
   plantones; la prueba de rutas absorbe lo abaratado antes de medir; y
   `module-graph` aprende los dos módulos nuevos del mapa. Suite rápida entera en
   local: 213 ficheros, 2 107 pruebas.
+- **Y las jornadas de la CI** (diecinueve rojas en trece ficheros): tres
+  regresiones de verdad, arregladas en el código. El corro de las reuniones
+  pedía un claro libre de doce celdas de lado y se plantaba a 14 de la capilla
+  (`MEETING_CLEARING` = 3,5). Las cascadas: la falda ensancha las gargantas y
+  once de 120 se quedaban sin la suya; se busca hasta 14 celdas por la
+  pendiente, 120 de 120. Y el zorro al amanecer, cuyo tope se medía en línea
+  recta. Lo demás es trayectoria y va con su causa escrita en cada prueba
+  (`docs/medidas/valle-forma-2026-10-02.md` §5).
 - **Abierto**: la cantera lejana (con la roca a más de catorce celdas, al
   albañil se le acaba la jornada antes de cargar: 15 valles de 60 en `main`, 20
-  con el contorno; es de v5.74) y la muralla en la falda, si pide nivelado.
+  con el contorno; es de v5.74); la muralla en la falda, si pide nivelado; los
+  pueblos que su propio cerco deja sin salida (a los cuarenta años, 3 de 24
+  valles por debajo de 500 celdas alcanzables, 1 de 24 en `main`: es la regla
+  del portón, en su propia ronda); y la mitad de sitio para campos cerca de la
+  plaza (unos 245 → 144 sitios de 3×2 a 18 celdas).
 
 ## v5.80 · 2 oct 2026 · El peto se ve en la muralla, y la escena lo sabe
 

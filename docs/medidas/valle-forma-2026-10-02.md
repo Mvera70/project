@@ -126,6 +126,39 @@ contorno.
   pila), la tala (un plantón entre los treinta primeros árboles) y la caché de
   rutas (abaratamientos pendientes contados a la obra que se medía).
 
+**Y en las jornadas de la CI, diecinueve rojas en trece ficheros.** Se
+diagnosticaron en tres tandas, cada una contra `main` con la misma sonda:
+
+- **Tres regresiones de verdad, arregladas en el código.**
+  - **El corro de las reuniones** (`life/staging.ts`): `MEETING_SEARCH` (6) se
+    leía como distancia de búsqueda y es el radio del claro libre que se pide.
+    Eso es un claro de doce celdas de lado, y con el contorno quedan pocos (112
+    celdas en la semilla 11 contra 401). El corro se plantaba a 14 celdas de la
+    capilla. Con `MEETING_CLEARING` = 3,5 (lo que piden los ochenta del aforo),
+    el más lejano vuelve a 7,2–13,9 celdas en siete valles.
+  - **Las cascadas** (`world/waterfalls.ts`): la falda ensancha las gargantas
+    y la pared quedaba más allá del alcance de 5 a 8 celdas. Once gargantas de
+    120 se quedaban sin cascada, y las que había caían menos (mediana 5,9
+    contra 8,6). Ahora se busca de 5 a 14 celdas, puntuando por la pendiente:
+    120 de 120 (y 280 de 280 en las semillas 61 a 200), caída mediana 9,7. En
+    los mapas de `main` da 120 de 120. Una de 120 (la 8 norte, pendiente 0,5)
+    se lee más como arroyo que como salto; en `main` había tres flojas.
+  - **El zorro al amanecer** (`life/companions.ts`): el tope de seguridad se
+    medía en línea recta y el río o el cerco alargan la ruta. En cinco valles
+    de 28 (también en `main`) llegaba al tope y desaparecía de golpe. Ahora va
+    por la ruta.
+- **De trayectoria, cada una con su causa escrita en la prueba:**
+  - el récord de 0,15 vuelve a `it` (0,162);
+  - el devoto, a `it.fails` (1,35× en la muestra de seis; en doce semillas,
+    1,72× con el contorno y 1,74× en `main`);
+  - el peloteo de tres, a `it.fails` (una jornada de 180 contra dos);
+  - el golpe de herramienta busca villas con alguien golpeando;
+  - los lobos, un valle con bosque a su alcance;
+  - el claro de la 7, a `it.fails` (su cerco la deja en 1 039 celdas), y la
+    37 sube a la lista;
+  - las visitas por la garganta se cuentan en doce valles: 9 de 12, y 10 en
+    `main`.
+
 ## 6 · Abierto
 
 - **La cantera lejana.** Con la roca a más de catorce celdas de la obra, al
@@ -135,3 +168,19 @@ contorno.
 - **La muralla en la falda**: el cerco sale del contorno en los doce valles.
   Se levanta igual (la falda es prado), pero llega 36 h más tarde; si eso pide
   nivelado, es de Vera.
+- **Pueblos que su propio cerco deja sin salida.** A los cuarenta años, con el
+  cerco puesto, el pueblo alcanza menos de 500 celdas en 3 valles de 24 (las
+  semillas 6, 13 y 17). Menos de 1 200 en 8 de 24; en `main`, 1 de 24 en los
+  dos recuentos. En la 13 el único portón da a tres celdas de prado y luego a
+  la montaña. Es un defecto que ya existía (la 18 en `main`, la 37 antes de
+  RD-3: `placeBuilding` no comprueba que el portón dé a algún sitio) y el
+  contorno lo hace más frecuente. Arreglarlo es cambiar la regla de colocación
+  del cerco y del portón, que mueve todas las trayectorias otra vez: va en su
+  propia ronda.
+- **Menos sitio para campos cerca de la plaza.** Sitios libres para un campo de
+  3×2 en pradera o claro, a 18 celdas o menos de la plaza, a los sesenta años y
+  en doce semillas: de 195–451 en `main` (mediana unos 245) a 123–200 (unos
+  144). Se lo dije a K5, que piensa en un campo de lino.
+- **Gargantas más anchas.** En los extremos del mapa la pared arranca a 9 o 14
+  celdas del río en lugar de a 3, porque el contorno llega hasta las gargantas
+  con su falda. Se ve en las hojas cenitales.

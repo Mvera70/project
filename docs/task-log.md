@@ -15,10 +15,21 @@ falda. Medidas y hojas: `docs/medidas/valle-forma-2026-10-02.md`. Destapado y
 arreglado: `reachableNear` se quedaba en un rincón y la aldea se quedaba sin
 presas. Suite rápida entera en local, 2 107 en verde; las jornadas, en CI.
 
+**Las jornadas de la CI** (19 rojas en 13 ficheros), diagnosticadas en tres
+tandas contra `main`: tres regresiones arregladas (el corro de las reuniones,
+las cascadas de las gargantas, el zorro al amanecer) y el resto de trayectoria,
+cada una con su causa en la prueba (`valle-forma-2026-10-02.md` §5).
+
 **Abierto:** (1) **la cantera lejana**: con la roca a más de catorce celdas al
 albañil se le acaba la jornada antes de cargar (15 de 60 valles en `main`, 20
 con el contorno); va con la cantera al pie de la montaña, en v5.74. (2) La
-muralla en la falda llega 36 h más tarde: si pide nivelado, es de Vera.
+muralla en la falda llega 36 h más tarde: si pide nivelado, es de Vera. (3)
+**Pueblos sin salida por su propio cerco**: a los cuarenta años, 3 de 24 valles
+alcanzan menos de 500 celdas (1 de 24 en `main`); en la semilla 13 el único
+portón da a la montaña. Es la regla del portón (`placeBuilding` no mira adónde
+da) y va en su propia ronda, porque mueve todas las trayectorias. (4) Cerca de
+la plaza queda la mitad de sitio para campos (unos 245 → 144 sitios de 3×2):
+avisado K5, por el lino.
 **Siguiente:** v5.74, los usos del cinturón.
 
 ## 2 oct 2026 · El peto en el asalto (v5.80, carril de combate)
