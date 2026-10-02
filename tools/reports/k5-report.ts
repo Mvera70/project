@@ -1,0 +1,165 @@
+// K5 · Qué falta hoy para que la caza y la recolección dejen materia. 2 oct 2026.
+//
+// La pregunta de la ronda (docs/plan-meta.md, K5): Vera quiere cuero de la
+// caza, lino y plantas que la aldea use. Antes de proponer ninguno se mide en
+// `main`, con `run` y la política prudente (nunca `tick` en un bucle: CLAUDE.md,
+// la trampa de v2.0), y en horas a ×1:
+//
+//   · cuántas piezas da la caza física si el jugador toca **todas** las señales
+//     y acierta siempre (la cota de arriba), con honda sola y con arco y lanza
+//     dados desde el principio: cuánto cuero podría salir;
+//   · cuándo sale la aldea a cazar o pescar sola por hambre (`forage.*`);
+//   · cuándo están abiertas en el tablón las setas y las hierbas;
+//   · qué aprieta en cada tramo: plata, madera, grano en años, ánimo, y de qué
+//     se muere la gente (frío, peste, hambre…), que es donde entrarían el
+//     cuero, el lino o las plantas.
+//
+//   npx tsx tools/reports/k5-report.ts                 # 12 semillas × 60 años
+//   npx tsx tools/reports/k5-report.ts --seeds 6 --years 40
+
+import { TIME } from '../../src/engine/balance';
+import { CATALOG } from '../../src/engine/crossroads/catalog';
+import { foundGame } from '../../src/engine/found';
+import { population } from '../../src/engine/people/demography';
+import { run } from '../../src/engine/sim';
+import type { DeathCause, GameState, PlayerAct } from '../../src/engine/state';
+import { ringClosed } from '../../src/engine/world/placement';
+import { nextProject } from '../../src/engine/world/works';
+import { huntOpportunity, type HuntOpportunity, type HuntSpecies } from '../../src/engine/world/hunting';
+import { missionsOpen } from '../../src/engine/world/expeditions';
+import { alive } from './ladder';
+
+const arg = (name: string, fallback: number): number => {
+  const i = process.argv.indexOf(`--${name}`);
+  return i >= 0 && process.argv[i + 1] !== undefined ? Number(process.argv[i + 1]) : fallback;
+};
+const SEED_COUNT = arg('seeds', 12);
+const YEARS = arg('years', 60);
+const SEEDS = Array.from({ length: SEED_COUNT }, (_, i) => 3 + i * 7);
+const WEEKS = YEARS * TIME.WEEKS_PER_YEAR;
+
+const hours = (ticks: number): number => (ticks * TIME.REAL_MS_PER_TICK) / 3_600_000;
+const median = (xs: readonly number[]): number => {
+  const s = [...xs].sort((a, b) => a - b);
+  return s.length === 0 ? Number.NaN : s[Math.floor(s.length / 2)]!;
+};
+const fmt = (h: number): string => (Number.isNaN(h) ? '—' : `${h.toFixed(h < 10 ? 1 : 0)} h`);
+const pct = (a: number, b: number): string => (b === 0 ? '—' : `${Math.round((100 * a) / b)} %`);
+
+type Phase = 'caserío (< 12)' | 'aldea, sin herrería' | 'herrería, sin cerco' | 'villa cerrada';
+const PHASES: readonly Phase[] = ['caserío (< 12)', 'aldea, sin herrería', 'herrería, sin cerco', 'villa cerrada'];
+const phaseOf = (s: GameState): Phase => {
+  if (ringClosed(s)) return 'villa cerrada';
+  if (alive(s, 'smithy') > 0) return 'herrería, sin cerco';
+  if (population(s) >= 12) return 'aldea, sin herrería';
+  return 'caserío (< 12)';
+};
+
+interface Tally {
+  weeks: number; hours: number; hungry: number; waitingWood: number; lowMorale: number; cold: number;
+  foraging: number; mushrooms: number; herbs: number;
+  silver: number[]; grainYears: number[]; fields: number[]; people: number[];
+  kills: Record<HuntSpecies, number>;
+  deaths: Partial<Record<DeathCause, number>>;
+}
+const blank = (): Tally => ({
+  weeks: 0, hours: 0, hungry: 0, waitingWood: 0, lowMorale: 0, cold: 0, foraging: 0, mushrooms: 0, herbs: 0,
+  silver: [], grainYears: [], fields: [], people: [],
+  kills: { partridge: 0, rabbit: 0, deer: 0, boar: 0, bear: 0 }, deaths: {},
+});
+
+/**
+ * Dos jugadores de caza, los dos cota de arriba: tocan todas las señales y
+ * aciertan siempre. `sling` es la honda sola (lo que el valle tiene sin dar
+ * nada); `armed` tiene arco y lanza desde la fundación, como si se hubieran
+ * dado `bows` y `arms` el primer día.
+ */
+type Hunter = 'sling' | 'armed';
+
+function play(seed: number, hunter: Hunter): { tallies: Map<Phase, Tally>; firstHide: number | null; ended: boolean } {
+  const tallies = new Map(PHASES.map((p) => [p, blank()]));
+  const state = foundGame(seed);
+  if (hunter === 'armed') state.traits.push('bows', 'arms');
+  let pending: HuntOpportunity | null = null;
+  let firstHide: number | null = null;
+  for (let t = 1; t <= WEEKS && state.ended === null; t += 1) {
+    const offered = pending;
+    const acts: PlayerAct[] = offered === null ? [] : [{
+      kind: 'hunt', sourceTick: offered.tick, species: offered.species,
+      weapon: offered.weapons[offered.weapons.length - 1]!, hits: 1, killed: true,
+    }];
+    const phase = phaseOf(state);
+    const tally = tallies.get(phase)!;
+    const open = missionsOpen(state);
+    if (open.some((m) => m.id === 'mushrooms' && m.refusal === null)) tally.mushrooms += 1;
+    if (open.some((m) => m.id === 'herbs' && m.refusal === null)) tally.herbs += 1;
+    const [report] = run(state, 1, 'prudent', CATALOG, () => acts);
+    if (report === undefined) break;
+    if (offered !== null && state.flags[`hunt:${offered.species}`] === 0) {
+      tally.kills[offered.species] += 1;
+      if (firstHide === null && (offered.species === 'deer' || offered.species === 'boar' || offered.species === 'bear')) {
+        firstHide = hours(state.tick);
+      }
+    }
+    pending = huntOpportunity(state);
+    tally.weeks += 1;
+    const pop = population(state);
+    if (state.village.grain < pop) tally.hungry += 1;
+    if (nextProject(state) === null && nextProject({ ...state }, Number.POSITIVE_INFINITY) !== null) tally.waitingWood += 1;
+    if (state.village.morale < 40) tally.lowMorale += 1;
+    if (report.cold) tally.cold += 1;
+    if (report.entries.some((e) => e.templateKey.startsWith('forage.hunt') || e.templateKey.startsWith('forage.both'))) tally.foraging += 1;
+    for (const d of report.deaths) tally.deaths[d.cause] = (tally.deaths[d.cause] ?? 0) + 1;
+    tally.silver.push(state.village.silver);
+    tally.grainYears.push(pop === 0 ? 0 : state.village.grain / (pop * TIME.WEEKS_PER_YEAR));
+    tally.fields.push(alive(state, 'field'));
+    tally.people.push(pop);
+  }
+  for (const t of tallies.values()) t.hours = hours(t.weeks);
+  return { tallies, firstHide, ended: state.ended !== null };
+}
+
+for (const hunter of ['sling', 'armed'] as const) {
+  const total = new Map(PHASES.map((p) => [p, blank()]));
+  const hides: number[] = [];
+  let ended = 0;
+  for (const seed of SEEDS) {
+    const { tallies, firstHide, ended: e } = play(seed, hunter);
+    if (e) ended += 1;
+    if (firstHide !== null) hides.push(firstHide);
+    for (const p of PHASES) {
+      const a = total.get(p)!; const b = tallies.get(p)!;
+      for (const k of ['weeks', 'hours', 'hungry', 'waitingWood', 'lowMorale', 'cold', 'foraging', 'mushrooms', 'herbs'] as const) a[k] += b[k];
+      a.silver.push(...b.silver); a.grainYears.push(...b.grainYears); a.fields.push(...b.fields); a.people.push(...b.people);
+      for (const s of Object.keys(a.kills) as HuntSpecies[]) a.kills[s] += b.kills[s];
+      for (const [c, n] of Object.entries(b.deaths)) a.deaths[c as DeathCause] = (a.deaths[c as DeathCause] ?? 0) + n;
+    }
+  }
+  const n = SEEDS.length;
+  console.log(`\n# Caza «${hunter === 'sling' ? 'honda sola' : 'arco y lanza desde el principio'}» · ${n} semillas × ${YEARS} años · prudent · horas a ×1`);
+  console.log(`\nprimera pieza grande (ciervo, jabalí, oso): mediana ${fmt(median(hides))}, ${hides.length}/${n} valles · partidas acabadas ${ended}/${n}\n`);
+  console.log('| tramo | horas (suma) | piezas por 10 h: perdiz · conejo · ciervo · jabalí · oso | grandes por 10 h |');
+  console.log('|---|---:|---|---:|');
+  for (const p of PHASES) {
+    const t = total.get(p)!;
+    const per10 = (x: number): string => (t.hours === 0 ? '—' : (10 * x / t.hours).toFixed(1));
+    const big = t.kills.deer + t.kills.boar + t.kills.bear;
+    console.log(`| ${p} | ${Math.round(t.hours)} | ${per10(t.kills.partridge)} · ${per10(t.kills.rabbit)} · ${per10(t.kills.deer)} · ${per10(t.kills.boar)} · ${per10(t.kills.bear)} | ${per10(big)} |`);
+  }
+  if (hunter === 'armed') continue;
+  console.log('\n## Qué aprieta en cada tramo (fracción de semanas; existencias en mediana)\n');
+  console.log('| tramo | gente | campos | hambre | grano (años) | obra esperando madera | ánimo < 40 | invierno sin leña | temporadas de caza por hambre, por 10 h | plata | setas abiertas | hierbas abiertas |');
+  console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
+  for (const p of PHASES) {
+    const t = total.get(p)!;
+    console.log(`| ${p} | ${median(t.people)} | ${median(t.fields)} | ${pct(t.hungry, t.weeks)} | ${median(t.grainYears).toFixed(1)} | ${pct(t.waitingWood, t.weeks)} | ${pct(t.lowMorale, t.weeks)} | ${pct(t.cold, t.weeks)} | ${t.hours === 0 ? '—' : (10 * t.foraging / t.hours).toFixed(1)} | ${median(t.silver)} | ${pct(t.mushrooms, t.weeks)} | ${pct(t.herbs, t.weeks)} |`);
+  }
+  console.log('\n## De qué se muere, por cada 100 horas a ×1 del tramo\n');
+  const causes: DeathCause[] = ['old_age', 'natural', 'hunger', 'cold', 'plague', 'fire', 'violence', 'mishap'];
+  console.log(`| tramo | ${causes.join(' | ')} |`);
+  console.log(`|---|${causes.map(() => '---:').join('|')}|`);
+  for (const p of PHASES) {
+    const t = total.get(p)!;
+    console.log(`| ${p} | ${causes.map((c) => (t.hours === 0 ? '—' : (100 * (t.deaths[c] ?? 0) / t.hours).toFixed(1))).join(' | ')} |`);
+  }
+}
