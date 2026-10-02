@@ -8233,6 +8233,108 @@
       "hashes": {
         "jerkin.glb": "6B44D4963ECEEFE9ACFDC15498E0B76806D5F913E0622E84F81AF0860A369876"
       }
+    },
+    {
+      "id": "bench",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/bench-candidate/bench.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/bench-candidate/bench.json",
+      "generator": "art/recipes/cart-candidate/build.py",
+      "approved": {
+        "runId": "astra-b7-2026-10-02",
+        "directory": "artifacts/graphics/astra-b7-2026-10-02/approved/bench"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 96
+      },
+      "hashes": {
+        "bench.glb": "C012E31A2D68C38E2EACF40ACCB57DA00CE08D7A4602BCC26ABA9CE37C844CA9"
+      }
+    },
+    {
+      "id": "log-seat",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/log-seat-candidate/log-seat.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/log-seat-candidate/log-seat.json",
+      "generator": "art/recipes/cart-candidate/build.py",
+      "approved": {
+        "runId": "astra-b7-2026-10-02",
+        "directory": "artifacts/graphics/astra-b7-2026-10-02/approved/log-seat"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 28
+      },
+      "hashes": {
+        "log-seat.glb": "E1A9581E3D35FA4FD58692B6901208B36B004C50563F6169A7049067939E9831"
+      }
+    },
+    {
+      "id": "cart",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/cart-candidate/cart.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/cart-candidate/cart.json",
+      "generator": "art/recipes/cart-candidate/build.py",
+      "approved": {
+        "runId": "astra-b7-2026-10-02",
+        "directory": "artifacts/graphics/astra-b7-2026-10-02/approved/cart"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 3,
+        "materials": 1,
+        "triangles": 416
+      },
+      "hashes": {
+        "cart.glb": "551CD4D69AE7C780D809CD778226A2E72F85768624EDFEA55301501D25A35D56"
+      }
     }
   ]
 }
