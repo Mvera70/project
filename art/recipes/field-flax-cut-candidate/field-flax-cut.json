@@ -1,0 +1,524 @@
+{
+  "schemaVersion": 1,
+  "id": "field-flax-cut",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "grain",
+      "role": "grain",
+      "color": "#D8B25E",
+      "roughness": 0.94
+    },
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.94
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "color": "#C7984A",
+      "roughness": 0.94
+    },
+    {
+      "name": "soil",
+      "role": "soil",
+      "color": "#866044",
+      "roughness": 0.94
+    },
+    {
+      "name": "trunk",
+      "role": "trunk",
+      "color": "#735338",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "field-flax-cut",
+    "footprint": [
+      3,
+      2
+    ],
+    "note": "Bloque 2: sastrer\u00eda y lino; modelo est\u00e1tico pendiente de K5. Unidades fuente en metros; celda=3m. Frente glTF +Z. Edificio/campos conservan esquina frontal izquierda como la casa/campo can\u00f3nicos; accesorios centrados."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      4,
+      -5,
+      4
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 4,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Soil",
+      "location": [
+        4.5,
+        3,
+        0.04
+      ],
+      "dimensions": [
+        9,
+        6,
+        0.08
+      ],
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "CutRow0",
+      "location": [
+        4.5,
+        0.55,
+        0.08
+      ],
+      "width": 0.26,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "roof",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "CutRow1",
+      "location": [
+        4.5,
+        1.73,
+        0.08
+      ],
+      "width": 0.26,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "roof",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "CutRow2",
+      "location": [
+        4.5,
+        2.91,
+        0.08
+      ],
+      "width": 0.26,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "roof",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "CutRow3",
+      "location": [
+        4.5,
+        4.09,
+        0.08
+      ],
+      "width": 0.26,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "roof",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "CutRow4",
+      "location": [
+        4.5,
+        5.27,
+        0.08
+      ],
+      "width": 0.26,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "roof",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "SheafBase0",
+      "location": [
+        1.4,
+        1.1,
+        0.32
+      ],
+      "radius": 0.29,
+      "depth": 0.49,
+      "vertices": 6,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "SheafTop0",
+      "location": [
+        1.4,
+        1.1,
+        0.75
+      ],
+      "radius": 0.26,
+      "depth": 0.4,
+      "vertices": 6,
+      "material": "grain",
+      "rotationDegrees": [
+        180,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Tie0",
+      "location": [
+        1.4,
+        1.1,
+        0.55
+      ],
+      "radius": 0.085,
+      "depth": 0.07,
+      "vertices": 4,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "SheafBase1",
+      "location": [
+        4.5,
+        1.1,
+        0.32
+      ],
+      "radius": 0.29,
+      "depth": 0.49,
+      "vertices": 6,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "SheafTop1",
+      "location": [
+        4.5,
+        1.1,
+        0.75
+      ],
+      "radius": 0.26,
+      "depth": 0.4,
+      "vertices": 6,
+      "material": "grain",
+      "rotationDegrees": [
+        180,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Tie1",
+      "location": [
+        4.5,
+        1.1,
+        0.55
+      ],
+      "radius": 0.085,
+      "depth": 0.07,
+      "vertices": 4,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "SheafBase2",
+      "location": [
+        7.6,
+        1.1,
+        0.32
+      ],
+      "radius": 0.29,
+      "depth": 0.49,
+      "vertices": 6,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "SheafTop2",
+      "location": [
+        7.6,
+        1.1,
+        0.75
+      ],
+      "radius": 0.26,
+      "depth": 0.4,
+      "vertices": 6,
+      "material": "grain",
+      "rotationDegrees": [
+        180,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Tie2",
+      "location": [
+        7.6,
+        1.1,
+        0.55
+      ],
+      "radius": 0.085,
+      "depth": 0.07,
+      "vertices": 4,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "SheafBase3",
+      "location": [
+        2.95,
+        3.8,
+        0.32
+      ],
+      "radius": 0.29,
+      "depth": 0.49,
+      "vertices": 6,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "SheafTop3",
+      "location": [
+        2.95,
+        3.8,
+        0.75
+      ],
+      "radius": 0.26,
+      "depth": 0.4,
+      "vertices": 6,
+      "material": "grain",
+      "rotationDegrees": [
+        180,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Tie3",
+      "location": [
+        2.95,
+        3.8,
+        0.55
+      ],
+      "radius": 0.085,
+      "depth": 0.07,
+      "vertices": 4,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "SheafBase4",
+      "location": [
+        6.1,
+        3.8,
+        0.32
+      ],
+      "radius": 0.29,
+      "depth": 0.49,
+      "vertices": 6,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "SheafTop4",
+      "location": [
+        6.1,
+        3.8,
+        0.75
+      ],
+      "radius": 0.26,
+      "depth": 0.4,
+      "vertices": 6,
+      "material": "grain",
+      "rotationDegrees": [
+        180,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Tie4",
+      "location": [
+        6.1,
+        3.8,
+        0.55
+      ],
+      "radius": 0.085,
+      "depth": 0.07,
+      "vertices": 4,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

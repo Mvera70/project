@@ -1,0 +1,30 @@
+{
+  "id": "field-flax-cut",
+  "triangles": 212,
+  "meshes": 1,
+  "materials": 1,
+  "bounds": {
+    "min": [
+      0.0,
+      0.0,
+      -2.0
+    ],
+    "max": [
+      3.0,
+      0.31666669249534607,
+      -0.0
+    ]
+  },
+  "dimensions": [
+    3.0,
+    0.31666669249534607,
+    2.0
+  ],
+  "origin": [
+    0,
+    0,
+    0
+  ],
+  "front": "+Z",
+  "palette": "art/recipes/palette.json"
+}

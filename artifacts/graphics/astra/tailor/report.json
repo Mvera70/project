@@ -1,0 +1,30 @@
+{
+  "id": "tailor",
+  "triangles": 960,
+  "meshes": 1,
+  "materials": 1,
+  "bounds": {
+    "min": [
+      0.0,
+      0.0,
+      -2.0
+    ],
+    "max": [
+      2.0,
+      1.4583333730697632,
+      -0.0033333301544189453
+    ]
+  },
+  "dimensions": [
+    2.0,
+    1.4583333730697632,
+    1.996666669845581
+  ],
+  "origin": [
+    0,
+    0,
+    0
+  ],
+  "front": "+Z",
+  "palette": "art/recipes/palette.json"
+}

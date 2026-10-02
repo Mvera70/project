@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "id": "linen-bolt",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.94
+    },
+    {
+      "name": "saltwhite",
+      "role": "saltWhite",
+      "color": "#F4F2EC",
+      "roughness": 0.94
+    },
+    {
+      "name": "timber",
+      "role": "timber",
+      "color": "#9A744C",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "linen-bolt",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 2: sastrer\u00eda y lino; modelo est\u00e1tico pendiente de K5. Unidades fuente en metros; celda=3m. Frente glTF +Z. Edificio/campos conservan esquina frontal izquierda como la casa/campo can\u00f3nicos; accesorios centrados."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      4,
+      -5,
+      4
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 4,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Linen",
+      "location": [
+        0,
+        0,
+        0.16
+      ],
+      "radius": 0.16,
+      "depth": 0.68,
+      "vertices": 8,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Tail",
+      "location": [
+        0,
+        -0.19,
+        0.05
+      ],
+      "dimensions": [
+        0.68,
+        0.3,
+        0.045
+      ],
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Core",
+      "location": [
+        0.346,
+        0,
+        0.16
+      ],
+      "radius": 0.05,
+      "depth": 0.015,
+      "vertices": 6,
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}
