@@ -18,11 +18,6 @@ import type { ArchivedGame, EndState, GameState, HappeningId, MeansId, Role, Sea
 /** Las cuatro maneras de acabar, que son las cuatro lápidas. */
 type EndCause = EndState['cause'];
 import { SEASONS, seasonOf, yearOf } from '@engine/time';
-import { paintVillageBackground, sizeCanvas } from '@render/canvas';
-import { paletteFor } from '@derive/palette';
-import { auditSprites } from '@render/sprites/audit';
-import { crowdPositions } from '@render/crowd';
-import { paintFigures, paintFigureShadows } from '@render/layers/figures';
 
 export interface DebugRequest {
   seed: number;
@@ -428,32 +423,14 @@ export async function openAtYearCooperative(
   }
 }
 
-function diagnosticCanvas(root: HTMLElement, state: GameState, request: DebugRequest): void {
-  root.replaceChildren();
-  const shell = document.createElement('main');
-  shell.id = 'valley-shell';
-  shell.style.cssText = 'width:390px;height:844px;display:grid;place-items:start center;background:#b9c9cf;color:#3c3a34';
-  const canvas = document.createElement('canvas');
-  canvas.id = 'valley';
-  sizeCanvas(canvas, 10, 2);
-  canvas.style.marginTop = '22px';
-  const ctx = canvas.getContext('2d');
-  if (ctx === null) throw new Error('Canvas 2D is unavailable.');
-  const palette = paletteFor(request.season, 6);
-  shell.style.background = palette.void;
-  ctx.scale(2, 2);
-  ctx.drawImage(paintVillageBackground(state, palette, 10), 0, 0);
-  const figures = crowdPositions(state, 0.45);
-  paintFigureShadows(ctx, figures, 10);
-  paintFigures(ctx, figures, palette, 10);
-  shell.append(canvas);
-  root.append(shell);
-}
-
 export function mountDebug(root: HTMLElement, request: DebugRequest): GameState {
   const state = stateAt(request);
-  diagnosticCanvas(root, state, request);
-  document.documentElement.dataset.debugReady = 'true';
-  document.documentElement.dataset.spriteAudit = JSON.stringify(auditSprites());
+  // El 2D se pide aquí y no arriba: así no viaja en el paquete del juego
+  // (`debug-canvas.ts`). `data-debug-ready` llega cuando ya está pintado.
+  void import('./debug-canvas').then(({ diagnosticCanvas, auditSprites }) => {
+    diagnosticCanvas(root, state, request);
+    document.documentElement.dataset.debugReady = 'true';
+    document.documentElement.dataset.spriteAudit = JSON.stringify(auditSprites());
+  });
   return state;
 }

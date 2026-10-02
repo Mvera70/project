@@ -32,6 +32,41 @@ una marca en el motor.
 Sin ilustraciones que pedir: K7 no añade líneas de crónica, sólo textos de
 pantalla (`epitaph.why.*`, `successor.fell.*`).
 
+## v5.69 · 2 oct 2026 · El 2D deja de viajar en el paquete del juego
+
+Vera, 2 oct: «si podemos evitar que se cargue [el 2D] mejor; si no se puede
+eliminar, no pasa nada». No se elimina —lo usan los recorridos de interfaz en
+un runner sin GPU (`?render=canvas`) y es la reserva si el 3D no llega—, pero
+el juego en 3D ya no lo descarga ni lo monta. Hasta hoy `src/ui/backend.ts` y
+`src/ui/debug.ts` lo importaban de entrada, y el 2D pintaba cada fotograma
+escondido detrás de la placa de carga.
+
+- **`backend.ts`:** `live` arranca como un render vacío `kind: 'loading'`
+  (`idleBackend`); `src/render/renderer` llega por `import()` sólo con
+  `?render=canvas` o en el `catch` del 3D. `data-render` dice `loading` hasta
+  el relevo, y en Canvas `onSwap` se llama también al llegar el 2D.
+- **`debug.ts`:** la pintura 2D de la página de diagnóstico y `auditSprites` se
+  mudan a `src/ui/debug-canvas.ts`, bajo demanda; `data-debug-ready` llega
+  después de pintar.
+- `src/render/crowd.ts` y `reactions.ts` se quedan en la entrada a propósito:
+  son lógica del inspector (`inspect.ts`), no dibujo.
+- **Medido** (`vite build`): el trozo de entrada baja de **611,05 a 593,11 kB**
+  (gzip 194,96 → 188,07). Los diez módulos de dibujo de `src/render/` y
+  `derive/palette` salen de él y viven en cinco trozos aparte (~19,7 kB) que el
+  juego en 3D no pide. Remedido tras traer #41 y #42 a la rama: **626,00 →
+  608,06 kB** (gzip 201,68 → 195,03), la misma diferencia.
+- El recorrido «la ruta viva abre un valle maduro…» medía `#valley` a 360 px en
+  3D, cierto sólo porque el 2D pintaba escondido: ahora comprueba lo contrario,
+  que tras el relevo el 2D no ha pintado nunca.
+- **Y la tormenta deja de depender del runner** (encargo del director, tras
+  fallar a ratos en la CI de #42 con `data-bolts` a 0 tras 120 s). La ruta abre
+  a ×1, donde una jornada son unos 120 s de reloj falso, y en la semilla 7 el
+  primer rayo pendiente cae en la fase 0,595 de una jornada que el 3D empieza
+  a pintar en 0,28–0,33: unos 38 s falsos, más de mil fotogramas por CPU con
+  el paso máximo del reloj de presentación. Ahora el reloj falso se para antes
+  de cargar y, comprobada la tormenta, el valle va a ×64. Mismo listón; 3/3 en
+  serie y 4/4 con cuatro a la vez, unos 36 s cada uno (antes 2,7 min).
+
 ## v5.57 · 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón, y desde ellas inclinar hacia un recurso
 
 **Medido antes, en `main`** (`docs/medidas/k8-k9-edificios-2026-10-02.md`,
@@ -154,6 +189,39 @@ sigo viendo baldosas de madera mal puestas».
   `life-visitors` acaban la jornada yéndose por la senda, no «idos»; y **los dos
   `it.fails` del factor de grano pasan**: llega antes (0,32–0,36), los
   porteadores con él, y la moneda pasa entre 0,49 y 0,61.
+
+## v5.68 · 2 oct 2026 · Por qué la CI tardaba 36 minutos, y lo que se arregla sin tocar el motor
+
+**El diagnóstico** (`docs/medidas/ci-lentitud-2026-10-02.md`). El servidor de
+CI no es más lento que local: `ledger.test.ts` tarda 689 s allí y 666 s aquí,
+en un hilo. Lo que pasó fue que **el tick se encareció unas diez veces** entre
+el 16 sep y el 1 oct (de 0,78 a 8,3 ms por semana de juego) y que **los
+ficheros de `tests/fast/` que juegan décadas pasaron de 15 a 58**. El escalón
+mayor del tick está en un solo commit, `6fa7fda1` (21 sep): ×2,3 con aldeas
+del mismo tamaño, porque `walkingGround()` tira todas las rutas con cada obra
+que se abre o se cierra. Con eso salen 9,5 búsquedas A\* por semana, y bajo
+vitest A\* es el 54 % del tick. La v5.56 (#38) arregló lo segundo; lo primero
+lo lleva la rama `claude/rutas-tick` (v5.71), con el parche medido aquí:
+−31 % del tick, misma crónica.
+
+**Lo arreglado, sin tocar el motor:**
+
+- **La suite rápida, sin aislar cada fichero** (`isolate: false`): de 249 a
+  180 s en local. Cada fichero volvía a importar Three, Rapier y el motor y lo
+  corría con el JIT en frío. Las 2079 pruebas pasan en tres órdenes distintos.
+- **Un tope por fichero en la suite rápida**: 30 s × `VALLEY_TIMING_SCALE`,
+  contando la recogida (`tests/helpers/fast-budget-reporter.ts`). Un fichero
+  que se pase sale rojo con su nombre el día que llega; se muda a las
+  jornadas, no se sube el tope. El más lento de hoy tarda 21 s.
+- **Cada partida una vez por fichero** en `ledger` (677 → 161 s) y `threat`
+  (1167 → 470 s), con los mismos asertos. Sus pesos en `shard-weights.ts`,
+  al día.
+- **`tools/reports/tick-bench.ts`**: el banco del tick en ms por semana, con
+  los vivos al final de cada valle. Se pasa antes de subir un tope de CI.
+- **`ci.yml`** ya no dice que el servidor va cinco veces más lento.
+
+**Abierto:** `catchUp` (960 ticks en menos de 2 s) da 2,05–2,26 s en local a
+escala 1. Es el tick caro; lo arregla el parche de rutas, no un umbral.
 
 ## v5.65 · 2 oct 2026 · Dientes de sierra en la tablet: la resolución sólo baja si bajar sirve
 
