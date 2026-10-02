@@ -223,6 +223,23 @@ pantalla todavía no enseña del todo:
 | **La entrega sin leñadores** | Entra igual, a su hora | El «+1» sale sin nadie delante los días en que el reparto no pone a nadie en el bosque (3 de 38 entregas medidas) | Que el reparto de la jornada (`life/day.ts`) ponga un leñador los días con entregas |
 | **La piedra y el grano** | Siguen entrando por semanas enteras | La piedra se acarrea sin «+1»; el grano sube de golpe | Lo mismo que la madera: entregas con hora, porteador y aviso. Pedido por el dueño del diseño el 28 sep 2026, para después de probar la madera |
 
+## Por qué cayó (2 oct 2026, K7, v5.72)
+
+El epitafio ya cuenta por qué cayó un valle, pero **en el valle no se ve la
+caída mientras ocurre**: la aldea que se va vaciando no tiene más señal que las
+cifras de la cabecera y la crónica. Lo que el motor sabe y la pantalla no
+enseña:
+
+- **El punto sin vuelta de un asalto** (la partida que bajaría ya cuadruplica
+  lo que el valle pone contra ella): se mide en `tools/reports/fall-report.ts`,
+  no se enseña en ningún sitio. Si Vera quiere el aviso en vida, es una línea
+  de crónica y quizá una señal en la muralla.
+- **Las casas que se vacían**: un valle que pasa de 80 a 20 personas conserva
+  sus casas en pie, y la ruina llega con el fuego o el asalto. Sin comprobar
+  todavía si una casa sin nadie se distingue de una habitada; si no, casas a
+  oscuras, puertas atrancadas y huertos sin cuidar contarían la bajada (se
+  cruza con K11, que la muerte se vea).
+
 ## Los tablones de la herrería y de la capilla (2 oct 2026, K8+K9, v5.57)
 
 | Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |

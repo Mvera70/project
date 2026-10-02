@@ -5232,6 +5232,50 @@ Las entradas se renderizan con `makeBundle(ArchivedGame.seed)`: el flujo
 guardar otro estado aleatorio ni subir el esquema. La partida terminada que aún
 se muestra como estado actual no se duplica en el selector.
 
+#### 13.3b Por qué cayó (K7, v5.72, 2 oct 2026)
+
+K7 no es un roguelike: no hay partidas cortas que desbloquean mejoras. Se
+fundan aldeas, algunas mueren y **lo que se aprende es de quien juega**. Lo
+que el juego pone de su parte es que un final se entienda: el epitafio decía
+**cómo** acabó (la causa de `EndState`) y no **por qué** ni **desde cuándo**.
+
+**El epitafio gana una sección, «How it came to this»**, entre la causa y la
+hoja de cuentas (`ui/screens/epitaph.ts`), y la cuenta `derive/fall.ts` con lo
+que la crónica archivada ya dijo —ni un campo nuevo en el guardado ni una
+tirada—:
+
+1. **El mejor momento**: la última vez que la crónica apuntó su mayor número
+   de gente (el `people` de nacimientos, llegadas, muertes y marchas).
+2. **Lo que se lo llevó, como mucho tres cosas** (`FALL.LINKS`), por la gente
+   que costó cada una —hambre, peste, frío, fuego, violencia, muertes antes de
+   tiempo, los que se marcharon— y el clan **por las veces que bajó**, con lo
+   que se llevó. Las muertes de viejo pesan un cuarto: no explican una caída.
+   Se cuenta desde **lo que antes llegue** de la última vez que tuvo la mitad
+   de su mejor momento (`FALL.HALF`) y de sus últimos `FALL.WINDOW_YEARS` años
+   (más `ABANDON_YEARS` en un abandono, que es la espera de §5.7 y no la
+   caída), nunca antes del mejor momento: cada regla sola dejaba valles sin
+   nada que contar (`docs/medidas/k7-caidas-2026-10-02.md`).
+3. **La decisión que la crónica apuntó cerca**, citada tal cual —con la semilla
+   de la partida y su posición en la crónica, la misma voz que la pantalla de
+   crónica—, mirando hasta `FALL.DECISION_YEARS` antes de la caída.
+4. **El último golpe**, que no es una causa: el asalto que tomó el valle no
+   cuenta entre lo que se lo llevó, se dice al final con cuántos bajaron y
+   cuántos quedaban.
+
+Una crónica podada (las partidas viejas del archivo guardan sólo los
+titulares) no sabe nada de esto y la sección no sale.
+
+**Y el valle siguiente se acuerda, en una línea**: al pulsar «Begin again», la
+voz dice cómo cayó el anterior y lo que más pesó («The last valley was taken in
+year 7. Hunger took five, from year 2 on.»). Es todo lo que hereda además de sus
+ruinas: ni una mejora ni un desbloqueo.
+
+**Lo que no se hizo, y por qué** (decisión de Vera pendiente): un aviso en vida
+cuando el valle cruza el punto de no retorno. Medido, en un asalto ese punto
+llega unas horas de reloj antes del final (5–8 h de mediana a ×1) y con el
+valle ya vaciado; la bajada que lo deja así dura mucho más. Pediría una marca
+en el motor.
+
 ### 13.4 Instalable y sin conexión
 
 `CLAUDE.md` describe el proyecto como PWA desde el primer día y este documento

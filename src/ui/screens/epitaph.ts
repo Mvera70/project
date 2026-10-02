@@ -298,9 +298,9 @@ function why(game: ArchivedGame): HTMLElement | null {
     const list = document.createElement('ul');
     for (const link of story.links) {
       const item = document.createElement('li');
-      item.textContent = sentence(renderUiText(`epitaph.why.${link.kind}${link.count === 1 ? '.one' : ''}`, {
+      item.textContent = renderUiText(`epitaph.why.${link.kind}${link.count === 1 ? '.one' : ''}`, {
         count: link.count, year: yearOf(link.tick), silver: link.silver, grain: link.grain,
-      }));
+      });
       list.append(item);
     }
     box.append(list);
@@ -326,16 +326,6 @@ function why(game: ArchivedGame): HTMLElement | null {
 }
 
 /**
- * K7 · Una frase empieza con mayúscula. Las del «por qué» abren con `{count}`,
- * que el banco escribe en letra («three starved»), y `renderUiText` no
- * capitaliza: lo hace la crónica (`render.ts`) y esto es lo mismo para la
- * pantalla.
- */
-function sentence(text: string): string {
-  return text.length === 0 ? text : `${text[0]!.toUpperCase()}${text.slice(1)}`;
-}
-
-/**
  * K7 · La línea con la que el valle siguiente se acuerda de éste: cómo cayó y,
  * si la crónica lo sabe, lo que más pesó. La dice `app.ts` al fundarlo.
  */
@@ -343,9 +333,9 @@ export function rememberFall(game: ArchivedGame): string {
   const fell = renderUiText(`successor.fell.${game.cause}`, { year: yearOf(game.endedTick) });
   const link = heaviestOf(fallOf(game));
   if (link === null) return fell;
-  const why = sentence(renderUiText(`epitaph.why.${link.kind}${link.count === 1 ? '.one' : ''}`, {
+  const why = renderUiText(`epitaph.why.${link.kind}${link.count === 1 ? '.one' : ''}`, {
     count: link.count, year: yearOf(link.tick), silver: link.silver, grain: link.grain,
-  }));
+  });
   return `${fell} ${why}`;
 }
 
