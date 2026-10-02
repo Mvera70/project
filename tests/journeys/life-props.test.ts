@@ -453,7 +453,10 @@ describe('V-09 · trastos', () => {
   // trayectoria nueva un pase se devuelve en **4** de las 36 jornadas y el
   // listón pide más de 4; no se baja: se declara aquí con la medida, y la
   // prueba de arriba sigue guardando que el pase se devuelve alguna vez.
-  it.fails('y un pase se devuelve en más de cuatro de las 36 jornadas', () => {
+  // **K5 (v5.76, 2 oct 2026) · sale de `it.fails`**: con la sastrería y el
+  // contorno juntos se cumple («Expect test to fail» en la CI). Si otro cambio
+  // del motor la mueve, se declara otra vez con lo medido.
+  it('y un pase se devuelve en más de cuatro de las 36 jornadas', () => {
     expect(returnedSeen, `un pase se devuelve en ${returnedSeen} de 36 jornadas`).toBeGreaterThan(4);
   });
 
@@ -482,7 +485,10 @@ describe('V-09 · trastos', () => {
   // ventana de 36 la da o no la da por suerte. Ni `PLAYED_OUT` ni la cota se
   // tocan, y cuando otra trayectoria vuelva a darla saltará «Expect test to fail»
   // y volverá a `it`.
-  it.fails('y tres veces seguidas, que es un peloteo largo', () => {
+  // **K5 (v5.76, 2 oct 2026) · sale de `it.fails`**: con la sastrería y el
+  // contorno juntos se cumple («Expect test to fail» en la CI). Si otro cambio
+  // del motor la mueve, se declara otra vez con lo medido.
+  it('y tres veces seguidas, que es un peloteo largo', () => {
     // **Esto estaba declarado en rojo y con el mapa grande sale verde.** La
     // medida anterior, en los valles de 36 × 56, era de setenta y dos muestras
     // sin una sola cadena de tres, y quedó escrita con `it.fails` en vez de
