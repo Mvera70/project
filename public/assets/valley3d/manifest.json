@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-02T15:54:06.414Z",
+  "generatedAt": "2026-10-02T16:06:08.923Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts --ids stork,chick,crane,butterfly",
   "assets": [
     {
@@ -1886,7 +1886,7 @@
     {
       "id": "stork",
       "file": "stork.glb",
-      "sha256": "4E2E6885FF2B56C03AD6735E2DD92F2B6E25EE9D6356BB29874AC9CA8DB3D065",
+      "sha256": "EA5EF203AB08DDCE0929FABA72001AAD5FAEAC58ED71E4E7BE7FA146116F0B56",
       "motion": [
         {
           "name": "walk",
@@ -1910,7 +1910,7 @@
     {
       "id": "chick",
       "file": "chick.glb",
-      "sha256": "1D0A91EC1DF9CFF4F7F16B91BF843723EAFDB53E929595A9DCAA4785E1EDBE24",
+      "sha256": "C84D5A04C89CB7D89431F22F75B8CCBC96B90E9CF8B28FB4E661A75D354E0739",
       "motion": [
         {
           "name": "walk",
@@ -1945,7 +1945,7 @@
     {
       "id": "butterfly",
       "file": "butterfly.glb",
-      "sha256": "2B0E14D6FF4D35AAD8AF100C26DCB3DB33578C4C956A465F1E516B4435582A05",
+      "sha256": "A6889E223D04063BA0B8F99E3DB1E8C6662C87E90AFEEB0D710EA48454488153",
       "motion": [],
       "provenance": {
         "kind": "original",

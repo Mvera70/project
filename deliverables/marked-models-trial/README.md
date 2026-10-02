@@ -178,12 +178,12 @@ dentro del presupuesto del encargo de la tanda (bloques 6 y 7):
 
 | ID | Qué | Triángulos | Esqueleto y clips |
 |---|---|---|---|
-| `horse` | Caballo de tiro castaño: crin y cola negras, lucero, calzas con pelo y collera | 888 / 900 | El de la mula; `walk` con el casco plantado (como el ciervo) e `idle` |
+| `horse` | Caballo de tiro castaño, ×1,15 sobre la mula (`HORSE_SIZE`): crin y cola negras, lucero, calzas con pelo y collera | 888 / 900 | El de la mula; `walk` con el casco plantado (como el ciervo) e `idle` |
 | `stork` | Cigüeña blanca de remeras negras, pico y patas rojos | 238 / 250 | El de la gallina (`legL`, `footL`…); `walk` e `idle` |
-| `stork-nest` | Rodete de ramas con las puntas saliendo por el borde | 188 / 200 | — (sólo modelo) |
-| `chick` | Polluelo: bola amarilla con la cabeza encima | 80 / 80 | El de la gallina; `walk` e `idle` |
+| `stork-nest` | Plataforma de ramas con rodete; la cigüeña pisa a `NEST_FLOOR` | 192 / 200 | — (sólo modelo) |
+| `chick` | Polluelo: la cabeza nace del pecho, pico, ojos, dos patas y alitas | 78 / 80 | El de la gallina; `walk` e `idle` |
 | `crane` | Grulla en vuelo, gris con las remeras negras | 142 / 150 | Alas `bird_wing_l`/`bird_wing_r` con el origen en el hombro, como la golondrina |
-| `butterfly` | Mariposa blanca de puntas negras, para teñir por instancia | 15 / 16 | `wing_l`/`wing_r` en el eje del cuerpo |
+| `butterfly` | Limonera de cuatro alas, amarilla con el borde naranja | 16 / 16 | `wing_l`/`wing_r` en el eje del cuerpo |
 
 Reconstruir y publicar (con `pip install bpy==5.0.1`):
 

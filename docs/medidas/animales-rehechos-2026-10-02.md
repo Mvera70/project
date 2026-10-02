@@ -12,21 +12,30 @@ de Astra de hoy: `stork`, `stork-nest`, `chick`, `crane`, `butterfly`
 | Animal | Lo de Astra | Lo nuevo |
 |---|---|---|
 | Cigüeña | Huevo de caras planas, el ala negra pegada como una placa, el cuello en pieza aparte sin esqueleto, sin patas que anden | Cuerpo en `ell`, cuello en `tube`, ala plegada en rombo como la de la gallina; nodos de la gallina y clips `walk`/`idle` |
-| Nido | Palangana de pared recta y fondo plano con astillas en el borde: se lee cesto | Rodete facetado de ramas con las puntas saliendo por el borde y el hueco hundido |
-| Polluelo | Campana amarilla sin cabeza distinta, sin nodos | Bola con la cabeza encima, pico y patas naranjas, nodos y clips de la gallina |
+| Nido | Palangana de pared recta y fondo plano con astillas en el borde: se lee cesto | Plataforma ancha de ramas pardas con el rodete encima y las puntas saliendo por el borde; la cigüeña, de pie sobre ella |
+| Polluelo | Campana amarilla sin cabeza distinta, sin nodos | La cabeza nace del pecho, pico, dos ojos, dos patas con el pie adelante y alitas; nodos y clips de la gallina |
 | Grulla | Alas de papel con dientes de sierra, cuerpo de huso: una cometa gris | Cuerpo en `loft`, cuello negro, alas grises con el borde de las remeras negro, en el hombro como la golondrina |
-| Mariposa | Pajaritas con los colores horneados, que el juego no puede teñir | Alas blancas de punta negra, que el juego tiñe por instancia |
+| Mariposa | Pajaritas con los colores horneados, que el juego no puede teñir | Cuatro alas amarillas con el borde naranja y el cuerpo oscuro; en el juego, los dos tonos tiñen el color de cada instancia |
 | Caballo | Patas en salchichas con huecos, tronco de caja, cascos de cubo (el estilo de G-23) | La mula de Vera más grande y pesada: crin y cola negras, lucero, calzas con pelo, collera; esqueleto de la mula y el casco plantado del ciervo |
+
+## La segunda vuelta
+
+Vera vio la primera hoja y no la aceptó («mira el pollo»). Se rehicieron el
+polluelo (dos bolas apiladas, sin ojos, una pata a la vista), la mariposa
+(blanca y plana), el nido (gris de ceniza, la cigüeña hundida) y la escala del
+caballo (apenas pasaba a la mula; ahora ×1,15 y el cuello más alto). La regla
+que queda: **ninguna hoja se enseña sin mirarla antes a la escala del juego,
+junto al vecino, preguntando si se reconoce sin el rótulo.**
 
 ## Presupuestos (encargo de la tanda larga, bloques 6 y 7)
 
 | | Astra | Nuevo | Tope |
 |---|---|---|---|
 | `stork` | 230 | 238 | 250 |
-| `stork-nest` | 180 | 188 | 200 |
-| `chick` | 78 | 80 | 80 |
+| `stork-nest` | 180 | 192 | 200 |
+| `chick` | 78 | 78 | 80 |
 | `crane` | 148 | 142 | 150 |
-| `butterfly` | 16 | 15 | 16 |
+| `butterfly` | 16 | 16 | 16 |
 | `horse` | 748 | 888 | 900 |
 
 ## Coste en el juego (`gl-probe.mjs`, antes y después seguidos, la máquina sola)
@@ -37,6 +46,16 @@ de Astra de hoy: `stork`, `stork-nest`, `chick`, `crane`, `butterfly`
 | Aldea 11/21, verano | 391 · 745 423 · 51 | 393 · 745 400 · 52 |
 | Aldea 11/21, otoño | 379 · 746 727 · 47 | 368 · 745 557 · 48 |
 | Villa 7/60, verano | 491 · 762 832 · 60 | 493 · 762 807 · 62 |
+
+**Y contra `main` de después de #59–#61** (segunda vuelta, con los objetos de
+los bloques 0 y 1 ya dentro: 133 recursos), mismo procedimiento:
+
+| Escena | `main`: llamadas · triángulos · programas | Esta rama |
+|---|---|---|
+| Aldea 11/21, primavera | 382 · 809 185 · 48 | 384 · 809 046 · 49 |
+| Aldea 11/21, verano | 395 · 818 674 · 52 | 392 · 808 928 · 53 |
+| Aldea 11/21, otoño | 377 · 809 586 · 48 | 366 · 808 416 · 49 |
+| Villa 7/60, verano | 499 · 839 554 · 60 | 501 · 839 541 · 62 |
 
 Las dos llamadas de más son las patas de la cigüeña (cuatro mallas instanciadas
 en vez de dos, sólo con cigüeñas a la vista); el programa de más, el Lambert con

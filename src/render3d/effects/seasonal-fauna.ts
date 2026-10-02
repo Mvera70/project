@@ -179,6 +179,18 @@ function butterflyModel(model: Object3D): BufferGeometry | null {
   const span = box.max.x - box.min.x;
   geometry.translate(-(box.max.x + box.min.x) / 2, 0, -(box.max.z + box.min.z) / 2);
   geometry.scale(1 / span, 1 / span, 1 / span);
+  // Los dos tonos del ala se quedan como luz y sombra del color de cada
+  // instancia (la limonera del modelo es amarilla con el borde naranja; en el
+  // valle salen cuatro especies): el tono más claro vale 1, el cuerpo oscuro
+  // sigue oscuro.
+  const colour = geometry.getAttribute('color');
+  const light = (k: number): number => 0.2126 * colour.getX(k) + 0.7152 * colour.getY(k) + 0.0722 * colour.getZ(k);
+  let brightest = 0;
+  for (let k = 0; k < colour.count; k += 1) brightest = Math.max(brightest, light(k));
+  for (let k = 0; k < colour.count; k += 1) {
+    const grey = light(k) / Math.max(1e-6, brightest);
+    colour.setXYZ(k, grey, grey, grey);
+  }
   return geometry;
 }
 

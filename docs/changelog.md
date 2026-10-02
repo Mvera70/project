@@ -28,10 +28,24 @@ clips, y el caballo con el cuerpo de cajas de G-23 que Vera retiró el 29 sep.
 con las piezas de la mula, la vaca y la gallina (`loft`, `tube`, `ell`, `leaf`),
 el mismo esqueleto de nodos y los clips de `tools/art/rigid-clips.mjs`, dentro del
 presupuesto del encargo: caballo 888/900 (esqueleto de la mula, `walk` con **el
-casco plantado** como el ciervo), cigüeña 238/250 y polluelo 80/80 (nodos de la
-gallina, `walk` e `idle`), nido 188/200, grulla 142/150 (alas en el hombro como la
-golondrina), mariposa 15/16. Admitidos en el catálogo (ronda
+casco plantado** como el ciervo), cigüeña 238/250 y polluelo 78/80 (nodos de la
+gallina, `walk` e `idle`), nido 192/200, grulla 142/150 (alas en el hombro como la
+golondrina), mariposa 16/16. Admitidos en el catálogo (ronda
 `animales-rehechos`); publicados los cuatro que tienen sitio.
+
+**Segunda vuelta, tras ver Vera la primera hoja** («¿en serio crees que esto
+está bien? Mira el pollo»). Tenía razón, y la primera hoja no se miró con ojos
+de jugador antes de enseñarla. El **polluelo** eran dos bolas apiladas, la
+cabeza flotando, sin ojos y con una pata a la vista: ahora la cabeza nace del
+pecho, con pico, dos ojos, dos patas con el pie adelante y las alitas, a la mitad
+de alto de la gallina. La **mariposa** era blanca y plana: ahora tiene cuatro
+alas, amarillas con el borde naranja, y el cuerpo oscuro (en el juego, los dos
+tonos se quedan como luz y sombra del color de cada instancia). El **nido** se
+leía quemado y la cigüeña se hundía en él: ahora es una plataforma ancha de
+ramas pardas con el rodete encima y la cigüeña de pie sobre ella (`NEST_FLOOR`).
+El **caballo** apenas pasaba a la mula: ahora va a 1,15 (`HORSE_SIZE`, escalado
+en los datos y no en la raíz, porque los clips leen las traslaciones) y con el
+cuello más alto, y la cruz le saca un 40 % a la de la mula.
 
 **Integrados** (avisado el director antes): la **cigüeña** (`seasonal-fauna.ts`)
 es su modelo partido por articulación (`effects/baked-parts.ts`): se agacha
