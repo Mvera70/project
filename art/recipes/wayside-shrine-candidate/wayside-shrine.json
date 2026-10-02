@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "id": "wayside-shrine",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.92
+    },
+    {
+      "name": "stone",
+      "role": "stone",
+      "color": "#9B958A",
+      "roughness": 0.92
+    },
+    {
+      "name": "timberdark",
+      "role": "timberDark",
+      "color": "#6B4C32",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "wayside-shrine",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Foot",
+      "location": [
+        0,
+        0,
+        0.07
+      ],
+      "dimensions": [
+        0.48,
+        0.38,
+        0.14
+      ],
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Pillar",
+      "location": [
+        0,
+        0,
+        0.34
+      ],
+      "dimensions": [
+        0.25,
+        0.25,
+        0.5
+      ],
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Niche",
+      "location": [
+        0,
+        0,
+        0.76
+      ],
+      "dimensions": [
+        0.49,
+        0.18,
+        0.47
+      ],
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Recess",
+      "location": [
+        0,
+        -0.097,
+        0.77
+      ],
+      "dimensions": [
+        0.32,
+        0.015,
+        0.35
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "Coping",
+      "location": [
+        0,
+        0,
+        1
+      ],
+      "width": 0.61,
+      "depth": 0.35,
+      "height": 0.23,
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "CrossUpright",
+      "location": [
+        0,
+        -0.119,
+        0.78
+      ],
+      "dimensions": [
+        0.045,
+        0.026,
+        0.26
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "CrossArms",
+      "location": [
+        0,
+        -0.119,
+        0.83
+      ],
+      "dimensions": [
+        0.19,
+        0.026,
+        0.04
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

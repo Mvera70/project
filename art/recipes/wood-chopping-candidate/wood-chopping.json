@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "id": "wood-chopping",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "eldergrey",
+      "role": "elderGrey",
+      "color": "#77796F",
+      "roughness": 0.92
+    },
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.92
+    },
+    {
+      "name": "timber",
+      "role": "timber",
+      "color": "#9A744C",
+      "roughness": 0.92
+    },
+    {
+      "name": "trunk",
+      "role": "trunk",
+      "color": "#735338",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "wood-chopping",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Stump",
+      "location": [
+        0,
+        0,
+        0.2
+      ],
+      "radius": 0.29,
+      "depth": 0.4,
+      "vertices": 7,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Cut",
+      "location": [
+        0,
+        0,
+        0.406
+      ],
+      "radius": 0.264,
+      "depth": 0.015,
+      "vertices": 7,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "AxeHandle",
+      "location": [
+        0.1,
+        0,
+        0.71
+      ],
+      "dimensions": [
+        0.04,
+        0.04,
+        0.69
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        20,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Blade",
+      "location": [
+        -0.04,
+        0,
+        0.46
+      ],
+      "dimensions": [
+        0.27,
+        0.04,
+        0.2
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        20,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Chip0",
+      "location": [
+        -0.36,
+        -0.15,
+        0.035
+      ],
+      "dimensions": [
+        0.19,
+        0.08,
+        0.07
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Chip1",
+      "location": [
+        0.32,
+        -0.15,
+        0.035
+      ],
+      "dimensions": [
+        0.19,
+        0.08,
+        0.07
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        42
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}
