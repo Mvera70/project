@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/crown-long.test.ts` (v5.56).
+//
 // K-1 · La corona. `docs/historico/plan-rey.md`.
 //
 // **Lo que se guarda aquí es que dar la corona sea un acto del jugador como dar
@@ -47,20 +49,6 @@ function rich(seed = 41, years = 15): GameState {
 }
 
 describe('K-1 · la corona se da, y se paga', () => {
-  it('cuesta exactamente su plata y nada más', () => {
-    const state = rich();
-    const before = { ...state.village };
-    const who = crownCandidates(state)[0];
-    expect(who, 'hay a quién coronar').toBeDefined();
-    if (who === undefined) return;
-    const out = crownKing(state, who.id, 'spring', 3);
-    expect(out.crowned).toBe(true);
-    expect(state.village.silver).toBe(before.silver - CROWN.SILVER);
-    expect(state.village.grain).toBe(before.grain);
-    expect(state.village.wood).toBe(before.wood);
-    expect(state.village.stone).toBe(before.stone);
-  });
-
   it('el rey ocupa el asiento del jefe, y su oficio queda anotado', () => {
     // Es la sustitución que se pidió: «sustituirá a lo que tenemos actualmente
     // como líder». El asiento es el mismo —siete plantillas lo reparten— y lo
@@ -193,32 +181,9 @@ describe('K-1 · coronar no mueve el azar', () => {
     crownKing(a, who.id, 'spring', 3);
     expect(a.rng).toEqual(b.rng);
   });
-
-  it('y una partida coronada en el mismo tick es la misma partida', () => {
-    const play = (): GameState => {
-      const state = rich(11, 15);
-      const who = crownCandidates(state)[0];
-      if (who !== undefined) crownKing(state, who.id, 'spring', 3);
-      run(state, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
-      return state;
-    };
-    expect(JSON.stringify(play())).toBe(JSON.stringify(play()));
-  });
 });
 
 describe('K-1 · sin corona, el valle es el de siempre', () => {
-  it('la voluntad de un valle sin rey es la de reposo', () => {
-    // **Es la garantía de §13.1 hecha aserto**: una partida sin coronar tiene
-    // que ser byte a byte la de antes de esta fase, y lo que lo asegura es que
-    // `will()` devuelva exactamente lo que el motor leía de la postura retirada.
-    const state = foundTwenty(7);
-    expect(state.crown).toBeNull();
-    expect(will(state)).toEqual(RESTING_WILL);
-    run(state, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
-    expect(will(state)).toEqual(RESTING_WILL);
-    expect(kingOf(state)).toBeNull();
-  });
-
   it('y el jefe de la fundación manda sin ejercer nada', () => {
     const state = foundTwenty(7);
     const leader = state.people.villagers.find((v) => v.role === 'leader');

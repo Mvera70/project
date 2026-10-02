@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/sim-endings-long.test.ts` (v5.56).
+//
 // Partido de `sim-long.test.ts` en v3.14 · design.md §14.1.
 //
 // El primer reparto dejó casi todo el peso en un solo fichero: 33 s de los
@@ -32,11 +34,8 @@ import { holderOf } from '@engine/crossroads/conditions';
 import { decide, run, tick } from '@engine/sim';
 import type { GameState } from '@engine/state';
 import type { CrossroadTemplate } from '@engine/crossroads/schema';
-import { fingerprint } from '../helpers/fingerprint';
 
 const YEAR = TIME.WEEKS_PER_YEAR;
-
-
 
 describe('la política prudent · §12.9', () => {
   // El catálogo real no sirve para fijar el resultado de una puntuación: no se
@@ -188,14 +187,6 @@ describe('la política prudent · §12.9', () => {
     expect(decide(s, [t], 'prudent')).toBe(first);
     expect({ ...s.rng }).toEqual(before);
   });
-
-  it('dos partidas con prudent y la misma semilla son idénticas', () => {
-    const a = foundTwenty(19);
-    const b = foundTwenty(19);
-    run(a, 3000, 'prudent', CATALOG);
-    run(b, 3000, 'prudent', CATALOG);
-    expect(fingerprint(a)).toBe(fingerprint(b));
-  });
 });
 
 describe('el abandono · §5.7, v2.16', () => {
@@ -264,22 +255,6 @@ describe('el abandono · §5.7, v2.16', () => {
     expect(s.ended).toBeNull();
   });
 
-  it('una aldea viable no se abandona nunca', () => {
-    // **Lo que esta prueba guarda es el abandono, no el final.** Pedía
-    // `ended === null` y desde B3 (18 sep 2026) eso es otra cosa: un valle
-    // puede acabar **tomado** por el clan vecino, que es la mitad grande de
-    // «caer» (§1b) y no tiene nada que ver con §5.7. Medido: la semilla 108
-    // llegaba al año 40 viva y ahora la toman en el año 21. La propiedad es la
-    // misma de siempre —una aldea con gente no se queda sin gente sola— y se
-    // dice como lo que es.
-    const s = foundTwenty(108);
-    run(s, 40 * YEAR, 'prudent', CATALOG);
-    if (population(s) >= MIGRATION.VIABLE_POPULATION) {
-      expect(s.ended?.cause ?? null, 'no se abandona').not.toBe('abandoned');
-      expect(s.dwindlingSince).toBeNull();
-    }
-  });
-
   it('deja su línea de peso 3 en la crónica, y no es la de extinción', () => {
     const s = shrunk(BELOW);
     for (let i = 0; i < (YEARS + 2) * YEAR && s.ended === null; i += 1) tick(s, CATALOG);
@@ -294,24 +269,6 @@ describe('el abandono · §5.7, v2.16', () => {
     tick(s, CATALOG);
     expect(s.ended?.cause).toBe('extinction');
   });
-
-  it('acota la racha más larga de agonía a los años que dice §5.7', () => {
-    // Lo que esto existe para arreglar: partidas que pasaban cuarenta años a
-    // dos habitantes sin morirse ni recuperarse.
-    // Seed 2 is the one natural terminal case in the v2.18 bank. More seeds
-    // here became four full 200-year balance runs after the plague fix, while
-    // the 60-seed bank already measures the population-level property.
-    const s = foundTwenty(2);
-    let longest = 0;
-    for (let i = 0; i < 200 * YEAR && s.ended === null; i += 1) {
-      tick(s, CATALOG);
-      if (s.dwindlingSince !== null) {
-        longest = Math.max(longest, s.tick - s.dwindlingSince);
-      }
-    }
-    expect(s.ended).not.toBeNull();
-    expect(longest / YEAR).toBeLessThanOrEqual(MIGRATION.ABANDON_YEARS);
-  });
 });
 
 describe('quedarse sin líder duele · Anexo A.15, v2.22', () => {
@@ -322,20 +279,6 @@ describe('quedarse sin líder duele · Anexo A.15, v2.22', () => {
     if (leader !== undefined) leader.diedTick = 0;
     return s;
   }
-
-  it('ningún forastero llega mientras el puesto está vacante', () => {
-    // Todas las demás puertas de §5.7 abiertas a propósito: si no llega nadie
-    // en treinta años con ánimo alto, grano de sobra y sitio en las casas, es
-    // porque falta el líder y no por otra cosa.
-    const s = beheaded(7);
-    s.village.morale = 80;
-    s.village.grain = 100000;
-    // El propio crossroad de sucesión queda sin responder: nunca se pasa una
-    // `decision`, así que el puesto sigue vacante los treinta años.
-    for (let i = 0; i < 30 * YEAR; i += 1) tick(s, CATALOG);
-    expect(holderOf(s, 'leader')).toBeNull();
-    expect(s.chronicle.some((e) => e.kind === 'arrival')).toBe(false);
-  });
 
   it('en cambio, con líder, llega gente en esas mismas condiciones', () => {
     const s = foundTwenty(7); // líder vivo
@@ -403,12 +346,5 @@ describe('quedarse sin líder duele · Anexo A.15, v2.22', () => {
     }
     expect(s.noOneStreak).toBe(0);
     expect(s.ended).toBeNull();
-  });
-
-  it('no cuenta como racha si nunca se pregunta por sucesión', () => {
-    // Un `no_one` en una encrucijada cualquiera no es un `no_one` de A.15.
-    const s = foundTwenty(7); // líder vivo: succession nunca sale elegible
-    run(s, 20 * YEAR, 'first', CATALOG);
-    expect(s.noOneStreak).toBe(0);
   });
 });

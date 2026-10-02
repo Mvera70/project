@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/sim-policies-long.test.ts` (v5.56).
+//
 // M-10 · design.md §4.2, §4.3, §6.2, §12.9.
 //
 // El orden del tick es normativo: cambiarlo cambia el balance y rompe las
@@ -10,7 +12,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { isHere, population } from '@engine/people/demography';
 import { ageOf } from '@engine/people/villagers';
 import { holderOf } from '@engine/crossroads/conditions';
-import { decide, fillVacancies, run, tick } from '@engine/sim';
+import { decide, fillVacancies, tick } from '@engine/sim';
 import { TERRAIN_CODE } from '@engine/state';
 import type { Villager } from '@engine/state';
 import type { CrossroadTemplate } from '@engine/crossroads/schema';
@@ -19,7 +21,6 @@ import { neighbours4 } from '@engine/world/tiles';
 import { fingerprint } from '../helpers/fingerprint';
 
 const YEAR = TIME.WEEKS_PER_YEAR;
-
 
 describe('la fundación', () => {
   it('empieza como manda §12.2', () => {
@@ -422,28 +423,8 @@ describe('cobertura de vacantes · §6.2', () => {
 });
 
 describe('políticas · §12.9', () => {
-  it('first toma la primera y last la última', () => {
-    const s = foundTwenty(7);
-    run(s, 3000, 'first', CATALOG);
-    if (s.crossroad !== null) {
-      expect(decide(s, CATALOG, 'first')).toBe(s.crossroad.optionIds[0]);
-      expect(decide(s, CATALOG, 'last')).toBe(
-        s.crossroad.optionIds[s.crossroad.optionIds.length - 1],
-      );
-    }
-  });
-
   it('sin encrucijada pendiente no hay nada que decidir', () => {
     const s = foundTwenty(7);
     expect(decide(s, CATALOG, 'first')).toBeNull();
-  });
-
-  it('first es acomodaticia: nunca levanta la empalizada', () => {
-    // §12.9 v2.10. Ninguna política es neutra, y ésta es la razón: `bandits`
-    // tiene por interruptor una obra que `first` no elige jamás.
-    const s = foundTwenty(7);
-    run(s, 100 * YEAR, 'first', CATALOG);
-    const walled = s.history.filter((d) => d.optionId === 'wall_the_village_first');
-    expect(walled).toHaveLength(0);
   });
 });

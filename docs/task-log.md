@@ -12,6 +12,35 @@ incluido: no mueve ninguna jornada. `docs/medidas/rutas-tick-2026-10-02.md`.
 **Abierto:** lo que queda del tick es la población (un A\* por origen y no por
 pareja sería un brief) y `placeBuilding` (16 % del perfil).
 
+## 2 oct 2026 · La senda de la garganta, pegada; los de fuera bajan por ella (v5.70)
+
+Rama `ccr-2aad21e1-6aw4u1`, **versiones reservadas v5.70–v5.74** (había otras
+sesiones con v5.56, v5.60, v5.65 y v5.66–v5.67 en vuelo). Cierra el primero de
+los dos abiertos de la entrada de v5.55 («el camino de la garganta flota»). Medido contra las mallas
+que se dibujan (`tools/reports/gorge-road-report.ts`): **antes**, ocho
+semillas, el 75,8 % de los vértices de la cinta más de 0,35 celdas por encima,
+el peor a 30,2, y el extremo de dentro hasta a 7,1 del camino pintado;
+**después**, dieciséis semillas, ninguno, el peor a 0,25, nada enterrado y los
+32 extremos en la boca. El cañón sigue al río, la sierra lleva columnas por el
+cañón (+5 % de triángulos), la cinta se apoya en lo dibujado y el puente es
+de una pieza y en arco (dos vueltas de capturas con Vera). Las visitas bajan
+por la senda: 9 de 12 valles, hacia el alba, en la plaza a 0,30–0,37, con el
+paso de visitante de 1,1 a 1,4. Capturas de antes y después en el mismo
+encuadre, desde el valle mirando a la garganta norte como las de Vera
+(semillas 11, 19 y 23, y el puente de la 11): `docs/medidas/garganta-img/`.
+Las dos pruebas nuevas van a las jornadas (`gorge-road-ground`,
+`visitors-gorge`): pesan seis y diez segundos, el criterio de la #38. La
+suite rápida entera pasa en local (242 ficheros, 2344 pruebas).
+
+**Abierto:** (1) **de día se les ve en el camino pintado** y, al irse,
+subiendo la garganta al atardecer: el camino entero no cabe en la jornada, y
+verlos bajar la garganta a plena luz pediría que llegaran a la plaza más tarde
+(el trato necesita que estén antes de ~0,40). Es de Vera. (2) Los viajeros de
+las expediciones siguen perdiéndose en la boca, sin subir la senda. (3) El
+forastero del vado sigue entrando por el camino pintado: RD-1 fija su hora.
+Siguiente: **el valle con forma natural** (el segundo abierto de v5.55), que
+es del motor y se mide antes de proponer nada.
+
 ## 2 oct 2026 · Dientes de sierra en la tablet (v5.65)
 
 Rama `ccr-2befdb3e-qwp7lu`. La tablet de Vera es una **iPlay 70 mini Ultra**
@@ -24,6 +53,29 @@ píxel por píxel CSS. Medido en el contenedor (aparato limitado por CPU: antes
 tablet** (aldea 11/21, panel de taller): (1) qué resolución y si sale «(CPU)»;
 (2) `?aa=msaa` contra sin nada: si los fps no bajan más de un 10 %, MSAA pasa
 a Medium en v5.66 (v5.66–v5.67 reservadas para eso).
+
+## 1 oct 2026 · La suite rápida vuelve a ser rápida (v5.56) — carril motor/pruebas
+
+Rama `claude/pruebas-lentas-a-jornadas`, desde `main`. El trabajo `fast` de CI
+tardaba 36 min y los trozos de jornadas 11, 33 y 30 (vuelta 36930779436).
+**Hecho:** 31 ficheros enteros y lo lento de otros 43 a `tests/journeys/`, con
+el mismo cuerpo y el mismo umbral (2343 registros antes y después, título a
+título; 15 `it.fails`; 54 `it.each`); `threat` y `wall-rings` partidas en dos;
+seis trozos repartidos por peso (`tests/journeys/shard-weights.ts`). Medido en
+local: `npm test` 262 s (4 hilos), 2087 pruebas. En CI: `npm test` **2 min 39 s** (antes 36 min) y el trabajo `fast` entero 3 min 30 s; los seis trozos de jornadas, 18:27, 13:08, 15:22, 16:31, 17:44 y 12:39 (antes 11, 33 y 30 min); la vuelta entera, **19 min** (vuelta 36948242697).
+**Lo que se aprendió:** el tiempo por fichero de vitest no cuenta la recogida
+(una partida en el cuerpo de un `describe` la paga antes de la primera prueba:
+`catalogue-coverage` decía 0,1 s y gasta 487), y mudar la prueba lenta de una
+caché compartida pasa la cuenta a la siguiente. Se mide con
+`vitest run <fichero> -t '^nada$'` y con la suite entera después de mudar.
+**Abierto:** (1) quedan en `fast` pruebas de ~3 s en local que son la primera
+que llena su aldea (`fate`, `life-beasts`, `graphics-world`, `means`); (2) la
+recogida de la suite rápida (~380 s sumados en local, importar Three y Rapier
+en cada fichero) pesa ya tanto como sus pruebas; (3) citas a ficheros mudados
+fuera de este carril: `docs/design.md` (`density`, `life-expeditions`,
+`life-perf`), `tools/README.md` (`reader-packet`) y un comentario de
+`src/render3d/life/staging.ts` (`life-staging`) —son del director—; (4) si una
+jornada nueva pasa de ~100 s, se apunta su peso en `shard-weights.ts`.
 
 ## 2 oct 2026 · Piedras de orilla, zorro, encrucijada a 600 (v5.55) · y dos abiertos
 
