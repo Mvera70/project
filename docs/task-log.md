@@ -1,5 +1,15 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · La tanda de la noche, cerrada (director)
+
+Ocho PR en `main` entre las 03:33 y las 06:52 de Madrid: #39 (v5.65), #38
+(v5.56), #41 (v5.70), #42 (v5.57), #43 (v5.68), #40 (v5.69), #44 (v5.71) y
+#45 (v5.72). El informe, con el orden, cómo combinan y lo que queda por dueño,
+está en `docs/medidas/fusion-2026-10-02.md`. **Abierto, de Vera:** la forma del
+valle (prototipo en `ccr-2aad21e1-6aw4u1`, cuatro preguntas pendientes); el
+aviso en vida de K7; el nivelado de K8+K9; la lectura con `?aa=msaa` en la
+tablet. **Abierto, sin dueño:** la medida combinada en el aparato.
+
 ## 2 oct 2026 · K7: el epitafio dice por qué cayó (v5.72)
 
 Rama `ccr-372e1786-k4brcp`, después de K8+K9 (#42, fusionada). Medido antes
