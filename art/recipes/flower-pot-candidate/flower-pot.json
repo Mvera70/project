@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "id": "flower-pot",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "clothaccent",
+      "role": "clothAccent",
+      "color": "#A96146",
+      "roughness": 0.92
+    },
+    {
+      "name": "foliage",
+      "role": "foliage",
+      "color": "#62864F",
+      "roughness": 0.92
+    },
+    {
+      "name": "grain",
+      "role": "grain",
+      "color": "#D8B25E",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "flower-pot",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Pot",
+      "location": [
+        0,
+        0,
+        0.16
+      ],
+      "radius": 0.19,
+      "depth": 0.32,
+      "vertices": 6,
+      "material": "clothaccent",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Rim",
+      "location": [
+        0,
+        0,
+        0.32
+      ],
+      "radius": 0.21,
+      "depth": 0.07,
+      "vertices": 6,
+      "material": "clothaccent",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Leaves",
+      "location": [
+        0,
+        0,
+        0.4
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.42,
+        0.38,
+        0.22
+      ],
+      "segments": 5,
+      "rings": 3,
+      "material": "foliage",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Flower0",
+      "location": [
+        -0.13,
+        0,
+        0.54
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.12,
+        0.12,
+        0.09
+      ],
+      "segments": 4,
+      "rings": 3,
+      "material": "grain",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Flower1",
+      "location": [
+        0.1,
+        0.06,
+        0.54
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.12,
+        0.12,
+        0.09
+      ],
+      "segments": 4,
+      "rings": 3,
+      "material": "grain",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Flower2",
+      "location": [
+        0,
+        -0.12,
+        0.54
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.12,
+        0.12,
+        0.09
+      ],
+      "segments": 4,
+      "rings": 3,
+      "material": "grain",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}
