@@ -41,26 +41,37 @@ describe('G-15 · dónde se dejan los trastos del corral', () => {
   });
 
   it('la leña, los cobertizos y los almiares responden a las reservas, no a contar casas y campos', () => {
-    // IA-piles · en la aldea de veinte: la recién fundada tiene una sola casa
-    // pegada a la plaza y su leñero cabe en una celda, con reservas o sin ellas.
-    const state = foundTwenty(7);
-    state.tick = 1;
-    state.village.wood = 0;
-    state.village.grain = 0;
-    expect(steadingOf(state, state.terrainSeed)
-      .filter(place => place.asset === 'log-pile' || place.asset === 'haystack')).toEqual([]);
+    // IA-piles · en la aldea de veinte. **En varios valles y sumados**: cuántas
+    // pilas caben depende del sitio que quede alrededor del leñero, y con el
+    // valle de forma natural (v5.73) el de la semilla 7 —la única que miraba
+    // esta prueba— sólo tenía hueco para una. Lo que se guarda es que más
+    // reservas sacan más, no cuántas caben en un leñero concreto.
+    const count = (places: ReturnType<typeof steadingOf>, asset: string): number =>
+      places.filter(place => place.asset === asset).length;
+    const scant = { 'log-pile': 0, haystack: 0, shed: 0 };
+    const stocked = { 'log-pile': 0, haystack: 0, shed: 0 };
+    for (const seed of [7, 3, 11, 19, 23]) {
+      const state = foundTwenty(seed);
+      state.tick = 1;
+      state.village.wood = 0;
+      state.village.grain = 0;
+      expect(steadingOf(state, state.terrainSeed)
+        .filter(place => place.asset === 'log-pile' || place.asset === 'haystack'), `semilla ${seed}`).toEqual([]);
 
-    state.village.wood = 60;
-    state.village.grain = 200;
-    const scant = steadingOf(state, state.terrainSeed);
-    state.village.wood = 180;
-    state.village.grain = 600;
-    const stocked = steadingOf(state, state.terrainSeed);
-    expect(stocked.filter(place => place.asset === 'log-pile').length)
-      .toBeGreaterThan(scant.filter(place => place.asset === 'log-pile').length);
-    expect(stocked.filter(place => place.asset === 'haystack').length)
-      .toBeGreaterThan(scant.filter(place => place.asset === 'haystack').length);
-    expect(stocked.filter(place => place.asset === 'shed').length)
-      .toBeGreaterThan(scant.filter(place => place.asset === 'shed').length);
+      state.village.wood = 60;
+      state.village.grain = 200;
+      const few = steadingOf(state, state.terrainSeed);
+      state.village.wood = 180;
+      state.village.grain = 600;
+      const many = steadingOf(state, state.terrainSeed);
+      for (const asset of ['log-pile', 'haystack', 'shed'] as const) {
+        expect(count(many, asset), `semilla ${seed}: ${asset}`).toBeGreaterThanOrEqual(count(few, asset));
+        scant[asset] += count(few, asset);
+        stocked[asset] += count(many, asset);
+      }
+    }
+    expect(stocked['log-pile']).toBeGreaterThan(scant['log-pile']);
+    expect(stocked.haystack).toBeGreaterThan(scant.haystack);
+    expect(stocked.shed).toBeGreaterThan(scant.shed);
   });
 });

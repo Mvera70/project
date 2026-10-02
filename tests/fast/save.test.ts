@@ -21,6 +21,8 @@ import {
   ticksOwed, SCHEMA_VERSION } from '@engine/save';
 import { run, tick } from '@engine/sim';
 import { TERRAIN_CODE } from '@engine/state';
+import { foundGame } from '@engine/found';
+import { rectangleHeart } from '@engine/world/tiles';
 import { fingerprint } from '../helpers/fingerprint';
 import { budgetMs } from '../helpers/timing';
 
@@ -234,6 +236,24 @@ describe('serialize / deserialize · §13.1', () => {
     expect(loaded.state.version).toBe(SCHEMA_VERSION);
     expect(loaded.state.terrainSeed).toBe(7);
     expect(loaded.state.peakPeople).toBe(27);
+  });
+
+  it('una partida de antes del contorno del valle carga con el rectángulo, que es con lo que se generó su mapa', () => {
+    // v5.73 · el corazón dejó de ser el rectángulo de `HEART` y pasó a ser el
+    // contorno que guarda el mapa (`map.heart`). Una partida del esquema 12 no
+    // lo trae: su bosque, su roca y su montaña se pusieron alrededor del
+    // rectángulo, así que ése es su valle. Recordar y no cambiar (§13.1).
+    for (const seed of [2, 5, 9]) {
+      const legacy = structuredClone(foundGame(seed)) as unknown as { map: Record<string, unknown>; version: number };
+      delete legacy.map['heart'];
+      const loaded = deserialize({ schema: 12, savedAtMs: 1, state: { ...legacy, version: 12 }, decisions: [], archive: [] });
+      expect(loaded.state.version, `semilla ${seed}`).toBe(SCHEMA_VERSION);
+      expect([...loaded.state.map.heart], `semilla ${seed}`).toEqual([...rectangleHeart()]);
+    }
+    // Y un contorno que no es de unos y ceros no es un valle: se rechaza.
+    const broken = structuredClone(foundGame(2));
+    broken.map.heart[0] = 2;
+    expect(() => deserialize(serialize(broken, [], [], 1))).toThrow();
   });
 });
 

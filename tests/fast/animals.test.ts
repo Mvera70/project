@@ -13,6 +13,7 @@ import { ANIMALS, TIME } from '@engine/balance';
 import type { GameState } from '@engine/state';
 import { run } from '@engine/sim';
 import { animalPositions, wildlifePositions } from '@derive/animals';
+import { valleyCore } from '@derive/anchors';
 import { herdCapacity } from '@engine/subsistence/herd';
 import { TERRAIN_CODE } from '@engine/state';
 import { fingerprint } from '../helpers/fingerprint';
@@ -131,11 +132,27 @@ describe('la fauna · §7.7', () => {
   });
 
   it('los lobos son de noche y de invierno, cuando el corral ya está vacío', () => {
-    const state = village(20);
+    // Bajan de la linde del bosque que queda cerca del pueblo (`WOLF_RANGE`),
+    // así que la propiedad se mira en un valle que la tenga: se busca entre
+    // varios. Con el valle de forma natural (v5.73) la aldea de la semilla 7 ya
+    // no guardaba bosque a ese alcance a los veinte años, y era la única que
+    // miraba esta prueba.
+    const winter = TIME.WEEKS_PER_SEASON * 3 + 4; // §5.1: el invierno empieza en la 36
+    const near = (candidate: GameState): boolean => {
+      const core = valleyCore(candidate);
+      return candidate.map.terrain.some((terrain, cell) => terrain === TERRAIN_CODE.forest
+        && Math.hypot(cell % candidate.map.width - core.x, Math.floor(cell / candidate.map.width) - core.y) <= ANIMALS.WOLF_RANGE);
+    };
+    let state: GameState | undefined;
+    for (const seed of [7, 3, 11, 19, 23]) {
+      const candidate = village(20, seed);
+      if (near(candidate)) { state = candidate; break; }
+    }
+    expect(state, 'algún valle con bosque cerca del pueblo').toBeDefined();
+    if (state === undefined) return;
     const wolves = (week: number, fraction: number): number =>
       wildlifePositions(atWeek(state, week), fraction).filter((a) => a.kind === 'wolf').length;
 
-    const winter = TIME.WEEKS_PER_SEASON * 3 + 4; // §5.1: el invierno empieza en la 36
     expect(wolves(winter, 0.9)).toBeGreaterThan(0);
     expect(wolves(winter, 0.45)).toBe(0); // de día no
     expect(wolves(TIME.WEEKS_PER_SEASON + 4, 0.9)).toBe(0); // en verano tampoco

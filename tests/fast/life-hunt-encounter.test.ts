@@ -8,6 +8,7 @@ import { standingOf } from '../../src/render3d/life/hunt-bodies';
 import { fitsCircle, indexSolids, type Body, type Solid, type Terrain } from '../../src/render3d/life/body';
 import { foundGame } from '../../src/engine/found';
 import type { GameState } from '../../src/engine/state';
+import { pathTo } from '../../src/render3d/life/navigate';
 
 // AN-5b · la caza decide con el contacto, así que cada encuentro lleva su mundo
 // de Rapier: el suelo, lo que está de pie y el cuerpo que se pinta de la presa.
@@ -47,15 +48,43 @@ describe('encuentro físico de caza', () => {
   });
 
   it('permite resolver cada presa común con su arma y exige dos impactos al jabalí', async () => {
-    const state = foundTwenty(7);
-    const land = terrainOf(state);
+    // Lo que se guarda son las armas y las heridas, así que se mira en un valle
+    // donde el cazador de la prueba —que se pone a cuatro celdas de la presa,
+    // sin mirar si en medio pasa el río— llega andando: un camino que no pase
+    // de vez y media la línea recta. Con el valle de forma natural (v5.73) el
+    // jabalí de la semilla 7 —la única que miraba esta prueba— nacía junto al
+    // río con el cazador en la otra orilla: rodeaba por el vado y el jabalí se
+    // iba, que es la caza y no un fallo de las armas. En el juego el cazador
+    // es un aldeano que sale de donde está (`renderer.ts`, `nearestHunter`).
+    let chosen: { state: GameState; land: Terrain; seed: number } | undefined;
+    for (const seed of [7, 3, 19, 23, 31]) {
+      const candidate = foundTwenty(seed);
+      const ground = terrainOf(candidate);
+      const near = (['partridge', 'rabbit', 'boar'] as const).every((kind) => {
+        const probe = createHuntEncounter(candidate, ground, kind, 'bow', () => 0, [], seed, null, false, {});
+        const prey = probe?.animals[0];
+        if (probe === null || prey === undefined) return false;
+        const from = { x: probe.hunter.x, z: probe.hunter.z };
+        const to = { x: prey.x, z: prey.y };
+        const path = pathTo(ground, from, to);
+        if (path === null) return false;
+        let walked = 0;
+        let at = from;
+        for (const step of path) { walked += Math.hypot(step.x - at.x, step.z - at.z); at = step; }
+        return walked <= 1.5 * Math.hypot(to.x - from.x, to.z - from.z) + 2;
+      });
+      if (near) { chosen = { state: candidate, land: ground, seed }; break; }
+    }
+    expect(chosen, 'algún valle donde el cazador llega andando a las tres presas').toBeDefined();
+    if (chosen === undefined) return;
+    const { state, land, seed } = chosen;
     const world = await contactOf(land, state);
     for (const [species, weapon, wounds] of [
       ['partridge', 'sling', 1],
       ['rabbit', 'sling', 1],
       ['boar', 'bow', 2],
     ] as const) {
-      const encounter = createHuntEncounter(state, land, species, weapon, () => 0, [], 7, null, false, { world });
+      const encounter = createHuntEncounter(state, land, species, weapon, () => 0, [], seed, null, false, { world });
       expect(encounter, species).not.toBeNull();
       if (encounter === null) continue;
       run(encounter, 900, [], 40);

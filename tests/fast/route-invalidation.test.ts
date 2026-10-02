@@ -89,6 +89,15 @@ describe('una obra no tira las rutas que no cruza (v5.71)', () => {
   it('dos estacas lejos de toda ruta no lanzan ni un A*, y las rutas son las de un cálculo desde cero', () => {
     for (const seed of [7, 23, 41]) {
       const state = grown(seed, 2);
+      // Primero un par que se lleve lo pendiente. Lo que se abarata entre dos
+      // obras —un árbol talado, una senda que mejora— se comprueba en la obra
+      // siguiente, y si esa es la que se mide, sus búsquedas se le cuentan a
+      // ella. Con el valle de forma natural (v5.73), las aldeas de las semillas
+      // 7 y 23 llegaban aquí con una y dos rutas así: idénticas al buscarlas de
+      // nuevo, pero buscadas.
+      expect(pairOfStakes(state, offRoute(state), true), `semilla ${seed}: sitio para las primeras estacas`).not.toBeNull();
+      routesFor(state);
+      OFF_ROUTE.delete(state);
       const before = plain(routesFor(state));
       const searches = routeSearches(state);
       expect(pairOfStakes(state, offRoute(state), true), `semilla ${seed}: sitio para las estacas`).not.toBeNull();
