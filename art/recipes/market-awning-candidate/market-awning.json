@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "id": "market-awning",
+  "scale": 0.5666666666666667,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "clothaccent",
+      "role": "clothAccent",
+      "color": "#A96146",
+      "roughness": 0.92
+    },
+    {
+      "name": "foliage",
+      "role": "foliage",
+      "color": "#62864F",
+      "roughness": 0.92
+    },
+    {
+      "name": "grain",
+      "role": "grain",
+      "color": "#D8B25E",
+      "roughness": 0.92
+    },
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.92
+    },
+    {
+      "name": "timber",
+      "role": "timber",
+      "color": "#9A744C",
+      "roughness": 0.92
+    },
+    {
+      "name": "timberdark",
+      "role": "timberDark",
+      "color": "#6B4C32",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "market-awning",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Post0",
+      "location": [
+        -0.65,
+        -0.37,
+        0.59
+      ],
+      "dimensions": [
+        0.05,
+        0.05,
+        1.18
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Post1",
+      "location": [
+        0.65,
+        -0.37,
+        0.59
+      ],
+      "dimensions": [
+        0.05,
+        0.05,
+        1.18
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Post2",
+      "location": [
+        -0.65,
+        0.37,
+        0.59
+      ],
+      "dimensions": [
+        0.05,
+        0.05,
+        1.18
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Post3",
+      "location": [
+        0.65,
+        0.37,
+        0.59
+      ],
+      "dimensions": [
+        0.05,
+        0.05,
+        1.18
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "Canvas",
+      "location": [
+        0,
+        0,
+        1.16
+      ],
+      "width": 1.5,
+      "depth": 0.99,
+      "height": 0.21,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Valance",
+      "location": [
+        0,
+        -0.5,
+        1.15
+      ],
+      "dimensions": [
+        1.5,
+        0.035,
+        0.16
+      ],
+      "material": "clothaccent",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Basket0",
+      "location": [
+        -0.36,
+        -0.03,
+        0.18
+      ],
+      "radius": 0.23,
+      "depth": 0.36,
+      "vertices": 6,
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Produce0",
+      "location": [
+        -0.36,
+        -0.03,
+        0.365
+      ],
+      "radius": 0.2,
+      "depth": 0.015,
+      "vertices": 6,
+      "material": "foliage",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Basket1",
+      "location": [
+        0.33,
+        -0.03,
+        0.18
+      ],
+      "radius": 0.23,
+      "depth": 0.36,
+      "vertices": 6,
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Produce1",
+      "location": [
+        0.33,
+        -0.03,
+        0.365
+      ],
+      "radius": 0.2,
+      "depth": 0.015,
+      "vertices": 6,
+      "material": "grain",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}
