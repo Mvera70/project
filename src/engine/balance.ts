@@ -1896,13 +1896,19 @@ export const MINE = {
   /**
    * Las manos que la mina se lleva cada semana mientras el acopio no esté
    * lleno. TUNE: dos, un picador y quien empuja la vagoneta, que es lo que la
-   * escena enseña (`life/mine.ts`). Como el leñador, sale de lo que sobra
-   * después de los campos, los cuervos y el forrajeo: nunca quita a nadie de
-   * la siega ni del hambre.
+   * escena enseña (`life/mine.ts`). Sale de las manos de la obra, después
+   * del bosque (`labour.ts`): nunca quita a nadie de la siega, del hambre ni
+   * de la leña.
    */
   CREW: 2,
-  /** Y nunca más de esta parte de lo que sobra, para que una aldea corta no se quede sin obra. TUNE. */
+  /** Y nunca más de esta parte de las manos de la obra. TUNE. */
   MAX_SHARE: 0.25,
+  /**
+   * Si la mina sólo baja cuando la obra está parada (la regla de la cantera de
+   * M-0). Medido en `labour.ts`, junto al reparto: costaba lo mismo y paraba
+   * la mina un tercio del tiempo. TUNE: no.
+   */
+  IDLE_YARD_ONLY: false as boolean,
   /** Mineral por minero y semana. TUNE: uno; con dos mineros, unos 96 al año. */
   ORE_PER_MINER: 1,
   /**

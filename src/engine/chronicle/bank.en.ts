@@ -3324,6 +3324,8 @@ export const UI_BANK: Record<string, string> = {
   'building.grave_yard': 'graveyard',
   // A3 · el bastión, la torre metida en la propia muralla.
   'building.bastion': 'bastion',
+  // AR-2 · la mina de la veta, al pie de la montaña.
+  'building.mine': 'mine',
   'trait.ambitious': 'ambitious',
   'trait.devout': 'devout',
   'trait.spiteful': 'spiteful',

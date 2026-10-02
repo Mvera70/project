@@ -2705,6 +2705,73 @@ ocho, a las 46 h y en 12 contra 4. Vender trae de 2,6 a 7,8 de plata por cada
 10 h. **Una partida sin caza no se mueve**: idéntica byte a byte en las
 semillas 7, 23 y 41 a treinta años.
 
+### 7.18 La mina y la Edad del Hierro (AR-2, v5.86, 2 oct 2026)
+
+Lo pidió el dueño del diseño: el metal sale «sobre todo de la minería», que
+tiene que ser «bonita de ver y de manejar como la tala de árboles», y el
+buhonero queda de fuente secundaria. **La primera mina abre la Edad del
+Hierro** (`docs/plan-meta.md`, AR: Cuero → Hierro → Acero → Caballeros), que
+es la que traerá la cota de malla y el casco (AR-1, otra ronda).
+
+**La veta** (`world/mine.ts`, `veinSite`) no es una capa del mapa: es una
+función pura del terreno y de lo construido. Una celda al pie de la montaña
+con `MINE.ROCK_BEHIND` vecinas de montaña y roca justo detrás de la boca, con
+`MINE.RAIL_CELLS` celdas libres y andables delante (los raíles y el acopio),
+alcanzable a pie desde la plaza y a `MINE.MIN_DISTANCE` celdas o más de su
+centro; entre las que quedan, **la más cercana a la plaza**, que es la regla
+del leñador. Empates por hash del terreno, sin consumir azar. **No pasa por
+`placement.ts`**: §7.4 coloca contra el pueblo y la mina va contra la roca;
+comparte con él `canPlace` (suelo, plaza, paso del portón, obras).
+
+**La mina** es un edificio (`kind: 'mine'`, 1×1, 80 de madera y 90 de obra,
+tope uno, sin piedra) que §7.3 pide en el punto **7b**, detrás del molino,
+cuando hay una obra de piedra en pie («la edad del metal después de la de
+piedra»), la fragua está encendida y hay `MINE.PEOPLE` personas. Se levanta
+como cualquier obra. El día que se termina la primera, la crónica lo dice con
+peso 3 (`mine.opened`) y queda la marca permanente `flags['age:iron']`
+(`ironAge`); una mina rehecha se cuenta como obra (`built.mine`). Sin subir el
+esquema.
+
+**El mineral** es una existencia nueva, `village.ore`, para que otros
+sistemas la gasten como el cuero de K5. El reparto de manos (§5.2) manda
+`MINE.CREW` mineros **de las manos de la obra, después del bosque**, y nunca
+más de `MINE.MAX_SHARE` de ellas, **sólo con mina en pie y el acopio por
+debajo de `MINE.ORE_STORE`**. Sacarlos antes del bosque bajaba la población
+final de 53 a 37 de mediana (12 semillas × 60 años): la leña es lo que aprieta
+(K3). Cada uno saca `MINE.ORE_PER_MINER` a la
+semana (la semana de la misa, menos). La fragua encendida gasta
+`MINE.SMITH_ORE` cada semana —el hierro de todos los días—, y eso es lo que
+mantiene la mina viva: sin gasto, el acopio se llenaba en año y medio y la
+mina se paraba para el resto de la partida. **Sin mina, el reparto no se
+mueve ni una décima.** No va en la cabecera: se ve en el montón de la boca.
+
+**Se ve** (`life/mine.ts`, `world/mine-works.ts`). La plaza del oficio está
+delante de la boca; quien llega empieza un turno que lo mueve la escena y no
+su rutina, como la caza: entra por la boca y **desaparece** al pasarla (no se
+pinta ni choca), y al rato sale empujando la vagoneta **llena** por los
+raíles (clip `push`), la vuelca de lado sobre el acopio (`sort`) y vuelve a
+meterla **vacía**; si la vagoneta está fuera con otro, sale a pie y pica la
+ladera junto a la boca (`mine`). A partir de `SHIFT_END` (fase 0,5) no se
+empieza nada dentro: quien está dentro sale y la rutina de casa le recupera.
+Los modelos son de Astra (`mine-mouth`, `minecart`/`minecart-full`,
+`ore-pile`, `rails`); mientras no llegan, un respaldo procedural con su forma,
+su origen y su frente (la cueva del oso escalada y entibada, cajas y conos).
+
+**Qué falsaría esto:** que la mina se abriera antes de la edad de piedra o sin
+fragua; que la boca no tuviera roca detrás o vía delante, o cayera dentro del
+caserío; que bajara alguien a la mina antes de abrirla; que el acopio pasara de
+su tope o hubiera más mineros que la cuadrilla; que la mina se parara para
+siempre; que una partida guardada sin mineral no cargara
+(`tests/fast/mine.test.ts`); y que el minero no entrara, desapareciera y
+saliera, que la vagoneta no saliera llena y volviera vacía, o que alguien se
+quedara dentro al acabar la jornada (`tests/fast/life-mine.test.ts`).
+
+**Abierto:** el buhonero como fuente secundaria de mineral espera a que algo lo
+gaste (AR-1): comprar lo que nada gasta sería tirar la plata. Y `design.md`
+dice «leader hasta la Edad del Hierro»: con esta escalera la del Hierro es la
+segunda, así que **la marca `age:iron` no trae al rey**; si el rey pasa a la de
+los Caballeros es de Vera (pregunta abierta en `plan-meta.md`, AR).
+
 ### 8.1 Esquema de plantilla
 
 ```ts
