@@ -1,0 +1,26 @@
+{
+  "beforeTriangles": 996,
+  "afterTriangles": 1152,
+  "beforePrimitives": 27,
+  "afterPrimitives": 8,
+  "materialCount": 1,
+  "pivotNamesAndTranslationsPreserved": true,
+  "identityRotationScale": true,
+  "vertexColors": true,
+  "emissive": false,
+  "restDirectionThree": [
+    1,
+    0.9,
+    1.15
+  ],
+  "restNativeViewport": [
+    390,
+    844
+  ],
+  "restNativeOrthographicHeight": 26,
+  "comparisonColumns": [
+    "before",
+    "after",
+    "house"
+  ]
+}

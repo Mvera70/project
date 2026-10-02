@@ -1,9 +1,10 @@
 """Casa quemada articulada; ejecutar en Blender --background --python este fichero."""
-import bpy, json, math, numpy as np
+import bpy, json
 from pathlib import Path
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[3]
-OUT=ROOT/'artifacts/graphics/astra/burnt-house'
+recipe=json.loads(Path(__file__).with_name('house-burnt.json').read_text())
+OUT=ROOT/'artifacts/graphics/astra/house-burnt'
 OUT.mkdir(parents=True,exist_ok=True)
 palette=json.loads((ROOT/'art/recipes/palette.json').read_text())
 colors={'char':palette['houses']['tiled']['timberDark'],'soot':palette['valley']['clericalBlack'],'ash':palette['valley']['elderGrey'],'stone':palette['valley']['stone'],'wood':palette['houses']['tiled']['timber']}
@@ -37,13 +38,14 @@ group('base');cube((3,3,.035),(6,6,.07),'char')
 for y in (.55,5.45):cube((3,y,.16),(5.15,.30,.23),'stone')
 for x in (.55,5.45):cube((x,3,.16),(.30,5.15,.23),'stone')
 for x,y in [(1.2,1.5),(3.7,2.8),(2.2,4.2)]:cube((x,y,.08),(.8,.55,.025),'ash')
+for a,b,w in recipe['fallenBeams']:beam(a,b,w,'char')
 for side,y in [('front',.53),('back',5.47)]:
     group('wall_'+side)
     for x in (.55,2.35,3.65,5.45):cube((x,y,1.35),(.21,.23,2.3),'soot')
     cube((3,y,2.40),(5.1,.22,.22))
     for i,x in enumerate([.95,1.53,2.04,3.99,4.55,5.08]):
         h=[1.95,1.55,2.03,1.71,1.15,1.98][i]
-        plank=cube((x,y,h/2+.24),(.46,.13,h),'char' if i%2 else 'wood')
+        plank=cube((x,y,h/2+.24),(.46,.13,h),'wood' if i==1 else 'char')
         for v in plank.data.vertices:
             if v.co.z>0:v.co.z-=.17 if v.co.x>0 else .035
     # Testero roto: la cumbrera queda sostenida por dos tornapuntas.
@@ -59,22 +61,31 @@ for side,x in [('left',.53),('right',5.47)]:
     for y in (1.9,4.1):cube((x,y,1.30),(.23,.22,2.18),'soot')
     for i,y in enumerate([.98,1.53,2.11,3.88,4.46,5.02]):
         h=[1.8,1.4,1.95,1.6,2,1.73][i]
-        plank=cube((x,y,h/2+.24),(.13,.46,h),'wood' if i%3==0 else 'char')
+        plank=cube((x,y,h/2+.24),(.13,.46,h),'wood' if i==4 else 'char')
         for v in plank.data.vertices:
             if v.co.z>0:v.co.z-=.20 if v.co.y>0 else .04
     cube((x,3,.57),(.14,1.2,.65),'char')
     beam((x,.65,.3),(x,2.22,2.3),.13,'ash')
+# Paños bajos supervivientes: conservan la relación con el adobe de house.glb.
+for side,a,b,fixed,height in recipe['wallRemnants']:
+ current='burnt_house_wall_'+side
+ outline=[(a,.24),(b,.24),(b,height*.76),(a+(b-a)*.67,height),(a+(b-a)*.32,height*.91),(a,height*1.10)]
+ if side in ['front','back']:verts=[(x,fixed+delta,z) for delta in [-.105,.105] for x,z in outline]
+ else:verts=[(fixed+delta,x,z) for delta in [-.105,.105] for x,z in outline]
+ n=len(outline);faces=[tuple(range(n)),tuple(reversed(range(n,n*2)))]+[(i,(i+1)%n,(i+1)%n+n,i+n) for i in range(n)]
+ mesh=bpy.data.meshes.new('OldPlaster');mesh.from_pydata(verts,[],faces);mesh.update();obj=bpy.data.objects.new('OldPlaster',mesh);bpy.context.collection.objects.link(obj);obj.data.materials.append(materials['stone']);parts[current].append(obj)
 for side,edge in [('left',0),('right',6)]:
     group('roof_'+side)
     def roofz(x):return 4.4-abs(x-3)*.65
-    for y in (.12,1.65,3.35,5.88):beam((edge,y,2.45),(3,y,4.4),.16,'soot')
+    for y,reach in zip((.12,1.65,3.35,5.88),recipe['brokenRafters'][side]):
+        end=3+(-reach if edge==0 else reach);beam((end,y,roofz(end)),(3,y,4.4),.16,'soot')
     # Tres paños con borde abrasado irregular; grandes huecos entre ellos.
-    for i,(ya,yb,reach) in enumerate([(0,1.3,.93),(2.05,3.15,.65),(4.35,6,.86)]):
+    for i,(ya,yb,reach) in enumerate(recipe['roofSpans'][side]):
         outer=3+(edge-3)*reach
         inset=outer+(.30 if edge==0 else -.30)
         pts=[(3,ya,4.4),(outer,ya+.09,roofz(outer)),(inset,yb-.22,roofz(inset)),(outer,yb,roofz(outer)),(3,yb,4.4)]
         if edge==6:pts.reverse()
-        prism(pts,.12,'char' if i!=1 else 'ash')
+        prism(pts,.12,'char')
     beam((3,0,4.4),(3,6,4.4),.12,'char')
 group('chimney')
 cube((4.48,4.74,1.57),(.70,.72,2.95),'stone')
@@ -99,42 +110,24 @@ def bounds(obs):
     vs=[o.matrix_world@Vector(v) for o in obs for v in o.bound_box]
     return [[min(v[i] for v in vs) for i in range(3)],[max(v[i] for v in vs) for i in range(3)]]
 triangles=sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in objects)
-assert triangles<=1200,triangles
+assert triangles<=recipe['triangleLimit'],triangles
+vertex_material=bpy.data.materials.new('BurntHousePalette');vertex_material.use_nodes=True
+bsdf=vertex_material.node_tree.nodes.get('Principled BSDF');bsdf.inputs['Roughness'].default_value=1
+vc=vertex_material.node_tree.nodes.new('ShaderNodeVertexColor');vc.layer_name='Color';vertex_material.node_tree.links.new(vc.outputs['Color'],bsdf.inputs['Base Color'])
+import bmesh
+for obj in objects:
+ mesh=obj.data;col=mesh.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='CORNER')
+ for poly in mesh.polygons:
+  color=mesh.materials[poly.material_index].diffuse_color
+  for idx in poly.loop_indices:col.data[idx].color=color
+ mesh.materials.clear();mesh.materials.append(vertex_material)
+ for poly in mesh.polygons:poly.material_index=0
+ bm=bmesh.new();bm.from_mesh(mesh);bmesh.ops.recalc_face_normals(bm,faces=bm.faces);bm.to_mesh(mesh);bm.free()
 bpy.ops.object.select_all(action='DESELECT')
 for o in objects:o.select_set(True)
-bpy.ops.export_scene.gltf(filepath=str(OUT/'burnt-house.glb'),export_format='GLB',use_selection=True,export_yup=True,export_animations=False)
+bpy.ops.export_scene.gltf(filepath=str(OUT/'house-burnt.glb'),export_format='GLB',use_selection=True,export_yup=True,export_animations=False)
 lo,hi=bounds(objects)
-metrics={'id':'burnt-house','triangles':triangles,'triangleLimit':1200,'boundsRuntimeCells':{'min':[lo[0],lo[2],-hi[1]],'max':[hi[0],hi[2],-lo[1]]},'materials':colors,'pivotsRuntimeCells':{k:[x/3,z/3,-y/3] for k,(x,y,z) in pivots.items()},'meshNames':[o.name for o in objects],'textures':0}
+metrics={'id':'house-burnt','triangles':triangles,'triangleLimit':1200,'boundsRuntimeCells':{'min':[lo[0],lo[2],-hi[1]],'max':[hi[0],hi[2],-lo[1]]},'materials':colors,'pivotsRuntimeCells':{k:[x/3,z/3,-y/3] for k,(x,y,z) in pivots.items()},'meshNames':[o.name for o in objects],'textures':0}
 (OUT/'metrics.json').write_text(json.dumps(metrics,indent=2))
-# Toda captura vuelve a cargar el GLB exportado.
-bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(OUT/'burnt-house.glb'))
-objects=[o for o in bpy.context.scene.objects if o.type=='MESH'];bpy.context.view_layer.update()
-scene=bpy.context.scene;scene.render.engine='CYCLES';scene.cycles.samples=16;scene.cycles.use_denoising=True
-scene.render.resolution_x=720;scene.render.resolution_y=640;scene.render.resolution_percentage=100
-scene.world=bpy.data.worlds.new('ReviewWorld');scene.world.use_nodes=True
-scene.world.node_tree.nodes['Background'].inputs[0].default_value=(.65,.68,.59,1);scene.world.node_tree.nodes['Background'].inputs[1].default_value=.7
-scene.view_settings.view_transform='Standard'
-bpy.ops.object.light_add(type='AREA',location=(-4,-6,10));bpy.context.object.data.energy=1500;bpy.context.object.data.size=7
-bpy.ops.object.camera_add();camera=bpy.context.object;camera.data.type='ORTHO';scene.camera=camera
-bpy.ops.mesh.primitive_plane_add(size=200,location=(0,0,-.008));ground=bpy.context.object
-groundmat=bpy.data.materials.new('ReviewGround');groundmat.diffuse_color=(.64,.68,.54,1);ground.data.materials.append(groundmat)
-images=[]
-for idx,(title,direction) in enumerate([('three-quarter',(1,-1.5,1.15)),('front',(0,-1,.015)),('side',(1,0,.015)),('scale',(0,-1.5,1.1))]):
-    currentobjects=objects[:]
-    if idx==3:
-        for file,offset in [('house',-2.6),('ruin-wood',2.6),('villager',2.1)]:
-            before=set(bpy.context.scene.objects);bpy.ops.import_scene.gltf(filepath=str(ROOT/'public/assets/valley3d'/(file+'.glb')))
-            imported=list(set(bpy.context.scene.objects)-before);bpy.context.view_layer.update();frozen=[];deps=bpy.context.evaluated_depsgraph_get()
-            for original in imported:
-                if original.type=='MESH' and original.visible_get():
-                    mesh=bpy.data.meshes.new_from_object(original.evaluated_get(deps));copy=bpy.data.objects.new('Reference_'+file,mesh);bpy.context.collection.objects.link(copy);copy.matrix_world=original.matrix_world.copy();frozen.append(copy)
-            for original in imported:bpy.data.objects.remove(original,do_unlink=True)
-            for o in frozen:o.location.x+=offset
-            currentobjects+=frozen
-    bpy.context.view_layer.update();a,b=bounds(currentobjects);center=Vector([(a[i]+b[i])/2 for i in range(3)]);span=max(b[i]-a[i] for i in range(3))
-    camera.location=center+Vector(direction)*max(10,span*2);camera.rotation_euler=(center-camera.location).to_track_quat('-Z','Y').to_euler();camera.data.ortho_scale=span*(1.68 if idx==0 else 1.28 if idx!=3 else 1.12)
-    scene.render.filepath=str(OUT/(title+'.png'));bpy.ops.render.render(write_still=True)
-    img=bpy.data.images.load(scene.render.filepath,check_existing=False);pixels=np.empty(720*640*4,dtype=np.float32);img.pixels.foreach_get(pixels);images.append(pixels.reshape((640,720,4)));bpy.data.images.remove(img)
-sheet=np.concatenate([np.concatenate(images[2:4],axis=1),np.concatenate(images[0:2],axis=1)],axis=0)
-img=bpy.data.images.new('Sheet',width=1440,height=1280);img.pixels.foreach_set(sheet.flatten());img.filepath_raw=str(OUT/'sheet.png');img.file_format='PNG';img.save()
-print('BURNT_HOUSE_COMPLETE',json.dumps(metrics),flush=True)
+
+print('HOUSE_BURNT_COMPLETE',json.dumps(metrics),flush=True)
