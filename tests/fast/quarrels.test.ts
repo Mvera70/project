@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/quarrels-long.test.ts` (v5.56).
+//
 // M-39 · design.md §6.4, §7.9 — cuando dos dejan de aguantarse.
 //
 // El valle sabía escribir rencores desde M-05 y no hacía nada con ellos. Un
@@ -23,14 +25,6 @@ function village(years: number, seed = 7): GameState {
   }
   return structuredClone(base);
 }
-
-/**
- * La opinión con la que los dos empiezan a medirse: pasada el −50 que abre un
- * rencor (§6.4) y **lejos del suelo**, que es donde el carácter deja de
- * distinguirse porque no hay a dónde bajar.
- */
-const QUARREL_FLOOR = -60;
-
 // **Y que sigan en el valle** (`leftTick`): RD-3 hizo real que quien pierde una
 // riña se marche (`smith_feud.side_with_*`), y un nombrado que se fue no riñe
 // con nadie —`quarrelOf` sólo mira a los presentes—, así que la prueba medía la
@@ -81,12 +75,6 @@ function quarrelWithin(state: GameState, weeks: number): ReturnType<typeof quarr
 }
 
 describe('sin rencor no hay riña · §7.9', () => {
-  it('una aldea sin rencores nunca discute', () => {
-    const state = village(20);
-    state.people.grudges = [];
-    expect(quarrelWithin(state, 400)).toBeNull();
-  });
-
   it('ni con un rencor ya curado', () => {
     // **Se cura el rencor y se apagan los demás.** La prueba pedía que no
     // hubiera **ninguna** riña en cuatrocientas semanas tras curar el rencor
@@ -149,65 +137,6 @@ describe('con rencor, acaba pasando · §7.9', () => {
     expect(a.memories.some((m) => m.aboutId === b.id)).toBe(true);
     expect(b.memories.some((m) => m.aboutId === a.id)).toBe(true);
   });
-
-  it('el que tiene mal genio riñe mucho más que el manso', () => {
-    // §6.3 tenía quince rasgos y sólo dos cambiaban comportamiento. Éste es el
-    // tercero: el carácter decide si el asunto estalla o se aguanta un año más.
-    //
-    // Se cuentan riñas en una ventana fija en vez de esperar a la primera: es
-    // treinta veces más barato y la suite rápida tiene veinte segundos para
-    // todo. Y con la proporción, no con el orden — comparar sólo «antes que»
-    // pasaba aunque el rasgo del genio vivo no hiciera nada, porque el manso
-    // frena por su cuenta. Lo destapó una mutación.
-    // Se cuentan semanas hasta la PRIMERA riña, no riñas en una ventana: desde
-    // v3.09 los mismos dos no pueden repetir antes de `REPEAT_TICKS`, así que
-    // contar en una ventana mide el freno y no el carácter.
-    const weeksUntil = (trait: 'hot_tempered' | 'kind', seed: number): number => {
-      const state = village(20, seed);
-      const [a, b] = feuding(state);
-      a.traits = [trait];
-      b.traits = [trait];
-      // **Y el mismo punto de partida para los dos.** `feuding` deja la opinión
-      // mutua en −80, pero la aldea de veinte años llega con la suya propia y
-      // cada cambio del motor la mueve: con la opinión ya en el suelo, el manso
-      // riñe tan pronto como el de mal genio y la proporción se cae. Es la
-      // misma lección que la nota de `feuding`, un paso más adentro.
-      a.opinions[b.id] = QUARREL_FLOOR;
-      b.opinions[a.id] = QUARREL_FLOOR;
-      for (let week = 0; week < 3000; week += 1) {
-        if (quarrelOf(state) !== null) return week;
-        state.tick += 1;
-      }
-      return 3000;
-    };
-
-    // **Tres semillas y no una**, que es la regla del proyecto: dos partidas
-    // divergen desde el primer tick y una sola es ruido.
-    let hotAll = 0;
-    let mildAll = 0;
-    // **La 11 sale de la lista el 30 sep 2026, con su causa**
-    // (`docs/historico/rework.md` §2.7). Al dejar de ser personajes los que
-    // llegan sin hueco (`world/means.ts`, `arriveToStay`), su aldea de veinte
-    // años cambia y la primera tirada del flujo `quarrels` sale por debajo de
-    // 0,0035 —la probabilidad del manso—, así que riñen los dos en la semana 0
-    // y `mild > hot` compara 0 con 0: mide la tirada, no el carácter. La 31 en
-    // su lugar: 5 semanas contra 166 (la 7, 16 contra 235; la 23, 11 contra
-    // 2 022).
-    for (const seed of [7, 23, 31]) {
-      const hot = weeksUntil('hot_tempered', seed);
-      const mild = weeksUntil('kind', seed);
-      expect(hot, `semilla ${seed}: el de mal genio riñe pronto`).toBeLessThan(600);
-      expect(mild, `semilla ${seed}: el manso aguanta más`).toBeGreaterThan(hot);
-      hotAll += hot;
-      mildAll += mild;
-    }
-    // **El listón, remedido y con su causa.** Era 8, medido cuando la prueba
-    // partía de la opinión que la aldea tuviera; al fijar el punto de partida
-    // lejos del suelo —para que lo que se mida sea el carácter y no la
-    // biografía— la proporción sale entre 3 y 5 en las tres semillas. Se pone
-    // en 3: lo que el título promete es «muchísimo más», y tres veces lo es.
-    expect(mildAll / Math.max(1, hotAll), 'el manso aguanta muchísimo más').toBeGreaterThan(3);
-  });
 });
 
 describe('no rompe las reglas · §4.3, §6.4', () => {
@@ -240,5 +169,4 @@ describe('no rompe las reglas · §4.3, §6.4', () => {
     feuding(b);
     expect(quarrelWithin(a, 500)).toEqual(quarrelWithin(b, 500));
   });
-
 });

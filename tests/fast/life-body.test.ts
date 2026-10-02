@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/life-body-long.test.ts` (v5.56).
+//
 // V-02 · Los cuerpos. Anexo E.
 //
 // Las cuatro propiedades que el plan exige, más la de la rejilla. Lo que
@@ -6,16 +8,11 @@
 // necesitar `lane` y `detour`.
 
 import { describe, expect, it } from 'vitest';
-import { foundGame } from '@engine/found';
-import { run } from '@engine/sim';
-import { CATALOG } from '@engine/crossroads/catalog';
-import type { GameState } from '@engine/state';
 import { hash32 } from '@engine/rng';
 import {
   blockedAt, gap, integrate, turnTo, type Body, type Terrain,
 } from '../../src/render3d/life/body';
 import { createNeighbourhood } from '../../src/render3d/life/grid';
-import { terrainOf } from '../../src/render3d/life/terrain';
 import { avoid, drive, resolve, seek, separate } from '../../src/render3d/life/steering';
 import { LIFE_STEP } from '../../src/render3d/life/clock';
 
@@ -27,14 +24,6 @@ function meadow(width = 24, height = 24): Terrain {
   }
   return { width, height, blocked };
 }
-
-/** El valle de verdad: río, roqueda y lo construido. */
-function valley(seed: number, years = 40): { land: Terrain; state: GameState } {
-  const state = foundGame(seed);
-  run(state, years * 48, 'prudent', CATALOG);
-  return { land: terrainOf(state), state };
-}
-
 /**
  * Gente repartida por el valle, **y sin nacer unos dentro de otros**.
  *
@@ -101,50 +90,6 @@ describe('V-02 · los cuerpos', () => {
       .toBeGreaterThan(0.63);
   });
 
-  it('nadie atraviesa nada en diez mil pasos, en seis valles', () => {
-    // Lo que `detour` y `aroundWalls` hacían a mano sobre una ruta que no podía
-    // cambiar. Aquí lo hace el cuerpo al no caber, y se comprueba sobre el valle
-    // de verdad: río con su cauce, roqueda y lo construido.
-    for (const seed of [7, 11, 23, 41, 97, 3]) {
-      const { land } = valley(seed);
-      const bodies = crowd(land, 30, seed);
-      const around = createNeighbourhood(land.width, land.height);
-      const goals = new Map<number, { x: number; z: number }>();
-      let trapped = 0;
-
-      for (let n = 0; n < 340; n += 1) {
-        // Se les manda a la otra punta cada tanto, para que crucen de verdad.
-        if (n % 85 === 0) {
-          bodies.forEach((body, i) => {
-            goals.set(body.id, (i + n) % 2 === 0
-              ? { x: land.width - 2, z: land.height - 2 }
-              : { x: 1.5, z: 1.5 });
-          });
-        }
-        step(bodies, land, around, goals);
-        for (const body of bodies) if (blockedAt(land, body.x, body.z)) trapped += 1;
-      }
-      expect(trapped, `semilla ${seed}: alguien dentro de un muro`).toBe(0);
-    }
-  });
-
-  it('nadie se sale del valle', () => {
-    const { land } = valley(7);
-    const bodies = crowd(land, 20, 11);
-    const around = createNeighbourhood(land.width, land.height);
-    // Todos empujando hacia fuera del mapa, a la vez, que es el caso peor.
-    const goals = new Map(bodies.map((b) => [b.id, { x: -50, z: -50 }]));
-    for (let n = 0; n < 600; n += 1) {
-      step(bodies, land, around, goals);
-      for (const body of bodies) {
-        expect(body.x).toBeGreaterThanOrEqual(0);
-        expect(body.z).toBeGreaterThanOrEqual(0);
-        expect(body.x).toBeLessThanOrEqual(land.width);
-        expect(body.z).toBeLessThanOrEqual(land.height);
-      }
-    }
-  });
-
   it('la cara sigue al paso, y no da tirones', () => {
     const body: Body = { id: 0, x: 4, z: 4, vx: 0, vz: 0, facing: 0, radius: 0.32, pace: 1.3 };
     let biggest = 0;
@@ -200,29 +145,5 @@ describe('V-02 · los cuerpos', () => {
     expect(seen, 've al de al lado').toContain(1);
     expect(seen, 'y no al de la otra punta').not.toContain(2);
     expect(seen, 'ni a sí mismo').not.toContain(0);
-  });
-
-  it('la rejilla hace que la escala deje de importar', () => {
-    // La razón de ser de V-02 frente al descarte. Todos contra todos es n²:
-    // medido allí, triplicar la gente multiplicaba el coste por seis. Con la
-    // rejilla, el coste por cuerpo tiene que quedarse plano.
-    const { land } = valley(7);
-    const around = createNeighbourhood(land.width, land.height);
-    const cost = (count: number): number => {
-      const bodies = crowd(land, count, 41);
-      const goals = new Map(bodies.map((b) => [b.id, { x: land.width / 2, z: land.height / 2 }]));
-      // Una vuelta en vacío, que la primera siempre paga la compilación.
-      for (let n = 0; n < 60; n += 1) step(bodies, land, around, goals);
-      const started = performance.now();
-      for (let n = 0; n < 300; n += 1) step(bodies, land, around, goals);
-      return (performance.now() - started) / 300 / count;
-    };
-
-    const few = cost(20);
-    const many = cost(160);
-    // Ocho veces la gente no puede costar más del triple por cabeza. Con n²
-    // costaría ocho veces más por cabeza, que es justo lo que se viene a evitar.
-    expect(many, `por cuerpo: ${(few * 1000).toFixed(1)} µs con 20, `
-      + `${(many * 1000).toFixed(1)} µs con 160`).toBeLessThan(few * 3);
   });
 });
