@@ -223,6 +223,16 @@ pantalla todavía no enseña del todo:
 | **La entrega sin leñadores** | Entra igual, a su hora | El «+1» sale sin nadie delante los días en que el reparto no pone a nadie en el bosque (3 de 38 entregas medidas) | Que el reparto de la jornada (`life/day.ts`) ponga un leñador los días con entregas |
 | **La piedra y el grano** | Siguen entrando por semanas enteras | La piedra se acarrea sin «+1»; el grano sube de golpe | Lo mismo que la madera: entregas con hora, porteador y aviso. Pedido por el dueño del diseño el 28 sep 2026, para después de probar la madera |
 
+## Los tablones de la herrería y de la capilla (2 oct 2026, K8+K9, v5.57)
+
+| Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
+|---|---|---|---|
+| **Los dos tablones** | La herrería y la capilla abren su ventana al tocarlos (`derive/building-boards.ts`) | La pieza provisional del tablón de la plaza, a 0,72, clavada en la fachada que mira a la plaza | `smithy-board` y `chapel-board`, encargados a Astra en `docs/encargos/ilustraciones-k8-k9.md` |
+| **El encargo en marcha** | Un año de hachas, rejas o herrajes (`smithy:*` en `flags`) | La línea de crónica y el herrero en su fragua, como siempre | Que se vea **qué** hace: hachas apoyadas en la puerta de la fragua, la reja en el campo, el fardo de herrajes esperando al buhonero |
+| **Los herrajes que se venden** | 4 de plata cada 8 semanas durante el año | Nada: la plata sube sola | Un buhonero o una mula que se lleva un fardo de la fragua el día de la venta |
+| **La misa** | El ánimo sube con la fe y esa semana se pierde un día de trabajo | La aldea se junta en la capilla un día (`derive/gatherings.ts`) | Las campanas (sonido) y la gente entrando por la puerta, no un corro delante |
+| **La rogativa** | La próxima siega rinde 1,15 | La aldea se junta en el campo más cercano a la plaza, dos días | Una procesión que **recorra** el borde de los campos detrás del cura, con una cruz, en vez de un corro quieto |
+
 ## El bosque que se aleja (1 oct 2026, K1–K3, v5.53)
 
 | Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |

@@ -609,6 +609,14 @@ export type PlayerAct =
    * llegó hasta el niño, como el parte de la caza o de la batalla.
    */
   | { kind: 'search'; sourceTick: number; child: VillagerId; searcher: VillagerId }
+  /**
+   * K8 · un encargo del tablón de la herrería (`world/boards.ts`): hachas,
+   * rejas de arado o herrajes para vender, por un año. El jugador dice qué; la
+   * herrería lo hace.
+   */
+  | { kind: 'smithy'; order: SmithyOrder }
+  /** K8 · un rito del tablón de la iglesia: convocar misa o una rogativa. */
+  | { kind: 'rite'; rite: Rite }
   | {
     kind: 'battle';
     /** Cuántos del clan quedaron en el suelo. */
@@ -618,6 +626,14 @@ export type PlayerAct =
     /** Si llegaron a entrar. Lo único que decide si la partida acaba. */
     breached: boolean;
   };
+
+/** K8 · los encargos de la herrería, en orden estable (el tablón los pinta así). */
+export const SMITHY_ORDERS = ['axes', 'ploughshares', 'ironware'] as const;
+export type SmithyOrder = (typeof SMITHY_ORDERS)[number];
+
+/** K8 · los ritos de la iglesia, en orden estable. */
+export const RITES = ['mass', 'rogation'] as const;
+export type Rite = (typeof RITES)[number];
 
 /**
  * §7.15 · Las misiones del tablón, en orden estable: de la más sencilla a la
@@ -1028,6 +1044,27 @@ export function valleyTraits(terrainSeed: number): ValleyTrait[] {
 /** Si este valle tiene ese rasgo. */
 export function hasTrait(state: { traits: readonly ValleyTrait[] }, trait: ValleyTrait): boolean {
   return state.traits.includes(trait);
+}
+
+/**
+ * K8 · si una marca de `flags` sigue viva esta semana: caduca en su tick, y
+ * 0 es para siempre. Vive aquí, junto a `hasTrait`, porque la leen el reparto
+ * de manos y la siega (`subsistence/`), que no pueden mirar a `world/`.
+ */
+export function flagLive(state: { readonly flags: Readonly<Record<string, number>>; readonly tick: number }, key: string): boolean {
+  const until = state.flags[key];
+  return until !== undefined && (until === 0 || until > state.tick);
+}
+
+/**
+ * K8 · si el valle tiene el hacha o el arado: el del carro, para siempre, o el
+ * encargo de la herrería, por un año (`world/boards.ts`). Valen lo mismo.
+ */
+export function toolInHand(
+  state: { readonly traits: readonly ValleyTrait[]; readonly flags: Readonly<Record<string, number>>; readonly tick: number },
+  tool: 'axe' | 'plough',
+): boolean {
+  return hasTrait(state, tool) || flagLive(state, tool === 'axe' ? 'smithy:axes' : 'smithy:ploughshares');
 }
 
 

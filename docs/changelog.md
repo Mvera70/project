@@ -1,5 +1,58 @@
 # The Valley — Registro de cambios
 
+## v5.57 · 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón, y desde ellas inclinar hacia un recurso
+
+**Medido antes, en `main`** (`docs/medidas/k8-k9-edificios-2026-10-02.md`,
+informe nuevo `tools/reports/k8-report.ts`): la capilla llega a las 33 h a ×1
+con 20 personas, la herrería a las 40 h con 22 y la iglesia de piedra a las
+65 h. Las tres llegan antes de la edad de piedra en los doce valles, así que
+ninguna llega tarde para que su tablón importe. La madera espera la obra el
+38 % de las semanas justo al llegar la herrería, la plata escasea siempre
+(2–9) y la piedra y la fe sobran (210 y ~89).
+
+**Decisiones de Vera:** encargos de temporada en la herrería, y el hacha y el
+arado salen del carro cuando hay fragua; misa y rogativa en la capilla; la misa
+no sale mal nunca, cuesta el día de trabajo; y la cara mala de los herrajes
+(la plata amontonada tienta al clan) se queda.
+
+- **El tablón de la herrería** (`world/boards.ts`, `BOARDS`): hachas (25
+  madera, 8 plata), rejas de arado (lo mismo) y herrajes para vender (60
+  madera, 24 de plata en el año). Uno cada vez, un año, con herrería encendida y
+  herrero. Las hachas y las rejas valen lo que el hacha y el arado del carro
+  (`toolInHand`), que con fragua dice «Ask at the forge» (`'smithy'`). Ningún
+  encargo quema la leña del invierno (`winterReserve`).
+- **El tablón de la capilla:**
+  - **Misa:** ánimo `10 · fe/100` por un séptimo del trabajo de esa semana, una
+    por temporada. La aldea se junta en la capilla un día.
+  - **Rogativa:** 20 de fe para que la próxima siega rinda 1,15. La aldea va
+    detrás del cura al campo.
+- **Por la puerta de los actos** (`{kind:'smithy'}`, `{kind:'rite'}`), sin
+  tirada, guardado en `state.flags`, sin subir el esquema. La crónica lo cuenta
+  como `means`.
+- **Se tocan en el mundo:**
+  - Dos tablones provisionales, como el de la plaza, a 0,72, clavados en la
+    fachada que mira a la plaza (`derive/building-boards.ts`).
+  - La misma ventana de madera (`ui/redesign/board.ts`) pinta los avisos de
+    cada uno.
+  - Capturas a 390 y 750 px en `docs/medidas/k-img/k8-*`.
+
+**K9, medido contra la trampa de v2.0** (`tools/reports/tilt-report.ts`, cada
+opción pedida siempre que se pueda, 8 semillas × 40 años):
+- **Cada opción gana en lo suyo:**
+  - rejas: la menor espera de madera;
+  - rogativa: la menor hambre y el mayor grano;
+  - herrajes: la plata;
+  - misa: el ánimo y la gente;
+  - hachas: cerrar la villa antes, en las 8 semillas, y los 8 valles la
+    cierran frente a 6 sin hachas.
+- **Los herrajes acaban 2 de 8 aldeas asaltadas**, por la plata amontonada.
+- **La misa es fuerte:** el ánimo medio pasa de 59 a 80. Nivelarla es de Vera.
+
+Encargos: las ilustraciones de las ocho líneas nuevas de crónica, las cinco
+tarjetas y los dos tablones de verdad, en `docs/encargos/ilustraciones-k8-k9.md`.
+Va ahí y no en `plan-arte-pendiente.md` mientras Codex trabaja en ese fichero.
+Lo que aún no se ve está en `docs/encargos-3d.md`.
+
 ## v5.70 · 2 oct 2026 · La senda de la garganta, pegada al suelo, y los de fuera bajan por ella
 
 Vera: «el camino sigue flotando… no sé cómo llegan las visitas al valle». Y con
