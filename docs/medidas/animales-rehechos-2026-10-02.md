@@ -27,16 +27,21 @@ caballo (apenas pasaba a la mula, y «la mula es mucho mejor»: ahora es la mula
 que queda: **ninguna hoja se enseña sin mirarla antes a la escala del juego,
 junto al vecino, preguntando si se reconoce sin el rótulo.**
 
+**Cuarta vuelta:** el caballo, de piezas rígidas, abría rendijas al andar; ahora
+es una sola malla con el esqueleto y los pesos del zorro (`rig-single-mesh.py`).
+El polluelo, con esferas de pocos husos, salía lleno de picos: ahora son de diez,
+como las de la gallina.
+
 ## Presupuestos (encargo de la tanda larga, bloques 6 y 7)
 
 | | Astra | Nuevo | Tope |
 |---|---|---|---|
 | `stork` | 230 | 238 | 250 |
 | `stork-nest` | 180 | 192 | 200 |
-| `chick` | 78 | 78 | 80 |
+| `chick` | 78 | 460 | 80 (excepción: con 80 salía lleno de picos) |
 | `crane` | 148 | 142 | 150 |
 | `butterfly` | 16 | 16 | 16 |
-| `horse` | 748 | 894 | 900 |
+| `horse` | 748 | 824 (una malla) | 900 |
 
 ## Coste en el juego (`gl-probe.mjs`, antes y después seguidos, la máquina sola)
 

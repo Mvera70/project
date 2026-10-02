@@ -19,7 +19,7 @@ Uso (con `pip install bpy==5.0.1 pillow`, sin Blender instalado):
 
 La hoja es un JSON con `out` (el PNG), `title` y `rows`; cada fila, `label` y
 `panels`; cada panel, `title`, `kind` (`detail`, `profile`, `front`, `mobile`) y
-`models`: `[{ "glb": ruta, "x": celdas, "z": celdas, "turn": grados, "lift": celdas }]`.
+`models`: `[{ "glb": ruta, "x": celdas, "z": celdas, "turn": grados, "lift": celdas, "clip": nombre, "at": fracción }]`.
 Un panel `detail` encuadra lo que haya; `scale` (celdas de alto) lo fija.
 """
 import bpy, json, math, sys, os
@@ -60,9 +60,22 @@ def scene_for(models):
     objects = []
     for m in models:
         before = set(bpy.context.scene.objects)
-        bpy.ops.import_scene.gltf(filepath=still(os.path.join(ROOT, m['glb'])))
+        path = os.path.join(ROOT, m['glb'])
+        bpy.ops.import_scene.gltf(filepath=path if 'clip' in m else still(path))
         added = [o for o in bpy.context.scene.objects if o not in before]
         for o in added:
+            if 'clip' in m:
+                # `clip` y `at` (fracción del ciclo): el animal a media zancada,
+                # que es donde una pieza mal unida abre su rendija.
+                acts = [a for a in bpy.data.actions if a.name.split('_')[0] == m['clip'] or a.name.startswith(m['clip'] + '_')]
+                if o.animation_data is not None and acts:
+                    for t in o.animation_data.nla_tracks:
+                        t.mute = True
+                    act = next((a for a in acts if o.name in a.name), acts[0])
+                    o.animation_data.action = act
+                    lo, hi = act.frame_range
+                    bpy.context.scene.frame_set(int(round(lo + (hi - lo) * m.get('at', 0.25))))
+                continue
             # La pose de reposo: sin clips, los nodos como vienen en el GLB.
             if o.animation_data is not None:
                 o.animation_data.action = None
@@ -77,7 +90,8 @@ def scene_for(models):
         pivot.location = (m.get('x', 0), -m.get('z', 0), m.get('lift', 0))
         objects += added
     bpy.context.view_layer.update()
-    return [o for o in objects if o.type == 'MESH']
+    # Sin la icosfera que el importador crea para dibujar los huesos: no se ve y mide dos metros.
+    return [o for o in objects if o.type == 'MESH' and not o.hide_render and o.users_collection and not o.name.startswith('Icosphere')]
 
 
 def bounds(meshes):

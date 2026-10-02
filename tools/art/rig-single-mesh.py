@@ -28,6 +28,10 @@ from mathutils import Vector, Quaternion
 
 argv = sys.argv[sys.argv.index('--') + 1:]
 SOURCE, OUTPUT, LENGTH = argv[0], argv[1], float(argv[2])
+# `--leg-top <fracción>` (v5.100, el caballo): dónde acaban las patas, como
+# fracción del alto. Por omisión 0,34, la del zorro; un animal de cuello alto
+# tiene la cabeza muy arriba y con 0,34 la barriga se iría con las patas.
+LEG_TOP = float(argv[argv.index('--leg-top') + 1]) if '--leg-top' in argv else 0.34
 FPS = 30
 STANCE = 0.62
 
@@ -57,7 +61,7 @@ L = maxX - minX
 # --- 2 · las regiones -------------------------------------------------------
 # El morro mira a −X (convenio del juego). Las patas son lo que queda por
 # debajo del vientre; se reparten en cuatro por delante/detrás y a cada lado.
-legTop = 0.34 * H
+legTop = LEG_TOP * H
 low = [v for v in verts if v.z < legTop * 0.8]
 midLegX = (min(v.x for v in low) + max(v.x for v in low)) / 2
 legs = {}

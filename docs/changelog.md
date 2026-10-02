@@ -27,8 +27,7 @@ clips, y el caballo con el cuerpo de cajas de G-23 que Vera retiró el 29 sep.
 **Lo que se hizo.** Seis funciones en `deliverables/marked-models-trial/build-models.py`
 con las piezas de la mula, la vaca y la gallina (`loft`, `tube`, `ell`, `leaf`),
 el mismo esqueleto de nodos y los clips de `tools/art/rigid-clips.mjs`, dentro del
-presupuesto del encargo: caballo 894/900 (esqueleto de la mula, `walk` con **el
-casco plantado** como el ciervo), cigüeña 238/250 y polluelo 78/80 (nodos de la
+presupuesto del encargo: caballo 824/900 (una malla con el esqueleto del zorro), cigüeña 238/250 y polluelo 460 (excepción declarada) (nodos de la
 gallina, `walk` e `idle`), nido 192/200, grulla 142/150 (alas en el hombro como la
 golondrina), mariposa 16/16. Admitidos en el catálogo (ronda
 `animales-rehechos`); publicados los cuatro que tienen sitio.
@@ -54,6 +53,20 @@ terracota, cuerpo oscuro— y forma de mariposa: dos pares de alas redondeadas, 
 cuerpo fino y las antenas; en el juego conserva esos colores con un matiz por
 instancia. El **polluelo** abre las patas, una adelante y otra atrás, y sube el
 cuerpo para que se vean las dos.
+
+**Cuarta vuelta** (Vera: «el pollo sigue sin convencerme, muchos vértices; y el
+caballo tiene piezas con huecos… mira la skill»). El **caballo** era de piezas
+rígidas: cada una gira con su nodo y al andar se abrían rendijas en la rodilla,
+en el casco y entre los dientes de la crin. Ahora es **una sola malla, como el
+zorro**: las piezas de la mula se unen en una, cada una entra en la de al lado,
+y `tools/art/rig-single-mesh.py` pone el esqueleto y los pesos por regiones; lo
+que se dobla se estira y no se abre (`--leg-top`, nuevo, dice dónde acaban las
+patas en un animal de cuello alto). 824 triángulos, una malla, clips `walk`,
+`idle` y `flee`. El **polluelo** con esferas de cinco y seis husos salía lleno de
+picos: ahora son de diez, como las de la gallina, con las alitas pegadas, el
+pico corto y dos patas con sus dedos. Son 460 triángulos, **por encima del
+presupuesto del encargo (80)**: es lo que cuesta que se lea redondo, en una
+llamada de dibujo igual.
 
 **Integrados** (avisado el director antes): la **cigüeña** (`seasonal-fauna.ts`)
 es su modelo partido por articulación (`effects/baked-parts.ts`): se agacha

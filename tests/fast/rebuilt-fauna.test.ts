@@ -26,8 +26,13 @@ const catalog = JSON.parse(readFileSync('art/catalog.json', 'utf8')) as { assets
 const manifest = JSON.parse(readFileSync('public/assets/valley3d/manifest.json', 'utf8')) as { schemaVersion: 1; generatedAt: string;
   assets: { id: string; file: string; sha256: string; motion: { name: string; seconds: number; loop: boolean; strideLength: number | null }[] }[] };
 
-/** Los presupuestos del encargo (`encargo-astra-tanda-larga-2026-10-02.md`, bloques 6 y 7). */
-const BUDGET: Record<string, number> = { stork: 250, 'stork-nest': 200, chick: 80, crane: 150, butterfly: 16, horse: 900 };
+/**
+ * Los presupuestos del encargo (`encargo-astra-tanda-larga-2026-10-02.md`,
+ * bloques 6 y 7). El polluelo es la excepción declarada: con 80 triángulos
+ * salía lleno de picos y Vera no lo aceptó («muchos vértices»); con esferas de
+ * diez husos, como las de la gallina, son 460, en una llamada de dibujo igual.
+ */
+const BUDGET: Record<string, number> = { stork: 250, 'stork-nest': 200, chick: 480, crane: 150, butterfly: 16, horse: 900 };
 
 async function library(...ids: string[]) {
   const bytes = Object.fromEntries(ids.map((id) => [id, Uint8Array.from(readFileSync(`public/assets/valley3d/${id}.glb`)).buffer]));

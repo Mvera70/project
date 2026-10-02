@@ -8203,71 +8203,77 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Caballo de tiro facetado de The Valley (deliverables/marked-models-trial/build-models.py, horse(); 2 oct 2026, v5.100), rehecho sobre la mula de Vera en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs con el casco plantado.",
+        "source": "La mula de Vera hecha caballo de tiro (deliverables/marked-models-trial/build-models.py, horse(); 2 oct 2026, v5.100), en una sola malla como el zorro; esqueleto, pesos y clips idle/walk/flee de tools/art/rig-single-mesh.py a 0,96 celdas.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
       "status": "study",
-      "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "recipe": "deliverables/marked-models-trial/build-models.py · tools/art/rig-single-mesh.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rig-single-mesh.py · tools/art/rigid-clips.mjs",
       "approved": {
         "runId": "animales-rehechos",
         "directory": "artifacts/graphics/animales-rehechos/approved/horse"
       },
       "bounds": {
         "min": [
-          -0.5642,
-          -0.018392,
-          -0.1352
+          -0.566462,
+          -0.00133,
+          -0.138291
         ],
         "max": [
-          0.400186,
-          0.728,
-          0.1352
+          0.393539,
+          0.776558,
+          0.138291
         ],
         "size": [
-          0.964386,
-          0.746393,
-          0.2704
+          0.96,
+          0.777887,
+          0.276582
         ]
       },
       "recipeSha256": null,
       "materials": [
         "coat",
-        "light",
         "coatTop",
         "blaze",
-        "earInner",
         "eye",
-        "ivory"
+        "ivory",
+        "light"
       ],
       "clips": [
         "walk",
-        "idle"
+        "idle",
+        "flee"
       ],
       "motion": [
         {
           "name": "walk",
-          "seconds": 1.2,
+          "seconds": 1,
           "loop": true,
-          "strideLength": 0.341
+          "strideLength": 0.263
         },
         {
           "name": "idle",
           "seconds": 4,
           "loop": true,
           "strideLength": null
+        },
+        {
+          "name": "flee",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.395
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 48,
-        "meshes": 29,
-        "materials": 7,
-        "triangles": 894
+        "objects": 19,
+        "meshes": 1,
+        "materials": 6,
+        "triangles": 824
       },
       "hashes": {
-        "horse.glb": "1ABC3C625ED33AF1C2DB78ABB46213F28AAEDB402A7D4E71561FAAD1CB356C2A"
+        "horse.glb": "1B8A1F54DA835290135284A7829DB1CC131F89C27C59B6B78A0BCED2AE34D07C"
       }
     },
     {
@@ -8337,7 +8343,7 @@
         "triangles": 238
       },
       "hashes": {
-        "stork.glb": "BE446EDA1FACCD77858550C50F465BA709411D45AAF8FBD26FF3B09398F4522C"
+        "stork.glb": "D6323CBB53DF3B374C58BF746ECE3E355930600CBBE03D31D4F9748153594867"
       }
     },
     {
@@ -8358,19 +8364,19 @@
       },
       "bounds": {
         "min": [
-          -0.064,
-          0,
-          -0.035
+          -0.068,
+          0.000558,
+          -0.037
         ],
         "max": [
-          0.045,
-          0.126,
-          0.035
+          0.048,
+          0.122,
+          0.037
         ],
         "size": [
-          0.109,
-          0.126,
-          0.07
+          0.116,
+          0.121442,
+          0.074
         ]
       },
       "recipeSha256": null,
@@ -8389,7 +8395,7 @@
           "name": "walk",
           "seconds": 0.6,
           "loop": true,
-          "strideLength": 0.04
+          "strideLength": 0.042
         },
         {
           "name": "idle",
@@ -8400,13 +8406,13 @@
       ],
       "connectors": [],
       "statistics": {
-        "objects": 15,
-        "meshes": 7,
+        "objects": 17,
+        "meshes": 9,
         "materials": 4,
-        "triangles": 78
+        "triangles": 460
       },
       "hashes": {
-        "chick.glb": "1CDBE4A4AF87B05E0DB4C18BDE04B8A04575195A4FB510563E279E2C627765AC"
+        "chick.glb": "B2B700F1B8B54ED5DE6A112036F38DE853A95D2F8CEC426BB0DE35DDFB3FB49A"
       }
     },
     {

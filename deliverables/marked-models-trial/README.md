@@ -178,18 +178,19 @@ dentro del presupuesto del encargo de la tanda (bloques 6 y 7):
 
 | ID | Qué | Triángulos | Esqueleto y clips |
 |---|---|---|---|
-| `horse` | La mula de Vera hecha caballo de tiro, ×1,3 (`HORSE_SIZE`): crin en la cresta, cola llena, lucero y calzas | 894 / 900 | El de la mula; `walk` con el casco plantado (como el ciervo) e `idle` |
+| `horse` | La mula de Vera hecha caballo de tiro, en **una sola malla** (`horse-mesh.glb`): crin en la cresta, cola llena, lucero y calzas | 824 / 900 | El del zorro: `rig-single-mesh.py … 0.96 --leg-top 0.27`, con `walk`, `idle` y `flee` |
 | `stork` | Cigüeña blanca de remeras negras, pico y patas rojos | 238 / 250 | El de la gallina (`legL`, `footL`…); `walk` e `idle` |
 | `stork-nest` | Plataforma de ramas con rodete; la cigüeña pisa a `NEST_FLOOR` | 192 / 200 | — (sólo modelo) |
-| `chick` | Polluelo: la cabeza nace del pecho, pico, ojos, dos patas y alitas | 78 / 80 | El de la gallina; `walk` e `idle` |
+| `chick` | Polluelo redondo y liso, esferas de diez husos como la gallina, pico, ojos, alitas y dos patas con dedos | 460 / 80 (excepción) | El de la gallina; `walk` e `idle` |
 | `crane` | Grulla en vuelo, gris con las remeras negras | 142 / 150 | Alas `bird_wing_l`/`bird_wing_r` con el origen en el hombro, como la golondrina |
 | `butterfly` | Dos pares de alas redondeadas, ocre y terracota (los colores de la de Astra), cuerpo fino y antenas | 16 / 16 | `wing_l`/`wing_r` en el eje del cuerpo |
 
 Reconstruir y publicar (con `pip install bpy==5.0.1`):
 
 ```bash
-cd deliverables/marked-models-trial && python3 build-models.py -- horse stork stork-nest chick crane butterfly
-node tools/art/rigid-clips.mjs deliverables/marked-models-trial/horse.glb <salida> horse   # y stork, chick
+cd deliverables/marked-models-trial && python3 build-models.py -- horse-mesh stork stork-nest chick crane butterfly
+python3 tools/art/rig-single-mesh.py -- deliverables/marked-models-trial/horse-mesh.glb deliverables/marked-models-trial/horse.glb 0.96 --leg-top 0.27
+node tools/art/rigid-clips.mjs deliverables/marked-models-trial/stork.glb <salida> stork   # y chick
 node tools/art/adopt-models.mjs <lista.json>     # ronda animales-rehechos
 npx tsx tools/graphics/publish-assets.ts --ids stork,chick,crane,butterfly
 ```

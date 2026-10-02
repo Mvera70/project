@@ -888,64 +888,57 @@ def turn_to_minus_y(objects):
     for o in objects:
         if o.type=='MESH': o.data.transform(r)
 
-HORSE_SIZE=1.3  # sobre la mula de Vera: la cruz del caballo de tiro le saca un 30 % a la suya
-
-def scale_all(k):
-    # Escala uniforme de todo el modelo en sus datos, no en la raíz: los clips
-    # de `rigid-clips.mjs` leen las traslaciones de los nodos y no su escala.
-    from mathutils import Matrix
-    for o in bpy.context.scene.objects:
-        if o.type=='MESH': o.data.transform(Matrix.Scale(k,4))
-        o.location=o.location*k
+# El caballo se escala al rigging: `rig-single-mesh.py … horse.glb 0.96` lo deja
+# de hocico a cola en 0,96 celdas, y la cruz le saca un 30 % a la de la mula.
+HORSE_LENGTH=.96
+HORSE_LEG_TOP=.27   # dónde acaban las patas, en fracción del alto (la barriga)
 
 def horse():
     # El caballo de tiro es **la mula de Vera hecha caballo** (Vera: «la mula
-    # es mucho mejor»): su receta pieza a pieza —tronco en `loft`, cuello en
-    # `tube`, cabeza larga con el morro claro y el labio, ojos con brillo,
-    # orejas en `ear`, crin de hojas en la nuca, cola fina con su borla, patas
-    # con la rodilla marcada y la caña clara— sin la albarda, y con lo que dice
-    # «tiro»: más alto en la cruz (`HORSE_SIZE`), cuello más largo y grueso,
-    # cabeza más larga, orejas cortas, crin y cola llenas y calzas blancas con
-    # pelo sobre el casco. Castaño con las extremidades negras y lucero.
+    # es mucho mejor»), con sus piezas —tronco en `loft`, cuello en `tube`,
+    # cabeza larga con el morro oscuro, ojos con brillo, orejas en `ear`, cola
+    # con borla— y lo que dice «tiro»: más alto en la cruz, cuello largo y
+    # grueso, orejas cortas, crin y cola llenas, calzas blancas y lucero.
+    #
+    # **Una sola malla, como el zorro** (Vera: «el caballo tiene piezas con
+    # huecos»). De piezas rígidas, cada una gira con su nodo y al andar se
+    # abren rendijas en la rodilla, en el casco y entre los dientes de la crin.
+    # Aquí todo se une en una malla, cada pieza entra en la de al lado, y el
+    # esqueleto y los pesos los pone `tools/art/rig-single-mesh.py` por
+    # regiones: lo que se dobla se estira, no se abre. Se exporta sin huesos
+    # como `horse-mesh.glb`; el esqueleto viene después.
     reset(); mat('coat','4A2A18'); mat('coatTop','16120F'); mat('light','D9CDB4'); mat('earInner','5A4030'); mat('blaze','E6E0D0')
-    body=empty('body',(0,0,.24),ROOT)
-    loft('Equine_Barrel',[(-.20,.372,.062,.092),(-.12,.378,.100,.108),(.028,.370,.104,.114),(.165,.372,.090,.104),(.222,.380,.050,.070)],'coat',body,10)
-    neck=empty('neck',(-.180,0,.400),body)
-    tube('Upright_Neck',[(-.160,0,.356),(-.218,0,.440),(-.246,0,.530),(-.268,0,.566)],[(.084,.070),(.076,.062),(.054,.050),(.040,.042)],'coat',neck,8)
-    head=empty('head',(-.286,0,.540),neck)
-    loft('Long_Equine_Head',[(-.250,.550,.044,.062),(-.300,.542,.052,.064),(-.352,.494,.038,.042),(-.396,.458,.034,.032)],'coat',head,8)
-    ell('Dark_Muzzle',(-.394,0,.450),(.080,.090,.064),'coatTop',head,8,4)
-    leaf('Blaze',(-.275,0,.590),(-.392,0,.478),.030,.010,'blaze',head)
+    parts=[]
+    P=lambda o: parts.append(o) or o
+    P(loft('Equine_Barrel',[(-.20,.272,.062,.092),(-.12,.278,.100,.108),(.028,.270,.104,.114),(.165,.272,.090,.104),(.222,.280,.050,.070)],'coat',None,10))
+    # El cuello nace dentro del pecho y la cabeza dentro del cuello: sin junta.
+    P(tube('Upright_Neck',[(-.120,0,.250),(-.190,0,.340),(-.232,0,.440),(-.262,0,.488)],[(.090,.074),(.080,.066),(.058,.052),(.044,.044)],'coat',None,8))
+    P(loft('Long_Equine_Head',[(-.236,.478,.044,.060),(-.290,.470,.052,.062),(-.344,.420,.038,.042),(-.388,.384,.034,.032)],'coat',None,8))
+    P(ell('Dark_Muzzle',(-.386,0,.376),(.080,.088,.064),'coatTop',None,8,4))
+    P(leaf('Blaze',(-.264,0,.518),(-.384,0,.404),.030,.010,'blaze'))
+    # La crin, una cresta llena hundida a medias en el cuello, de la nuca a la cruz.
+    P(tube('Crest_Mane',[(-.244,.010,.536),(-.208,.010,.488),(-.166,.010,.420),(-.112,.010,.350)],[(.022,.028),(.028,.032),(.028,.032),(.014,.018)],'coatTop',None,5))
+    P(leaf('Forelock',(-.262,0,.526),(-.292,0,.490),.034,.010,'coatTop'))
     for s in (-1,1):
-        ell('Eye_'+str(s),(-.306,s*.049,.550),(.018,.008,.016),'eye',head,5,3)
-        ell('Eye_Glint_'+str(s),(-.309,s*.052,.554),(.005,.004,.005),'ivory',head,4,3)
-        # Orejas cortas: las de la mula eran de 0,14; las del caballo, la mitad.
-        ear('ear'+str(s),(-.266,s*.030,.588),(-.252,s*.046,.660),.034,'coat',head)
-    # La crin llena: más hojas y más largas que las de la mula, cayendo a un lado.
-    # Sobre la cresta del cuello, no dentro: de la nuca a la cruz.
-    for j in range(7):
-        t=j/6; bx,bz=-.236+t*.128,.592-t*.190
-        leaf('Mane_'+str(j),(bx,0,bz),(bx+.038,.006*(1-2*(j%2)),bz+.016),.030,.012,'coatTop',neck)
-    leaf('Forelock',(-.272,0,.598),(-.300,0,.560),.034,.010,'coatTop',head)
-    tail=empty('tail',(.218,0,.392),body)
-    tube('Full_Tail',[(.218,0,.392),(.250,0,.336),(.262,0,.240),(.268,0,.150)],[.016,.020,.024,.020],'coatTop',tail,6)
-    tube('Tail_Brush',[(.264,0,.200),(.278,0,.140),(.276,0,.086)],[.026,.030,.004],'coatTop',tail,6)
-    body.location.z-=MULE_DROP
-    k=(.375-MULE_DROP-.044)/(.375-.044)
-    lz=lambda z: .044+(z-.044)*k
+        P(ell('Eye_'+str(s),(-.298,s*.048,.478),(.018,.008,.016),'eye',None,5,3))
+        P(ell('Eye_Glint_'+str(s),(-.301,s*.051,.482),(.005,.004,.005),'ivory',None,4,3))
+        # Orejas cortas, la mitad que las de la mula, saliendo de dentro de la cabeza.
+        P(leaf('Ear_'+str(s),(-.258,s*.028,.500),(-.246,s*.046,.584),.034,.008,'coat'))
+    P(tube('Full_Tail',[(.190,0,.300),(.236,0,.256),(.252,0,.170),(.258,0,.080)],[.020,.022,.026,.022],'coatTop',None,6))
+    P(tube('Tail_Brush',[(.256,0,.130),(.266,0,.070),(.262,0,.020)],[.028,.030,.004],'coatTop',None,6))
     for pre,x in [('fore',-.148),('hind',.162)]:
-        for s,l in [(-1,'L'),(1,'R')]:
-            # La rodilla de delante, algo doblada en reposo (como la del ciervo):
-            # recta, la cinemática del casco plantado no llega y el casco patina.
-            y=s*.062; hip=(x,y,.375-MULE_DROP); knee=(x+(.012 if pre=='fore' else -.037),y,lz(.200)); ankle=(x+(-.003 if pre=='fore' else .028),y,.044); toe=(ankle[0]-.011,y,.021)
-            p=empty(pre+l,hip,body); tube(pre+l+'_Upper',[hip,knee],[.038,.024],'coat',p,6)
-            q=empty(pre+l+'Lower',knee,p); tube(pre+l+'_Shin',[knee,ankle],[.020,.017],'coatTop',q,6)
-            ell(pre+l+'_Knee',knee,(.040,.040,.044),'coatTop',q,4,3)
-            # Las calzas: pelo blanco que cae sobre el casco, más ancho abajo.
-            tube(pre+l+'_Feather',[(ankle[0],y,lz(.11)),(ankle[0]-.003,y,.034)],[.018,.030],'light',q,6)
-            f=empty(pre+l+'Foot',ankle,q); box(pre+l+'_Hoof',toe,(.046,.040,.042),'coatTop',f)
-    scale_all(HORSE_SIZE)
-    merge_parts(); save('horse')
+        for s in (-1,1):
+            y=s*.062; hip=(x,y,.250); knee=(x+(.010 if pre=='fore' else -.034),y,.140); fet=(x+(-.002 if pre=='fore' else .024),y,.050)
+            # La pata entera en un tubo de la cadera (dentro del tronco) al menudillo.
+            P(tube('Leg_'+pre+str(s),[hip,knee,fet],[.040,.026,.020],'coat',None,6))
+            P(tube('Cannon_'+pre+str(s),[(knee[0],y,knee[2]+.012),fet],[.024,.020],'coatTop',None,6))
+            P(tube('Feather_'+pre+str(s),[(fet[0],y,.090),(fet[0]-.003,y,.024)],[.018,.030],'light',None,6))
+            P(box('Hoof_'+pre+str(s),(fet[0]-.006,y,.016),(.048,.042,.034),'coatTop'))
+    one=join('Horse',parts)
+    bpy.ops.object.select_all(action='DESELECT'); one.select_set(True); bpy.context.view_layer.objects.active=one
+    bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM'); bpy.ops.object.transform_apply(location=True,rotation=True,scale=True)
+    for o in [o for o in bpy.context.scene.objects if o is not one]: bpy.data.objects.remove(o)
+    save('horse-mesh')
 
 def stork():
     # La cigüeña blanca, de pie en el prado: la gallina de Vera estirada. Cuerpo
@@ -989,33 +982,30 @@ def stork_nest():
 NEST_FLOOR=.046  # donde pisa la cigüeña, en celdas
 
 def chick():
-    # El polluelo de la gallina, en el lenguaje de la gallina (`hen()`): cuerpo
-    # lleno, cabeza que nace del pecho sin cuello que se vea, pico naranja, dos
-    # ojos negros, dos patas naranjas separadas y las alitas a los lados. A la
-    # escala de la gallina, de modo que se lea como su cría y no como una
-    # pelota: la mitad de alto que ella. Ochenta triángulos: esferas de seis
-    # husos, ojos y alas de una cara, y patas de tres caras sin tapas.
-    reset(); mat('down','E3B32C'); mat('downShade','C99A22'); mat('beak','D2691E'); mat('eye','0E0D0C',.35)
-    body=empty('body',(0,0,.040),ROOT)
-    ell('Fluff',(.004,0,.054),(.082,.068,.066),'down',body,6,4)
-    neck=empty('neck',(-.016,0,.074),body)
-    head=empty('head',(-.022,0,.082),neck)
-    # La cabeza se hunde en el pecho: unida al cuerpo, no apilada encima.
-    ell('Head',(-.026,0,.090),(.050,.046,.048),'down',head,5,4)
-    tetra('Beak',[(-.064,0,.088),(-.047,-.008,.092),(-.047,.008,.092),(-.047,0,.081)],'beak',head)
+    # El polluelo de la gallina, en el lenguaje de la gallina (`hen()`): un
+    # cuerpo redondo y liso con la cabeza redonda hundida en el pecho, pico
+    # naranja corto, dos ojos negros, dos patas naranjas abiertas y las alitas
+    # pegadas a los costados. Vera: «el pollo sigue sin convencerme, muchos
+    # vértices»: con esferas de cinco y seis husos salía lleno de picos y
+    # aristas; aquí son de diez husos, como las de la gallina, y sin piezas
+    # que sobresalgan. Pasa del presupuesto del encargo (80): es el precio de
+    # que se lea redondo, una llamada de dibujo igual.
+    reset(); mat('down','E3B32C'); mat('downShade','CFA024'); mat('beak','D2691E'); mat('eye','0E0D0C',.35)
+    body=empty('body',(0,0,.052),ROOT)
+    ell('Fluff',(.006,0,.066),(.084,.070,.068),'down',body,10,6)
+    neck=empty('neck',(-.018,0,.082),body)
+    head=empty('head',(-.026,0,.090),neck)
+    ell('Head',(-.030,0,.097),(.052,.048,.050),'down',head,10,6)
+    loft('Beak',[(-.054,.094,.008,.006),(-.068,.092,.001,.001)],'beak',head,4)
     for s,l in [(-1,'L'),(1,'R')]:
-        flat('Eye_'+l,[(-.043,s*.0175,.099),(-.035,s*.0215,.104),(-.034,s*.0215,.094)],'eye',head)
-        flat('Wing_'+l,[(-.004,s*.035,.066),(.042,s*.033,.060),(.014,s*.034,.040)],'downShade',body)
-    # El cuerpo sube un poco: las patas se ven por debajo del plumón.
-    body.location.z+=.012
+        ell('Eye_'+l,(-.046,s*.017,.104),(.008,.004,.009),'eye',head,6,4)
+        ell('Wing_'+l,(.012,s*.031,.066),(.040,.012,.028),'downShade',body,6,4)
     for s,l in [(-1,'L'),(1,'R')]:
-        # Una adelante y otra atrás, y abiertas: de perfil se ven las dos.
-        hip=(.002,s*.019,.038); ankle=(-.002+s*.008,s*.023,.000)
-        # La pata, una lámina con el pie hacia delante: de perfil y desde la
-        # cámara de reposo se ven las dos (con tubo no cabían ojos y alas).
-        p=empty('leg'+l,hip,body)
-        flat('Leg_'+l,[(hip[0]+.004,hip[1],hip[2]),(ankle[0]+.004,ankle[1],.004),(ankle[0]-.016,ankle[1],.000),(hip[0]-.004,hip[1],hip[2])],'beak',p)
-        empty('foot'+l,ankle,p)
+        # Abiertas, una adelante y otra atrás: de perfil se ven las dos.
+        hip=(.004,s*.018,.040); ankle=(.000+s*.008,s*.021,.006)
+        p=empty('leg'+l,hip,body); tube('Leg_'+l,[hip,ankle],[.0045,.004],'beak',p,5)
+        f=empty('foot'+l,ankle,p)
+        for j in (-1,0,1): tube('Toe_'+l+str(j),[ankle,(ankle[0]-.014,ankle[1]+j*.008,.002)],[.003,.0015],'beak',f,4)
     merge_parts(); save('chick')
 
 def crane():
@@ -1067,6 +1057,6 @@ def butterfly():
 ONLY=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 BUILDS=[('wolf',lambda: canine('wolf')),('dog',lambda: canine('dog')),('boar',boar),('bear',bear),('bear_v3',bear_v3),('mule',mule),
         ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('crow',crow),('duck',duck),('deer',deer),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe),
-        ('horse',horse),('stork',stork),('stork-nest',stork_nest),('chick',chick),('crane',crane),('butterfly',butterfly)]
+        ('horse-mesh',horse),('stork',stork),('stork-nest',stork_nest),('chick',chick),('crane',crane),('butterfly',butterfly)]
 for name,build in BUILDS:
     if (not ONLY and name!='bear_v3') or name in ONLY: build()
