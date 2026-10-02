@@ -1253,10 +1253,10 @@ export async function createGraphicsRenderer(
       snowing < 0.5 ? (x, z) => meadowWeight(terrainSeed, x, z) : undefined, road.wear);
     if (signposts !== null) world.remove(signposts);
     signposts = buildSignposts(road.signposts, (x, z) => elevationAt(state.map, x, z));
-    // Y en la villa, piedras sueltas por la calzada, con la forma de un peñasco de Astra.
+    // Y en la villa, piedras por la calzada, en grupos de canto rodado.
     // Fuera del pueblo: entre las casas y en la plaza la calle está barrida
     // (Vera, 2 oct 2026: «hay también que quitarlas del pueblo»).
-    const roadStones = buildRoadStones(road, state.map, terrainSeed, rockGeometry(library.get('crag-2')?.original) ?? null,
+    const roadStones = buildRoadStones(road, state.map, terrainSeed,
       (x, z) => elevationAt(state.map, x, z), palette.stone, townCells(state, plazaOf(state)));
     if (roadStones !== null) signposts.add(roadStones);
     world.add(signposts);

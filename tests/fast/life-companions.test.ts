@@ -9,7 +9,7 @@ import { run } from '@engine/sim';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { foundTwenty } from '../helpers/founding';
 import { createVillage } from '../../src/render3d/life/village';
-import { createDog, createFox, dogAction, stepDog, stepFox } from '../../src/render3d/life/companions';
+import { createDog, createFox, dogAction, foxDawnSteps, stepDog, stepFox } from '../../src/render3d/life/companions';
 import { terrainOf } from '../../src/render3d/life/terrain';
 import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
 import { isNight } from '../../src/render3d/life/home';
@@ -47,12 +47,19 @@ describe('El valle más vivo · el perro, el zorro, los patos y la mula', () => 
       const kinds = (): string[] => life.wildlife.map((animal) => animal.kind);
       let foxByDay = 0;
       let foxByNight = 0;
+      let foxHomeByDay = 0;
       let dryDuck = 0;
       for (let n = 0; n < STEPS_PER_DAY; n += 1) {
         const phase = n / STEPS_PER_DAY;
         life.step(phase);
         const night = isNight(phase);
-        if (kinds().includes('fox')) { if (night) foxByNight += 1; else foxByDay += 1; }
+        // De día sólo se le ve volviendo a su linde, si el amanecer lo pilló fuera.
+        const fox = life.wildlife.find((animal) => animal.kind === 'fox');
+        if (fox !== undefined) {
+          if (night) foxByNight += 1;
+          else if (life.fox?.phase === 'back' || life.fox?.phase === 'fleeing') foxHomeByDay += 1;
+          else foxByDay += 1;
+        }
         for (const duck of life.wildlife.filter((animal) => animal.kind === 'duck')) {
           const cell = Math.floor(duck.y) * state.map.width + Math.floor(duck.x);
           const t = state.map.terrain[cell];
@@ -63,10 +70,39 @@ describe('El valle más vivo · el perro, el zorro, los patos y la mula', () => 
       expect(kinds().filter((kind) => kind === 'duck').length, `semilla ${seed}`).toBe(3);
       expect(dryDuck, `semilla ${seed}: un pato fuera del agua`).toBe(0);
       expect(foxByDay, `semilla ${seed}: zorro de día`).toBe(0);
+      expect(foxHomeByDay, `semilla ${seed}: de vuelta a la linde de día`).toBeLessThan(STEPS_PER_DAY / 2);
       if (foxByNight > 0) foxNights += 1;
       expect(JSON.stringify(state), 'no escriben en el motor').toBe(before);
     }
     expect(foxNights).toBeGreaterThanOrEqual(2);
+  });
+
+  it('si el amanecer pilla al zorro fuera, vuelve andando a su linde y no desaparece', () => {
+    // Vera, 2 oct 2026: «el zorro por la noche se acerca a la aldea, correcto;
+    // pero luego desaparece al amanecer, no se ve irse al bosque».
+    for (const seed of SEEDS) {
+      const state = grown(seed);
+      const land = terrainOf(state);
+      const heart = { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 };
+      const fox = createFox(state, land, seed, heart, heart)!;
+      expect(fox, `semilla ${seed}`).not.toBeNull();
+      let step = 0;
+      for (; step < 2000 && fox.phase !== 'watching'; step += 1) stepFox(fox, land, seed, step, true, []);
+      expect(fox.phase, `semilla ${seed}: llega a mirar el gallinero`).toBe('watching');
+      const away = (): number => Math.hypot(fox.body.x - fox.den.x, fox.body.z - fox.den.z);
+      const start = away();
+      expect(start, `semilla ${seed}: está lejos de su linde`).toBeGreaterThan(2);
+      // Amanece: el primer paso de día no lo lleva a casa de un salto.
+      stepFox(fox, land, seed, step, false, []);
+      expect(away(), `semilla ${seed}: no salta a la madriguera`).toBeGreaterThan(start - 0.5);
+      expect(fox.phase, `semilla ${seed}`).toBe('back');
+      const cap = foxDawnSteps(start);
+      let steps = 0;
+      while (fox.phase !== 'den' && steps < cap + 10) { step += 1; steps += 1; stepFox(fox, land, seed, step, false, []); }
+      expect(fox.phase, `semilla ${seed}: llega`).toBe('den');
+      // Llega andando, no por el tope de seguridad.
+      expect(steps, `semilla ${seed}: pasos hasta la linde`).toBeLessThan(cap - 1);
+    }
   });
 
   it('el perro sale a ver al forastero, y el zorro huye de quien se acerca', () => {

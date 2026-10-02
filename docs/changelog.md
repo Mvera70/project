@@ -32,6 +32,31 @@ Pruebas: la adaptativa con un modelo de aparato (CPU, GPU y a medias, y con
 ruido de ±10 % en doce semillas) y el suelo de High y Medium
 (`adaptive-scale`, `graphics-profile`).
 
+## v5.55 · 2 oct 2026 · Las piedras de la calzada, en grupos de orilla
+
+Vera, sobre los cantos de v5.54: «haz grupos más realistas, típicas del río,
+algunas más grandes, otras más pequeñas; cuidado con el rendimiento». Fuera el
+peñasco de Astra, que es anguloso: un canto rodado propio (icosaedro de 80
+caras, vértices movidos un poco), aplastado por piedra. En una celda de cada
+tres, un canto grande (0,2–0,38 de celda), una mediana arrimada y de dos a
+cinco pequeñas **amontonadas hacia un lado**, casi tocándose (en anillo
+alrededor del grande salía una flor); en otras, un guijarro suelto. Cada
+piedra con su tono (`setColorAt`). Sigue siendo una malla instanciada, una
+llamada de dibujo, y la prueba pone el techo de triángulos en 40 000.
+Captura: `docs/medidas/k-img/piedras-grupos.png`.
+
+**El zorro vuelve andando al bosque al amanecer** (Vera: «por la noche se
+acerca a la aldea, correcto; pero luego desaparece al amanecer, no se ve irse
+al bosque»). `stepFox` lo llevaba a la madriguera de un salto en cuanto dejaba
+de ser de noche. Ahora, si el amanecer lo pilla fuera, vuelve andando a su
+linde y desaparece al entrar; de día no sale nunca. Hay un tope de seguridad
+por si la ruta se pierde: el doble de lo que tardaría en línea recta. Con un
+tope fijo de 600 pasos (12 celdas), la semilla 23 se quedaba a medio camino.
+
+Y las dos tomas que K1–K3 dejó pendientes en `encargos-3d.md`: los plantones
+(`k2-plantones.png`, se leen como bosque joven) y el frente de tala lejano
+(`k3-tala-lejos.png`, sin haz al hombro: sigue en encargo).
+
 ## v5.54 · 2 oct 2026 · Lo que Vera vio en la tablet: laderas, piedras, crónica y encrucijada
 
 Cuatro cosas que Vera marcó jugando la versión publicada, en la tablet.
