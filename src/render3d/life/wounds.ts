@@ -51,6 +51,27 @@ export const DAMAGE: Readonly<Record<Weapon, number>> = {
   sword: 0.55,
 };
 
+/**
+ * Dónde da el golpe. **Hoy todo es `torso`**: el impacto no sabe todavía dónde
+ * toca (eso pide el contacto físico de F-0/F-1). La ronda de las partes del
+ * cuerpo (`docs/ideas.md`: la cabeza multiplica el daño, brazos y piernas
+ * menos) sólo tendrá que pasar la zona a `strike` y escribir sus factores.
+ */
+export type Zone = 'head' | 'torso' | 'arms' | 'legs';
+
+/**
+ * Qué zonas cubre cada pieza. Una pieza sólo protege donde está: así el casco
+ * será una pieza que cubre `head`, y las grebas, una que cubre `legs`, sin
+ * cambiar la forma de la tabla. TUNE: la cota baja por los brazos; el arnés
+ * lo cubre todo.
+ */
+export const COVERS: Readonly<Record<Armour, readonly Zone[]>> = {
+  jerkin: ['torso'],
+  mail: ['torso', 'arms'],
+  plate: ['torso'],
+  harness: ['head', 'torso', 'arms', 'legs'],
+};
+
 /** Lo que hace una pieza contra un arma: cuánto protege, y con qué probabilidad rebota entero. */
 export interface Guard {
   /** De 0 a 1: la parte del daño que la pieza para si no rebota. */
@@ -124,9 +145,9 @@ export interface Blow {
  * `Math.random`, y nunca con un flujo del motor—: la misma batalla repetida da
  * los mismos rebotes, que es lo que deja comparar con y sin armadura.
  */
-export function strike(body: Wounded, id: number, weapon: Weapon, step: number): Blow {
+export function strike(body: Wounded, id: number, weapon: Weapon, step: number, zone: Zone = 'torso'): Blow {
   const bare = DAMAGE[weapon];
-  const guard = body.armour === undefined ? null : GUARD[body.armour][weapon];
+  const guard = body.armour === undefined || !COVERS[body.armour].includes(zone) ? null : GUARD[body.armour][weapon];
   const roll = hash32(step >>> 0, `wound:${id}:${weapon}`) / 0x1_0000_0000;
   const ricocheted = guard !== null && roll < guard.ricochet;
   const damage = ricocheted ? 0 : bare * (1 - (guard?.protects ?? 0));

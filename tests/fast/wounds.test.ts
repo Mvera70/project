@@ -9,7 +9,7 @@
 // probabilidad que se cumple, y la misma batalla repetida rebota igual.
 
 import { describe, expect, it } from 'vitest';
-import { blowsToFell, DAMAGE, GUARD, strike, type Armour, type Weapon } from '../../src/render3d/life/wounds';
+import { blowsToFell, COVERS, DAMAGE, GUARD, strike, type Armour, type Weapon } from '../../src/render3d/life/wounds';
 
 const WEAPONS: readonly Weapon[] = ['arrow', 'spear', 'sword'];
 const LADDER: readonly Armour[] = ['jerkin', 'mail', 'plate', 'harness'];
@@ -86,5 +86,14 @@ describe('v5.81 · el daño por arma y lo que protege cada pieza', () => {
       else expect(before - (body.health ?? 1)).toBeCloseTo(Math.min(before, DAMAGE.spear * (1 - GUARD.harness.spear.protects)));
       if (blow.felled) break;
     }
+  });
+
+  it('una pieza sólo protege la zona que cubre; hoy todo golpe es al torso, y todas lo cubren', () => {
+    for (const armour of LADDER) expect(COVERS[armour], armour).toContain('torso');
+    // El peto no cubre las piernas: un lanzazo ahí entra entero.
+    const legs = strike({ armour: 'jerkin' }, 9, 'spear', 1, 'legs');
+    expect(legs.damage).toBe(DAMAGE.spear);
+    const torso = strike({ armour: 'jerkin' }, 9, 'spear', 1);
+    expect(torso.damage).toBeCloseTo(DAMAGE.spear * (1 - GUARD.jerkin.spear.protects));
   });
 });
