@@ -82,8 +82,11 @@ const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [97, 25], [23,
  * 39 y 9; la 11 **a los 25 ya no tiene cerco** (cero arqueros) y a los 30
  * suelta 21 y acierta 10; la 3 a los 25, 14 y 4. La 36 a los 30 suelta 8 y no
  * acierta ninguna: queda aparte, con su `it.fails`.
+ *
+ * **Con la mina encima (AR-2 + K5, 2 oct 2026) la 36 a los treinta vuelve a
+ * acertar** («Expect test to fail» en local) y entra en la lista de main, que
+ * ya la llevaba; la 11 a los veinticinco queda aparte, declarada por AR-2.
  */
-const MISSING: readonly [number, number] = [36, 30];
 
 describe('D2 · la muralla contesta', () => {
   it('se dispara, y alguna acierta, en los valles que se acercan al cerco', async () => {
@@ -114,20 +117,6 @@ describe('D2 · la muralla contesta', () => {
         .toBeLessThan(60);
       physics.dispose();
     }
-  });
-
-  it.fails('semilla 36 · a los treinta también acierta alguna (medido con K5: 8 flechas, 0)', async () => {
-    const [seed, years] = MISSING;
-    const state = assaulted(seed, years, true);
-    const physics = await createPhysics(terrainOf(state));
-    expect(physics).not.toBeNull();
-    if (physics === null) return;
-    const life = createVillage(state, 0, { physics });
-    for (let n = 0; n < DAY_STEPS; n += 1) life.step();
-    const { loosed, hits } = life.defence;
-    physics.dispose();
-    expect(loosed).toBeGreaterThan(0);
-    expect(hits, `semilla ${seed}: ${hits} de ${loosed} dieron`).toBeGreaterThan(0);
   });
 
   // **AR-2 (v5.86, 2 oct 2026) · la semilla 11 vuelve a salir de la lista,

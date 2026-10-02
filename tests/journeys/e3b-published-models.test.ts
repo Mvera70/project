@@ -15,10 +15,20 @@ const ROOT = resolve(import.meta.dirname, '..', '..');
 // jornada vigila el camino que el juego pinta, con los recursos publicados.
 describe('villa real · adarve generado con los recursos publicados', () => {
   it('monta el adarve y la torre sin almenas propias en el bastión que construye el motor', async () => {
-    const state = foundGame(23);
-    run(state, 60 * 48 + 18, 'prudent', CATALOG);
-    const plan = planFor(state);
-    const planned = plan.buildings.find(building => building.kind === 'bastion' && building.rampartShift !== undefined);
+    // La villa se busca por su precondición —un bastión con el adarve corrido a
+    // los sesenta años— y no se fija: con la sastrería y la mina juntas (K5 +
+    // AR-2, 2 oct 2026) la 23 llega a los sesenta sin bastión ninguno, y las 7,
+    // 11 y 3 lo tienen.
+    let plan = null as ReturnType<typeof planFor> | null;
+    let planned: ReturnType<typeof planFor>['buildings'][number] | undefined;
+    for (const seed of [23, 7, 11, 3]) {
+      const state = foundGame(seed);
+      run(state, 60 * 48 + 18, 'prudent', CATALOG);
+      plan = planFor(state);
+      planned = plan.buildings.find(building => building.kind === 'bastion' && building.rampartShift !== undefined);
+      if (planned !== undefined) break;
+    }
+    if (plan === null) throw new Error('sin candidatas');
     expect(planned).toBeDefined();
     expect(planned?.bastionWalkway).toBeUndefined();
     expect(plan.rampart).not.toBeNull();
