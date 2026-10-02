@@ -158,6 +158,13 @@ if (root) {
     // alterar otra ruta de depuración: sólo vive bajo los tres interruptores.
     if (query.get('e3b') === '1') walkwayNow(state);
     if (query.get('hunger') === '1') state.village.grain = 0;
+    // K5 · `&hides=8` pone pieles en los bastidores, para fotografiar el aviso
+    // de los petos de la herrería y el buhonero que las pide.
+    const hides = Number(query.get('hides'));
+    if (Number.isFinite(hides) && hides > 0) state.village.hides = Math.floor(hides);
+    // K5 · `&jerkins=1` deja el encargo de los petos en marcha un año, para
+    // fotografiar el cerco con ellos puestos (`Garrison.jerkins`).
+    if (query.get('jerkins') === '1') state.flags['smithy:jerkins'] = state.tick + TIME.WEEKS_PER_YEAR;
     // F3 · `&ended=1` acaba la partida, y `&ended=<causa>` acaba de esa manera
     // concreta: `extinction`, `abandoned`, `dispersed` o `stormed`. Hacía falta
     // para poder fotografiar las cuatro lápidas —cada una tiene su capitular y

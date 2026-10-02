@@ -20,7 +20,7 @@ ordena lo que viene. Esta skill es ese método en una página. Lee también
 | Vuelo de la flecha, almenas, caída de los muertos, cascotes | **Rapier** | `life/physics.ts` (`launch`, `articulate`, `debris`) |
 | Si la flecha alcanza | **Cilindro** de 0,45 × 0,7 **desde y=0**, mirado al final del paso | `life/archery.ts`, `stepArchery` |
 | Qué hace un flechazo | Regla: una flecha tumba | `stepArchery` |
-| Cuerpo a cuerpo | Distancia 0,9, un golpe cada 15 pasos, cae a los 3 | `life/melee.ts`, `stepMelee` |
+| Cuerpo a cuerpo | Distancia 0,9, un golpe cada 15 pasos, cae a los 3. **El peto de K5 no cambia nada aquí**: se cuenta en sombra (`jerkinTally`) y lo decide el motor (`settle` levanta la mitad); `jerkinBlows` sólo lo ponen el banco y el informe | `life/melee.ts`, `stepMelee` |
 | Portón | Distancia 2,6, un golpe por segundo, 60 lo rompen | `life/raiders.ts` |
 | Movimiento y empujes | Integrador de la vida en rejilla, no Rapier | `life/body.ts`, `integrate`; `separate` |
 | Caza | **Rapier, desde AN-5b**: un mundo de contacto sólo de consulta (suelo, lo que está de pie con su altura pintada, la cápsula que se pinta de la presa); el tiro se barre paso a paso, la estocada va de la mano a la punta medidas; el fallo sale del pulso sembrado, de la presa que se mueve y de lo que hay en medio | `life/physics.ts` `createContactWorld`; `life/hunt-shot.ts`; `life/hunt-bodies.ts`; `life/hunt-encounter.ts` |

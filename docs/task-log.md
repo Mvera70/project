@@ -21,6 +21,52 @@ con el contorno); va con la cantera al pie de la montaña, en v5.74. (2) La
 muralla en la falda llega 36 h más tarde: si pide nivelado, es de Vera.
 **Siguiente:** v5.74, los usos del cinturón.
 
+## 2 oct 2026 · El peto en el asalto (v5.80, carril de combate)
+
+Rama `claude/petos-asalto`, **versiones reservadas v5.80–v5.84**, encargo del
+director. Hecho: el peto en el torso de todo el cerco mientras dura el encargo
+(`render3d/world/jerkin.ts`), la pelea que lo cuenta en sombra (`jerkinTally`,
+`moments.battle.jerkinBlows`), el mando «Petos» del banco y
+`battle-report.ts --jerkins`. **El efecto sigue en el motor**: la escena no
+decide. Medida en `docs/medidas/k5-petos-asalto-2026-10-02.md`; capturas en
+`docs/medidas/k-img/k5-petos-*.jpg`. Pruebas: `melee`, `battle-sandbox`,
+`jerkin-piece`. No toca el motor.
+
+**Abierto:**
+
+- **Para el nivelado:** con 0–3 bajas por asalto, `floor(caídos × 0,5)` no
+  levanta a nadie en la configuración del juego (0 de 20); si el peto ha de
+  pesar, o se redondea de otra forma o decide la escena (`JERKIN_EXTRA_BLOWS`),
+  y lo segundo pide quitar el efecto del motor cuando hay parte (motor, no combate).
+- **Sin ver:** la pelea con petos en un aparato (el contenedor no llega al
+  choque); el caído que se levanta.
+- **De otros carriles:** el golpe sobre cuero que suene distinto (sonido, la
+  cuenta ya está publicada); un peto modelado (Astra).
+
+## 2 oct 2026 · K5: el cuero de la caza (v5.75)
+
+Rama `claude/k5-caza-recoleccion`, **versiones reservadas v5.75–v5.79**. Medido
+antes en `main` (`docs/medidas/k5-caza-recoleccion-2026-10-02.md`, informe
+`tools/reports/k5-report.ts`): sin arco ni lanza la caza no da piezas grandes;
+el frío no mata; el hambre y la plata aprietan. Vera eligió el cuero y que el
+peto se pida en la herrería. Hecho: `village.hides` (sin subir el esquema), el
+buhonero que compra todas las pieles, el encargo `jerkins` y su efecto en
+`settle`. Prueba: `tests/fast/k5-hides.test.ts` (11 s). Captura:
+`docs/medidas/k-img/k5-tablon-petos-{8,3}-pieles-390.png`. La suite rápida
+entera pasa en local (213 ficheros, 2106 pruebas); una partida sin caza no se
+mueve byte a byte.
+
+**Abierto:**
+
+- **De Vera:** el lino y las plantas (no empezados); el nivelado del cuero
+  (`HIDES`, `JERKIN_SAVE`): quien toca todas las señales tiene pieles para las
+  dos cosas.
+- **Sin medir:** cuántos asaltos de más trae la plata del cuero vendido.
+- **De otros carriles:** la escena del asalto no sabe del peto (combate); el
+  bastidor, el fardo y el peto en el torso (Astra); las seis ilustraciones y la
+  tarjeta (Codex, `docs/encargos/ilustraciones-k5-cuero.md`); el «+1 piel» sobre
+  el cazador.
+
 ## 2 oct 2026 · La tanda de la noche, cerrada (director)
 
 Ocho PR en `main` entre las 03:33 y las 06:52 de Madrid: #39 (v5.65), #38

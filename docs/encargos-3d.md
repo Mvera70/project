@@ -240,6 +240,15 @@ enseña:
   oscuras, puertas atrancadas y huertos sin cuidar contarían la bajada (se
   cruza con K11, que la muerte se vea).
 
+## El cuero de la caza (2 oct 2026, K5, v5.75)
+
+| Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
+|---|---|---|---|
+| **Las pieles** | Cada ciervo o jabalí cazado deja una piel, el oso dos (`HIDES.PER_KILL`), en `village.hides` | Sólo la cuenta en el aviso de los petos del tablón de la herrería («N on the racks»); ningún objeto en el valle | **El bastidor de pieles** junto a la casa del cazador, con más o menos pieles según la cuenta (`docs/encargos/ilustraciones-k5-cuero.md` §3, Astra). Y un «+1» con icono de piel sobre el cazador al cobrar la pieza, al lado del «+N» de grano (`renderer.ts`, `wood-gains.ts`): falta el icono `#hide` en el sprite |
+| **El buhonero que compra pieles** | Si hay 3 o más, las pide todas (hasta 12) por 2 de plata cada una | El mismo buhonero con el mismo fardo de leña | Que cargue un fardo de pieles (`life/village.ts` `tradeSites`: hoy `bundle` o `grain`) |
+| **Los petos** | Encargo `jerkins` de la herrería: 6 pieles y 4 de plata, un año | **Desde v5.80**, todo el cerco lleva un peto de cuero mientras dura el encargo: pieza procedural colgada del hueso `spine` (`render3d/world/jerkin.ts`), cuero, hombreras y bandolera clara; se lee a escala de móvil (`docs/medidas/k-img/k5-petos-*.jpg`) | Un peto modelado en el GLB, si Astra lo hace mejor que las seis cajas de hoy. Un sonido de golpe sobre cuero: la cuenta ya está publicada (`moments.battle.jerkinBlows`, carril de sonido) |
+| **El peto en la pelea** | De los que el parte da por caídos en un cerco que aguanta, se levanta la mitad (`settle`, `BOARDS.JERKIN_SAVE`) | **La escena lo cuenta en sombra y no decide** (v5.80): golpes al cuero y caídos con peto en el banco y en `battle-report.ts --jerkins`. Los que caen siguen cayendo (ragdoll) y la semana siguiente la mitad está viva | Si Vera quiere que la pelea lo note —el golpe de más que aguanta el peto, medido en `artifacts/physics/K5-petos/`—, hay que **mover** el efecto del motor a la escena, no duplicarlo: el motor dejaría de levantar a nadie cuando hay parte (cambio del motor, no del carril de combate). Y el caído que se levanta, que hoy no se ve en ningún caso |
+
 ## Los tablones de la herrería y de la capilla (2 oct 2026, K8+K9, v5.57)
 
 | Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |

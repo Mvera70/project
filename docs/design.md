@@ -371,7 +371,8 @@ export interface Clock {
 
 ### 3.3 Estadísticas de aldea
 
-Exactamente cinco. Añadir una sexta requiere modificar este documento.
+Exactamente siete. Añadir una octava requiere modificar este documento. Eran
+cinco; M-0 metió la piedra y la plata como existencias, y K5 (v5.75) las pieles.
 
 ```ts
 export interface VillageStats {
@@ -379,6 +380,9 @@ export interface VillageStats {
   wood: number;     // unidades
   morale: number;   // 0..100
   faith: number;    // 0..100
+  stone: number;    // M-0 · la piedra canteada, en el montón
+  silver: number;   // M-0 · lo único que viene de fuera del valle
+  hides: number;    // K5 · las pieles de la caza grande (§7.17)
   // 'people' NO se guarda: es people.villagers.filter(alive).length
 }
 ```
@@ -2632,6 +2636,55 @@ vendiendo el hacha con fragua en pie. Las seis tienen prueba en
 
 El verbo del jugador y el motor de la variedad. No se escriben una a una: se
 generan cruzando los otros tres sistemas.
+
+
+### 7.17 El cuero de la caza (K5, v5.75, 2 oct 2026)
+
+Lo pidió el dueño del diseño: que la caza y la recolección **dejen materia que
+se use** —cuero, lino, plantas—, con la condición del plan: un recurso cada
+vez, y sólo si crea un dilema visible. Se midió antes en `main`
+(`docs/medidas/k5-caza-recoleccion-2026-10-02.md`): el frío no mata a nadie
+(un cuero «para abrigar» no resolvería nada), el hambre es lo que más mata y
+pediría mapa para el lino, y la plata falta toda la partida. **Va primero el
+cuero**, decidido por Vera el 2 oct; el lino y las plantas esperan.
+
+**De dónde sale.** Cada ciervo o jabalí cazado deja una piel y el oso dos
+(`HIDES.PER_KILL`, en `settleHunt`); la perdiz y el conejo, ninguna. Y esas
+piezas sólo existen con el arco o la lanza que el jugador dio (`WEAPONS`): con la
+honda sola no sale ninguna piel en doce valles de sesenta años. Así que el
+cuero es la cola de un medio de defensa ya pagado.
+
+**El dilema, en una frase:** cada piel o se vende al buhonero por la plata que
+siempre falta —y que tienta al clan (`THREAT.WORTH_PER_SILVER`)—, o se queda
+para los petos de los del cerco, que mueren menos en el asalto.
+
+- **El buhonero** (`fate.ts`, suceso `pedlar`): si hay 3 pieles o más, sube
+  aunque falte la leña y **las pide todas**, hasta 12, a 2 de plata cada una.
+  Todas y no unas pocas porque la medida lo obligó: comprando tres por visita,
+  el valle que vendía llegaba al primer aviso del clan con 86 pieles y el que
+  guardaba con 92 (2 semillas × 10 años, todas las señales tocadas); vender no
+  vaciaba nada.
+- **Los petos** (cuarto encargo del tablón de la herrería, §7.16): 6 pieles y
+  4 de plata, sin madera, por un año, como los demás encargos (Vera: «pagado,
+  como las hachas y los herrajes»; la aldea no se los pone sola). Mientras
+  dura, de los que el parte de la batalla da por caídos en un cerco que
+  **aguanta** se levanta la mitad, hacia abajo (`BOARDS.JERKIN_SAVE`,
+  `settle`). Si entran, entran.
+
+**Cómo se ve.** Las pieles se cuentan en el aviso de los petos del tablón
+(«N on the racks»), no en la cabecera: una cifra más que vigilar es lo que el
+plan prohíbe. El buhonero lo dice con su voz («A pedlar wants N hides for M
+silver») y la crónica cuenta la venta, el encargo y a los que se levantaron.
+Lo que falta en 3D —el bastidor, el fardo, el peto en el torso, la escena que
+sepa del peto— está en `docs/encargos-3d.md`.
+
+**Medido después** (`k5-report.ts --after`, 12 semillas × 60 años, arco y
+lanza dados, horas a ×1): tocando una de cada tres señales, las seis pieles de
+los petos se juntan a las 18 h, y al primer aviso del clan el que guarda puede
+pagarlos en 12 de 12 valles y el que vende en 10 de 12; tocando una de cada
+ocho, a las 46 h y en 12 contra 4. Vender trae de 2,6 a 7,8 de plata por cada
+10 h. **Una partida sin caza no se mueve**: idéntica byte a byte en las
+semillas 7, 23 y 41 a treinta años.
 
 ### 8.1 Esquema de plantilla
 
@@ -5114,6 +5167,17 @@ entre valles 0,22. El detalle y las causas de fin están en `docs/historico/rewo
 | `MASS_EVERY` | 12 semanas | Una misa por temporada |
 | `ROGATION_FAITH` | 20 | La fe sobra en cuanto hay capilla (~89 de mediana) |
 | `ROGATION_YIELD` | 1,15 | Lo mismo que el molino (`FOOD.MILL_BONUS`), por una siega |
+| `ORDERS.jerkins` | 6 pieles, 4 plata | K5: doce de plata que no se le venden al buhonero, y el trabajo |
+| `JERKIN_SAVE` | 0,5 | K5: la mitad de los caídos en un cerco que aguanta se levanta. Sin nivelar |
+
+### 12.12 Las pieles (`HIDES`, K5)
+
+| Constante | Valor | Por qué |
+|---|---:|---|
+| `PER_KILL` | ciervo 1, jabalí 1, oso 2; perdiz y conejo 0 | Sólo la caza grande da cuero para un peto |
+| `PEDLAR_MIN_HIDES` | 3 | Desde aquí el buhonero sube a por pieles, aunque falte la leña |
+| `PEDLAR_MAX_HIDES` | 12 | Se las lleva todas hasta aquí: vender es quedarse sin petos |
+| `PEDLAR_SILVER_PER_HIDE` | 2 | Contra 6 de plata por 80 de leña; doce pieles son un arado |
 
 ## 13. Persistencia y letargo
 

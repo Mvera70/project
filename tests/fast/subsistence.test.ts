@@ -90,6 +90,7 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
       faith: TWENTY.FAITH,
       stone: 0,
       silver: 0,
+      hides: 0,
     },
     people,
     buildings: [

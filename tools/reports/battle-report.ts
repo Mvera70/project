@@ -26,6 +26,18 @@
 // cada batalla se corre también **sin** sombra para comprobar que la sombra no
 // cambia nada. `--relief` pone el relieve del juego (`elevationAt`) como suelo,
 // que es lo que el juego le pasa a la jornada; sin él el suelo es plano.
+//
+// **K5 · el peto en la pelea** (2 oct 2026, v5.80):
+//
+//   npx tsx tools/reports/battle-report.ts --jerkins --seeds 7,11,21,42 --days 6
+//     [--jerkin-blows 1] [--relief] [--arm spear]
+//
+// Con `--jerkins`, cada jornada (`--days` por semilla: cada una tiene su propia
+// semilla de escena) se corre tres veces: sin peto, con peto **en sombra** (se
+// cuenta y no decide; tiene que dar el mismo resultado que sin peto) y con peto
+// **decidiendo** (`--jerkin-blows` golpes de más para tumbar a quien lo lleva).
+// Al final, la distribución de bajas de cada rama y lo que haría el motor con
+// cada una (`settle` levanta la mitad de los caídos de un cerco que aguanta).
 
 import type { GameState } from '../../src/engine/state';
 import { stateAt, giveNow, raidNow } from '../../src/ui/debug';
@@ -34,6 +46,8 @@ import { garrisonAs } from '../../src/derive/garrison';
 import { LIFE_STEP } from '../../src/render3d/life/clock';
 import { elevationAt } from '../../src/render3d/world/ground';
 import type { ShadowArrow } from '../../src/render3d/life/archery';
+import { advanceThreat } from '../../src/engine/world/threat';
+import { JERKIN_EXTRA_BLOWS } from '../../src/render3d/life/melee';
 
 const args = process.argv.slice(2);
 const opt = (name: string, fallback: string): string => {
@@ -51,7 +65,10 @@ const every = Number(opt('every', '250'));
 const radii = flag('shadow') ? opt('shadow', '0.12').split(',').map(Number) : [];
 const probeHeight = Number(opt('probe-height', '0.65'));
 const relief = flag('relief');
-const quiet = flag('quiet') || seeds.length > 1 || radii.length > 1;
+const jerkinMode = flag('jerkins');
+const days = Number(opt('days', '1'));
+const jerkinBlows = Number(opt('jerkin-blows', String(JERKIN_EXTRA_BLOWS)));
+const quiet = flag('quiet') || seeds.length > 1 || radii.length > 1 || jerkinMode;
 
 interface Run {
   readonly seed: number;
@@ -65,10 +82,21 @@ interface Run {
   readonly probesPeak: number;
 }
 
-async function battle(prepared: GameState, seed: number, radius: number | null): Promise<Run> {
+interface Armour {
+  /** Si los del cerco llevan peto. */
+  readonly jerkins: boolean;
+  /** Golpes de más que aguanta el peto; cero es la sombra. */
+  readonly blows: number;
+  /** La jornada de escena: cada una con su semilla. */
+  readonly day: number;
+}
+
+const NO_ARMOUR: Armour = { jerkins: false, blows: 0, day: 0 };
+
+async function battle(prepared: GameState, seed: number, radius: number | null, armour = NO_ARMOUR): Promise<Run> {
   const state = structuredClone(prepared);
-  const life = createVillage(state, 0, {
-    battle: { raiders, garrison: garrisonAs(state, defenders, arm) },
+  const life = createVillage(state, armour.day, {
+    battle: { raiders, garrison: garrisonAs(state, defenders, arm, armour.jerkins), jerkinBlows: armour.blows },
     ...(relief ? { ground: (x: number, z: number) => elevationAt(state.map, x, z) } : {}),
     ...(radius === null ? {} : { shadow: { radius, height: probeHeight } }),
   });
@@ -172,9 +200,68 @@ const feetOf = (seed: number, x: number, z: number): number => {
   const map = maps.get(seed);
   return relief && map !== undefined ? elevationAt(map, x, z) : 0;
 };
+/** K5 · Una jornada en las tres ramas: sin peto, peto en sombra, peto que decide. */
+interface JerkinTrial {
+  readonly seed: number;
+  readonly day: number;
+  readonly bare: Run;
+  readonly shadow: Run;
+  readonly rule: Run;
+}
+
+/**
+ * Lo que el motor entierra con este parte, con o sin el encargo: se le pasa
+ * **al motor de verdad** (`advanceThreat` → `settle`, sobre una copia), por la
+ * misma puerta que el juego (`app.ts`, `PlayerAct` `battle`). Si el cerco cae,
+ * el motor no mira `lost`: saquea con su cuenta (`storm`).
+ */
+const preparedOf = new Map<number, GameState>();
+const motorOf = (seed: number, run: Run, jerkins: boolean): { fallen: number; stormed: boolean; raised: number } => {
+  const state = structuredClone(preparedOf.get(seed)!);
+  if (jerkins) state.flags['smithy:jerkins'] = state.tick + 52;
+  const event = advanceThreat(state, {
+    slain: run.defence.fallen, lost: run.defence.lost, breached: run.defence.gate?.entered === true,
+  });
+  return { fallen: event?.fallen ?? 0, stormed: event?.kind === 'stormed', raised: event?.jerkins ?? 0 };
+};
+
+function jerkinTable(trials: readonly JerkinTrial[]): string {
+  const mean = (values: readonly number[]): string => values.length === 0 ? '—'
+    : (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
+  const spread = (values: readonly number[]): string =>
+    `media ${mean(values)} · mediana ${quantile(values, 0.5)} · p90 ${quantile(values, 0.9)} · máx ${values.length === 0 ? '—' : Math.max(...values)}`;
+  const neutral = trials.filter((trial) => trial.shadow.summary === trial.bare.summary).length;
+  const lines = [
+    `  sombra neutra: ${neutral} de ${trials.length} jornadas dan el mismo resultado con peto en sombra que sin peto`,
+  ];
+  const branch = (name: string, pick: (trial: JerkinTrial) => Run, motorJerkins: boolean): void => {
+    const runs = trials.map(pick);
+    const motor = trials.map((trial) => motorOf(trial.seed, pick(trial), motorJerkins));
+    lines.push(`  ${name}`);
+    lines.push(`    caídos en la escena (lost): ${spread(runs.map((run) => run.defence.lost))}`);
+    lines.push(`    asaltantes caídos: ${spread(runs.map((run) => run.defence.fallen))} · `
+      + `entraron en ${runs.filter((run) => run.defence.gate?.entered === true).length} de ${runs.length}`);
+    lines.push(`    el motor${motorJerkins ? ' con el encargo' : ''}: entierra ${spread(motor.map((m) => m.fallen))}; `
+      + `tomado en ${motor.filter((m) => m.stormed).length} de ${motor.length}`
+      + (motorJerkins ? `; levanta ${motor.reduce((a, m) => a + m.raised, 0)} en total` : ''));
+  };
+  branch('sin peto', (trial) => trial.bare, false);
+  branch('peto en sombra (hoy: decide el motor)', (trial) => trial.shadow, true);
+  const tallies = trials.map((trial) => trial.shadow.defence.jerkins);
+  lines.push(`    en sombra: golpes al peto ${spread(tallies.map((t) => t.blows))}; caídos con peto `
+    + `${tallies.reduce((a, t) => a + t.fallen, 0)}, de ellos ${tallies.reduce((a, t) => a + t.delayed, 0)} `
+    + `en un golpe que ${jerkinBlows === 1 ? 'uno más' : `${jerkinBlows} más`} de aguante no habría tumbado`);
+  branch(`peto que decide en la escena (+${jerkinBlows} golpe${jerkinBlows === 1 ? '' : 's'}), sin el motor`, (trial) => trial.rule, false);
+  branch(`peto que decide en la escena y además el motor (doble)`, (trial) => trial.rule, true);
+  return lines.join('\n');
+}
+
+const jerkinTrials: JerkinTrial[] = [];
+
 for (const seed of seeds) {
   const prepared = stateAt({ seed, year, season: 'summer' });
   maps.set(seed, prepared.map);
+  preparedOf.set(seed, prepared);
   giveNow(prepared, 'arms');
   giveNow(prepared, 'bows');
   raidNow(prepared, raiders, true);
@@ -182,6 +269,18 @@ for (const seed of seeds) {
   // del JIT: medido el 29 sep, 0,64 ms por paso contra 0,29 de las siguientes.
   // Con varias pasadas se tira una primero para no cargárselo a la de sin sombra.
   if (radii.length > 0 && runs.length === 0) await battle(prepared, seed, null);
+  if (jerkinMode) {
+    for (let day = 0; day < days; day += 1) {
+      const bare = await battle(prepared, seed, null, { jerkins: false, blows: 0, day });
+      const shadow = await battle(prepared, seed, null, { jerkins: true, blows: 0, day });
+      const rule = await battle(prepared, seed, null, { jerkins: true, blows: jerkinBlows, day });
+      jerkinTrials.push({ seed, day, bare, shadow, rule });
+      process.stdout.write(`semilla ${seed} jornada ${day}: sin peto ${bare.defence.lost} caídos · en sombra `
+        + `${shadow.summary === bare.summary ? 'igual' : 'DISTINTO'} (${shadow.defence.jerkins.blows} golpes al peto) · `
+        + `decidiendo ${rule.defence.lost} caídos, ${rule.defence.fallen} asaltantes\n`);
+    }
+    continue;
+  }
   const base = await battle(prepared, seed, null);
   runs.push(base);
   if (quiet) process.stdout.write(`semilla ${seed} sin sombra: ${base.summary}\n`);
@@ -210,4 +309,10 @@ if (radii.length > 0) {
       + `de media por paso (hasta ${Math.max(...mine.map((run) => run.probesPeak))} sondas a la vez)\n`);
     process.stdout.write(`${shadowTable(mine, feetOf)}\n`);
   }
+}
+
+if (jerkinMode) {
+  process.stdout.write(`\nK5 · el peto en la pelea: ${jerkinTrials.length} jornadas (${seeds.length} semillas × ${days}), `
+    + `${defenders} en el cerco (${arm}) contra ${raiders}, año ${year}, suelo ${relief ? 'con el relieve del juego' : 'plano'}\n`);
+  process.stdout.write(`${jerkinTable(jerkinTrials)}\n`);
 }
