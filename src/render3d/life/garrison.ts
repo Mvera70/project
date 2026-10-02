@@ -65,6 +65,8 @@ export interface Manned {
   readonly walkway?: { readonly firstWall: Point; readonly nextWall: Point };
   /** Hacia dónde mira quien está ahí: afuera, que es de donde vienen. */
   readonly facing: Point;
+  /** K5 · Si quien sube lleva peto (`Garrison.jerkins`). Lo pinta el render y lo cuenta la pelea. */
+  readonly jerkin: boolean;
 }
 
 /** Sólo baja a la cota de tablero las celdas de piedra que sostienen una ruta asignada. */
@@ -248,6 +250,7 @@ export function garrisonPlaces(
         // Mirando afuera: el puesto está entre quien lo ocupa y el camino, así
         // que la celda de la muralla **es** la dirección de la amenaza.
         : { x: post.x + 0.5, z: post.y + 0.5 },
+      jerkin: garrison.jerkins,
     });
   }
   return manned.sort((a, b) => (order.get(postKey(a.post)) ?? 0) - (order.get(postKey(b.post)) ?? 0));
