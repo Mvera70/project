@@ -361,7 +361,11 @@ Tres cosas del dueño que mandan sobre cualquier otra regla de este fichero:
 **el caos es el juego** («que haya partidas que se rompan es la idea»: las dos
 puertas del rayo que R-1 puso hay que quitarlas, `docs/historico/rework.md` §2.6); **los planes
 de prueba y el nivelado van después**, la puerta es la suite rápida y las
-jornadas y nada más; y **las jornadas rojas por la trayectoria nueva ya
+jornadas y nada más —y antes de afinar una cifra se mira `docs/plan-meta.md`:
+si una ronda futura la va a mover, se deja con su `// TUNE:` y se sigue («a
+veces se tiran mucho tiempo rebalanceando cuando eso mismo, con otra medida
+nueva, se va a quitar o a descolocar … una base sólida, un sistema que funcione
+y tenga sentido», Vera, 2 oct 2026, por la sastrería de K5)—; y **las jornadas rojas por la trayectoria nueva ya
 están resueltas**: eran once (`docs/historico/rework.md` §2.8) y quedan dos,
 rojas a propósito y declaradas —la de los catorce avisos y la de la palanca del
 bosque— (`docs/task-log.md`, «Las jornadas rojas», 128 de 130 en 284 s). **Y desde v3.75 la aldea de veinte años de cualquier semilla ya no
