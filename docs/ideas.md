@@ -36,56 +36,6 @@ verano y otoño. Sólo vida, sin tocar el motor.
 Toca el motor (edificio nuevo, el asedio) y el pasto de la falda del valle
 natural (PR #48). **Encargado** a «Fauna por estaciones» para `plan-meta.md`.
 
-### 2 oct 2026 · El daño por arma y la armadura que para unas cosas y otras no
-> «Cuero no debe proteger mucho. No sé si es posible en función del arma
-> establecer un daño, en plan el arco hace menos daño que una espada. A lo
-> mejor el cuero sí que puede parar una flecha, pero no puede parar una
-> espada. … a lo mejor la flecha hace un 15 % de daño y la espada hace un 50 %
-> o un 60 %.»
-
-**En curso:** la ronda del daño de la sesión de los petos (v5.81–v5.84): vida
-en porcentaje y una tabla arma × pieza → daño y probabilidad de rebote.
-
-### 2 oct 2026 · El rebote, con el metal
-> «También como los juegos de balas que hay ricochet. … cuando ya en un futuro
-> encima con el metal, los cascos de metal, la malla de metal, después la
-> pechera de metal, la armadura entera de metal … que pueda haber probabilidad
-> de que la flecha o lo que sea rebote.»
-
-### 2 oct 2026 · Las cuatro edades de la armadura
-> «La edad del metal después de la de piedra.» «Eso, apuntad, que no se olvide.»
-
-Decidido con ella, en la sesión de los petos y con el director:
-
-| Edad | En el juego | Pieza (en la herrería) | Llega con |
-|---|---|---|---|
-| del Cuero | Age of Leather | cuero y acolchado (el peto de hoy) | la herrería |
-| del Hierro | Age of Iron | cota de malla y casco de hierro | la primera mina |
-| del Acero | Age of Steel | placas sobre la malla (pechera, grebas o brigantina) | la villa cerrada con muralla de piedra |
-| de los Caballeros | Age of Knights | arnés completo | después de la villa: el castillo y el rey |
-
-Las cuatro piezas hay que hacerlas, «replicando la Edad Media sin ser súper
-fiel»; los nombres se pueden afinar. **Pregunta abierta para Vera:** design.md
-(v4.66) dice «leader hasta la Edad del Hierro»; si el rey pasa a la de los
-Caballeros, hay que retocarlo.
-
-### 2 oct 2026 · La minería, y la mina que se ve
-> El metal sale de las dos fuentes, pero sobre todo de la minería, que tiene
-> que ser «bonita de ver y de manejar como la tala de árboles»; el buhonero,
-> secundario.
->
-> «Estaría muy guay que la mina tuviese una entrada que se viese como la cueva
-> del oso, más grande, y que entrasen y se viesen entrar y desaparecer y salir,
-> carruajes con el mineral. Que lleguen llenos, se descarguen y salgan vacíos
-> para adentro.»
-
-Lo que habrá que modelar: la boca (a partir de la cueva del oso, más grande),
-la vagoneta llena y vacía, el montón de mineral, y los gestos de picar,
-empujar y descargar.
-
-Estas tres últimas, más el rebote, están **encargadas** a la sesión de los
-petos para `plan-meta.md` y `encargos-3d.md` en la PR de la ronda del daño.
-
 ### 2 oct 2026 · La ropa abriga
 > «La ropa no es que sea el ánimo, sino también la ropa te calienta en
 > invierno, ese tipo de cosas. Por eso sí sube el ánimo, claro, a la ropa.»
@@ -111,5 +61,65 @@ enfermería («no está nada mal»).
 
 ## Repartidas
 
-(Vacía. Cuando una idea quede escrita en `main` en su sitio, baja aquí con
-**repartida → dónde** y la PR.)
+### 2 oct 2026 · El daño por arma y la armadura que para unas cosas y otras no
+> «Cuero no debe proteger mucho. No sé si es posible en función del arma
+> establecer un daño, en plan el arco hace menos daño que una espada. A lo
+> mejor el cuero sí que puede parar una flecha, pero no puede parar una
+> espada. … a lo mejor la flecha hace un 15 % de daño y la espada hace un 50 %
+> o un 60 %.»
+
+Y la corrección de la misma mañana: «no quita un 15 %: el cuero protege un
+15 %, la flecha quita 85».
+
+**Repartida → hecha en v5.81** (`render3d/life/wounds.ts`): vida en porcentaje,
+daño por arma a cuerpo descubierto y la tabla de lo que protege cada pieza.
+Medida en `docs/medidas/dano-por-arma-2026-10-02.md`.
+
+### 2 oct 2026 · El rebote, con el metal
+> «También como los juegos de balas que hay ricochet. … cuando ya en un futuro
+> encima con el metal, los cascos de metal, la malla de metal, después la
+> pechera de metal, la armadura entera de metal … que pueda haber probabilidad
+> de que la flecha o lo que sea rebote.»
+
+**Repartida → v5.81**: la probabilidad de rebote por pieza y arma ya está en la
+tabla de `wounds.ts`, con las piezas de metal escritas; su llegada, en
+`docs/plan-meta.md` (AR).
+
+### 2 oct 2026 · Las cuatro edades de la armadura
+> «La edad del metal después de la de piedra.» «Eso, apuntad, que no se olvide.»
+
+Decidido con ella, en la sesión de los petos y con el director:
+
+| Edad | En el juego | Pieza (en la herrería) | Llega con |
+|---|---|---|---|
+| del Cuero | Age of Leather | cuero y acolchado (el peto de hoy) | la herrería |
+| del Hierro | Age of Iron | cota de malla y casco de hierro | la primera mina |
+| del Acero | Age of Steel | placas sobre la malla (pechera, grebas o brigantina) | la villa cerrada con muralla de piedra |
+| de los Caballeros | Age of Knights | arnés completo | después de la villa: el castillo y el rey |
+
+Las cuatro piezas hay que hacerlas, «replicando la Edad Media sin ser súper
+fiel»; los nombres se pueden afinar. **Pregunta abierta para Vera:** design.md
+(v4.66) dice «leader hasta la Edad del Hierro»; si el rey pasa a la de los
+Caballeros, hay que retocarlo.
+
+**Repartida → `docs/plan-meta.md`, punto AR** (v5.81), y una fila por pieza en
+`docs/encargos-3d.md`.
+
+### 2 oct 2026 · La minería, y la mina que se ve
+> El metal sale de las dos fuentes, pero sobre todo de la minería, que tiene
+> que ser «bonita de ver y de manejar como la tala de árboles»; el buhonero,
+> secundario.
+>
+> «Estaría muy guay que la mina tuviese una entrada que se viese como la cueva
+> del oso, más grande, y que entrasen y se viesen entrar y desaparecer y salir,
+> carruajes con el mineral. Que lleguen llenos, se descarguen y salgan vacíos
+> para adentro.»
+
+Lo que habrá que modelar: la boca (a partir de la cueva del oso, más grande),
+la vagoneta llena y vacía, el montón de mineral, y los gestos de picar,
+empujar y descargar.
+
+**Repartida → `docs/plan-meta.md`, AR-2** (punto propio, con su cita), y en
+`docs/encargos-3d.md` una fila por pieza: la boca, entrar y salir como el oso,
+la vagoneta, el montón y los tres gestos (v5.81).
+
