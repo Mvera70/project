@@ -4,8 +4,9 @@
 servidor ni el reparto. **Un tick del motor cuesta hoy unas diez veces lo que
 costaba el 16 sep**, y en el mismo periodo **las pruebas de la suite rápida que
 juegan décadas pasaron de 15 a 58**. Las dos causas se multiplican. La PR #38
-(v5.56) arregla la segunda; la primera sigue abierta y aquí va su parche,
-propuesto y sin aplicar (§6).
+(v5.56) arregla la segunda. La primera la lleva la rama `claude/rutas-tick`
+(v5.71) con el parche de §6.1, que Vera aprobó. **Lo demás se arregló en v5.68**
+(§9).
 
 ## 1 · Dónde se va el tiempo (CI, vuelta 36943479458, `main` del 1 oct)
 
@@ -267,14 +268,16 @@ Hay que quitar «en el servidor todo va unas cinco veces más lento que en local
 y poner la medida de §2. Mientras siga escrito, la respuesta natural a una
 vuelta lenta es subir el tope.
 
-## 7 · La regla que se propone (para CLAUDE.md y `tools/README.md`, sin aplicar)
+## 7 · La regla (aplicada en v5.68, con un tope de 30 s y no de 10)
 
-> **Ningún fichero de `tests/fast/` pasa de 10 s.** Una prueba que juega años
+> **Ningún fichero de `tests/fast/` pasa de 30 s.** Una prueba que juega años
 > va en `tests/journeys/` desde el primer día, no cuando la CI ya tarda media
 > hora. Lo comprueba la propia suite: un reportero de vitest que suma la
 > duración de cada fichero (pruebas **y recogida**, porque `ui-milestones`
 > juega 189 s en el cuerpo del `describe` y eso no sale en el tiempo por
-> fichero) y falla nombrando el fichero si pasa de 10 s × `VALLEY_TIMING_SCALE`.
+> fichero) y falla nombrando el fichero si pasa de 30 s × `VALLEY_TIMING_SCALE`.
+> (Con 10 s, once ficheros de hoy, de 10 a 21 s, habrían salido rojos el
+> primer día; 30 s es el más lento con un 40 % de margen.)
 >
 > **Y un cambio del motor que toque `paths.ts`, `placement.ts` o `works.ts`
 > mide el tick antes y después** con el banco de §7: 40 años, semillas 7, 23 y
@@ -313,3 +316,29 @@ Los cronómetros por función de §3 se ponen envolviendo en `paths.ts` las
 funciones `routesFor`, `routeBetween`, `destinations`, `walkingGround` y
 `banksOf` con `performance.now()`, y en `sim.ts` la función `tick`. Esas
 mediciones se hacen en una prueba de vitest, no con tsx (ver §3).
+
+## 9 · Lo que se arregló en v5.68 (2 oct 2026)
+
+Medido en local, con 4 hilos, sobre `main` después de #38 (`568e0e2`):
+
+| Qué | Antes | Después |
+|---|---|---|
+| `npm test`, sin aislar los ficheros (`isolate: false`) | 249 s; 49 s de recogida y 21 s de preparación | **180 s**; 15 s de recogida y 0,4 s de preparación |
+| `tests/journeys/ledger.test.ts`, cada partida una vez por fichero | 677 s (11 partidas de 80 años) | **161 s** (3 partidas) |
+| `tests/journeys/threat.test.ts`, lo mismo | 1167 s (18 partidas de 80 años) | **470 s** (6 partidas) |
+
+- **Sin aislar, la suite entera pasa** en el orden de siempre y en dos órdenes
+  barajados (`--sequence.shuffle.files`, semillas 7919 y 15838). Las pruebas
+  mismas van un 15 % más deprisa, porque el JIT ya tiene caliente el motor del
+  fichero anterior.
+- **El tope por fichero** existe y funciona (`tests/helpers/fast-budget-reporter.ts`):
+  30 s × `VALLEY_TIMING_SCALE`, contando la recogida. Se comprobó bajándolo a
+  1 ms: la suite sale con código 1 y nombra el fichero.
+- **El banco del tick** está en el catálogo: `tools/reports/tick-bench.ts`.
+- **El comentario de `ci.yml`** dice ya la medida de §2.
+
+**Abierto:** `tests/fast/save.test.ts`, «cuatro horas ejecutan exactamente 960
+ticks en menos de 2 s», da entre 2,05 y 2,26 s en local a escala 1, aislado o
+no, y en CI pasa porque la escala es 3. Es el tick caro asomando en el
+cronómetro del diseño (§13.2). Lo arregla el parche de rutas (−31 % del tick),
+no un umbral nuevo.

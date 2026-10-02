@@ -244,6 +244,13 @@ sigue valiendo; el plan de arreglarla, no** (ver arriba: el rework).
 
 **Reglas que cuestan tiempo cada vez que se olvidan:**
 
+- **Ante una CI lenta, se mide el tick antes de subir un tope**
+  (`npx tsx tools/reports/tick-bench.ts`, en ms por semana y con los vivos al
+  final). `6fa7fda1` multiplicó el tick por 2,3 y la CI llegó a 36 minutos sin
+  que nadie lo viera en nueve días; el servidor no era más lento
+  (`docs/medidas/ci-lentitud-2026-10-02.md`). Y **ningún fichero de
+  `tests/fast/` pasa de 30 s** contando la recogida: el reportero de la suite
+  lo tumba con su nombre, y se muda a las jornadas.
 - **Un umbral que decide *cuándo* pasa algo se mira en horas de reloj, no en
   años de juego.** `npx tsx tools/reports/pace-report.ts` imprime la escalera del juego
   en horas a ×1, que es la velocidad por omisión y la unidad en la que el dueño
