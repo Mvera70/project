@@ -239,6 +239,7 @@ export const WANTED = [
   // M-3 · el arado ya tiene GLB; el barril sigue usando el respaldo procedural.
   // `WANTED` puede incluirlo antes de publicarlo para que aparezca al llegar.
   'barrel', 'plough',
+  'notice-board', 'smithy-board', 'chapel-board', 'signpost', 'hide-rack', 'hammer',
   'burnt-house', 'great-oak',
   ...FAUNA,
   // E3 · el plan sustituye el bastión por esta variante cuando cabe su escalera.
@@ -615,16 +616,18 @@ export async function createGraphicsRenderer(
   // Y los banderines y farolillos cuando hay fiesta (`derive/festivity.ts`).
   const festoon = createFestoon();
   // §7.15 · el tablón de misiones, que abre su ventana al tocarlo.
-  const noticeBoard = createNoticeBoard();
+  const noticeBoard = createNoticeBoard(library.instance('notice-board'));
   /** Cuántas misiones anuncia esta semana: tantos papeles clavados. */
   let boardNotes = 0;
   // K8 · y los tablones de la herrería y de la capilla, clavados en su fachada
   // (`derive/building-boards.ts`): la misma pieza provisional, más pequeña.
-  const buildingBoards = { smithy: createNoticeBoard(), church: createNoticeBoard() } as const;
+  const smithyBoard = library.instance('smithy-board');
+  const chapelBoard = library.instance('chapel-board');
+  const buildingBoards = { smithy: createNoticeBoard(smithyBoard), church: createNoticeBoard(chapelBoard) } as const;
   for (const [which, mesh] of Object.entries(buildingBoards)) {
     mesh.group.name = `Valley_NoticeBoard_${which}`;
     mesh.group.userData['board'] = which;
-    mesh.group.scale.setScalar(BUILDING_BOARD_SCALE);
+    mesh.group.scale.setScalar((which === 'smithy' ? smithyBoard : chapelBoard) === undefined ? BUILDING_BOARD_SCALE : 1);
   }
   /** Cuántos avisos se pueden atender en cada uno: tantos papeles. */
   const buildingNotes = { smithy: 0, church: 0 };
@@ -1242,8 +1245,9 @@ export async function createGraphicsRenderer(
     }
     const sapling = library.get(TREE);
     if (sapling === undefined) return;
+    // Con el bosque de ladera alrededor del valle (v5.74): lo que el juego planta.
     forest = buildForest(state, sapling.original as Object3D, palette, treeFalls.suppressed,
-      library.get(TREE_PINE)?.original as Object3D | undefined);
+      library.get(TREE_PINE)?.original as Object3D | undefined, true);
     world.add(forest.group);
   }
 
@@ -1272,7 +1276,7 @@ export async function createGraphicsRenderer(
     ground = buildGround(state.map, palette, plazaOf(state), era,
       snowing < 0.5 ? (x, z) => meadowWeight(terrainSeed, x, z) : undefined, road.wear);
     if (signposts !== null) world.remove(signposts);
-    signposts = buildSignposts(road.signposts, (x, z) => elevationAt(state.map, x, z));
+    signposts = buildSignposts(road.signposts, (x, z) => elevationAt(state.map, x, z), library.instance('signpost'));
     // Y en la villa, piedras por la calzada, en grupos de canto rodado.
     // Fuera del pueblo: entre las casas y en la plaza la calle está barrida
     // (Vera, 2 oct 2026: «hay también que quitarlas del pueblo»).
@@ -2533,6 +2537,7 @@ export async function createGraphicsRenderer(
       plaza.show(plazaOf(shown), groundFloor);
       const board = noticeBoardOf(shown);
       noticeBoard.place(board.x, groundFloor(board.x, board.z), board.z, board.yaw, boardNotes);
+      steading.setHides(shown.village.hides);
       // K8 · los de la herrería y la capilla, sólo si el edificio está en pie.
       const onFacades = buildingBoardsOf(shown);
       for (const which of ['smithy', 'church'] as const) {

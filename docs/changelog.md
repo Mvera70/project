@@ -62,6 +62,32 @@ del caballo, la cigüeña que pica hasta el suelo y no mete las patas en él, el
 paso igual a 30 o a 360 fotogramas, la grulla con su envergadura y el ala en el
 hombro, el polluelo con los clips de la gallina). `life-seasonal-fauna` acepta
 que una cría tenga modelo propio en vez de ir a escala.
+## v5.89 · 2 oct 2026 · El cerco sin salida: el portón da al valle, no a la montaña
+
+**Motor** (`world/placement.ts`, la regla del portón). Lo pidió Vera con su
+regla de que lo que rompe la partida se arregla. **El defecto, medido por #48:**
+a los cuarenta años, 3 de 24 valles alcanzaban menos de 500 celdas porque su
+único portón daba a una bolsa de prado entre el cerco y la montaña (en la
+semilla 13, tres celdas y la sierra; el pueblo entero, 448 celdas).
+
+**Por qué pasaba.** La puerta tiene que dar por fuera a `exterior`, y
+`exterior` se sembraba en cualquier celda transitable más allá del anillo: la
+bolsa contaba como campo abierto. **Ahora fuera es lo que llega a las
+gargantas** —las filas de los dos extremos, por donde entra el río y llega
+quien viene de fuera—, que es el resto del valle con sus campos, su bosque y sus
+caminos. Sin constante nueva y sin cambio de esquema; la puerta se sigue
+eligiendo por lo pisado y la cercanía a la plaza.
+
+**Medido** (`tools/reports/enclosure-report.ts`, nuevo; dos series de 24
+semillas a 40 años): valles por debajo de 500 celdas, **de 3 a 0** (semillas
+1–24) y **de 2 a 0** (3 + 7i). Sólo cambian los valles cuyo portón daba a una
+bolsa, y uno más cuyo portón se movió (la 11); los demás juegan la misma
+partida. **El ritmo no se mueve:** muralla 193 h, portón 194 h, villa cerrada
+329 h, antes y después (`pace-report.ts`, 24 × 60); sólo el bastión, de 491 h
+(20/24) a 459 h (19/24), porque cuatro valles juegan otra partida desde su
+portón. **El tick, tampoco:** 4,71 → 4,18 ms por semana, con las huellas de
+las semillas 7, 23 y 41 idénticas. Prueba: `tests/journeys/enclosure.test.ts`.
+Planos y capturas de la semilla 13: `docs/medidas/cerco-sin-salida-2026-10-02.md`.
 
 ## v5.85 · 2 oct 2026 · La fauna por estaciones: que cada estación se note en sus animales
 
@@ -233,6 +259,44 @@ cosas (nivelado, de Vera); no se ha medido cuántos asaltos de más trae la plat
 del cuero; y la escena del asalto todavía no sabe del peto (carril de combate).
 Lo que no se ve, en `docs/encargos-3d.md`; las imágenes y modelos, en
 `docs/encargos/ilustraciones-k5-cuero.md`.
+
+## v5.74 · 2 oct 2026 · Los usos del cinturón: bosque de ladera, pasto y cantera
+
+Lo que Vera eligió para el cinturón con el valle de forma natural delante
+(v5.73): **pasto, bosque de ladera y cantera, como vida y sin tocar el balance**.
+Ninguno da recursos: son las bases, y lo que un día den va por
+`docs/plan-meta.md` con su nivelado. Medidas: `docs/medidas/cinturon-2026-10-02.md`.
+
+- **El bosque de ladera** (`forest.ts`, `slopeWoodCells`). Pinos en la ladera
+  baja y robles en el prado del pie, en arboledas, de 3 a 13 celdas fuera del
+  contorno: de 172 a 387 pinos y de 93 a 123 robles por valle (doce valles).
+  Nunca dentro del valle, sobre una obra, una senda, el agua, las gargantas ni
+  la senda de las visitas. Sin sombra y en seis piezas instanciadas: de 51 a 67
+  mil triángulos más, la misma malla. **Y sus troncos paran a quien anda**
+  (`solidTerrain`): sin eso el oso, los de fuera y el rebaño los cruzaban.
+- **El pasto de la falda** (`beasts.ts`). El rebaño se ancla junto en el prado
+  de fuera del contorno más cercano andando a los campos, y pasta allí: con
+  cuatro vacas, 64 anclas de 64 en la falda (ocho aldeas) y el 82 % de la
+  jornada fuera del contorno. La víspera de un asedio, junto a las casas, como
+  antes. **Dato para Vera:** con la política prudente casi ninguna aldea tiene
+  vacas (una muestra de 96 en doce valles hasta los sesenta años), así que el
+  pasto sólo se verá cuando haya ganado. Para grabarlo, `&cows=4` y `--cows 4`.
+- **La cantera, al pie de la montaña** (`resource-sites.ts`, `offers.ts`,
+  `village.ts`, `decide.ts`). Primero las caras de la montaña, y de las doce más
+  cercanas la de menor ruta andando (la línea recta cruzaba el río); y nadie le
+  quita la carga al albañil: pica hasta la fase 0,68 y, con la piedra al hombro,
+  sigue hasta dejarla. En sesenta valles entrega piedra en su jornada en los 60
+  (antes, en 49). Cierra lo que v5.73 dejó abierto.
+- **La senda de la garganta, a ras** (`mountains.ts`, `ROAD_LIFT` 0,07 → 0,02).
+  Vera: «el camino flotando… casi». En ocho semillas, ningún vértice bajo el
+  suelo, nada tapado y el 98,4 % a menos de 0,05 de lo que se dibuja.
+- **Pruebas** nuevas: `belt-uses.test.ts` (el bosque por el camino del juego, y
+  cada árbol en suelo de andar es un tronco para la vida) y `life-falda.test.ts`
+  (el rebaño en la falda); el cantero de `life-resources.test.ts` pasa a
+  mirarse al pie de la montaña en tres valles. Y la de los porteadores de leña
+  (`life-wood-run`) se cuenta en doce aldeas y tres jornadas: con cuatro y dos
+  se debían 14 haces y una jornada movía un 7 % (11 de 14 en `main`, 10 de 14
+  con la cantera); en la muestra grande, 42 de 51 contra 43 de 51.
 
 ## v5.73 · 2 oct 2026 · El valle con forma natural
 

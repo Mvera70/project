@@ -68,7 +68,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "boar-short",
@@ -146,7 +146,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, boar()); 29 sep 2026: patas acortadas y colmillos mayores a petición suya (BOAR_DROP 0,08, BOAR_TUSK 1,5). Clips de tools/art/rigid-clips.mjs.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, boar()); 29 sep 2026: patas acortadas y colmillos mayores a petici\u00f3n suya (BOAR_DROP 0,08, BOAR_TUSK 1,5). Clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     },
@@ -238,7 +238,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "marked-models-63db59c",
@@ -326,7 +326,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "bear-v4",
@@ -408,7 +408,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "deer-faceted",
@@ -828,7 +828,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Tramo recto E3b con ménsulas de piedra, aceptado visualmente por Vera el 22 sep 2026; modelo procedural local.",
+        "source": "Tramo recto E3b con m\u00e9nsulas de piedra, aceptado visualmente por Vera el 22 sep 2026; modelo procedural local.",
         "license": "Project original"
       }
     },
@@ -889,7 +889,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "source": "Modelado original para The Valley, encargos de 17\u201320 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     },
@@ -949,7 +949,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "source": "Modelado original para The Valley, encargos de 17\u201320 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     },
@@ -1125,7 +1125,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "source": "Modelado original para The Valley, encargos de 17\u201320 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     },
@@ -1184,7 +1184,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "source": "Modelado original para The Valley, encargos de 17\u201320 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     },
@@ -1242,7 +1242,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "source": "Modelado original para The Valley, encargos de 17\u201320 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     },
@@ -1502,7 +1502,7 @@
       "artifactRound": "G-17",
       "status": "study",
       "recipe": "art/recipes/villager/villager.json",
-      "generator": "tools/art/blender-build.py · tools/art/bake-clips.mjs",
+      "generator": "tools/art/blender-build.py \u00b7 tools/art/bake-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "AN-1-bake-2026-09-29",
@@ -1579,7 +1579,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager: rediseño low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md. AN-1 (29 sep 2026): walk y carry_walk reescritos por art/recipes/villager/plant-gait.mjs y horneados en el GLB de G-17 con tools/art/bake-clips.mjs (sin Blender en la ronda); geometría, rig e idle/work_hoe intactos.",
+        "source": "Original villager: redise\u00f1o low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md. AN-1 (29 sep 2026): walk y carry_walk reescritos por art/recipes/villager/plant-gait.mjs y horneados en el GLB de G-17 con tools/art/bake-clips.mjs (sin Blender en la ronda); geometr\u00eda, rig e idle/work_hoe intactos.",
         "license": "Project original"
       }
     },
@@ -1870,7 +1870,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: granero elevado de madera, portón doble y cubierta de paja.",
+        "source": "Original G-21: granero elevado de madera, port\u00f3n doble y cubierta de paja.",
         "license": "Project original"
       }
     },
@@ -1930,7 +1930,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: molino facetado con cuatro aspas de bastidor y paños de paleta común.",
+        "source": "Original G-21: molino facetado con cuatro aspas de bastidor y pa\u00f1os de paleta com\u00fan.",
         "license": "Project original"
       }
     },
@@ -1990,7 +1990,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: herrería abierta, tejado de teja, fragua y yunque de formas facetadas.",
+        "source": "Original G-21: herrer\u00eda abierta, tejado de teja, fragua y yunque de formas facetadas.",
         "license": "Project original"
       }
     },
@@ -2050,7 +2050,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: capilla con espadaña, campana, contrafuertes y portada de piedra.",
+        "source": "Original G-21: capilla con espada\u00f1a, campana, contrafuertes y portada de piedra.",
         "license": "Project original"
       }
     },
@@ -2283,7 +2283,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Revisión original de mampostería para The Valley, receta G-41.",
+        "source": "Revisi\u00f3n original de mamposter\u00eda para The Valley, receta G-41.",
         "license": "Project original"
       }
     },
@@ -2575,7 +2575,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: atalaya de piedra con galería abierta y cubierta a cuatro aguas.",
+        "source": "Original G-21: atalaya de piedra con galer\u00eda abierta y cubierta a cuatro aguas.",
         "license": "Project original"
       }
     },
@@ -2634,7 +2634,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: cementerio con lápidas, cruces de madera y sepulturas bajas.",
+        "source": "Original G-21: cementerio con l\u00e1pidas, cruces de madera y sepulturas bajas.",
         "license": "Project original"
       }
     },
@@ -2753,7 +2753,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: ruina de piedra con hiladas rotas, cascote y tejas caídas.",
+        "source": "Original G-21: ruina de piedra con hiladas rotas, cascote y tejas ca\u00eddas.",
         "license": "Project original"
       }
     },
@@ -2821,7 +2821,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "cow-faceted",
@@ -2895,7 +2895,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "pig-faceted",
@@ -2967,7 +2967,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "hen-faceted",
@@ -3040,7 +3040,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "marked-models-63db59c",
@@ -3120,7 +3120,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "crow-faceted",
@@ -3192,7 +3192,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "fish-trout",
@@ -3690,7 +3690,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Jefe: gorro alto aparente, manto dorado sobre los hombros y túnica burdeos.",
+        "source": "Original G-18: Jefe: gorro alto aparente, manto dorado sobre los hombros y t\u00fanica burdeos.",
         "license": "Project original"
       }
     },
@@ -3783,7 +3783,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager-smith: rediseño low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md.",
+        "source": "Original villager-smith: redise\u00f1o low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md.",
         "license": "Project original"
       }
     },
@@ -3969,7 +3969,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager-priest: rediseño low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md.",
+        "source": "Original villager-priest: redise\u00f1o low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md.",
         "license": "Project original"
       }
     },
@@ -4062,7 +4062,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Guardabosques: capucha y capa corta verde oscuro, cinturón de cuero.",
+        "source": "Original G-18: Guardabosques: capucha y capa corta verde oscuro, cintur\u00f3n de cuero.",
         "license": "Project original"
       }
     },
@@ -4155,7 +4155,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Alguacil: túnica ocre corta, cinturón ancho y cuaderno al cinto; manos libres.",
+        "source": "Original G-18: Alguacil: t\u00fanica ocre corta, cintur\u00f3n ancho y cuaderno al cinto; manos libres.",
         "license": "Project original"
       }
     },
@@ -4248,7 +4248,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Herbolario: túnica verde hierba y zurrón ocre con un haz de plantas.",
+        "source": "Original G-18: Herbolario: t\u00fanica verde hierba y zurr\u00f3n ocre con un haz de plantas.",
         "license": "Project original"
       }
     },
@@ -4365,7 +4365,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: leña apilada con corteza, cortes, duramen y grietas.",
+        "source": "Original G-21: le\u00f1a apilada con corteza, cortes, duramen y grietas.",
         "license": "Project original"
       }
     },
@@ -4610,7 +4610,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Niño: cabeza mayor, brazos y piernas proporcionalmente cortos, túnica terracota sin herramientas; 0,65 celdas antes de statureAt.",
+        "source": "Original G-18: Ni\u00f1o: cabeza mayor, brazos y piernas proporcionalmente cortos, t\u00fanica terracota sin herramientas; 0,65 celdas antes de statureAt.",
         "license": "Project original"
       }
     },
@@ -4703,7 +4703,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Anciano: espalda inclinada en la geometría, pelo claro y chal apagado. Sin bastón fijo: ambas manos permanecen disponibles para los accesorios del juego.",
+        "source": "Original G-18: Anciano: espalda inclinada en la geometr\u00eda, pelo claro y chal apagado. Sin bast\u00f3n fijo: ambas manos permanecen disponibles para los accesorios del juego.",
         "license": "Project original"
       }
     },
@@ -4889,7 +4889,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Leñador: chaleco abierto oscuro, mangas arremangadas y hacha guardada al cinto.",
+        "source": "Original G-18: Le\u00f1ador: chaleco abierto oscuro, mangas arremangadas y hacha guardada al cinto.",
         "license": "Project original"
       }
     },
@@ -4982,7 +4982,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Albañil: gorra, delantal marfil y pequeño bloque sobre un protector de hombro.",
+        "source": "Original G-18: Alba\u00f1il: gorra, delantal marfil y peque\u00f1o bloque sobre un protector de hombro.",
         "license": "Project original"
       }
     },
@@ -5075,7 +5075,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Pastor: sombrero pequeño, ropa clara, zurrón y vara lateral guardada; conectores libres.",
+        "source": "Original G-18: Pastor: sombrero peque\u00f1o, ropa clara, zurr\u00f3n y vara lateral guardada; conectores libres.",
         "license": "Project original"
       }
     },
@@ -5168,7 +5168,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Pescador: camisa azul río, botas altas y cesto lateral; manos libres para la acción.",
+        "source": "Original G-18: Pescador: camisa azul r\u00edo, botas altas y cesto lateral; manos libres para la acci\u00f3n.",
         "license": "Project original"
       }
     },
@@ -5227,7 +5227,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-22: coles con corazón redondeado y hojas verdes abiertas.",
+        "source": "Original G-22: coles con coraz\u00f3n redondeado y hojas verdes abiertas.",
         "license": "Project original"
       }
     },
@@ -5529,7 +5529,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "marked-models-63db59c",
@@ -5600,8 +5600,8 @@
       "id": "fox",
       "artifactRound": "G-40",
       "status": "study",
-      "recipe": "deliverables/fox-model-trial/fox-astra-softened-muzzle.glb · tools/art/rig-single-mesh.py",
-      "generator": "deliverables/fox-model-trial/fox-astra-softened-muzzle.glb · tools/art/rig-single-mesh.py · tools/art/rigid-clips.mjs",
+      "recipe": "deliverables/fox-model-trial/fox-astra-softened-muzzle.glb \u00b7 tools/art/rig-single-mesh.py",
+      "generator": "deliverables/fox-model-trial/fox-astra-softened-muzzle.glb \u00b7 tools/art/rig-single-mesh.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "fox-rig",
@@ -5681,7 +5681,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "mule-short",
@@ -5749,7 +5749,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, mule()); 29 sep 2026: patas acortadas a petición suya (MULE_DROP 0,10). Clips idle/walk de tools/art/rigid-clips.mjs.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, mule()); 29 sep 2026: patas acortadas a petici\u00f3n suya (MULE_DROP 0,10). Clips idle/walk de tools/art/rigid-clips.mjs.",
         "license": "project-original"
       }
     },
@@ -5758,7 +5758,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "duck-faceted",
@@ -5826,7 +5826,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Ánade real facetado de The Valley (deliverables/marked-models-trial/build-models.py, duck(); 29 sep 2026), aprobado por Vera; clips de tools/art/rigid-clips.mjs.",
+        "source": "\u00c1nade real facetado de The Valley (deliverables/marked-models-trial/build-models.py, duck(); 29 sep 2026), aprobado por Vera; clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     },
@@ -6562,7 +6562,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/hall-candidate, rama art/astra-modelos, commit 725a512): casa larga medieval del líder, con hall_door.",
+        "source": "Modelado por Astra para The Valley (art/recipes/hall-candidate, rama art/astra-modelos, commit 725a512): casa larga medieval del l\u00edder, con hall_door.",
         "license": "project-original"
       }
     },
@@ -6614,7 +6614,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Portón de madera G-24 aprobado previamente para The Valley; conservado para la empalizada.",
+        "source": "Port\u00f3n de madera G-24 aprobado previamente para The Valley; conservado para la empalizada.",
         "license": "Project original"
       }
     },
@@ -6945,6 +6945,1260 @@
       }
     },
     {
+      "id": "barrel",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/barrel-candidate/barrel.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/barrel-candidate/barrel.json",
+      "generator": "art/recipes/barrel-candidate/barrel.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/barrel"
+      },
+      "bounds": {
+        "min": [
+          -0.106,
+          0,
+          -0.106
+        ],
+        "max": [
+          0.106,
+          0.24,
+          0.106
+        ],
+        "size": [
+          0.212,
+          0.24,
+          0.212
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 140
+      },
+      "hashes": {
+        "barrel.glb": "ACBF7867340AAC9AFCAC6FF33F6716C59B468D9CD90A5E46D02C263A2EEC5788"
+      }
+    },
+    {
+      "id": "crate",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/crate-candidate/crate.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/crate-candidate/crate.json",
+      "generator": "art/recipes/crate-candidate/crate.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/crate"
+      },
+      "bounds": {
+        "min": [
+          -0.111667,
+          0,
+          -0.09
+        ],
+        "max": [
+          0.111667,
+          0.190833,
+          0.100167
+        ],
+        "size": [
+          0.223333,
+          0.190833,
+          0.190167
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 60
+      },
+      "hashes": {
+        "crate.glb": "8EB654ACA9CFB03C9A46CF6DB54F86372E8B622D477B9A873BF473A3F76655F6"
+      }
+    },
+    {
+      "id": "sack-pile",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/sack-pile-candidate/sack-pile.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/sack-pile-candidate/sack-pile.json",
+      "generator": "art/recipes/sack-pile-candidate/sack-pile.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/sack-pile"
+      },
+      "bounds": {
+        "min": [
+          -0.163333,
+          0,
+          -0.086667
+        ],
+        "max": [
+          0.158,
+          0.230167,
+          0.066667
+        ],
+        "size": [
+          0.321333,
+          0.230167,
+          0.153333
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 108
+      },
+      "hashes": {
+        "sack-pile.glb": "519A2993969659E8FC0BD86B5E309D69AD9B277FB939BBDFE13DF1A3E7318765"
+      }
+    },
+    {
+      "id": "tool-rack",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/tool-rack-candidate/tool-rack.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/tool-rack-candidate/tool-rack.json",
+      "generator": "art/recipes/tool-rack-candidate/tool-rack.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/tool-rack"
+      },
+      "bounds": {
+        "min": [
+          -0.166667,
+          0,
+          -0.023333
+        ],
+        "max": [
+          0.166667,
+          0.38,
+          0.010833
+        ],
+        "size": [
+          0.333333,
+          0.38,
+          0.034167
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 144
+      },
+      "hashes": {
+        "tool-rack.glb": "64FE9FF504ED28EA438C8C9F57CD4055B33CBF892A26AD6172E85547A2449862"
+      }
+    },
+    {
+      "id": "washing-line",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/washing-line-candidate/washing-line.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/washing-line-candidate/washing-line.json",
+      "generator": "art/recipes/washing-line-candidate/washing-line.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/washing-line"
+      },
+      "bounds": {
+        "min": [
+          -0.426542,
+          0,
+          -0.015708
+        ],
+        "max": [
+          0.426542,
+          0.657333,
+          0.015708
+        ],
+        "size": [
+          0.853083,
+          0.657333,
+          0.031417
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 72
+      },
+      "hashes": {
+        "washing-line.glb": "B005238883BB73C8EFA976B1AAFA25F36B214FBE723551EC256996F50998FD83"
+      }
+    },
+    {
+      "id": "flower-pot",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/flower-pot-candidate/flower-pot.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/flower-pot-candidate/flower-pot.json",
+      "generator": "art/recipes/flower-pot-candidate/flower-pot.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/flower-pot"
+      },
+      "bounds": {
+        "min": [
+          -0.07,
+          0,
+          -0.07002
+        ],
+        "max": [
+          0.07,
+          0.195,
+          0.07
+        ],
+        "size": [
+          0.14,
+          0.195,
+          0.14002
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 108
+      },
+      "hashes": {
+        "flower-pot.glb": "C0D614F8B1CD235DED3F3C7BF883A59286E299D730E4A9E1C4AD7DBCD67849AC"
+      }
+    },
+    {
+      "id": "herb-bed",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/herb-bed-candidate/herb-bed.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/herb-bed-candidate/herb-bed.json",
+      "generator": "art/recipes/herb-bed-candidate/herb-bed.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/herb-bed"
+      },
+      "bounds": {
+        "min": [
+          -0.164167,
+          0,
+          -0.111667
+        ],
+        "max": [
+          0.164167,
+          0.13,
+          0.111667
+        ],
+        "size": [
+          0.328333,
+          0.13,
+          0.223333
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 116
+      },
+      "hashes": {
+        "herb-bed.glb": "168D4D06091C3B16337823C1A21FDD1B54EBB2DDC6143F14B04F36EB2373D847"
+      }
+    },
+    {
+      "id": "beehive",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/beehive-candidate/beehive.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/beehive-candidate/beehive.json",
+      "generator": "art/recipes/beehive-candidate/beehive.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/beehive"
+      },
+      "bounds": {
+        "min": [
+          -0.101667,
+          0,
+          -0.095
+        ],
+        "max": [
+          0.101667,
+          0.241667,
+          0.095
+        ],
+        "size": [
+          0.203333,
+          0.241667,
+          0.19
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 150
+      },
+      "hashes": {
+        "beehive.glb": "E2E6BA34E053B426712F64D8E2C02244EC878C009A7EADDF8F42AAA0CBD13FAC"
+      }
+    },
+    {
+      "id": "scarecrow",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/scarecrow-candidate/scarecrow.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/scarecrow-candidate/scarecrow.json",
+      "generator": "art/recipes/scarecrow-candidate/scarecrow.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/scarecrow"
+      },
+      "bounds": {
+        "min": [
+          -0.16,
+          0,
+          -0.076667
+        ],
+        "max": [
+          0.16,
+          0.536667,
+          0.076667
+        ],
+        "size": [
+          0.32,
+          0.536667,
+          0.153333
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 86
+      },
+      "hashes": {
+        "scarecrow.glb": "98994A03E4A81D1C2BF5E69B94034BFF1331431EABD1CA1164E4085B655ACF14"
+      }
+    },
+    {
+      "id": "trough",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/trough-candidate/trough.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/trough-candidate/trough.json",
+      "generator": "art/recipes/trough-candidate/trough.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/trough"
+      },
+      "bounds": {
+        "min": [
+          -0.1675,
+          0,
+          -0.0775
+        ],
+        "max": [
+          0.1675,
+          0.113333,
+          0.0775
+        ],
+        "size": [
+          0.335,
+          0.113333,
+          0.155
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 72
+      },
+      "hashes": {
+        "trough.glb": "F76FB1A55ACC6C0DC3997D62FCD050C82B4E61BF951CEFDFD98BE8F96F0E9348"
+      }
+    },
+    {
+      "id": "chicken-coop",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/chicken-coop-candidate/chicken-coop.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/chicken-coop-candidate/chicken-coop.json",
+      "generator": "art/recipes/chicken-coop-candidate/chicken-coop.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/chicken-coop"
+      },
+      "bounds": {
+        "min": [
+          -0.158333,
+          0,
+          -0.126667
+        ],
+        "max": [
+          0.158333,
+          0.366667,
+          0.275546
+        ],
+        "size": [
+          0.316667,
+          0.366667,
+          0.402213
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 92
+      },
+      "hashes": {
+        "chicken-coop.glb": "205F1D01A263EF5481C225915F7F2778AE727C5ED3F2043A49E7D9CA105DF095"
+      }
+    },
+    {
+      "id": "wood-chopping",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wood-chopping-candidate/wood-chopping.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/wood-chopping-candidate/wood-chopping.json",
+      "generator": "art/recipes/wood-chopping-candidate/wood-chopping.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/wood-chopping"
+      },
+      "bounds": {
+        "min": [
+          -0.151667,
+          0,
+          -0.096667
+        ],
+        "max": [
+          0.139121,
+          0.347011,
+          0.087094
+        ],
+        "size": [
+          0.290788,
+          0.347011,
+          0.18376
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 96
+      },
+      "hashes": {
+        "wood-chopping.glb": "DAA42A6F1BAC4F8CEA68F3A1E8A8A62044B0CAD7A36C4BEA3B680C0F3698B036"
+      }
+    },
+    {
+      "id": "stump",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/stump-candidate/stump.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/stump-candidate/stump.json",
+      "generator": "art/recipes/stump-candidate/stump.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/stump"
+      },
+      "bounds": {
+        "min": [
+          -0.125,
+          0,
+          -0.102178
+        ],
+        "max": [
+          0.107542,
+          0.131167,
+          0.131821
+        ],
+        "size": [
+          0.232542,
+          0.131167,
+          0.233998
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 84
+      },
+      "hashes": {
+        "stump.glb": "57A842071E1D69B1F02B8CDB5C43DE3CCB96E2039E8104022812C3F18041D213"
+      }
+    },
+    {
+      "id": "fallen-log",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/fallen-log-candidate/fallen-log.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/fallen-log-candidate/fallen-log.json",
+      "generator": "art/recipes/fallen-log-candidate/fallen-log.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/fallen-log"
+      },
+      "bounds": {
+        "min": [
+          -0.213,
+          0,
+          -0.076667
+        ],
+        "max": [
+          0.213,
+          0.159744,
+          0.069074
+        ],
+        "size": [
+          0.426,
+          0.159744,
+          0.145741
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 92
+      },
+      "hashes": {
+        "fallen-log.glb": "1F8016ECEDA72C0C1D33C3FFEE2D69592477D1B17A6A6309EA47491279864306"
+      }
+    },
+    {
+      "id": "bush",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/bush-candidate/bush.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/bush-candidate/bush.json",
+      "generator": "art/recipes/bush-candidate/bush.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/bush"
+      },
+      "bounds": {
+        "min": [
+          -0.161667,
+          0,
+          -0.112433
+        ],
+        "max": [
+          0.17,
+          0.22,
+          0.129417
+        ],
+        "size": [
+          0.331667,
+          0.22,
+          0.24185
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 72
+      },
+      "hashes": {
+        "bush.glb": "3F9435EA50C4B4C0737B6D82DEC3478B3A38384E30B689AB3FA5B789FAF67086"
+      }
+    },
+    {
+      "id": "wildflowers",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wildflowers-candidate/wildflowers.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/wildflowers-candidate/wildflowers.json",
+      "generator": "art/recipes/wildflowers-candidate/wildflowers.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/wildflowers"
+      },
+      "bounds": {
+        "min": [
+          -0.106667,
+          0,
+          -0.093333
+        ],
+        "max": [
+          0.103333,
+          0.121667,
+          0.063333
+        ],
+        "size": [
+          0.21,
+          0.121667,
+          0.156667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 140
+      },
+      "hashes": {
+        "wildflowers.glb": "D8650A0F2A5B6F8FE76AD026D6362B7AA9D14D97BA428A5363CCDDD9DD1AF003"
+      }
+    },
+    {
+      "id": "mushrooms",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/mushrooms-candidate/mushrooms.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/mushrooms-candidate/mushrooms.json",
+      "generator": "art/recipes/mushrooms-candidate/mushrooms.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/mushrooms"
+      },
+      "bounds": {
+        "min": [
+          -0.095534,
+          0,
+          -0.09
+        ],
+        "max": [
+          0.085534,
+          0.096667,
+          0.093333
+        ],
+        "size": [
+          0.181068,
+          0.096667,
+          0.183333
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 66
+      },
+      "hashes": {
+        "mushrooms.glb": "C06F0115548C8C95A73CE637874A759F9E5C34D9D32E63CC775F779BAC679607"
+      }
+    },
+    {
+      "id": "stone-wall",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/stone-wall-candidate/stone-wall.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/stone-wall-candidate/stone-wall.json",
+      "generator": "art/recipes/stone-wall-candidate/stone-wall.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/stone-wall"
+      },
+      "bounds": {
+        "min": [
+          -0.499862,
+          0,
+          -0.094106
+        ],
+        "max": [
+          0.504893,
+          0.12,
+          0.106399
+        ],
+        "size": [
+          1.004755,
+          0.12,
+          0.200505
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 96
+      },
+      "hashes": {
+        "stone-wall.glb": "99FFD1D1F6EF6679AFF3984DB3A7A8E4E949887421383A50DBD789F8BAEDFFB9"
+      }
+    },
+    {
+      "id": "wayside-shrine",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wayside-shrine-candidate/wayside-shrine.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/wayside-shrine-candidate/wayside-shrine.json",
+      "generator": "art/recipes/wayside-shrine-candidate/wayside-shrine.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/wayside-shrine"
+      },
+      "bounds": {
+        "min": [
+          -0.101667,
+          0,
+          -0.063333
+        ],
+        "max": [
+          0.101667,
+          0.41,
+          0.063333
+        ],
+        "size": [
+          0.203333,
+          0.41,
+          0.126667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 80
+      },
+      "hashes": {
+        "wayside-shrine.glb": "F82598E5747739E78D6453642DE2A46C8081D692A8C2033495137FE83D984F08"
+      }
+    },
+    {
+      "id": "lantern-post",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/lantern-post-candidate/lantern-post.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/lantern-post-candidate/lantern-post.json",
+      "generator": "art/recipes/lantern-post-candidate/lantern-post.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/lantern-post"
+      },
+      "bounds": {
+        "min": [
+          -0.02,
+          0,
+          -0.06
+        ],
+        "max": [
+          0.2075,
+          0.8,
+          0.06
+        ],
+        "size": [
+          0.2275,
+          0.8,
+          0.12
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 80
+      },
+      "hashes": {
+        "lantern-post.glb": "58E81BE6E8B3C54AE41233503F7B12F6F04D53552055F3F19E6F7957643701BA"
+      }
+    },
+    {
+      "id": "market-awning",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/market-awning-candidate/market-awning.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/market-awning-candidate/market-awning.json",
+      "generator": "art/recipes/market-awning-candidate/market-awning.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/market-awning"
+      },
+      "bounds": {
+        "min": [
+          -0.425,
+          0,
+          -0.2805
+        ],
+        "max": [
+          0.425,
+          0.776333,
+          0.29325
+        ],
+        "size": [
+          0.85,
+          0.776333,
+          0.57375
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 148
+      },
+      "hashes": {
+        "market-awning.glb": "DB292E22939323A64969AA3B0A74BC28E357F161E848E6C03D9CDC2BF393295E"
+      }
+    },
+    {
+      "id": "notice-board",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/notice-board.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/notice-board.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/notice-board"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 5,
+        "meshes": 5,
+        "materials": 1,
+        "triangles": 260
+      },
+      "hashes": {
+        "notice-board.glb": "FBD8D6AC2B4D12467FFB77BF276C3B4099A433C037711191B4BB11B1EEF969F3"
+      }
+    },
+    {
+      "id": "smithy-board",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/smithy-board.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/smithy-board.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/smithy-board"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 204
+      },
+      "hashes": {
+        "smithy-board.glb": "CF9226069E39F7378C06C07E2EEF263D2F72FE285706A2EFFE92D4AE4313D44E"
+      }
+    },
+    {
+      "id": "chapel-board",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/chapel-board.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/chapel-board.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/chapel-board"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 184
+      },
+      "hashes": {
+        "chapel-board.glb": "9C70EEB3E8479451023809E438B5EC6F92C46550EEF1931CB10B94F425357C30"
+      }
+    },
+    {
+      "id": "signpost",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/signpost.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/signpost.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/signpost"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 96
+      },
+      "hashes": {
+        "signpost.glb": "9B355379E5C7F6A3867108C590D995E18220FE4F55DCF4E7CB5F91081E931C44"
+      }
+    },
+    {
+      "id": "hide-rack",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/hide-rack.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/hide-rack.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/hide-rack"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 5,
+        "meshes": 5,
+        "materials": 1,
+        "triangles": 384
+      },
+      "hashes": {
+        "hide-rack.glb": "150FA21996C9027FA4556256B8C9EF4A1A37990FB27E93FCD92D3C39D9EE87D2"
+      }
+    },
+    {
+      "id": "hammer",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/hammer.json",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/hammer.json",
+      "generator": "art/recipes/notice-board-candidate/build.py",
+      "approved": {
+        "runId": "astra-b1-2026-10-02",
+        "directory": "artifacts/graphics/astra-b1-2026-10-02/approved/hammer"
+      },
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 56
+      },
+      "hashes": {
+        "hammer.glb": "91EA37D6B90E5D537E953B479FF7366858B217B909B1DE13D6D5210F7359C2F8"
+      }
+    },
+    {
       "id": "horse",
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
@@ -6955,7 +8209,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "approved": {
         "runId": "animales-rehechos",
         "directory": "artifacts/graphics/animales-rehechos/approved/horse"
@@ -7020,13 +8274,13 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Cigüeña blanca facetada de The Valley (build-models.py, stork(); 2 oct 2026, v5.100), sobre la estructura de la gallina, en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "source": "Cig\u00fce\u00f1a blanca facetada de The Valley (build-models.py, stork(); 2 oct 2026, v5.100), sobre la estructura de la gallina, en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "approved": {
         "runId": "animales-rehechos",
         "directory": "artifacts/graphics/animales-rehechos/approved/stork"
@@ -7096,7 +8350,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
       "approved": {
         "runId": "animales-rehechos",
         "directory": "artifacts/graphics/animales-rehechos/approved/chick"
@@ -7157,7 +8411,7 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Nido de cigüeña facetado de The Valley (build-models.py, stork_nest(); 2 oct 2026, v5.100), en lugar del candidato de Astra. Sólo modelo.",
+        "source": "Nido de cig\u00fce\u00f1a facetado de The Valley (build-models.py, stork_nest(); 2 oct 2026, v5.100), en lugar del candidato de Astra. S\u00f3lo modelo.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
@@ -7261,7 +8515,7 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Mariposa facetada de The Valley (build-models.py, butterfly(); 2 oct 2026, v5.100), dos alas de una cara para teñir por instancia, en lugar del candidato de Astra.",
+        "source": "Mariposa facetada de The Valley (build-models.py, butterfly(); 2 oct 2026, v5.100), dos alas de una cara para te\u00f1ir por instancia, en lugar del candidato de Astra.",
         "license": "project-original"
       },
       "artifactRound": "G-40",

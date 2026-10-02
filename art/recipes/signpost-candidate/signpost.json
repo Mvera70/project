@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "id": "signpost",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros Blender; Z arriba, frente -Y; glTF Y arriba, frente +Z. Una celda = 3 m.",
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": false,
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.92
+    },
+    {
+      "name": "dark",
+      "role": "timberDark",
+      "roughness": 0.92
+    },
+    {
+      "name": "paper",
+      "role": "saltWhite",
+      "roughness": 0.92
+    },
+    {
+      "name": "linen",
+      "role": "neighborLinen",
+      "roughness": 0.92
+    },
+    {
+      "name": "iron",
+      "role": "elderGrey",
+      "roughness": 0.92
+    },
+    {
+      "name": "hide",
+      "role": "soil",
+      "roughness": 0.92
+    },
+    {
+      "name": "hideLight",
+      "role": "trunk",
+      "roughness": 0.92
+    },
+    {
+      "name": "accent",
+      "role": "clothAccent",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "post",
+      "location": [
+        0,
+        0,
+        1.6500000000000001
+      ],
+      "radius": 0.12,
+      "depth": 3.3000000000000003,
+      "vertices": 5,
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "sign",
+      "location": [
+        0,
+        -0.135,
+        2.7
+      ],
+      "dimensions": [
+        1.6800000000000002,
+        0.195,
+        0.6000000000000001
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        4,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "nail_-0.21",
+      "location": [
+        -0.63,
+        -0.255,
+        2.73
+      ],
+      "radius": 0.036000000000000004,
+      "depth": 0.05399999999999999,
+      "vertices": 6,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "nail_0.21",
+      "location": [
+        0.63,
+        -0.255,
+        2.73
+      ],
+      "radius": 0.036000000000000004,
+      "depth": 0.05399999999999999,
+      "vertices": 6,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "arrow_shaft",
+      "location": [
+        -0.09,
+        -0.252,
+        2.7
+      ],
+      "dimensions": [
+        0.6900000000000001,
+        0.024,
+        0.066
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "arrow_-1",
+      "location": [
+        0.1275,
+        -0.264,
+        2.6310000000000002
+      ],
+      "radius": 0.042,
+      "depth": 0.21510230124292035,
+      "vertices": 3,
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        -129.90788487550108,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "arrow_1",
+      "location": [
+        0.1275,
+        -0.264,
+        2.769
+      ],
+      "radius": 0.042,
+      "depth": 0.21510230124292035,
+      "vertices": 3,
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        -50.092115124498946,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "signpost",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Candidato Bloque 1. Exportaci\u00f3n por build.py: color de v\u00e9rtice, material \u00fanico; m\u00e1ximo 150 tri\u00e1ngulos."
+  },
+  "referenceRender": {
+    "width": 600,
+    "height": 600,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.6
+    ],
+    "orthoScale": 2,
+    "worldRole": "sky"
+  },
+  "triangleBudget": 150
+}
