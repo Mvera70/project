@@ -53,6 +53,27 @@ forastero del vado sigue entrando por el camino pintado: RD-1 fija su hora.
 Siguiente: **el valle con forma natural** (el segundo abierto de v5.55), que
 es del motor y se mide antes de proponer nada.
 
+## 2 oct 2026 · Por qué la CI tardaba 36 minutos (v5.68) — carril CI
+
+Rama `ccr-91b06db8-ilbj88`, sobre `main` con #38 dentro. **Diagnóstico**
+(`docs/medidas/ci-lentitud-2026-10-02.md`): el servidor no es más lento que
+local (ledger, 689 s en CI y 666 s en local). El tick pasó de 0,78 a
+8,3 ms/semana entre el 16 sep y el 1 oct, con un ×2,3 en `6fa7fda1`
+(`walkingGround` tira todas las rutas con cada obra; A\* es el 54 % del tick
+bajo vitest). Y los ficheros de `fast` que juegan décadas pasaron de 15 a 58.
+**Hecho:** `npm test` sin aislar (249 → 180 s en local, en verde en tres
+órdenes); tope de 30 s × escala por fichero en `fast`, contando la recogida
+(`tests/helpers/fast-budget-reporter.ts`); `ledger` 677 → 161 s y `threat`
+1167 → 470 s jugando cada partida una vez; `tools/reports/tick-bench.ts`; el
+comentario de `ci.yml`. **El parche de rutas** (−31 % del tick, crónica,
+gente y edificios iguales a 40 años en 7/23/41; cambia `map.traffic` en dos
+semillas) **lo lleva la rama `claude/rutas-tick` (v5.71)**, aprobado por Vera.
+**Abierto:** (1) `catchUp` en `save.test.ts` da 2,05–2,26 s contra 2 s en
+local a escala 1; se cierra con el parche de rutas. (2) El mismo patrón de
+partida repetida en cada `it` está en unos ochenta ficheros más (la lista sale
+del guion de §6.2 del documento), casi todos baratos o con aldeas que la prueba
+modifica; si una jornada vuelve a pesar, se mira primero ahí.
+
 ## 2 oct 2026 · Dientes de sierra en la tablet (v5.65)
 
 Rama `ccr-2befdb3e-qwp7lu`. La tablet de Vera es una **iPlay 70 mini Ultra**

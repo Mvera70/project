@@ -25,12 +25,24 @@ import { yearOf } from '@engine/time';
 import type { ChronicleEntry, GameState } from '@engine/state';
 import { foundTwenty } from '../helpers/founding';
 
-/** Una partida jugada hasta que acaba, o hasta los ochenta años. */
+/**
+ * Una partida jugada hasta que acaba, o hasta los ochenta años, **jugada una
+ * vez por fichero**. Cuatro de las cinco pruebas que la piden volvían a jugar
+ * las mismas tres partidas: once partidas de ochenta años donde bastan tres,
+ * 677 s de los que sobraban dos tercios (docs/medidas/ci-lentitud-2026-10-02.md
+ * §6.2). Las pruebas sólo la leen; la que necesita cerrarla trabaja sobre una
+ * copia.
+ */
+const PLAYED = new Map<string, GameState>();
 function played(seed: number, years = 80): GameState {
+  const key = `${seed}/${years}`;
+  const known = PLAYED.get(key);
+  if (known !== undefined) return known;
   const state = foundTwenty(seed);
   for (let week = 0; week < TIME.WEEKS_PER_YEAR * years && state.ended === null; week += 1) {
     run(state, 1, 'prudent', CATALOG);
   }
+  PLAYED.set(key, state);
   return state;
 }
 
@@ -151,10 +163,11 @@ describe('F3a · el libro de cuentas', () => {
   it('una partida acabada se archiva con sus cuentas dentro', () => {
     // La otra mitad de F3a: el libro viaja en el archivo, porque la crónica de
     // las partidas viejas se poda y entonces recontar dejaría de ser posible.
-    const state = played(41);
-    if (state.ended === null) {
-      state.ended = { tick: state.tick, cause: 'abandoned', lastId: null };
-    }
+    // Una copia superficial: la partida es compartida y no se cierra aquí.
+    const shared = played(41);
+    const state: GameState = shared.ended === null
+      ? { ...shared, ended: { tick: shared.tick, cause: 'abandoned', lastId: null } }
+      : shared;
     const game = archiveGame(state);
     expect(game.ledger, 'el archivo lleva el libro').toBeDefined();
     expect(game.ledger, 'y es el mismo que se cuenta al cerrar').toEqual(ledgerOf(state));
