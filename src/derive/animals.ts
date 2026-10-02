@@ -38,6 +38,12 @@ export interface Animal {
    * render lo deduce del desplazamiento, como hacía con todos hasta esta ronda.
    */
   facing?: number;
+  /**
+   * v5.85 · A qué escala se pinta respecto al modelo adulto. Sólo las crías de
+   * primavera (`life/young.ts`) lo traen: un ternero es la vaca a media alzada
+   * mientras no haya malla propia (`docs/encargos-3d.md`). Sin él, 1.
+   */
+  scale?: number;
 }
 
 /**

@@ -62,6 +62,15 @@ const TURN = 12;
 
 const ease = (seconds: number, delta: number): number => 1 - Math.exp(-delta / seconds);
 
+/**
+ * v5.85 · Lo que una cría no tiene: la cuerna y las puntas del ciervo, los
+ * cuernos y la ubre de la vaca, los colmillos del jabalí del año. Cada pieza
+ * rígida del modelo es un hueso con su nombre (`skinRigidBody`), así que basta
+ * con encogerlo a cero mientras el animal venga a menos de su tamaño adulto. Es
+ * el apaño hasta las mallas propias (`docs/encargos-3d.md`).
+ */
+const ADULT_ONLY = ['head_antler', 'head_ivory', 'body_udder', 'Curved_Tusk_-1', 'Curved_Tusk_1'];
+
 export class AnimalMotion {
   readonly group = new Group();
   private readonly mixer: AnimationMixer;
@@ -97,6 +106,8 @@ export class AnimalMotion {
    * más ancho del modelo, el ciervo quedaba flotando sobre su cuerna.
    */
   private readonly flank: number;
+  /** Las piezas de adulto, para encogerlas en una cría (`ADULT_ONLY`). */
+  private readonly adultParts: Object3D[];
 
   constructor(readonly kind: Animal['kind'], object: Object3D, asset: LoadedAsset, id: number) {
     this.group.name = `Animal_${kind}_${id}`;
@@ -106,6 +117,7 @@ export class AnimalMotion {
     const rest = new Box3().setFromObject(object);
     const trunk = (PREY_BODY as Partial<Record<Animal['kind'], { readonly flank: number }>>)[kind];
     this.flank = trunk?.flank ?? (Number.isFinite(rest.max.z - rest.min.z) ? (rest.max.z - rest.min.z) / 2 : 0);
+    this.adultParts = ADULT_ONLY.map((name) => object.getObjectByName(name)).filter((node): node is Object3D => node !== undefined);
     object.traverse(node => {
       // Sin sombra (27 sep 2026): un animal a esta distancia apenas la deja ver,
       // y cada malla con sombra se dibuja dos veces. Eran 177 llamadas en la villa.
@@ -180,7 +192,9 @@ export class AnimalMotion {
       const difference = Math.atan2(Math.sin(this.heading - this.group.rotation.y), Math.cos(this.heading - this.group.rotation.y));
       this.group.rotation.y += difference * (1 - Math.exp(-TURN * delta));
     }
-    this.distance += step;
+    // Una cría de media alzada da medio paso: la zancada del clip, a su escala,
+    // para que el casco no patine (AN-1: toda marcha va por suelo recorrido).
+    this.distance += step / (animal.scale ?? 1);
     if (delta > 0) this.blend += ((moving ? 1 : 0) - this.blend) * ease(BLEND.walk, delta);
     const takingOff = animal.action === 'takeoff' && this.takeoff !== undefined;
     if (takingOff && this.takeoffStartedAt === undefined) { this.takeoffStartedAt = seconds; this.takeoff!.reset().play(); }
@@ -245,9 +259,13 @@ export class AnimalMotion {
       this.attack!.setEffectiveWeight(this.oneShotBlend);
     }
     this.mixer.update(0);
+    if ((animal.scale ?? 1) < 1) for (const part of this.adultParts) part.scale.setScalar(0);
     const settle = this.downBlend * this.downBlend * (3 - 2 * this.downBlend);
     this.group.rotation.x = DOWN_ROLL * settle;
-    this.group.position.set(animal.x, floor + (animal.altitude ?? 0) + this.flank * settle, animal.y);
+    // v5.85 · La cría de primavera es el adulto a menor escala, y se apoya igual.
+    const scale = animal.scale ?? 1;
+    if (this.group.scale.x !== scale) this.group.scale.setScalar(scale);
+    this.group.position.set(animal.x, floor + (animal.altitude ?? 0) + this.flank * scale * settle, animal.y);
     this.previous = { x: animal.x, y: animal.y };
   }
 

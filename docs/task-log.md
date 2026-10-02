@@ -1,5 +1,33 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · La fauna por estaciones (v5.85)
+
+Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
+rama `claude/fauna-estaciones`, **versiones reservadas v5.85–v5.89** (usada
+v5.85). **Sólo vida, derive y render**: el motor no se toca. Hecho lo que Vera
+eligió, las cuatro cosas: crías en primavera (`life/young.ts`, detrás de la
+madre y a su escala, sin cuerna ni ubre), golondrinas sólo en primavera y
+verano y una uve de grullas en otoño (`effects/ambience.ts`), cigüeñas,
+mariposas y abejas (`effects/seasonal-fauna.ts`), invierno escaso (un ciervo
+que baja al prado, un conejo más arisco) y jabalíes hozando en otoño
+(`life/rooting-boars.ts`). Qué toca cada estación, en `derive/seasonal-fauna.ts`.
+Medido en ocho semillas y con capturas de las cuatro estaciones:
+`docs/medidas/fauna-estaciones-2026-10-02.md`. Prueba:
+`tests/fast/life-seasonal-fauna.test.ts` (3 s). No se ha tocado el anclaje de
+las vacas de `beasts.ts` (#48): las crías leen el cuerpo de la madre desde
+`village.ts`.
+
+**Abierto:**
+
+- **De Vera:** K12, el ganado en invierno (establos, cercas fuera de la
+  muralla, el asalto que lo encuentra), apuntado en `docs/plan-meta.md` con
+  cinco preguntas; y si la cigüeña debe anidar en la capilla (pide malla y
+  saber la altura del tejado).
+- **Lo que no se ve bien** (`docs/encargos-3d.md`): los polluelos son gallinas
+  diminutas y no se leen; la cigüeña es de primitivas; no hay clip de hozar.
+- **Sin medir:** el coste en el aparato (cuatro llamadas más con todo
+  encendido, tres más con las grullas).
+
 ## 2 oct 2026 · La ronda del daño (v5.81, carril de combate)
 
 Rama `claude/petos-asalto` rehecha desde `main` tras #49, **versiones

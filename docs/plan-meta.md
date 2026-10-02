@@ -323,6 +323,26 @@ propuesta totalmente diferente de lo que suele haber.»
 | **K10 · La aldea fuerte del final** | La meta sigue siendo la aldea construida y fuerte con toda la muralla, y faltan edificios de defensa: **arquería, armería** | Hoy las armas y los arcos entran como medios (M-2). Con K8 pasarían a edificios con su tablón | P2 | Media |
 | **K11 · Morir se ve, y la enfermería** | Que **el proceso de morir se vea**. En un caserío, el enfermo o el viejo se muere por ahí fuera, apoyado en un árbol o donde le pille. En una aldea grande va a **la enfermería**, que es un edificio que se toca (K8): se ve a cada paciente, y desde allí quizá **la recolección de plantas** (K5) | Hoy la muerte es una línea de crónica y un cuerpo que desaparece al cerrar la semana. El motor ya sabe quién enferma (peste, hambre, frío, vejez) y la vida ya sabe tumbar un cuerpo (caídas y ragdoll del asedio). La curandera es un suceso. Junta K5, K6 y K8 en un sitio, y también sirve a K7: que la muerte se entienda | P2 | Media |
 
+| **K12 · El ganado pasa el invierno a cubierto, y fuera de la muralla** *(propuesto, 2 oct 2026; no es de ninguna ronda abierta)* | Vera, al pedir la fauna por estaciones: «en invierno el ganado debe guardarse en establos, que no tenemos; en los pueblos medievales, cuando se cerraba la muralla, fuera quedaban campos de cultivo y zonas donde el ganado pastaba y luego pasaba la noche. Con cercas de valla de madera quedaría bien. Además luego aporta a las invasiones, porque tendrán que ir a la aldea y algunos no lo conseguirán… hay mucho que desarrollar aquí» | **Lo que ya existe:** la cabaña es cosmética y se cuenta de `state.herd` (§7.7); en la vida, `createBeasts(…, secure)` (`life/beasts.ts`) ya recoge gallinas, cerdos y vacas junto a las casas más interiores la víspera de un asalto (E0a, `preparationActive`), sin perder una cabeza; la sesión del valle con forma natural (#48) está llevando las vacas a pastar en la falda; el anillo y el cerco (A, C2) ya separan dentro de fuera; los lobos del corral (`wolves_at_the_coop`, §7.10) ya se llevan gallinas en invierno; y la fauna por estaciones (v5.85) deja las crías de primavera como cuerpos que se ven. **Lo que no existe:** un establo o una cerca como edificio, un sitio de noche para la cabaña distinto de la puerta de una casa, y que el asedio sepa dónde está el ganado. Toca el motor (edificio en `works.ts`, quizá `state.herd` por sitio y su migración), la vida (`beasts.ts`, cuando #48 esté dentro) y el asedio (`raiders.ts`, `sack.ts`) | P2 | Alta |
+
+**Preguntas de diseño abiertas para K12, de Vera** (no las decide ningún agente):
+
+1. **¿El establo es una obra del motor** (con su coste en madera, su sitio y su
+   ruina) **o sólo una cerca de vida** que se dibuja junto a los campos? Lo
+   primero pide `SCHEMA_VERSION`; lo segundo no cambia ninguna partida.
+2. **¿Qué pasa en invierno sin establo?** ¿Muere ganado de frío o de hambre
+   (motor, nivelado), sólo se ve a la cabaña apretada junto a las casas (vida),
+   o los lobos se llevan más?
+3. **Con la muralla cerrada, ¿el pasto y los corrales quedan fuera siempre**,
+   o la aldea elige? ¿Cuántas cabezas caben dentro?
+4. **En un asalto, ¿el ganado de fuera es botín** (lo que el clan se lleva en
+   vez de entrar), **un aviso** (los pastores corren a meterlo y alguno no
+   llega, como dijo Vera) o las dos cosas? ¿Cuenta en el parte de la batalla
+   (`PlayerAct`, B4) o es sólo escena?
+5. **¿La cerca se ve como valla de madera alrededor del pasto de la falda**
+   (#48) o junto a cada casa? Hace falta malla (`docs/encargos-3d.md`): tramo
+   de valla, portillo y cobertizo, por encargo y por omisión de Astra.
+
 **Los modelos nuevos van por encargo** (regla de Vera, recordada el 1 oct
 2026). Todo modelo 3D que pida K (la enfermería, la arquería, la armería, la
 herrería con su tablón, los cuerpos que se tumban a morir, los puestos de
