@@ -116,12 +116,12 @@ export function preyShape(species: HuntSpecies, id: number, x: number, z: number
 
 /**
  * La altura con que se pinta cada edificio que cierra sus celdas, del catálogo
- * (`bounds.size[1]`). Una casa tiene tres variantes (1,56–1,66) y la de piedra
- * cuatro (1,56–1,88): va la de base, que es la más común. TUNE en
+ * (`bounds.size[1]`). Las casas de madera van de 1,47 a 1,77 celdas y las de
+ * piedra de 1,30 a 1,67: se usa la altura de la variante base. TUNE en
  * `tests/fast/hunt-bodies.test.ts` contra el catálogo.
  */
 export const STANDING_HEIGHT: Readonly<Partial<Record<BuildingKind, number>>> = {
-  house: 1.583, stone_house: 1.573, granary: 1.765, chapel: 2.1, church: 3.717, smithy: 1.404,
+  house: 1.583, stone_house: 1.299, granary: 1.765, chapel: 2.1, church: 3.717, smithy: 1.404,
   mill: 2.657, watchtower: 2.75, palisade: 0.867, wall: 0.885, hall: 1.923, bastion: 1.36, well: 1.033,
 };
 

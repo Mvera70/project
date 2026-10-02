@@ -4917,3 +4917,6 @@ de 549 a 553 llamadas y de 787 354 a 782 700 triángulos estables; aldea,
 no subieron. Pasaron `typecheck`, `lint`, 15 pruebas rápidas, validador V3 y
 `npm run shot`. Capturas reales antes/después de caserío, aldea y villa en
 `artifacts/graphics/G-43/`.
+El control rápido de CI encontró una altura de contacto de piedra aún fijada
+al GLB antiguo; se actualizó en la capa de vida 3D, sin tocar `src/engine/`.
+Después pasaron las 2 175 pruebas rápidas con cuatro workers (225 ficheros).
