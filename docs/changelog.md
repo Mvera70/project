@@ -21,7 +21,8 @@ escondido detrás de la placa de carga.
 - **Medido** (`vite build`): el trozo de entrada baja de **611,05 a 593,11 kB**
   (gzip 194,96 → 188,07). Los diez módulos de dibujo de `src/render/` y
   `derive/palette` salen de él y viven en cinco trozos aparte (~19,7 kB) que el
-  juego en 3D no pide.
+  juego en 3D no pide. Remedido tras traer #41 y #42 a la rama: **626,00 →
+  608,06 kB** (gzip 201,68 → 195,03), la misma diferencia.
 - El recorrido «la ruta viva abre un valle maduro…» medía `#valley` a 360 px en
   3D, cierto sólo porque el 2D pintaba escondido: ahora comprueba lo contrario,
   que tras el relevo el 2D no ha pintado nunca.

@@ -5,7 +5,8 @@
 Rama `claude/sin-2d-en-el-paquete`, tanda nocturna. El Canvas 2D (`src/render/`)
 se queda para `?render=canvas` y como reserva, pero se pide con `import()`: el
 juego en 3D ya no lo descarga ni lo pinta detrás de la placa. Entrada de
-611,05 a 593,11 kB (gzip 194,96 → 188,07). Mientras carga, `data-render` dice
+611,05 a 593,11 kB (gzip 194,96 → 188,07); sobre el main con #41 y #42,
+626,00 → 608,06. Mientras carga, `data-render` dice
 `loading`. Y el recorrido de la tormenta, que fallaba a ratos en la CI, va
 con el reloj falso parado al cargar y a ×64 tras ver la tormenta. Nada abierto.
 
