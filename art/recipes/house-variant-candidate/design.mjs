@@ -1,118 +1,56 @@
 import { readFile, writeFile } from 'node:fs/promises';
 const here = new URL('./', import.meta.url);
-const read = async path => JSON.parse(await readFile(new URL(path, here), 'utf8'));
-const cube = (name, location, dimensions, material) => ({ type: 'cube', name, location, dimensions, material, parent: 'Root' });
-const gable = (name, location, width, depth, height, rotation = 0) => ({ type: 'gable', name, location, width, depth, height, rotationDegrees: [0, 0, rotation], material: 'roof', parent: 'Root' });
-
-// Las carpinterías conservan los anclajes del modelo publicado.
-const wood = await read('../house/house.json');
-wood.id = 'house-twin-gable';
-wood.metadata.note = 'Candidato original: dos crujías escalonadas de entramado y paja. Puerta y tres ventanas conservan los anclajes publicados.';
-wood.primitives = wood.primitives.filter(p => !/House_(Walls|Roof|Eaves|Ridge|ThatchCourse|Chimney|Lintel|SideLintel)/.test(p.name));
-wood.primitives.push(
-  cube('House_MainWalls', [2.01,3,1.38], [3.18,5.16,2.76], 'plaster'),
-  cube('House_LowerWalls', [4.59,3,1.1], [1.98,5.16,2.2], 'plaster'),
-  gable('House_MainRoof', [1.95,3,2.76], 3.9,6,1.56),
-  gable('House_LowerRoof', [4.86,3,2.2], 2.28,6,1.14),
-  cube('House_MainRidge', [1.95,3,4.33], [.2,6,.13], 'roof'),
-  cube('House_LowerRidge', [4.86,3,3.35], [.19,6,.13], 'roof'),
-  cube('House_ValleyFlashing', [3.77,3,2.4], [.14,6,.14], 'wood'),
-  cube('House_Chimney', [3.25,4.4,3.45], [.48,.48,2.3], 'stone'),
-  cube('House_ChimneyCap', [3.25,4.4,4.59], [.64,.64,.15], 'stone'),
-  cube('House_ChimneyOpening', [3.25,4.4,4.674], [.36,.36,.018], 'window'),
-);
-for (const y of [.4,5.6]) {
-  wood.primitives.push(cube(`House_MainBeam_${y}`, [2.01,y,2.7], [3.35,.17,.17], 'wood'));
-  wood.primitives.push(cube(`House_LowerBeam_${y}`, [4.59,y,2.15], [2.1,.17,.17], 'wood'));
-  wood.primitives.push(cube(`House_PartyPost_${y}`, [3.6,y,1.4], [.16,.16,2.7], 'wood'));
+const read = async p => JSON.parse(await readFile(new URL(p, here), 'utf8'));
+const cube=(name,location,dimensions,material)=>({type:'cube',name,location,dimensions,material,parent:'Root'});
+const gable=(name,location,width,depth,height,rotation=0,material='roof')=>({type:'gable',name,location,width,depth,height,rotationDegrees:[0,0,rotation],material,parent:'Root'});
+const pyramid=(name,x,y,width,base,height)=>({type:'cone',name,location:[x,y,base+height/2],radius:width/Math.sqrt(2),depth:height,vertices:4,rotationDegrees:[0,0,45],material:'roof',parent:'Root',smooth:false});
+const timber=await read('../house/house.json'), rock=await read('../stone-house/stone-house.json');
+const recipes=[];
+function base(id,stone=false){
+ const r=structuredClone(stone?rock:timber);r.id=id;
+ r.primitives=r.primitives.filter(p=>!/(Roof|Eaves|Ridge|ThatchCourse|TileCourse|Chimney)/.test(p.name));
+ recipes.push(r);return r;
 }
-for (const [center,width,base,height] of [[1.95,3.9,2.76,1.56],[4.86,2.28,2.2,1.14]]) {
-  for (const sign of [-1,1]) for (const fraction of [.35,.72]) {
-    wood.primitives.push(cube(`House_Thatch_${center}_${sign}_${fraction}`, [center+sign*width*.5*fraction,3,base+height*(1-fraction)+.025], [.1,5.98,.07], 'roof'));
-  }
+function chimney(r,x,y,base,top){const p=r.id.startsWith('stone')?'Stone':'House';r.primitives.push(cube(p+'_Chimney',[x,y,(base+top)/2],[.5,.5,top-base],'stone'),cube(p+'_ChimneyCap',[x,y,top],[.68,.68,.16],'stone'),cube(p+'_ChimneyOpening',[x,y,top+.085],[.36,.36,.01],'window'));}
+function roofBands(r,cx,cy,w,d,z,h,rotate=0){
+ for(const side of [-1,1])for(const f of [.3,.65]){
+  const loc=rotate?[cx,cy+side*w/2*f,z+h*(1-f)+.025]:[cx+side*w/2*f,cy,z+h*(1-f)+.025];
+  r.primitives.push(cube('RoofCourse_'+r.primitives.length,loc,rotate?[d,.085,.065]:[.085,d,.065],'roof'));
+ }
 }
-
-const stone = await read('../stone-house/stone-house.json');
-stone.id = 'stone-house-cross-gable';
-stone.metadata.note = 'Candidato original: casa de mampostería con hastial central elevado, cubierta en cruz y dos alas bajas. Puerta y ventanas conservan anclajes publicados.';
-stone.primitives = stone.primitives.filter(p => !/Stone_(Roof|Ridge|TileCourse)/.test(p.name));
-stone.primitives.push(
-  gable('Stone_MainRoof', [3,3,2.6], 6,6,1.45,90),
-  cube('Stone_EntryUpperWall', [3,1.7,2.9], [1.7,2.62,.6], 'stone'),
-  gable('Stone_EntryRoof', [3,1.62,3.2], 2.2,3.24,1.4),
-  cube('Stone_EntryRidge', [3,1.62,4.6], [.17,3.24,.16], 'roof'),
-  cube('Stone_RearRidge', [3,3,4.06], [6,.18,.14], 'roof'),
-);
-// Las hiladas del tejado transversal se cortan donde entra el hastial.
-for (const y of [.55,1.3,2.05,3.95,4.7,5.45]) {
-  const z = 2.6 + 1.45 * (1-Math.abs(y-3)/3) + .025;
-  if (y < 3) for (const x of [.95,5.05]) stone.primitives.push(cube(`Stone_Tiles_${x}_${y}`, [x,y,z], [1.86,.09,.06], 'roof'));
-  else stone.primitives.push(cube(`Stone_Tiles_${y}`, [3,y,z], [5.98,.09,.06], 'roof'));
-}
-for (const x of [2.25,2.6,3.4,3.75]) {
-  const z=3.2+1.4*(1-Math.abs(x-3)/1.1)+.02;
-  stone.primitives.push(cube(`Stone_EntryTiles_${x}`, [x,1.62,z], [.08,3.22,.06], 'roof'));
-}
-const pyramid = (name, x, y, width, base, height) => ({ type: 'cone', name, location: [x,y,base+height/2], radius: width/Math.sqrt(2), depth: height, vertices: 4, rotationDegrees: [0,0,45], material: 'roof', parent: 'Root', smooth: false });
-const hip = await read('../house/house.json');
-hip.id = 'house-hip-roof';
-hip.metadata.note = 'Segunda variante original: cuerpo alto de entramado bajo cubierta piramidal de cuatro aguas. Exactamente tres ventanas y puerta originales; sin huecos nuevos.';
-hip.primitives = hip.primitives.filter(p => !/House_(Roof|Eaves|Ridge|ThatchCourse|Chimney)/.test(p.name));
-for (const p of hip.primitives) {
-  if (p.name==='House_Walls') { p.location[2]=1.42; p.dimensions[2]=2.84; }
-  if (/House_(Lintel|SideLintel)/.test(p.name)) p.location[2]=2.77;
-  if (/House_(FrontPost|BackPost|SidePost)/.test(p.name)) { p.location[2]=1.52; p.dimensions[2]=2.57; }
-}
-hip.primitives.push(pyramid('House_HipRoof',3,3,6,2.84,2.12));
-// Bandas de paja en cuatro vertientes, anillos cerrados y ninguna ventana extra.
-for (const fraction of [.25,.55,.8]) {
-  const width=6*(1-fraction),z=2.84+2.12*fraction+.025;
-  for (const sign of [-1,1]) {
-    hip.primitives.push(cube(`House_HipCourseX_${fraction}_${sign}`,[3,3+sign*width/2,z],[width+.07,.09,.07],'roof'));
-    hip.primitives.push(cube(`House_HipCourseY_${fraction}_${sign}`,[3+sign*width/2,3,z],[.09,width+.07,.07],'roof'));
-  }
-}
-hip.primitives.push(cube('House_Chimney',[4.55,4.55,3.65],[.45,.45,1.7],'stone'),cube('House_ChimneyCap',[4.55,4.55,4.47],[.61,.61,.15],'stone'),cube('House_ChimneyOpening',[4.55,4.55,4.554],[.34,.34,.018],'window'));
-
-const loft = await read('../stone-house/stone-house.json');
-loft.id = 'stone-house-tower-loft';
-loft.metadata.note = 'Segunda variante original: vivienda compacta con altillo lateral alto y cubierta piramidal independiente, sin almenas ni iconografía militar; tres ventanas y puerta originales.';
-loft.primitives=loft.primitives.filter(p=>!/Stone_(Roof|Ridge|TileCourse|Chimney)/.test(p.name));
-loft.primitives.push(
-  gable('Stone_LowRoof',[3,3,2.6],6,6,1.03,90),
-  cube('Stone_LoftWalls',[4.7,4.7,3.53],[2.04,2.04,2.14],'stone'),
-  cube('Stone_LoftBelt',[4.7,4.7,3.62],[2.16,2.16,.15],'stone'),
-  pyramid('Stone_LoftRoof',4.7,4.7,2.6,4.6,1.03),
-  cube('Stone_LowRidge',[1.8,3,3.63],[3.6,.19,.13],'roof'),
-  cube('Stone_Chimney',[1.4,4.4,3.2],[.52,.52,1.9],'stone'),
-  cube('Stone_ChimneyCap',[1.4,4.4,4.14],[.68,.68,.15],'stone'),
-  cube('Stone_ChimneyOpening',[1.4,4.4,4.224],[.38,.38,.018],'window'),
-);
-for (const y of [.6,1.45,2.3,3.7,4.55,5.4]) {
-  const z=2.6+1.03*(1-Math.abs(y-3)/3)+.025;
-  const width=y>3.6?3.62:5.98;
-  loft.primitives.push(cube(`Stone_LowTile_${y}`,[width/2+.01,y,z],[width,.09,.065],'roof'));
-}
-for (const x of [3.72,5.68]) for (const y of [3.72,5.68]) {
-  loft.primitives.push(cube(`Stone_LoftQuoin_${x}_${y}`,[x,y,4.1],[.22,.22,.65],'stone'));
-}
-// Candidato de la base: nunca se sobrescribe el recurso aprobado durante autoría.
-const stoneBase = await read('../stone-house/stone-house.json');
-stoneBase.metadata.note += ' Revisión 27 sep: juntas y relieve facetado de mampostería, sin texturas.';
-for (const recipe of [wood,stone,hip,loft,stoneBase]) {
-  const isStone = recipe.id.startsWith('stone-house');
-  const door = recipe.primitives.find(p => p.name === (isStone ? 'Stone_Door' : 'House_Door'));
-  recipe.candidateBuild = {
-    adapter: 'build-candidates.py',
-    triangleLimit: isStone ? 1200 : 900,
-    doorPivot: [door.location[0] - door.dimensions[0]/2, door.location[1], 0],
-    removeBuriedFaces: true,
-    masonry: isStone ? [
-      { primitive: 'Stone_Walls', rows: 4, columns: 3, relief: 0.035, joint: 0.035 },
-      ...(recipe.id === 'stone-house-cross-gable' ? [{ primitive: 'Stone_EntryUpperWall', rows: 1, columns: 2, relief: 0.025, joint: 0.035 }] : []),
-      ...(recipe.id === 'stone-house-tower-loft' ? [{ primitive: 'Stone_LoftWalls', rows: 2, columns: 2, relief: 0.025, joint: 0.035 }] : []),
-    ] : [],
-  };
-  for (const p of recipe.primitives) p.name=p.name.replaceAll('.', '_').replaceAll('-', 'n');
-  await writeFile(new URL(`${recipe.id}.json`,here), JSON.stringify(recipe,null,2)+'\n');
+// Dos hastiales muy estrechos y altos, con una diferencia de altura visible.
+const twin=base('house-twin-gable');
+twin.primitives=twin.primitives.filter(p=>p.name!=='House_Walls');
+twin.primitives.push(cube('House_LeftBody',[1.72,3,1.62],[2.6,5.16,3.24],'plaster'),cube('House_RightBody',[4.3,3,1.3],[2.56,5.16,2.6],'plaster'),gable('House_LeftRoof',[1.55,3,3.24],3.1,6,2.08),gable('House_RightRoof',[4.55,3,2.6],2.9,6,1.68));
+for(const y of [.38,5.62]){twin.primitives.push(cube('House_UpperBeam_'+y,[1.72,y,3.12],[2.75,.17,.18],'wood'),cube('House_UpperPost_'+y,[1.56,y,2.82],[.16,.17,.9],'wood'));}
+roofBands(twin,1.55,3,3.1,6,3.24,2.08);roofBands(twin,4.55,3,2.9,6,2.6,1.68);chimney(twin,3.2,4.8,2.6,4.15);
+// Gran pirámide sobre cuerpo bajo: el contorno se reconoce por sus cuatro faldones.
+const hip=base('house-hip-roof');
+hip.primitives.push(pyramid('House_HipRoof',3,3,6,2.45,2.9));
+for(const f of [.28,.58,.8]){const w=6*(1-f),z=2.45+2.9*f+.025;for(const s of [-1,1])hip.primitives.push(cube('HipX_'+f+'_'+s,[3,3+s*w/2,z],[w,.09,.07],'roof'),cube('HipY_'+f+'_'+s,[3+s*w/2,3,z],[.09,w,.07],'roof'));}
+chimney(hip,4.8,4.7,2.6,3.75);
+// Casa pétrea baja con cumbrera transversal y porche frontal de ancho completo.
+const low=base('stone-house',true);
+low.primitives.push(gable('Stone_RearRoof',[3,3.28,2.6],5.44,6,.9,90),cube('Stone_Ridge',[3,3.28,3.52],[6,.18,.16],'roof'));
+roofBands(low,3,3.28,5.44,6,2.6,.9,90);
+// El porche ocupa solamente el retranqueo existente delante de las ventanas.
+low.primitives.push(gable('Stone_PorchRoof',[3,.41,2.42],.82,5.9,.22,90));
+for(const x of [.18,5.82])low.primitives.push(cube('Stone_PorchPost_'+x,[x,.16,1.18],[.18,.18,2.36],'wood'));
+chimney(low,4.8,4.6,2.6,4.2);
+// Gran cruz: dos hastiales perpendiculares de alturas comparables, sin torre.
+const cross=base('stone-house-cross-gable',true);
+cross.primitives.push(gable('Stone_TransverseRoof',[3,3.55,2.6],4.9,6,1.9,90),cube('Stone_FrontUpper',[3,1.7,3.05],[2.3,2.62,.9],'stone'),gable('Stone_FrontRoof',[3,2.1,3.5],2.95,4.2,2.15),cube('Stone_FrontRidge',[3,2.1,5.65],[.18,4.2,.14],'roof'));
+roofBands(cross,3,2.1,2.95,4.2,3.5,2.15);chimney(cross,.9,4.7,2.6,4.2);
+// Altillo doméstico alto: una torre ancha sobre el ala derecha y faldón bajo a la izquierda.
+const tower=base('stone-house-tower-loft',true);
+tower.primitives.push(gable('Stone_LowRoof',[3,3,2.6],6,6,.75,90),cube('Stone_LoftWalls',[4.45,3.95,4.28],[2.65,3.3,3.44],'stone'),cube('Stone_LoftBelt',[4.45,3.95,4.35],[2.8,3.45,.2],'wood'),gable('Stone_LoftRoof',[4.45,3.95,6],3.1,4.1,1.38),cube('Stone_LoftRidge',[4.45,3.95,7.39],[.17,4.1,.14],'roof'));
+// Entramado cerrado del altillo: ningún hueco nocturno adicional.
+for(const x of [3.2,4.45,5.7])tower.primitives.push(cube('Stone_LoftPost_'+x,[x,2.27,5.15],[.15,.13,1.65],'wood'));
+roofBands(tower,4.45,3.95,3.1,4.1,6,1.38);chimney(tower,1.2,4.7,2.6,3.65);
+for(const r of recipes){
+ const stone=r.id.startsWith('stone'),door=r.primitives.find(p=>p.name===(stone?'Stone_Door':'House_Door'));
+ r.metadata.note='V2, 2 oct 2026: silueta reconstruida para lectura móvil; tres ventanas, puerta y origen conservados literalmente.';
+ r.candidateBuild={adapter:'build-candidates.py',triangleLimit:stone?1200:900,doorPivot:[door.location[0]-door.dimensions[0]/2,door.location[1],0],removeBuriedFaces:true,masonry:stone?[{primitive:'Stone_Walls',rows:3,columns:3,relief:.035,joint:.035},...(r===tower?[{primitive:'Stone_LoftWalls',rows:3,columns:2,relief:.025,joint:.035}]:[])]:[]};
+ for(const p of r.primitives)p.name=p.name.replaceAll('.','_').replaceAll('-','n');
+ await writeFile(new URL(r.id+'.json',here),JSON.stringify(r,null,2)+'\n');
 }

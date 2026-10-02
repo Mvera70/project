@@ -1,30 +1,26 @@
-# Viviendas candidatas · GLB y mampostería
+# Viviendas V2 · cinco siluetas para móvil
 
-27 sep 2026. Cuatro variantes y mejora de muros para stone-house, sin cambiar parcela, capacidad, puerta ni las tres ventanas originales.
+2 oct 2026. Rehechas las cinco variantes; `house.glb` básico se conserva como referencia.
 
-| Modelo | Silueta | Triángulos GLB | Límite |
+| Modelo | Forma dominante | Triángulos | Mallas/materiales |
 |---|---|---:|---:|
-| house-twin-gable | Dos crujías y cumbreras paralelas de paja | 708 | 900 |
-| house-hip-roof | Cubierta piramidal de cuatro aguas | 664 | 900 |
-| stone-house-cross-gable | Hastial transversal elevado | 1176 | 1200 |
-| stone-house-tower-loft | Altillo lateral con cubierta propia | 1198 | 1200 |
-| stone-house | Silueta original, nuevas juntas y relieve | 1048 | 1200 |
+| house-twin-gable | Dos hastiales altos desiguales | 694 | 6 |
+| house-hip-roof | Gran pirámide de paja | 672 | 6 |
+| stone-house | Cumbrera transversal baja y porche | 958 | 5 |
+| stone-house-cross-gable | Cruz con hastial frontal alto | 950 | 5 |
+| stone-house-tower-loft | Altillo de 7,46 m sobre ala baja | 1140 | 5 |
 
 ## Reproducción
 
 1. `node art/recipes/house-variant-candidate/design.mjs`
 2. `blender --background --python art/recipes/house-variant-candidate/build-candidates.py`
+3. `blender --background --python art/recipes/house-variant-candidate/comparison-v2.py`
+4. `npx tsx art/recipes/house-variant-candidate/validate-v2.ts`
 
-El generador produce los cinco JSON de esta carpeta a partir de las recetas originales. El adaptador Blender consume también `candidateBuild`: juntas, biseles, eliminación de caras enterradas y pivote. Es necesario usar este adaptador para reproducir los GLB: el constructor genérico no aplica esa extensión. Se puede construir uno pasando `-- <id>` después del script.
+Cada receta JSON incluye `candidateBuild`: juntas de piedra, eliminación de caras enterradas y pivote de puerta. El adaptador de esta carpeta es necesario. Las hojas muestran tres cuartos con el vector de reposo, frente, perfil y escala junto a aldeano/casas publicados. `artifacts/graphics/astra/house-variants-v2/comparison-rest.png` compara las seis casas a escala común, también reducidas a unos 55 px de ancho.
 
-Salida por modelo: `artifacts/graphics/astra/<id>/`, con `<id>.glb`, `sheet.png`, cuatro capturas individuales, `metrics.json` y `README.md`. Las hojas muestran tres cuartos, frente, frente opuesto y comparación a escala con aldeano, house y stone-house publicados. Dimensiones precisas y materiales en cada README y metrics.json.
+## Contrato
 
-## Geometría y contrato
+Recetas en metros y exportación a 1/3: parcela 6×6 m = 2×2 celdas. Se conservan literalmente las tres ventanas y las primitivas de puerta de los originales. Bisagra madera `[2.5, .28, 0]` m y piedra `[2.475, .25, 0]` m en Blender; glTF convierte a Y arriba. El umbral heredado baja 0,0025 celdas. Los materiales y colores no cambian; `window` incluye también fondos oscuros no emisivos. Ninguna textura. Una malla por material, puerta independiente, compatible con mergeStatic.
 
-Parcela 6×6 m = 2×2 celdas. Receta en metros, Blender Z arriba, exportación a escala 1/3. Se conservan origen y orientación originales. El fondo del umbral heredado alcanza −0,0025 celdas; no se altera. Las pequeñas desviaciones del límite 2,0 en los GLB son precisión de coma flotante.
-
-La puerta es la malla `<id>_door`, con origen en la bisagra izquierda: madera `[2.5, 0.28, 0]` m; piedra `[2.475, 0.25, 0]` m, en Blender. Las piezas de puerta y las tres ventanas conservan exactamente sus primitivas, dimensiones y posiciones respecto a los modelos base. No hay ventanas nuevas. El material `window` incluye también fondos oscuros heredados: la integración no debe convertir todo ese material en emisivo.
-
-La piedra incorpora hiladas alternadas, juntas retranqueadas y biseles de 2,5–3,5 cm. Usa el mismo material `stone`, sin texturas ni nuevos colores. Se eliminan solo polígonos enteros estrictamente contenidos en otro sólido; puertas y huecos oscuros quedan excluidos. Los pequeños puntos oscuros en cumbreras y marcos son sombras de contacto: una reconstrucción frontal de house-twin-gable conservando todas sus caras originales produjo una captura idéntica píxel a píxel.
-
-Recuento de triángulos, nombres de puerta, pivotes y ausencia de texturas comprobados directamente en los cinco GLB. Sin preguntas de diseño pendientes. La revisión cubre recetas, GLB y capturas; integración, emisión nocturna y estaciones corresponden a la sesión principal. No se han ejecutado tests ni modificado los modelos publicados.
+Validación: esquema de las cinco recetas, validador GLB del proyecto, identidad de aberturas/puertas/materiales, bisagras exportadas y presupuestos 900/1200; importación Blender y revisión visual de GLB. Integración, estaciones, iluminación nocturna y prueba en el juego corresponden al carril principal.

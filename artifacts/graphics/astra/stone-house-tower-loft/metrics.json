@@ -1,11 +1,12 @@
 {
+  "meshes": 5,
   "id": "stone-house-tower-loft",
-  "triangles": 1198,
+  "triangles": 1140,
   "triangleLimit": 1200,
-  "recipePrimitiveTriangles": 818,
+  "recipePrimitiveTriangles": 784,
   "dimensionsMetres": [
     6.000000357627869,
-    5.637500166893005,
+    7.46750020980835,
     6.000000357627869
   ],
   "boundsBlenderCells": {
@@ -17,7 +18,7 @@
     "max": [
       2.0,
       2.0,
-      1.8766666650772095
+      2.486666679382324
     ]
   },
   "doorPivotMetres": [

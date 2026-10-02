@@ -112,7 +112,7 @@ def build(id):
     assert b[0]-a[0]<=2.00001 and b[1]-a[1]<=2.00001
     out=ROOT/'artifacts/graphics/astra'/id;out.mkdir(parents=True,exist_ok=True)
     bpy.ops.export_scene.gltf(filepath=str(out/(id+'.glb')),export_format='GLB',export_yup=True,export_animations=False,export_cameras=False,export_lights=False)
-    metrics=dict(id=id,triangles=triangles,triangleLimit=cfg['triangleLimit'],recipePrimitiveTriangles=before,dimensionsMetres=[(b[i]-a[i])*3 for i in [0,2,1]],boundsBlenderCells=dict(min=a,max=b),doorPivotMetres=cfg['doorPivot'],materials={m['name']:colors[m['role']] for m in r['materials']})
+    metrics=dict(meshes=len(objects),id=id,triangles=triangles,triangleLimit=cfg['triangleLimit'],recipePrimitiveTriangles=before,dimensionsMetres=[(b[i]-a[i])*3 for i in [0,2,1]],boundsBlenderCells=dict(min=a,max=b),doorPivotMetres=cfg['doorPivot'],materials={m['name']:colors[m['role']] for m in r['materials']})
     (out/'metrics.json').write_text(json.dumps(metrics,indent=2)+'\n')
     bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(out/(id+'.glb')))
     objects=[o for o in bpy.context.scene.objects if o.type=='MESH'];bpy.context.view_layer.update();a,b=bounds(objects)
@@ -125,7 +125,7 @@ def build(id):
     bpy.ops.mesh.primitive_plane_add(size=100,location=(0,0,-.006));ground=bpy.context.object
     mat=bpy.data.materials.new('ReviewGround');mat.diffuse_color=(.64,.68,.54,1);ground.data.materials.append(mat)
     center=mathutils.Vector([(a[i]+b[i])/2 for i in range(3)]);span=max(b[i]-a[i] for i in range(3));images=[]
-    for idx,(name,direction) in enumerate([('three-quarter',(1,-1.5,1.1)),('front',(0,-1,.05)),('opposite',(-1,-1.5,1.1)),('scale',(1,-1.5,1.1))]):
+    for idx,(name,direction) in enumerate([('three-quarter',(1,-1.15,.9)),('front',(0,-1,.05)),('profile',(1,0,.05)),('scale',(1,-1.15,.9))]):
         if idx==3:
             objects+=reference('villager',(2.35,1));objects+=reference('house',(3.2,1));objects+=reference('stone-house',(5.5,1))
             bpy.context.view_layer.update();a,b=bounds(objects);center=mathutils.Vector([(a[i]+b[i])/2 for i in range(3)]);span=max(b[i]-a[i] for i in range(3))
@@ -137,13 +137,13 @@ def build(id):
     dims=metrics['dimensionsMetres']
     (out/'README.md').write_text(f'''# {id} · candidato de vivienda
 
-27 sep 2026. {triangles} triángulos / {cfg['triangleLimit']}; {len(materials)} materiales, sin texturas, facetas planas.
+2 oct 2026. {triangles} triángulos / {cfg['triangleLimit']}; {len(materials)} materiales, sin texturas, facetas planas.
 
 - Caja X × alto × fondo: {dims[0]:.3f} × {dims[1]:.3f} × {dims[2]:.3f} m. Parcela 6×6 m = 2×2 celdas, mismo origen y orientación que el publicado.
 - Puerta `{id}_door`, pivote de bisagra en {cfg['doorPivot']} m (Blender). Las tres ventanas originales, carpinterías y piezas de puerta conservan sus medidas y posiciones.
 - Paleta: {', '.join(k+' '+v for k,v in metrics['materials'].items())}.
 - En los modelos de piedra, la mampostería usa juntas retranqueadas, hiladas alternadas y biseles de 2,5–3,5 cm; conserva el material stone. Se eliminan sólo caras enteras estrictamente enterradas en otro sólido. Puerta y huecos oscuros excluidos de esa simplificación.
-- `sheet.png`: tres cuartos y frente arriba, frente opuesto abajo izquierda, comparación sin reescalar con aldeano, house y stone-house publicados abajo derecha (candidato a la izquierda).
+- `sheet.png`: tres cuartos y frente arriba, perfil abajo izquierda, comparación sin reescalar con aldeano, house y stone-house publicados abajo derecha (candidato a la izquierda).
 - Fuente única de diseño: `art/recipes/house-variant-candidate/design.mjs`; receta generada `{id}.json`. Ejecutar `node art/recipes/house-variant-candidate/design.mjs` y Blender con `--background --python art/recipes/house-variant-candidate/build-candidates.py`.
 
 Sin preguntas pendientes. Evidencia de GLB y renders de revisión; integración, emisión nocturna y estaciones quedan para la sesión principal. No se ha publicado ni ejecutado tests.

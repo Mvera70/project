@@ -1,23 +1,24 @@
 {
+  "meshes": 6,
   "id": "house-twin-gable",
-  "triangles": 708,
+  "triangles": 694,
   "triangleLimit": 900,
-  "recipePrimitiveTriangles": 736,
+  "recipePrimitiveTriangles": 724,
   "dimensionsMetres": [
-    6.000000715255737,
-    4.690500050783157,
-    6.000000089406967
+    6.0,
+    5.327500015497208,
+    6.0
   ],
   "boundsBlenderCells": {
     "min": [
       0.0,
-      -2.9802322387695312e-08,
+      0.0,
       -0.0025000274181365967
     ],
     "max": [
-      2.000000238418579,
       2.0,
-      1.5609999895095825
+      2.0,
+      1.7733333110809326
     ]
   },
   "doorPivotMetres": [

@@ -12,7 +12,7 @@
       2,
       2
     ],
-    "note": "Segunda variante original: cuerpo alto de entramado bajo cubierta piramidal de cuatro aguas. Exactamente tres ventanas y puerta originales; sin huecos nuevos."
+    "note": "V2, 2 oct 2026: silueta reconstruida para lectura móvil; tres ventanas, puerta y origen conservados literalmente."
   },
   "materials": [
     {
@@ -64,12 +64,12 @@
       "location": [
         3,
         3,
-        1.42
+        1.15
       ],
       "dimensions": [
         5.16,
         5.16,
-        2.84
+        2.3
       ],
       "material": "plaster",
       "parent": "Root"
@@ -161,12 +161,12 @@
       "location": [
         0.45,
         0.4,
-        1.52
+        1.27
       ],
       "dimensions": [
         0.16,
         0.15,
-        2.57
+        2.05
       ],
       "material": "wood",
       "parent": "Root",
@@ -178,12 +178,12 @@
       "location": [
         0.45,
         5.6,
-        1.52
+        1.27
       ],
       "dimensions": [
         0.16,
         0.15,
-        2.57
+        2.05
       ],
       "material": "wood",
       "parent": "Root",
@@ -195,12 +195,12 @@
       "location": [
         3,
         5.6,
-        1.52
+        1.27
       ],
       "dimensions": [
         0.16,
         0.15,
-        2.57
+        2.05
       ],
       "material": "wood",
       "parent": "Root",
@@ -212,12 +212,12 @@
       "location": [
         5.55,
         0.4,
-        1.52
+        1.27
       ],
       "dimensions": [
         0.16,
         0.15,
-        2.57
+        2.05
       ],
       "material": "wood",
       "parent": "Root",
@@ -229,12 +229,12 @@
       "location": [
         5.55,
         5.6,
-        1.52
+        1.27
       ],
       "dimensions": [
         0.16,
         0.15,
-        2.57
+        2.05
       ],
       "material": "wood",
       "parent": "Root",
@@ -263,7 +263,7 @@
       "location": [
         3,
         0.4,
-        2.77
+        2.23
       ],
       "dimensions": [
         5.34,
@@ -297,7 +297,7 @@
       "location": [
         3,
         5.6,
-        2.77
+        2.23
       ],
       "dimensions": [
         5.34,
@@ -331,7 +331,7 @@
       "location": [
         0.4,
         3,
-        2.77
+        2.23
       ],
       "dimensions": [
         0.17,
@@ -348,12 +348,12 @@
       "location": [
         0.4,
         3,
-        1.52
+        1.28
       ],
       "dimensions": [
         0.16,
         0.16,
-        2.57
+        2.02
       ],
       "material": "wood",
       "parent": "Root",
@@ -382,7 +382,7 @@
       "location": [
         5.6,
         3,
-        2.77
+        2.23
       ],
       "dimensions": [
         0.17,
@@ -399,12 +399,12 @@
       "location": [
         5.6,
         3,
-        1.52
+        1.28
       ],
       "dimensions": [
         0.16,
         0.16,
-        2.57
+        2.02
       ],
       "material": "wood",
       "parent": "Root",
@@ -789,10 +789,10 @@
       "location": [
         3,
         3,
-        3.9
+        3.9000000000000004
       ],
       "radius": 4.242640687119285,
-      "depth": 2.12,
+      "depth": 2.9,
       "vertices": 4,
       "rotationDegrees": [
         0,
@@ -805,14 +805,14 @@
     },
     {
       "type": "cube",
-      "name": "House_HipCourseX_0_25_n1",
+      "name": "HipX_0_28_n1",
       "location": [
         3,
-        0.75,
-        3.395
+        0.8399999999999999,
+        3.2870000000000004
       ],
       "dimensions": [
-        4.57,
+        4.32,
         0.09,
         0.07
       ],
@@ -821,15 +821,15 @@
     },
     {
       "type": "cube",
-      "name": "House_HipCourseY_0_25_n1",
+      "name": "HipY_0_28_n1",
       "location": [
-        0.75,
+        0.8399999999999999,
         3,
-        3.395
+        3.2870000000000004
       ],
       "dimensions": [
         0.09,
-        4.57,
+        4.32,
         0.07
       ],
       "material": "roof",
@@ -837,46 +837,14 @@
     },
     {
       "type": "cube",
-      "name": "House_HipCourseX_0_25_1",
+      "name": "HipX_0_28_1",
       "location": [
         3,
-        5.25,
-        3.395
+        5.16,
+        3.2870000000000004
       ],
       "dimensions": [
-        4.57,
-        0.09,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseY_0_25_1",
-      "location": [
-        5.25,
-        3,
-        3.395
-      ],
-      "dimensions": [
-        0.09,
-        4.57,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseX_0_55_n1",
-      "location": [
-        3,
-        1.6500000000000001,
-        4.031000000000001
-      ],
-      "dimensions": [
-        2.7699999999999996,
+        4.32,
         0.09,
         0.07
       ],
@@ -885,15 +853,15 @@
     },
     {
       "type": "cube",
-      "name": "House_HipCourseY_0_55_n1",
+      "name": "HipY_0_28_1",
       "location": [
-        1.6500000000000001,
+        5.16,
         3,
-        4.031000000000001
+        3.2870000000000004
       ],
       "dimensions": [
         0.09,
-        2.7699999999999996,
+        4.32,
         0.07
       ],
       "material": "roof",
@@ -901,14 +869,14 @@
     },
     {
       "type": "cube",
-      "name": "House_HipCourseX_0_55_1",
+      "name": "HipX_0_58_n1",
       "location": [
         3,
-        4.35,
-        4.031000000000001
+        1.7399999999999998,
+        4.157
       ],
       "dimensions": [
-        2.7699999999999996,
+        2.5200000000000005,
         0.09,
         0.07
       ],
@@ -917,15 +885,15 @@
     },
     {
       "type": "cube",
-      "name": "House_HipCourseY_0_55_1",
+      "name": "HipY_0_58_n1",
       "location": [
-        4.35,
+        1.7399999999999998,
         3,
-        4.031000000000001
+        4.157
       ],
       "dimensions": [
         0.09,
-        2.7699999999999996,
+        2.5200000000000005,
         0.07
       ],
       "material": "roof",
@@ -933,14 +901,46 @@
     },
     {
       "type": "cube",
-      "name": "House_HipCourseX_0_8_n1",
+      "name": "HipX_0_58_1",
+      "location": [
+        3,
+        4.26,
+        4.157
+      ],
+      "dimensions": [
+        2.5200000000000005,
+        0.09,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "HipY_0_58_1",
+      "location": [
+        4.26,
+        3,
+        4.157
+      ],
+      "dimensions": [
+        0.09,
+        2.5200000000000005,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "HipX_0_8_n1",
       "location": [
         3,
         2.4000000000000004,
-        4.561
+        4.795
       ],
       "dimensions": [
-        1.2699999999999998,
+        1.1999999999999997,
         0.09,
         0.07
       ],
@@ -949,15 +949,15 @@
     },
     {
       "type": "cube",
-      "name": "House_HipCourseY_0_8_n1",
+      "name": "HipY_0_8_n1",
       "location": [
         2.4000000000000004,
         3,
-        4.561
+        4.795
       ],
       "dimensions": [
         0.09,
-        1.2699999999999998,
+        1.1999999999999997,
         0.07
       ],
       "material": "roof",
@@ -965,14 +965,14 @@
     },
     {
       "type": "cube",
-      "name": "House_HipCourseX_0_8_1",
+      "name": "HipX_0_8_1",
       "location": [
         3,
         3.5999999999999996,
-        4.561
+        4.795
       ],
       "dimensions": [
-        1.2699999999999998,
+        1.1999999999999997,
         0.09,
         0.07
       ],
@@ -981,15 +981,15 @@
     },
     {
       "type": "cube",
-      "name": "House_HipCourseY_0_8_1",
+      "name": "HipY_0_8_1",
       "location": [
         3.5999999999999996,
         3,
-        4.561
+        4.795
       ],
       "dimensions": [
         0.09,
-        1.2699999999999998,
+        1.1999999999999997,
         0.07
       ],
       "material": "roof",
@@ -999,14 +999,14 @@
       "type": "cube",
       "name": "House_Chimney",
       "location": [
-        4.55,
-        4.55,
-        3.65
+        4.8,
+        4.7,
+        3.175
       ],
       "dimensions": [
-        0.45,
-        0.45,
-        1.7
+        0.5,
+        0.5,
+        1.15
       ],
       "material": "stone",
       "parent": "Root"
@@ -1015,14 +1015,14 @@
       "type": "cube",
       "name": "House_ChimneyCap",
       "location": [
-        4.55,
-        4.55,
-        4.47
+        4.8,
+        4.7,
+        3.75
       ],
       "dimensions": [
-        0.61,
-        0.61,
-        0.15
+        0.68,
+        0.68,
+        0.16
       ],
       "material": "stone",
       "parent": "Root"
@@ -1031,14 +1031,14 @@
       "type": "cube",
       "name": "House_ChimneyOpening",
       "location": [
-        4.55,
-        4.55,
-        4.554
+        4.8,
+        4.7,
+        3.835
       ],
       "dimensions": [
-        0.34,
-        0.34,
-        0.018
+        0.36,
+        0.36,
+        0.01
       ],
       "material": "window",
       "parent": "Root"

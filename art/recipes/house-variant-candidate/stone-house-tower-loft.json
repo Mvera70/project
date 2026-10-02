@@ -12,7 +12,7 @@
       2,
       2
     ],
-    "note": "Segunda variante original: vivienda compacta con altillo lateral alto y cubierta piramidal independiente, sin almenas ni iconografía militar; tres ventanas y puerta originales."
+    "note": "V2, 2 oct 2026: silueta reconstruida para lectura móvil; tres ventanas, puerta y origen conservados literalmente."
   },
   "materials": [
     {
@@ -924,7 +924,7 @@
       ],
       "width": 6,
       "depth": 6,
-      "height": 1.03,
+      "height": 0.75,
       "rotationDegrees": [
         0,
         0,
@@ -937,14 +937,14 @@
       "type": "cube",
       "name": "Stone_LoftWalls",
       "location": [
-        4.7,
-        4.7,
-        3.53
+        4.45,
+        3.95,
+        4.28
       ],
       "dimensions": [
-        2.04,
-        2.04,
-        2.14
+        2.65,
+        3.3,
+        3.44
       ],
       "material": "stone",
       "parent": "Root"
@@ -953,50 +953,161 @@
       "type": "cube",
       "name": "Stone_LoftBelt",
       "location": [
-        4.7,
-        4.7,
-        3.62
+        4.45,
+        3.95,
+        4.35
       ],
       "dimensions": [
-        2.16,
-        2.16,
-        0.15
+        2.8,
+        3.45,
+        0.2
       ],
-      "material": "stone",
+      "material": "wood",
       "parent": "Root"
     },
     {
-      "type": "cone",
+      "type": "gable",
       "name": "Stone_LoftRoof",
       "location": [
-        4.7,
-        4.7,
-        5.114999999999999
+        4.45,
+        3.95,
+        6
       ],
-      "radius": 1.8384776310850235,
-      "depth": 1.03,
-      "vertices": 4,
+      "width": 3.1,
+      "depth": 4.1,
+      "height": 1.38,
       "rotationDegrees": [
         0,
         0,
-        45
+        0
       ],
       "material": "roof",
-      "parent": "Root",
-      "smooth": false
+      "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Stone_LowRidge",
+      "name": "Stone_LoftRidge",
       "location": [
-        1.8,
-        3,
-        3.63
+        4.45,
+        3.95,
+        7.39
       ],
       "dimensions": [
-        3.6,
-        0.19,
-        0.13
+        0.17,
+        4.1,
+        0.14
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LoftPost_3_2",
+      "location": [
+        3.2,
+        2.27,
+        5.15
+      ],
+      "dimensions": [
+        0.15,
+        0.13,
+        1.65
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LoftPost_4_45",
+      "location": [
+        4.45,
+        2.27,
+        5.15
+      ],
+      "dimensions": [
+        0.15,
+        0.13,
+        1.65
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Stone_LoftPost_5_7",
+      "location": [
+        5.7,
+        2.27,
+        5.15
+      ],
+      "dimensions": [
+        0.15,
+        0.13,
+        1.65
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RoofCourse_59",
+      "location": [
+        3.9850000000000003,
+        3.95,
+        6.9910000000000005
+      ],
+      "dimensions": [
+        0.085,
+        4.1,
+        0.065
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RoofCourse_60",
+      "location": [
+        3.4425,
+        3.95,
+        6.508
+      ],
+      "dimensions": [
+        0.085,
+        4.1,
+        0.065
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RoofCourse_61",
+      "location": [
+        4.915,
+        3.95,
+        6.9910000000000005
+      ],
+      "dimensions": [
+        0.085,
+        4.1,
+        0.065
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RoofCourse_62",
+      "location": [
+        5.4575000000000005,
+        3.95,
+        6.508
+      ],
+      "dimensions": [
+        0.085,
+        4.1,
+        0.065
       ],
       "material": "roof",
       "parent": "Root"
@@ -1005,14 +1116,14 @@
       "type": "cube",
       "name": "Stone_Chimney",
       "location": [
-        1.4,
-        4.4,
-        3.2
+        1.2,
+        4.7,
+        3.125
       ],
       "dimensions": [
-        0.52,
-        0.52,
-        1.9
+        0.5,
+        0.5,
+        1.0499999999999998
       ],
       "material": "stone",
       "parent": "Root"
@@ -1021,14 +1132,14 @@
       "type": "cube",
       "name": "Stone_ChimneyCap",
       "location": [
-        1.4,
-        4.4,
-        4.14
+        1.2,
+        4.7,
+        3.65
       ],
       "dimensions": [
         0.68,
         0.68,
-        0.15
+        0.16
       ],
       "material": "stone",
       "parent": "Root"
@@ -1037,176 +1148,16 @@
       "type": "cube",
       "name": "Stone_ChimneyOpening",
       "location": [
-        1.4,
-        4.4,
-        4.224
+        1.2,
+        4.7,
+        3.735
       ],
       "dimensions": [
-        0.38,
-        0.38,
-        0.018
+        0.36,
+        0.36,
+        0.01
       ],
       "material": "window",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Stone_LowTile_0_6",
-      "location": [
-        3,
-        0.6,
-        2.831
-      ],
-      "dimensions": [
-        5.98,
-        0.09,
-        0.065
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Stone_LowTile_1_45",
-      "location": [
-        3,
-        1.45,
-        3.1228333333333333
-      ],
-      "dimensions": [
-        5.98,
-        0.09,
-        0.065
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Stone_LowTile_2_3",
-      "location": [
-        3,
-        2.3,
-        3.4146666666666667
-      ],
-      "dimensions": [
-        5.98,
-        0.09,
-        0.065
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Stone_LowTile_3_7",
-      "location": [
-        1.82,
-        3.7,
-        3.4146666666666667
-      ],
-      "dimensions": [
-        3.62,
-        0.09,
-        0.065
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Stone_LowTile_4_55",
-      "location": [
-        1.82,
-        4.55,
-        3.1228333333333333
-      ],
-      "dimensions": [
-        3.62,
-        0.09,
-        0.065
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Stone_LowTile_5_4",
-      "location": [
-        1.82,
-        5.4,
-        2.831
-      ],
-      "dimensions": [
-        3.62,
-        0.09,
-        0.065
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Stone_LoftQuoin_3_72_3_72",
-      "location": [
-        3.72,
-        3.72,
-        4.1
-      ],
-      "dimensions": [
-        0.22,
-        0.22,
-        0.65
-      ],
-      "material": "stone",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Stone_LoftQuoin_3_72_5_68",
-      "location": [
-        3.72,
-        5.68,
-        4.1
-      ],
-      "dimensions": [
-        0.22,
-        0.22,
-        0.65
-      ],
-      "material": "stone",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Stone_LoftQuoin_5_68_3_72",
-      "location": [
-        5.68,
-        3.72,
-        4.1
-      ],
-      "dimensions": [
-        0.22,
-        0.22,
-        0.65
-      ],
-      "material": "stone",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Stone_LoftQuoin_5_68_5_68",
-      "location": [
-        5.68,
-        5.68,
-        4.1
-      ],
-      "dimensions": [
-        0.22,
-        0.22,
-        0.65
-      ],
-      "material": "stone",
       "parent": "Root"
     }
   ],
@@ -1240,14 +1191,14 @@
     "masonry": [
       {
         "primitive": "Stone_Walls",
-        "rows": 4,
+        "rows": 3,
         "columns": 3,
         "relief": 0.035,
         "joint": 0.035
       },
       {
         "primitive": "Stone_LoftWalls",
-        "rows": 2,
+        "rows": 3,
         "columns": 2,
         "relief": 0.025,
         "joint": 0.035

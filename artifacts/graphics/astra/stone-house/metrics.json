@@ -1,23 +1,24 @@
 {
+  "meshes": 5,
   "id": "stone-house",
-  "triangles": 1048,
+  "triangles": 958,
   "triangleLimit": 1200,
-  "recipePrimitiveTriangles": 764,
+  "recipePrimitiveTriangles": 748,
   "dimensionsMetres": [
-    6.000000357627869,
-    4.7174999713897705,
-    6.000000357627869
+    6.000000089406967,
+    4.297500371932983,
+    6.0
   ],
   "boundsBlenderCells": {
     "min": [
-      -1.1920928955078125e-07,
-      -1.1920928955078125e-07,
+      -2.9802322387695312e-08,
+      0.0,
       -0.0025000572204589844
     ],
     "max": [
       2.0,
       2.0,
-      1.5699999332427979
+      1.4300000667572021
     ]
   },
   "doorPivotMetres": [
