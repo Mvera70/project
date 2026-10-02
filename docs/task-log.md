@@ -29,6 +29,76 @@ forastero del vado sigue entrando por el camino pintado: RD-1 fija su hora.
 Siguiente: **el valle con forma natural** (el segundo abierto de v5.55), que
 es del motor y se mide antes de proponer nada.
 
+## 2 oct 2026 · Dientes de sierra en la tablet (v5.65)
+
+Rama `ccr-2befdb3e-qwp7lu`. La tablet de Vera es una **iPlay 70 mini Ultra**
+(Android 14, Adreno 725, 2560×1600 a 144 Hz). Medium caía al 50 % de
+resolución porque la adaptativa bajaba sin comprobar que bajar acortara el
+fotograma; ahora una bajada que no paga se deshace, y el suelo de Medium es un
+píxel por píxel CSS. Medido en el contenedor (aparato limitado por CPU: antes
+0,5, ahora 1, tres de tres) y con hojas antes/después a 390 y 750
+(`docs/medidas/dientes-de-sierra-tablet-2026-10-02.md`). **Abierto, en la
+tablet** (aldea 11/21, panel de taller): (1) qué resolución y si sale «(CPU)»;
+(2) `?aa=msaa` contra sin nada: si los fps no bajan más de un 10 %, MSAA pasa
+a Medium en v5.66 (v5.66–v5.67 reservadas para eso).
+
+## 1 oct 2026 · La suite rápida vuelve a ser rápida (v5.56) — carril motor/pruebas
+
+Rama `claude/pruebas-lentas-a-jornadas`, desde `main`. El trabajo `fast` de CI
+tardaba 36 min y los trozos de jornadas 11, 33 y 30 (vuelta 36930779436).
+**Hecho:** 31 ficheros enteros y lo lento de otros 43 a `tests/journeys/`, con
+el mismo cuerpo y el mismo umbral (2343 registros antes y después, título a
+título; 15 `it.fails`; 54 `it.each`); `threat` y `wall-rings` partidas en dos;
+seis trozos repartidos por peso (`tests/journeys/shard-weights.ts`). Medido en
+local: `npm test` 262 s (4 hilos), 2087 pruebas. En CI: `npm test` **2 min 39 s** (antes 36 min) y el trabajo `fast` entero 3 min 30 s; los seis trozos de jornadas, 18:27, 13:08, 15:22, 16:31, 17:44 y 12:39 (antes 11, 33 y 30 min); la vuelta entera, **19 min** (vuelta 36948242697).
+**Lo que se aprendió:** el tiempo por fichero de vitest no cuenta la recogida
+(una partida en el cuerpo de un `describe` la paga antes de la primera prueba:
+`catalogue-coverage` decía 0,1 s y gasta 487), y mudar la prueba lenta de una
+caché compartida pasa la cuenta a la siguiente. Se mide con
+`vitest run <fichero> -t '^nada$'` y con la suite entera después de mudar.
+**Abierto:** (1) quedan en `fast` pruebas de ~3 s en local que son la primera
+que llena su aldea (`fate`, `life-beasts`, `graphics-world`, `means`); (2) la
+recogida de la suite rápida (~380 s sumados en local, importar Three y Rapier
+en cada fichero) pesa ya tanto como sus pruebas; (3) citas a ficheros mudados
+fuera de este carril: `docs/design.md` (`density`, `life-expeditions`,
+`life-perf`), `tools/README.md` (`reader-packet`) y un comentario de
+`src/render3d/life/staging.ts` (`life-staging`) —son del director—; (4) si una
+jornada nueva pasa de ~100 s, se apunta su peso en `shard-weights.ts`.
+
+## 2 oct 2026 · Piedras de orilla, zorro, encrucijada a 600 (v5.55) · y dos abiertos
+
+Hecho: las piedras de la calzada en grupos de canto rodado; el zorro vuelve
+andando a su linde al amanecer; la hoja de la encrucijada a 600 px, centrada;
+el encargo de sus quince viñetas a Codex (`docs/encargos/ilustraciones-encrucijada.md`);
+las tomas de los plantones y del frente de tala lejano. En vuelo, en otra
+sesión: mudar las pruebas lentas de la suite rápida a las jornadas (rama
+`claude/pruebas-lentas-a-jornadas`, v5.56).
+
+**Abierto, para otra sesión: el camino de la garganta flota** (Vera, 2 oct:
+«el camino sigue flotando… no sé cómo llegan las visitas al valle»). Medido,
+semillas 7/11/23: del 61 al 96 % de los vértices de la cinta más de 0,35
+celdas por encima de la malla que se dibuja, el peor a 22 celdas. Tres causas,
+de menos a más honda:
+
+1. La cota se lee de la fórmula `ridgeAt`, pero la malla de la sierra lleva un
+   vértice cada 2–4 celdas, movidos de su nudo: entre vértices no es la
+   fórmula. Leer la malla dibujada baja el peor caso de 22 a 4–10 celdas.
+2. `ROAD_GRADE` sólo sube: una muestra que roza un cortado levanta una
+   calzada en rampa de decenas de celdas. Quitarla rompe «la senda no tiene
+   muros» (`valley-road`): la cinta trepa 6,5 celdas entre dos muestras.
+3. **La de fondo:** fuera del mapa el suelo del cañón sigue el eje del valle
+   (`valleyShoulder`, recto), pero el río se curva hasta 2,8 celdas
+   (`riverSection`); la senda, que va en seco por fuera del río, no cabe en el
+   fondo y sube por la pared. Hay que trazar la senda por el fondo real (que
+   `gorgeRoadPaths` mire `ridgeAt` fuera del mapa, como mira el suelo dentro)
+   o que el cañón siga al río. Densificar la malla a paso 1 en el pasillo no
+   sirve: de 18 000 a 31 600 triángulos y flotaba más.
+
+**Abierto, para otra sesión: el valle es un rectángulo** («no es muy
+cuadrado, debería tener una forma más natural, y zonas muy desaprovechadas»).
+Es el corazón productivo de 36 × 56 del mapa de 72 × 112: cambio del motor, mueve
+todas las trayectorias. Va con el camino, porque los dos tocan el eje y la garganta.
+
 ## 2 oct 2026 · Lo que Vera vio en la tablet (v5.54)
 
 Hecho y en PR: las laderas sin el suelo asomando por la piel, las piedras de la

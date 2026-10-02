@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/ui-redesign-people-long.test.ts` (v5.56).
+//
 // UI-R4 · Propiedades puras de `redesign/people-panel.ts` y
 // `redesign/inspect-panel.ts`. `docs/ui-redesign/implementation-plan.md`
 // §2.5, §4; `docs/ui-redesign/acceptance-scenarios.md` AC-9, AC-10, AC-11,
@@ -23,25 +25,6 @@ import { trackedIdFor } from '@ui/redesign/inspect-panel';
 import { namedPresent, peopleScope } from '@ui/redesign/people-panel';
 
 describe('namedPresent · filtro nombrados/presentes (U-08, AC-9)', () => {
-  it('coincide exactamente con nombrados && isHere, en el orden del motor', () => {
-    const state = foundTwenty(7);
-    run(state, 20 * TIME.WEEKS_PER_YEAR, 'first', CATALOG);
-    const expected = state.people.villagers.filter((v) => v.named && isHere(v));
-    expect(expected.length).toBeGreaterThan(0);
-    expect(namedPresent(state)).toEqual(expected);
-  });
-
-  it('a los veinte años hay nombrados muertos o marchados que la lista no enseña', () => {
-    // La propia lista de U-08 ya lo comprobaba (`tests/fast/ui.test.ts`): esto
-    // repite la misma propiedad contra la función pura que ahora usa el panel.
-    const state = foundTwenty(7);
-    run(state, 20 * TIME.WEEKS_PER_YEAR, 'first', CATALOG);
-    const gone = state.people.villagers.filter((v) => v.named && !isHere(v));
-    expect(gone.length).toBeGreaterThan(0);
-    const shown = namedPresent(state);
-    for (const v of gone) expect(shown).not.toContain(v);
-  });
-
   it('es pura: la misma llamada con dos estados distintos nunca mezcla sus resultados', () => {
     // AC-9: "volver a la lista no selecciona otra identidad". No hay estado
     // interno que perpetuar entre dos partidas: se comprueba llamando dos

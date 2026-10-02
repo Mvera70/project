@@ -1268,6 +1268,11 @@ html:has(.valley-board-veil) .valley-compass { visibility: hidden; }
    pantalla: el canto, estirado, era un recuadro vacío sobre el título. El
    tirador no engaña: deslizar la cabecera hacia abajo aparca la decisión
    (§11.2, `crossroad.ts`). */
+/* Y con su ancho: a 600 px como mucho, centrada, con valle a los lados en la
+   tablet (Vera, 2 oct 2026: «descentrado y sin margen» a todo el ancho;
+   «600 o así creo que valdrán»). La franja de arriba va con ella. */
+:root .crossroad,
+:root .crossroad-fade { width: min(100%, 600px); }
 :root .crossroad {
   padding-top: 34px;
   border-radius: 14px 14px 0 0;

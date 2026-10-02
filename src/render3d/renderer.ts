@@ -1252,10 +1252,10 @@ export async function createGraphicsRenderer(
       snowing < 0.5 ? (x, z) => meadowWeight(terrainSeed, x, z) : undefined, road.wear);
     if (signposts !== null) world.remove(signposts);
     signposts = buildSignposts(road.signposts, (x, z) => elevationAt(state.map, x, z));
-    // Y en la villa, piedras sueltas por la calzada, con la forma de un peñasco de Astra.
+    // Y en la villa, piedras por la calzada, en grupos de canto rodado.
     // Fuera del pueblo: entre las casas y en la plaza la calle está barrida
     // (Vera, 2 oct 2026: «hay también que quitarlas del pueblo»).
-    const roadStones = buildRoadStones(road, state.map, terrainSeed, rockGeometry(library.get('crag-2')?.original) ?? null,
+    const roadStones = buildRoadStones(road, state.map, terrainSeed,
       (x, z) => elevationAt(state.map, x, z), palette.stone, townCells(state, plazaOf(state)));
     if (roadStones !== null) signposts.add(roadStones);
     world.add(signposts);
@@ -1916,6 +1916,9 @@ export async function createGraphicsRenderer(
     calls: renderer.info.render.calls,
     triangles: renderer.info.render.triangles,
     scale: renderScale,
+    // v5.65 · si la adaptativa probó a bajar y no acortó el fotograma: en el
+    // aparato, la señal de que lo que pesa es la CPU y no los píxeles.
+    scaleUnpaid: adapt.unpaidAt !== null,
     level: profile.level,
     targetFps: profile.targetFps,
     renderMs: lastRenderMs,
@@ -3226,7 +3229,7 @@ declare global {
     __valleyBattle?: (choice: { raiders: number; hands: number; arm: Arm; shadow?: number } | null) => void;
     __valleyBattleStats?: () => BattleStats;
     __valleyRenderStats?: () => {
-      calls: number; triangles: number; scale: number; level: string; targetFps: number;
+      calls: number; triangles: number; scale: number; scaleUnpaid: boolean; level: string; targetFps: number;
       renderMs: number; lifeMs: number; lifeSteps: number; paintMs: number;
       aa: string; aaBytes: number; revealed: number; trackedHidden: boolean | null;
     };

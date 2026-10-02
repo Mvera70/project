@@ -70,6 +70,94 @@ sigo viendo baldosas de madera mal puestas».
   `it.fails` del factor de grano pasan**: llega antes (0,32–0,36), los
   porteadores con él, y la moneda pasa entre 0,49 y 0,61.
 
+## v5.65 · 2 oct 2026 · Dientes de sierra en la tablet: la resolución sólo baja si bajar sirve
+
+Vera, con su tablet (iPlay 70 mini Ultra, Adreno 725, Medium @60): «se ve muy
+mal y con dientes de sierra todo», con el panel en «resolución 50 %». Medium
+dibuja a 1,5 de densidad sin MSAA, y la adaptativa lo bajaba a la mitad: 0,75
+píxeles por píxel CSS, cada uno tapando 2,7 de la pantalla. El estiramiento ya
+era lineal; faltaba resolución. Y la adaptativa bajaba **sin mirar si bajar
+servía**: en un aparato al que le pesa la CPU el fotograma tarda lo mismo a
+cualquier escala, y en ocho segundos estaba en el suelo sin ganar nada.
+
+- **Una bajada tiene que pagarse** (`adaptive-scale.ts`): la ventana siguiente
+  la juzga, y si el fotograma no se acortó la mitad de lo que se acortaría con
+  todo en píxeles, se deshace y no se reintenta hasta que empeore un 25 %. Los
+  8 primeros segundos del valle no deciden. En vivo, con un aparato limitado
+  por la CPU: antes 0,5 a los 8 s; ahora prueba 0,85, la deshace y se queda en
+  1, tres de tres.
+- **El suelo de Medium, un píxel por píxel CSS** (`profile.ts`, de 0,5 a
+  1/1,5), como ya tenía High.
+- **El panel de taller dice «(CPU)»** cuando bajar no pagó.
+
+Descartado con medida: FXAA (GV-3, sigue valiendo); alpha-to-coverage (las
+briznas son geometría sin alfa: no hay borde que suavizar); bajar sombras o
+hierba (ya van a cada 4 fotogramas y aligeradas en Medium, y no es lo que se
+ve dentado). **MSAA en Medium se decide en la tablet** con `?aa=msaa`: en
+SwiftShader cuesta un 33–36 % de fotogramas, en Adreno se espera menos de 1 ms.
+Medidas y hojas antes/después a 390 y 750:
+`docs/medidas/dientes-de-sierra-tablet-2026-10-02.md`.
+
+Pruebas: la adaptativa con un modelo de aparato (CPU, GPU y a medias, y con
+ruido de ±10 % en doce semillas) y el suelo de High y Medium
+(`adaptive-scale`, `graphics-profile`).
+
+## v5.56 · 1 oct 2026 · La suite rápida vuelve a ser rápida: lo lento, a las jornadas
+
+**Medido antes, en CI** (vuelta 36930779436 del 1 oct 2026): el trabajo `fast`
+tardaba **36 min** (`npm test`, 2172 s de reloj, 5808 s de prueba sumada en
+240 ficheros) y 71 ficheros pasaban de 10 s; los tres trozos de `journeys`,
+**11, 33 y 30 min**, desequilibrados porque vitest reparte por el hash de la
+ruta y uno se llevaba `threat` entera (1994 s en un solo hilo). La regla de
+Vera —ninguna espera de más de media hora— la rompían los dos.
+
+- **A las jornadas, con el mismo cuerpo y el mismo umbral**: 31 ficheros
+  enteros y lo lento de otros 43, que se parten en `tests/journeys/<nombre>-long.test.ts`
+  (lo barato se queda en `fast`). Ninguna prueba quitada ni convertida en
+  `skip`: 2343 registros antes y después, título a título, con los 15
+  `it.fails` y los 54 `it.each`. Cada fichero mudado dice de dónde viene y
+  cuánto tardaba.
+- **Dos trampas que el informe por fichero no enseña.** Una caché compartida
+  (`grown.get(...)`) la paga la primera prueba que la pide: al mudar la lenta,
+  la siguiente pasaba a tardar lo mismo, así que salen todas las que piden esa
+  aldea. Y **la recogida**: `ui-milestones`, `fate`, `life-beasts` y
+  `demography` juegan sus partidas en el cuerpo del `describe` (189, 148, 31 y
+  10 s en local) y ese tiempo no sale en el tiempo por fichero; en las
+  jornadas, `catalogue-coverage` (487 s) y `founding` (242 s) apuntaban 0,1 s.
+- **Seis trozos repartidos por peso** (`tests/journeys/shard-weights.ts` y un
+  secuenciador en `vitest.journeys.config.ts`): el más pesado primero, al trozo
+  que menos lleva, y dentro de cada trozo el largo empieza antes. `threat` y
+  `wall-rings` se parten en dos (`threat-defence`, `wall-rings-gates-era`)
+  porque un fichero corre entero en un hilo y eran más largos que un trozo.
+
+**Después, en local** (4 hilos): `npm test` 209 ficheros, 2087 pruebas, **262 s**;
+las 78 jornadas mudadas o partidas, 298 pruebas en verde. **En CI:** `npm test` **2 min 39 s** (antes 36 min) y el trabajo `fast` entero 3 min 30 s; los seis trozos de jornadas, 18:27, 13:08, 15:22, 16:31, 17:44 y 12:39 (antes 11, 33 y 30 min); la vuelta entera, **19 min** (vuelta 36948242697)
+
+## v5.55 · 2 oct 2026 · Las piedras de la calzada, en grupos de orilla
+
+Vera, sobre los cantos de v5.54: «haz grupos más realistas, típicas del río,
+algunas más grandes, otras más pequeñas; cuidado con el rendimiento». Fuera el
+peñasco de Astra, que es anguloso: un canto rodado propio (icosaedro de 80
+caras, vértices movidos un poco), aplastado por piedra. En una celda de cada
+tres, un canto grande (0,2–0,38 de celda), una mediana arrimada y de dos a
+cinco pequeñas **amontonadas hacia un lado**, casi tocándose (en anillo
+alrededor del grande salía una flor); en otras, un guijarro suelto. Cada
+piedra con su tono (`setColorAt`). Sigue siendo una malla instanciada, una
+llamada de dibujo, y la prueba pone el techo de triángulos en 40 000.
+Captura: `docs/medidas/k-img/piedras-grupos.png`.
+
+**El zorro vuelve andando al bosque al amanecer** (Vera: «por la noche se
+acerca a la aldea, correcto; pero luego desaparece al amanecer, no se ve irse
+al bosque»). `stepFox` lo llevaba a la madriguera de un salto en cuanto dejaba
+de ser de noche. Ahora, si el amanecer lo pilla fuera, vuelve andando a su
+linde y desaparece al entrar; de día no sale nunca. Hay un tope de seguridad
+por si la ruta se pierde: el doble de lo que tardaría en línea recta. Con un
+tope fijo de 600 pasos (12 celdas), la semilla 23 se quedaba a medio camino.
+
+Y las dos tomas que K1–K3 dejó pendientes en `encargos-3d.md`: los plantones
+(`k2-plantones.png`, se leen como bosque joven) y el frente de tala lejano
+(`k3-tala-lejos.png`, sin haz al hombro: sigue en encargo).
+
 ## v5.54 · 2 oct 2026 · Lo que Vera vio en la tablet: laderas, piedras, crónica y encrucijada
 
 Cuatro cosas que Vera marcó jugando la versión publicada, en la tablet.

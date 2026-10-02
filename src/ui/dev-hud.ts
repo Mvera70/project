@@ -12,6 +12,8 @@
 //       reparto del último fotograma: el dibujo, los pasos de vida (y cuántos)
 //       y el `paint` entero, en milisegundos. Añadido el 29 sep 2026 para
 //       leer desde la tablet de Vera dónde se van dos segundos por fotograma.
+//       «(CPU)» tras la resolución (v5.65): la adaptativa probó a bajarla y
+//       el fotograma no se acortó, así que lo que pesa no son los píxeles.
 //
 // Cuesta un `requestAnimationFrame` que sólo suma, y reescribir tres líneas
 // dos veces por segundo.
@@ -60,7 +62,7 @@ export function startDevHud(host: HTMLElement): DevHud {
       const lines = [`${fps.toFixed(0)} fps · peor ${worst.toFixed(0)} ms`];
       if (stats !== undefined) {
         lines.push(`${stats.calls} llamadas · ${(stats.triangles / 1000).toFixed(0)}k tri`);
-        lines.push(`${stats.level} @${stats.targetFps} · resolución ${(stats.scale * 100).toFixed(0)} % · dibujo ${stats.renderMs.toFixed(0)}`
+        lines.push(`${stats.level} @${stats.targetFps} · resolución ${(stats.scale * 100).toFixed(0)} %${stats.scaleUnpaid ? ' (CPU)' : ''} · dibujo ${stats.renderMs.toFixed(0)}`
           + ` · vida ${stats.lifeMs.toFixed(0)}/${stats.lifeSteps}p · paint ${stats.paintMs.toFixed(0)} ms`);
       }
       panel.textContent = lines.join('\n');

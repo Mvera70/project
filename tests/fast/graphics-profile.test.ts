@@ -33,6 +33,15 @@ describe('el perfil de render', () => {
     expect(resolveProfile({ quality: 'low', frameRate: 60 }, false)).toEqual(low);
   });
 
+  it('en Alto y Medio la adaptativa no baja de un píxel dibujado por píxel CSS', () => {
+    // Vera, 2 oct 2026, Medium en su tablet: «se ve muy mal y con dientes de
+    // sierra todo», con la resolución al 50 %: 0,75 píxeles por píxel CSS.
+    for (const quality of ['high', 'medium'] as const) {
+      const profile = resolveProfile({ quality, frameRate: 60 }, true);
+      expect(profile.pixelRatioCap * profile.lowestScale, quality).toBeGreaterThanOrEqual(1 - 1e-9);
+    }
+  });
+
   it('los umbrales de la adaptativa salen del objetivo, y a 60 caben en una pantalla de 60 Hz', () => {
     const at60 = resolveProfile(DEFAULT_GRAPHICS, false);
     const at30 = resolveProfile({ ...DEFAULT_GRAPHICS, frameRate: 30 }, false);

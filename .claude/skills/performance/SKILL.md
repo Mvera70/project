@@ -120,6 +120,8 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
    recolección, volver de otra pestaña— la bajaba 6 s. **Y el tope de fotogramas acumula
    citas** (`ui/loop.ts`, `frameDue`): contando desde el último dibujo, un tope de 60 en
    una pantalla de 90 Hz pintaba a 45 y la adaptativa hundía la resolución al suelo.
+   **Y desde v5.65 una bajada tiene que pagarse** (lección 24): si no acorta el
+   fotograma se deshace, y los primeros 8 s del valle no deciden.
 8. **`renderer.compileAsync` al montar el valle NO sirve tal cual**: los programas
    enlazados pasaron de 35 a 68 —compiló variantes con otro estado de luces/sombras que
    luego no se usaron— y se retiró. Precompilar bien pide hacerlo con la escena ya
@@ -243,6 +245,26 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
     una. Es lo que la PR #3 no hizo: sus modelos pesaban la mitad y tenían
     menos triángulos, y aun así casi doblaron las llamadas de la villa.
 
+24. **Bajar la resolución sólo sirve si lo que pesa son los píxeles, y hay que
+    comprobarlo** (v5.65, 2 oct 2026, `adaptive-scale.ts`). La tablet de Vera
+    (iPlay 70 mini Ultra, Adreno 725) iba al 50 % con todo dentado: la
+    adaptativa bajaba en cada ventana lenta sin mirar si el fotograma se
+    acortaba, y un aparato al que le pesa la CPU llega al suelo en 8 s sin
+    ganar nada. Ahora la ventana siguiente juzga la bajada (tiene que dar la
+    mitad de lo que daría con todo en píxeles, que van con la escala al
+    cuadrado), la deshace si no paga y el panel lo dice con «(CPU)». Tres
+    cosas medidas por el camino: **el estiramiento del lienzo ya es lineal**
+    (los escalones salen borrosos, no duros: no hay `image-rendering` que
+    tocar); **el suelo de Medium es un píxel por píxel CSS** (0,5 de 1,5 eran
+    0,75); y **la adaptativa necesita calentamiento y margen**: el valle recién
+    abierto va un 20 % más lento la primera ventana y una ventana de 2 s baila
+    un 6–10 %, y con umbrales justos el ruido daba por buenas bajadas inútiles.
+    Para probarlo en el navegador, un aparato limitado por CPU se fabrica con
+    SwiftShader a 200×300 (el coste en los vértices); el limitado por píxeles
+    no se puede fabricar con fiabilidad (fotogramas de 800 ms, vértices y
+    píxeles en serie), y lo guarda la prueba con `max(cpu, gpu · escala²)`.
+    `docs/medidas/dientes-de-sierra-tablet-2026-10-02.md`.
+
 ## Lo que queda (por lo que pesa)
 
 - **Abaratar `createVillage`** (GV-4b): el bucle de la villa (lección 22) está
@@ -259,13 +281,17 @@ venía de antes**. Y la villa grande sigue por encima de lo cómodo para una tab
 - **Fuera de Windows, las sondas quieren el navegador de Playwright a mano:**
   `VALLEY_CHROMIUM=/opt/pw-browsers/chromium-<n>/chrome-linux/chrome`, y
   `bundle-game.ts --out` sólo acepta una carpeta dentro de `artifacts/`.
-- **Medir en un aparato real** (la tablet de Vera) y apuntar aquí las cifras: FPS, y
-  si siguen los tirones al caer un rayo o empezar una fiesta. Y las dos lecturas que
-  dejó GV (29 sep 2026): el pie de los edificios (`?contact=off` contra el valle
+- **Medir en un aparato real** (la tablet de Vera: iPlay 70 mini Ultra, Android 14,
+  Snapdragon 7+ Gen 2 con Adreno 725, 2560×1600 a 144 Hz) y apuntar aquí las cifras:
+  FPS, y si siguen los tirones al caer un rayo o empezar una fiesta. Y las dos lecturas
+  que dejó GV (29 sep 2026): el pie de los edificios (`?contact=off` contra el valle
   normal) y el suavizado (`?aa=msaa` contra `?aa=none`), con el panel de taller.
+  **Desde v5.65 el panel dice si manda la CPU** («(CPU)» tras la resolución): si lo
+  dice y `?aa=msaa` no quita más de un 10 % de fps, MSAA pasa a Medium.
 - **El coste por píxel**: todo es `MeshStandardMaterial` (PBR). Si la tablet sigue
-  limitada por píxeles, pasar lo lejano o lo pequeño a `MeshLambertMaterial`, o bajar
-  la densidad de partida en táctil (hoy 1,5; la adaptativa baja hasta la mitad).
+  limitada por píxeles (el panel sin «(CPU)» y la resolución en el suelo), pasar lo
+  lejano o lo pequeño a `MeshLambertMaterial`. La densidad de partida en táctil es
+  1,5 y desde v5.65 la adaptativa no baja de un píxel por píxel CSS en Medium.
 - **Casas (70 mallas en la villa) y campos (24)**: un lote como el de la muralla pide
   separar lo que se mueve (puertas) y la nieve de los tejados.
 - **El JS de la villa (~10 ms)**: la vida (`finePathTo`, `stepHome`) es lo que más pesa

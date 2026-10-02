@@ -227,8 +227,8 @@ pantalla todavía no enseña del todo:
 
 | Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
 |---|---|---|---|
-| **Talar lejos cuesta** | Más allá de 10 celdas de la plaza cada leñador trae menos (`woodHaul`) y la aldea manda más | Los leñadores van al foco lejano (`fellingTarget`) y la tira dice «esperando madera» si la obra espera | Que se vea el viaje: el haz al hombro de vuelta desde lejos, y quizá un carro o una pila de leña junto al foco. **Ningún modelo nuevo sin encargo en `docs/encargos/`** (Astra) |
-| **El bosque que brota** | Plantones de 1 a 7 años junto al bosque | Se pintan con la malla del rebrote, a escala de su edad | Medir en el observatorio que se lee como bosque joven y no como hierba alta (falta la toma) |
+| **Talar lejos cuesta** | Más allá de 10 celdas de la plaza cada leñador trae menos (`woodHaul`) y la aldea manda más | Los leñadores van al foco lejano (`fellingTarget`) y la tira dice «esperando madera» si la obra espera | Que se vea el viaje: el haz al hombro de vuelta desde lejos, y quizá un carro o una pila de leña junto al foco. **Ningún modelo nuevo sin encargo en `docs/encargos/`** (Astra). La toma del frente lejano (semilla 11, año 30, celda 22,40, a 15 de la plaza): el árbol a medio talar y gente yendo y viniendo, sin haz a la vista (`docs/medidas/k-img/k3-tala-lejos.png`) |
+| **El bosque que brota** | Plantones de 1 a 7 años junto al bosque | Se pintan con la malla del rebrote, a escala de su edad | **Tomado** (2 oct 2026, semilla 11, año 30, celda 50,34): los plantones se leen como árboles pequeños en la linde, no como hierba alta (`docs/medidas/k-img/k2-plantones.png`). Con nueve plantones en el año 30 la expansión es lenta; si se quiere ver más bosque joven, es `FOREST_SPREAD` y es de Vera |
 | **El último foco** | Nunca se talan las últimas 24 celdas | Nada lo distingue | Nada por ahora: es una garantía, no un suceso |
 
 ## El roble del valle (24 sep 2026)
