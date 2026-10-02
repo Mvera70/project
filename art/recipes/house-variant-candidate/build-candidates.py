@@ -2,6 +2,7 @@
 blender --background --python art/recipes/house-variant-candidate/build-candidates.py
 """
 import bpy
+import bmesh
 import json
 import math
 import mathutils
@@ -88,7 +89,12 @@ def build(id):
     materials={m['name']:make_material(dict(m,color=colors[m['role']])) for m in r['materials']}
     parts=[]
     for raw in r['primitives']:
-        spec={'rotationDegrees':[0,0,0],'bevel':0,'smooth':False,**raw};obj=create_primitive(spec,materials)
+        spec={'rotationDegrees':[0,0,0],'bevel':0,'smooth':False,**raw}
+        if 'customMesh' in raw:
+            mesh=bpy.data.meshes.new(raw['name']);mesh.from_pydata(raw['customMesh']['vertices'],[],raw['customMesh']['faces']);mesh.materials.append(materials[raw['material']]);mesh.update()
+            bm=bmesh.new();bm.from_mesh(mesh);bmesh.ops.recalc_face_normals(bm,faces=bm.faces);bm.to_mesh(mesh);bm.free()
+            obj=bpy.data.objects.new(raw['name'],mesh);bpy.context.collection.objects.link(obj);obj.location=raw['location']
+        else:obj=create_primitive(spec,materials)
         if spec['type']=='cube':obj.rotation_euler=[math.radians(v) for v in spec['rotationDegrees']]
         parts.append(obj)
     bpy.context.view_layer.update();before=sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in parts)
@@ -137,10 +143,10 @@ def build(id):
     dims=metrics['dimensionsMetres']
     (out/'README.md').write_text(f'''# {id} · candidato de vivienda
 
-2 oct 2026. {triangles} triángulos / {cfg['triangleLimit']}; {len(materials)} materiales, sin texturas, facetas planas.
+2 oct 2026. {triangles} triángulos / {cfg['triangleLimit']}; {len(materials)} mallas y materiales, sin texturas, facetas planas.
 
 - Caja X × alto × fondo: {dims[0]:.3f} × {dims[1]:.3f} × {dims[2]:.3f} m. Parcela 6×6 m = 2×2 celdas, mismo origen y orientación que el publicado.
-- Puerta `{id}_door`, pivote de bisagra en {cfg['doorPivot']} m (Blender). Las tres ventanas originales, carpinterías y piezas de puerta conservan sus medidas y posiciones.
+- Puerta `{id}_door`, pivote de bisagra en {cfg['doorPivot']} m (Blender). Las piezas de puerta conservan medidas y posiciones. Tres superficies window asimétricas cambian de tamaño y posición según referencia; sus coordenadas viven en la receta.
 - Paleta: {', '.join(k+' '+v for k,v in metrics['materials'].items())}.
 - En los modelos de piedra, la mampostería usa juntas retranqueadas, hiladas alternadas y biseles de 2,5–3,5 cm; conserva el material stone. Se eliminan sólo caras enteras estrictamente enterradas en otro sólido. Puerta y huecos oscuros excluidos de esa simplificación.
 - `sheet.png`: tres cuartos y frente arriba, perfil abajo izquierda, comparación sin reescalar con aldeano, house y stone-house publicados abajo derecha (candidato a la izquierda).
@@ -148,6 +154,10 @@ def build(id):
 
 Sin preguntas pendientes. Evidencia de GLB y renders de revisión; integración, emisión nocturna y estaciones quedan para la sesión principal. No se ha publicado ni ejecutado tests.
 ''',encoding='utf8')
+    ref=r.get('reference')
+    if ref:
+        with (out/'README.md').open('a',encoding='utf8') as f:
+            f.write('\n## Referencia arquitectónica\n\n'+ref['name']+' — '+ref['page']+'\n\n'+ref['adaptation']+'\n\nFoto examinada: '+str(ref.get('photo') or 'no disponible; se utiliza únicamente descripción oficial')+'\n\nEl ID histórico se conserva por compatibilidad. Modelo original del proyecto basado en rasgos documentados; no replica a escala el edificio completo.\n')
     print('CANDIDATE_COMPLETE',id,triangles,flush=True)
 
 for id in (sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else IDS):build(id)
