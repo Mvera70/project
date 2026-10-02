@@ -250,6 +250,16 @@ const COOP_GAP = 3;
 const FOX_ALARM = 3.5;
 /** Lo que descansa en la madriguera entre dos salidas, en pasos: de 10 a 20 s. */
 const FOX_REST: readonly [number, number] = [300, 300];
+/**
+ * Lo más que se le deja para volver a la madriguera si el amanecer lo pilla
+ * fuera: el doble de lo que tardaría en línea recta, más un margen, en pasos.
+ * Es un tope de seguridad, por si la ruta se pierde; lo normal es llegar
+ * andando antes. Con un tope fijo de 600 pasos (12 celdas) la semilla 23 se
+ * quedaba a medio camino y volvía a desaparecer de golpe.
+ */
+export function foxDawnSteps(away: number): number {
+  return Math.ceil((2 * away) / (FOX_PACE * LIFE_STEP)) + 150;
+}
 /** Lo lejos del pueblo que vive: fuera del corro de casas, como los conejos. */
 const DEN_FROM_HEART = 12;
 const DEN_FROM_BUILDING = 5;
@@ -259,6 +269,8 @@ export interface Fox extends Walker {
   readonly coop: Point;
   phase: 'den' | 'creeping' | 'watching' | 'back' | 'fleeing';
   until: number;
+  /** El paso en que, si sigue fuera de día, se le da por llegado; `null` de noche. */
+  dawnBy: number | null;
 }
 
 export function createFox(state: GameState, land: Terrain, seed: number, heart: Point, coop: Point): Fox | null {
@@ -291,7 +303,7 @@ export function createFox(state: GameState, land: Terrain, seed: number, heart: 
   }, FOX_RADIUS) ?? coop;
   return {
     body: { id: FOX_ID, x: den.x, z: den.z, vx: 0, vz: 0, facing: 0, radius: FOX_RADIUS, pace: FOX_PACE },
-    route: [], goal: null, replanAt: 0, den, coop: near, phase: 'den', until: 0,
+    route: [], goal: null, replanAt: 0, den, coop: near, phase: 'den', until: 0, dawnBy: null,
   };
 }
 
@@ -300,11 +312,24 @@ export function stepFox(fox: Fox | null, land: Terrain, seed: number, step: numb
   if (fox === null) return;
   const { body } = fox;
   if (!night) {
-    // De día, en la madriguera: no se ve.
+    // De día, en la madriguera: no se ve. **Pero si el amanecer lo pilla
+    // fuera, vuelve andando a su linde** y se mete en el bosque; antes se le
+    // llevaba a la madriguera de un salto y desaparecía a la vista (Vera, 2 oct
+    // 2026: «al amanecer desaparece, no se ve irse al bosque»). De día no
+    // sale: lo único que puede hacer es volver.
+    const home = fox.phase === 'den' || Math.hypot(body.x - fox.den.x, body.z - fox.den.z) < 0.2;
+    if (!home) {
+      if (fox.phase !== 'fleeing') fox.phase = 'back';
+      fox.dawnBy ??= step + foxDawnSteps(Math.hypot(body.x - fox.den.x, body.z - fox.den.z));
+      const gone = walk(fox, land, fox.den, fox.phase === 'fleeing' ? FOX_FLEE : FOX_PACE, step, 0.15);
+      if (!gone && step < fox.dawnBy) return;
+    }
     fox.phase = 'den';
+    fox.dawnBy = null;
     body.x = fox.den.x; body.z = fox.den.z; still(body);
     return;
   }
+  fox.dawnBy = null;
   if (fox.phase !== 'fleeing' && nearest(body, people, FOX_ALARM) !== null) {
     fox.phase = 'fleeing';
     fox.goal = null;
