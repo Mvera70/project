@@ -10,17 +10,16 @@
 import { hash32 } from '@engine/rng';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 import type { Animal } from '@derive/animals';
+import { faunaSeason } from '@derive/seasonal-fauna';
 import { fitsCircle, integrate, turnTo, type Body, type Point, type Terrain } from './body';
 import { LIFE_STEP } from './clock';
 import { canReach, reachableNear } from './terrain';
 
 /** Fuera del hueco de la presa de caza (42 000..42 002) y de los ciervos (40 000..). */
 const RABBIT_ID = 43_000;
-/**
- * TUNE: tres conejos. Son pequeños —se leen de cerca— y con más la linde
- * parece una granja; con uno pasan desapercibidos.
- */
-const MAX_RABBITS = 3;
+// Cuántos conejos salen lo dice la estación (`faunaSeason`, v5.85): tres el
+// resto del año —son pequeños y se leen de cerca; con más la linde parece una
+// granja— y uno en invierno, que además huye de más lejos.
 /** Lejos del corro de casas, como el ciervo: no pastan junto a una puerta. */
 const VILLAGE_CLEARANCE = 10;
 const BUILDING_CLEARANCE = 5;
@@ -46,6 +45,8 @@ export interface Rabbit {
   fleeingUntil: number;
   choices: number;
   out: boolean;
+  /** A cuánto de una persona echa a correr: más lejos en invierno (v5.85). */
+  alarm?: number;
 }
 
 /** Si a esta hora los conejos están fuera de la madriguera. */
@@ -79,6 +80,7 @@ export function edgeOfWood(state: GameState, x: number, z: number): boolean {
 }
 
 export function createRabbits(state: GameState, land: Terrain, seed: number, heart: Point): Rabbit[] {
+  const { rabbits: MAX_RABBITS, wariness } = faunaSeason(state);
   const shore = reachableNear(land, heart);
   const buildings = state.buildings.filter(building => building.lostTick === null);
   const spots: Point[] = [];
@@ -115,6 +117,7 @@ export function createRabbits(state: GameState, land: Terrain, seed: number, hea
     fleeingUntil: 0,
     choices: 0,
     out: false,
+    alarm: ALARM * wariness,
   }));
 }
 
@@ -142,7 +145,7 @@ export function stepRabbits(
     rabbit.out = out;
     if (!out) { body.vx = 0; body.vz = 0; continue; }
     let threat: Point | null = null;
-    let nearest = ALARM;
+    let nearest = rabbit.alarm ?? ALARM;
     for (const person of people) {
       const gap = Math.hypot(body.x - person.body.x, body.z - person.body.z);
       if (gap < nearest) { nearest = gap; threat = person.body; }

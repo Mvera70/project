@@ -57,6 +57,7 @@ import { buildRoadStones, buildSignposts, townCells, valleyRoad } from './world/
 import { createTrampleMap, setTramplers, snowTracks, SNOW_FROM, type TrampleMap, type Trampler } from './effects/trample';
 import { cloudsFor, stepClouds } from './effects/clouds';
 import { createAmbience, type Ambience } from './effects/ambience';
+import { createSeasonalFauna } from './effects/seasonal-fauna';
 import { createPuddles, wetnessAt, type Puddles } from './effects/puddles';
 import { createFires } from './effects/fires';
 import { createHearth } from './effects/hearth';
@@ -598,6 +599,9 @@ export async function createGraphicsRenderer(
   // E4 · los edificios que arden (`effects/fires.ts`).
   const fires = createFires((id) => library.instance(id));
   const fauna = new Fauna((kind) => library.instance(kind), (kind) => library.get(kind));
+  // v5.85 · Cigüeñas, mariposas y abejas, según la estación (`effects/seasonal-fauna.ts`).
+  const seasonalFauna = createSeasonalFauna();
+  let seasonalGround: (x: number, z: number) => number = () => 0;
   const bubbles = new Bubbles();
   const props = new Props((id) => library.instance(id));
   // D2b · las flechas del asedio. Un grupo vacío el 99 % de la partida.
@@ -638,7 +642,7 @@ export async function createGraphicsRenderer(
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, quarry.group, coins.mesh, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group, noticeBoard.group, buildingBoards.smithy.group, buildingBoards.church.group, buildingBoards.tailor.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, quarry.group, coins.mesh, fauna.group, seasonalFauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group, noticeBoard.group, buildingBoards.smithy.group, buildingBoards.church.group, buildingBoards.tailor.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1399,6 +1403,7 @@ export async function createGraphicsRenderer(
     };
     cast.standOn(walk);
     fauna.standOn(walk);
+    seasonalGround = walk;
     treeFalls.standOn(floor);
     mapWidth = state.map.width;
     mapHeight = state.map.height;
@@ -1441,6 +1446,11 @@ export async function createGraphicsRenderer(
       viewport: { width: viewport.widthCss, height: viewport.heightCss },
       map: { width: life.land.width, height: life.land.height, blocked: Array.from(life.land.blocked) },
       renderedAnimals: fauna.snapshot().map(animal => ({ ...animal, screen: screen(animal.x, animal.z) })),
+      // v5.85 · La fauna de la estación que se está viendo: crías, cigüeñas,
+      // mariposas, abejas, golondrinas y grullas.
+      seasonal: { young: life.young.length, ...seasonalFauna.visible,
+        swallows: ambience?.visible.birds ?? 0, cranes: ambience?.visible.cranes ?? 0,
+        craneLead: ambience?.visible.craneLead ?? null },
       day: lifeDay,
       steps: life.steps,
       // IA-anim · los sitios de la jornada: sin ellos no se ve por qué un
@@ -2674,6 +2684,8 @@ export async function createGraphicsRenderer(
       fauna.update(shown, phase, [...life.wildlife.filter(animal => animal.id !== huntScene?.targetId),
         ...(huntScene?.animals ?? []),
         ...(huntScene === null ? wildPreyPosition(huntSighting?.prey ?? null) : []),
+        // v5.85 · Y las crías de primavera detrás de sus madres (`life/young.ts`).
+        ...life.young,
         ...mountainWolves(shown.map, shown.terrainSeed, frame.presentationSeconds),
         ...life.beasts.map(beast => ({
         id: beast.dweller.body.id, kind: beast.kind, x: beast.dweller.body.x, y: beast.dweller.body.z,
@@ -2736,6 +2748,7 @@ export async function createGraphicsRenderer(
       stepClouds(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       ambience?.step(phase, clockOf(shown.tick).season, ambienceSky, frame.speed === 0 ? 0 : frame.realDeltaSeconds, camera);
       yards.step(phase, clockOf(shown.tick).season, ambienceSky, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
+      seasonalFauna.update(shown, phase, ambienceSky, frame.presentationSeconds, seasonalGround);
       puddles?.step(wetnessAt(ambienceSky, skyAt(shown, today - 1).kind, phase), groundFloor, frame.deltaSeconds);
       // Y la luz que hace a esa hora, con el cielo que haga encima.
       light(phase, frame.speed, overcastOf(sky));
@@ -3173,6 +3186,7 @@ export async function createGraphicsRenderer(
       stalls.dispose();
       coins.dispose();
       fauna.dispose();
+      seasonalFauna.dispose();
       bubbles.dispose();
       props.dispose();
       arrows.dispose();

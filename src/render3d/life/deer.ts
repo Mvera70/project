@@ -8,16 +8,18 @@ import { ratioOf } from '@engine/crossroads/conditions';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { fellingTarget } from '@engine/world/forest';
 import type { Animal } from '@derive/animals';
+import { faunaSeason } from '@derive/seasonal-fauna';
 import { fitsCircle, integrate, turnTo, type Body, type Point, type Terrain } from './body';
 import { LIFE_STEP } from './clock';
 import { reachableNear, canReach } from './terrain';
 
 // Los lobos de montaña ocupan 30_000..; Fauna indexa por id entre especies.
 const DEER_ID = 40_000;
-// TUNE: dos ciervos (~6 000 triángulos en total), fuera del pueblo.
-const MAX_DEER = 2;
-// Un ciervo no pasta junto a una casa y sale antes de que alguien lo alcance.
-const VILLAGE_CLEARANCE = 12;
+// v5.85 · Cuántos ciervos se dejan ver y a cuánto del corazón de la aldea
+// pastan lo dice la estación (`faunaSeason`): dos (~6 000 triángulos en total)
+// a doce celdas el resto del año; en invierno, uno, que baja al prado.
+// Un ciervo no pasta junto a una casa y sale antes de que alguien lo alcance:
+// esa distancia no la toca el invierno.
 const BUILDING_CLEARANCE = 8;
 const PERSON_ALARM = 7;
 const HUNTER_ALARM = 11;
@@ -48,6 +50,7 @@ function clearLine(land: Terrain, from: Point, to: Point): boolean {
 /** Pastos a la linde del bosque que usa la caza real, en la misma orilla. */
 export function createDeer(state: GameState, land: Terrain, seed: number, heart: Point): Deer[] {
   if (ratioOf(state, 'forestLeft') < FORAGE.MIN_FOREST) return [];
+  const { deer: MAX_DEER, deerClearance: VILLAGE_CLEARANCE, deerDownhill } = faunaSeason(state);
   const tree = fellingTarget(state);
   if (tree === null) return [];
   const treeAt = { x: tree % land.width + 0.5, z: Math.floor(tree / land.width) + 0.5 };
@@ -70,7 +73,11 @@ export function createDeer(state: GameState, land: Terrain, seed: number, heart:
     }
   }
   // Misma semilla, mismos animales; variar el día cambia su prado sin tocar el RNG del motor.
-  spots.sort((a, b) => hash32(seed, `deer:${a.x}:${a.z}`) - hash32(seed, `deer:${b.x}:${b.z}`));
+  // En invierno el ciervo baja: el pasto más cercano a la aldea primero, y el
+  // hash sólo desempata entre los de la misma franja de tres celdas.
+  const order = (at: Point): number => (deerDownhill ? Math.floor(Math.hypot(at.x - heart.x, at.z - heart.z) / 3) * 4_294_967_296 : 0)
+    + hash32(seed, `deer:${at.x}:${at.z}`);
+  spots.sort((a, b) => order(a) - order(b));
   const chosen: Point[] = [];
   for (const spot of spots) {
     if (chosen.some(other => Math.hypot(other.x - spot.x, other.z - spot.z) < 4)) continue;

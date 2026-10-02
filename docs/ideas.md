@@ -15,27 +15,6 @@ la vista. «Apuntado» quiere decir escrito en este fichero o en el plan, en
 
 ## Sin repartir
 
-### 2 oct 2026 · La fauna, por estaciones
-> «¿Ahora mismo los animales salen por temporada? … Esta es un poco la idea.»
-
-Eligió las cuatro: crías en primavera (cervatillos, polluelos, lechones,
-terneros), aves de paso (cigüeñas o golondrinas en primavera y verano,
-bandadas que se van en otoño), invierno escaso (menos caza, huellas en la
-nieve, el ciervo baja al prado), y mariposas, abejas y jabalíes al bosque en
-verano y otoño. Sólo vida, sin tocar el motor.
-**En curso:** sesión «Fauna por estaciones», rama `claude/fauna-estaciones`.
-
-### 2 oct 2026 · Establos y cercados fuera de la muralla
-> «En invierno el ganado debe guardarse en establos, el que no tenemos; en los
-> pueblos medievales, cuando se cerraba la muralla, fuera quedan cosas así como
-> campos de cultivo y zonas para el ganado donde pastar y luego pasar la noche.
-> Con cercas de valla de madera quedaría bien. Además luego aporta a las
-> invasiones porque tendrán que ir a la aldea y algunos no lo conseguirán…
-> hay mucho que desarrollar aquí.»
-
-Toca el motor (edificio nuevo, el asedio) y el pasto de la falda del valle
-natural (PR #48). **Encargado** a «Fauna por estaciones» para `plan-meta.md`.
-
 ### 2 oct 2026 · Las partes del cuerpo: cabeza, torso, brazos y piernas
 > «¿De momento no hay partes débiles, como cabeza, torso?» — «Sí, apunta.»
 
@@ -84,6 +63,34 @@ Es un principio, no una tarea. El lino servirá también para las vendas de la
 enfermería («no está nada mal»). **Repartida → la cabecera K de
 `docs/plan-meta.md`** (v5.76); el lienzo es una existencia (`village.linen`)
 que otro sistema puede gastar.
+
+### 2 oct 2026 · La fauna, por estaciones
+> «¿Ahora mismo los animales salen por temporada? … Esta es un poco la idea.»
+
+Eligió las cuatro: crías en primavera (cervatillos, polluelos, lechones,
+terneros), aves de paso (cigüeñas o golondrinas en primavera y verano,
+bandadas que se van en otoño), invierno escaso (menos caza, huellas en la
+nieve, el ciervo baja al prado), y mariposas, abejas y jabalíes al bosque en
+verano y otoño. Sólo vida, sin tocar el motor.
+**Repartida → hecha en v5.85** (PR #54, sólo vida, derive y render): crías
+detrás de las madres, golondrinas sólo en primavera y verano y una uve de
+grullas en otoño, cigüeñas, mariposas y abejas, el invierno con un ciervo que
+baja al prado y un conejo, y dos jabalíes hozando en otoño. Medida y capturas en
+`docs/medidas/fauna-estaciones-2026-10-02.md`; lo que falta por verse, en
+`docs/encargos-3d.md` («La fauna por estaciones»).
+
+### 2 oct 2026 · Establos y cercados fuera de la muralla
+> «En invierno el ganado debe guardarse en establos, el que no tenemos; en los
+> pueblos medievales, cuando se cerraba la muralla, fuera quedan cosas así como
+> campos de cultivo y zonas para el ganado donde pastar y luego pasar la noche.
+> Con cercas de valla de madera quedaría bien. Además luego aporta a las
+> invasiones porque tendrán que ir a la aldea y algunos no lo conseguirán…
+> hay mucho que desarrollar aquí.»
+
+Toca el motor (edificio nuevo, el asedio) y el pasto de la falda del valle
+natural (PR #48). **Repartida → K12 en `plan-meta.md`**, como punto propuesto,
+con lo que ya existe (el modo `secure` de `beasts.ts`, el pasto de la falda, el
+cerco) y cinco preguntas de diseño abiertas para Vera. Sin implementar.
 
 ### 2 oct 2026 · El daño por arma y la armadura que para unas cosas y otras no
 > «Cuero no debe proteger mucho. No sé si es posible en función del arma

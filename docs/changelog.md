@@ -37,6 +37,66 @@ la atalaya de 199 a 227.
 plantas. Lo que no se ve —el taller, la tejedora, el campo azul, el lienzo
 blanqueando—, en `docs/encargos-3d.md` y `docs/encargos/ilustraciones-k5-lino.md`.
 
+## v5.85 · 2 oct 2026 · La fauna por estaciones: que cada estación se note en sus animales
+
+**Sólo capa de vida, derive y render** (decisión de Vera): el motor no se toca,
+ninguna partida cambia, `state.herd` y la caza siguen igual. **Medido antes en
+`main`:** los lobos sólo salían las noches de invierno, el oso en verano y
+otoño (suceso del motor) y los cuervos con el grano madurando; ciervos,
+conejos, perdices, jabalíes y peces eran iguales todo el año, la primavera no
+tenía nada propio y **las golondrinas cruzaban el cielo de enero igual que el
+de junio**.
+
+**Lo que Vera eligió, las cuatro cosas, y cómo quedan.** La estación se lee del
+estado (`faunaSeason`, `derive/seasonal-fauna.ts`), nunca del reloj del
+navegador, y toda la variación sale de un hash de la semilla:
+
+1. **Primavera, crías** (`life/young.ts`): la cierva con su cervatillo (la
+   primera siempre), la mitad de las vacas con ternero, la mitad de las cerdas
+   con dos lechones y un tercio de las gallinas con tres polluelos, **sólo si la
+   aldea tiene esa cabaña**. Son el adulto a escala (`Animal.scale`) detrás de
+   la madre, con la zancada a su escala para que no patinen; no son cabezas
+   nuevas y desaparecen con la primavera. Van en `village.young`, aparte de
+   `wildlife`.
+2. **Aves de paso**: las golondrinas de Astra sólo en primavera y verano; en
+   otoño, **una uve de grullas** (la misma ave, gris y grande) que cruza hacia
+   el sur; y en primavera y verano, **dos cigüeñas** picando en el prado húmedo
+   más cercano a la aldea (primitivas de código, `effects/seasonal-fauna.ts`).
+3. **Invierno escaso**: un ciervo en vez de dos, que **baja al prado** (pasta a
+   nueve celdas del corazón en vez de doce, el más cercano primero; la
+   distancia a cada casa no cambia), un conejo en vez de tres y que huye a vez
+   y media de distancia. Las huellas en la nieve ya existían para todo animal
+   que anda; ahora se ven más cerca.
+4. **Verano y otoño**: mariposas y abejas sobre los campos y el prado de la
+   aldea (a medio gas desde la segunda mitad de la primavera, llenas en
+   verano), y **en otoño dos jabalíes**, la hembra y su cría del año (sin
+   colmillos), hozando a dos pasos de la linde más espesa y sin bosque entre
+   ellos y la cámara —en la primera captura las copas los tapaban—
+   (`life/rooting-boars.ts`); no embisten, se meten en el bosque si ven gente,
+   y no son la presa de la caza.
+
+**Medido** (8 semillas, aldea de veinte a mitad de cada estación, una jornada
+de 240 pasos): en primavera 59 crías (13 cervatillos, 42 polluelos, 4
+terneros; ningún lechón porque esas aldeas no tienen cerdos) y ninguna el resto
+del año; ciervos y conejos a la vista, 16 y 24 en primavera, verano y otoño y
+**8 y 8 en invierno**, con el ciervo a 15,8 celdas del centro contra 19,4; 16
+jabalíes en otoño y ninguno fuera de él; 16 cigüeñas en primavera y verano;
+mariposas y abejas 48+32 en primavera, 128+64 en verano, ninguna en otoño ni en
+invierno. Coste: cuatro llamadas de dibujo con todo encendido (cigüeñas,
+cuellos, alas, abejas) y tres más para las grullas, sólo en su estación.
+
+**Prueba**: `tests/fast/life-seasonal-fauna.test.ts` (una propiedad por
+estación, cuatro semillas sumadas, y que ningún id se repita entre especies: la
+primera versión daba al jabalí el id del perro; 3 s). **Capturas** de las cuatro
+estaciones en `docs/medidas/fauna-estaciones-2026-10-02.md` con la herramienta
+nueva `tools/graphics/seasons.mjs`; **la uve de grullas no tiene captura** (en
+el dibujo por software su reloj real avanza a una décima) y hay que mirarla en
+el aparato. **Lo que no se ve todavía** (mallas
+propias de las crías, la cigüeña de verdad y su nido en la capilla, el clip de
+hozar), en `docs/encargos-3d.md`. **Y apuntada, no hecha**, la idea de Vera del
+ganado en invierno —establos, cercas fuera de la muralla y el asalto que lo
+encuentra—, como **K12** en `docs/plan-meta.md`, con sus cinco preguntas.
+
 ## v5.81 · 2 oct 2026 · La vida en porcentaje, y lo que protege cada pieza
 
 **Por qué.** Vera, al ver los petos: «el cuero no debe proteger mucho»; la

@@ -67,6 +67,17 @@ function birdParts(model: Object3D): { body: BirdPart[]; left: BirdPart[]; right
   return body.length === 0 || left.length === 0 || right.length === 0 ? null : { body, left, right };
 }
 const FLIES = 90;
+/**
+ * v5.85 · La bandada que se va al sur en otoño: una uve de grullas, grandes y
+ * lentas, muy por encima de las golondrinas. TUNE: quince aves en uve, a
+ * catorce celdas de altura, del doble de envergadura que la golondrina en
+ * pantalla, y una pasada cada minuto y medio de juego.
+ */
+const CRANES = 15;
+const CRANE_SCALE = 22;
+const CRANE_HEIGHT = 14;
+const CRANE_PERIOD = 90;
+const CRANE_TINT = '#8e9296';
 
 function unit(index: number, what: string): number {
   return hash32(index, `ambience:${what}`) / 4_294_967_296;
@@ -109,7 +120,9 @@ function birdTexture(): Texture | null {
 export interface Ambience {
   readonly group: Group;
   /** Cuántas piezas de cada capa se ven ahora (para las pruebas y la traza). */
-  readonly visible: { readonly mist: number; readonly birds: number; readonly flies: number };
+  readonly visible: { readonly mist: number; readonly birds: number; readonly flies: number; readonly cranes: number;
+    /** Dónde va la grulla que abre la uve, si pasa la bandada: para encuadrarla al mirar. */
+    readonly craneLead: { readonly x: number; readonly y: number; readonly z: number } | null };
   step(phase: number, season: Season, sky: SkyKind, seconds: number, camera: Camera): void;
   dispose(): void;
 }
@@ -131,11 +144,29 @@ export function mistAt(hour: number): number {
   return Math.max(0, 1 - (hour - 7) / 3);
 }
 
-/** Si vuelan pájaros a esta hora y con este cielo. */
-export function birdsAt(hour: number, sky: SkyKind): number {
+/**
+ * Si vuelan pájaros a esta hora, con este cielo y en esta estación.
+ *
+ * v5.85 · **Son golondrinas, y la golondrina es de paso**: llega en primavera,
+ * se queda el verano y se va. Hasta esta ronda cruzaban el cielo de enero
+ * igual que el de junio. Sin estación (las pruebas viejas, el respaldo) vuelan
+ * como antes.
+ */
+export function birdsAt(hour: number, sky: SkyKind, season?: Season): number {
+  if (season !== undefined && season !== 'spring' && season !== 'summer') return 0;
   if (sky === 'storm' || sky === 'snow') return 0;
   if (hour < 6.5 || hour > 19.5) return 0;
   return sky === 'rain' ? 0.3 : 1;
+}
+
+/**
+ * v5.85 · Las grullas que se van: sólo en otoño, de día y sin tormenta. Es la
+ * contracara de las golondrinas: el cielo de otoño se vacía con una bandada.
+ */
+export function cranesAt(hour: number, sky: SkyKind, season: Season): number {
+  if (season !== 'autumn' || sky === 'storm') return 0;
+  if (hour < 7.5 || hour > 18.5) return 0;
+  return 1;
 }
 
 /** Luciérnagas: noches de primavera y verano, sin lluvia. */
@@ -177,11 +208,23 @@ export function createAmbience(map: ValleyMap, bird?: Object3D): Ambience {
     part.material.transparent = true;
     return new InstancedMesh(part.geometry, part.material, BIRDS);
   });
-  for (const mesh of [mist, birds, flies, ...flock]) {
+  // Las grullas son el mismo pájaro de Astra, más grande y gris: una malla más
+  // por pieza (tres llamadas), y sólo se dibuja en otoño.
+  const cranes = pieces.map(({ part }) => {
+    const material = part.material.clone();
+    const tinted = material as Material & { color?: Color };
+    tinted.color?.set(CRANE_TINT);
+    return new InstancedMesh(part.geometry, material, CRANES);
+  });
+  // Las grullas, en su propio grupo: son otra bandada, no más piezas de la golondrina.
+  const migrating = new Group();
+  migrating.name = 'Valley_Cranes';
+  group.add(migrating);
+  for (const mesh of [mist, birds, flies, ...flock, ...cranes]) {
     mesh.frustumCulled = false;
     mesh.instanceMatrix.setUsage(DynamicDrawUsage);
     mesh.count = 0;
-    group.add(mesh);
+    (cranes.includes(mesh) ? migrating : group).add(mesh);
   }
   const heading = new Quaternion();
   const flight = new Matrix4();
@@ -196,7 +239,8 @@ export function createAmbience(map: ValleyMap, bird?: Object3D): Ambience {
   const size = new Vector3();
   const face = new Quaternion();
   let time = 0;
-  const shown = { mist: 0, birds: 0, flies: 0 };
+  const shown: { mist: number; birds: number; flies: number; cranes: number;
+    craneLead: { x: number; y: number; z: number } | null } = { mist: 0, birds: 0, flies: 0, cranes: 0, craneLead: null };
 
   return {
     group,
@@ -220,7 +264,7 @@ export function createAmbience(map: ValleyMap, bird?: Object3D): Ambience {
       mist.instanceMatrix.needsUpdate = true;
 
       // Los pájaros: tres bandadas que cruzan el mapa, cada una a su altura.
-      const birdAmount = birdsAt(hour, sky);
+      const birdAmount = birdsAt(hour, sky, season);
       birdMaterial.opacity = 0.85 * birdAmount;
       birds.count = birdAmount > 0 && parts === null ? BIRDS : 0;
       if (parts !== null) {
@@ -269,6 +313,42 @@ export function createAmbience(map: ValleyMap, bird?: Object3D): Ambience {
       }
       birds.instanceMatrix.needsUpdate = true;
 
+      // Las grullas de otoño: una uve que cruza el valle hacia el sur, a ratos.
+      // Se ve la mitad de cada pasada; la otra mitad la bandada está fuera del mapa.
+      const craneAmount = parts === null ? 0 : cranesAt(hour, sky, season);
+      const craneCount = craneAmount > 0 ? CRANES : 0;
+      for (const mesh of cranes) mesh.count = craneCount;
+      if (craneCount > 0) {
+        const t = (time % CRANE_PERIOD) / (CRANE_PERIOD * 0.5);
+        // De la esquina del noreste a la del suroeste: hacia +z y -x.
+        const leadX = map.width + 12 - t * (map.width + 24);
+        const leadZ = -12 + t * (map.height + 24);
+        const dirX = -(map.width + 24), dirZ = map.height + 24;
+        const length = Math.hypot(dirX, dirZ);
+        const fx = dirX / length, fz = dirZ / length;
+        tilt.set(0, Math.atan2(fx, fz), 0);
+        heading.setFromEuler(tilt);
+        shown.craneLead = { x: leadX, y: CRANE_HEIGHT, z: leadZ };
+        for (let n = 0; n < CRANES; n += 1) {
+          // La uve: la primera en punta y las demás en dos brazos que se abren atrás.
+          const rank = Math.ceil(n / 2);
+          const arm = n === 0 ? 0 : n % 2 === 0 ? 1 : -1;
+          const back = rank * 1.3;
+          const across = arm * rank * 1.1;
+          at.set(leadX - fx * back + fz * across, CRANE_HEIGHT + Math.sin(time * 0.3 + n) * 0.2, leadZ - fz * back - fx * across);
+          flight.compose(at, heading, size.setScalar(CRANE_SCALE));
+          // La grulla planea mucho y bate despacio.
+          const beat = 0.5 + 0.5 * Math.sin(time * 3.2 + rank * 0.6);
+          const angle = WING_UP * 0.6 + (WING_DOWN - WING_UP * 0.6) * beat;
+          pieces.forEach(({ part, wing: side }, k) => {
+            wing.multiplyMatrices(flight, part.local);
+            if (side !== 0) wing.multiply(hinge.makeRotationZ(side * angle));
+            cranes[k]!.setMatrixAt(n, wing);
+          });
+        }
+        for (const mesh of cranes) mesh.instanceMatrix.needsUpdate = true;
+      }
+
       // Las luciérnagas: cada una se enciende y se apaga a su ritmo.
       const flyAmount = fliesAt(hour, season, sky);
       flyMaterial.opacity = flyAmount;
@@ -286,13 +366,15 @@ export function createAmbience(map: ValleyMap, bird?: Object3D): Ambience {
       shown.mist = mist.count;
       shown.birds = parts === null ? birds.count : flock[0]!.count;
       shown.flies = flies.count;
+      shown.cranes = craneCount;
+      if (craneCount === 0) shown.craneLead = null;
     },
     dispose(): void {
       plane.dispose();
       mistMaterial.dispose();
       birdMaterial.dispose();
       // Las geometrías son del modelo compartido; los materiales, copias nuestras.
-      for (const mesh of flock) (mesh.material as Material).dispose();
+      for (const mesh of [...flock, ...cranes]) (mesh.material as Material).dispose();
       flyMaterial.dispose();
       soft?.dispose();
       birdMap?.dispose();
