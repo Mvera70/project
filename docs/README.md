@@ -76,6 +76,7 @@ Las herramientas que las produjeron están en `tools/reports/`.
 | `medidas/animacion-matriz-2026-09-29.md` | **La matriz de animación (AN-0 a AN-4)**: 24 clips humanos, 15 especies y la golondrina, con origen, situación en partida, evidencia, defecto, gravedad, coste y decisión; línea de base y «después» de cada fase (cadencia, apoyo, plantado, rumbo, mezclas, gestos, combate) y los veredictos de AN-4 |
 | `medidas/animacion-tomas-2026-09-29.md` | **El índice de las tomas de la ronda AN**: cada toma del observatorio con semilla, año, lead, fps, viewport, cámara y escenario, y las hojas de gestos |
 | `medidas/fusion-cuatro-ramas-2026-09-29.md` | **La fusión de las cuatro ramas del 29 sep** (animación AN-0…AN-5, modelos de animales, gráficos GV, sonido): esquema de qué trajo cada una, cómo combinan y los huecos entre ellas repartidos por dueño |
+| `medidas/ci-lento-2026-10-02.md` | **Por qué la CI tarda 36 min**: el tick cuesta ~10× lo del 16 sep (×2,3 en `6fa7fda1`, que invalida todas las rutas con cada obra) y la suite rápida pasó de 15 a 58 ficheros que juegan décadas; el servidor no es más lento que local. Banco, perfil y contadores para reproducir |
 | `medidas/findings-drama.md` | Los dos sistemas del motor que no se disparaban nunca (13 sep). **La medida sigue valiendo**; el plan de arreglarla, no |
 | `medidas/rey-medida.md` | Qué llegó y qué no de la fase del rey (K-6) |
 | `medidas/spatial-engine.md` | Cierre real, accesos y trazado en cuatro semillas; límites y reproducción |
