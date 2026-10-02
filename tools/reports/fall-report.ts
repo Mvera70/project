@@ -36,6 +36,8 @@ import { yearOf } from '../../src/engine/time';
 import { smithyOrdersOpen } from '../../src/engine/world/boards';
 import { resistance } from '../../src/engine/world/garrison';
 import { worthOf } from '../../src/engine/world/threat';
+import { archiveGame } from '../../src/engine/save';
+import { fallOf, type FallStory } from '../../src/derive/fall';
 
 const arg = (name: string, fallback: number): number => {
   const i = process.argv.indexOf(`--${name}`);
@@ -98,6 +100,10 @@ interface Fall {
   headlines: string[]; weight2: number;
   /** Cuántos asaltos/saqueos hubo antes del final. */
   raids: number;
+  /** Lo que contaría el epitafio (`derive/fall.ts`). */
+  story: FallStory;
+  /** La decisión que citaría, como `plantilla:opción`. */
+  quoted: string;
 }
 
 function play(name: string, seed: number): { fall: Fall | null; peak: number } {
@@ -152,6 +158,7 @@ function play(name: string, seed: number): { fall: Fall | null; peak: number } {
     .filter((d) => d.tick >= pnr - NEAR_WEEKS && d.tick <= pnr)
     .map((d) => `${d.templateId}:${d.optionId} (año ${yearOf(d.tick)})`);
   const window = state.chronicle.filter((e) => e.tick >= pnr && e.tick <= end);
+  const story = fallOf(archiveGame(state));
   return {
     peak,
     fall: {
@@ -160,6 +167,8 @@ function play(name: string, seed: number): { fall: Fall | null; peak: number } {
       headlines: window.filter((e) => e.weight === 3).map((e) => `${e.templateKey} (año ${yearOf(e.tick)})`),
       weight2: window.filter((e) => e.weight === 2).length,
       raids: state.threat.raids,
+      story,
+      quoted: story.decision === null ? '—' : state.chronicle[story.decision]!.templateKey.replace('crossroad.', ''),
     },
   };
 }
@@ -205,4 +214,13 @@ for (const f of falls) {
 console.log('\n### Lo que la crónica dijo entre el punto y el final (titulares)\n');
 for (const f of falls) {
   console.log(`- **${f.strategy} ${f.seed}** (${f.cause}, ${f.leadHours.toFixed(0)} h): ${f.headlines.join('; ') || 'ningún titular'} · y ${f.weight2} líneas de peso 2`);
+}
+
+console.log('\n### Lo que contaría el epitafio (`derive/fall.ts`)\n');
+console.log('| estrategia | semilla | causa | mejor momento | quedaban | lo que se lo llevó | bajaron | decisión citada | del mejor momento al final |');
+console.log('|---|---:|---|---|---:|---|---:|---|---:|');
+for (const f of falls) {
+  const s = f.story;
+  const links = s.links.map((l) => `${l.kind} ${l.count}${l.kind === 'raids' ? ` (${l.silver} plata, ${l.grain} grano)` : ''} desde el año ${yearOf(l.tick)}`).join('; ');
+  console.log(`| ${f.strategy} | ${f.seed} | ${f.cause} | ${s.peak} en el año ${yearOf(s.peakTick)} | ${s.left} | ${links || '—'} | ${s.band ?? '—'} | ${f.quoted} | ${(f.endHours - hours(s.peakTick)).toFixed(0)} h |`);
 }
