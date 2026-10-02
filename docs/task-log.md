@@ -23,6 +23,18 @@ asaltadas por la plata amontonada, y Vera lo deja. Todo en
 - **Las ilustraciones y los modelos**, encargados en
   `docs/encargos/ilustraciones-k8-k9.md`; pasan a `plan-arte-pendiente.md`
   cuando Codex suelte ese fichero.
+## 2 oct 2026 · Dientes de sierra en la tablet (v5.65)
+
+Rama `ccr-2befdb3e-qwp7lu`. La tablet de Vera es una **iPlay 70 mini Ultra**
+(Android 14, Adreno 725, 2560×1600 a 144 Hz). Medium caía al 50 % de
+resolución porque la adaptativa bajaba sin comprobar que bajar acortara el
+fotograma; ahora una bajada que no paga se deshace, y el suelo de Medium es un
+píxel por píxel CSS. Medido en el contenedor (aparato limitado por CPU: antes
+0,5, ahora 1, tres de tres) y con hojas antes/después a 390 y 750
+(`docs/medidas/dientes-de-sierra-tablet-2026-10-02.md`). **Abierto, en la
+tablet** (aldea 11/21, panel de taller): (1) qué resolución y si sale «(CPU)»;
+(2) `?aa=msaa` contra sin nada: si los fps no bajan más de un 10 %, MSAA pasa
+a Medium en v5.66 (v5.66–v5.67 reservadas para eso).
 
 ## 2 oct 2026 · Piedras de orilla, zorro, encrucijada a 600 (v5.55) · y dos abiertos
 
