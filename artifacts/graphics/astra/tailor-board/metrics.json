@@ -1,0 +1,19 @@
+{
+  "id": "tailor-board",
+  "triangles": 248,
+  "budget": 250,
+  "meshes": [
+    "tailor-board"
+  ],
+  "materials": 1,
+  "textures": 0,
+  "sizeGltf": [
+    0.5,
+    0.7050082683563232,
+    0.1339999921619892
+  ],
+  "origin": "base",
+  "front": "+Z",
+  "glbBytes": 24940,
+  "sha256": "359ae418086d1375145cedc087fe109e791c12194d88214b3ac1f4e95bd1cad3"
+}

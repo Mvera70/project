@@ -1,0 +1,23 @@
+{
+  "id": "notice-board",
+  "triangles": 260,
+  "budget": 400,
+  "meshes": [
+    "notice-board",
+    "note_1",
+    "note_2",
+    "note_3",
+    "note_4"
+  ],
+  "materials": 1,
+  "textures": 0,
+  "sizeGltf": [
+    0.8781111836433411,
+    1.3009670972824097,
+    0.29999998211860657
+  ],
+  "origin": "base",
+  "front": "+Z",
+  "glbBytes": 28124,
+  "sha256": "fbd8d6ac2b4d12467ffb77bf276c3b4099a433c037711191b4bb11b1eef969f3"
+}

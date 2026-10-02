@@ -1,0 +1,19 @@
+{
+  "id": "smithy-board",
+  "triangles": 204,
+  "budget": 250,
+  "meshes": [
+    "smithy-board"
+  ],
+  "materials": 1,
+  "textures": 0,
+  "sizeGltf": [
+    0.5,
+    0.6742608547210693,
+    0.10249999538064003
+  ],
+  "origin": "base",
+  "front": "+Z",
+  "glbBytes": 20716,
+  "sha256": "cf9226069e39f7378c06c07e2eef263d2f72fe285706a2effe92d4ae4313d44e"
+}

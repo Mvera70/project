@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T20:19:37.522Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids mule,boar",
+  "generatedAt": "2026-10-02T16:04:02.936Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bench,log-seat,cart",
   "assets": [
     {
       "id": "axis-marker",
@@ -1584,6 +1584,347 @@
         "kind": "original",
         "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, boar()); 29 sep 2026: patas acortadas y colmillos mayores a petición suya (BOAR_DROP 0,08, BOAR_TUSK 1,5). Clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
+      }
+    },
+    {
+      "id": "barrel",
+      "file": "barrel.glb",
+      "sha256": "ACBF7867340AAC9AFCAC6FF33F6716C59B468D9CD90A5E46D02C263A2EEC5788",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/barrel-candidate/barrel.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "crate",
+      "file": "crate.glb",
+      "sha256": "8EB654ACA9CFB03C9A46CF6DB54F86372E8B622D477B9A873BF473A3F76655F6",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/crate-candidate/crate.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "sack-pile",
+      "file": "sack-pile.glb",
+      "sha256": "519A2993969659E8FC0BD86B5E309D69AD9B277FB939BBDFE13DF1A3E7318765",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/sack-pile-candidate/sack-pile.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "tool-rack",
+      "file": "tool-rack.glb",
+      "sha256": "64FE9FF504ED28EA438C8C9F57CD4055B33CBF892A26AD6172E85547A2449862",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/tool-rack-candidate/tool-rack.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "washing-line",
+      "file": "washing-line.glb",
+      "sha256": "B005238883BB73C8EFA976B1AAFA25F36B214FBE723551EC256996F50998FD83",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/washing-line-candidate/washing-line.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "flower-pot",
+      "file": "flower-pot.glb",
+      "sha256": "C0D614F8B1CD235DED3F3C7BF883A59286E299D730E4A9E1C4AD7DBCD67849AC",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/flower-pot-candidate/flower-pot.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "herb-bed",
+      "file": "herb-bed.glb",
+      "sha256": "168D4D06091C3B16337823C1A21FDD1B54EBB2DDC6143F14B04F36EB2373D847",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/herb-bed-candidate/herb-bed.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "beehive",
+      "file": "beehive.glb",
+      "sha256": "E2E6BA34E053B426712F64D8E2C02244EC878C009A7EADDF8F42AAA0CBD13FAC",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/beehive-candidate/beehive.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "scarecrow",
+      "file": "scarecrow.glb",
+      "sha256": "98994A03E4A81D1C2BF5E69B94034BFF1331431EABD1CA1164E4085B655ACF14",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/scarecrow-candidate/scarecrow.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "trough",
+      "file": "trough.glb",
+      "sha256": "F76FB1A55ACC6C0DC3997D62FCD050C82B4E61BF951CEFDFD98BE8F96F0E9348",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/trough-candidate/trough.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "chicken-coop",
+      "file": "chicken-coop.glb",
+      "sha256": "205F1D01A263EF5481C225915F7F2778AE727C5ED3F2043A49E7D9CA105DF095",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/chicken-coop-candidate/chicken-coop.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "wood-chopping",
+      "file": "wood-chopping.glb",
+      "sha256": "DAA42A6F1BAC4F8CEA68F3A1E8A8A62044B0CAD7A36C4BEA3B680C0F3698B036",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wood-chopping-candidate/wood-chopping.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "stump",
+      "file": "stump.glb",
+      "sha256": "57A842071E1D69B1F02B8CDB5C43DE3CCB96E2039E8104022812C3F18041D213",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/stump-candidate/stump.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "fallen-log",
+      "file": "fallen-log.glb",
+      "sha256": "1F8016ECEDA72C0C1D33C3FFEE2D69592477D1B17A6A6309EA47491279864306",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/fallen-log-candidate/fallen-log.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "bush",
+      "file": "bush.glb",
+      "sha256": "3F9435EA50C4B4C0737B6D82DEC3478B3A38384E30B689AB3FA5B789FAF67086",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/bush-candidate/bush.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "wildflowers",
+      "file": "wildflowers.glb",
+      "sha256": "D8650A0F2A5B6F8FE76AD026D6362B7AA9D14D97BA428A5363CCDDD9DD1AF003",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wildflowers-candidate/wildflowers.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "mushrooms",
+      "file": "mushrooms.glb",
+      "sha256": "C06F0115548C8C95A73CE637874A759F9E5C34D9D32E63CC775F779BAC679607",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/mushrooms-candidate/mushrooms.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "stone-wall",
+      "file": "stone-wall.glb",
+      "sha256": "99FFD1D1F6EF6679AFF3984DB3A7A8E4E949887421383A50DBD789F8BAEDFFB9",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/stone-wall-candidate/stone-wall.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "wayside-shrine",
+      "file": "wayside-shrine.glb",
+      "sha256": "F82598E5747739E78D6453642DE2A46C8081D692A8C2033495137FE83D984F08",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wayside-shrine-candidate/wayside-shrine.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "lantern-post",
+      "file": "lantern-post.glb",
+      "sha256": "58E81BE6E8B3C54AE41233503F7B12F6F04D53552055F3F19E6F7957643701BA",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/lantern-post-candidate/lantern-post.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "market-awning",
+      "file": "market-awning.glb",
+      "sha256": "DB292E22939323A64969AA3B0A74BC28E357F161E848E6C03D9CDC2BF393295E",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/market-awning-candidate/market-awning.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "notice-board",
+      "file": "notice-board.glb",
+      "sha256": "FBD8D6AC2B4D12467FFB77BF276C3B4099A433C037711191B4BB11B1EEF969F3",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/notice-board.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "smithy-board",
+      "file": "smithy-board.glb",
+      "sha256": "CF9226069E39F7378C06C07E2EEF263D2F72FE285706A2EFFE92D4AE4313D44E",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/smithy-board.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "chapel-board",
+      "file": "chapel-board.glb",
+      "sha256": "9C70EEB3E8479451023809E438B5EC6F92C46550EEF1931CB10B94F425357C30",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/chapel-board.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "signpost",
+      "file": "signpost.glb",
+      "sha256": "9B355379E5C7F6A3867108C590D995E18220FE4F55DCF4E7CB5F91081E931C44",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/signpost.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "hide-rack",
+      "file": "hide-rack.glb",
+      "sha256": "150FA21996C9027FA4556256B8C9EF4A1A37990FB27E93FCD92D3C39D9EE87D2",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/hide-rack.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "hammer",
+      "file": "hammer.glb",
+      "sha256": "91EA37D6B90E5D537E953B479FF7366858B217B909B1DE13D6D5210F7359C2F8",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/hammer.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "jerkin",
+      "file": "jerkin.glb",
+      "sha256": "6B44D4963ECEEFE9ACFDC15498E0B76806D5F913E0622E84F81AF0860A369876",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/jerkin-candidate/jerkin.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "bench",
+      "file": "bench.glb",
+      "sha256": "C012E31A2D68C38E2EACF40ACCB57DA00CE08D7A4602BCC26ABA9CE37C844CA9",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/bench-candidate/bench.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "log-seat",
+      "file": "log-seat.glb",
+      "sha256": "E1A9581E3D35FA4FD58692B6901208B36B004C50563F6169A7049067939E9831",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/log-seat-candidate/log-seat.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "cart",
+      "file": "cart.glb",
+      "sha256": "551CD4D69AE7C780D809CD778226A2E72F85768624EDFEA55301501D25A35D56",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/cart-candidate/cart.json",
+        "license": "project-original"
       }
     }
   ]

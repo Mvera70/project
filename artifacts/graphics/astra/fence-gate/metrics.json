@@ -1,0 +1,25 @@
+{
+  "triangles": 96,
+  "limit": 100,
+  "meshCount": 2,
+  "primitives": 2,
+  "dimensionsCells": [
+    1.0,
+    0.36666667461395264,
+    0.050833333283662796
+  ],
+  "pivotsMetres": {
+    "gate_posts": [
+      0,
+      0,
+      0
+    ],
+    "gate_leaf": [
+      -1.28,
+      0,
+      0
+    ]
+  },
+  "vertexColors": true,
+  "textures": 0
+}

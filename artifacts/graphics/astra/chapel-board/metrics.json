@@ -1,0 +1,19 @@
+{
+  "id": "chapel-board",
+  "triangles": 184,
+  "budget": 250,
+  "meshes": [
+    "chapel-board"
+  ],
+  "materials": 1,
+  "textures": 0,
+  "sizeGltf": [
+    0.5131112337112427,
+    0.7172322273254395,
+    0.21049997955560684
+  ],
+  "origin": "base",
+  "front": "+Z",
+  "glbBytes": 18248,
+  "sha256": "9c70eeb3e8479451023809e438b5ec6f92c46550eef1931cb10b94f425357c30"
+}
