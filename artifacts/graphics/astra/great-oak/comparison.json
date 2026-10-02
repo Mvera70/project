@@ -1,0 +1,30 @@
+{
+  "baselineCommit": "fcfb4cb27e520cb90e29630892918614eb73faf6",
+  "baseline": {
+    "triangles": 2346,
+    "meshes": 7,
+    "primitives": 11,
+    "materials": 5,
+    "textures": 0,
+    "bytes": 182112
+  },
+  "candidate": {
+    "triangles": 2346,
+    "meshes": 7,
+    "primitives": 11,
+    "materials": 5,
+    "textures": 0,
+    "bytes": 182116
+  },
+  "cameraRuntimeDirection": [
+    1,
+    0.9,
+    1.15
+  ],
+  "restingVisibleHeightCells": 26,
+  "viewport": [
+    390,
+    844
+  ],
+  "method": "Blender studio render at game camera direction and pixel scale; not an in-game capture."
+}

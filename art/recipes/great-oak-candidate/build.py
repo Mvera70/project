@@ -5,6 +5,7 @@ from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[3]
 OUT=ROOT/'artifacts/graphics/astra/great-oak';OUT.mkdir(parents=True,exist_ok=True)
 P=json.loads((ROOT/'art/recipes/palette.json').read_text())
+TUNE=json.loads((Path(__file__).parent/'great-oak.json').read_text(encoding='utf-8'))
 colors={'bark':P['valley']['trunk'],'bark_dark':P['houses']['tiled']['timberDark'],'foliage_shadow':P['valley']['forestGreen'],'foliage':P['valley']['foliage'],'foliage_light':P['valley']['foliageLight']}
 bpy.ops.wm.read_factory_settings(use_empty=True)
 mats={};parts={}
@@ -35,7 +36,8 @@ def tube(name,points,radii,sides=7):
 tube('great_oak_trunk',[(0,0,0),(.025,.015,.35),(-.04,.025,.9),(.06,0,1.35),(.02,.035,1.83),(.17,.02,2.3)],[.43,.32,.265,.26,.18,.07],9)
 for i in range(7):
     a=2*math.pi*i/7+.15;dx,dy=math.cos(a),math.sin(a)
-    tube('great_oak_roots',[(dx*.12,dy*.12,.24),(dx*.43,dy*.43,.12),(dx*.79,dy*.79,.025),(dx*.99,dy*.99,0)],[.22,.16,.065,.007],6)
+    reach=TUNE['rootReach'][i]/.99
+    tube('great_oak_roots',[(dx*.12,dy*.12,.24),(dx*.43*reach,dy*.43*reach,.12),(dx*.79*reach,dy*.79*reach,.025),(dx*.99*reach,dy*.99*reach,0)],[.22,.16,.065,.007],6)
 # Ramas bajas anchas que vuelven a subir, como los brazos del emblema.
 for i in range(7):
     a=2*math.pi*i/7+.2;dx,dy=math.cos(a),math.sin(a);reach=1.35+.13*math.sin(i*3)
@@ -54,12 +56,13 @@ def clump(index,pos,size,mat):
     o.rotation_euler.z=index*.73;o.data.materials.append(mats[mat]);parts.setdefault('great_oak_canopy_'+mat.removeprefix('foliage').strip('_'),[]).append(o)
 # Revisión del emblema: grupos terminales separados y tres pisos con vacíos reales.
 # No hay cogollo central inferior que tape la bifurcación del tronco.
-lower=[(-1.36,-.53),(-1.30,.59),(1.36,-.52),(1.28,.61),(-.72,-1.20),(.72,-1.20),(-.74,1.20),(.73,1.20)]
-for i,(x,y) in enumerate(lower):
-    clump(i,(x,y,2.23+.025*(i%2)),(.55,.51,.24),'foliage_shadow' if i in (1,6) else 'foliage')
-for i,(x,y) in enumerate([(-.77,-.39),(.77,-.39),(-.72,.46),(.72,.46)]):
-    clump(i+8,(x,y,2.83+.025*(i%2)),(.48,.47,.25),'foliage_light' if i%2 else 'foliage')
-clump(12,(.04,0,3.23),(.36,.38,.24),'foliage_light')
+# Revisión B8: trece cogollos originales, copas con volumen y alturas irregulares.
+for i,(x,y,z,sx,sy,sz) in enumerate(TUNE['lower']):
+    clump(i,(x,y,z),(sx,sy,sz),'foliage_shadow' if i in (1,6) else 'foliage')
+for i,(x,y,z,sx,sy,sz) in enumerate(TUNE['upper']):
+    clump(i+8,(x,y,z),(sx,sy,sz),'foliage_light' if i%2 else 'foliage')
+x,y,z,sx,sy,sz=TUNE['top']
+clump(12,(x,y,z),(sx,sy,sz),'foliage_light')
 # El remate central y los dos pares altos necesitan ramillas que atraviesen los huecos.
 tube('great_oak_twigs',[(.10,.02,2.18),(.06,.02,2.73),(.04,0,3.24)],[.09,.065,.016],6)
 for x,y in [(-.77,-.39),(.77,-.39),(-.72,.46),(.72,.46)]:
@@ -78,13 +81,14 @@ def bounds(obs):
 bpy.context.view_layer.update();lo,hi=bounds(objects)
 # Altura exacta de integración: 3,4 celdas con identidad de escala.
 for o in objects:
-    for v in o.data.vertices:v.co.z*=3.4/hi[2]
+    for v in o.data.vertices:v.co.z*=TUNE['height']/hi[2]
 bpy.context.view_layer.update();lo,hi=bounds(objects)
 triangles=sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in objects)
+assert triangles <= TUNE['triangleLimit'], triangles
 bpy.ops.object.select_all(action='DESELECT')
 for o in objects:o.select_set(True)
 bpy.ops.export_scene.gltf(filepath=str(OUT/'great-oak.glb'),export_format='GLB',use_selection=True,export_yup=True,export_animations=False)
-metrics={'id':'great-oak','triangles':triangles,'triangleLimit':3500,'boundsRuntimeCells':{'min':[lo[0],lo[2],-hi[1]],'max':[hi[0],hi[2],-lo[1]]},'materials':colors,'pivotsRuntimeCells':{o.name:[0,0,0] for o in objects},'meshNames':[o.name for o in objects],'textures':0}
+metrics={'id':'great-oak','triangles':triangles,'triangleLimit':TUNE['triangleLimit'],'boundsRuntimeCells':{'min':[lo[0],lo[2],-hi[1]],'max':[hi[0],hi[2],-lo[1]]},'materials':colors,'pivotsRuntimeCells':{o.name:[0,0,0] for o in objects},'meshNames':[o.name for o in objects],'textures':0}
 (OUT/'metrics.json').write_text(json.dumps(metrics,indent=2))
 bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(OUT/'great-oak.glb'))
 objects=[o for o in bpy.context.scene.objects if o.type=='MESH'];bpy.context.view_layer.update()
@@ -97,7 +101,7 @@ bpy.ops.object.camera_add();camera=bpy.context.object;camera.data.type='ORTHO';s
 bpy.ops.mesh.primitive_plane_add(size=200,location=(0,0,-.008));ground=bpy.context.object
 m=bpy.data.materials.new('ReviewGround');m.diffuse_color=(.64,.68,.54,1);ground.data.materials.append(m)
 images=[]
-for idx,(title,direction) in enumerate([('three-quarter',(1,-1.5,1.15)),('front',(0,-1,.015)),('side',(1,0,.015)),('scale',(0,-1.5,.8))]):
+for idx,(title,direction) in enumerate([('three-quarter',(1,-1.15,.9)),('front',(0,-1,.015)),('side',(1,0,.015)),('scale',(0,-1.5,.8))]):
     current=objects[:]
     if idx==3:
         for file,offset in [('house',3.0),('villager',2.1)]:

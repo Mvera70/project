@@ -1,36 +1,45 @@
-# Gran roble icónico · candidato
+# Gran roble icónico · revisión B8
 
-Interpretación tridimensional del árbol de `public/ui/art/title-logo-en.png`: tronco grueso, raíces abiertas y brazos extendidos bajo una copa horizontal. Colores naturales de la paleta, caras planas y ninguna textura.
+Mejora acotada del candidato existente: copa más voluminosa, alturas irregulares y raíces de longitudes distintas. Conserva el tronco, el trazado de las ramas, los trece grupos de hojas y la topología. La silueta mantiene los huecos que dejan leer la bifurcación.
 
-- **2346 triángulos**, siete mallas, cinco materiales, **182112 bytes** de GLB.
-- Anchura × altura × fondo: **3.748944 × 3.400000 × 3.506433 celdas**, equivalentes a **11.246832 × 10.200000 × 10.519298 m**.
-- Caja Three.js: mínimo `(-1.895501, 0, -1.786677)`, máximo `(1.853443, 3.400000, 1.719755)`.
-- Origen en el centro del pie; suelo Y=0, Y arriba. Nodos raíz con transformaciones identidad. El modelo ya tiene la altura final: integrarlo con escala **1**, sin volver a aplicar el `SCALE=1.35` del roble procedural.
+| Medida | Antes | B8 |
+|---|---:|---:|
+| Triángulos (máximo 3500) | 2346 | 2346 |
+| Mallas | 7 | 7 |
+| Primitivas GLB | 11 | 11 |
+| Materiales | 5 | 5 |
+| Texturas / animaciones | 0 / 0 | 0 / 0 |
+| Bytes GLB | 182112 | 182116 |
 
-## Nombres y estaciones
+Las once primitivas incluyen los dos materiales de cada malla de madera. El recuento de mallas no equivale a llamadas de dibujo: el coste de envío no crece respecto al candidato anterior, pero las llamadas totales de la escena y las sombras se medirán al integrar.
 
-Madera: `great_oak_trunk`, `great_oak_roots`, `great_oak_branches`, `great_oak_twigs`.
+## Medidas y contrato
 
-Copas separadas para tintado estacional:
+Anchura × altura × fondo: **3,797504 × 3,400000 × 3,486532 celdas** (11,392512 × 10,200000 × 10,459597 m). Caja Three.js: mínimo `(-1.924711, 0, -1.766270)`, máximo `(1.872794, 3.400000, 1.720263)`.
 
-| Malla | Material | Color de paleta |
+Origen en el centro del pie; suelo Y=0, Y arriba. Nodos raíz con transformaciones identidad. Integración a escala **1**: no aplicar de nuevo el `SCALE=1.35` del roble procedural.
+
+Madera: `great_oak_trunk`, `great_oak_roots`, `great_oak_branches`, `great_oak_twigs`. Materiales `great_oak_bark` (`trunk` #735338) y `great_oak_bark_dark` (`houses.tiled.timberDark` #3F2B22).
+
+| Copa separada | Material | Paleta |
 |---|---|---|
 | `great_oak_canopy_shadow` | `great_oak_foliage_shadow` | `forestGreen` #344D35 |
 | `great_oak_canopy_mid` | `great_oak_foliage` | `foliage` #62864F |
 | `great_oak_canopy_light` | `great_oak_foliage_light` | `foliageLight` #7F9F64 |
 
-La corteza usa `great_oak_bark` (`trunk` #735338) y `great_oak_bark_dark` (`houses.tiled.timberDark` #3F2B22). Todas las superficies tienen rugosidad 1. Las copas tienen un solo material por malla; pueden ocultarse en invierno si la integración lo requiere, dejando ramas completas debajo. El candidato no lleva animaciones ni cambio estacional embebido.
+Rugosidad 1 en todas las superficies. Cada copa tiene un solo material y puede tintarse u ocultarse por estación; quedan ramas completas debajo. El candidato no incorpora cambio estacional.
 
 ## Reproducción y evidencia
 
-Fuente autónoma: `art/recipes/great-oak-candidate/build.py`. Desde la raíz, PowerShell:
+Receta parametrizada: `art/recipes/great-oak-candidate/great-oak.json`; generador: `build.py`. Desde la raíz del repositorio, PowerShell:
 
 ```powershell
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python art/recipes/great-oak-candidate/build.py
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python art/recipes/great-oak-candidate/compare.py
 ```
 
-Reconstruye GLB, métricas y capturas. Reimporta el GLB antes de renderizar. `sheet.png`: arriba izquierda cámara inclinada de juego, arriba derecha frente, abajo izquierda perfil y abajo derecha escala con casa y aldeano publicados sin modificar su tamaño. También se entregan las cuatro vistas individuales.
+`build.py` reconstruye el GLB, métricas y hoja, reimportando el GLB antes de renderizar. `sheet.png`: arriba izquierda ángulo del juego, arriba derecha frente, abajo izquierda perfil y abajo derecha escala junto a `house.glb` y `villager.glb`, ambos publicados y sin cambiar su escala.
 
-Revisados visualmente la hoja de contactos y el frente corregido; comprobados en los bytes del GLB los 2346 triángulos, siete nodos y ausencia de texturas/transformaciones. La captura es de Blender. La integración y la captura dentro del juego están documentadas en `docs/historico/graphics-rounds/G-42.md`. Sin preguntas pendientes.
+`comparison-rest.png`: **izquierda antes, derecha B8**, recortes sin ampliar de dos renders de 390 × 844 px. Usa la dirección `(1, 0.9, 1.15)` de `src/render3d/camera.ts` y 26 celdas de altura visible de reposo. La comparación usa Blender, luz idéntica y fondo de estudio: **no es una captura del juego ni mide rendimiento en el aparato**. Se aprecia la copa más llena y escalonada; a esta escala las raíces aportan una diferencia menor. `comparison.json` recoge los recuentos auditados desde los bytes de ambos GLB y el commit base `fcfb4cb27e520cb90e29630892918614eb73faf6`.
 
-Revisión acotada de silueta: trece grupos terminales de hojas repartidos en tres pisos, con huecos reales entre la copa baja y las ramas altas. La bifurcación central queda visible desde el frente y desde la cámara inclinada. Se conserva la familia de siete mallas, la paleta y la altura final de 3,4 celdas.
+Verificados visualmente hoja y comparación; el auditor comprueba presupuesto, ausencia de texturas/animaciones y transformaciones de traslación/escala identidad. Revisión sólo de candidato: no modifica el GLB publicado, el motor ni la integración. La captura dentro del juego y la medición combinada quedan para el director al integrar. El historial anterior sigue en `docs/historico/graphics-rounds/G-42.md`.
