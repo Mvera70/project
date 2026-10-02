@@ -69,7 +69,8 @@ describe('K7 · por qué cayó', () => {
       expect(story.links.length).toBeLessThanOrEqual(FALL.LINKS);
       for (let i = 0; i < story.links.length; i += 1) {
         const link = story.links[i]!;
-        expect(link.tick, link.kind).toBeGreaterThanOrEqual(story.peakTick);
+        expect(link.tick, link.kind).toBeGreaterThanOrEqual(story.from);
+        expect(story.from).toBeGreaterThanOrEqual(story.peakTick);
         expect(link.tick, link.kind).toBeLessThanOrEqual(game!.endedTick);
         if (i > 0) expect(link.tick).toBeGreaterThanOrEqual(story.links[i - 1]!.tick);
       }
@@ -100,7 +101,7 @@ describe('K7 · por qué cayó', () => {
     const raids = story.links.find((l) => l.kind === 'raids');
     if (raids !== undefined) {
       const before = game!.chronicle.filter((e) => ['raid.open', 'raid.walled', 'raid.assault'].includes(e.templateKey)
-        && e.tick >= story.peakTick && e.tick < last.tick).length;
+        && e.tick >= story.from && e.tick < last.tick).length;
       expect(raids.count).toBe(before);
     }
   });

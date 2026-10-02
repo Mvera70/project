@@ -42,6 +42,8 @@ export interface FallStory {
   /** El mejor momento: cuándo y con cuánta gente. Desde ahí se cuenta la caída. */
   readonly peakTick: number;
   readonly peak: number;
+  /** Desde cuándo se cuenta lo que se lo llevó (`FALL.WINDOW_YEARS`). */
+  readonly from: number;
   /** La gente que quedaba al final, antes del último golpe. */
   readonly left: number;
   /** Lo que se la llevó, de mayor a menor peso, como mucho `FALL.LINKS`. */
@@ -56,13 +58,24 @@ export interface FallStory {
 }
 
 /**
- * TUNE: cuántas cosas cuenta el epitafio, y cuántos años antes del mejor
- * momento se mira si hubo una decisión. Tres porque es lo que cabe en la
- * columna de 390 px sin que el «por qué» tape la lápida; dos años porque la
- * pregunta que torció la partida suele venir antes del descenso, y lo que se
- * midió está en `docs/medidas/k7-caidas-2026-10-02.md`.
+ * TUNE: cuántas cosas cuenta el epitafio, cuántos años antes del final mira, y
+ * cuántos años antes de esa ventana se busca una decisión.
+ *
+ *  · `LINKS` 3: lo que cabe en la columna de 390 px sin que el «por qué» tape
+ *    la lápida.
+ *  · `WINDOW_YEARS` 5: medido el 2 oct 2026 en los 29 valles caídos de
+ *    `fall-report` (herrajes y adversa, 30 semillas × 100 años), del mejor
+ *    momento al final van de 0 a 674 h a ×1 —hasta sesenta años de meseta—, y
+ *    contando desde ahí el relato sumaba décadas («158 murieron de hambre
+ *    desde el año 34»). Lo que acaba con un valle pasa en sus últimos años: el
+ *    momento en que cualquier partida del clan ya entraba precede al final en
+ *    5–8 h de mediana, y el hambre y las bajadas que lo dejan así, en los
+ *    cinco años de antes.
+ *  · `DECISION_YEARS` 2: la pregunta que torció la partida suele llegar antes
+ *    del descenso; en 28 de los 29 la que se cita es `raiders_coming`,
+ *    `succession` o el forastero del vado.
  */
-export const FALL = { LINKS: 3, DECISION_YEARS: 2 } as const;
+export const FALL = { LINKS: 3, WINDOW_YEARS: 5, DECISION_YEARS: 2 } as const;
 
 const DEATH = /^death\.(hunger|plague|cold|fire|violence|natural|old_age)\.(named|anon\.one|anon\.many)$/;
 const RAIDS = new Set(['raid.open', 'raid.walled', 'raid.assault']);
@@ -125,7 +138,10 @@ export function fallOf(game: Pick<ArchivedGame, 'cause' | 'chronicle' | 'endedTi
   // El último golpe no es una causa: es el final, y el epitafio ya lo dice.
   const last = [...chronicle].reverse().find((e) => e.templateKey === 'raid.stormed');
   const band = game.cause === 'stormed' && last !== undefined ? headsIn(last) : null;
-  const all = linksSince(chronicle, peakTick, game.cause === 'stormed' && last !== undefined ? last.tick - 1 : end);
+  // Se cuenta desde el mejor momento o desde los últimos `WINDOW_YEARS`, lo
+  // que esté más cerca del final: una meseta de décadas no es la caída.
+  const from = Math.max(peakTick, end - FALL.WINDOW_YEARS * TIME.WEEKS_PER_YEAR);
+  const all = linksSince(chronicle, from, game.cause === 'stormed' && last !== undefined ? last.tick - 1 : end);
   const weight = (l: FallLink): number => (l.kind === 'old_age' || l.kind === 'natural' ? l.count / 4 : l.count);
   const links = all
     .filter((l) => l.count > 0)
@@ -135,13 +151,13 @@ export function fallOf(game: Pick<ArchivedGame, 'cause' | 'chronicle' | 'endedTi
 
   // La decisión más cercana al final, mirando desde un poco antes del mejor
   // momento: la pregunta que torció la partida suele llegar antes del descenso.
-  const since = peakTick - FALL.DECISION_YEARS * TIME.WEEKS_PER_YEAR;
+  const since = from - FALL.DECISION_YEARS * TIME.WEEKS_PER_YEAR;
   let decision: number | null = null;
   chronicle.forEach((e, i) => {
     if (e.kind === 'crossroad_taken' && e.tick >= since && e.tick <= end) decision = i;
   });
 
-  return { cause: game.cause, peakTick, peak, left, links, decision, band };
+  return { cause: game.cause, peakTick, peak, from, left, links, decision, band };
 }
 
 /**
