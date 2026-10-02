@@ -1,5 +1,32 @@
 # The Valley — Registro de cambios
 
+## v5.89 · 2 oct 2026 · El cerco sin salida: el portón da al valle, no a la montaña
+
+**Motor** (`world/placement.ts`, la regla del portón). Lo pidió Vera con su
+regla de que lo que rompe la partida se arregla. **El defecto, medido por #48:**
+a los cuarenta años, 3 de 24 valles alcanzaban menos de 500 celdas porque su
+único portón daba a una bolsa de prado entre el cerco y la montaña (en la
+semilla 13, tres celdas y la sierra; el pueblo entero, 448 celdas).
+
+**Por qué pasaba.** La puerta tiene que dar por fuera a `exterior`, y
+`exterior` se sembraba en cualquier celda transitable más allá del anillo: la
+bolsa contaba como campo abierto. **Ahora fuera es lo que llega a las
+gargantas** —las filas de los dos extremos, por donde entra el río y llega
+quien viene de fuera—, que es el resto del valle con sus campos, su bosque y sus
+caminos. Sin constante nueva y sin cambio de esquema; la puerta se sigue
+eligiendo por lo pisado y la cercanía a la plaza.
+
+**Medido** (`tools/reports/enclosure-report.ts`, nuevo; dos series de 24
+semillas a 40 años): valles por debajo de 500 celdas, **de 3 a 0** (semillas
+1–24) y **de 2 a 0** (3 + 7i). Sólo cambian los valles cuyo portón daba a una
+bolsa, y uno más cuyo portón se movió (la 11); los demás juegan la misma
+partida. **El ritmo no se mueve:** muralla 193 h, portón 194 h, villa cerrada
+329 h, antes y después (`pace-report.ts`, 24 × 60); sólo el bastión, de 491 h
+(20/24) a 459 h (19/24), porque cuatro valles juegan otra partida desde su
+portón. **El tick, tampoco:** 4,71 → 4,18 ms por semana, con las huellas de
+las semillas 7, 23 y 41 idénticas. Prueba: `tests/journeys/enclosure.test.ts`.
+Planos y capturas de la semilla 13: `docs/medidas/cerco-sin-salida-2026-10-02.md`.
+
 ## v5.85 · 2 oct 2026 · La fauna por estaciones: que cada estación se note en sus animales
 
 **Sólo capa de vida, derive y render** (decisión de Vera): el motor no se toca,

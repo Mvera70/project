@@ -31,6 +31,27 @@ decidido por Sol 6: los 21 tipos del Bloque 0 usan una malla instanciada por tip
 decidido por Sol 6: el modelo de lavado y el de bancal pueden convivir con los elementos procedurales anteriores cuando hay sitio libre; el mismo filtro de celdas libres impide tapar accesos.
 
 Bloque 0 candidato integrado, comparado contra `main` `24683e35` con la misma semilla/año/estación: villa `gl-probe` **511 llamadas (+17), 763 963 triángulos (+1 462), 48 programas (+1)**; `scene-report` **492 mallas (+28), 207 sombras (=), 730 672 triángulos (+3 698)**. Aldea `gl-probe` **411 llamadas (+11), 747 635 triángulos** (la diferencia bruta varía con animaciones); `scene-report` **425 mallas (+15), 160 sombras (=), 646 842 triángulos (+2 374)**. El Bloque 0 queda por debajo de +30 llamadas y +60 000 triángulos en villa. Captura a cámara de reposo de la zona de casas: `artifacts/graphics/astra-b0-integrated/village-close.png`, comparada con `artifacts/graphics/astra-baseline-main/village-close.png`.
+## 2 oct 2026 · El cerco sin salida (v5.89)
+
+Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
+rama `claude/cerco-sin-salida`, **versión v5.89**. Motor: el abierto (3) del
+valle natural (#48, abajo). **Hecho:** el portón sólo se cuelga donde por fuera
+dé a suelo que llega a una garganta (`placeBuilding`, la inundación de
+`exterior`); antes valía cualquier bolsa de prado entre el cerco y la montaña.
+Medido en 24 semillas a 40 años (`tools/reports/enclosure-report.ts`): pueblos
+por debajo de 500 celdas, **de 3 a 0** (semillas 1–24) y de 2 a 0 (3 + 7i). Sin
+cambio en el ritmo (muralla 193 h, villa cerrada 329 h; el bastión, 491 → 459
+h, 19/24), ni en el tick (huellas idénticas en 7, 23 y 41). Suite rápida entera
+en local, 2 132 en verde; las doce jornadas del cerco y del asalto, 93 de 93.
+Medidas y planos: `docs/medidas/cerco-sin-salida-2026-10-02.md`. Avisada la
+sesión de AR-2 (minería), que también toca el motor.
+
+**Abierto:** (1) **el río parte el exterior**: con el vado dentro del anillo y
+una sola puerta, la otra orilla sólo se alcanza por dentro; seis valles de 24
+se quedan entre 900 y 1 200 celdas. No encierra, pero es medio valle; pedir la
+segunda puerta en la otra orilla sería otra ronda. (2) Una obra que tape el
+portón por dentro (la 37 antes de RD-3) no la ha tocado esta ronda; no aparece
+en las dos series.
 
 ## 2 oct 2026 · La fauna por estaciones (v5.85)
 
@@ -176,7 +197,7 @@ en la prueba (`valle-forma-2026-10-02.md` §5).
 albañil se le acaba la jornada antes de cargar (15 de 60 valles en `main`, 20
 con el contorno); va con la cantera al pie de la montaña, en v5.74. (2) La
 muralla en la falda llega 36 h más tarde: si pide nivelado, es de Vera. (3)
-**Pueblos sin salida por su propio cerco**: a los cuarenta años, 3 de 24 valles
+~~**Pueblos sin salida por su propio cerco**~~ (arreglado en v5.89, arriba): a los cuarenta años, 3 de 24 valles
 alcanzan menos de 500 celdas (1 de 24 en `main`); en la semilla 13 el único
 portón da a la montaña. Es la regla del portón (`placeBuilding` no mira adónde
 da) y va en su propia ronda, porque mueve todas las trayectorias. (4) Cerca de
