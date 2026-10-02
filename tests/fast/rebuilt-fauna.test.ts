@@ -27,12 +27,15 @@ const manifest = JSON.parse(readFileSync('public/assets/valley3d/manifest.json',
   assets: { id: string; file: string; sha256: string; motion: { name: string; seconds: number; loop: boolean; strideLength: number | null }[] }[] };
 
 /**
- * Los presupuestos del encargo (`encargo-astra-tanda-larga-2026-10-02.md`,
- * bloques 6 y 7). El polluelo es la excepción declarada: con 80 triángulos
- * salía lleno de picos y Vera no lo aceptó («muchos vértices»); con esferas de
- * diez husos, como las de la gallina, son 460, en una llamada de dibujo igual.
+ * Lo que pesa cada uno, contra su animal de referencia del valle: el
+ * presupuesto del encargo de Astra (80 el polluelo, 250 la cigüeña, 900 el
+ * caballo) obligaba a esferas de cinco husos y a piezas que no se tocaban, y
+ * Vera lo rechazó («hazlos bien, con la calidad de los que tenemos ahora»).
+ * La propiedad es que ninguno pese más que el modelo del valle del que sale
+ * (la gallina, 1978; la mula, 2474), y que todo animal con clips siga siendo
+ * una llamada de dibujo (`animal-draws.test.ts`).
  */
-const BUDGET: Record<string, number> = { stork: 250, 'stork-nest': 200, chick: 480, crane: 150, butterfly: 16, horse: 900 };
+const BUDGET: Record<string, number> = { stork: 1978, 'stork-nest': 400, chick: 1978, crane: 1978, butterfly: 200, horse: 2474 };
 
 async function library(...ids: string[]) {
   const bytes = Object.fromEntries(ids.map((id) => [id, Uint8Array.from(readFileSync(`public/assets/valley3d/${id}.glb`)).buffer]));
@@ -53,7 +56,7 @@ function worldPoints(mesh: InstancedMesh, n: number): Vector3[] {
 }
 
 describe('v5.100 · los animales rehechos', () => {
-  it.each(Object.keys(BUDGET))('%s cabe en el presupuesto del encargo', (id) => {
+  it.each(Object.keys(BUDGET))('%s no pesa más que su animal de referencia del valle', (id) => {
     const asset = catalog.assets.find((a) => a.id === id);
     expect(asset?.statistics?.triangles).toBeGreaterThan(0);
     expect(asset!.statistics!.triangles).toBeLessThanOrEqual(BUDGET[id]!);

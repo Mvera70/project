@@ -1,5 +1,0 @@
-{"out":"artifacts/graphics/animales-rehechos/horse/andando.png","title":"caballo andando, casco plantado","rows":[{"label":"","panels":[
-{"title":"0,1","kind":"profile","models":[{"glb":"deliverables/marked-models-trial/horse.glb","clip":"walk","at":0.1}]},
-{"title":"0,35","kind":"profile","models":[{"glb":"deliverables/marked-models-trial/horse.glb","clip":"walk","at":0.35}]},
-{"title":"0,6","kind":"profile","models":[{"glb":"deliverables/marked-models-trial/horse.glb","clip":"walk","at":0.6}]},
-{"title":"0,85 · reposo de cámara","kind":"detail","models":[{"glb":"deliverables/marked-models-trial/horse.glb","clip":"walk","at":0.85}]}]}]}

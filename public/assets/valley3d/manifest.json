@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-02T16:39:45.627Z",
+  "generatedAt": "2026-10-02T16:47:05.098Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts --ids stork,chick,crane,butterfly",
   "assets": [
     {
@@ -1886,13 +1886,13 @@
     {
       "id": "stork",
       "file": "stork.glb",
-      "sha256": "F6FA3E0D6AA85E5771494B393FCB8A0CF55F0C8F3CF59B7E7341372634099FF9",
+      "sha256": "25E51FDEC2225E149AC9680602052C818985D96AE4317E205CEF21B5E199935E",
       "motion": [
         {
           "name": "walk",
           "seconds": 0.6,
           "loop": true,
-          "strideLength": 0.232
+          "strideLength": 0.234
         },
         {
           "name": "idle",
@@ -1903,20 +1903,20 @@
       ],
       "provenance": {
         "kind": "original",
-        "source": "Cigüeña blanca facetada de The Valley (build-models.py, stork(); 2 oct 2026, v5.100), sobre la estructura de la gallina, en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "source": "Cigüeña blanca en el lenguaje de la gallina de Vera (build-models.py, stork(); 2 oct 2026, v5.100); clips idle/walk de tools/art/rigid-clips.mjs.",
         "license": "project-original"
       }
     },
     {
       "id": "chick",
       "file": "chick.glb",
-      "sha256": "F11BCD575233D292C913E2426118DD7A65594A43E6319BA93665219F54588F3C",
+      "sha256": "3C8A49C7DAF45F471869123F0B9CC69636AB27F38D11DCAA7D8AE9E1DB73D46B",
       "motion": [
         {
           "name": "walk",
           "seconds": 0.6,
           "loop": true,
-          "strideLength": 0.042
+          "strideLength": 0.038
         },
         {
           "name": "idle",
@@ -1927,29 +1927,29 @@
       ],
       "provenance": {
         "kind": "original",
-        "source": "Polluelo facetado de The Valley (build-models.py, chick(); 2 oct 2026, v5.100), con los nodos de la gallina, en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "source": "Polluelo: la gallina de Vera en cría, con su receta y su densidad (build-models.py, chick(); 2 oct 2026, v5.100); clips idle/walk de tools/art/rigid-clips.mjs.",
         "license": "project-original"
       }
     },
     {
       "id": "crane",
       "file": "crane.glb",
-      "sha256": "708D7CFED25679AAC46C977B411FC0877A7183E434325BAE6A95A3F75C39EC18",
+      "sha256": "48F758F9E03FF021B86CE3A0B5819B05E412253BF9CA57C42D1D2C200EBBB69E",
       "motion": [],
       "provenance": {
         "kind": "original",
-        "source": "Grulla en vuelo facetada de The Valley (build-models.py, crane(); 2 oct 2026, v5.100), con las alas en el hombro como la golondrina, en lugar del candidato de Astra.",
+        "source": "Grulla en vuelo con el cuerpo de la gallina y las plumas de la perdiz (build-models.py, crane(); 2 oct 2026, v5.100), las alas en el hombro como la golondrina.",
         "license": "project-original"
       }
     },
     {
       "id": "butterfly",
       "file": "butterfly.glb",
-      "sha256": "6B35D5F3D733C2DBCBB0056FC83C9566D7901A639A27577FC94B044CD013CBC1",
+      "sha256": "95046AFCA8307CFCE1C532A07BB916BC2FB70889B703466D9CED7C21246C555E",
       "motion": [],
       "provenance": {
         "kind": "original",
-        "source": "Mariposa facetada de The Valley (build-models.py, butterfly(); 2 oct 2026, v5.100), dos alas de una cara para teñir por instancia, en lugar del candidato de Astra.",
+        "source": "Mariposa con los colores elegidos de la de Astra y forma de mariposa (build-models.py, butterfly(); 2 oct 2026, v5.100).",
         "license": "project-original"
       }
     }

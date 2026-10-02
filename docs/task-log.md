@@ -3,26 +3,28 @@
 ## 2 oct 2026 · Los animales rehechos (v5.100)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
-rama `claude/animales-rehechos`, **versiones reservadas v5.100–v5.101** (usada
-v5.100). Rehechos con el camino de los animales del valle (`build-models.py` +
-`rigid-clips.mjs` + `adopt-models.mjs`) los seis de Astra que a Vera no le
-gustaban: cigüeña, nido, polluelo, grulla, mariposa y caballo. Integrados la
-cigüeña, la mariposa, el polluelo y la grulla; el nido y el caballo, sólo
-modelo. Coste: +2 llamadas con cigüeñas a la vista. Hoja de antes y después:
-`artifacts/graphics/animales-rehechos/antes-despues.png`. Informe:
+rama `claude/animales-rehechos`, PR #62, **versiones reservadas v5.100–v5.101**
+(usada v5.100). Los seis de Astra que a Vera no le gustaban —cigüeña, nido,
+polluelo, grulla, mariposa y caballo— rehechos **de la receta de su animal del
+valle y con su densidad** (`build-models.py`), tras cinco vueltas rechazadas
+dentro de los topes del encargo de Astra. Integrados la cigüeña, la mariposa,
+el polluelo y la grulla; el nido y el caballo, sólo modelo. Informe:
 `docs/medidas/animales-rehechos-2026-10-02.md`.
+
+**Lo que costó, para la próxima:** un tope de triángulos pensado para otro
+autor no es una razón para entregar menos calidad que los animales que ya hay;
+y **nada se enseña sin mirarlo antes de cerca en sus juntas, andando y junto a
+su vecino** (`tools/art/fauna-sheet.py` lo hace con `look` y `clip`).
 
 **Abierto:**
 
-- **De Vera:** cuál le gusta más de cada pareja (A = Astra, B = nuevo). Si elige
-  A en alguno, se publica el de Astra en su lugar por el mismo camino; la
-  integración del juego no cambia.
-- **Sin captura en el juego:** la uve de grullas (en el dibujo por software su
-  reloj real avanza a una décima, como en v5.85) y el polluelo de cerca si la
-  semilla no lo pone en cuadro.
-- **Sin medir:** el coste en el aparato.
+- **De Vera:** que los vea. La PR no se fusiona hasta que diga.
+- **Sin captura en el juego:** la uve de grullas (el dibujo por software no
+  llega) y el polluelo de cerca si la semilla no lo pone en cuadro.
 - **La cigüeña queda tapada a medias** por la hierba alta en la semilla 11
   (antes y después): es del sitio de `storkSpots`, no del modelo.
+- **Sin medir:** el coste en el aparato.
+
 ## 2 oct 2026 · Tanda larga de modelos (dirección Sol 6)
 
 Base: `origin/main` en `aba7889b` (brief #55). Trabajo aislado de la copia local `art/astra-modelos`. Prioridad: Bloque 0 completo dentro de +30 llamadas y +60 000 triángulos en la villa grande. El motor queda fuera del alcance. Cada carril trae `main` antes de su PR y hace commit y push al acabar su bloque.

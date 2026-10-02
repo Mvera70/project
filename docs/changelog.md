@@ -1,6 +1,6 @@
 # The Valley — Registro de cambios
 
-## v5.100 · 2 oct 2026 · Los animales rehechos: los de Astra, con el estilo de los del valle
+## v5.100 · 2 oct 2026 · Los animales rehechos: de la receta de los del valle
 
 **Por qué.** Vera, 2 oct 2026: «los modelos de Astra de los animales no me
 gustan, los corregirás tú con el estilo que has ido usando con los últimos».
@@ -9,110 +9,61 @@ Los seis candidatos de Astra de hoy (`art/astra-b6-fauna-polish`,
 mallas rígidas de vértices escritos a mano, sin los nodos de su esqueleto y sin
 clips, y el caballo con el cuerpo de cajas de G-23 que Vera retiró el 29 sep.
 
-**Qué falla en cada uno, comparado con los nuestros** (una línea cada uno):
+**Qué falla en cada uno de Astra, comparado con los nuestros:** la cigüeña, un
+huevo de caras planas con el ala pegada como una placa y sin patas que anden; el
+nido, una palangana de pared recta que se lee cesto; el polluelo, una campana
+amarilla sin cabeza; la grulla, alas de papel en dientes de sierra; la
+mariposa, dos pajaritas sin forma de mariposa; el caballo, patas en salchichas
+con huecos y tronco de caja.
 
-- **Cigüeña**: huevo de caras planas con el ala negra pegada como una placa, el
-  cuello en una pieza aparte sin esqueleto y sin patas que anden.
-- **Nido**: una palangana de pared recta y fondo plano con astillas en el borde;
-  se lee cesto, no nido de ramas.
-- **Polluelo**: una campana amarilla con el pico pegado, sin cabeza que se
-  distinga del cuerpo y sin nodos para andar detrás de la gallina.
-- **Grulla**: alas de papel con dientes de sierra y cuerpo de huso; de lejos, una
-  cometa gris.
-- **Mariposa**: dos pajaritas con los colores horneados, que el juego no puede
-  teñir por instancia.
-- **Caballo**: patas en salchichas con huecos en las rodillas, tronco de caja y
-  cascos de cubo: el estilo de G-23, no el facetado de la mula y la vaca.
+**Cinco vueltas para aprender una cosa.** Las primeras se hicieron dentro de
+los topes de triángulos del encargo de Astra (80 el polluelo, 250 la cigüeña,
+900 el caballo), con esferas de cinco y seis husos y piezas que no se tocaban,
+y Vera las rechazó una tras otra («mira el pollo», «el caballo tiene piezas con
+huecos», «es un nivel bajísimo»). La que vale salió de su última frase: **«para
+y hazlos bien, con la calidad de los que tenemos ahora».** Cada uno sale de la
+receta de su animal del valle, casi literal y con su misma densidad
+(`deliverables/marked-models-trial/build-models.py`):
 
-**Lo que se hizo.** Seis funciones en `deliverables/marked-models-trial/build-models.py`
-con las piezas de la mula, la vaca y la gallina (`loft`, `tube`, `ell`, `leaf`),
-el mismo esqueleto de nodos y los clips de `tools/art/rigid-clips.mjs`, dentro del
-presupuesto del encargo: caballo 818/900 (piel continua en una malla, esqueleto del zorro con el casco plantado), cigüeña 238/250 y polluelo 460 (excepción declarada) (nodos de la
-gallina, `walk` e `idle`), nido 192/200, grulla 142/150 (alas en el hombro como la
-golondrina), mariposa 16/16. Admitidos en el catálogo (ronda
-`animales-rehechos`); publicados los cuatro que tienen sitio.
+| Animal | De qué receta | Triángulos (su referencia) |
+|---|---|---|
+| Caballo de tiro | `mule()` pieza a pieza, sin albarda: pecho y cruz que funden el cuello, orejas cortas, crin y cola llenas, lucero, calzas; ×1,22 | 2202 (mula 2474) |
+| Cigüeña | `hen()`: ala plegada con las remeras negras, cuello en S con las plumas de la garganta, pico largo, patas con dedos | 1838 (gallina 1978) |
+| Polluelo | `hen()` en cría: cabeza grande, pico corto, sin cresta, alitas, plumón amarillo | 1454 (gallina 1978) |
+| Grulla | El cuerpo de la gallina y las plumas de la perdiz: cobertoras grises, borde de salida negro, dedos en la punta, franja blanca y mancha roja | 832 |
+| Mariposa | Los colores que Vera eligió de la de Astra en dos pares de alas redondeadas, con borde y mancha, cuerpo y antenas con maza | 182 |
+| Nido | Plataforma de ramas pardas con rodete; la cigüeña de pie encima | 192 |
 
-**Segunda vuelta, tras ver Vera la primera hoja** («¿en serio crees que esto
-está bien? Mira el pollo»). Tenía razón, y la primera hoja no se miró con ojos
-de jugador antes de enseñarla. El **polluelo** eran dos bolas apiladas, la
-cabeza flotando, sin ojos y con una pata a la vista: ahora la cabeza nace del
-pecho, con pico, dos ojos, dos patas con el pie adelante y las alitas, a la mitad
-de alto de la gallina. La **mariposa** era blanca y plana (ver la tercera vuelta). El **nido** se
-leía quemado y la cigüeña se hundía en él: ahora es una plataforma ancha de
-ramas pardas con el rodete encima y la cigüeña de pie sobre ella (`NEST_FLOOR`).
-El **caballo** apenas pasaba a la mula y Vera dijo «la mula es mucho mejor»:
-ahora es **la mula de Vera hecha caballo de tiro**, pieza a pieza con su receta
-(morro, ojos con brillo, orejas, crin de hojas en la cresta, cola con borla,
-rodillas marcadas), sin albarda, con orejas cortas, crin y cola llenas y calzas,
-a ×1,3 (`HORSE_SIZE`, escalado en los datos y no en la raíz, porque los clips
-leen las traslaciones): la cruz le saca un 30 % a la de la mula. 894/900.
+Esqueletos y clips: el caballo, los nodos de la mula con el **casco plantado**
+del ciervo (`rigid-clips.mjs`); la cigüeña y el polluelo, los de la gallina; la
+grulla, `bird_wing_l`/`bird_wing_r` con el origen en el hombro como la
+golondrina. Cada animal con clips es una llamada de dibujo al cargar
+(`skinRigidBody`), tenga los triángulos que tenga.
 
-**Tercera vuelta** (Vera marcó en rojo el polluelo y la mariposa, A y B): la
-**mariposa** lleva los colores que eligió de la de Astra —ocre con el borde
-terracota, cuerpo oscuro— y forma de mariposa: dos pares de alas redondeadas, el
-cuerpo fino y las antenas; en el juego conserva esos colores con un matiz por
-instancia. El **polluelo** abre las patas, una adelante y otra atrás, y sube el
-cuerpo para que se vean las dos.
+**Integrados** (avisado el director antes): la **cigüeña**
+(`effects/seasonal-fauna.ts`) es su modelo partido por articulación
+(`effects/baked-parts.ts`): se agacha desde la cadera para picar —con el cuello
+solo el pico no llegaba al suelo— y **da el paso con las patas por el suelo
+recorrido**, no por reloj. La **mariposa** es su modelo con sus colores y un
+matiz por instancia. El **polluelo** es su modelo detrás de la gallina
+(`Litter.kind`, `AnimalKind 'chick'`). La **grulla** de la uve es la grulla, a
+1,8 celdas de envergadura en pantalla. El caballo y el nido, sólo modelo.
 
-**Cuarta vuelta** (Vera: «el pollo sigue sin convencerme, muchos vértices; y el
-caballo tiene piezas con huecos… mira la skill»). El **caballo** era de piezas
-rígidas: cada una gira con su nodo y al andar se abrían rendijas en la rodilla,
-en el casco y entre los dientes de la crin. Ahora es **una sola malla, como el
-zorro**: las piezas de la mula se unen en una, cada una entra en la de al lado,
-y `tools/art/rig-single-mesh.py` pone el esqueleto y los pesos por regiones; lo
-que se dobla se estira y no se abre (`--leg-top`, nuevo, dice dónde acaban las
-patas en un animal de cuello alto). 824 triángulos, una malla, clips `walk`,
-`idle` y `flee`. El **polluelo** con esferas de cinco y seis husos salía lleno de
-picos: ahora son de diez, como las de la gallina, con las alitas pegadas, el
-pico corto y dos patas con sus dedos. Son 460 triángulos, **por encima del
-presupuesto del encargo (80)**: es lo que cuesta que se lea redondo, en una
-llamada de dibujo igual.
+**Herramientas.** `tools/art/fauna-sheet.py` (nueva) fotografía cualquier GLB a
+la cámara de reposo del juego, con la misma luz, a escala de móvil, junto a sus
+vecinos, a media zancada (`clip`) y de cerca en una junta (`look`).
+`seasons.mjs` encuadra sola la primera cigüeña (`seasonal.storkLead`).
 
-**Quinta vuelta** (Vera, con una captura del caballo de la collera: la cabeza
-encajada con un escalón detrás de las orejas y el cuello que cortaba en seco
-contra el pecho, «es un nivel bajísimo»). El fallo era de fondo: el caballo se
-armaba pegando cuerpos que se cruzan, y cada cruce deja un escalón. Ahora el
-tronco, el cuello y las cuatro patas son **piel continua** (`skin_chain` en
-`build-models.py`: el modificador Skin de Blender sobre una cadena de puntos
-con su radio, redondeado y facetado), el cuello nace del pecho y la pata del
-costado sin junta, la caña oscura está pintada en la misma piel, la cabeza de
-la mula va hundida en el final del cuello y la crin es una cresta continua (las
-hojas sueltas se leían como pinchos). `rig-single-mesh.py` gana `--knee` (la
-rodilla del caballo está mucho más arriba que la del zorro) y `--planted` (el
-casco apoyado se queda en el suelo, por cinemática inversa de dos huesos como
-el ciervo). 818 triángulos, una malla. Mirado de cerca en la nuca, la garganta
-y el pecho, y andando, antes de enseñarlo
-(`artifacts/graphics/animales-rehechos/horse/nuca-y-pecho.png`, `andando.png`).
+**Medido** y **evidencia**: `docs/medidas/animales-rehechos-2026-10-02.md`; la
+hoja de antes y después, `artifacts/graphics/animales-rehechos/antes-despues.png`,
+y una por animal en su carpeta.
 
-**Integrados** (avisado el director antes): la **cigüeña** (`seasonal-fauna.ts`)
-es su modelo partido por articulación (`effects/baked-parts.ts`): se agacha
-desde la cadera para picar —con el cuello solo, desde su arranque, el pico no
-llegaba al suelo— y **da el paso con las patas por el suelo recorrido**, no por
-reloj. La **mariposa** es su modelo, teñida por instancia como antes. El
-**polluelo** es su modelo a escala 1 detrás de la gallina (`Litter.kind`,
-`AnimalKind 'chick'`), no la gallina a 0,42. La **grulla** de la uve es la grulla
-a 1,8 celdas de envergadura en pantalla, no la golondrina gris ×22. El caballo y
-el nido, sólo modelo (no tienen sitio todavía: `docs/encargos-3d.md`).
+**Prueba**: `tests/fast/rebuilt-fauna.test.ts` (ninguno pesa más que su
+referencia del valle, el casco plantado del caballo, la cigüeña que pica hasta
+el suelo y no mete las patas en él, el paso igual a 30 o a 360 fotogramas, la
+grulla con su envergadura y el ala en el hombro, el polluelo con los clips de la
+gallina). `life-seasonal-fauna` acepta que una cría tenga modelo propio.
 
-**Medido** (`gl-probe`, aldea 11/21 y villa 7/60, antes y después seguidos con la
-máquina sola): llamadas 384 → 386 en primavera y 391 → 393 en verano (las dos
-patas de la cigüeña), 379 → 368 en otoño, villa 491 → 493; triángulos iguales
-(±0,2 %); un programa más (el Lambert con color de vértice de la grulla y la
-mariposa). Hoja de antes y después para que Vera elija:
-`artifacts/graphics/animales-rehechos/antes-despues.png`, y una por animal en su
-carpeta, todas con `tools/art/fauna-sheet.py` (la cámara de reposo del juego, la
-misma luz, a escala de móvil y junto a sus vecinos). Capturas en el juego en
-`artifacts/graphics/animales-rehechos/juego-{before,after}/`. Informe:
-`docs/medidas/animales-rehechos-2026-10-02.md`.
-
-`seasons.mjs` encuadra ahora sola la primera cigüeña (`seasonal.storkLead` en
-`__valleyLife`) y el polluelo de cerca por su clase nueva.
-
-**Prueba**: `tests/fast/rebuilt-fauna.test.ts` (presupuestos, el casco plantado
-del caballo, la cigüeña que pica hasta el suelo y no mete las patas en él, el
-paso igual a 30 o a 360 fotogramas, la grulla con su envergadura y el ala en el
-hombro, el polluelo con los clips de la gallina). `life-seasonal-fauna` acepta
-que una cría tenga modelo propio en vez de ir a escala.
 ## v5.89 · 2 oct 2026 · El cerco sin salida: el portón da al valle, no a la montaña
 
 **Motor** (`world/placement.ts`, la regla del portón). Lo pidió Vera con su

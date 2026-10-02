@@ -8203,77 +8203,72 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "La mula de Vera hecha caballo de tiro (deliverables/marked-models-trial/build-models.py, horse(); 2 oct 2026, v5.100): tronco, cuello y patas en piel continua (Skin) y la cabeza de la mula, en una sola malla como el zorro; esqueleto, pesos y clips idle/walk/flee de tools/art/rig-single-mesh.py a 1 celda.",
+        "source": "La mula de Vera hecha caballo de tiro, pieza a pieza (deliverables/marked-models-trial/build-models.py, horse(); 2 oct 2026, v5.100); clips idle/walk de tools/art/rigid-clips.mjs con el casco plantado.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
       "status": "study",
-      "recipe": "deliverables/marked-models-trial/build-models.py · tools/art/rig-single-mesh.py",
-      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rig-single-mesh.py · tools/art/rigid-clips.mjs",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "approved": {
         "runId": "animales-rehechos",
         "directory": "artifacts/graphics/animales-rehechos/approved/horse"
       },
       "bounds": {
         "min": [
-          -0.567733,
-          0,
-          -0.13993
+          -0.49898,
+          -0.036964,
+          -0.12688
         ],
         "max": [
-          0.432267,
-          0.950563,
-          0.14211
+          0.373313,
+          0.65392,
+          0.12688
         ],
         "size": [
-          1,
-          0.950563,
-          0.28204
+          0.872293,
+          0.690884,
+          0.25376
         ]
       },
       "recipeSha256": null,
       "materials": [
         "coat",
-        "coatTop",
         "light",
+        "coatTop",
         "blaze",
+        "earInner",
         "eye",
-        "earInner"
+        "ivory",
+        "nose"
       ],
       "clips": [
         "walk",
-        "idle",
-        "flee"
+        "idle"
       ],
       "motion": [
         {
           "name": "walk",
-          "seconds": 1,
+          "seconds": 1.2,
           "loop": true,
-          "strideLength": 0.394
+          "strideLength": 0.32
         },
         {
           "name": "idle",
           "seconds": 4,
           "loop": true,
           "strideLength": null
-        },
-        {
-          "name": "flee",
-          "seconds": 0.6,
-          "loop": true,
-          "strideLength": 0.591
         }
       ],
       "connectors": [],
       "statistics": {
-        "objects": 19,
-        "meshes": 1,
-        "materials": 6,
-        "triangles": 818
+        "objects": 49,
+        "meshes": 30,
+        "materials": 8,
+        "triangles": 2202
       },
       "hashes": {
-        "horse.glb": "7D8E403AD3BC3D670AD3C571990F15086E877AF1D2719F160C0D49EC2282DA3F"
+        "horse.glb": "69D3C536DA2128A6A224497D645FF3C35D992C395DFF2C43F58A85B20999B909"
       }
     },
     {
@@ -8281,7 +8276,7 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Cigüeña blanca facetada de The Valley (build-models.py, stork(); 2 oct 2026, v5.100), sobre la estructura de la gallina, en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "source": "Cigüeña blanca en el lenguaje de la gallina de Vera (build-models.py, stork(); 2 oct 2026, v5.100); clips idle/walk de tools/art/rigid-clips.mjs.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
@@ -8294,27 +8289,28 @@
       },
       "bounds": {
         "min": [
-          -0.252,
-          0.003,
-          -0.065985
+          -0.256,
+          0.00202,
+          -0.0754
         ],
         "max": [
-          0.179012,
-          0.45,
-          0.065985
+          0.174,
+          0.458,
+          0.0754
         ],
         "size": [
-          0.431012,
-          0.447,
-          0.13197
+          0.43,
+          0.45598,
+          0.1508
         ]
       },
       "recipeSha256": null,
       "materials": [
         "white",
-        "black",
         "red",
+        "black",
         "eye_001",
+        "ivory_001",
         "shade"
       ],
       "clips": [
@@ -8326,7 +8322,7 @@
           "name": "walk",
           "seconds": 0.6,
           "loop": true,
-          "strideLength": 0.232
+          "strideLength": 0.234
         },
         {
           "name": "idle",
@@ -8337,13 +8333,13 @@
       ],
       "connectors": [],
       "statistics": {
-        "objects": 19,
-        "meshes": 11,
-        "materials": 5,
-        "triangles": 238
+        "objects": 30,
+        "meshes": 19,
+        "materials": 6,
+        "triangles": 1838
       },
       "hashes": {
-        "stork.glb": "F6FA3E0D6AA85E5771494B393FCB8A0CF55F0C8F3CF59B7E7341372634099FF9"
+        "stork.glb": "25E51FDEC2225E149AC9680602052C818985D96AE4317E205CEF21B5E199935E"
       }
     },
     {
@@ -8351,7 +8347,7 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Polluelo facetado de The Valley (build-models.py, chick(); 2 oct 2026, v5.100), con los nodos de la gallina, en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "source": "Polluelo: la gallina de Vera en cría, con su receta y su densidad (build-models.py, chick(); 2 oct 2026, v5.100); clips idle/walk de tools/art/rigid-clips.mjs.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
@@ -8364,27 +8360,29 @@
       },
       "bounds": {
         "min": [
-          -0.068,
-          0.000558,
-          -0.037
+          -0.083,
+          0.000841,
+          -0.0496
         ],
         "max": [
-          0.048,
-          0.122,
-          0.037
+          0.066,
+          0.139,
+          0.0496
         ],
         "size": [
-          0.116,
-          0.121442,
-          0.074
+          0.149,
+          0.138159,
+          0.0992
         ]
       },
       "recipeSha256": null,
       "materials": [
-        "downShade",
         "down",
-        "beak",
-        "eye_004"
+        "yellow",
+        "downShade",
+        "eye_003",
+        "ivory_003",
+        "wing"
       ],
       "clips": [
         "walk",
@@ -8395,7 +8393,7 @@
           "name": "walk",
           "seconds": 0.6,
           "loop": true,
-          "strideLength": 0.042
+          "strideLength": 0.038
         },
         {
           "name": "idle",
@@ -8406,13 +8404,13 @@
       ],
       "connectors": [],
       "statistics": {
-        "objects": 17,
-        "meshes": 9,
-        "materials": 4,
-        "triangles": 460
+        "objects": 28,
+        "meshes": 17,
+        "materials": 6,
+        "triangles": 1454
       },
       "hashes": {
-        "chick.glb": "F11BCD575233D292C913E2426118DD7A65594A43E6319BA93665219F54588F3C"
+        "chick.glb": "3C8A49C7DAF45F471869123F0B9CC69636AB27F38D11DCAA7D8AE9E1DB73D46B"
       }
     },
     {
@@ -8420,7 +8418,7 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Nido de cigüeña facetado de The Valley (build-models.py, stork_nest(); 2 oct 2026, v5.100), en lugar del candidato de Astra. Sólo modelo.",
+        "source": "Nido de cigüeña, plataforma de ramas (build-models.py, stork_nest(); 2 oct 2026, v5.100). Sólo modelo.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
@@ -8471,7 +8469,7 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Grulla en vuelo facetada de The Valley (build-models.py, crane(); 2 oct 2026, v5.100), con las alas en el hombro como la golondrina, en lugar del candidato de Astra.",
+        "source": "Grulla en vuelo con el cuerpo de la gallina y las plumas de la perdiz (build-models.py, crane(); 2 oct 2026, v5.100), las alas en el hombro como la golondrina.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
@@ -8484,38 +8482,43 @@
       },
       "bounds": {
         "min": [
-          -0.374,
-          -0.034641,
-          -0.270082
+          -0.3608,
+          -0.044,
+          -0.2701
         ],
         "max": [
-          0.374,
-          0.037578,
-          0.28
+          0.3608,
+          0.044,
+          0.282
         ],
         "size": [
-          0.748,
-          0.072219,
-          0.550082
+          0.7216,
+          0.088,
+          0.5521
         ]
       },
       "recipeSha256": null,
       "materials": [
-        "grey",
+        "bill",
         "black_001",
-        "bill"
+        "eye_004",
+        "grey",
+        "greyLight",
+        "ivory_004",
+        "white_001",
+        "red_001"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 142
+        "objects": 18,
+        "meshes": 14,
+        "materials": 8,
+        "triangles": 832
       },
       "hashes": {
-        "crane.glb": "708D7CFED25679AAC46C977B411FC0877A7183E434325BAE6A95A3F75C39EC18"
+        "crane.glb": "48F758F9E03FF021B86CE3A0B5819B05E412253BF9CA57C42D1D2C200EBBB69E"
       }
     },
     {
@@ -8523,7 +8526,7 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Mariposa facetada de The Valley (build-models.py, butterfly(); 2 oct 2026, v5.100), dos alas de una cara para teñir por instancia, en lugar del candidato de Astra.",
+        "source": "Mariposa con los colores elegidos de la de Astra y forma de mariposa (build-models.py, butterfly(); 2 oct 2026, v5.100).",
         "license": "project-original"
       },
       "artifactRound": "G-40",
@@ -8536,38 +8539,38 @@
       },
       "bounds": {
         "min": [
-          -0.03,
-          0.0014,
+          -0.034,
+          0.000402,
           -0.02
         ],
         "max": [
-          0.03,
-          0.004,
-          0.03
+          0.034,
+          0.009,
+          0.0306
         ],
         "size": [
-          0.06,
-          0.0026,
-          0.05
+          0.068,
+          0.008598,
+          0.0506
         ]
       },
       "recipeSha256": null,
       "materials": [
         "mark",
-        "wing",
-        "edge"
+        "edge",
+        "wing_001"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 4,
-        "meshes": 3,
+        "objects": 11,
+        "meshes": 7,
         "materials": 3,
-        "triangles": 16
+        "triangles": 182
       },
       "hashes": {
-        "butterfly.glb": "6B35D5F3D733C2DBCBB0056FC83C9566D7901A639A27577FC94B044CD013CBC1"
+        "butterfly.glb": "95046AFCA8307CFCE1C532A07BB916BC2FB70889B703466D9CED7C21246C555E"
       }
     }
   ]

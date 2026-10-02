@@ -1,5 +1,0 @@
-{"out":"artifacts/graphics/animales-rehechos/horse/nuca-y-pecho.png","title":"nuca, garganta y pecho de cerca","rows":[{"label":"","panels":[
-{"title":"perfil","kind":"profile","look":[-0.36,0,0.62],"scale":0.42,"models":[{"glb":"deliverables/marked-models-trial/horse.glb"}]},
-{"title":"cámara de reposo","kind":"detail","look":[-0.36,0,0.62],"scale":0.45,"models":[{"glb":"deliverables/marked-models-trial/horse.glb"}]},
-{"title":"frente","kind":"front","look":[-0.36,0,0.55],"scale":0.55,"models":[{"glb":"deliverables/marked-models-trial/horse.glb"}]},
-{"title":"andando, perfil","kind":"profile","look":[-0.36,0,0.6],"scale":0.5,"models":[{"glb":"deliverables/marked-models-trial/horse.glb","clip":"walk","at":0.3}]}]}]}
