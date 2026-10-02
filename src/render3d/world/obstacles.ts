@@ -7,7 +7,7 @@ import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { sapling } from '@engine/world/forest';
 import { terrainOf } from '../life/terrain';
 import { indexSolids, type Solid, type Terrain } from '../life/body';
-import { steadingOf } from './steading';
+import { steadingOf, steadingScale } from './steading';
 import { builtCells, pineScaleAt, scatterTransform, slopeWoodCells } from './forest';
 import { gorgeRoadPaths } from './mountains';
 import { defenceGates } from '@derive/defence-gates';
@@ -68,8 +68,14 @@ export function solidTerrain(
     if (model === undefined) continue;
     const matrix = new Matrix4().compose(
       new Vector3(object.cell % land.width + 0.5, 0, Math.floor(object.cell / land.width) + 0.5),
-      new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), object.facing), new Vector3(1, 1, 1));
-    block(new Box3().setFromObject(model).applyMatrix4(matrix));
+      new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), object.facing),
+      new Vector3(1, 1, 1).multiplyScalar(steadingScale(object)));
+    const footprint = new Box3().setFromObject(model).applyMatrix4(matrix);
+    // Los trastos pequeños conservan pasos entre sí: reservar la celda entera
+    // por una maceta o unas flores cerraría una calle aunque la malla ocupe
+    // sólo una esquina. La vida recibe su huella precisa como sólido fino.
+    if (['haystack', 'log-pile', 'handcart', 'shed'].includes(object.asset)) block(footprint);
+    else add(footprint);
   }
   for (const building of visibleBuildings(state)) {
     if (building.kind === 'grave_yard' && building.lostTick === null) {

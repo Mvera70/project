@@ -1,5 +1,36 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · Tanda larga de modelos (dirección Sol 6)
+
+Base: `origin/main` en `aba7889b` (brief #55). Trabajo aislado de la copia local `art/astra-modelos`. Prioridad: Bloque 0 completo dentro de +30 llamadas y +60 000 triángulos en la villa grande. El motor queda fuera del alcance. Cada carril trae `main` antes de su PR y hace commit y push al acabar su bloque.
+
+| Carril / rama | Versión | Propiedad exclusiva | Integración y contrato |
+|---|---|---|---|
+| Astra 0 · `art/astra-b0-props` | v5.90 | `art/recipes/*-candidate/`, `artifacts/graphics/astra/` de IDs 0a–0o | Sol 6 integra por instancias en `render3d/world/`; estado existente, sin motor; límite conjunto de rendimiento |
+| Astra 1 · `art/astra-b1-boards` | v5.91 | Recetas y arte de IDs 1–7 | Sol 6 sustituye provisionales uno por uno; los anclajes de martillo siguen `hand_r` |
+| Astra 2 · `art/astra-b2-tailor` | v5.92 | Recetas y arte de IDs 8–11 | Sólo se integra tras K5 sastrería y lino en `main` |
+| Astra 3 · `art/astra-b3-armor` | v5.93 | Recetas y arte de IDs 12–15 | Sólo se modela metal; Sol 6 integra el peto de cuero existente |
+| Astra 4 · `art/astra-b4-mine` | v5.94 | Recetas y arte de IDs 16–19 | Sólo se modela; ruedas y carga con mallas y orígenes independientes |
+| Astra 5 · `art/astra-b5-visitors` | v5.95 | Recetas y arte de IDs 20–25 | Sol 6 integra sólo los accesorios con anclaje ya presente |
+| Astra 6 · `art/astra-b6-fauna` | v5.96 | Recetas y arte de IDs 26–29 | Sol 6 integra cigüeña, polluelo y mariposa si el coste cabe |
+| Astra 7 · `art/astra-b7-village` | v5.97 | Recetas y arte de IDs 30–33 | Sol 6 integra banco y carro donde ya exista sitio; resto, sólo modelo |
+| Astra 8 · `art/astra-b8-candidates` | v5.98 | Candidatos de IDs 34–35 | Sólo si los bloques 0–7 están terminados; requiere petición de Vera para mejorar el roble |
+| Dirección e informe · `art/astra-tanda-larga` | v5.99 | `docs/task-log.md`, mediciones, código de integración y PR en serie | `typecheck`, `lint`, pruebas afectadas, `npm run shot`; `gl-probe` y `scene-report` antes y después |
+
+Ficheros compartidos (`docs/changelog.md`, `docs/task-log.md`, `docs/plan-meta.md`, `tools/README.md`) los actualiza Sol 6 al integrar; Astra no toca código ni esos índices. Las recetas y arte de cada bloque tienen IDs exclusivos. No se toca `src/engine/`, ni se añaden sangre o fuego. Pendiente al cierre: informe de fusión, evidencia visual a escala móvil y medida en aparato real de Vera.
+
+decidido por Sol 6: se inicia en paralelo 0, 1 y 6 porque son independientes y el Bloque 0 conserva prioridad de revisión e integración.
+decidido por Sol 6: el Bloque 8 espera a que los bloques 0–7 estén completos; el roble no se modifica sin petición expresa de Vera, como indica el brief.
+decidido por Sol 6: las recetas toman los colores de `art/recipes/palette.json`; la ruta `public/assets/models/palette.json` citada en el encargo no existe en `main`.
+
+Línea base antes de integrar, `main` `aba7889b`, empaquetado local `artifacts/graphics/astra-baseline/game/valley.html`, sonda `gl-probe` 8 s con `debug=1&live=1`: villa 7/año 60/verano **494 llamadas, 798 955 triángulos, 46 programas**; aldea 11/año 21/verano **355 llamadas, 694 465 triángulos, 47 programas**. `scene-report` en las mismas escenas: villa 469 mallas visibles, 202 con sombra, 695 138 triángulos; aldea 409, 139, 601 034. Estas cifras sustituyen para esta tanda las referencias históricas de septiembre; SwiftShader sólo sirve para comparación, no para FPS en la tablet. CI de `main` `aba7889b`: verde.
+
+`main` avanzó a `24683e35` (PR #48, nueva forma del valle); se volvió a medir antes de la integración. Villa 7/año 60/verano: `gl-probe` **494 llamadas, 762 501 triángulos, 47 programas**; `scene-report` **464 mallas, 207 sombras, 726 974 triángulos**. Aldea 11/año 21/verano: **400 llamadas, 754 128 triángulos, 51 programas**; escena **410 mallas, 160 sombras, 644 468 triángulos**. Ambos empaquetados desde `main` limpio y CI verde.
+
+decidido por Sol 6: los 21 tipos del Bloque 0 usan una malla instanciada por tipo, tamaño 0,8/1/1,2 sólo en adornos pequeños y ninguna sombra nueva; los sólidos finos siguen la caja real de cada objeto para conservar pasos. La variedad ocupa casas, oficios, campos, plaza y linde y se deduce del estado. Las tiendas de visita y el espantapájaros son condicionales a su evento o estación; no se fuerzan a aparecer fuera de contexto.
+decidido por Sol 6: el modelo de lavado y el de bancal pueden convivir con los elementos procedurales anteriores cuando hay sitio libre; el mismo filtro de celdas libres impide tapar accesos.
+
+Bloque 0 candidato integrado, comparado contra `main` `24683e35` con la misma semilla/año/estación: villa `gl-probe` **511 llamadas (+17), 763 963 triángulos (+1 462), 48 programas (+1)**; `scene-report` **492 mallas (+28), 207 sombras (=), 730 672 triángulos (+3 698)**. Aldea `gl-probe` **411 llamadas (+11), 747 635 triángulos** (la diferencia bruta varía con animaciones); `scene-report` **425 mallas (+15), 160 sombras (=), 646 842 triángulos (+2 374)**. El Bloque 0 queda por debajo de +30 llamadas y +60 000 triángulos en villa. Captura a cámara de reposo de la zona de casas: `artifacts/graphics/astra-b0-integrated/village-close.png`, comparada con `artifacts/graphics/astra-baseline-main/village-close.png`.
 ## 2 oct 2026 · El cerco sin salida (v5.89)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),

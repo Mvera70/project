@@ -113,12 +113,18 @@ describe('IA-10 · cuerpo, malla y casa', () => {
     expect(fitsCircle(land, body.x, body.z, body.radius)).toBe(true);
   });
 
-  it('carros y leña reservan las celdas de los mismos objetos que se pintan', () => {
+  it('los trastos grandes reservan celdas y los pequeños mantienen su huella fina', () => {
     const state = foundTwenty(7);
     const placements = steadingOf(state, state.terrainSeed);
     expect(placements.length).toBeGreaterThan(0);
     const land = solidTerrain(state, () => new Mesh(new BoxGeometry(0.7, 0.7, 0.7), new MeshBasicMaterial()));
-    for (const placement of placements) expect(land.blocked[placement.cell]).toBe(1);
+    for (const placement of placements) {
+      if (['haystack', 'log-pile', 'handcart', 'shed'].includes(placement.asset)) {
+        expect(land.blocked[placement.cell], placement.asset).toBe(1);
+      } else {
+        expect(land.solids?.get(placement.cell)?.length, placement.asset).toBeGreaterThan(0);
+      }
+    }
   });
 
   it('llega andando al umbral, duerme y sale al alba; una puerta bloqueada no teletransporta', () => {

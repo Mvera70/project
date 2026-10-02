@@ -1,0 +1,170 @@
+[
+  {
+    "id": "barrel",
+    "glb": "artifacts/graphics/astra/barrel/barrel.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/barrel-candidate/barrel.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/barrel-candidate/barrel.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "crate",
+    "glb": "artifacts/graphics/astra/crate/crate.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/crate-candidate/crate.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/crate-candidate/crate.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "sack-pile",
+    "glb": "artifacts/graphics/astra/sack-pile/sack-pile.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/sack-pile-candidate/sack-pile.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/sack-pile-candidate/sack-pile.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "tool-rack",
+    "glb": "artifacts/graphics/astra/tool-rack/tool-rack.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/tool-rack-candidate/tool-rack.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/tool-rack-candidate/tool-rack.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "washing-line",
+    "glb": "artifacts/graphics/astra/washing-line/washing-line.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/washing-line-candidate/washing-line.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/washing-line-candidate/washing-line.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "flower-pot",
+    "glb": "artifacts/graphics/astra/flower-pot/flower-pot.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/flower-pot-candidate/flower-pot.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/flower-pot-candidate/flower-pot.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "herb-bed",
+    "glb": "artifacts/graphics/astra/herb-bed/herb-bed.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/herb-bed-candidate/herb-bed.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/herb-bed-candidate/herb-bed.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "beehive",
+    "glb": "artifacts/graphics/astra/beehive/beehive.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/beehive-candidate/beehive.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/beehive-candidate/beehive.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "scarecrow",
+    "glb": "artifacts/graphics/astra/scarecrow/scarecrow.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/scarecrow-candidate/scarecrow.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/scarecrow-candidate/scarecrow.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "trough",
+    "glb": "artifacts/graphics/astra/trough/trough.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/trough-candidate/trough.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/trough-candidate/trough.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "chicken-coop",
+    "glb": "artifacts/graphics/astra/chicken-coop/chicken-coop.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/chicken-coop-candidate/chicken-coop.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/chicken-coop-candidate/chicken-coop.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "wood-chopping",
+    "glb": "artifacts/graphics/astra/wood-chopping/wood-chopping.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/wood-chopping-candidate/wood-chopping.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wood-chopping-candidate/wood-chopping.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "stump",
+    "glb": "artifacts/graphics/astra/stump/stump.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/stump-candidate/stump.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/stump-candidate/stump.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "fallen-log",
+    "glb": "artifacts/graphics/astra/fallen-log/fallen-log.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/fallen-log-candidate/fallen-log.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/fallen-log-candidate/fallen-log.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "bush",
+    "glb": "artifacts/graphics/astra/bush/bush.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/bush-candidate/bush.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/bush-candidate/bush.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "wildflowers",
+    "glb": "artifacts/graphics/astra/wildflowers/wildflowers.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/wildflowers-candidate/wildflowers.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wildflowers-candidate/wildflowers.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "mushrooms",
+    "glb": "artifacts/graphics/astra/mushrooms/mushrooms.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/mushrooms-candidate/mushrooms.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/mushrooms-candidate/mushrooms.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "stone-wall",
+    "glb": "artifacts/graphics/astra/stone-wall/stone-wall.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/stone-wall-candidate/stone-wall.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/stone-wall-candidate/stone-wall.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "wayside-shrine",
+    "glb": "artifacts/graphics/astra/wayside-shrine/wayside-shrine.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/wayside-shrine-candidate/wayside-shrine.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wayside-shrine-candidate/wayside-shrine.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "lantern-post",
+    "glb": "artifacts/graphics/astra/lantern-post/lantern-post.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/lantern-post-candidate/lantern-post.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/lantern-post-candidate/lantern-post.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  },
+  {
+    "id": "market-awning",
+    "glb": "artifacts/graphics/astra/market-awning/market-awning.glb",
+    "round": "astra-b0-2026-10-02",
+    "recipe": "art/recipes/market-awning-candidate/market-awning.json",
+    "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/market-awning-candidate/market-awning.json; art/recipes/barrel-candidate/build-block0.py.",
+    "license": "project-original"
+  }
+]

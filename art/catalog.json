@@ -6943,6 +6943,1056 @@
         "source": "Modelo original de The Valley, fuente art/recipes/great-oak-candidate/build.py.",
         "license": "Project original"
       }
+    },
+    {
+      "id": "barrel",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/barrel-candidate/barrel.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/barrel-candidate/barrel.json",
+      "generator": "art/recipes/barrel-candidate/barrel.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/barrel"
+      },
+      "bounds": {
+        "min": [
+          -0.106,
+          0,
+          -0.106
+        ],
+        "max": [
+          0.106,
+          0.24,
+          0.106
+        ],
+        "size": [
+          0.212,
+          0.24,
+          0.212
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 140
+      },
+      "hashes": {
+        "barrel.glb": "ACBF7867340AAC9AFCAC6FF33F6716C59B468D9CD90A5E46D02C263A2EEC5788"
+      }
+    },
+    {
+      "id": "crate",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/crate-candidate/crate.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/crate-candidate/crate.json",
+      "generator": "art/recipes/crate-candidate/crate.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/crate"
+      },
+      "bounds": {
+        "min": [
+          -0.111667,
+          0,
+          -0.09
+        ],
+        "max": [
+          0.111667,
+          0.190833,
+          0.100167
+        ],
+        "size": [
+          0.223333,
+          0.190833,
+          0.190167
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 60
+      },
+      "hashes": {
+        "crate.glb": "8EB654ACA9CFB03C9A46CF6DB54F86372E8B622D477B9A873BF473A3F76655F6"
+      }
+    },
+    {
+      "id": "sack-pile",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/sack-pile-candidate/sack-pile.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/sack-pile-candidate/sack-pile.json",
+      "generator": "art/recipes/sack-pile-candidate/sack-pile.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/sack-pile"
+      },
+      "bounds": {
+        "min": [
+          -0.163333,
+          0,
+          -0.086667
+        ],
+        "max": [
+          0.158,
+          0.230167,
+          0.066667
+        ],
+        "size": [
+          0.321333,
+          0.230167,
+          0.153333
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 108
+      },
+      "hashes": {
+        "sack-pile.glb": "519A2993969659E8FC0BD86B5E309D69AD9B277FB939BBDFE13DF1A3E7318765"
+      }
+    },
+    {
+      "id": "tool-rack",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/tool-rack-candidate/tool-rack.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/tool-rack-candidate/tool-rack.json",
+      "generator": "art/recipes/tool-rack-candidate/tool-rack.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/tool-rack"
+      },
+      "bounds": {
+        "min": [
+          -0.166667,
+          0,
+          -0.023333
+        ],
+        "max": [
+          0.166667,
+          0.38,
+          0.010833
+        ],
+        "size": [
+          0.333333,
+          0.38,
+          0.034167
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 144
+      },
+      "hashes": {
+        "tool-rack.glb": "64FE9FF504ED28EA438C8C9F57CD4055B33CBF892A26AD6172E85547A2449862"
+      }
+    },
+    {
+      "id": "washing-line",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/washing-line-candidate/washing-line.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/washing-line-candidate/washing-line.json",
+      "generator": "art/recipes/washing-line-candidate/washing-line.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/washing-line"
+      },
+      "bounds": {
+        "min": [
+          -0.426542,
+          0,
+          -0.015708
+        ],
+        "max": [
+          0.426542,
+          0.657333,
+          0.015708
+        ],
+        "size": [
+          0.853083,
+          0.657333,
+          0.031417
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 72
+      },
+      "hashes": {
+        "washing-line.glb": "B005238883BB73C8EFA976B1AAFA25F36B214FBE723551EC256996F50998FD83"
+      }
+    },
+    {
+      "id": "flower-pot",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/flower-pot-candidate/flower-pot.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/flower-pot-candidate/flower-pot.json",
+      "generator": "art/recipes/flower-pot-candidate/flower-pot.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/flower-pot"
+      },
+      "bounds": {
+        "min": [
+          -0.07,
+          0,
+          -0.07002
+        ],
+        "max": [
+          0.07,
+          0.195,
+          0.07
+        ],
+        "size": [
+          0.14,
+          0.195,
+          0.14002
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 108
+      },
+      "hashes": {
+        "flower-pot.glb": "C0D614F8B1CD235DED3F3C7BF883A59286E299D730E4A9E1C4AD7DBCD67849AC"
+      }
+    },
+    {
+      "id": "herb-bed",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/herb-bed-candidate/herb-bed.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/herb-bed-candidate/herb-bed.json",
+      "generator": "art/recipes/herb-bed-candidate/herb-bed.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/herb-bed"
+      },
+      "bounds": {
+        "min": [
+          -0.164167,
+          0,
+          -0.111667
+        ],
+        "max": [
+          0.164167,
+          0.13,
+          0.111667
+        ],
+        "size": [
+          0.328333,
+          0.13,
+          0.223333
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 116
+      },
+      "hashes": {
+        "herb-bed.glb": "168D4D06091C3B16337823C1A21FDD1B54EBB2DDC6143F14B04F36EB2373D847"
+      }
+    },
+    {
+      "id": "beehive",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/beehive-candidate/beehive.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/beehive-candidate/beehive.json",
+      "generator": "art/recipes/beehive-candidate/beehive.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/beehive"
+      },
+      "bounds": {
+        "min": [
+          -0.101667,
+          0,
+          -0.095
+        ],
+        "max": [
+          0.101667,
+          0.241667,
+          0.095
+        ],
+        "size": [
+          0.203333,
+          0.241667,
+          0.19
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 150
+      },
+      "hashes": {
+        "beehive.glb": "E2E6BA34E053B426712F64D8E2C02244EC878C009A7EADDF8F42AAA0CBD13FAC"
+      }
+    },
+    {
+      "id": "scarecrow",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/scarecrow-candidate/scarecrow.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/scarecrow-candidate/scarecrow.json",
+      "generator": "art/recipes/scarecrow-candidate/scarecrow.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/scarecrow"
+      },
+      "bounds": {
+        "min": [
+          -0.16,
+          0,
+          -0.076667
+        ],
+        "max": [
+          0.16,
+          0.536667,
+          0.076667
+        ],
+        "size": [
+          0.32,
+          0.536667,
+          0.153333
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 86
+      },
+      "hashes": {
+        "scarecrow.glb": "98994A03E4A81D1C2BF5E69B94034BFF1331431EABD1CA1164E4085B655ACF14"
+      }
+    },
+    {
+      "id": "trough",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/trough-candidate/trough.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/trough-candidate/trough.json",
+      "generator": "art/recipes/trough-candidate/trough.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/trough"
+      },
+      "bounds": {
+        "min": [
+          -0.1675,
+          0,
+          -0.0775
+        ],
+        "max": [
+          0.1675,
+          0.113333,
+          0.0775
+        ],
+        "size": [
+          0.335,
+          0.113333,
+          0.155
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 72
+      },
+      "hashes": {
+        "trough.glb": "F76FB1A55ACC6C0DC3997D62FCD050C82B4E61BF951CEFDFD98BE8F96F0E9348"
+      }
+    },
+    {
+      "id": "chicken-coop",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/chicken-coop-candidate/chicken-coop.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/chicken-coop-candidate/chicken-coop.json",
+      "generator": "art/recipes/chicken-coop-candidate/chicken-coop.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/chicken-coop"
+      },
+      "bounds": {
+        "min": [
+          -0.158333,
+          0,
+          -0.126667
+        ],
+        "max": [
+          0.158333,
+          0.366667,
+          0.275546
+        ],
+        "size": [
+          0.316667,
+          0.366667,
+          0.402213
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 92
+      },
+      "hashes": {
+        "chicken-coop.glb": "205F1D01A263EF5481C225915F7F2778AE727C5ED3F2043A49E7D9CA105DF095"
+      }
+    },
+    {
+      "id": "wood-chopping",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wood-chopping-candidate/wood-chopping.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/wood-chopping-candidate/wood-chopping.json",
+      "generator": "art/recipes/wood-chopping-candidate/wood-chopping.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/wood-chopping"
+      },
+      "bounds": {
+        "min": [
+          -0.151667,
+          0,
+          -0.096667
+        ],
+        "max": [
+          0.139121,
+          0.347011,
+          0.087094
+        ],
+        "size": [
+          0.290788,
+          0.347011,
+          0.18376
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 96
+      },
+      "hashes": {
+        "wood-chopping.glb": "DAA42A6F1BAC4F8CEA68F3A1E8A8A62044B0CAD7A36C4BEA3B680C0F3698B036"
+      }
+    },
+    {
+      "id": "stump",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/stump-candidate/stump.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/stump-candidate/stump.json",
+      "generator": "art/recipes/stump-candidate/stump.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/stump"
+      },
+      "bounds": {
+        "min": [
+          -0.125,
+          0,
+          -0.102178
+        ],
+        "max": [
+          0.107542,
+          0.131167,
+          0.131821
+        ],
+        "size": [
+          0.232542,
+          0.131167,
+          0.233998
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 84
+      },
+      "hashes": {
+        "stump.glb": "57A842071E1D69B1F02B8CDB5C43DE3CCB96E2039E8104022812C3F18041D213"
+      }
+    },
+    {
+      "id": "fallen-log",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/fallen-log-candidate/fallen-log.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/fallen-log-candidate/fallen-log.json",
+      "generator": "art/recipes/fallen-log-candidate/fallen-log.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/fallen-log"
+      },
+      "bounds": {
+        "min": [
+          -0.213,
+          0,
+          -0.076667
+        ],
+        "max": [
+          0.213,
+          0.159744,
+          0.069074
+        ],
+        "size": [
+          0.426,
+          0.159744,
+          0.145741
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 92
+      },
+      "hashes": {
+        "fallen-log.glb": "1F8016ECEDA72C0C1D33C3FFEE2D69592477D1B17A6A6309EA47491279864306"
+      }
+    },
+    {
+      "id": "bush",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/bush-candidate/bush.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/bush-candidate/bush.json",
+      "generator": "art/recipes/bush-candidate/bush.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/bush"
+      },
+      "bounds": {
+        "min": [
+          -0.161667,
+          0,
+          -0.112433
+        ],
+        "max": [
+          0.17,
+          0.22,
+          0.129417
+        ],
+        "size": [
+          0.331667,
+          0.22,
+          0.24185
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 72
+      },
+      "hashes": {
+        "bush.glb": "3F9435EA50C4B4C0737B6D82DEC3478B3A38384E30B689AB3FA5B789FAF67086"
+      }
+    },
+    {
+      "id": "wildflowers",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wildflowers-candidate/wildflowers.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/wildflowers-candidate/wildflowers.json",
+      "generator": "art/recipes/wildflowers-candidate/wildflowers.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/wildflowers"
+      },
+      "bounds": {
+        "min": [
+          -0.106667,
+          0,
+          -0.093333
+        ],
+        "max": [
+          0.103333,
+          0.121667,
+          0.063333
+        ],
+        "size": [
+          0.21,
+          0.121667,
+          0.156667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 140
+      },
+      "hashes": {
+        "wildflowers.glb": "D8650A0F2A5B6F8FE76AD026D6362B7AA9D14D97BA428A5363CCDDD9DD1AF003"
+      }
+    },
+    {
+      "id": "mushrooms",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/mushrooms-candidate/mushrooms.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/mushrooms-candidate/mushrooms.json",
+      "generator": "art/recipes/mushrooms-candidate/mushrooms.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/mushrooms"
+      },
+      "bounds": {
+        "min": [
+          -0.095534,
+          0,
+          -0.09
+        ],
+        "max": [
+          0.085534,
+          0.096667,
+          0.093333
+        ],
+        "size": [
+          0.181068,
+          0.096667,
+          0.183333
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 66
+      },
+      "hashes": {
+        "mushrooms.glb": "C06F0115548C8C95A73CE637874A759F9E5C34D9D32E63CC775F779BAC679607"
+      }
+    },
+    {
+      "id": "stone-wall",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/stone-wall-candidate/stone-wall.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/stone-wall-candidate/stone-wall.json",
+      "generator": "art/recipes/stone-wall-candidate/stone-wall.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/stone-wall"
+      },
+      "bounds": {
+        "min": [
+          -0.499862,
+          0,
+          -0.094106
+        ],
+        "max": [
+          0.504893,
+          0.12,
+          0.106399
+        ],
+        "size": [
+          1.004755,
+          0.12,
+          0.200505
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 96
+      },
+      "hashes": {
+        "stone-wall.glb": "99FFD1D1F6EF6679AFF3984DB3A7A8E4E949887421383A50DBD789F8BAEDFFB9"
+      }
+    },
+    {
+      "id": "wayside-shrine",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/wayside-shrine-candidate/wayside-shrine.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/wayside-shrine-candidate/wayside-shrine.json",
+      "generator": "art/recipes/wayside-shrine-candidate/wayside-shrine.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/wayside-shrine"
+      },
+      "bounds": {
+        "min": [
+          -0.101667,
+          0,
+          -0.063333
+        ],
+        "max": [
+          0.101667,
+          0.41,
+          0.063333
+        ],
+        "size": [
+          0.203333,
+          0.41,
+          0.126667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 80
+      },
+      "hashes": {
+        "wayside-shrine.glb": "F82598E5747739E78D6453642DE2A46C8081D692A8C2033495137FE83D984F08"
+      }
+    },
+    {
+      "id": "lantern-post",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/lantern-post-candidate/lantern-post.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/lantern-post-candidate/lantern-post.json",
+      "generator": "art/recipes/lantern-post-candidate/lantern-post.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/lantern-post"
+      },
+      "bounds": {
+        "min": [
+          -0.02,
+          0,
+          -0.06
+        ],
+        "max": [
+          0.2075,
+          0.8,
+          0.06
+        ],
+        "size": [
+          0.2275,
+          0.8,
+          0.12
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 80
+      },
+      "hashes": {
+        "lantern-post.glb": "58E81BE6E8B3C54AE41233503F7B12F6F04D53552055F3F19E6F7957643701BA"
+      }
+    },
+    {
+      "id": "market-awning",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/market-awning-candidate/market-awning.json; art/recipes/barrel-candidate/build-block0.py.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/market-awning-candidate/market-awning.json",
+      "generator": "art/recipes/market-awning-candidate/market-awning.json",
+      "approved": {
+        "runId": "astra-b0-2026-10-02",
+        "directory": "artifacts/graphics/astra-b0-2026-10-02/approved/market-awning"
+      },
+      "bounds": {
+        "min": [
+          -0.425,
+          0,
+          -0.2805
+        ],
+        "max": [
+          0.425,
+          0.776333,
+          0.29325
+        ],
+        "size": [
+          0.85,
+          0.776333,
+          0.57375
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 148
+      },
+      "hashes": {
+        "market-awning.glb": "DB292E22939323A64969AA3B0A74BC28E357F161E848E6C03D9CDC2BF393295E"
+      }
     }
   ]
 }
