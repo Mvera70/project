@@ -8,7 +8,8 @@ import { sapling } from '@engine/world/forest';
 import { terrainOf } from '../life/terrain';
 import { indexSolids, type Solid, type Terrain } from '../life/body';
 import { steadingOf, steadingScale } from './steading';
-import { builtCells, scatterTransform } from './forest';
+import { builtCells, pineScaleAt, scatterTransform, slopeWoodCells } from './forest';
+import { gorgeRoadPaths } from './mountains';
 import { defenceGates } from '@derive/defence-gates';
 
 /** Recorta triángulos a la banda del cuerpo: sin copas, tejados ni suelo.
@@ -101,6 +102,28 @@ export function solidTerrain(
       const { x, z, scale, facing } = scatterTransform(land.width, cell);
       const matrix = new Matrix4().compose(new Vector3(x, 0, z), new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), facing), new Vector3(scale, scale, scale));
       for (const trunk of trunks) add(trunk.clone().applyMatrix4(matrix));
+    }
+  }
+  // v5.74 · Y el bosque de ladera, donde se anda. En la montaña la celda ya
+  // está cerrada, pero en el prado del pie un roble o un pino es un tronco
+  // como los del bosque, y sin él la gente, el oso y el rebaño de la falda lo
+  // cruzaban por en medio. Sólo si el juego lo planta (`rebuildForest`, con
+  // los dos árboles cargados), para no dejar troncos que no se ven.
+  const pine = source('tree-pine');
+  if (tree !== undefined && pine !== undefined) {
+    const wood = slopeWoodCells(state.map, taken, gorgeRoadPaths(state.map, state.terrainSeed ?? 0));
+    const kinds = [
+      { cells: wood.leafy, trunks: groundFootprints(tree), size: (): number => 1 },
+      { cells: wood.pines, trunks: groundFootprints(pine), size: pineScaleAt },
+    ];
+    for (const { cells, trunks, size } of kinds) {
+      for (const cell of cells) {
+        if (land.blocked[cell] === 1) continue;
+        const { x, z, scale, facing } = scatterTransform(land.width, cell);
+        const grown = scale * size(cell);
+        const matrix = new Matrix4().compose(new Vector3(x, 0, z), new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), facing), new Vector3(grown, grown, grown));
+        for (const trunk of trunks) add(trunk.clone().applyMatrix4(matrix));
+      }
     }
   }
   const gates = defenceGates(state);

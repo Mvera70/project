@@ -18,16 +18,28 @@ import { LIFE_STEP, STEPS_PER_DAY } from '../../src/render3d/life/clock';
 
 const WEEK_SECONDS = TIME.REAL_MS_PER_TICK / 1000;
 
+/**
+ * Doce aldeas y tres jornadas cada una, y no cuatro y dos (2 oct 2026, v5.74).
+ * Con cuatro semillas y dos días se debían 14 haces, y una sola jornada mal
+ * alineada movía la cuenta un 7 %: en `main` salían 11 de 14 y con la cantera
+ * al pie de la montaña 10 de 14 —el albañil carga la piedra durante el
+ * mediodía, deja libre un sitio en la comida de la plaza, el leñador de la
+ * semilla 3 lo coge y se le pasa la hora del haz—. En esta muestra, 42 de 51
+ * en `main` y 43 de 51 con la cantera nueva: la propiedad no se movió, se
+ * movía la muestra. El umbral sigue en el 75 %.
+ */
+const SEEDS = [3, 7, 11, 23, 31, 41, 53, 61, 67, 73, 89, 97];
+
 describe('los porteadores van con el reloj de las entregas · esquema 12', () => {
   it('nadie descarga un haz antes de su hora, y casi todas llegan con alguien delante', () => {
     let delivered = 0;
     let owed = 0;
-    for (const seed of [3, 7, 11, 23]) {
+    for (const seed of SEEDS) {
       const state = foundTwenty(seed);
       run(state, TIME.WEEKS_PER_YEAR * 3, 'prudent', CATALOG);
       const at = state.woodRun?.at ?? [];
       // El segundo y el tercer día de la semana: la jornada entera con sus horas.
-      for (const weekDay of [1, 2]) {
+      for (const weekDay of [1, 2, 3]) {
         const life = createVillage(state, state.tick * TIME.DAYS_PER_WEEK + weekDay);
         // La jornada de vida empieza a medianoche (fase 0) y la semana del motor a
         // media mañana (`DAY_START_PHASE`): la hora de la semana de cada paso es

@@ -199,7 +199,9 @@ describe('V-10 · sitios con vida', () => {
   // de bosque, a su alcance). No es cosa de la 7: con cuarenta años de aldea hay
   // claro en 23 de 24 valles en `main` (semillas 1 a 24; falta la 18) y en 20 con
   // el contorno (faltan la 6, la 7, la 13 y la 17; en la 6, la 13 y la 17 el
-  // pueblo alcanza menos de 500 celdas). Cuando una jornada nueva la devuelva a
+  // pueblo alcanzaba menos de 500 celdas, por un portón que daba a la montaña:
+  // arreglado en v5.89, `docs/medidas/cerco-sin-salida-2026-10-02.md`; la 7 no
+  // cambia con eso, su portón ya daba al valle). Cuando una jornada nueva la devuelva a
   // verde («Expect test to fail»), sube a la lista de arriba.
   it.fails('semilla 7 · la plaza, el vado y el claro se detectan y son alcanzables a los cuarenta años', () => {
     expectCommons(7);
