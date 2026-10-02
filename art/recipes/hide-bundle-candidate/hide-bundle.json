@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "id": "hide-bundle",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.94
+    },
+    {
+      "name": "soil",
+      "role": "soil",
+      "color": "#866044",
+      "roughness": 0.94
+    },
+    {
+      "name": "trunk",
+      "role": "trunk",
+      "color": "#735338",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "mount",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "connectors": [
+    "mount"
+  ],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "hide-bundle",
+    "footprint": [
+      1,
+      1
+    ],
+    "attachment": "spine",
+    "note": "Bloque 5. Metros fuente a celdas; frente +Z glTF. Origen en enganche, NO en base. Ajuste de montaje medido contra el nodo publicado en attachment.json; escala inversa del padre para evitar escala doble. Recurso est\u00e1tico preview-only."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 1,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "Fold0",
+      "location": [
+        0,
+        0.35,
+        0.18
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.62,
+        0.34,
+        0.16
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Fold1",
+      "location": [
+        0,
+        0.35,
+        0.31
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.62,
+        0.34,
+        0.16
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Fold2",
+      "location": [
+        0,
+        0.35,
+        0.44
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.62,
+        0.34,
+        0.16
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Tie0",
+      "location": [
+        -0.18,
+        0.53,
+        0.31
+      ],
+      "dimensions": [
+        0.04,
+        0.025,
+        0.42
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Tie1",
+      "location": [
+        0.18,
+        0.53,
+        0.31
+      ],
+      "dimensions": [
+        0.04,
+        0.025,
+        0.42
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "ShoulderFlap",
+      "location": [
+        0.2,
+        0.16,
+        0.4
+      ],
+      "dimensions": [
+        0.2,
+        0.23,
+        0.065
+      ],
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "HangingFlap",
+      "location": [
+        -0.25,
+        0.34,
+        0.065
+      ],
+      "dimensions": [
+        0.13,
+        0.27,
+        0.27
+      ],
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

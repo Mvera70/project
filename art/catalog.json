@@ -8335,6 +8335,524 @@
       "hashes": {
         "cart.glb": "551CD4D69AE7C780D809CD778226A2E72F85768624EDFEA55301501D25A35D56"
       }
+    },
+    {
+      "id": "fiddle",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/fiddle-candidate/fiddle.json",
+      "generator": "art/recipes/fiddle-candidate/fiddle.json",
+      "approved": {
+        "runId": "astra-b5",
+        "directory": "artifacts/graphics/astra-b5/approved/fiddle"
+      },
+      "bounds": {
+        "min": [
+          -0.051667,
+          -0.175,
+          -0.018333
+        ],
+        "max": [
+          0.080833,
+          0.093333,
+          0.029667
+        ],
+        "size": [
+          0.1325,
+          0.268333,
+          0.048
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "grip"
+      ],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 124
+      },
+      "hashes": {
+        "fiddle.glb": "0D7115F2F4B70B7D8144D3F5759145FC791D3BA8CFC5C613DFA16BB2F20F7A06",
+        "fiddle-preview.png": "D55FE0DC5200D03534F4A23188C82839E64A01DF18F936D2679D6983737B29A9"
+      }
+    },
+    {
+      "id": "pilgrim-hat",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/pilgrim-hat-candidate/pilgrim-hat.json",
+      "generator": "art/recipes/pilgrim-hat-candidate/pilgrim-hat.json",
+      "approved": {
+        "runId": "astra-b5",
+        "directory": "artifacts/graphics/astra-b5/approved/pilgrim-hat"
+      },
+      "bounds": {
+        "min": [
+          -0.126808,
+          0.135833,
+          -0.133333
+        ],
+        "max": [
+          0.126808,
+          0.255,
+          0.133333
+        ],
+        "size": [
+          0.253615,
+          0.119167,
+          0.266667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 98
+      },
+      "hashes": {
+        "pilgrim-hat.glb": "04F1C3C3685B3C4CE92BB0ED738CBF86881194D126C23A9D150AE63BEDBEA849",
+        "pilgrim-hat-preview.png": "5ADC4DFCD4C3E10446D1376E33AFB93428D643C10E6F16F4D867BD1B50CB189C"
+      }
+    },
+    {
+      "id": "pilgrim-staff",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/pilgrim-staff-candidate/pilgrim-staff.json",
+      "generator": "art/recipes/pilgrim-staff-candidate/pilgrim-staff.json",
+      "approved": {
+        "runId": "astra-b5",
+        "directory": "artifacts/graphics/astra-b5/approved/pilgrim-staff"
+      },
+      "bounds": {
+        "min": [
+          -0.015,
+          -0.22,
+          -0.035
+        ],
+        "max": [
+          0.081667,
+          0.54,
+          0.035
+        ],
+        "size": [
+          0.096667,
+          0.76,
+          0.07
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "grip"
+      ],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 108
+      },
+      "hashes": {
+        "pilgrim-staff.glb": "1141692090050540A7F6FBD5FFC7C9BC0F21A1CA0640D6DE2ADAE5D5441FA64A",
+        "pilgrim-staff-preview.png": "553CCBB6B809C07FA21C12CAF0FDFE5AA08F8877EFC098348E506FB5A816882E"
+      }
+    },
+    {
+      "id": "grindstone-pack",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/grindstone-pack-candidate/grindstone-pack.json",
+      "generator": "art/recipes/grindstone-pack-candidate/grindstone-pack.json",
+      "approved": {
+        "runId": "astra-b5",
+        "directory": "artifacts/graphics/astra-b5/approved/grindstone-pack"
+      },
+      "bounds": {
+        "min": [
+          -0.166457,
+          -0.066667,
+          -0.165
+        ],
+        "max": [
+          0.166457,
+          0.21,
+          -0.044167
+        ],
+        "size": [
+          0.332914,
+          0.276667,
+          0.120833
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 148
+      },
+      "hashes": {
+        "grindstone-pack.glb": "6C12F9F4D17706298A56A01307EFA3BD5EC75522E2C0949703DA008D0209F375",
+        "grindstone-pack-preview.png": "C2691B9DF9EEEDFAF8D8A50C43A645B759AB60DEBE0FE7BC610065C2A2969A00"
+      }
+    },
+    {
+      "id": "herb-basket",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/herb-basket-candidate/herb-basket.json",
+      "generator": "art/recipes/herb-basket-candidate/herb-basket.json",
+      "approved": {
+        "runId": "astra-b5",
+        "directory": "artifacts/graphics/astra-b5/approved/herb-basket"
+      },
+      "bounds": {
+        "min": [
+          -0.06662,
+          -0.14,
+          -0.071
+        ],
+        "max": [
+          0.064167,
+          0.021667,
+          0.071
+        ],
+        "size": [
+          0.130787,
+          0.161667,
+          0.142
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "grip"
+      ],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 100
+      },
+      "hashes": {
+        "herb-basket.glb": "5B00A816B4A18AB6BAE0FBE1B2BF990D0AA2E0143A659BE93B82566BB3830C8D",
+        "herb-basket-preview.png": "67E3BA64D9AE75BBA3E45C0DD19C58CAADD3005D6D4417F89F5569628A937AE1"
+      }
+    },
+    {
+      "id": "bundle-pack",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/bundle-pack-candidate/bundle-pack.json",
+      "generator": "art/recipes/bundle-pack-candidate/bundle-pack.json",
+      "approved": {
+        "runId": "astra-b5",
+        "directory": "artifacts/graphics/astra-b5/approved/bundle-pack"
+      },
+      "bounds": {
+        "min": [
+          -0.101667,
+          -0.046667,
+          -0.2175
+        ],
+        "max": [
+          0.101667,
+          0.2,
+          -0.036667
+        ],
+        "size": [
+          0.203333,
+          0.246667,
+          0.180833
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 92
+      },
+      "hashes": {
+        "bundle-pack.glb": "59D4A7B48A544485E515CBF9E6AD3B919A8391F8AC08E9D379F9EF8D32647339",
+        "bundle-pack-preview.png": "9E8563BCA238A0C56817D346912022B751C50136405F9024B9431A26D6CF5058"
+      }
+    },
+    {
+      "id": "forage-basket",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/forage-basket-candidate/forage-basket.json",
+      "generator": "art/recipes/forage-basket-candidate/forage-basket.json",
+      "approved": {
+        "runId": "astra-b5",
+        "directory": "artifacts/graphics/astra-b5/approved/forage-basket"
+      },
+      "bounds": {
+        "min": [
+          -0.064167,
+          -0.14,
+          -0.071
+        ],
+        "max": [
+          0.064167,
+          0.004167,
+          0.071
+        ],
+        "size": [
+          0.128333,
+          0.144167,
+          0.142
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "grip"
+      ],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 124
+      },
+      "hashes": {
+        "forage-basket.glb": "513F5F10BE19AEA2A4B68E9E7B10EF5B4CF0FDB36CC14BE4F7E2A4A184093340",
+        "forage-basket-preview.png": "31F90F29C54ECF13B9F124D32F00A0C14C89C69824FA3EAFEE78507B478F41E4"
+      }
+    },
+    {
+      "id": "rope-pick",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/rope-pick-candidate/rope-pick.json",
+      "generator": "art/recipes/rope-pick-candidate/rope-pick.json",
+      "approved": {
+        "runId": "astra-b5",
+        "directory": "artifacts/graphics/astra-b5/approved/rope-pick"
+      },
+      "bounds": {
+        "min": [
+          -0.151887,
+          -0.111667,
+          -0.135833
+        ],
+        "max": [
+          0.110833,
+          0.235145,
+          -0.089167
+        ],
+        "size": [
+          0.26272,
+          0.346811,
+          0.046667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 144
+      },
+      "hashes": {
+        "rope-pick.glb": "5A5A5FDC8729308CFBD2782BFC75D6D9C29CCBEF53999CAB13E71AFBC84466BB",
+        "rope-pick-preview.png": "A0F32845040CD6EADABECC07EBFF59F131E7B5AF8758FBC50879BF59DFA512C9"
+      }
+    },
+    {
+      "id": "trade-pack",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/trade-pack-candidate/trade-pack.json",
+      "generator": "art/recipes/trade-pack-candidate/trade-pack.json",
+      "approved": {
+        "runId": "astra-b5",
+        "directory": "artifacts/graphics/astra-b5/approved/trade-pack"
+      },
+      "bounds": {
+        "min": [
+          -0.11,
+          -0.038333,
+          -0.200833
+        ],
+        "max": [
+          0.11,
+          0.264641,
+          -0.0415
+        ],
+        "size": [
+          0.22,
+          0.302974,
+          0.159333
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 104
+      },
+      "hashes": {
+        "trade-pack.glb": "5CF40250A3C69631B7817487EF0F810079D2B6018AC1E6B1026F091D8E060507",
+        "trade-pack-preview.png": "9FACED8EC4469DDD92686FD5F857E77C9114D7937E1D7BBA0B8A1834697080F4"
+      }
+    },
+    {
+      "id": "hide-bundle",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/hide-bundle-candidate/hide-bundle.json",
+      "generator": "art/recipes/hide-bundle-candidate/hide-bundle.json",
+      "approved": {
+        "runId": "astra-b5",
+        "directory": "artifacts/graphics/astra-b5/approved/hide-bundle"
+      },
+      "bounds": {
+        "min": [
+          -0.105,
+          -0.023333,
+          -0.180833
+        ],
+        "max": [
+          0.103333,
+          0.173333,
+          -0.015
+        ],
+        "size": [
+          0.208333,
+          0.196667,
+          0.165833
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 120
+      },
+      "hashes": {
+        "hide-bundle.glb": "D1E236DFE297C2A673501193711BCAABE14B9F20070268C864DF504F99788CE2",
+        "hide-bundle-preview.png": "75252503FB48F73D97452414A3DA1E681CBA92932B6EFC986849CEC6846099E3"
+      }
     }
   ]
 }
