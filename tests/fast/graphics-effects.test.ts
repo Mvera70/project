@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/graphics-effects-long.test.ts` (v5.56).
+//
 import { destroyBuilding } from '@engine/world/buildings';
 // G-08 · design.md §10.3, D.3, D.8 — estaciones y consecuencias visibles.
 //
@@ -25,7 +27,7 @@ import {
   type InstancedMesh, type Object3D,
 } from 'three';
 import { TERRAIN_CODE } from '@engine/state';
-import { animalPositions, wildlifePositions, type Animal } from '@derive/animals';
+import { animalPositions, wildlifePositions } from '@derive/animals';
 import { daylightAt, NIGHT_FLOOR, NOON } from '../../src/render3d/effects/daylight';
 import { Fauna, ashore as ashoreOf } from '../../src/render3d/effects/fauna';
 import { readFileSync } from 'node:fs';
@@ -33,7 +35,6 @@ import { resolve } from 'node:path';
 import { dayPhase, SCENIC_DAY_SECONDS } from '../../src/render3d/presentation-clock';
 import { Tells, WINDOWS } from '../../src/render3d/effects/tells';
 import { createScenicState } from '../../src/render3d/scenic-state';
-import { cellColour } from '../../src/render3d/world/ground';
 import { TIME } from '@engine/balance';
 import { FIELD_CROPS, groundSignature, planChange, planFor } from '../../src/render3d/world/plan';
 import { fingerprint } from '../helpers/fingerprint';
@@ -76,34 +77,6 @@ function atTick(state: GameState, tick: number): GameState {
 }
 
 describe('G-08 · las estaciones', () => {
-  it('el valle cambia de color cuatro veces al año', () => {
-    // Sin esto el suelo sólo se reconstruía cuando alguien talaba un árbol, y
-    // el valle seguía verde en enero.
-    const state = village(10);
-    const seen = new Set<number>();
-    for (let week = 0; week < 48; week += 1) {
-      seen.add(groundSignature(state.map, week));
-    }
-    // Cuatro estaciones y `TURN_WEEKS` semanas de transición en cada una: una
-    // firma por paso, ni una más.
-    expect(seen.size).toBe(SEASONS.length * (TURN_WEEKS + 1));
-  });
-
-  it('el invierno no se parece al verano en ninguna celda de prado', () => {
-    const state = village(10);
-    let different = 0;
-    let checked = 0;
-    for (let cell = 0; cell < state.map.terrain.length; cell += 1) {
-      if ((state.map.terrain[cell] ?? 0) !== 0 || (state.map.path[cell] ?? 0) > 0) continue;
-      checked += 1;
-      if (cellColour(state.map, cell, PALETTES.winter) !== cellColour(state.map, cell, PALETTES.summer)) {
-        different += 1;
-      }
-    }
-    expect(checked).toBeGreaterThan(100);
-    expect(different).toBe(checked);
-  });
-
   it('la estación se deshiela hacia la siguiente durante sus últimas semanas', () => {
     // §10.3. Un cambio de golpe se lee como un fallo de dibujo; el degradado se
     // lee como que ha pasado el tiempo.
@@ -134,32 +107,6 @@ describe('G-08 · las estaciones', () => {
 });
 
 describe('G-08 · las consecuencias', () => {
-  it('el valle dice sin abrir una ficha qué le pasa a la aldea', () => {
-    // La matriz que el brief pide: cada señal existe y sale del estado.
-    const state = village(14);
-    const kinds = new Set(tellsFor(state).map((tell) => tell.kind));
-    // Humo y luz en las casas habitadas, y el granero con su nivel: son las
-    // tres que una aldea viva tiene siempre.
-    expect(kinds.has('smoke')).toBe(true);
-    expect(kinds.has('light')).toBe(true);
-    expect(kinds.has('granary')).toBe(true);
-  });
-
-  it('una peste se ve mientras dura y deja de verse al vencerla', () => {
-    // La regla entera de la ronda: no hay temporizador propio. Cuando el estado
-    // deja de decir peste, la mancha desaparece sola.
-    const state = village(14);
-    const sick = structuredClone(state);
-    sick.outbreak = { startedTick: sick.tick, endsTick: sick.tick + 6, deaths: 0 };
-    const during = tellsFor(sick).filter((tell) => tell.kind === 'plague');
-    expect(during.length).toBeGreaterThan(0);
-
-    // Vencida: el mismo estado, con la peste ya caducada.
-    const cured = structuredClone(sick);
-    cured.tick = sick.outbreak.endsTick;
-    expect(tellsFor(cured).filter((tell) => tell.kind === 'plague')).toEqual([]);
-  });
-
   it('una casa quemada deja de echar humo', () => {
     // Una consecuencia no es sólo lo que aparece: es también lo que se apaga.
     const state = village(14);
@@ -419,50 +366,6 @@ describe('G-10 · la fauna (§7.7)', () => {
     fauna.dispose();
     expect(fauna.group.children.length).toBe(0);
     expect(fauna.count).toBe(0);
-  });
-});
-
-describe('IA-5 · el lobo tiene una sola fuente en 3D', () => {
-  function model(): Object3D {
-    const group = new Group();
-    group.add(new Mesh(new BoxGeometry(0.2, 0.2, 0.2), new MeshStandardMaterial()));
-    return group;
-  }
-
-  it('la fórmula vieja ya no pone lobos en la escena 3D, aunque siga dándolos para Canvas', () => {
-    // Noche de invierno: la ventana en la que el lobo decorativo
-    // (`wildlifePositions`) sale siempre que haga frío, pase o no
-    // `wolves_at_the_coop` esa semana en concreto — es justo la doble fuente
-    // que esta fase quita del 3D. Canvas (`render/renderer.ts`) sigue
-    // llamando a `wildlifePositions` directamente y no pasa por `Fauna`, así
-    // que su lobo no se toca: se comprueba aquí que la función lo sigue dando.
-    const base = village(20);
-    const winter = TIME.WEEKS_PER_SEASON * 3 + 4;
-    const moment = atTick(
-      base, Math.floor(base.tick / TIME.WEEKS_PER_YEAR) * TIME.WEEKS_PER_YEAR + winter,
-    );
-    const formulaWolves = wildlifePositions(moment, 0.95).filter((a) => a.kind === 'wolf');
-    expect(formulaWolves.length, 'la fórmula sigue dando lobos, para Canvas').toBeGreaterThan(0);
-    // Y de noche el resto de la cabaña está recogida (§10.6), así que si algo
-    // se pinta a esta hora sólo puede ser el lobo de la fórmula — el que no
-    // tiene que colarse.
-    expect(animalPositions(moment, 0.95)).toEqual([]);
-
-    const fauna = new Fauna(() => model());
-    fauna.update(moment, 0.95); // sin `live`: nada de la fórmula debe colarse.
-    expect(fauna.count).toBe(0);
-    fauna.dispose();
-  });
-
-  it('con un lobo vivo, la escena pinta exactamente ése', () => {
-    const state = village(20);
-    const fauna = new Fauna(() => model());
-    const live: Animal[] = [{ id: 20_000, kind: 'wolf', x: 5, y: 5 }];
-    // De noche, para que la cabaña de la fórmula no aporte nada y lo único
-    // que pueda haber en escena sea `live`.
-    fauna.update(state, 0.95, live);
-    expect(fauna.count).toBe(1);
-    fauna.dispose();
   });
 });
 

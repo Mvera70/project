@@ -13,6 +13,29 @@ tablet** (aldea 11/21, panel de taller): (1) qué resolución y si sale «(CPU)�
 (2) `?aa=msaa` contra sin nada: si los fps no bajan más de un 10 %, MSAA pasa
 a Medium en v5.66 (v5.66–v5.67 reservadas para eso).
 
+## 1 oct 2026 · La suite rápida vuelve a ser rápida (v5.56) — carril motor/pruebas
+
+Rama `claude/pruebas-lentas-a-jornadas`, desde `main`. El trabajo `fast` de CI
+tardaba 36 min y los trozos de jornadas 11, 33 y 30 (vuelta 36930779436).
+**Hecho:** 31 ficheros enteros y lo lento de otros 43 a `tests/journeys/`, con
+el mismo cuerpo y el mismo umbral (2343 registros antes y después, título a
+título; 15 `it.fails`; 54 `it.each`); `threat` y `wall-rings` partidas en dos;
+seis trozos repartidos por peso (`tests/journeys/shard-weights.ts`). Medido en
+local: `npm test` 262 s (4 hilos), 2087 pruebas. En CI: `npm test` **2 min 39 s** (antes 36 min) y el trabajo `fast` entero 3 min 30 s; los seis trozos de jornadas, 18:27, 13:08, 15:22, 16:31, 17:44 y 12:39 (antes 11, 33 y 30 min); la vuelta entera, **19 min** (vuelta 36948242697).
+**Lo que se aprendió:** el tiempo por fichero de vitest no cuenta la recogida
+(una partida en el cuerpo de un `describe` la paga antes de la primera prueba:
+`catalogue-coverage` decía 0,1 s y gasta 487), y mudar la prueba lenta de una
+caché compartida pasa la cuenta a la siguiente. Se mide con
+`vitest run <fichero> -t '^nada$'` y con la suite entera después de mudar.
+**Abierto:** (1) quedan en `fast` pruebas de ~3 s en local que son la primera
+que llena su aldea (`fate`, `life-beasts`, `graphics-world`, `means`); (2) la
+recogida de la suite rápida (~380 s sumados en local, importar Three y Rapier
+en cada fichero) pesa ya tanto como sus pruebas; (3) citas a ficheros mudados
+fuera de este carril: `docs/design.md` (`density`, `life-expeditions`,
+`life-perf`), `tools/README.md` (`reader-packet`) y un comentario de
+`src/render3d/life/staging.ts` (`life-staging`) —son del director—; (4) si una
+jornada nueva pasa de ~100 s, se apunta su peso en `shard-weights.ts`.
+
 ## 2 oct 2026 · Piedras de orilla, zorro, encrucijada a 600 (v5.55) · y dos abiertos
 
 Hecho: las piedras de la calzada en grupos de canto rodado; el zorro vuelve

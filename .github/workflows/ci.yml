@@ -42,13 +42,17 @@ jobs:
   # Enteras en un solo servidor tardaban 48 minutos (#280) y, con la jornada
   # larga del sonido, pasaron del tope de 60 y se cortaban sin decir nada
   # (30 sep 2026). En tres trozos que corren a la vez, cada uno cabe holgado.
+  # Desde v5.56 (1 oct 2026) reciben también lo que pasaba de diez segundos en
+  # `fast` —que tardaba 36 minutos— y van en seis trozos repartidos por peso
+  # (`tests/journeys/shard-weights.ts`): con el reparto por hash de vitest, los
+  # tres de antes tardaban 11, 33 y 30 minutos.
   journeys:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4, 5, 6]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -59,7 +63,7 @@ jobs:
       # El tercer nivel de §14: jornadas y siglos en varias semillas. Fuera del
       # bucle de trabajo por lo que cuesta, dentro de la puerta porque es lo que
       # prueba la capa que hoy mueve la aldea.
-      - run: npm run test:journeys -- --shard=${{ matrix.shard }}/3
+      - run: npm run test:journeys -- --shard=${{ matrix.shard }}/6
         env:
           VALLEY_TIMING_SCALE: 3
 
