@@ -46,6 +46,7 @@ import { LIFE_STEP } from '../../src/render3d/life/clock';
 import { elevationAt } from '../../src/render3d/world/ground';
 import type { ShadowArrow } from '../../src/render3d/life/archery';
 import { advanceThreat } from '../../src/engine/world/threat';
+import { DAMAGE } from '../../src/render3d/life/wounds';
 
 const args = process.argv.slice(2);
 const opt = (name: string, fallback: string): string => {
@@ -64,6 +65,10 @@ const radii = flag('shadow') ? opt('shadow', '0.12').split(',').map(Number) : []
 const probeHeight = Number(opt('probe-height', '0.65'));
 const relief = flag('relief');
 const jerkinMode = flag('jerkins');
+// v5.81 · `--arrow-damage 0.34`: la vida que quita una flecha, sólo en este
+// proceso, para medir el valor antes de fijarlo en `wounds.ts`. El juego no
+// lo lee nunca.
+if (flag('arrow-damage')) (DAMAGE as Record<string, number>)['arrow'] = Number(opt('arrow-damage', String(DAMAGE.arrow)));
 const days = Number(opt('days', '1'));
 const quiet = flag('quiet') || seeds.length > 1 || radii.length > 1 || jerkinMode;
 
@@ -305,6 +310,7 @@ if (radii.length > 0) {
 }
 
 if (jerkinMode) {
+  process.stdout.write(`\nflecha: quita ${DAMAGE.arrow} de vida\n`);
   process.stdout.write(`\nK5 · el peto en la pelea: ${jerkinTrials.length} jornadas (${seeds.length} semillas × ${days}), `
     + `${defenders} en el cerco (${arm}) contra ${raiders}, año ${year}, suelo ${relief ? 'con el relieve del juego' : 'plano'}\n`);
   process.stdout.write(`${jerkinTable(jerkinTrials)}\n`);
