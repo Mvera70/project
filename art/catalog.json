@@ -8250,7 +8250,7 @@
           "name": "walk",
           "seconds": 1.2,
           "loop": true,
-          "strideLength": 0.286
+          "strideLength": 0.341
         },
         {
           "name": "idle",
@@ -8267,7 +8267,7 @@
         "triangles": 894
       },
       "hashes": {
-        "horse.glb": "49DCB025CCC5FF6F6043A203C47845A3B503CF503E72A843C4EA075A90CD51BF"
+        "horse.glb": "1ABC3C625ED33AF1C2DB78ABB46213F28AAEDB402A7D4E71561FAAD1CB356C2A"
       }
     },
     {
@@ -8337,7 +8337,7 @@
         "triangles": 238
       },
       "hashes": {
-        "stork.glb": "31400F87B27F130F0D6F43695662C9077567D786B6A44051ACB3EF7231730B00"
+        "stork.glb": "BE446EDA1FACCD77858550C50F465BA709411D45AAF8FBD26FF3B09398F4522C"
       }
     },
     {
@@ -8389,7 +8389,7 @@
           "name": "walk",
           "seconds": 0.6,
           "loop": true,
-          "strideLength": 0.021
+          "strideLength": 0.04
         },
         {
           "name": "idle",
@@ -8406,7 +8406,7 @@
         "triangles": 78
       },
       "hashes": {
-        "chick.glb": "196A958DF5A74ABDF3AC11C4D8D1E585F401B1E3A464AA3863B87181981180A3"
+        "chick.glb": "1CDBE4A4AF87B05E0DB4C18BDE04B8A04575195A4FB510563E279E2C627765AC"
       }
     },
     {

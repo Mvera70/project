@@ -935,7 +935,9 @@ def horse():
     lz=lambda z: .044+(z-.044)*k
     for pre,x in [('fore',-.148),('hind',.162)]:
         for s,l in [(-1,'L'),(1,'R')]:
-            y=s*.062; hip=(x,y,.375-MULE_DROP); knee=(x+(.004 if pre=='fore' else -.037),y,lz(.200)); ankle=(x+(.003 if pre=='fore' else .028),y,.044); toe=(ankle[0]-.011,y,.021)
+            # La rodilla de delante, algo doblada en reposo (como la del ciervo):
+            # recta, la cinemática del casco plantado no llega y el casco patina.
+            y=s*.062; hip=(x,y,.375-MULE_DROP); knee=(x+(.012 if pre=='fore' else -.037),y,lz(.200)); ankle=(x+(-.003 if pre=='fore' else .028),y,.044); toe=(ankle[0]-.011,y,.021)
             p=empty(pre+l,hip,body); tube(pre+l+'_Upper',[hip,knee],[.038,.024],'coat',p,6)
             q=empty(pre+l+'Lower',knee,p); tube(pre+l+'_Shin',[knee,ankle],[.020,.017],'coatTop',q,6)
             ell(pre+l+'_Knee',knee,(.040,.040,.044),'coatTop',q,4,3)
