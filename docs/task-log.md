@@ -1,6 +1,6 @@
 # Cuaderno de tareas — el rework
 
-## 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón (v5.60)
+## 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón (v5.57)
 
 Rama `ccr-372e1786-k4brcp`. Medido antes en `main`, decidido con Vera y hecho:
 los encargos de la herrería y los ritos de la capilla, por `PlayerAct`, con su

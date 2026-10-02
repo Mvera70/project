@@ -2522,7 +2522,7 @@ se ve, en `tests/fast/life-expeditions.test.ts`.
 cazado o visto un asalto no cargaba** —`loadSave` la daba por corrupta y el
 juego empezaba otra—. Arreglado, con prueba.
 
-### 7.16 Los tablones de la herrería y de la capilla (K8+K9, v5.60, 2 oct 2026)
+### 7.16 Los tablones de la herrería y de la capilla (K8+K9, v5.57, 2 oct 2026)
 
 Lo pidió el dueño del diseño: «cada edificio con sentido y su propio tablón,
 como el de misiones de la plaza: la herrería con encargos o mejoras pagadas;

@@ -1,6 +1,6 @@
 # Encargo · K8+K9: las ilustraciones y los dos tablones
 
-**Ronda:** K8+K9, 2 oct 2026 (v5.60). **Por qué aquí y no en
+**Ronda:** K8+K9, 2 oct 2026 (v5.57). **Por qué aquí y no en
 `docs/plan-arte-pendiente.md`:** Codex está trabajando ahora en ese fichero,
 en `public/ui/art/index.json`, `chronicle-art.ts` y `ui/milestones.ts`, y la
 ronda no los toca. Cuando Codex termine, estas filas pasan allí y se integran

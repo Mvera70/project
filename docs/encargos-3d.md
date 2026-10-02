@@ -223,7 +223,7 @@ pantalla todavía no enseña del todo:
 | **La entrega sin leñadores** | Entra igual, a su hora | El «+1» sale sin nadie delante los días en que el reparto no pone a nadie en el bosque (3 de 38 entregas medidas) | Que el reparto de la jornada (`life/day.ts`) ponga un leñador los días con entregas |
 | **La piedra y el grano** | Siguen entrando por semanas enteras | La piedra se acarrea sin «+1»; el grano sube de golpe | Lo mismo que la madera: entregas con hora, porteador y aviso. Pedido por el dueño del diseño el 28 sep 2026, para después de probar la madera |
 
-## Los tablones de la herrería y de la capilla (2 oct 2026, K8+K9, v5.60)
+## Los tablones de la herrería y de la capilla (2 oct 2026, K8+K9, v5.57)
 
 | Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
 |---|---|---|---|

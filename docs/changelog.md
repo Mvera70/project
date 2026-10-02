@@ -1,6 +1,6 @@
 # The Valley — Registro de cambios
 
-## v5.60 · 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón, y desde ellas inclinar hacia un recurso
+## v5.57 · 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón, y desde ellas inclinar hacia un recurso
 
 **Medido antes, en `main`** (`docs/medidas/k8-k9-edificios-2026-10-02.md`,
 informe nuevo `tools/reports/k8-report.ts`): la capilla llega a las 33 h a ×1

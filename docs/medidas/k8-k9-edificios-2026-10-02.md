@@ -49,7 +49,7 @@ madera, hay obra que levantar con madera de sobra y no la hay (`nextProject`).
 
 ## K9 · ¿alguna inclinación dominada o que mate aldeas?
 
-Con los tablones hechos (v5.60), `tools/reports/tilt-report.ts`: cada opción
+Con los tablones hechos (v5.57), `tools/reports/tilt-report.ts`: cada opción
 pedida **siempre que se pueda**, 8 semillas (3, 10…52) × 40 años, `run` y
 política prudente. Es la prueba contra la trampa de v2.0, donde sólo vivía la
 postura de fábrica y `timber` a 0,2 mataba 11 aldeas de 16.
