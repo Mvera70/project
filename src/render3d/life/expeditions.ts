@@ -19,7 +19,7 @@
 
 import { TIME } from '@engine/balance';
 import { hash32 } from '@engine/rng';
-import type { GameState, VillagerId } from '@engine/state';
+import type { GameState, MissionId, VillagerId } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
 import { missionSpec } from '@engine/world/expeditions';
 import type { Body, Point, Terrain } from './body';
@@ -34,6 +34,7 @@ export type TravellerPhase = 'waiting' | 'walking' | 'gone';
 
 export interface Traveller {
   readonly villager: VillagerId;
+  readonly mission: MissionId;
   readonly body: Body;
   phase: TravellerPhase;
   /** Cuándo echa a andar y cuándo se da por perdido de vista, en fase de jornada. */
@@ -139,11 +140,11 @@ export function createTravellers(state: GameState, land: Terrain, heart: Point, 
   const road = roadInto(state, land, shore, plaza);
   const forest = forestPlaces(state, land, shore, heart, seed);
   const out: Traveller[] = [];
-  const add = (id: VillagerId, from: Point, stops: Point[], start: number, linger: number, load: 'bundle' | null): void => {
+  const add = (id: VillagerId, mission: MissionId, from: Point, stops: Point[], start: number, linger: number, load: 'bundle' | null): void => {
     const n = out.length;
     const jitter = unit(seed, `start:${id}`) * 0.04;
     out.push({
-      villager: id,
+      villager: id, mission,
       body: { id: TRAVELLER_ID_BASE + n, x: from.x, z: from.z, vx: 0, vz: 0, facing: 0, radius: RADIUS, pace: PACE },
       phase: 'waiting', start: start + jitter, stops, linger, next: 0, route: [], waitUntil: 0, stalled: 0, travelled: 0,
       load,
@@ -164,14 +165,14 @@ export function createTravellers(state: GameState, land: Terrain, heart: Point, 
       if (returning && trip.dead.includes(id)) continue;
       const home = homeOf(state, land, id, heart);
       if (leaving) {
-        add(id, home, outward, LEAVE_AT, inForest ? LINGER : 0, null);
+        add(id, trip.mission, home, outward, LEAVE_AT, inForest ? LINGER : 0, null);
       } else if (gathering) {
-        add(id, forest!.deep, [...forest!.stops, forest!.deep], GATHER_FROM, LINGER, null);
+        add(id, trip.mission, forest!.deep, [...forest!.stops, forest!.deep], GATHER_FROM, LINGER, null);
       } else {
         const way = inForest ? forest!.deep : road!.entry;
         const along = inForest ? [forest!.stops[0]!, home] : [...road!.road, home];
         const loaded = trip.end === 'back' || trip.end === 'back_mourning';
-        add(id, way, along, RETURN_AT, 0, loaded ? 'bundle' : null);
+        add(id, trip.mission, way, along, RETURN_AT, 0, loaded ? 'bundle' : null);
       }
     }
   }
@@ -245,4 +246,3 @@ export function stepTraveller(t: Traveller, land: Terrain, phase: number, step: 
     t.route = pathTo(land, { x: body.x, z: body.z }, goal) ?? [];
   }
 }
-

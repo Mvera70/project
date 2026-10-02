@@ -12,18 +12,38 @@
 
 import { lostInSight } from './lost-child';
 import { travelling } from './expeditions';
-import { visiting } from './visitors';
+import { visiting, type Visitor } from './visitors';
 import { indoors } from './home';
 import { occupationOf } from '../world/models';
 import type { ArrowSighting } from '../world/arrows';
-import type { VillagerId } from '@engine/state';
-import type { Activity, Actor } from '../contracts';
+import type { MissionId, VillagerId } from '@engine/state';
+import type { AccessoryId, Activity, Actor } from '../contracts';
 import type { ClipName } from '../clips';
 import { clipTime, VILLAGER_CLIPS } from '../clips';
 import { LIFE_STEP } from './clock';
 import { meleePose } from './melee';
 import type { Prop } from './props';
 import type { Dweller, Village } from './village';
+
+function expeditionAccessory(mission: MissionId): AccessoryId {
+  switch (mission) {
+    case 'mushrooms': case 'herbs': return 'forage-basket';
+    case 'high_seam': return 'rope-pick';
+    case 'market': return 'trade-pack';
+    case 'wolf_den': return 'hide-bundle';
+  }
+}
+
+function visitorAccessories(visitor: Visitor): readonly AccessoryId[] {
+  switch (visitor.kind) {
+    case 'minstrel': return ['fiddle'];
+    case 'pilgrims': return ['pilgrim-hat', 'pilgrim-staff'];
+    case 'tinker': return ['grindstone-pack'];
+    case 'wise_woman': return ['herb-basket'];
+    case 'refugees': return (visitor.member ?? 0) < 2 ? ['bundle-pack'] : [];
+    default: return [];
+  }
+}
 
 /**
  * Qué clip le toca a lo que uno está haciendo.
@@ -276,6 +296,7 @@ export function castOf(
       activity: moving ? 'walking' : 'resting',
       clip,
       load: carrying ? traveller.load : null,
+      accessories: carrying ? [expeditionAccessory(traveller.mission)] : [],
       poseSeconds: seconds,
       clipSeconds: clipTime(clip, traveller.travelled, seconds, (traveller.villager % 11) / 11),
       travelled: traveller.travelled,
@@ -340,6 +361,7 @@ export function castOf(
       activity: moving ? 'walking' : 'resting',
       clip,
       load: carries && moving ? 'bundle' : null,
+      accessories: visitorAccessories(visitor),
       poseSeconds: seconds,
       clipSeconds: clipTime(clip, visitor.travelled, seconds, 0),
       travelled: visitor.travelled,

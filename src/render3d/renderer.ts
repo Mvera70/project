@@ -237,6 +237,8 @@ export const WANTED = [
   // `WANTED` puede incluirlo antes de publicarlo para que aparezca al llegar.
   'barrel', 'plough',
   'jerkin',
+  'fiddle', 'pilgrim-hat', 'pilgrim-staff', 'grindstone-pack', 'herb-basket',
+  'bundle-pack', 'forage-basket', 'rope-pick', 'trade-pack', 'hide-bundle',
   'notice-board', 'smithy-board', 'chapel-board', 'signpost', 'hide-rack', 'hammer',
   'burnt-house', 'great-oak',
   ...FAUNA,
