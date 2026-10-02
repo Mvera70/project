@@ -377,7 +377,12 @@ describe('V-09 · trastos', () => {
   // **Y vuelve a `it.fails` con K1–K3 (v5.53, 1 oct 2026).** La trayectoria de
   // cuarenta años se mueve otra vez y le toca a la semilla 23: 0 pases en las
   // diez jornadas. Misma causa 1, otra semilla.
-  it.fails('y en todas las semillas, sin una sola aldea muda', () => {
+  //
+  // **Y vuelve a verde con la mina (AR-2, v5.86, 2 oct 2026)**: la trayectoria
+  // se mueve desde el año ~5 y en la jornada local las seis semillas juegan
+  // («Expect test to fail»). La causa 1 sigue; la próxima trayectoria puede
+  // volver a tumbarla.
+  it('y en todas las semillas, sin una sola aldea muda', () => {
     const DAYS = 10;
     for (const seed of SEEDS) {
       const state = village(seed);
@@ -453,7 +458,10 @@ describe('V-09 · trastos', () => {
   // trayectoria nueva un pase se devuelve en **4** de las 36 jornadas y el
   // listón pide más de 4; no se baja: se declara aquí con la medida, y la
   // prueba de arriba sigue guardando que el pase se devuelve alguna vez.
-  it.fails('y un pase se devuelve en más de cuatro de las 36 jornadas', () => {
+  // **Y se cumple con la mina (AR-2, v5.86)**: la trayectoria nueva lo pasa en
+  // la jornada local («Expect test to fail»). Vuelve a `it.fails` con lo medido
+  // si otra trayectoria lo tumba.
+  it('y un pase se devuelve en más de cuatro de las 36 jornadas', () => {
     expect(returnedSeen, `un pase se devuelve en ${returnedSeen} de 36 jornadas`).toBeGreaterThan(4);
   });
 

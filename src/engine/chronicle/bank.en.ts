@@ -1280,6 +1280,20 @@ export const BANK: Record<string, string[]> = {
   // A1 · El cierre del anillo (§1b, fase 3): la aldea deja de ser un pueblo
   // abierto. Es la línea más alta que puede decir una obra, y por eso no es un
   // `built.*` más: lo que se cuenta no es la última estaca, es la villa.
+  // AR-2 · **La primera mina abre la Edad del Hierro** (peso 3, una vez en la
+  // vida de un valle). Lo que se ve: la boca entibada al pie de la montaña,
+  // los mineros que entran y desaparecen y las vagonetas que salen cargadas.
+  'mine.opened': [
+    'In the {season} of year {year} they timbered a mouth in the mountain. The Age of Iron had begun.',
+    'The first cart of ore came out of the hillside that {season}. The forge had iron of the valley’s own.',
+    'Year {year}: a mine at the foot of the mountain, and ore on the rails. The valley entered its Age of Iron.',
+  ],
+  // AR-2 · la mina rehecha, si se hundió o ardió: ya no es una edad, es obra.
+  'built.mine': [
+    'They shored up the mine again in the {season} of year {year}.',
+    'The mine was opened anew that {season}, and the carts ran again.',
+    'In year {year} the mouth in the mountain had timber in it once more.',
+  ],
   'wall.closed': [
     'The last stake went in at {season}, and the village stood enclosed.',
     'By {season} the ring was whole: {pieces} lengths of it, and no way in but the gate.',
@@ -2581,6 +2595,12 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'The first bastion stands in the wall.',
     'Part of the wall stands higher than the rest now.',
   ],
+  // AR-2 · la boca de la mina, al pie de la montaña.
+  'milestone.first_of_kind.mine': [
+    'There is a mine in the mountain now.',
+    'The first cart of ore has come out of the hillside.',
+    'The valley digs its own iron.',
+  ],
 
   'milestone.work_done.chapel': [
     'A second chapel stands.',
@@ -3016,6 +3036,7 @@ export const UI_BANK: Record<string, string> = {
   'doing.raising.church': 'They are raising the church.',
   'doing.raising.watchtower': 'They are raising the watchtower.',
   'doing.raising.bastion': 'They are raising a bastion into the wall.',
+  'doing.raising.mine': 'They are timbering a mine into the mountain.',
   // U-06 · la línea de estación bajo el año (`src/ui/app.ts`, `seasonLabel`):
   // una clave por estación, nunca un literal junto a `seasonOf`.
   'app.season.spring': 'Spring',
@@ -3310,6 +3331,8 @@ export const UI_BANK: Record<string, string> = {
   'building.grave_yard': 'graveyard',
   // A3 · el bastión, la torre metida en la propia muralla.
   'building.bastion': 'bastion',
+  // AR-2 · la mina de la veta, al pie de la montaña.
+  'building.mine': 'mine',
   'trait.ambitious': 'ambitious',
   'trait.devout': 'devout',
   'trait.spiteful': 'spiteful',

@@ -91,6 +91,7 @@ import { boltPlace, boltsInDay, overcastOf, skyAt, type SkyKind } from '../deriv
 import { floodOf } from '../derive/flood';
 import { SHARED_WATER } from './world/water-surface';
 import { createQuarryFace, quarryStage } from './world/quarry-face';
+import { createMineWorks, MINE_ASSETS } from './world/mine-works';
 import { rockGeometry } from './world/mountains';
 import { stoneWork, woodStoreCells } from './life/resource-sites';
 import { createWeather } from './effects/weather';
@@ -239,6 +240,10 @@ export const WANTED = [
   // M-3 · el arado ya tiene GLB; el barril sigue usando el respaldo procedural.
   // `WANTED` puede incluirlo antes de publicarlo para que aparezca al llegar.
   'barrel', 'plough',
+  // AR-2 · la mina del encargo de Astra (bloque 4): se piden antes de estar
+  // publicadas, como el barril, para que aparezcan al llegar.
+  ...MINE_ASSETS,
+  'jerkin',
   'notice-board', 'smithy-board', 'chapel-board', 'signpost', 'hide-rack', 'hammer',
   'burnt-house', 'great-oak',
   ...FAUNA,
@@ -639,6 +644,8 @@ export async function createGraphicsRenderer(
   const stalls = createStalls((kind) => library.instance(STALL_ASSETS[kind]));
   // La cara de la cantera donde se pica hoy (`world/quarry-face.ts`).
   const quarry = createQuarryFace();
+  // AR-2 · la mina: boca, raíles, acopio y vagoneta (`world/mine-works.ts`).
+  const mineWorks = createMineWorks();
   const cameraRight = new Vector3();
   // Y las monedas que pasan de mano en un trato cerrado.
   const coins = createCoins();
@@ -646,7 +653,7 @@ export async function createGraphicsRenderer(
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, quarry.group, coins.mesh, fauna.group, seasonalFauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group, noticeBoard.group, buildingBoards.smithy.group, buildingBoards.church.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, quarry.group, mineWorks.group, coins.mesh, fauna.group, seasonalFauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group, noticeBoard.group, buildingBoards.smithy.group, buildingBoards.church.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -2565,6 +2572,8 @@ export async function createGraphicsRenderer(
         quarry.show(Number(quarryPlace.id.slice('quarry:'.length)), quarryStage(stoneJob.stoneDone, BUILDINGS[stoneJob.kind].stone),
           shown.map.width, { x: stoneJob.x + stoneJob.w / 2, z: stoneJob.y + stoneJob.h / 2 }, groundFloor, (id) => library.instance(id));
       }
+      // AR-2 · la mina del día y su vagoneta, donde la tenga la vida.
+      mineWorks.show(life.mine, shown.village.ore, groundFloor, (id) => library.instance(id));
       // Y lo que se lleva la mula del que cerró el trato.
       stalls.carry(life.visitors.flatMap((visitor): MuleLoad[] => visitor.loaded && visitor.beast?.kind === 'mule'
         && visitor.phase !== 'gone'

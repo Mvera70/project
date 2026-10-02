@@ -1,0 +1,33 @@
+{
+  "id": "jerkin",
+  "triangles": 176,
+  "budget": 200,
+  "mount": {
+    "jerkin_spine": "spine"
+  },
+  "materials": 1,
+  "textures": 0,
+  "rigSha256": "cbc336551f462700a5ba04e94b76504718ee42a6a4b90864eebbeca6a6ef6d66",
+  "mountBoundsError": 7.450580596923828e-09,
+  "mountedBoundsBlender": [
+    [
+      -0.15166667103767395,
+      -0.096333347260952,
+      0.2983333468437195
+    ],
+    [
+      0.15166667103767395,
+      0.07900001108646393,
+      0.49166667461395264
+    ]
+  ],
+  "localUnits": "metres: use the bone scale, no extra scale",
+  "status": "candidate, metal model only",
+  "sha256": "6b44d4963eceefe9acfdc15498e0b76806d5f913e0622e84f81af0860a369876",
+  "bytes": 17512,
+  "mountedSizeGltfCells": [
+    0.3033333420753479,
+    0.19333332777023315,
+    0.17533335834741592
+  ]
+}

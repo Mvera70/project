@@ -232,6 +232,8 @@ describe('grafo de módulos del motor', () => {
     expect(importsOf('world/works.ts')).toEqual([
       'balance',
       'buildings',
+      // AR-2 · dónde va la mina (la veta) y si la aldea la quiere ya.
+      'mine',
       'people/crown',
       'people/demography',
       'placement',

@@ -9,6 +9,21 @@ tanda de aldeanos. Sirve como lista de trabajo para las siguientes rondas y
 separa las ilustraciones de crónica, los adornos de interfaz y el arte 3D del
 mundo.
 
+## AR-2 · La mina y la Edad del Hierro (2 oct 2026, v5.86) — **pedidas por la regla de la crónica**
+
+Dos claves nuevas en `src/engine/chronicle/bank.en.ts`. Hasta que lleguen caen
+al grabado genérico de obra (`built.png`, por `kind: 'built'`), y eso es justo
+lo que la regla vigila: **la primera es un cambio de edad, peso 3, una vez en la
+vida de un valle**, como `wall.closed`. Al llegar, cada fichero entra en
+`public/ui/art/index.json` y su clave en `BUILD_ART`
+(`src/ui/redesign/chronicle-art.ts`), con su fila en
+`tests/fast/ui-chronicle-art.test.ts`.
+
+| Fichero | Clave | Qué tiene que enseñar |
+|---|---|---|
+| `mine-opened.png` | `mine.opened` | **La Edad del Hierro empieza**: la boca de la mina entibada (dos postes y un dintel) hundida en la ladera al pie de la montaña, como la cueva del oso pero más grande; los raíles que salen de ella hasta un montón de mineral rojizo, una vagoneta cargada saliendo de lo oscuro y un minero con el pico al hombro entrando. Peso 3 |
+| `built-mine.png` | `built.mine` | **La mina rehecha** tras hundirse o arder: entibado nuevo de madera clara en la misma boca, y la vagoneta otra vez en los raíles. Puede ser una variante más tranquila de la de arriba |
+
 ## RD-3 · encrucijadas reescritas (1 oct 2026): ninguna imagen nueva que pedir
 
 La regla del dueño del diseño («cada vez que creas una crónica hay que ir

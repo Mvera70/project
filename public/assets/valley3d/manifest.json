@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-02T16:47:05.098Z",
+  "generatedAt": "2026-10-02T16:55:53.610Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts --ids stork,chick,crane,butterfly",
   "assets": [
     {
@@ -1880,6 +1880,50 @@
       "provenance": {
         "kind": "original",
         "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/notice-board-candidate/hammer.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "jerkin",
+      "file": "jerkin.glb",
+      "sha256": "6B44D4963ECEEFE9ACFDC15498E0B76806D5F913E0622E84F81AF0860A369876",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/jerkin-candidate/jerkin.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "bench",
+      "file": "bench.glb",
+      "sha256": "C012E31A2D68C38E2EACF40ACCB57DA00CE08D7A4602BCC26ABA9CE37C844CA9",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/bench-candidate/bench.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "log-seat",
+      "file": "log-seat.glb",
+      "sha256": "E1A9581E3D35FA4FD58692B6901208B36B004C50563F6169A7049067939E9831",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/log-seat-candidate/log-seat.json",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "cart",
+      "file": "cart.glb",
+      "sha256": "551CD4D69AE7C780D809CD778226A2E72F85768624EDFEA55301501D25A35D56",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/cart-candidate/cart.json",
         "license": "project-original"
       }
     },
