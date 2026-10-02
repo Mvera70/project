@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "id": "pilgrim-staff",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "eldergrey",
+      "role": "elderGrey",
+      "color": "#77796F",
+      "roughness": 0.94
+    },
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.94
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "color": "#C7984A",
+      "roughness": 0.94
+    },
+    {
+      "name": "trunk",
+      "role": "trunk",
+      "color": "#735338",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "grip",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "connectors": [
+    "grip"
+  ],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "pilgrim-staff",
+    "footprint": [
+      1,
+      1
+    ],
+    "attachment": "hand_r",
+    "note": "Bloque 5. Metros fuente a celdas; frente +Z glTF. Origen en enganche, NO en base. Ajuste de montaje medido contra el nodo publicado en attachment.json; escala inversa del padre para evitar escala doble. Recurso est\u00e1tico preview-only."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 1,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Staff",
+      "location": [
+        0,
+        0,
+        0.45
+      ],
+      "radius": 0.031,
+      "depth": 2.18,
+      "vertices": 6,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Ferrule",
+      "location": [
+        0,
+        0,
+        -0.61
+      ],
+      "radius": 0.034,
+      "depth": 0.1,
+      "vertices": 6,
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Gourd",
+      "location": [
+        0.13,
+        0,
+        0.88
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.23,
+        0.21,
+        0.29
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "roof",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "GourdNeck",
+      "location": [
+        0.13,
+        0,
+        1.055
+      ],
+      "radius": 0.045,
+      "depth": 0.11,
+      "vertices": 5,
+      "material": "roof",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Cord",
+      "location": [
+        0.075,
+        0,
+        1.14
+      ],
+      "dimensions": [
+        0.18,
+        0.025,
+        0.026
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Knob",
+      "location": [
+        0,
+        0,
+        1.56
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.09,
+        0.08,
+        0.12
+      ],
+      "segments": 4,
+      "rings": 3,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

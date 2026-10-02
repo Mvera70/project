@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 1,
+  "id": "fiddle",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "clothaccent",
+      "role": "clothAccent",
+      "color": "#A96146",
+      "roughness": 0.94
+    },
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.94
+    },
+    {
+      "name": "saltwhite",
+      "role": "saltWhite",
+      "color": "#F4F2EC",
+      "roughness": 0.94
+    },
+    {
+      "name": "timber",
+      "role": "timber",
+      "color": "#9A744C",
+      "roughness": 0.94
+    },
+    {
+      "name": "timberdark",
+      "role": "timberDark",
+      "color": "#6B4C32",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "grip",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "connectors": [
+    "grip"
+  ],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "fiddle",
+    "footprint": [
+      1,
+      1
+    ],
+    "attachment": "hand_r",
+    "note": "Bloque 5. Metros fuente a celdas; frente +Z glTF. Origen en enganche, NO en base. Ajuste de montaje medido contra el nodo publicado en attachment.json; escala inversa del padre para evitar escala doble. Recurso est\u00e1tico preview-only."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 1,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "UpperBout",
+      "location": [
+        0,
+        0,
+        -0.23
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.25,
+        0.1,
+        0.23
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "clothaccent",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "LowerBout",
+      "location": [
+        0,
+        0,
+        -0.4
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.31,
+        0.11,
+        0.25
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "clothaccent",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Neck",
+      "location": [
+        0,
+        0,
+        0.01
+      ],
+      "dimensions": [
+        0.06,
+        0.065,
+        0.34
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Scroll",
+      "location": [
+        0,
+        0,
+        0.21
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.105,
+        0.085,
+        0.1
+      ],
+      "segments": 4,
+      "rings": 3,
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Fingerboard",
+      "location": [
+        0,
+        -0.059,
+        -0.08
+      ],
+      "dimensions": [
+        0.04,
+        0.013,
+        0.39
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Bridge",
+      "location": [
+        0,
+        -0.075,
+        -0.32
+      ],
+      "dimensions": [
+        0.12,
+        0.028,
+        0.034
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Bow",
+      "location": [
+        0.23,
+        0,
+        -0.12
+      ],
+      "dimensions": [
+        0.025,
+        0.03,
+        0.8
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "BowHair",
+      "location": [
+        0.2,
+        -0.015,
+        -0.12
+      ],
+      "dimensions": [
+        0.013,
+        0.012,
+        0.76
+      ],
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}
