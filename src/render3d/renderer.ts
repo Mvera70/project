@@ -248,7 +248,7 @@ export const WANTED = [
   'fiddle', 'pilgrim-hat', 'pilgrim-staff', 'grindstone-pack', 'herb-basket',
   'bundle-pack', 'forage-basket', 'rope-pick', 'trade-pack', 'hide-bundle',
   'notice-board', 'smithy-board', 'chapel-board', 'signpost', 'hide-rack', 'hammer',
-  'tailor-board', 'field-flax', 'field-flax-cut',
+  'tailor-board', 'field-flax', 'field-flax-cut', 'loom',
   'burnt-house', 'great-oak',
   ...FAUNA,
   // E3 · el plan sustituye el bastión por esta variante cuando cabe su escalera.
