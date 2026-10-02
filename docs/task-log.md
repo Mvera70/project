@@ -13,7 +13,12 @@ el peor a 30,2, y el extremo de dentro hasta a 7,1 del camino pintado;
 cañón (+5 % de triángulos), la cinta se apoya en lo dibujado y el puente es
 de una pieza y en arco (dos vueltas de capturas con Vera). Las visitas bajan
 por la senda: 9 de 12 valles, hacia el alba, en la plaza a 0,30–0,37, con el
-paso de visitante de 1,1 a 1,4. Capturas en `docs/medidas/garganta-img/`.
+paso de visitante de 1,1 a 1,4. Capturas de antes y después en el mismo
+encuadre, desde el valle mirando a la garganta norte como las de Vera
+(semillas 11, 19 y 23, y el puente de la 11): `docs/medidas/garganta-img/`.
+Las dos pruebas nuevas van a las jornadas (`gorge-road-ground`,
+`visitors-gorge`): pesan seis y diez segundos, el criterio de la #38. La
+suite rápida entera pasa en local (242 ficheros, 2344 pruebas).
 
 **Abierto:** (1) **de día se les ve en el camino pintado** y, al irse,
 subiendo la garganta al atardecer: el camino entero no cabe en la jornada, y

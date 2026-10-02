@@ -58,9 +58,11 @@ sigo viendo baldosas de madera mal puestas».
   pintado. Visitas: en doce valles de veinte vecinos con buhonero, en la plaza
   entre 0,30 y 0,37; bajan por la garganta hacia el alba (la boca, de 0,01 a
   0,08) y vuelven a subirla al atardecer.
-- **Pruebas.** Nuevas: `gorge-road-ground.test.ts` (la cinta no flota ni se
-  entierra, fuera del mapa no trepa, empieza en la boca y el puente sube y baja
-  una vez; las tres primeras caen en `main`) y `visitors-gorge.test.ts`. Las
+- **Pruebas.** Nuevas, en las jornadas porque pesan seis y diez segundos (el
+  criterio de la #38): `journeys/gorge-road-ground.test.ts` (la cinta no flota
+  ni se entierra, fuera del mapa no trepa, empieza en la boca y el puente sube y
+  baja una vez; las tres primeras caen en `main`) y
+  `journeys/visitors-gorge.test.ts`. Las
   que se mueven, cada una con su causa: el eje del cañón de `graphics-ridge` se
   mide en el río y no en la recta; `valley-road` y `graphics-mountains` llaman
   a la cinta con su firma nueva; el salinero de la semilla 23 y el buhonero de

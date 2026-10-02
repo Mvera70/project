@@ -7,7 +7,7 @@
 // contra **las mallas tal y como se construyen** —el suelo del mapa, la piel
 // de la montaña y la sierra de fuera—, con un rayo vertical por cada vértice
 // de la cinta. Lo usa el informe (`gorge-road-report.ts`); la prueba
-// (`tests/fast/gorge-road-ground.test.ts`) mide lo mismo con la consulta por
+// (`tests/journeys/gorge-road-ground.test.ts`) mide lo mismo con la consulta por
 // cubos de la malla (`meshSurface`), que da lo mismo que el rayo y es cien
 // veces más rápida.
 
