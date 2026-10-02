@@ -1,0 +1,345 @@
+{
+  "schemaVersion": 1,
+  "id": "tool-rack",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "eldergrey",
+      "role": "elderGrey",
+      "color": "#77796F",
+      "roughness": 0.92
+    },
+    {
+      "name": "timber",
+      "role": "timber",
+      "color": "#9A744C",
+      "roughness": 0.92
+    },
+    {
+      "name": "timberdark",
+      "role": "timberDark",
+      "color": "#6B4C32",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "tool-rack",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Rail",
+      "location": [
+        0,
+        0.03,
+        0.56
+      ],
+      "dimensions": [
+        1.0,
+        0.08,
+        0.09
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Handle0",
+      "location": [
+        -0.38,
+        0,
+        0.51
+      ],
+      "dimensions": [
+        0.045,
+        0.045,
+        1.02
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Handle1",
+      "location": [
+        0,
+        0,
+        0.51
+      ],
+      "dimensions": [
+        0.045,
+        0.045,
+        1.02
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Handle2",
+      "location": [
+        0.38,
+        0,
+        0.51
+      ],
+      "dimensions": [
+        0.045,
+        0.045,
+        1.02
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Spade",
+      "location": [
+        -0.38,
+        -0.01,
+        0.15
+      ],
+      "dimensions": [
+        0.2,
+        0.045,
+        0.24
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Rake",
+      "location": [
+        0,
+        0,
+        0.95
+      ],
+      "dimensions": [
+        0.28,
+        0.04,
+        0.05
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Tine0",
+      "location": [
+        -0.1,
+        0,
+        0.88
+      ],
+      "dimensions": [
+        0.025,
+        0.04,
+        0.12
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Tine1",
+      "location": [
+        0,
+        0,
+        0.88
+      ],
+      "dimensions": [
+        0.025,
+        0.04,
+        0.12
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Tine2",
+      "location": [
+        0.1,
+        0,
+        0.88
+      ],
+      "dimensions": [
+        0.025,
+        0.04,
+        0.12
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Fork",
+      "location": [
+        0.38,
+        0,
+        0.95
+      ],
+      "dimensions": [
+        0.19,
+        0.04,
+        0.035
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Prong0",
+      "location": [
+        0.31,
+        0,
+        1.04
+      ],
+      "dimensions": [
+        0.025,
+        0.04,
+        0.2
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Prong1",
+      "location": [
+        0.45,
+        0,
+        1.04
+      ],
+      "dimensions": [
+        0.025,
+        0.04,
+        0.2
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

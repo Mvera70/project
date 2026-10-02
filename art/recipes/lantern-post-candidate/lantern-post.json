@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "id": "lantern-post",
+  "scale": 0.5,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "eldergrey",
+      "role": "elderGrey",
+      "color": "#77796F",
+      "roughness": 0.92
+    },
+    {
+      "name": "grain",
+      "role": "grain",
+      "color": "#D8B25E",
+      "roughness": 0.92
+    },
+    {
+      "name": "timberdark",
+      "role": "timberDark",
+      "color": "#6B4C32",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "lantern-post",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Post",
+      "location": [
+        0,
+        0,
+        0.8
+      ],
+      "dimensions": [
+        0.08,
+        0.08,
+        1.6
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Arm",
+      "location": [
+        0.14,
+        0,
+        1.55
+      ],
+      "dimensions": [
+        0.36,
+        0.065,
+        0.065
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Glass",
+      "location": [
+        0.28,
+        0,
+        1.32
+      ],
+      "dimensions": [
+        0.19,
+        0.17,
+        0.28
+      ],
+      "material": "grain",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "Hood",
+      "location": [
+        0.28,
+        0,
+        1.47
+      ],
+      "width": 0.27,
+      "depth": 0.24,
+      "height": 0.12,
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Base",
+      "location": [
+        0.28,
+        0,
+        1.17
+      ],
+      "dimensions": [
+        0.23,
+        0.21,
+        0.045
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Frame0",
+      "location": [
+        0.18,
+        -0.09,
+        1.32
+      ],
+      "dimensions": [
+        0.018,
+        0.018,
+        0.29
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Frame1",
+      "location": [
+        0.38,
+        -0.09,
+        1.32
+      ],
+      "dimensions": [
+        0.018,
+        0.018,
+        0.29
+      ],
+      "material": "eldergrey",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

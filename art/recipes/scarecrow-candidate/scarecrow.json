@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 1,
+  "id": "scarecrow",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "clothaccent",
+      "role": "clothAccent",
+      "color": "#A96146",
+      "roughness": 0.92
+    },
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.92
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "color": "#C7984A",
+      "roughness": 0.92
+    },
+    {
+      "name": "trunk",
+      "role": "trunk",
+      "color": "#735338",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "scarecrow",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Stake",
+      "location": [
+        0,
+        0,
+        0.7
+      ],
+      "dimensions": [
+        0.07,
+        0.07,
+        1.4
+      ],
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Arms",
+      "location": [
+        0,
+        0,
+        1.03
+      ],
+      "dimensions": [
+        0.96,
+        0.065,
+        0.065
+      ],
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Tunic",
+      "location": [
+        0,
+        0,
+        0.9
+      ],
+      "dimensions": [
+        0.36,
+        0.19,
+        0.45
+      ],
+      "material": "clothaccent",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Head",
+      "location": [
+        0,
+        0,
+        1.28
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.23,
+        0.21,
+        0.25
+      ],
+      "segments": 5,
+      "rings": 3,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Brim",
+      "location": [
+        0,
+        0,
+        1.42
+      ],
+      "radius": 0.23,
+      "depth": 0.035,
+      "vertices": 6,
+      "material": "roof",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Hat",
+      "location": [
+        0,
+        0,
+        1.51
+      ],
+      "radius": 0.15,
+      "depth": 0.2,
+      "vertices": 6,
+      "material": "roof",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}
