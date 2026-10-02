@@ -49,12 +49,14 @@ describe('v5.85 · la fauna por estaciones', () => {
       const seen = new Set<string>();
       for (const cub of village.young) {
         young += 1;
-        expect(cub.scale).toBeLessThan(1);
+        // Se ve como cría: su propio modelo (el polluelo, v5.100) o la madre en pequeño.
+        const mother = cub.kind === 'chick' ? 'hen' : cub.kind;
+        if (mother === cub.kind) expect(cub.scale).toBeLessThan(1);
         // Cada cría es de una clase de madre que la aldea tiene, y va pegada a una.
-        const near = mothers.filter((mother) => mother.kind === cub.kind
-          && Math.hypot(mother.x - cub.x, mother.z - cub.y) < 1.4);
+        const near = mothers.filter((one) => one.kind === mother
+          && Math.hypot(one.x - cub.x, one.z - cub.y) < 1.4);
         expect(near.length).toBeGreaterThan(0);
-        seen.add(`${cub.kind}:${Math.round(near[0]!.x * 10)}`);
+        seen.add(`${mother}:${Math.round(near[0]!.x * 10)}`);
       }
       // La primera cierva lleva siempre su cervatillo, si hay ciervos.
       if (village.wildlife.some((animal) => animal.kind === 'deer')) {

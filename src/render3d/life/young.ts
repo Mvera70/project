@@ -73,7 +73,7 @@ export function youngOf(state: GameState, mothers: readonly Mother[], land: Terr
       let x = body.x + backX * behind + sideX * side;
       let z = body.z + backZ * behind + sideZ * side;
       if (!fitsCircle(land, x, z, YOUNG_RADIUS)) { x = body.x + sideX * side * 0.4; z = body.z + sideZ * side * 0.4; }
-      out.push({ id, kind: mother.kind, x, y: z, facing: body.facing, scale: litter.scale,
+      out.push({ id, kind: litter.kind ?? mother.kind, x, y: z, facing: body.facing, scale: litter.scale,
         action: moving ? 'walk' : undefined });
     }
   }

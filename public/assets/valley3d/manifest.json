@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-02T16:04:02.936Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bench,log-seat,cart",
+  "generatedAt": "2026-10-02T17:12:30.769Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids stork,chick,crane,butterfly",
   "assets": [
     {
       "id": "axis-marker",
@@ -2034,6 +2034,76 @@
       "provenance": {
         "kind": "original",
         "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "stork",
+      "file": "stork.glb",
+      "sha256": "25E51FDEC2225E149AC9680602052C818985D96AE4317E205CEF21B5E199935E",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.234
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Cigüeña blanca en el lenguaje de la gallina de Vera (build-models.py, stork(); 2 oct 2026, v5.100); clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "chick",
+      "file": "chick.glb",
+      "sha256": "3C8A49C7DAF45F471869123F0B9CC69636AB27F38D11DCAA7D8AE9E1DB73D46B",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.038
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Polluelo: la gallina de Vera en cría, con su receta y su densidad (build-models.py, chick(); 2 oct 2026, v5.100); clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "crane",
+      "file": "crane.glb",
+      "sha256": "48F758F9E03FF021B86CE3A0B5819B05E412253BF9CA57C42D1D2C200EBBB69E",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Grulla en vuelo con el cuerpo de la gallina y las plumas de la perdiz (build-models.py, crane(); 2 oct 2026, v5.100), las alas en el hombro como la golondrina.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "butterfly",
+      "file": "butterfly.glb",
+      "sha256": "95046AFCA8307CFCE1C532A07BB916BC2FB70889B703466D9CED7C21246C555E",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Mariposa con los colores elegidos de la de Astra y forma de mariposa (build-models.py, butterfly(); 2 oct 2026, v5.100).",
         "license": "project-original"
       }
     }

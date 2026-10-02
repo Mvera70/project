@@ -1,5 +1,30 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · Los animales rehechos (v5.100)
+
+Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
+rama `claude/animales-rehechos`, PR #62, **versiones reservadas v5.100–v5.101**
+(usada v5.100). Los seis de Astra que a Vera no le gustaban —cigüeña, nido,
+polluelo, grulla, mariposa y caballo— rehechos **de la receta de su animal del
+valle y con su densidad** (`build-models.py`), tras cinco vueltas rechazadas
+dentro de los topes del encargo de Astra. Integrados la cigüeña, la mariposa,
+el polluelo y la grulla; el nido y el caballo, sólo modelo. Informe:
+`docs/medidas/animales-rehechos-2026-10-02.md`.
+
+**Lo que costó, para la próxima:** un tope de triángulos pensado para otro
+autor no es una razón para entregar menos calidad que los animales que ya hay;
+y **nada se enseña sin mirarlo antes de cerca en sus juntas, andando y junto a
+su vecino** (`tools/art/fauna-sheet.py` lo hace con `look` y `clip`).
+
+**Abierto:**
+
+- **De Vera:** que los vea. La PR no se fusiona hasta que diga.
+- **Sin captura en el juego:** la uve de grullas (el dibujo por software no
+  llega) y el polluelo de cerca si la semilla no lo pone en cuadro.
+- **La cigüeña queda tapada a medias** por la hierba alta en la semilla 11
+  (antes y después): es del sitio de `storkSpots`, no del modelo.
+- **Sin medir:** el coste en el aparato.
+
 ## 2 oct 2026 · AR-2, la minería (v5.86)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),

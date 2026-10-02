@@ -21,14 +21,15 @@
 // uve dibujada.
 
 import {
-  AdditiveBlending, CanvasTexture, Color, DynamicDrawUsage, Euler, Group, InstancedMesh, Matrix4,
-  MeshBasicMaterial, PlaneGeometry, Quaternion, Vector3, type BufferGeometry, type Camera, type Material, type Mesh,
-  type Object3D, type Texture,
+  AdditiveBlending, Box3, CanvasTexture, Color, DoubleSide, DynamicDrawUsage, Euler, Group, InstancedMesh, Matrix4,
+  MeshBasicMaterial, MeshLambertMaterial, PlaneGeometry, Quaternion, Vector3, type BufferAttribute, type BufferGeometry,
+  type Camera, type Material, type Mesh, type Object3D, type Texture,
 } from 'three';
 import { hash32 } from '@engine/rng';
 import { TERRAIN_CODE, type ValleyMap } from '@engine/state';
 import type { Season } from '@engine/state';
 import type { SkyKind } from '../../derive/weather';
+import { bakeParts } from './baked-parts';
 import { hourAt } from './day-phases';
 
 const MIST = 40;
@@ -75,6 +76,12 @@ const FLIES = 90;
  */
 const CRANES = 15;
 const CRANE_SCALE = 22;
+/**
+ * v5.100 · Con el modelo de la grulla (`crane.glb`, a su tamaño de verdad:
+ * 0,73 celdas de punta a punta) se escala para que ocupe en pantalla lo mismo
+ * que la golondrina ×22 que la sustituye: 0,083 × 22 ≈ 1,8 celdas.
+ */
+const CRANE_SPAN = 1.8;
 const CRANE_HEIGHT = 14;
 const CRANE_PERIOD = 90;
 const CRANE_TINT = '#8e9296';
@@ -178,7 +185,28 @@ export function fliesAt(hour: number, season: Season, sky: SkyKind): number {
   return 0;
 }
 
-export function createAmbience(map: ValleyMap, bird?: Object3D): Ambience {
+/**
+ * v5.100 · La grulla del modelo: cuerpo y alas horneados en una geometría con
+ * el color en el vértice cada uno (`baked-parts.ts`), el ala con el origen en
+ * el hombro, y la escala que la pone a `CRANE_SPAN` de punta a punta.
+ */
+function craneParts(model: Object3D): { pieces: { geometry: BufferGeometry; local: Matrix4; wing: number }[]; scale: number } | null {
+  const parts = bakeParts(model, ['bird_wing_l', 'bird_wing_r'], 'bird_body');
+  const body = parts.bird_body, left = parts.bird_wing_l, right = parts.bird_wing_r;
+  if (body === undefined || left === undefined || right === undefined) return null;
+  const span = new Box3().setFromBufferAttribute(left.geometry.getAttribute('position') as BufferAttribute).min.x + left.pivot.x;
+  const reach = new Box3().setFromBufferAttribute(right.geometry.getAttribute('position') as BufferAttribute).max.x + right.pivot.x;
+  return {
+    pieces: [
+      { geometry: body.geometry, local: new Matrix4().makeTranslation(body.pivot), wing: 0 },
+      { geometry: left.geometry, local: new Matrix4().makeTranslation(left.pivot), wing: 1 },
+      { geometry: right.geometry, local: new Matrix4().makeTranslation(right.pivot), wing: -1 },
+    ],
+    scale: CRANE_SPAN / Math.max(1e-6, reach - span),
+  };
+}
+
+export function createAmbience(map: ValleyMap, bird?: Object3D, crane?: Object3D): Ambience {
   const group = new Group();
   group.name = 'Valley_Ambience';
   const soft = softTexture();
@@ -208,14 +236,21 @@ export function createAmbience(map: ValleyMap, bird?: Object3D): Ambience {
     part.material.transparent = true;
     return new InstancedMesh(part.geometry, part.material, BIRDS);
   });
-  // Las grullas son el mismo pájaro de Astra, más grande y gris: una malla más
-  // por pieza (tres llamadas), y sólo se dibuja en otoño.
-  const cranes = pieces.map(({ part }) => {
-    const material = part.material.clone();
-    const tinted = material as Material & { color?: Color };
-    tinted.color?.set(CRANE_TINT);
-    return new InstancedMesh(part.geometry, material, CRANES);
-  });
+  // Las grullas: su modelo si ha llegado (v5.100) y, si no, el mismo pájaro de
+  // Astra más grande y gris. Una malla por pieza (tres llamadas), y sólo se
+  // dibuja en otoño.
+  const craneModel = crane === undefined ? null : craneParts(crane);
+  const craneMaterial = new MeshLambertMaterial({ vertexColors: true, side: DoubleSide });
+  const cranePieces = craneModel?.pieces ?? pieces.map(({ part, wing: side }) => ({ geometry: part.geometry, local: part.local, wing: side }));
+  const craneScale = craneModel?.scale ?? CRANE_SCALE;
+  const cranes = craneModel !== null
+    ? craneModel.pieces.map(({ geometry }) => new InstancedMesh(geometry, craneMaterial, CRANES))
+    : pieces.map(({ part }) => {
+      const material = part.material.clone();
+      const tinted = material as Material & { color?: Color };
+      tinted.color?.set(CRANE_TINT);
+      return new InstancedMesh(part.geometry, material, CRANES);
+    });
   // Las grullas, en su propio grupo: son otra bandada, no más piezas de la golondrina.
   const migrating = new Group();
   migrating.name = 'Valley_Cranes';
@@ -315,7 +350,7 @@ export function createAmbience(map: ValleyMap, bird?: Object3D): Ambience {
 
       // Las grullas de otoño: una uve que cruza el valle hacia el sur, a ratos.
       // Se ve la mitad de cada pasada; la otra mitad la bandada está fuera del mapa.
-      const craneAmount = parts === null ? 0 : cranesAt(hour, sky, season);
+      const craneAmount = cranes.length === 0 ? 0 : cranesAt(hour, sky, season);
       const craneCount = craneAmount > 0 ? CRANES : 0;
       for (const mesh of cranes) mesh.count = craneCount;
       if (craneCount > 0) {
@@ -336,12 +371,12 @@ export function createAmbience(map: ValleyMap, bird?: Object3D): Ambience {
           const back = rank * 1.3;
           const across = arm * rank * 1.1;
           at.set(leadX - fx * back + fz * across, CRANE_HEIGHT + Math.sin(time * 0.3 + n) * 0.2, leadZ - fz * back - fx * across);
-          flight.compose(at, heading, size.setScalar(CRANE_SCALE));
+          flight.compose(at, heading, size.setScalar(craneScale));
           // La grulla planea mucho y bate despacio.
           const beat = 0.5 + 0.5 * Math.sin(time * 3.2 + rank * 0.6);
           const angle = WING_UP * 0.6 + (WING_DOWN - WING_UP * 0.6) * beat;
-          pieces.forEach(({ part, wing: side }, k) => {
-            wing.multiplyMatrices(flight, part.local);
+          cranePieces.forEach(({ local, wing: side }, k) => {
+            wing.multiplyMatrices(flight, local);
             if (side !== 0) wing.multiply(hinge.makeRotationZ(side * angle));
             cranes[k]!.setMatrixAt(n, wing);
           });
@@ -374,7 +409,9 @@ export function createAmbience(map: ValleyMap, bird?: Object3D): Ambience {
       mistMaterial.dispose();
       birdMaterial.dispose();
       // Las geometrías son del modelo compartido; los materiales, copias nuestras.
-      for (const mesh of [...flock, ...cranes]) (mesh.material as Material).dispose();
+      for (const mesh of [...flock, ...(craneModel === null ? cranes : [])]) (mesh.material as Material).dispose();
+      craneMaterial.dispose();
+      for (const piece of craneModel?.pieces ?? []) piece.geometry.dispose();
       flyMaterial.dispose();
       soft?.dispose();
       birdMap?.dispose();
