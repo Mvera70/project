@@ -27,7 +27,7 @@ clips, y el caballo con el cuerpo de cajas de G-23 que Vera retiró el 29 sep.
 **Lo que se hizo.** Seis funciones en `deliverables/marked-models-trial/build-models.py`
 con las piezas de la mula, la vaca y la gallina (`loft`, `tube`, `ell`, `leaf`),
 el mismo esqueleto de nodos y los clips de `tools/art/rigid-clips.mjs`, dentro del
-presupuesto del encargo: caballo 888/900 (esqueleto de la mula, `walk` con **el
+presupuesto del encargo: caballo 894/900 (esqueleto de la mula, `walk` con **el
 casco plantado** como el ciervo), cigüeña 238/250 y polluelo 78/80 (nodos de la
 gallina, `walk` e `idle`), nido 192/200, grulla 142/150 (alas en el hombro como la
 golondrina), mariposa 16/16. Admitidos en el catálogo (ronda
@@ -38,14 +38,22 @@ está bien? Mira el pollo»). Tenía razón, y la primera hoja no se miró con o
 de jugador antes de enseñarla. El **polluelo** eran dos bolas apiladas, la
 cabeza flotando, sin ojos y con una pata a la vista: ahora la cabeza nace del
 pecho, con pico, dos ojos, dos patas con el pie adelante y las alitas, a la mitad
-de alto de la gallina. La **mariposa** era blanca y plana: ahora tiene cuatro
-alas, amarillas con el borde naranja, y el cuerpo oscuro (en el juego, los dos
-tonos se quedan como luz y sombra del color de cada instancia). El **nido** se
+de alto de la gallina. La **mariposa** era blanca y plana (ver la tercera vuelta). El **nido** se
 leía quemado y la cigüeña se hundía en él: ahora es una plataforma ancha de
 ramas pardas con el rodete encima y la cigüeña de pie sobre ella (`NEST_FLOOR`).
-El **caballo** apenas pasaba a la mula: ahora va a 1,15 (`HORSE_SIZE`, escalado
-en los datos y no en la raíz, porque los clips leen las traslaciones) y con el
-cuello más alto, y la cruz le saca un 40 % a la de la mula.
+El **caballo** apenas pasaba a la mula y Vera dijo «la mula es mucho mejor»:
+ahora es **la mula de Vera hecha caballo de tiro**, pieza a pieza con su receta
+(morro, ojos con brillo, orejas, crin de hojas en la cresta, cola con borla,
+rodillas marcadas), sin albarda, con orejas cortas, crin y cola llenas y calzas,
+a ×1,3 (`HORSE_SIZE`, escalado en los datos y no en la raíz, porque los clips
+leen las traslaciones): la cruz le saca un 30 % a la de la mula. 894/900.
+
+**Tercera vuelta** (Vera marcó en rojo el polluelo y la mariposa, A y B): la
+**mariposa** lleva los colores que eligió de la de Astra —ocre con el borde
+terracota, cuerpo oscuro— y forma de mariposa: dos pares de alas redondeadas, el
+cuerpo fino y las antenas; en el juego conserva esos colores con un matiz por
+instancia. El **polluelo** abre las patas, una adelante y otra atrás, y sube el
+cuerpo para que se vean las dos.
 
 **Integrados** (avisado el director antes): la **cigüeña** (`seasonal-fauna.ts`)
 es su modelo partido por articulación (`effects/baked-parts.ts`): se agacha

@@ -888,7 +888,7 @@ def turn_to_minus_y(objects):
     for o in objects:
         if o.type=='MESH': o.data.transform(r)
 
-HORSE_SIZE=1.15  # Vera: «junto a la mula apenas es más grande»; a 1,15 la cruz queda un 40 % por encima de la de la mula
+HORSE_SIZE=1.3  # sobre la mula de Vera: la cruz del caballo de tiro le saca un 30 % a la suya
 
 def scale_all(k):
     # Escala uniforme de todo el modelo en sus datos, no en la raíz: los clips
@@ -899,44 +899,49 @@ def scale_all(k):
         o.location=o.location*k
 
 def horse():
-    # El caballo de tiro: la mula de Vera más grande y más pesada, sin carga.
-    # Tronco hondo, cuello alto y arqueado con la crin negra en la cresta,
-    # cabeza larga con lucero blanco, cascos con calzas blancas y pelo en los
-    # menudillos (lo que dice «tiro» de lejos) y la collera al pecho. Castaño
-    # con las extremidades negras, que es lo que no se confunde con la mula.
-    reset(); mat('coat','3E2214'); mat('coatTop','0D0B0A'); mat('light','E2DCCB'); mat('earInner','4A3426'); mat('collar','8A5A34'); mat('collarPad','3E2E22')
-    body=empty('body',(0,0,.30),ROOT)
-    barrel=[(-.228,.345,.060,.086),(-.170,.340,.112,.128),(-.060,.326,.118,.140),(.070,.330,.114,.134),(.175,.350,.100,.118),(.232,.362,.050,.074)]
-    loft('Draught_Barrel',barrel,'coat',body,12)
-    neck=empty('neck',(-.215,0,.40),body)
-    tube('Arched_Neck',[(-.205,0,.365),(-.262,0,.478),(-.302,0,.570),(-.322,0,.608)],[(.094,.076),(.080,.064),(.060,.050),(.046,.044)],'coat',neck,8)
-    tube('Crest_Mane',[(-.150,0,.452),(-.204,0,.532),(-.252,0,.610),(-.292,0,.656)],[(.020,.028),(.024,.030),(.022,.026),(.012,.016)],'coatTop',neck,4)
-    head=empty('head',(-.305,0,.585),neck)
-    loft('Long_Head',[(-.288,.590,.050,.066),(-.335,.578,.057,.068),(-.385,.528,.046,.052),(-.425,.488,.040,.040),(-.446,.468,.034,.030)],'coat',head,8)
-    ell('Dark_Muzzle',(-.440,0,.462),(.070,.074,.058),'coatTop',head,8,4)
-    # Lucero: la franja blanca de la frente al hocico, sobre la cara.
-    leaf('Blaze',(-.330,0,.612),(-.437,0,.497),.032,.010,'light',head)
-    leaf('Forelock',(-.296,0,.628),(-.336,0,.600),.040,.012,'coatTop',head)
+    # El caballo de tiro es **la mula de Vera hecha caballo** (Vera: «la mula
+    # es mucho mejor»): su receta pieza a pieza —tronco en `loft`, cuello en
+    # `tube`, cabeza larga con el morro claro y el labio, ojos con brillo,
+    # orejas en `ear`, crin de hojas en la nuca, cola fina con su borla, patas
+    # con la rodilla marcada y la caña clara— sin la albarda, y con lo que dice
+    # «tiro»: más alto en la cruz (`HORSE_SIZE`), cuello más largo y grueso,
+    # cabeza más larga, orejas cortas, crin y cola llenas y calzas blancas con
+    # pelo sobre el casco. Castaño con las extremidades negras y lucero.
+    reset(); mat('coat','4A2A18'); mat('coatTop','16120F'); mat('light','D9CDB4'); mat('earInner','5A4030'); mat('blaze','E6E0D0')
+    body=empty('body',(0,0,.24),ROOT)
+    loft('Equine_Barrel',[(-.20,.372,.062,.092),(-.12,.378,.100,.108),(.028,.370,.104,.114),(.165,.372,.090,.104),(.222,.380,.050,.070)],'coat',body,10)
+    neck=empty('neck',(-.180,0,.400),body)
+    tube('Upright_Neck',[(-.160,0,.356),(-.218,0,.440),(-.246,0,.530),(-.268,0,.566)],[(.084,.070),(.076,.062),(.054,.050),(.040,.042)],'coat',neck,8)
+    head=empty('head',(-.286,0,.540),neck)
+    loft('Long_Equine_Head',[(-.250,.550,.044,.062),(-.300,.542,.052,.064),(-.352,.494,.038,.042),(-.396,.458,.034,.032)],'coat',head,8)
+    ell('Dark_Muzzle',(-.394,0,.450),(.080,.090,.064),'coatTop',head,8,4)
+    leaf('Blaze',(-.275,0,.590),(-.392,0,.478),.030,.010,'blaze',head)
     for s in (-1,1):
-        ell('Eye_'+str(s),(-.352,s*.054,.582),(.020,.010,.018),'eye',head,6,3)
-        ear('ear'+str(s),(-.296,s*.030,.628),(-.280,s*.050,.700),.036,'coat',head,'earInner')
-    # El cuello alto del caballo de tiro: la cabeza sube con él, por encima de la cruz.
-    head.location.x-=.012; head.location.z+=.046
-    # La collera: un aro de cuero relleno donde el cuello entra en el pecho.
-    from mathutils import Matrix
-    c=ring('Horse_Collar',(0,0,0),.106,.082,.036,'collar',None,8)
-    c.data.transform(Matrix.Translation((-.222,0,.408))@Matrix.Rotation(math.radians(-31),4,'Y')); par(c,neck)
-    for pre,x in [('fore',-.160),('hind',.168)]:
+        ell('Eye_'+str(s),(-.306,s*.049,.550),(.018,.008,.016),'eye',head,5,3)
+        ell('Eye_Glint_'+str(s),(-.309,s*.052,.554),(.005,.004,.005),'ivory',head,4,3)
+        # Orejas cortas: las de la mula eran de 0,14; las del caballo, la mitad.
+        ear('ear'+str(s),(-.266,s*.030,.588),(-.252,s*.046,.660),.034,'coat',head)
+    # La crin llena: más hojas y más largas que las de la mula, cayendo a un lado.
+    # Sobre la cresta del cuello, no dentro: de la nuca a la cruz.
+    for j in range(7):
+        t=j/6; bx,bz=-.236+t*.128,.592-t*.190
+        leaf('Mane_'+str(j),(bx,0,bz),(bx+.038,.006*(1-2*(j%2)),bz+.016),.030,.012,'coatTop',neck)
+    leaf('Forelock',(-.272,0,.598),(-.300,0,.560),.034,.010,'coatTop',head)
+    tail=empty('tail',(.218,0,.392),body)
+    tube('Full_Tail',[(.218,0,.392),(.250,0,.336),(.262,0,.240),(.268,0,.150)],[.016,.020,.024,.020],'coatTop',tail,6)
+    tube('Tail_Brush',[(.264,0,.200),(.278,0,.140),(.276,0,.086)],[.026,.030,.004],'coatTop',tail,6)
+    body.location.z-=MULE_DROP
+    k=(.375-MULE_DROP-.044)/(.375-.044)
+    lz=lambda z: .044+(z-.044)*k
+    for pre,x in [('fore',-.148),('hind',.162)]:
         for s,l in [(-1,'L'),(1,'R')]:
-            y=s*.068; hip=(x,y,.300); knee=(x+(.006 if pre=='fore' else -.040),y,.168); ankle=(x+(.002 if pre=='fore' else .022),y,.052)
-            p=empty(pre+l,hip,body); tube(pre+l+'_Upper',[hip,knee],[.050,.026],'coat',p,6)
-            q=empty(pre+l+'Lower',knee,p); tube(pre+l+'_Cannon',[knee,(ankle[0],y,.070)],[.026,.024],'coatTop',q,6)
-            # Las calzas: el pelo blanco que cae sobre el casco, más ancho abajo.
-            tube(pre+l+'_Feather',[(ankle[0],y,.098),(ankle[0]-.004,y,.030)],[.022,.040],'light',q,6)
-            f=empty(pre+l+'Foot',ankle,q); box(pre+l+'_Hoof',(ankle[0]-.006,y,.016),(.060,.054,.032),'coatTop',f)
-    tail=empty('tail',(.240,0,.400),body)
-    tube('Full_Tail',[(.240,0,.400),(.272,0,.352),(.284,0,.262),(.280,0,.170)],[.020,.026,.030,.026],'coatTop',tail,6)
-    tube('Tail_End',[(.280,0,.190),(.278,0,.130),(.272,0,.098)],[.028,.022,.004],'coatTop',tail,6)
+            y=s*.062; hip=(x,y,.375-MULE_DROP); knee=(x+(.004 if pre=='fore' else -.037),y,lz(.200)); ankle=(x+(.003 if pre=='fore' else .028),y,.044); toe=(ankle[0]-.011,y,.021)
+            p=empty(pre+l,hip,body); tube(pre+l+'_Upper',[hip,knee],[.038,.024],'coat',p,6)
+            q=empty(pre+l+'Lower',knee,p); tube(pre+l+'_Shin',[knee,ankle],[.020,.017],'coatTop',q,6)
+            ell(pre+l+'_Knee',knee,(.040,.040,.044),'coatTop',q,4,3)
+            # Las calzas: pelo blanco que cae sobre el casco, más ancho abajo.
+            tube(pre+l+'_Feather',[(ankle[0],y,lz(.11)),(ankle[0]-.003,y,.034)],[.018,.030],'light',q,6)
+            f=empty(pre+l+'Foot',ankle,q); box(pre+l+'_Hoof',toe,(.046,.040,.042),'coatTop',f)
     scale_all(HORSE_SIZE)
     merge_parts(); save('horse')
 
@@ -999,8 +1004,11 @@ def chick():
     for s,l in [(-1,'L'),(1,'R')]:
         flat('Eye_'+l,[(-.043,s*.0175,.099),(-.035,s*.0215,.104),(-.034,s*.0215,.094)],'eye',head)
         flat('Wing_'+l,[(-.004,s*.035,.066),(.042,s*.033,.060),(.014,s*.034,.040)],'downShade',body)
+    # El cuerpo sube un poco: las patas se ven por debajo del plumón.
+    body.location.z+=.012
     for s,l in [(-1,'L'),(1,'R')]:
-        hip=(.002,s*.017,.026); ankle=(-.002,s*.019,.000)
+        # Una adelante y otra atrás, y abiertas: de perfil se ven las dos.
+        hip=(.002,s*.019,.038); ankle=(-.002+s*.008,s*.023,.000)
         # La pata, una lámina con el pie hacia delante: de perfil y desde la
         # cámara de reposo se ven las dos (con tubo no cabían ojos y alas).
         p=empty('leg'+l,hip,body)
@@ -1038,22 +1046,19 @@ def crane():
     save('crane')
 
 def butterfly():
-    # Una mariposa limonera: cuatro alas —las de delante grandes y en punta, las
-    # de atrás redondas—, amarillas con el borde naranja, el cuerpo oscuro y
-    # las antenas. Dieciséis triángulos, todos de una cara (el material es de
-    # dos). El juego toma de aquí los dos tonos y los tiñe por instancia para
-    # sacar cuatro especies (`seasonal-fauna.ts`).
-    reset(); mat('wing','D29C12'); mat('edge','B0500E'); mat('mark','1A1612')
-    body=tetra('Body',[(0,-.017,.003),(-.0025,.013,.001),(.0025,.013,.001),(0,.004,.0055)],'mark')
-    ant=[flat('Antenna_'+str(s),[(s*.001,-.015,.004),(s*.009,-.029,.008),(s*.002,-.016,.004)],'mark') for s in (-1,1)]
+    # Una mariposa con los colores que Vera eligió de la de Astra —ocre con el
+    # borde terracota y el cuerpo oscuro— y forma de mariposa: dos pares de
+    # alas redondeadas, las de delante mayores, el cuerpo fino entre ellas y
+    # dos antenas. Dieciséis triángulos de una cara (el material es de dos).
+    reset(); mat('wing','B87418'); mat('edge','8A2E14'); mat('mark','120F0C')
+    body=flat('Body',[(0,-.017,.003),(.0022,-.002,.003),(0,.014,.003),(-.0022,-.002,.003)],'mark')
+    ant=[flat('Antenna_'+str(s),[(s*.0008,-.016,.003),(s*.010,-.030,.004),(s*.0020,-.015,.003)],'mark') for s in (-1,1)]
     join('body',[body]+ant)
     for s,name in [(1,'wing_l'),(-1,'wing_r')]:
         x=lambda v: -s*v
-        fore=flat('Forewing',[(x(.002),-.009,.0012),(x(.020),-.019,.002),(x(.024),-.004,.002),(x(.003),.001,.0012)],'wing')
-        tip=flat('Fore_Edge',[(x(.020),-.019,.0021),(x(.033),-.017,.0021),(x(.024),-.004,.0021)],'edge')
-        hind=flat('Hindwing',[(x(.003),.002,.0011),(x(.022),.000,.0018),(x(.019),.017,.0018)],'wing')
-        hedge=flat('Hind_Edge',[(x(.003),.002,.0012),(x(.019),.017,.0019),(x(.007),.019,.0015)],'edge')
-        k=join(name,[fore,tip,hind,hedge]); reorigin(k,(x(.002),-.002,.001))
+        fore=flat('Forewing',[(x(.002),-.010,.0015),(x(.013),-.020,.002),(x(.027),-.016,.002),(x(.030),-.004,.002),(x(.003),.000,.0015)],'wing')
+        hind=flat('Hindwing',[(x(.003),.001,.0014),(x(.022),.000,.0018),(x(.025),.012,.0018),(x(.015),.020,.0018),(x(.004),.012,.0014)],'edge')
+        k=join(name,[fore,hind]); reorigin(k,(x(.002),-.002,.001))
     save('butterfly')
 
 # `-- bear` construye sólo esos; sin nombres, todos (el oso, en su v4).

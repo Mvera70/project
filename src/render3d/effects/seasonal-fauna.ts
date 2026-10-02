@@ -51,6 +51,8 @@ const BEE_SIZE = 0.07;
 /** Colores de las mariposas: blanca de la col, amarilla, una naranja y una azul apagada. */
 const BUTTERFLY_COLOURS = ['#f2efe2', '#e8cf5a', '#d9853b', '#8fa3c9'];
 const BEE_COLOUR = '#d6a62c';
+/** v5.100 · El matiz de cada mariposa del modelo, para que no salgan todas iguales sin perder su color. */
+const BUTTERFLY_TINTS = ['#ffffff', '#fff1d6', '#ffe2cc', '#f2ecff'];
 
 function unit(index: number, what: string): number {
   return hash32(index, `seasonal-fauna:${what}`) / 4_294_967_296;
@@ -179,18 +181,6 @@ function butterflyModel(model: Object3D): BufferGeometry | null {
   const span = box.max.x - box.min.x;
   geometry.translate(-(box.max.x + box.min.x) / 2, 0, -(box.max.z + box.min.z) / 2);
   geometry.scale(1 / span, 1 / span, 1 / span);
-  // Los dos tonos del ala se quedan como luz y sombra del color de cada
-  // instancia (la limonera del modelo es amarilla con el borde naranja; en el
-  // valle salen cuatro especies): el tono más claro vale 1, el cuerpo oscuro
-  // sigue oscuro.
-  const colour = geometry.getAttribute('color');
-  const light = (k: number): number => 0.2126 * colour.getX(k) + 0.7152 * colour.getY(k) + 0.0722 * colour.getZ(k);
-  let brightest = 0;
-  for (let k = 0; k < colour.count; k += 1) brightest = Math.max(brightest, light(k));
-  for (let k = 0; k < colour.count; k += 1) {
-    const grey = light(k) / Math.max(1e-6, brightest);
-    colour.setXYZ(k, grey, grey, grey);
-  }
   return geometry;
 }
 
@@ -264,7 +254,10 @@ export function createSeasonalFauna(models: SeasonalModels = {}): SeasonalFauna 
     mesh.count = 0;
     group.add(mesh);
   }
-  for (let n = 0; n < POLLINATOR_MAX; n += 1) wings.setColorAt(n, new Color(BUTTERFLY_COLOURS[n % BUTTERFLY_COLOURS.length]!));
+  // Con el modelo, sus colores (los que Vera eligió: ocre con el borde
+  // terracota) y sólo un matiz por instancia; sin él, las cuatro de siempre.
+  const tints = modelWings === null ? BUTTERFLY_COLOURS : BUTTERFLY_TINTS;
+  for (let n = 0; n < POLLINATOR_MAX; n += 1) wings.setColorAt(n, new Color(tints[n % tints.length]!));
   if (wings.instanceColor !== null) wings.instanceColor.needsUpdate = true;
 
   const matrix = new Matrix4();

@@ -15,15 +15,15 @@ de Astra de hoy: `stork`, `stork-nest`, `chick`, `crane`, `butterfly`
 | Nido | Palangana de pared recta y fondo plano con astillas en el borde: se lee cesto | Plataforma ancha de ramas pardas con el rodete encima y las puntas saliendo por el borde; la cigüeña, de pie sobre ella |
 | Polluelo | Campana amarilla sin cabeza distinta, sin nodos | La cabeza nace del pecho, pico, dos ojos, dos patas con el pie adelante y alitas; nodos y clips de la gallina |
 | Grulla | Alas de papel con dientes de sierra, cuerpo de huso: una cometa gris | Cuerpo en `loft`, cuello negro, alas grises con el borde de las remeras negro, en el hombro como la golondrina |
-| Mariposa | Pajaritas con los colores horneados, que el juego no puede teñir | Cuatro alas amarillas con el borde naranja y el cuerpo oscuro; en el juego, los dos tonos tiñen el color de cada instancia |
-| Caballo | Patas en salchichas con huecos, tronco de caja, cascos de cubo (el estilo de G-23) | La mula de Vera más grande y pesada: crin y cola negras, lucero, calzas con pelo, collera; esqueleto de la mula y el casco plantado del ciervo |
+| Mariposa | Pajaritas con los colores horneados, sin forma de mariposa | Los colores de la de Astra (ocre, terracota, cuerpo oscuro) en dos pares de alas redondeadas, cuerpo fino y antenas; en el juego, un matiz por instancia |
+| Caballo | Patas en salchichas con huecos, tronco de caja, cascos de cubo (el estilo de G-23) | La mula de Vera hecha caballo de tiro con su receta, a ×1,3: crin en la cresta, cola llena, lucero, calzas; esqueleto de la mula y el casco plantado del ciervo |
 
 ## La segunda vuelta
 
 Vera vio la primera hoja y no la aceptó («mira el pollo»). Se rehicieron el
 polluelo (dos bolas apiladas, sin ojos, una pata a la vista), la mariposa
 (blanca y plana), el nido (gris de ceniza, la cigüeña hundida) y la escala del
-caballo (apenas pasaba a la mula; ahora ×1,15 y el cuello más alto). La regla
+caballo (apenas pasaba a la mula, y «la mula es mucho mejor»: ahora es la mula hecha caballo, a ×1,3). En la tercera, la mariposa con los colores de A y alas redondeadas, y el polluelo con las dos patas a la vista. La regla
 que queda: **ninguna hoja se enseña sin mirarla antes a la escala del juego,
 junto al vecino, preguntando si se reconoce sin el rótulo.**
 
@@ -36,7 +36,7 @@ junto al vecino, preguntando si se reconoce sin el rótulo.**
 | `chick` | 78 | 78 | 80 |
 | `crane` | 148 | 142 | 150 |
 | `butterfly` | 16 | 16 | 16 |
-| `horse` | 748 | 888 | 900 |
+| `horse` | 748 | 894 | 900 |
 
 ## Coste en el juego (`gl-probe.mjs`, antes y después seguidos, la máquina sola)
 

@@ -178,12 +178,12 @@ dentro del presupuesto del encargo de la tanda (bloques 6 y 7):
 
 | ID | Qué | Triángulos | Esqueleto y clips |
 |---|---|---|---|
-| `horse` | Caballo de tiro castaño, ×1,15 sobre la mula (`HORSE_SIZE`): crin y cola negras, lucero, calzas con pelo y collera | 888 / 900 | El de la mula; `walk` con el casco plantado (como el ciervo) e `idle` |
+| `horse` | La mula de Vera hecha caballo de tiro, ×1,3 (`HORSE_SIZE`): crin en la cresta, cola llena, lucero y calzas | 894 / 900 | El de la mula; `walk` con el casco plantado (como el ciervo) e `idle` |
 | `stork` | Cigüeña blanca de remeras negras, pico y patas rojos | 238 / 250 | El de la gallina (`legL`, `footL`…); `walk` e `idle` |
 | `stork-nest` | Plataforma de ramas con rodete; la cigüeña pisa a `NEST_FLOOR` | 192 / 200 | — (sólo modelo) |
 | `chick` | Polluelo: la cabeza nace del pecho, pico, ojos, dos patas y alitas | 78 / 80 | El de la gallina; `walk` e `idle` |
 | `crane` | Grulla en vuelo, gris con las remeras negras | 142 / 150 | Alas `bird_wing_l`/`bird_wing_r` con el origen en el hombro, como la golondrina |
-| `butterfly` | Limonera de cuatro alas, amarilla con el borde naranja | 16 / 16 | `wing_l`/`wing_r` en el eje del cuerpo |
+| `butterfly` | Dos pares de alas redondeadas, ocre y terracota (los colores de la de Astra), cuerpo fino y antenas | 16 / 16 | `wing_l`/`wing_r` en el eje del cuerpo |
 
 Reconstruir y publicar (con `pip install bpy==5.0.1`):
 
