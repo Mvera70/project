@@ -32,6 +32,15 @@ SOURCE, OUTPUT, LENGTH = argv[0], argv[1], float(argv[2])
 # fracción del alto. Por omisión 0,34, la del zorro; un animal de cuello alto
 # tiene la cabeza muy arriba y con 0,34 la barriga se iría con las patas.
 LEG_TOP = float(argv[argv.index('--leg-top') + 1]) if '--leg-top' in argv else 0.34
+# `--planted` (v5.100, el caballo): el casco apoyado se queda plantado en el
+# suelo —cadera y rodilla por cinemática inversa de dos huesos, como el ciervo
+# de `rigid-clips.mjs`— en vez de describir el arco de girar la pata entera
+# desde la cadera, que lo levanta en los extremos del apoyo y lo hace patinar.
+PLANTED = '--planted' in argv
+# `--knee <fracción>` (v5.100): a qué altura de la pata está la rodilla, en
+# fracción de `legTop`. El zorro la tiene a media pata (0,5, por omisión); el
+# caballo, con la caña larga, mucho más arriba, y con 0,5 doblaba a media caña.
+KNEE = float(argv[argv.index('--knee') + 1]) if '--knee' in argv else 0.5
 FPS = 30
 STANCE = 0.62
 
@@ -101,7 +110,7 @@ neckTop = (headBase, 0, ear.z - 0.12 * H)
 bone('neck', (neckBase, 0, bodyZ + 0.1 * H), neckTop, 'body')
 bone('head', neckTop, (minX, 0, neckTop[2] - 0.1 * H), 'neck')
 for name, (cx, cy) in legs.items():
-    knee = legTop * 0.5
+    knee = legTop * KNEE
     ankle = legTop * 0.12
     bone(name, (cx, cy, legTop), (cx, cy, knee), 'body')
     bone(name + 'Lower', (cx, cy, knee), (cx, cy, ankle), name)
@@ -119,7 +128,7 @@ def region(v):
     if v.z < legTop * 1.02 and v.x > minX + 0.12 * L and v.x < tailBase:
         # La pata más cercana de su lado, y dentro de ella por altura.
         name = min(legs, key=lambda n: (v.x - legs[n][0]) ** 2 + 4 * (v.y - legs[n][1]) ** 2)
-        if v.z > legTop * 0.5: return name
+        if v.z > legTop * KNEE: return name
         if v.z > legTop * 0.12: return name + 'Lower'
         return name + 'Foot'
     if v.x > tailMid: return 'tailTip'
@@ -186,7 +195,40 @@ PHASE = {'foreL': 0, 'hindR': 0, 'foreR': 0.5, 'hindL': 0.5}
 travel = 2 * legTop * math.sin(0.4)
 stride = travel / STANCE
 
+def planted_gait(gain):
+    # Cada pata: el tobillo va a donde manda el apoyo (adelante es +), y la
+    # cadera y la rodilla salen de ahí; la rodilla de delante dobla hacia
+    # adelante y el corvejón de atrás hacia atrás, y el casco no gira.
+    pose = {}
+    L1 = legTop * (1 - KNEE)
+    L2 = legTop * (KNEE - 0.12)
+    crouch = 0.03 * legTop
+    for leg, phase in PHASE.items():
+        k = 1 if leg.startswith('fore') else -1
+        def solve(t, ph=phase, k=k):
+            p = (t + ph) % 1
+            swing = p > STANCE
+            u = (p - STANCE) / (1 - STANCE) if swing else p / STANCE
+            tr = travel * gain
+            ahead = -tr / 2 + tr * (0.5 - 0.5 * math.cos(math.pi * u)) if swing else tr / 2 - tr * u
+            down = L1 + L2 - crouch - (tr * 0.28 * math.sin(math.pi * u) if swing else 0)
+            d = min(L1 + L2 - 1e-4, max(abs(L1 - L2) + 1e-4, math.hypot(ahead, down)))
+            base = math.atan2(ahead, down)
+            alpha = math.acos(max(-1, min(1, (L1 * L1 + d * d - L2 * L2) / (2 * L1 * d))))
+            thigh = base + k * alpha
+            shin = math.atan2(ahead - L1 * math.sin(thigh), down - L1 * math.cos(thigh))
+            return thigh, shin - thigh, -shin
+        pose[leg] = [(LATERAL, (lambda f: lambda t: f(t)[0])(solve))]
+        pose[leg + 'Lower'] = [(LATERAL, (lambda f: lambda t: f(t)[1])(solve))]
+        pose[leg + 'Foot'] = [(LATERAL, (lambda f: lambda t: f(t)[2])(solve))]
+    pose['neck'] = [(LATERAL, lambda t: 0.04 * wave(t, 2))]
+    pose['tail'] = [(VERTICAL, lambda t: 0.15 * wave(t))]
+    pose['tailTip'] = [(VERTICAL, lambda t: 0.12 * wave(t, 1, 0.15))]
+    return pose
+
 def gait(gain, bend):
+    if PLANTED:
+        return planted_gait(gain)
     pose = {}
     for leg, phase in PHASE.items():
         pose[leg] = [(LATERAL, (lambda ph: lambda t: leg_angle((t + ph) % 1, travel * gain, legTop))(phase))]

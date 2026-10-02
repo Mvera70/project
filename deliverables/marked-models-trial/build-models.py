@@ -888,52 +888,84 @@ def turn_to_minus_y(objects):
     for o in objects:
         if o.type=='MESH': o.data.transform(r)
 
-# El caballo se escala al rigging: `rig-single-mesh.py … horse.glb 0.96` lo deja
-# de hocico a cola en 0,96 celdas, y la cruz le saca un 30 % a la de la mula.
-HORSE_LENGTH=.96
-HORSE_LEG_TOP=.27   # dónde acaban las patas, en fracción del alto (la barriga)
+# El caballo se escala al rigging: `rig-single-mesh.py … horse.glb 1.0
+# --leg-top 0.33` lo deja de hocico a cola en una celda (la cruz le saca un
+# 30 % a la de la mula) y pone el final de las patas en la barriga.
+HORSE_LENGTH=1.0
+HORSE_LEG_TOP=.33
+
+def skin_chain(name,pts,m,levels=1,keep=1.0,low=None):
+    # Una piel continua sobre una cadena de puntos con su radio (ancho, alto):
+    # el modificador Skin la cierra sin junta y la subdivisión la redondea.
+    me=bpy.data.meshes.new(name); me.from_pydata([p for p,_ in pts],[(i,i+1) for i in range(len(pts)-1)],[])
+    o=bpy.data.objects.new(name,me); bpy.context.collection.objects.link(o)
+    bpy.context.view_layer.objects.active=o
+    o.modifiers.new('Skin','SKIN')
+    for i,(_,r) in enumerate(pts): me.skin_vertices[0].data[i].radius=r
+    me.skin_vertices[0].data[0].use_root=True
+    o.modifiers.new('Round','SUBSURF').levels=levels
+    bpy.ops.object.select_all(action='DESELECT'); o.select_set(True)
+    if keep<1: o.modifiers.new('Facets','DECIMATE').ratio=keep
+    for mo in list(o.modifiers): bpy.ops.object.modifier_apply(modifier=mo.name)
+    me.materials.append(M[m])
+    if low is not None:
+        # La parte baja de la pata, de otro color en la misma piel: sin manga encima.
+        me.materials.append(M[low[0]])
+        for f in me.polygons:
+            if f.center.z<low[1]: f.material_index=1
+    return par(o,None)
+
+HORSE_FACETS=.26  # qué parte de las caras de la piel se queda: el facetado y el presupuesto (≤ 900)
 
 def horse():
-    # El caballo de tiro es **la mula de Vera hecha caballo** (Vera: «la mula
-    # es mucho mejor»), con sus piezas —tronco en `loft`, cuello en `tube`,
-    # cabeza larga con el morro oscuro, ojos con brillo, orejas en `ear`, cola
-    # con borla— y lo que dice «tiro»: más alto en la cruz, cuello largo y
-    # grueso, orejas cortas, crin y cola llenas, calzas blancas y lucero.
+    # El caballo de tiro: **la mula de Vera hecha caballo** (Vera: «la mula es
+    # mucho mejor»), y **sin juntas** (Vera: «el caballo tiene piezas con
+    # huecos… es un nivel bajísimo»: la cabeza encajada con un escalón detrás
+    # de las orejas y el cuello que cortaba en seco contra el pecho).
     #
-    # **Una sola malla, como el zorro** (Vera: «el caballo tiene piezas con
-    # huecos»). De piezas rígidas, cada una gira con su nodo y al andar se
-    # abren rendijas en la rodilla, en el casco y entre los dientes de la crin.
-    # Aquí todo se une en una malla, cada pieza entra en la de al lado, y el
-    # esqueleto y los pesos los pone `tools/art/rig-single-mesh.py` por
-    # regiones: lo que se dobla se estira, no se abre. Se exporta sin huesos
-    # como `horse-mesh.glb`; el esqueleto viene después.
+    # El tronco, el cuello y las cuatro patas son **piel continua**
+    # (`skin_chain`): una cadena de puntos con su radio que el modificador
+    # Skin cierra sin costura, de modo que el cuello nace del pecho y la pata
+    # del costado sin escalón. Encima van las piezas de la mula —su cabeza con
+    # el morro y el labio, ojos con brillo, orejas, crin de hojas sobre la
+    # cresta, cola con borla— hundidas en la piel, y lo que dice «tiro»:
+    # cruz alta, cuello largo y grueso, orejas cortas, crin y cola llenas,
+    # calzas blancas y lucero. Todo se une en una malla y el esqueleto y los
+    # pesos los pone `tools/art/rig-single-mesh.py`, como al zorro: lo que se
+    # dobla se estira y no se abre.
     reset(); mat('coat','4A2A18'); mat('coatTop','16120F'); mat('light','D9CDB4'); mat('earInner','5A4030'); mat('blaze','E6E0D0')
     parts=[]
     P=lambda o: parts.append(o) or o
-    P(loft('Equine_Barrel',[(-.20,.272,.062,.092),(-.12,.278,.100,.108),(.028,.270,.104,.114),(.165,.272,.090,.104),(.222,.280,.050,.070)],'coat',None,10))
-    # El cuello nace dentro del pecho y la cabeza dentro del cuello: sin junta.
-    P(tube('Upright_Neck',[(-.120,0,.250),(-.190,0,.340),(-.232,0,.440),(-.262,0,.488)],[(.090,.074),(.080,.066),(.058,.052),(.044,.044)],'coat',None,8))
-    P(loft('Long_Equine_Head',[(-.236,.478,.044,.060),(-.290,.470,.052,.062),(-.344,.420,.038,.042),(-.388,.384,.034,.032)],'coat',None,8))
-    P(ell('Dark_Muzzle',(-.386,0,.376),(.080,.088,.064),'coatTop',None,8,4))
-    P(leaf('Blaze',(-.264,0,.518),(-.384,0,.404),.030,.010,'blaze'))
-    # La crin, una cresta llena hundida a medias en el cuello, de la nuca a la cruz.
-    P(tube('Crest_Mane',[(-.244,.010,.536),(-.208,.010,.488),(-.166,.010,.420),(-.112,.010,.350)],[(.022,.028),(.028,.032),(.028,.032),(.014,.018)],'coatTop',None,5))
-    P(leaf('Forelock',(-.262,0,.526),(-.292,0,.490),.034,.010,'coatTop'))
-    for s in (-1,1):
-        P(ell('Eye_'+str(s),(-.298,s*.048,.478),(.018,.008,.016),'eye',None,5,3))
-        P(ell('Eye_Glint_'+str(s),(-.301,s*.051,.482),(.005,.004,.005),'ivory',None,4,3))
-        # Orejas cortas, la mitad que las de la mula, saliendo de dentro de la cabeza.
-        P(leaf('Ear_'+str(s),(-.258,s*.028,.500),(-.246,s*.046,.584),.034,.008,'coat'))
-    P(tube('Full_Tail',[(.190,0,.300),(.236,0,.256),(.252,0,.170),(.258,0,.080)],[.020,.022,.026,.022],'coatTop',None,6))
-    P(tube('Tail_Brush',[(.256,0,.130),(.266,0,.070),(.262,0,.020)],[.028,.030,.004],'coatTop',None,6))
-    for pre,x in [('fore',-.148),('hind',.162)]:
+    # Tronco y cuello: de la grupa a la nuca, sin ramas. (x, 0, z), (ancho, alto).
+    P(skin_chain('Body',[((.262,0,.405),(.050,.060)),((.222,0,.415),(.098,.112)),((.130,0,.405),(.116,.128)),((.000,0,.395),(.120,.134)),
+        ((-.120,0,.402),(.114,.132)),((-.196,0,.432),(.090,.112)),((-.236,0,.505),(.072,.086)),((-.264,0,.572),(.058,.066)),
+        ((-.286,0,.616),(.050,.058))],'coat',keep=HORSE_FACETS))
+    for x,kx,ax in [(-.152,.010,-.004),(.172,-.034,.024)]:
         for s in (-1,1):
-            y=s*.062; hip=(x,y,.250); knee=(x+(.010 if pre=='fore' else -.034),y,.140); fet=(x+(-.002 if pre=='fore' else .024),y,.050)
-            # La pata entera en un tubo de la cadera (dentro del tronco) al menudillo.
-            P(tube('Leg_'+pre+str(s),[hip,knee,fet],[.040,.026,.020],'coat',None,6))
-            P(tube('Cannon_'+pre+str(s),[(knee[0],y,knee[2]+.012),fet],[.024,.020],'coatTop',None,6))
-            P(tube('Feather_'+pre+str(s),[(fet[0],y,.090),(fet[0]-.003,y,.024)],[.018,.030],'light',None,6))
-            P(box('Hoof_'+pre+str(s),(fet[0]-.006,y,.016),(.048,.042,.034),'coatTop'))
+            P(skin_chain('Leg',[((x,s*.058,.390),(.050,.050)),((x,s*.062,.300),(.046,.050)),((x+kx,s*.064,.175),(.028,.030)),
+                ((x+ax,s*.064,.068),(.022,.022)),((x+ax-.004,s*.064,.030),(.024,.020))],'coat',keep=HORSE_FACETS,low=('coatTop',.168)))
+            fx=x+ax-.004
+            # Las calzas de pelo blanco y el casco, sobre la piel.
+            P(tube('Feather',[(fx,s*.064,.098),(fx-.003,s*.064,.028)],[.026,.036],'light',None,6))
+            P(box('Hoof',(fx-.006,s*.064,.016),(.052,.046,.032),'coatTop',None))
+    # La cabeza de la mula, más larga, hundida en el final del cuello.
+    P(loft('Long_Equine_Head',[(-.262,.626,.046,.060),(-.306,.612,.054,.066),(-.356,.556,.040,.046),(-.398,.512,.035,.034)],'coat',None,8))
+    P(ell('Dark_Muzzle',(-.396,0,.502),(.078,.084,.066),'coatTop',None,8,4))
+    P(ell('Lip',(-.410,0,.486),(.052,.064,.030),'coatTop',None,6,3))
+    P(leaf('Blaze',(-.292,0,.664),(-.394,0,.540),.030,.010,'blaze'))
+    for s in (-1,1):
+        P(ell('Eye_'+str(s),(-.318,s*.052,.624),(.022,.010,.020),'eye',None,6,3))
+        # Orejas cortas, la mitad que las de la mula.
+        P(leaf('Ear_'+str(s),(-.278,s*.028,.650),(-.268,s*.046,.730),.036,.010,'coat'))
+        P(leaf('Ear_Inner_'+str(s),(-.281,s*.030,.656),(-.272,s*.042,.716),.020,.004,'earInner'))
+    P(leaf('Forelock',(-.282,0,.668),(-.318,0,.628),.040,.012,'coatTop'))
+    # La crin, una cresta llena y continua de la nuca a la cruz, medio hundida
+    # en el cuello: las hojas sueltas de la mula, en un cuello tan grueso, se
+    # leían como pinchos.
+    P(tube('Crest_Mane',[(-.272,.004,.664),(-.242,.006,.640),(-.210,.008,.600),(-.168,.008,.540),(-.112,.006,.480),(-.080,.004,.462)],
+        [(.030,.020),(.036,.022),(.036,.022),(.032,.020),(.022,.016),(.006,.006)],'coatTop',None,5))
+    P(tube('Full_Tail',[(.236,0,.420),(.272,0,.372),(.286,0,.280),(.292,0,.190)],[.016,.022,.026,.024],'coatTop',None,6))
+    P(tube('Tail_Brush',[(.290,0,.230),(.300,0,.150),(.296,0,.100)],[.028,.032,.004],'coatTop',None,6))
     one=join('Horse',parts)
     bpy.ops.object.select_all(action='DESELECT'); one.select_set(True); bpy.context.view_layer.objects.active=one
     bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM'); bpy.ops.object.transform_apply(location=True,rotation=True,scale=True)

@@ -8203,7 +8203,7 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "La mula de Vera hecha caballo de tiro (deliverables/marked-models-trial/build-models.py, horse(); 2 oct 2026, v5.100), en una sola malla como el zorro; esqueleto, pesos y clips idle/walk/flee de tools/art/rig-single-mesh.py a 0,96 celdas.",
+        "source": "La mula de Vera hecha caballo de tiro (deliverables/marked-models-trial/build-models.py, horse(); 2 oct 2026, v5.100): tronco, cuello y patas en piel continua (Skin) y la cabeza de la mula, en una sola malla como el zorro; esqueleto, pesos y clips idle/walk/flee de tools/art/rig-single-mesh.py a 1 celda.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
@@ -8216,29 +8216,29 @@
       },
       "bounds": {
         "min": [
-          -0.566462,
-          -0.00133,
-          -0.138291
+          -0.567733,
+          0,
+          -0.13993
         ],
         "max": [
-          0.393539,
-          0.776558,
-          0.138291
+          0.432267,
+          0.950563,
+          0.14211
         ],
         "size": [
-          0.96,
-          0.777887,
-          0.276582
+          1,
+          0.950563,
+          0.28204
         ]
       },
       "recipeSha256": null,
       "materials": [
         "coat",
         "coatTop",
+        "light",
         "blaze",
         "eye",
-        "ivory",
-        "light"
+        "earInner"
       ],
       "clips": [
         "walk",
@@ -8250,7 +8250,7 @@
           "name": "walk",
           "seconds": 1,
           "loop": true,
-          "strideLength": 0.263
+          "strideLength": 0.394
         },
         {
           "name": "idle",
@@ -8262,7 +8262,7 @@
           "name": "flee",
           "seconds": 0.6,
           "loop": true,
-          "strideLength": 0.395
+          "strideLength": 0.591
         }
       ],
       "connectors": [],
@@ -8270,10 +8270,10 @@
         "objects": 19,
         "meshes": 1,
         "materials": 6,
-        "triangles": 824
+        "triangles": 818
       },
       "hashes": {
-        "horse.glb": "1B8A1F54DA835290135284A7829DB1CC131F89C27C59B6B78A0BCED2AE34D07C"
+        "horse.glb": "7D8E403AD3BC3D670AD3C571990F15086E877AF1D2719F160C0D49EC2282DA3F"
       }
     },
     {
@@ -8343,7 +8343,7 @@
         "triangles": 238
       },
       "hashes": {
-        "stork.glb": "D6323CBB53DF3B374C58BF746ECE3E355930600CBBE03D31D4F9748153594867"
+        "stork.glb": "F6FA3E0D6AA85E5771494B393FCB8A0CF55F0C8F3CF59B7E7341372634099FF9"
       }
     },
     {
@@ -8412,7 +8412,7 @@
         "triangles": 460
       },
       "hashes": {
-        "chick.glb": "B2B700F1B8B54ED5DE6A112036F38DE853A95D2F8CEC426BB0DE35DDFB3FB49A"
+        "chick.glb": "F11BCD575233D292C913E2426118DD7A65594A43E6319BA93665219F54588F3C"
       }
     },
     {

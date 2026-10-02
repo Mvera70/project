@@ -178,7 +178,7 @@ dentro del presupuesto del encargo de la tanda (bloques 6 y 7):
 
 | ID | Qué | Triángulos | Esqueleto y clips |
 |---|---|---|---|
-| `horse` | La mula de Vera hecha caballo de tiro, en **una sola malla** (`horse-mesh.glb`): crin en la cresta, cola llena, lucero y calzas | 824 / 900 | El del zorro: `rig-single-mesh.py … 0.96 --leg-top 0.27`, con `walk`, `idle` y `flee` |
+| `horse` | La mula de Vera hecha caballo de tiro en **una sola malla** (`horse-mesh.glb`): tronco, cuello y patas en piel continua (`skin_chain`, sin juntas), la cabeza de la mula hundida en el cuello, crin en cresta, cola llena, lucero y calzas | 818 / 900 | El del zorro: `rig-single-mesh.py … 1.0 --leg-top 0.33 --knee 0.66 --planted`, con `walk` (casco plantado), `idle` y `flee` |
 | `stork` | Cigüeña blanca de remeras negras, pico y patas rojos | 238 / 250 | El de la gallina (`legL`, `footL`…); `walk` e `idle` |
 | `stork-nest` | Plataforma de ramas con rodete; la cigüeña pisa a `NEST_FLOOR` | 192 / 200 | — (sólo modelo) |
 | `chick` | Polluelo redondo y liso, esferas de diez husos como la gallina, pico, ojos, alitas y dos patas con dedos | 460 / 80 (excepción) | El de la gallina; `walk` e `idle` |
@@ -189,7 +189,7 @@ Reconstruir y publicar (con `pip install bpy==5.0.1`):
 
 ```bash
 cd deliverables/marked-models-trial && python3 build-models.py -- horse-mesh stork stork-nest chick crane butterfly
-python3 tools/art/rig-single-mesh.py -- deliverables/marked-models-trial/horse-mesh.glb deliverables/marked-models-trial/horse.glb 0.96 --leg-top 0.27
+python3 tools/art/rig-single-mesh.py -- deliverables/marked-models-trial/horse-mesh.glb deliverables/marked-models-trial/horse.glb 1.0 --leg-top 0.33 --knee 0.66 --planted
 node tools/art/rigid-clips.mjs deliverables/marked-models-trial/stork.glb <salida> stork   # y chick
 node tools/art/adopt-models.mjs <lista.json>     # ronda animales-rehechos
 npx tsx tools/graphics/publish-assets.ts --ids stork,chick,crane,butterfly

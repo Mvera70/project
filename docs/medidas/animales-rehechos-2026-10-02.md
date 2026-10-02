@@ -32,6 +32,12 @@ es una sola malla con el esqueleto y los pesos del zorro (`rig-single-mesh.py`).
 El polluelo, con esferas de pocos husos, salía lleno de picos: ahora son de diez,
 como las de la gallina.
 
+**Quinta vuelta:** el caballo seguía armado de cuerpos que se cruzan, con
+escalones en la nuca y en el pecho. Ahora tronco, cuello y patas son una piel
+continua (Skin de Blender), con la cabeza de la mula hundida en el cuello, la
+crin en cresta y el casco plantado. La regla: **un animal que se ve de cerca se
+mira de cerca en sus juntas, y andando, antes de enseñarlo.**
+
 ## Presupuestos (encargo de la tanda larga, bloques 6 y 7)
 
 | | Astra | Nuevo | Tope |
@@ -41,7 +47,7 @@ como las de la gallina.
 | `chick` | 78 | 460 | 80 (excepción: con 80 salía lleno de picos) |
 | `crane` | 148 | 142 | 150 |
 | `butterfly` | 16 | 16 | 16 |
-| `horse` | 748 | 824 (una malla) | 900 |
+| `horse` | 748 | 818 (una malla, piel continua) | 900 |
 
 ## Coste en el juego (`gl-probe.mjs`, antes y después seguidos, la máquina sola)
 

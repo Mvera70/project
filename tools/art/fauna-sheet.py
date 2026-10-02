@@ -140,6 +140,9 @@ def render(panel, path):
         g.data.materials.append(mat)
     direction = Vector(VIEWS[panel['kind']]).normalized()
     centre = (lo + hi) / 2
+    if 'look' in panel:
+        # `look`: [x, z, alto] en celdas del GLB (+Z delante): mirar de cerca una junta.
+        centre = Vector((panel['look'][0], -panel['look'][1], panel['look'][2]))
     bpy.ops.object.camera_add()
     cam = bpy.context.object
     cam.data.type = 'ORTHO'
