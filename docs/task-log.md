@@ -20,6 +20,16 @@ poco: lo que gana el parche crece con la gente.
 **Abierto:** lo que queda del tick es la población (un A\* por origen y no por
 pareja sería un brief) y `placeBuilding` (16 % del perfil).
 
+## 2 oct 2026 · El 2D fuera del paquete del juego (v5.69)
+
+Rama `claude/sin-2d-en-el-paquete`, tanda nocturna. El Canvas 2D (`src/render/`)
+se queda para `?render=canvas` y como reserva, pero se pide con `import()`: el
+juego en 3D ya no lo descarga ni lo pinta detrás de la placa. Entrada de
+611,05 a 593,11 kB (gzip 194,96 → 188,07); sobre el main con #41 y #42,
+626,00 → 608,06. Mientras carga, `data-render` dice
+`loading`. Y el recorrido de la tormenta, que fallaba a ratos en la CI, va
+con el reloj falso parado al cargar y a ×64 tras ver la tormenta. Nada abierto.
+
 ## 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón (v5.57)
 
 Rama `ccr-372e1786-k4brcp`. Medido antes en `main`, decidido con Vera y hecho:

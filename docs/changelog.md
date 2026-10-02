@@ -33,6 +33,41 @@ regla de `CLAUDE.md` junta la de v5.68 con la de pasarlo antes y después de
 tocar `paths`, `astar`, `placement` o `works`. Medidas y perfil:
 `docs/medidas/rutas-tick-2026-10-02.md`.
 
+## v5.69 · 2 oct 2026 · El 2D deja de viajar en el paquete del juego
+
+Vera, 2 oct: «si podemos evitar que se cargue [el 2D] mejor; si no se puede
+eliminar, no pasa nada». No se elimina —lo usan los recorridos de interfaz en
+un runner sin GPU (`?render=canvas`) y es la reserva si el 3D no llega—, pero
+el juego en 3D ya no lo descarga ni lo monta. Hasta hoy `src/ui/backend.ts` y
+`src/ui/debug.ts` lo importaban de entrada, y el 2D pintaba cada fotograma
+escondido detrás de la placa de carga.
+
+- **`backend.ts`:** `live` arranca como un render vacío `kind: 'loading'`
+  (`idleBackend`); `src/render/renderer` llega por `import()` sólo con
+  `?render=canvas` o en el `catch` del 3D. `data-render` dice `loading` hasta
+  el relevo, y en Canvas `onSwap` se llama también al llegar el 2D.
+- **`debug.ts`:** la pintura 2D de la página de diagnóstico y `auditSprites` se
+  mudan a `src/ui/debug-canvas.ts`, bajo demanda; `data-debug-ready` llega
+  después de pintar.
+- `src/render/crowd.ts` y `reactions.ts` se quedan en la entrada a propósito:
+  son lógica del inspector (`inspect.ts`), no dibujo.
+- **Medido** (`vite build`): el trozo de entrada baja de **611,05 a 593,11 kB**
+  (gzip 194,96 → 188,07). Los diez módulos de dibujo de `src/render/` y
+  `derive/palette` salen de él y viven en cinco trozos aparte (~19,7 kB) que el
+  juego en 3D no pide. Remedido tras traer #41 y #42 a la rama: **626,00 →
+  608,06 kB** (gzip 201,68 → 195,03), la misma diferencia.
+- El recorrido «la ruta viva abre un valle maduro…» medía `#valley` a 360 px en
+  3D, cierto sólo porque el 2D pintaba escondido: ahora comprueba lo contrario,
+  que tras el relevo el 2D no ha pintado nunca.
+- **Y la tormenta deja de depender del runner** (encargo del director, tras
+  fallar a ratos en la CI de #42 con `data-bolts` a 0 tras 120 s). La ruta abre
+  a ×1, donde una jornada son unos 120 s de reloj falso, y en la semilla 7 el
+  primer rayo pendiente cae en la fase 0,595 de una jornada que el 3D empieza
+  a pintar en 0,28–0,33: unos 38 s falsos, más de mil fotogramas por CPU con
+  el paso máximo del reloj de presentación. Ahora el reloj falso se para antes
+  de cargar y, comprobada la tormenta, el valle va a ×64. Mismo listón; 3/3 en
+  serie y 4/4 con cuatro a la vez, unos 36 s cada uno (antes 2,7 min).
+
 ## v5.57 · 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón, y desde ellas inclinar hacia un recurso
 
 **Medido antes, en `main`** (`docs/medidas/k8-k9-edificios-2026-10-02.md`,

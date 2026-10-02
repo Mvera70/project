@@ -930,9 +930,9 @@ export function boot(
     if (handle.failure !== null) document.documentElement.dataset.renderFailure = handle.failure;
   };
 
-  // G-07 · Canvas pinta desde el primer fotograma, siempre. El 3D —que desde
-  // G-12 es el juego— se carga por detrás y releva cuando esté; si falla, el
-  // valle sigue en 2D en vez de quedarse en un error.
+  // G-07 · El 3D —que desde G-12 es el juego— se carga detrás de la placa y
+  // releva cuando esté; si falla, se descarga el 2D en vez de quedarse en un
+  // error. Desde v5.69 el 2D no pinta mientras tanto: ni viaja en el paquete.
   /**
    * U-11 · El inicio guiado. Al fundar un valle la vista baja desde la sierra
    * hasta la aldea (`flyIn`), que es lo que el dueño pidió: «la aldea al
