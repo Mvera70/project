@@ -29,6 +29,7 @@ import { bastionAccessOf, type BastionAccess } from '@derive/bastion-access';
 import { bastionWalkwayOf, type BastionWalkway } from '@derive/bastion-walkway';
 import { elevatedRingOf, type ElevatedRing, type ElevatedRingSegment, type ElevatedRingVariant, type RingCell, type RingPoint } from '@derive/elevated-ring';
 import { CROPS, cropOf, fieldMoment, type FieldPhase } from '@engine/world/crops';
+import { flaxField } from '@engine/world/tailor';
 import { RAMPART, rampartBoxes, rampartPlatformCells, rampartPrisms, type RampartBastion, type RampartLayout } from './rampart';
 
 /** Radio del tronco adulto de `tree.glb`, medido en la receta E3b.2. */
@@ -617,6 +618,7 @@ export function planFor(state: GameState): ScenePlan {
     !hiding.has(building.id) && houseRubbleStage(building, state.tick) !== 'gone');
   const connections = defenceConnections(visible);
   const gates = defenceGates(state);
+  const flax = flaxField(state);
   const gateAsset = (gate: Building): string => {
     const nearby = visible.filter((building) => building.lostTick === null
       && Math.abs(building.x - gate.x) <= 1 && Math.abs(building.y - gate.y) <= 1);
@@ -645,7 +647,12 @@ export function planFor(state: GameState): ScenePlan {
     buildings: visible.map((building) => {
       const access = building.kind === 'bastion' ? bastionAccessOf(state, building) : null;
       const walkway = access === null ? null : sceneWalkwayOf(state, building);
+      const flaxPhase = building.kind === 'field' && building.id === flax && building.lostTick === null
+        ? fieldMoment(cropOf(building), state.tick).phase : null;
       return { ...plannedFrom(building, state.tick),
+        ...(flaxPhase === null ? {} : {
+          asset: flaxPhase === 'grow' || flaxPhase === 'ripe' ? 'field-flax' : 'field-flax-cut',
+        }),
         ...(building.kind === 'gate' && building.lostTick === null ? {
           asset: gateAsset(building),
           gateCornerLinks: gateAsset(building) === 'gate' ? gateCornerLinks(building) : 0,

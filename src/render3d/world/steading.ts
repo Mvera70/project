@@ -39,6 +39,7 @@ export const STEADING_ASSETS = [
   'beehive', 'scarecrow', 'trough', 'chicken-coop', 'wood-chopping', 'stump', 'fallen-log',
   'bush', 'wildflowers', 'mushrooms', 'stone-wall', 'wayside-shrine', 'lantern-post', 'market-awning',
   'hide-rack',
+  'linen-bolt',
   'bench', 'log-seat', 'cart',
 ] as const;
 export type SteadingAsset = (typeof STEADING_ASSETS)[number];
@@ -66,6 +67,7 @@ export const MOST_STEADED: Readonly<Record<SteadingAsset, number>> = {
   'chicken-coop': 2, 'wood-chopping': 2, stump: 5, 'fallen-log': 3,
   bush: 6, wildflowers: 6, mushrooms: 4, 'stone-wall': 3,
   'wayside-shrine': 2, 'lantern-post': 2, 'market-awning': 1, 'hide-rack': 1,
+  'linen-bolt': 1,
   bench: 3, 'log-seat': 2, cart: 1,
 };
 
@@ -318,6 +320,7 @@ export function steadingOf(state: GameState, seed: number): Steaded[] {
 
   // Added last so the established homes and paths keep their scenic places.
   place('hide-rack', around('smithy', 'house', 'stone_house'));
+  if (state.village.linen > 0) place('linen-bolt', around('tailor'));
   place('bench', homes);
   place('cart', around('granary', 'mill'));
   const px = Math.floor(square.x), pz = Math.floor(square.y);

@@ -24,7 +24,8 @@ import { Box3, BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } f
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import type { Actor } from '../../src/render3d/contracts';
 import type { LoadedAsset } from '../../src/render3d/assets';
-import { BUILDINGS } from '@engine/balance';
+import { BUILDINGS, TIME } from '@engine/balance';
+import { cropOf, fieldMoment } from '@engine/world/crops';
 import { TERRAIN_CODE, type BuildingKind } from '@engine/state';
 import { BUILDING_ASSETS } from '../../src/render3d/world/buildings';
 import { Cast } from '../../src/render3d/world/cast';
@@ -51,6 +52,31 @@ function village(years: number, seed = 7): GameState {
   return structuredClone(base);
 }
 describe('G-06 · el plan de escena', () => {
+  it('el campo encargado para lino cambia de flor a gavillas y vuelve al cultivo normal', () => {
+    const state = village(10);
+    const field = state.buildings.find((one) => one.kind === 'field' && one.lostTick === null);
+    expect(field).toBeDefined();
+    const year = Math.floor(state.tick / TIME.WEEKS_PER_YEAR) * TIME.WEEKS_PER_YEAR;
+    const weeks = Array.from({ length: TIME.WEEKS_PER_YEAR }, (_, week) => week);
+    const flowering = weeks.find((week) => fieldMoment(cropOf(field!), year + week).phase === 'grow');
+    const cut = weeks.find((week) => fieldMoment(cropOf(field!), year + week).phase === 'stubble');
+    expect(flowering).toBeDefined();
+    expect(cut).toBeDefined();
+    state.flags['tailor:flax:field'] = field!.id;
+    state.flags['tailor:flax'] = year + TIME.WEEKS_PER_YEAR + 1;
+
+    state.tick = year + flowering!;
+    const flowers = planFor(state);
+    expect(flowers.buildings.find((one) => one.id === field!.id)?.asset).toBe('field-flax');
+    state.tick = year + cut!;
+    const sheaves = planFor(state);
+    expect(sheaves.buildings.find((one) => one.id === field!.id)?.asset).toBe('field-flax-cut');
+    expect(planChange(flowers, sheaves).changed.some((one) => one.id === field!.id)).toBe(true);
+
+    state.flags['tailor:flax'] = state.tick;
+    expect(planFor(state).buildings.find((one) => one.id === field!.id)?.asset).toBe('field-cut');
+  });
+
   it('talar cambia el suelo y nada más', () => {
     // El bosque es terreno, no edificio: la tala tiene que mover la firma del
     // suelo sin tocar un solo edificio.
@@ -704,20 +730,6 @@ describe('G-10 · el reparto no son clones', () => {
   });
 });
 
-/**
- * Los tipos de edificio que **todavía no tienen malla**, con su encargo escrito.
- *
- * Es una lista de deuda, no una excusa: cada entrada tiene que apuntar a un
- * encargo de arte pendiente, y el día que llega la malla la entrada se borra y
- * las dos pruebas de abajo vuelven a pedirla sin excepciones. Hoy no queda
- * ninguna: la sala del líder de K-4, la última, llegó el 27 sep 2026 (la casa
- * larga de Astra, `art/recipes/hall-candidate`).
- */
-// K5 (2 oct 2026) · la sastrería: encargada a Astra en
-// `docs/encargos/ilustraciones-k5-lino.md` §3 (`tailor.glb`). Mientras, la caja
-// de `BUILDING_LOOKS.tailor`.
-const PENDING_MESH: ReadonlySet<string> = new Set(['tailor']);
-
 describe('G-10 · cobertura del catálogo', () => {
   it('ningún tipo de edificio se queda en la caja de reserva', () => {
     // El criterio de terminado de G-10 con estas palabras: cobertura sin
@@ -730,7 +742,6 @@ describe('G-10 · cobertura del catálogo', () => {
       // acopio y la vagoneta los pone `world/mine-works.ts`, con los GLB del
       // encargo de Astra (bloque 4) o su respaldo procedural.
       if (kind === 'mine') continue;
-      if (PENDING_MESH.has(kind)) continue;
       expect(BUILDING_ASSETS[kind], `${kind} no tiene recurso`).toBeDefined();
     }
   });
@@ -743,14 +754,8 @@ describe('G-10 · cobertura del catálogo', () => {
     )) as { assets: { id: string }[] };
     const published = new Set(manifest.assets.map((asset) => asset.id));
     for (const id of Object.values(BUILDING_ASSETS)) {
-      if (id === undefined || PENDING_MESH.has(id)) continue;
+      if (id === undefined) continue;
       expect(published.has(id), `${id} no está publicado`).toBe(true);
-    }
-    // Y lo pendiente sigue pendiente: si alguien publica la malla y se olvida de
-    // borrar la línea de `PENDING_MESH`, esto lo dice.
-    for (const id of PENDING_MESH) {
-      expect(published.has(id), `${id} ya está publicado: bórralo de PENDING_MESH`)
-        .toBe(false);
     }
     // Y los que no son edificios pero el renderer pide igualmente.
     for (const id of ['villager', 'tree', 'rock', 'reed', 'hoe', 'bundle',

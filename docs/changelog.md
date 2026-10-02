@@ -1,5 +1,11 @@
 # The Valley — Registro de cambios
 
+## v5.91–v5.92 · 2 oct 2026 · Modelos de sastrería tras K5
+
+**Arte publicado.** `tailor`, `loom`, `field-flax`, `field-flax-cut`, `linen-bolt` y `tailor-board` entran en el catálogo y el manifiesto tras K5 (#56). El taller sustituye la caja provisional y lleva su propio telar visible; el telar suelto queda publicado sin duplicarse en la escena. El tablón de fachada cambia su pieza provisional por el GLB. El campo señalado por el encargo de lino muestra flores durante crecimiento y madurez, y gavillas en las demás fases. Si hay lienzo almacenado, aparece un rollo junto al taller en una celda libre. Todo se deduce del estado, sin cambios en `src/engine/`.
+
+**Comprobado.** En la villa grande, `gl-probe` dio 525 → 512 llamadas y 48 → 48 programas; `scene-report`, 472 → 467 mallas, 203 → 197 sombras y 786.222 → 787.354 triángulos. La comparación de rutas de 12 s tuvo los mismos contadores de penetración y desajuste antes y después, sin errores de página. Pasaron `typecheck`, `lint`, las pruebas de gráficos, K5, accesos y colocación, y `npm run shot`. Medidas y capturas en `docs/task-log.md`.
+
 ## v5.76 · 2 oct 2026 · K5: la sastrería y el lino, comida contra tela
 
 **Medido antes** (`docs/medidas/k5-caza-recoleccion-2026-10-02.md` §7,
