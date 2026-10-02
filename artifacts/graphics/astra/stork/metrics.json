@@ -1,0 +1,25 @@
+{
+  "triangles": 158,
+  "limit": 250,
+  "meshCount": 2,
+  "primitives": 2,
+  "dimensionsCells": [
+    0.11664939671754837,
+    0.41413078806363046,
+    0.25928252190351486
+  ],
+  "pivotsMetres": {
+    "stork_body": [
+      0,
+      0,
+      0
+    ],
+    "stork_neck": [
+      0,
+      0.81,
+      0.08
+    ]
+  },
+  "vertexColors": true,
+  "textures": 0
+}

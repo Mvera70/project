@@ -1,0 +1,30 @@
+{
+  "triangles": 88,
+  "limit": 150,
+  "meshCount": 3,
+  "primitives": 3,
+  "dimensionsCells": [
+    0.6666666865348816,
+    0.0683333333581686,
+    0.5236309766769409
+  ],
+  "pivotsMetres": {
+    "bird_body": [
+      0,
+      0,
+      0
+    ],
+    "bird_wing_l": [
+      -0.09,
+      0.17,
+      0.1
+    ],
+    "bird_wing_r": [
+      0.09,
+      0.17,
+      0.1
+    ]
+  },
+  "vertexColors": true,
+  "textures": 0
+}

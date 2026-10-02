@@ -1,0 +1,20 @@
+{
+  "triangles": 180,
+  "limit": 200,
+  "meshCount": 1,
+  "primitives": 1,
+  "dimensionsCells": [
+    0.36666667461395264,
+    0.06901097111403942,
+    0.36666667461395264
+  ],
+  "pivotsMetres": {
+    "nest": [
+      0,
+      0,
+      0
+    ]
+  },
+  "vertexColors": true,
+  "textures": 0
+}

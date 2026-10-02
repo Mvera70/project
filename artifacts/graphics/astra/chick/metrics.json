@@ -1,0 +1,20 @@
+{
+  "triangles": 70,
+  "limit": 80,
+  "meshCount": 1,
+  "primitives": 1,
+  "dimensionsCells": [
+    0.04703333228826523,
+    0.06966666923835874,
+    0.07301419228315353
+  ],
+  "pivotsMetres": {
+    "chick_body": [
+      0,
+      0,
+      0
+    ]
+  },
+  "vertexColors": true,
+  "textures": 0
+}
