@@ -1280,6 +1280,20 @@ export const BANK: Record<string, string[]> = {
   // A1 · El cierre del anillo (§1b, fase 3): la aldea deja de ser un pueblo
   // abierto. Es la línea más alta que puede decir una obra, y por eso no es un
   // `built.*` más: lo que se cuenta no es la última estaca, es la villa.
+  // AR-2 · **La primera mina abre la Edad del Hierro** (peso 3, una vez en la
+  // vida de un valle). Lo que se ve: la boca entibada al pie de la montaña,
+  // los mineros que entran y desaparecen y las vagonetas que salen cargadas.
+  'mine.opened': [
+    'In the {season} of year {year} they timbered a mouth in the mountain. The Age of Iron had begun.',
+    'The first cart of ore came out of the hillside that {season}. The forge had iron of the valley’s own.',
+    'Year {year}: a mine at the foot of the mountain, and ore on the rails. The valley entered its Age of Iron.',
+  ],
+  // AR-2 · la mina rehecha, si se hundió o ardió: ya no es una edad, es obra.
+  'built.mine': [
+    'They shored up the mine again in the {season} of year {year}.',
+    'The mine was opened anew that {season}, and the carts ran again.',
+    'In year {year} the mouth in the mountain had timber in it once more.',
+  ],
   'wall.closed': [
     'The last stake went in at {season}, and the village stood enclosed.',
     'By {season} the ring was whole: {pieces} lengths of it, and no way in but the gate.',

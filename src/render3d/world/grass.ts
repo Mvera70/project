@@ -42,6 +42,8 @@ import {
   Matrix4, MeshLambertMaterial, Quaternion, Vector3,
 } from 'three';
 import { hash32 } from '@engine/rng';
+import { MINE } from '@engine/balance';
+import { mouthFacing } from '@engine/world/mine';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { cropOf, fieldMoment } from '@engine/world/crops';
 import type { Palette } from '@derive/palette';
@@ -493,6 +495,14 @@ export function createGrass(handheld: boolean): Grass {
           if (!cut) continue;
         }
         mark(b.x, b.y, b.w, b.h, blocked);
+        // AR-2 · delante de la mina, la vía y el acopio: tierra pisada, sin
+        // hierba que tape los raíles (`world/mine-works.ts`).
+        const out = b.kind === 'mine' && b.lostTick === null ? mouthFacing(state.map, b.x, b.y) : null;
+        if (out !== null) {
+          for (let n = 1; n <= MINE.RAIL_CELLS; n += 1) {
+            mark(b.x + out.dx * n - Math.abs(out.dy), b.y + out.dy * n - Math.abs(out.dx), 1 + 2 * Math.abs(out.dy), 1 + 2 * Math.abs(out.dx), blocked);
+          }
+        }
       }
       for (const w of state.works) mark(w.x, w.y, w.w, w.h, blocked);
       const seed = state.terrainSeed;

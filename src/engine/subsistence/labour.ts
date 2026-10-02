@@ -27,7 +27,7 @@
 // y el forrajeo, que son emergencias y se sirven antes que cualquier postura.
 // Un jugador puede equivocarse; no puede saltarse la aritmética del hambre.
 
-import { BOARDS, CROWN, FOOD, FORAGE, LABOUR, TIME, MEANS } from '../balance';
+import { BOARDS, CROWN, FOOD, FORAGE, LABOUR, TIME, MEANS, MINE } from '../balance';
 import { population, workforce } from '../people/demography';
 import { toolInHand } from '../state';
 import { will } from '../people/crown';
@@ -142,6 +142,14 @@ export function allocateLabour(state: GameState, haul = 1): Allocation {
   const hunters = river ? foragers * 0.5 : foragers;
   const fishers = river ? foragers - hunters : 0;
 
+  // AR-2 · **la mina**, después del hambre y antes del bosque y la obra: lo que
+  // sobra paga a dos mineros mientras el acopio de la boca tenga sitio. Con el
+  // acopio lleno no baja nadie, y sin mina esto es cero y el reparto no se
+  // mueve ni una décima (la trayectoria de antes de la mina es la de siempre).
+  const miners = count(state, 'mine') > 0 && state.village.ore < MINE.ORE_STORE
+    ? Math.min(MINE.CREW, spare * MINE.MAX_SHARE) : 0;
+  spare -= miners;
+
   // **La aldea corta la leña que necesita, no una cuota.**
   //
   // Aquí vivía `spare * intent.timber`: una parte fija de lo que sobra iba al
@@ -183,6 +191,7 @@ export function allocateLabour(state: GameState, haul = 1): Allocation {
     hunters,
     fishers,
     wardens,
+    miners,
     // No fields worked means no harvest at all, so the factor is 0 rather than
     // a division by zero.
     labourFactor: farmDemand > 0 ? farmers / farmDemand : 0,

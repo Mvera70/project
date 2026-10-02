@@ -1874,6 +1874,67 @@ export const BOARDS = {
  * por cada 10 h si se tocan todas las señales y se acierta siempre (la cota de
  * arriba). La plata vive en 2–8 toda la partida.
  */
+/**
+ * AR-2 · **La mina y el mineral de hierro** (2 oct 2026, `world/mine.ts`).
+ *
+ * Vera: el metal sale «sobre todo de la minería», que tiene que ser «bonita de
+ * ver y de manejar como la tala de árboles», y el buhonero queda de fuente
+ * secundaria. La primera mina abre la Edad del Hierro (`docs/plan-meta.md`
+ * AR), que es la que traerá la cota de malla y el casco (AR-1). **Todas las
+ * cifras son TUNE y no se nivelan aquí**: AR-1 es la primera que gastará el
+ * mineral, y es ella la que dirá cuánto hace falta.
+ */
+export const MINE = {
+  /**
+   * La gente a partir de la cual la aldea abre la mina, **después de la edad
+   * de piedra** (una obra de piedra en pie) y con la fragua encendida. Vera:
+   * «la edad del metal después de la de piedra». TUNE: 20, la aldea que ya
+   * tiene molino a la vista (`MILL_PEOPLE` 18); la medida de la hora, en la
+   * entrada de v5.86 del changelog (`pace-report.ts`, peldaño «EDAD DEL HIERRO»).
+   */
+  PEOPLE: 20,
+  /**
+   * Las manos que la mina se lleva cada semana mientras el acopio no esté
+   * lleno. TUNE: dos, un picador y quien empuja la vagoneta, que es lo que la
+   * escena enseña (`life/mine.ts`). Como el leñador, sale de lo que sobra
+   * después de los campos, los cuervos y el forrajeo: nunca quita a nadie de
+   * la siega ni del hambre.
+   */
+  CREW: 2,
+  /** Y nunca más de esta parte de lo que sobra, para que una aldea corta no se quede sin obra. TUNE. */
+  MAX_SHARE: 0.25,
+  /** Mineral por minero y semana. TUNE: uno; con dos mineros, unos 96 al año. */
+  ORE_PER_MINER: 1,
+  /**
+   * Lo que la fragua encendida gasta del acopio cada semana: los clavos, las
+   * herraduras, los goznes y las rejas de todos los días, que hasta la mina se
+   * daban por hechos. **Es lo que mantiene la mina viva**: sin gasto, el
+   * acopio se llenaba en año y medio y la mina se paraba para el resto de la
+   * partida (medido en la semilla 7: a los seis años, ni un minero en la boca).
+   * Con él, la mina trabaja casi todas las semanas y el acopio se queda lleno
+   * para lo que pida AR-1. TUNE: uno, la mitad de lo que sacan dos mineros.
+   */
+  SMITH_ORE: 1,
+  /**
+   * Lo que cabe en el acopio de la boca. Lleno, la mina para y los mineros
+   * vuelven a lo demás: así el mineral no es una cifra que crece sola. TUNE:
+   * 120, un año y cuarto de mina; el montón tiene cuatro tamaños en la escena
+   * (`ore-pile`), un cuarto de esto cada uno.
+   */
+  ORE_STORE: 120,
+  /**
+   * Lo lejos que queda la boca del centro de la plaza, como mínimo, en celdas.
+   * TUNE: 9, fuera del caserío de once casas (el anillo se dibuja a unas once
+   * del centro); se elige la veta más cercana a partir de ahí, como el leñador
+   * tala lo más cercano.
+   */
+  MIN_DISTANCE: 9,
+  /** Cuántas de las ocho vecinas de la boca tienen que ser montaña: la mina se mete en la ladera, no en una mota. TUNE: 3, la regla de la cueva del oso. */
+  ROCK_BEHIND: 3,
+  /** Las celdas que salen rectas de la boca hacia el valle, libres para los raíles y el acopio. TUNE: 3. */
+  RAIL_CELLS: 3,
+} as const;
+
 export const HIDES = {
   /**
    * Pieles por pieza cobrada. TUNE: una por pieza grande y dos el oso; la
@@ -2401,6 +2462,14 @@ export const BUILDINGS = {
   // dónde se pone la gente, no con qué. Letalidad sin mover: 3 de 12 partidas
   // acabadas, dentro de la cuenta que B3 dejó escrita.
   bastion: { w: 1, h: 1, wood: 0, stone: 50, bp: 75, cap: 2, tier: 1, upgradeOf: 'wall', byCrossroad: false },
+  // AR-2 · **la mina**: una boca entibada en la veta, al pie de la montaña
+  // (`world/mine.ts`). 1×1 porque lo que ocupa el valle es la boca; la galería
+  // está dentro de la roca. TUNE: madera de un pozo y pico (el entibado, los
+  // raíles y la vagoneta) y obra de un granero (cavar es trabajo), sin piedra:
+  // la piedra se saca, no se pone. Tope uno: la primera abre la Edad del Hierro
+  // y la segunda no la pide nadie todavía. Arde como cualquier madera, pero no
+  // está en `FIRE_KINDS`: lo que arde de una mina es poco y no es un techo.
+  mine: { w: 1, h: 1, wood: 80, stone: 0, bp: 90, cap: 1, tier: 0, upgradeOf: null, byCrossroad: false },
 } as const;
 
 /**
