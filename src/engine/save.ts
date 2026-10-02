@@ -376,7 +376,7 @@ function isPlausibleState(value: unknown): value is GameState {
     && record(s['plaza'])
     && finite((s['plaza'] as Record<string, unknown>)['x'])
     && finite((s['plaza'] as Record<string, unknown>)['y'])
-    && record(village) && ['grain', 'wood', 'morale', 'faith', 'stone', 'silver'].every((key) => finite(village[key]))
+    && record(village) && ['grain', 'wood', 'morale', 'faith', 'stone', 'silver', 'hides'].every((key) => finite(village[key]))
     && record(s['herd']) && HERD_KINDS.every((kind) => tickValue((s['herd'] as Record<string, unknown>)[kind]))
     // La postura. Se comprueba que sea finita y no que esté en rango:
     // `allocateLabour` ya la recorta, y rechazar una partida entera por una
@@ -597,6 +597,11 @@ export function deserialize(raw: unknown): SaveFile {
   // cargando con el mismo bosque.
   if (state.rng.forest === undefined) {
     state = { ...state, rng: { ...state.rng, forest: hash32(state.seed, 'forest') } } as GameState;
+  }
+  // K5 · las pieles, **sin subir el esquema**: una partida guardada antes no
+  // había cazado ninguna que dejara piel, así que entra con cero.
+  if (record(state.village) && (state.village as Partial<GameState['village']>).hides === undefined) {
+    state = { ...state, village: { ...state.village, hides: 0 } } as GameState;
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');

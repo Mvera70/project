@@ -23,7 +23,8 @@
 // mitad pequeña que el dueño ya decidió: **entran, se llevan lo que pueden y se
 // van**, y la aldea sigue con lo que queda.
 
-import { THREAT, TIME } from '../balance';
+import { BOARDS, THREAT, TIME } from '../balance';
+import { orderLive } from './boards';
 import { defenders, resistance } from './garrison';
 import { flagSet } from '../crossroads/conditions';
 import { next } from '../rng';
@@ -73,6 +74,11 @@ export interface ThreatEvent {
    * y cuántas salvó la aldea con cubos. `null` cuando no hubo flechas.
    */
   fired?: { burnt: number; saved: number } | null;
+  /**
+   * K5 · Los que cayeron en el cerco y se levantaron porque llevaban peto de
+   * cuero (el encargo `jerkins` de la herrería). Sólo en un asalto aguantado.
+   */
+  jerkins?: number;
 }
 
 /** Lo que un asalto se lleva, para que la crónica pueda contarlo. */
@@ -280,12 +286,16 @@ function settle(state: GameState, battle?: Battle): ThreatEvent {
   }
   // Y los nuestros, si el parte dice que cayeron. Sin parte los cuenta `storm`.
   const ours = breached ? 0 : Math.min(lost, defenders(state));
-  const buried = fall(state, ours);
+  // K5 · **el peto**: de los que cayeron en la muralla, una parte se levanta.
+  // Sin dados —un acto del jugador no puede desplazar la partida— y sólo si el
+  // encargo de la herrería sigue en marcha la semana de la pelea.
+  const jerkins = orderLive(state, 'jerkins') ? Math.floor(ours * BOARDS.JERKIN_SAVE) : 0;
+  const buried = fall(state, ours - jerkins);
 
   if (!breached) {
     // E4 · el cerco aguantó, pero desde fuera prendieron tejados.
     const fired = fireArrows(state, band);
-    return { kind: 'held', band, sack: null, fallen: buried, slain, fired };
+    return { kind: 'held', band, sack: null, fallen: buried, slain, fired, jerkins };
   }
   const taken = storm(state);
   return { kind: 'stormed', band, sack: taken.sack, fallen: taken.fallen + buried, slain };

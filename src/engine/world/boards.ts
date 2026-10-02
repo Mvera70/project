@@ -66,7 +66,7 @@ export function orderLive(state: GameState, order: SmithyOrder): boolean {
   return liveOrder(state)?.order === order;
 }
 
-/** El tablón de la herrería: los tres encargos, con por qué no si no se puede. */
+/** El tablón de la herrería: los cuatro encargos, con por qué no si no se puede. */
 export function smithyOrdersOpen(state: GameState): OrderOpen[] {
   const live = liveOrder(state);
   return SMITHY_ORDERS.map((id) => {
@@ -80,7 +80,8 @@ export function smithyOrdersOpen(state: GameState): OrderOpen[] {
               // necesita para no helarse, la misma regla que K3a puso a las obras
               // (`winterReserve`). Medido: con herrajes sin parar, una semilla
               // pasó 46 semanas con la leñera vacía.
-              || state.village.wood - cost.wood < winterReserve(state) ? 'cost'
+              // K5 · un encargo sin madera (los petos) no toca la leñera.
+              || (cost.wood > 0 && state.village.wood - cost.wood < winterReserve(state)) ? 'cost'
               : null;
     return { id, cost, refusal, live };
   });
@@ -108,7 +109,7 @@ export function orderSmithy(state: GameState, order: SmithyOrder, year: number):
     entry: {
       kind: 'means',
       templateKey: `smithy.${order}.ordered`,
-      params: { year, season: seasonOf(state.tick), wood: open.cost.wood ?? 0, silver: open.cost.silver ?? 0 },
+      params: { year, season: seasonOf(state.tick), wood: open.cost.wood ?? 0, silver: open.cost.silver ?? 0, hides: open.cost.hides ?? 0 },
       weight: 2,
     },
   };

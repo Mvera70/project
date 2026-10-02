@@ -1,5 +1,29 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · K5: el cuero de la caza (v5.75)
+
+Rama `claude/k5-caza-recoleccion`, **versiones reservadas v5.75–v5.79**. Medido
+antes en `main` (`docs/medidas/k5-caza-recoleccion-2026-10-02.md`, informe
+`tools/reports/k5-report.ts`): sin arco ni lanza la caza no da piezas grandes;
+el frío no mata; el hambre y la plata aprietan. Vera eligió el cuero y que el
+peto se pida en la herrería. Hecho: `village.hides` (sin subir el esquema), el
+buhonero que compra todas las pieles, el encargo `jerkins` y su efecto en
+`settle`. Prueba: `tests/fast/k5-hides.test.ts` (11 s). Captura:
+`docs/medidas/k-img/k5-tablon-petos-{8,3}-pieles-390.png`. La suite rápida
+entera pasa en local (213 ficheros, 2106 pruebas); una partida sin caza no se
+mueve byte a byte.
+
+**Abierto:**
+
+- **De Vera:** el lino y las plantas (no empezados); el nivelado del cuero
+  (`HIDES`, `JERKIN_SAVE`): quien toca todas las señales tiene pieles para las
+  dos cosas.
+- **Sin medir:** cuántos asaltos de más trae la plata del cuero vendido.
+- **De otros carriles:** la escena del asalto no sabe del peto (combate); el
+  bastidor, el fardo y el peto en el torso (Astra); las seis ilustraciones y la
+  tarjeta (Codex, `docs/encargos/ilustraciones-k5-cuero.md`); el «+1 piel» sobre
+  el cazador.
+
 ## 2 oct 2026 · La tanda de la noche, cerrada (director)
 
 Ocho PR en `main` entre las 03:33 y las 06:52 de Madrid: #39 (v5.65), #38

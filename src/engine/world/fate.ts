@@ -19,7 +19,7 @@
 // Determinista por el flujo `fate` y nada más: ningún suceso toca otro flujo,
 // y hay prueba. El cielo lo pregunta a `world/sky.ts`, que no consume tiradas.
 
-import { DISASTER, FATE, LIFE, MEANS, OFFER, TIME } from '../balance';
+import { DISASTER, FATE, HIDES, LIFE, MEANS, OFFER, TIME } from '../balance';
 import { flagSet, ratioOf } from '../crossroads/conditions';
 import type { VisualEffect } from '../crossroads/schema';
 import { isHere, population } from '../people/demography';
@@ -156,7 +156,9 @@ function weightOf(state: GameState, id: HappeningId, ctx: Context): number {
         ? w * (aleWindow(state) ? FATE.ALE_WEDDING : 1) : 0;
     case 'pedlar':
       // M-0 · una visita no sube mientras hay otra esperando en el camino.
-      return visitable(state, 'pedlar') && ctx.season === 'summer' && state.village.wood >= OFFER.PEDLAR_WOOD * 2 ? w : 0;
+      // K5 · y sube también si hay pieles que comprar, aunque falte la leña.
+      return visitable(state, 'pedlar') && ctx.season === 'summer'
+        && (state.village.wood >= OFFER.PEDLAR_WOOD * 2 || state.village.hides >= HIDES.PEDLAR_MIN_HIDES) ? w : 0;
     case 'factor_visit':
       // Cuando sobra grano, y el doble en los tres meses después de la siega,
       // que es cuando sobra de verdad.
@@ -383,6 +385,23 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
       break;
     }
     case 'pedlar': {
+      // K5 · **si hay pieles, pide pieles**: el cuero paga más que la leña, y
+      // es la mitad de la decisión de Vera —venderlas aquí o hacer petos en la
+      // herrería—. Sin pieles, todo sigue como antes, y la partida de quien no
+      // caza no se mueve.
+      if (state.village.hides >= HIDES.PEDLAR_MIN_HIDES) {
+        // Todas las que haya, hasta el tope: vender es quedarse sin petos.
+        const hides = Math.min(HIDES.PEDLAR_MAX_HIDES, Math.floor(state.village.hides));
+        const silver = hides * HIDES.PEDLAR_SILVER_PER_HIDE;
+        postOffer(state, id,
+          [{ k: 'stat', stat: 'silver', amount: silver }],
+          [{ k: 'stat', stat: 'hides', amount: hides }]);
+        key = 'fate.pedlar.hides';
+        params['hides'] = hides;
+        params['silver'] = silver;
+        visible.push({ k: 'gather', where: 'square', days: 1 });
+        break;
+      }
       // M-0 · el buhonero ya no se lleva la leña: la **pide**, y el jugador dice.
       postOffer(state, id,
         [{ k: 'stat', stat: 'silver', amount: OFFER.PEDLAR_SILVER }],

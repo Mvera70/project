@@ -7,6 +7,7 @@
 
 import { renderUiText } from '@engine/chronicle/render';
 import type { Offer } from '@engine/state';
+import { offerKey } from '@engine/world/road';
 
 /**
  * Las cifras de una oferta, con el nombre de su bien: `{wood: 80, silver: 6}`.
@@ -27,5 +28,6 @@ export function offerParams(offer: Offer): Record<string, number> {
 
 /** Lo que la voz de la bandeja lee cuando hay alguien esperando en el camino. */
 export function offerLine(offer: Offer): string {
-  return renderUiText(`offer.${offer.id}.say`, offerParams(offer));
+  // K5 · el buhonero que pide pieles tiene su propia frase (`offerKey`).
+  return renderUiText(`${offerKey(offer)}.say`, offerParams(offer));
 }

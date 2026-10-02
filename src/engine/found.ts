@@ -89,6 +89,8 @@ export function foundGame(
       // cuando tiene fragua, la segunda le llega del camino.
       stone: 0,
       silver: 0,
+      // K5 · las pieles: sólo las trae la caza grande.
+      hides: 0,
     },
     people: foundPeople(rng, 0, profile),
     buildings: [],

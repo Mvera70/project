@@ -858,6 +858,12 @@ export const BANK: Record<string, string[]> = {
     'The pedlar of year {year} stood in the square and asked for {wood} wood, for {silver} silver.',
     'A cart came over the ridge that {season}. The pedlar wanted {wood} wood and had {silver} silver for it.',
   ],
+  // K5 · el buhonero que pide pieles (2 oct 2026): lo que la caza grande deja.
+  'fate.pedlar.hides': [
+    'A pedlar came up the road in {season} and went straight to the hides: {hides} of them, for {silver} silver.',
+    'The pedlar of year {year} had heard there was leather in the valley. {hides} hides, he said, for {silver} silver.',
+    'A cart over the ridge that {season}, and a man who knew a good hide. He wanted {hides}, and had {silver} silver.',
+  ],
   'fate.factor_visit': [
     'A grain factor rode in that {season} and offered {silver} silver for {grain} bushels.',
     'The factor of year {year} had heard the granary was full. {silver} silver for {grain} bushels, he said.',
@@ -883,6 +889,16 @@ export const BANK: Record<string, string[]> = {
     'The pedlar waited, and went on without the timber.',
     'Nobody sold the pedlar his wood that {season}. He went over the ridge empty.',
     'The cart left the square empty in year {year}. The woodpile stayed where it was.',
+  ],
+  'offer.pedlar.hides.taken': [
+    '{hides} hides went down the road with the pedlar, and {silver} silver stayed in the valley.',
+    'The pedlar rolled up {hides} hides in the {season} of year {year} and paid {silver} silver for them.',
+    'They sold the leather that {season}: {hides} hides for {silver} silver. Nobody would wear it on the wall.',
+  ],
+  'offer.pedlar.hides.gone': [
+    'The pedlar waited, and went on without the hides.',
+    'Nobody sold the pedlar the leather that {season}. It stayed on the racks.',
+    'The cart left the square in year {year} without the hides. They were wanted for something else.',
   ],
   'offer.factor_visit.taken': [
     '{grain} bushels went to the factor for {silver} silver. The road would hear of it.',
@@ -1069,6 +1085,12 @@ export const BANK: Record<string, string[]> = {
     'Ironware for the road, year {year}: the smith worked for silver instead of for the valley.',
     'The charcoal went into hinges and nails that {season}. Someone would buy them.',
   ],
+  // K5 · los petos de cuero: las pieles de la caza, al cerco.
+  'smithy.jerkins.ordered': [
+    'In the {season} of year {year} the smith cut {hides} hides into jerkins for the wall.',
+    'Leather jerkins from the forge, year {year}: {hides} hides and {silver} silver, for whoever stood on the wall.',
+    'That {season} the hides came down from the racks and went to the smith. Jerkins, for a year.',
+  ],
   'smithy.axes.done': [
     'The axes of year {year} had lost their edge by the {season}. The smith was free again.',
     'A year of good axes ended in the {season}.',
@@ -1083,6 +1105,11 @@ export const BANK: Record<string, string[]> = {
     'The last of the ironware went down the road in the {season} of year {year}. It had brought in {silver} silver.',
     'A year of nails and hinges sold: {silver} silver, by the {season} of year {year}.',
     'The smith hung up the last hinge in the {season}. The road had paid {silver} silver for a year of them.',
+  ],
+  'smithy.jerkins.done': [
+    'The jerkins of year {year} were cracked and stiff by the {season}. They hung them up.',
+    'A year of leather on the wall ended in the {season}.',
+    'By the {season} of year {year} the jerkins had done their year. The wall went back to plain wool.',
   ],
   'rite.mass.held': [
     'The priest called them to mass in the {season} of year {year}. Nobody worked that day, and nobody minded.',
@@ -1334,6 +1361,13 @@ export const BANK: Record<string, string[]> = {
     'The gate held that {season}, and {slain} of them were left in front of it.',
     'They did not get in. Year {year}: {slain} dead on the field, {fallen} of ours on the wall.',
     'The wall held in year {year}. The {slain} who fell there were not ours.',
+  ],
+  // K5 · los que el peto levantó: sólo en un asalto aguantado, con el
+  // encargo de la herrería en marcha.
+  'raid.held.jerkins': [
+    '{count} went down on the wall and got up again. The leather had taken it.',
+    'In year {year} the jerkins earned their hides: {count} who fell on the wall walked home.',
+    'The blades found leather that {season}, and {count} of ours lived who should not have.',
   ],
   // B3 · **La línea que cierra una partida.** design.md §1b: «cuando la aldea
   // muera tiene que ser que el ejército rival consiga entrar y rompa todo». Es
@@ -2795,6 +2829,7 @@ export const UI_BANK: Record<string, string> = {
   // M-0 · la oferta del camino, dicha por la voz de la bandeja. Dos botones y
   // una razón cuando no se puede pagar.
   'offer.pedlar.say': 'A pedlar wants {wood} wood for {silver} silver.',
+  'offer.pedlar.hides.say': 'A pedlar wants {hides} hides for {silver} silver.',
   'offer.factor_visit.say': 'A grain factor offers {silver} silver for {grain} bushels.',
   'offer.drover_visit.say': 'A drover sells a cow for {silver} silver.',
   'offer.salt_visit.say': 'A salter sells salt for {silver} silver.',
@@ -2850,6 +2885,8 @@ export const UI_BANK: Record<string, string> = {
   'board.until': 'Until the {season} of year {year}',
   'board.cost.wood': '{wood} wood',
   'board.cost.faith': '{faith} faith',
+  'board.cost.hides': '{hides} hides',
+  'board.hides.have': '{hides} hides on the racks.',
   'board.why.smithy': 'There is no forge standing.',
   'board.why.smith': 'The forge is cold: no smith at the anvil.',
   'board.why.busy': 'The smith is still at the last commission.',
@@ -2865,6 +2902,8 @@ export const UI_BANK: Record<string, string> = {
   'order.ploughshares.what': 'A field wants fewer hands. The rest go where the valley needs them.',
   'order.ironware.name': 'Ironware for the road',
   'order.ironware.what': 'Nails and hinges to sell to whoever passes: silver every two months. It burns wood.',
+  'order.jerkins.name': 'Leather jerkins for the wall',
+  'order.jerkins.what': 'The hides from the hunt, cut for whoever stands on the wall. Half of those who fall there get up.',
   'rite.mass.name': 'Call them to mass',
   'rite.mass.what': 'The whole valley in the chapel for a day. Spirits rise with faith; the day’s work is lost.',
   'rite.rogation.name': 'A rogation',

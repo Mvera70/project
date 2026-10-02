@@ -875,6 +875,15 @@ export function tick(
         },
         weight: 3,
       });
+      // K5 · y los que el cuero levantó del suelo.
+      if ((raid.jerkins ?? 0) > 0) {
+        say({
+          kind: 'raid',
+          templateKey: 'raid.held.jerkins',
+          params: { year: year(), season: season(), count: raid.jerkins ?? 0 },
+          weight: 2,
+        });
+      }
       // E4 · y las flechas incendiarias que dejaron al irse.
       const fired = raid.fired ?? null;
       if (fired !== null && fired.burnt + fired.saved > 0) {

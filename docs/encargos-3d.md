@@ -240,6 +240,15 @@ enseña:
   oscuras, puertas atrancadas y huertos sin cuidar contarían la bajada (se
   cruza con K11, que la muerte se vea).
 
+## El cuero de la caza (2 oct 2026, K5, v5.75)
+
+| Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
+|---|---|---|---|
+| **Las pieles** | Cada ciervo o jabalí cazado deja una piel, el oso dos (`HIDES.PER_KILL`), en `village.hides` | Sólo la cuenta en el aviso de los petos del tablón de la herrería («N on the racks»); ningún objeto en el valle | **El bastidor de pieles** junto a la casa del cazador, con más o menos pieles según la cuenta (`docs/encargos/ilustraciones-k5-cuero.md` §3, Astra). Y un «+1» con icono de piel sobre el cazador al cobrar la pieza, al lado del «+N» de grano (`renderer.ts`, `wood-gains.ts`): falta el icono `#hide` en el sprite |
+| **El buhonero que compra pieles** | Si hay 3 o más, las pide todas (hasta 12) por 2 de plata cada una | El mismo buhonero con el mismo fardo de leña | Que cargue un fardo de pieles (`life/village.ts` `tradeSites`: hoy `bundle` o `grain`) |
+| **Los petos** | Encargo `jerkins` de la herrería: 6 pieles y 4 de plata, un año | La línea de crónica y el aviso del tablón | El peto en el torso de los del cerco mientras dura (Astra) |
+| **El peto en la pelea** | De los que el parte da por caídos en un cerco que aguanta, se levanta la mitad (`settle`, `BOARDS.JERKIN_SAVE`) | La escena los tumba igual (ragdoll) y la semana siguiente están vivos; la crónica lo cuenta (`raid.held.jerkins`) | Que la escena lo sepa: un golpe sobre peto que no tumba, o el caído que se levanta. **Es del carril de física y combate** (`melee.ts`, `archery.ts`, skill `fisica-combate`), no de K5 |
+
 ## Los tablones de la herrería y de la capilla (2 oct 2026, K8+K9, v5.57)
 
 | Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
