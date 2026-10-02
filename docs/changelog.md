@@ -1,5 +1,57 @@
 # The Valley — Registro de cambios
 
+## v5.86 · 2 oct 2026 · AR-2, la minería: la mina, el mineral y la Edad del Hierro
+
+Lo pidió Vera: el metal sale «sobre todo de la minería», que tiene que ser
+«bonita de ver y de manejar como la tala de árboles», y «que la mina tuviese
+una entrada que se viese como la cueva del oso, más grande, y que entrasen y
+se viesen entrar, desaparecer y salir; carruajes con el mineral: que lleguen
+llenos, se descarguen y salgan vacíos para adentro». **La primera mina abre la
+Edad del Hierro** (`plan-meta.md` AR). Diseño en `docs/design.md` §7.18 y
+medidas en `docs/medidas/ar2-mina-2026-10-02.md`.
+
+**Motor.** La veta es una función pura del terreno (`world/mine.ts`,
+`veinSite`): al pie de la montaña, con roca detrás, tres celdas libres delante
+para los raíles y el acopio, alcanzable desde la plaza y a nueve celdas o más
+de ella; la más cercana, como el leñador. **No toca `placement.ts`.** La mina
+es un edificio (`kind: 'mine'`, 1×1, 80 de madera y 90 de obra) que §7.3 pide
+en el punto 7b tras la edad de piedra, con fragua y veinte personas; la
+primera deja `flags['age:iron']` y su línea de peso 3 (`mine.opened`). El
+mineral es una existencia nueva, `village.ore`, sin subir el esquema (una
+partida vieja carga con cero), con su acopio (`MINE.ORE_STORE`, 120) y el gasto
+de la fragua (`MINE.SMITH_ORE`, uno a la semana), **que es lo que mantiene la
+mina viva**: sin él se paraba al año y medio para siempre. Los mineros
+(`allocation.miners`, hasta dos) salen **de las manos de la obra, después del
+bosque**: sacarlos antes que a los leñadores bajaba la población final de 53 a
+37 (12 semillas × 60 años); así, 48, dentro del ruido. Sin mina el reparto no
+se mueve.
+
+**Medido** (24 semillas × 60 años, `pace-report.ts` con el peldaño nuevo):
+**la Edad del Hierro llega a las 71 h a ×1** (38–104 h, 22/24), diez horas
+después de la piedra (61 h). **El precio**, que se queda escrito para el
+nivelado: la villa cerrada pasa de 329 h (21/24) a 362 h (22/24) y la población
+final de 56 a 50; la letalidad no se mueve (2/24). El tick, de 3,80 a 3,41 ms
+por semana (`tick-bench.ts`).
+
+**Vida.** El turno del minero (`life/mine.ts`) lo mueve la escena y no su
+rutina, como la caza: entra por la boca y desaparece, sale empujando la
+vagoneta llena por los raíles (clip nuevo `push`, marcha corta por suelo
+recorrido), la vuelca de lado sobre el acopio y la mete vacía; si la vagoneta
+está fuera, sale a pie y pica la ladera (`mine`). Desde la fase 0,5 no se
+empieza nada dentro. **Render** (`world/mine-works.ts`): los modelos son de
+Astra (bloque 4 del encargo de la tanda larga); hasta que lleguen, un respaldo
+procedural con su forma, su origen y sus nombres (la cueva del oso escalada y
+entibada, raíles, una vagoneta con `ore_load` aparte, el montón en cuatro
+tamaños), y la hierba se aparta de la vía. Unas siete llamadas de dibujo.
+
+**Crónica:** `mine.opened` y `built.mine`, con sus dos ilustraciones pedidas en
+`docs/plan-arte-pendiente.md`. **Pruebas:** `tests/fast/mine.test.ts` y
+`tests/fast/life-mine.test.ts`; la suite rápida entera pasa en local (219
+ficheros, 2 141 pruebas). **Abierto:** el buhonero como fuente secundaria (con
+AR-1, que es quien gastará el mineral); lo que no se ve bien, en
+`encargos-3d.md`; y, de Vera, que `age:iron` **no** trae al rey («leader hasta
+la Edad del Hierro» en `design.md`, y la del Hierro ya es la segunda).
+
 ## v5.85 · 2 oct 2026 · La fauna por estaciones: que cada estación se note en sus animales
 
 **Sólo capa de vida, derive y render** (decisión de Vera): el motor no se toca,
