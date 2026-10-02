@@ -21,6 +21,7 @@ import { applyEffect, applyOption } from '@engine/crossroads/resolve';
 import { fireSeeds, pendingSeeds } from '@engine/crossroads/seeds';
 import { PLAGUE_BLAME } from '@engine/crossroads/catalog/plague';
 import { SMITH_FEUD } from '@engine/crossroads/catalog/feud';
+import { rectangleHeart } from '@engine/world/tiles';
 
 const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 const YEAR = TIME.WEEKS_PER_YEAR;
@@ -55,7 +56,7 @@ function village(seed: number, houses = 12): GameState {
       path: new Uint8Array(CELLS),
       ruins: new Uint8Array(CELLS),
       forestAge: new Uint8Array(CELLS),
-      forestStock: new Uint16Array(CELLS),
+      forestStock: new Uint16Array(CELLS), heart: rectangleHeart(),
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,

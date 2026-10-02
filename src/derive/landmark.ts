@@ -40,7 +40,7 @@ function nearestShore(map: ValleyMap, water: number, outsideHeart: boolean): num
     if ((map.path[cell] ?? 0) > 0) continue;
     const x = cell % map.width;
     const z = Math.floor(cell / map.width);
-    if (outsideHeart && inHeart(x, z)) continue;
+    if (outsideHeart && inHeart(map, x, z)) continue;
     const wet = [
       x > 0 ? cell - 1 : -1,
       x < map.width - 1 ? cell + 1 : -1,

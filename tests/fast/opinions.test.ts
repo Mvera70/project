@@ -16,6 +16,7 @@ import {
   worstEnemyOf,
 } from '@engine/people/opinions';
 import { decayMemories, memoriesAbout, remember, yearsSince } from '@engine/people/memories';
+import { rectangleHeart } from '@engine/world/tiles';
 
 const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 
@@ -42,7 +43,7 @@ function village(seed: number): GameState {
       path: new Uint8Array(CELLS),
       ruins: new Uint8Array(CELLS),
       forestAge: new Uint8Array(CELLS),
-      forestStock: new Uint16Array(CELLS),
+      forestStock: new Uint16Array(CELLS), heart: rectangleHeart(),
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,

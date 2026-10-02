@@ -11,6 +11,7 @@ import { makeBundle } from '@engine/rng';
 import type { GameState, Role, Trait, Villager } from '@engine/state';
 import { FEMALE_NAMES, MALE_NAMES, makeName } from '@engine/people/names';
 import { ALL_TRAITS, rollTraits, suitsRole } from '@engine/people/traits';
+import { rectangleHeart } from '@engine/world/tiles';
 import {
   FOUNDING_ROLES,
   ageOf,
@@ -47,7 +48,7 @@ function stateOf(seed: number): GameState {
       path: new Uint8Array(CELLS),
       ruins: new Uint8Array(CELLS),
       forestAge: new Uint8Array(CELLS),
-      forestStock: new Uint16Array(CELLS),
+      forestStock: new Uint16Array(CELLS), heart: rectangleHeart(),
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
