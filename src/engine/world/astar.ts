@@ -164,6 +164,22 @@ export function lastSearchBounds(): SearchBounds {
   return BOUNDS;
 }
 
+/**
+ * v5.73 · Si la última búsqueda se agotó sin llegar. Una búsqueda así ha mirado
+ * **todo** lo que se alcanza desde su salida —la frontera sólo se vacía de esa
+ * manera—, y `lastSearchSaw` dice qué. Una búsqueda que ni empezó (destino que
+ * no se pisa) no cuenta.
+ */
+let EXHAUSTED = false;
+export function lastSearchExhausted(): boolean {
+  return EXHAUSTED;
+}
+
+/** v5.73 · Si la última búsqueda llegó a mirar `cell`. Borrador compartido, como `SCRATCH`. */
+export function lastSearchSaw(cell: number): boolean {
+  return SCRATCH !== null && SCRATCH.seen[cell] === VISIT;
+}
+
 function scratchFor(cells: number): Scratch {
   if (SCRATCH === null || SCRATCH.gScore.length < cells) {
     SCRATCH = {
@@ -186,6 +202,7 @@ function scratchFor(cells: number): Scratch {
  * the day somebody tuned `PATH_DISCOUNT`.
  */
 export function route(map: ValleyMap, from: number, to: number): number[] {
+  EXHAUSTED = false;
   if (from === to) {
     BOUNDS = { x0: from % map.width, y0: Math.floor(from / map.width), x1: from % map.width, y1: Math.floor(from / map.width) };
     return [from];
@@ -259,7 +276,10 @@ export function route(map: ValleyMap, from: number, to: number): number[] {
 
   // Las vecinas de lo expandido también se miraron: un borde de una celda.
   BOUNDS = { x0: x0 - 1, y0: y0 - 1, x1: x1 + 1, y1: y1 + 1 };
-  if (scoreOf(to) === -1) return [];
+  if (scoreOf(to) === -1) {
+    EXHAUSTED = true;
+    return [];
+  }
   const path: number[] = [];
   for (let at = to; at !== -1; at = seen[at] === visit ? cameFrom[at] as number : -1) {
     path.push(at);

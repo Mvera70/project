@@ -123,13 +123,52 @@ sesión nueva de combate. Lo siguiente de K5 es **el lino** (v5.76–v5.79).
   tarjeta (Codex, `docs/encargos/ilustraciones-k5-cuero.md`); el «+1 piel» sobre
   el cazador.
 
+## 2 oct 2026 · El valle con forma natural (v5.73)
+
+Rama `ccr-2aad21e1-6aw4u1`, **versiones v5.73 (esto) y v5.74 (los usos del
+cinturón)**: v5.71 y v5.72 las tomaron rutas y K7 esta noche. Medido antes en
+`main` y decidido por Vera con las hojas delante (cenital, en su ángulo): la
+misma superficie, con falda de prado; en el cinturón, pasto, bosque de ladera y
+cantera, como vida y sin tocar el balance. Hecho: el corazón es un contorno que
+sigue al río (`world/valley-shape.ts`, `map.heart`, esquema 13 con migración
+al rectángulo), la montaña y el lago se miden desde él y el relieve 3D sube
+desde su borde. Escalera (24 semillas): edad de piedra 61 h (63), villa
+cerrada 329 h (331); la primera muralla, 193 h (157), porque el cerco sale a la
+falda. Medidas y hojas: `docs/medidas/valle-forma-2026-10-02.md`. Destapado y
+arreglado: `reachableNear` se quedaba en un rincón y la aldea se quedaba sin
+presas. Suite rápida entera en local, 2 107 en verde; las jornadas, en CI.
+
+**Las jornadas de la CI** (19 rojas en 13 ficheros), diagnosticadas en tres
+tandas contra `main`: cuatro regresiones arregladas (el corro de las
+reuniones, las cascadas de las gargantas, el zorro al amanecer y la partida que
+asalta desde la otra orilla) y el resto de trayectoria, cada una con su causa
+en la prueba (`valle-forma-2026-10-02.md` §5).
+
+**Abierto:** (1) **la cantera lejana**: con la roca a más de catorce celdas al
+albañil se le acaba la jornada antes de cargar (15 de 60 valles en `main`, 20
+con el contorno); va con la cantera al pie de la montaña, en v5.74. (2) La
+muralla en la falda llega 36 h más tarde: si pide nivelado, es de Vera. (3)
+**Pueblos sin salida por su propio cerco**: a los cuarenta años, 3 de 24 valles
+alcanzan menos de 500 celdas (1 de 24 en `main`); en la semilla 13 el único
+portón da a la montaña. Es la regla del portón (`placeBuilding` no mira adónde
+da) y va en su propia ronda, porque mueve todas las trayectorias. (4) Cerca de
+la plaza queda la mitad de sitio para campos (unos 245 → 144 sitios de 3×2):
+avisado K5, por el lino.
+**v5.74, los usos del cinturón, está hecha y sin subir**: el commit
+`9bf57322`, sobre `5575f1f5`, guardado en un `git bundle` y un `format-patch` en
+el scratchpad de la sesión (bosque de ladera, pasto de la falda, cantera al pie
+de la montaña y la senda a 0,02). Entra como PR propia cuando #48 esté en
+`main`.
+**Siguiente:** v5.74, los usos del cinturón.
+
 ## 2 oct 2026 · La tanda de la noche, cerrada (director)
 
 Ocho PR en `main` entre las 03:33 y las 06:52 de Madrid: #39 (v5.65), #38
 (v5.56), #41 (v5.70), #42 (v5.57), #43 (v5.68), #40 (v5.69), #44 (v5.71) y
 #45 (v5.72). El informe, con el orden, cómo combinan y lo que queda por dueño,
 está en `docs/medidas/fusion-2026-10-02.md`. **Abierto, de Vera:** la forma del
-valle (prototipo en `ccr-2aad21e1-6aw4u1`, cuatro preguntas pendientes); el
+valle (~~prototipo en `ccr-2aad21e1-6aw4u1`, cuatro preguntas pendientes~~
+contestadas: arriba, v5.73); el
 aviso en vida de K7; el nivelado de K8+K9; la lectura con `?aa=msaa` en la
 tablet. **Abierto, sin dueño:** la medida combinada en el aparato.
 

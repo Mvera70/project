@@ -252,14 +252,35 @@ const FOX_ALARM = 3.5;
 const FOX_REST: readonly [number, number] = [300, 300];
 /**
  * Lo más que se le deja para volver a la madriguera si el amanecer lo pilla
- * fuera: el doble de lo que tardaría en línea recta, más un margen, en pasos.
- * Es un tope de seguridad, por si la ruta se pierde; lo normal es llegar
- * andando antes. Con un tope fijo de 600 pasos (12 celdas) la semilla 23 se
- * quedaba a medio camino y volvía a desaparecer de golpe.
+ * fuera: el doble de lo que tardaría en recorrer `away` celdas, más un margen,
+ * en pasos. Es un tope de seguridad, por si la ruta se pierde; lo normal es
+ * llegar andando antes. Con un tope fijo de 600 pasos (12 celdas) la semilla 23
+ * se quedaba a medio camino y volvía a desaparecer de golpe.
+ *
+ * **`away` es lo que hay que andar —la ruta—, no la recta** (2 oct 2026). La
+ * madriguera se elige por lo cerca que queda del gallinero **en línea recta**,
+ * y con el río o el cerco de por medio la ruta da un rodeo. Medido en 28 valles
+ * de veinte vecinos, la ruta pasa del doble de la recta más el margen en cinco
+ * de ellos, tanto en `main` (semillas 5, 8, 20, 21 y 25) como con el valle de
+ * forma natural (5, 8, 11, 12 y 25): con el tope hecho sobre la recta el zorro
+ * llegaba a medias y se le daba por llegado, y desaparecía de golpe, que es lo
+ * que Vera pidió que no ocurriera.
  */
 export function foxDawnSteps(away: number): number {
   return Math.ceil((2 * away) / (FOX_PACE * LIFE_STEP)) + 150;
 }
+
+/** Lo que hay que andar de `from` a `to` por la ruta de verdad; la recta si no hay ruta. */
+function walkingDistance(land: Terrain, from: Body, to: Point): number {
+  const straight = Math.hypot(to.x - from.x, to.z - from.z);
+  const route = pathTo(land, from, to, from.radius);
+  if (route === null) return straight;
+  let along = 0;
+  let last: Point = from;
+  for (const point of route) { along += Math.hypot(point.x - last.x, point.z - last.z); last = point; }
+  return Math.max(straight, along + Math.hypot(to.x - last.x, to.z - last.z));
+}
+
 /** Lo lejos del pueblo que vive: fuera del corro de casas, como los conejos. */
 const DEN_FROM_HEART = 12;
 const DEN_FROM_BUILDING = 5;
@@ -320,7 +341,7 @@ export function stepFox(fox: Fox | null, land: Terrain, seed: number, step: numb
     const home = fox.phase === 'den' || Math.hypot(body.x - fox.den.x, body.z - fox.den.z) < 0.2;
     if (!home) {
       if (fox.phase !== 'fleeing') fox.phase = 'back';
-      fox.dawnBy ??= step + foxDawnSteps(Math.hypot(body.x - fox.den.x, body.z - fox.den.z));
+      fox.dawnBy ??= step + foxDawnSteps(walkingDistance(land, body, fox.den));
       const gone = walk(fox, land, fox.den, fox.phase === 'fleeing' ? FOX_FLEE : FOX_PACE, step, 0.15);
       if (!gone && step < fox.dawnBy) return;
     }

@@ -10,6 +10,7 @@ import { herdCapacity } from './subsistence/herd';
 import { EXPEDITION_ENDS, HAPPENINGS, HERD_KINDS, MEANS_IDS, MISSION_IDS, RITES, SCHEMA_VERSION, SMITHY_ORDERS, TAILOR_ORDERS, TERRAIN_CODE, valleyTraits } from './state';
 import { ledgerOf } from './chronicle/ledger';
 import { choosePlaza } from './world/plaza';
+import { rectangleHeart } from './world/tiles';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
 import { SEASONS } from './time';
 
@@ -315,6 +316,8 @@ function byteMap(value: unknown): boolean {
     && value['ruins'] instanceof Uint8Array && value['ruins'].length === cells
     && value['forestAge'] instanceof Uint8Array && value['forestAge'].length === cells
     && value['forestStock'] instanceof Uint16Array && value['forestStock'].length === cells
+    && value['heart'] instanceof Uint8Array && value['heart'].length === cells
+    && value['heart'].every((cell) => cell <= 1)
     // El tope sale de la tabla y no de un número escrito a mano: con la montaña
     // y el lago del mapa grande eran seis y ocho, y un validador que se queda en
     // cinco rechaza como corrupta una partida perfectamente válida.
@@ -455,7 +458,7 @@ export function deserialize(raw: unknown): SaveFile {
     }, population(legacy as GameState));
     state = { ...legacy, version: SCHEMA_VERSION, terrainSeed: legacy.seed, peakPeople: observed };
     archive = archive.map((game) => ({ ...game, terrainSeed: game.terrainSeed ?? game.seed }));
-  } else if (candidate.schema !== SCHEMA_VERSION && ![2, 3, 6, 7, 8, 9, 10].includes(candidate.schema)) {
+  } else if (candidate.schema !== SCHEMA_VERSION && ![2, 3, 6, 7, 8, 9, 10, 12].includes(candidate.schema)) {
     throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
   }
 
@@ -600,6 +603,15 @@ export function deserialize(raw: unknown): SaveFile {
   // cargando con el mismo bosque.
   if (state.rng.forest === undefined) {
     state = { ...state, rng: { ...state.rng, forest: hash32(state.seed, 'forest') } } as GameState;
+  }
+  // 12 -> 13: el contorno del valle (2 oct 2026, `world/valley-shape.ts`).
+  //
+  // **El rectángulo, y es recordar y no cambiar**: el mapa de una partida de
+  // antes se generó con el bosque, la roca y la montaña alrededor del
+  // rectángulo de `HEART`, así que ése es su valle. Darle un contorno nuevo
+  // dejaría su bosque fuera de él.
+  if ((state.map as Partial<GameState['map']>).heart === undefined) {
+    state = { ...state, version: SCHEMA_VERSION, map: { ...state.map, heart: rectangleHeart() } } as GameState;
   }
   // K5 · las pieles, **sin subir el esquema**: una partida guardada antes no
   // había cazado ninguna que dejara piel, así que entra con cero.

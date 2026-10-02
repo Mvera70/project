@@ -108,7 +108,7 @@ export function meetingPlace(
   reach?: Uint8Array,
 ): Place | null {
   if (order.kind !== 'gather') return null;
-  const at = reach === undefined ? order.at : nearestReachable(land, reach, order.at, MEETING_SEARCH);
+  const at = reach === undefined ? order.at : nearestReachable(land, reach, order.at, MEETING_CLEARING);
   if (at === null) return null;
   const offer = placedOffer(OFFERS['gather'] as OfferSpec, at, land, MEETING_HOURS, crowdSeats(land, at));
   if (offer === null) return null;
@@ -195,13 +195,30 @@ export function wolfRaidToday(state: GameState): boolean {
 const MEETING_HOURS: readonly [number, number] = [0.25, 0.75];
 
 /**
- * Cuántas celdas se busca alrededor del punto del motor una celda alcanzable.
+ * El claro que se le exige al sitio del corro, en celdas de radio.
  *
- * Seis: el edificio más grande que convoca es la iglesia (3×3), así que desde
- * su centro hay que poder salir de su huella y de la fila de alrededor. Con
- * menos, una capilla pegada a otro edificio no encuentra la salida buena.
+ * **Es el radio de un disco libre, no una distancia de búsqueda**, que es como
+ * se leía. `nearestReachable` devuelve la celda alcanzable más cercana **cuyo
+ * entorno de ese radio no toca pared, agua ni roca** (`fitsCircle`), y con seis
+ * eso es un claro de doce celdas de lado: casi el doble de lo que necesita el
+ * gentío, porque los ochenta cuerpos de `crowdSeats` ocupan unas 3,3 de radio.
+ * Con el valle rectangular se notaba poco (el corro de la capilla quedaba de 7 a
+ * 11 celdas de ella, medido en ocho semillas); con el valle de forma natural
+ * (v5.73), que lleva pedregales y río dentro del corazón, quedan pocos claros
+ * así y el corro se plantaba al otro lado del pueblo: de 7,5 a 16 celdas de la
+ * capilla en siete valles, y en cuatro de ellos el más lejano de la aldea a más
+ * de dieciséis, con toda la aldea apuntada y el corro entero —radio 4— pero
+ * lejos de la capilla.
+ *
+ * TUNE: 3,5. Con la malla de 0,7 de `crowdSeats` (2,36 plazas por celda²) un
+ * disco libre de ese radio guarda 90 plazas, que son las 80 del aforo con
+ * holgura, y es lo que el corro necesita de verdad. Con menos el aforo no
+ * cabe: a 1,5 el corro queda pegado al sitio pero se apunta menos gente (39 de
+ * 47 en la plaza de la semilla 31 y 52 de 63 en el vado de la 23, contra 42 y 61
+ * con 3,5). Con 3,5, el corro de la capilla vuelve a quedar de 5 a 11 celdas
+ * de ella (medido en siete valles).
  */
-const MEETING_SEARCH = 6;
+const MEETING_CLEARING = 3.5;
 
 /**
  * Las plazas de un gentío: una malla hexagonal alrededor del punto, de dentro

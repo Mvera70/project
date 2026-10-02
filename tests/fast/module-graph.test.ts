@@ -168,7 +168,12 @@ describe('grafo de módulos del motor', () => {
     // M-13 y M-14. tiles.ts es la hoja topológica: la geometría del mapa sin
     // el generador, para que M-14 y M-15 no arrastren el ruido.
     expect(importsOf('world/tiles.ts')).toEqual(['balance']);
-    expect(importsOf('world/mapgen.ts')).toEqual(['balance', 'rng', 'state', 'tiles']);
+    // Y desde el 2 oct 2026 el contorno del valle: `valley-shape` lo crece y
+    // `noise` es el ruido de valor que comparten los dos. Ninguno sale de
+    // `world/` ni mira a §8.
+    expect(importsOf('world/mapgen.ts')).toEqual(['balance', 'noise', 'rng', 'state', 'tiles', 'valley-shape']);
+    expect(importsOf('world/valley-shape.ts')).toEqual(['balance', 'noise', 'rng', 'tiles']);
+    expect(importsOf('world/noise.ts')).toEqual(['balance', 'rng']);
     // `tiles` desde el mapa grande: `placeBuilding` acota su barrido al
     // corazón del valle (`HEART`), que es la misma geometría que el generador
     // usa y que por eso vive en la hoja topológica. Tres módulos con su propia

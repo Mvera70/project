@@ -4,7 +4,9 @@ import { int, next } from '../rng';
 import type { RngBundle } from '../rng';
 import { TERRAIN_CODE, valleyTraits } from '../state';
 import type { ValleyMap } from '../state';
-import { HEART, idx, inHeart, neighbours4 } from './tiles';
+import { HEART, idx, neighbours4 } from './tiles';
+import { noiseGrid } from './noise';
+import { distanceOutside, shapeValley } from './valley-shape';
 
 // The M-13 contract names all four functions together (§17). The topology two
 // live in tiles.ts because M-14 and M-15 need them without pulling in the
@@ -13,19 +15,6 @@ export { idx, neighbours4 } from './tiles';
 
 interface Site { x: number; y: number }
 const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
-
-/**
- * Lo lejos que una celda está del corazón, en celdas, y 0 dentro.
- *
- * Es lo que hace que la montaña suba hacia fuera en vez de caer en manchas
- * sueltas: la sierra de `ridge.ts` empieza donde acaba el mapa, y esto es su
- * pie dentro de él.
- */
-function outOfHeart(x: number, y: number): number {
-  const dx = Math.max(0, Math.max(HEART.x0 - x, x - (HEART.x1 - 1)));
-  const dy = Math.max(0, Math.max(HEART.y0 - y, y - (HEART.y1 - 1)));
-  return Math.hypot(dx, dy);
-}
 
 /** Manhattan distance to water, including water itself at zero. */
 function riverDistances(map: ValleyMap): Int16Array {
@@ -91,22 +80,6 @@ export function foundingSite(map: ValleyMap): Site {
   return best;
 }
 
-function noiseGrid(b: RngBundle, scale: number): (x: number, y: number) => number {
-  const width = Math.ceil(WORLD.WIDTH / scale) + 1;
-  const height = Math.ceil(WORLD.HEIGHT / scale) + 1;
-  const values = Array.from({ length: width * height }, () => next(b, 'map'));
-  return (x, y) => {
-    const gx = Math.floor(x / scale);
-    const gy = Math.floor(y / scale);
-    const ease = (t: number): number => t * t * (3 - 2 * t);
-    const fx = ease(x / scale - gx);
-    const fy = ease(y / scale - gy);
-    const upper = values[gy * width + gx]! * (1 - fx) + values[gy * width + gx + 1]! * fx;
-    const lower = values[(gy + 1) * width + gx]! * (1 - fx) + values[(gy + 1) * width + gx + 1]! * fx;
-    return upper * (1 - fy) + lower * fy;
-  };
-}
-
 /**
  * El vado: las celdas de agua que se pisan para cruzar, desde una orilla.
  *
@@ -149,6 +122,7 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
     traffic: new Uint16Array(CELLS), path: new Uint8Array(CELLS),
     ruins: new Uint8Array(CELLS), forestAge: new Uint8Array(CELLS),
     forestStock: new Uint16Array(CELLS),
+    heart: new Uint8Array(CELLS),
   };
   // 2. RIVER: one continuous strip; a lateral move never skips a row.
   const entry = HEART.x0 + int(b, 'map', ...MAPGEN.RIVER_ENTRY);
@@ -170,6 +144,17 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
   const protectedCell = (x: number, y: number): boolean =>
     x >= site.x - 1 && x <= site.x + MAPGEN.CLEARING_SIZE &&
     y >= site.y - 1 && y <= site.y + MAPGEN.CLEARING_SIZE;
+  // 2b. EL VALLE: el contorno productivo alrededor del río, con el claro
+  // dentro (`valley-shape.ts`). Desde aquí, «dentro del corazón» es esto y no
+  // el rectángulo de `HEART`, que sólo queda para decidir por dónde entra el
+  // río y dónde puede caer el claro.
+  map.heart = shapeValley(b, {
+    river,
+    riverWidth: (y) => (y >= 2 * WORLD.HEIGHT / 3 ? MAPGEN.RIVER_LOWER_WIDTH : MAPGEN.RIVER_WIDTH),
+    keep: protectedCell,
+    from: { x: site.x + MAPGEN.CLEARING_SIZE / 2, y: site.y + MAPGEN.CLEARING_SIZE / 2 },
+  });
+  const outside = distanceOutside(map.heart);
 
   // 3. FOREST: two-octave value noise, thresholded by rank to meet the target.
   const broad = noiseGrid(b, MAPGEN.NOISE_SCALES[0]);
@@ -182,7 +167,7 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
       // bosque es la madera del valle y su cantidad es fija: ver
       // `WORLD.HEART_WIDTH`. Los árboles que se ven en las laderas de fuera son
       // de `ridge.ts` y no tienen tronco que contar.
-      if (!inHeart(x, y)) continue;
+      if (map.heart[cell] !== 1) continue;
       if (map.terrain[cell] !== TERRAIN_CODE.meadow || protectedCell(x, y) || distance[cell]! <= MAPGEN.MARSH_WIDTH[1]) continue;
       candidates.push({ cell, score: broad(x, y) + MAPGEN.FINE_NOISE_WEIGHT * fine(x, y)
         + MAPGEN.SLOPE_BIAS * Math.abs(2 * x / (WORLD.WIDTH - 1) - 1)
@@ -210,7 +195,7 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
       // En el corazón: la piedra de un pedregal es la de las casas de piedra
       // (§7.3), así que un pedregal a treinta celdas del pueblo no es un
       // recurso, es decorado — y ya hay montaña para eso.
-      inHeart(i % WORLD.WIDTH, Math.floor(i / WORLD.WIDTH)) &&
+      map.heart[i] === 1 &&
       map.terrain[i] === TERRAIN_CODE.meadow && distance[i]! > MAPGEN.MARSH_WIDTH[1] &&
       !protectedCell(i % WORLD.WIDTH, Math.floor(i / WORLD.WIDTH)) &&
       !neighbours4(i).some((n) => map.terrain[n] === TERRAIN_CODE.rock));
@@ -291,8 +276,8 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
       if (map.terrain[cell] !== TERRAIN_CODE.meadow) continue;
       // Ni dentro del corazón ni pegado al río: un lago sobre el cauce sería un
       // embalse, y el río es la espina del valle y tiene que llegar entero.
-      const out = outOfHeart(x, y);
-      if (inHeart(x, y) || protectedCell(x, y)) continue;
+      const out = outside[cell]!;
+      if (map.heart[cell] === 1 || protectedCell(x, y)) continue;
       if (out < MAPGEN.MOUNTAIN_FOOT || distance[cell]! <= MAPGEN.MARSH_WIDTH[1] + 1) continue;
       lakeSeeds.push({ cell, random: next(b, 'map') });
     }
@@ -308,7 +293,7 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
     // no es quien lo garantiza— y un lago dentro de la plaza del pueblo deja la
     // fundación sin sitio donde ponerse.
     const open = (cell: number): boolean => map.terrain[cell] === TERRAIN_CODE.meadow
-      && !inHeart(cell % WORLD.WIDTH, Math.floor(cell / WORLD.WIDTH))
+      && map.heart[cell] !== 1
       && !protectedCell(cell % WORLD.WIDTH, Math.floor(cell / WORLD.WIDTH))
       && distance[cell]! > MAPGEN.MARSH_WIDTH[1] + 1;
     const shore = [lakeStart.cell];
@@ -341,11 +326,11 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
       // de 144— y con eso `foundingSite` dejaba de encontrar sitio y la
       // generación se caía en la semilla 1 de 200. Un valle con un risco en
       // medio de la plaza.
-      if (inHeart(x, y) || protectedCell(x, y)) continue;
+      if (map.heart[cell] === 1 || protectedCell(x, y)) continue;
       // El río cruza la falda por el norte y por el sur, y tiene que seguir
       // cruzándola: sin esta holgura la montaña lo embalsa en el borde.
       if (distance[cell]! <= MAPGEN.MARSH_WIDTH[1]) continue;
-      const out = outOfHeart(x, y) + (relief(x, y) - 0.5) * 2 * MAPGEN.MOUNTAIN_ROUGH;
+      const out = outside[cell]! + (relief(x, y) - 0.5) * 2 * MAPGEN.MOUNTAIN_ROUGH;
       if (out <= MAPGEN.MOUNTAIN_FOOT) continue;
       const climb = Math.min(1,
         (out - MAPGEN.MOUNTAIN_FOOT) / (MAPGEN.MOUNTAIN_FULL - MAPGEN.MOUNTAIN_FOOT));

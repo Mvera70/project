@@ -20,7 +20,7 @@
 import { SKY } from '../engine/balance';
 import type { GameState } from '../engine/state';
 import { skyDice, skyOfDay, type Sky, type SkyKind } from '../engine/world/sky';
-import { HEART } from '../engine/world/tiles';
+import { heartBox, inHeart } from '../engine/world/tiles';
 
 export type { Sky, SkyKind };
 
@@ -86,8 +86,24 @@ export function boltsInDay(state: GameState, day: number): readonly number[] {
 export function boltPlace(
   state: GameState, day: number, index: number,
 ): { readonly x: number; readonly z: number } {
-  return {
-    x: HEART.x0 + dice(state.seed, day, `where:x:${index}`) * (HEART.x1 - HEART.x0),
-    z: HEART.y0 + dice(state.seed, day, `where:z:${index}`) * (HEART.y1 - HEART.y0),
-  };
+  // Desde el 2 oct 2026 el valle no es un rectángulo (`map.heart`): se tira en
+  // la caja que lo contiene y se repite, con otra sal, mientras caiga fuera
+  // del contorno. El primer intento es la tirada de siempre, así que en una
+  // partida de antes —cuyo valle es el rectángulo— el rayo cae donde caía.
+  const box = heartBox(state.map);
+  let place = { x: 0, z: 0 };
+  for (let attempt = 0; attempt < BOLT_TRIES; attempt += 1) {
+    const salt = attempt === 0 ? '' : `:${attempt}`;
+    place = {
+      x: box.x0 + dice(state.seed, day, `where:x:${index}${salt}`) * (box.x1 - box.x0),
+      z: box.y0 + dice(state.seed, day, `where:z:${index}${salt}`) * (box.y1 - box.y0),
+    };
+    if (inHeart(state.map, Math.floor(place.x), Math.floor(place.z))) return place;
+  }
+  // Ocho fallos seguidos son uno entre cien con un valle que llena casi la
+  // mitad de su caja: cae en la plaza, que es valle seguro.
+  return { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 };
 }
+
+/** Cuántas veces se vuelve a tirar un rayo que cae fuera del valle. */
+const BOLT_TRIES = 8;

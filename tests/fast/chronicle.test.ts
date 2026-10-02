@@ -29,6 +29,7 @@ import { epitaphFor, namedDeathEntry } from '@engine/chronicle/events';
 import { adjustOpinion } from '@engine/people/opinions';
 import { remember } from '@engine/people/memories';
 import { welcomeDigest } from '@engine/chronicle/digest';
+import { rectangleHeart } from '@engine/world/tiles';
 
 const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 
@@ -55,7 +56,7 @@ function village(seed: number): GameState {
       path: new Uint8Array(CELLS),
       ruins: new Uint8Array(CELLS),
       forestAge: new Uint8Array(CELLS),
-      forestStock: new Uint16Array(CELLS),
+      forestStock: new Uint16Array(CELLS), heart: rectangleHeart(),
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,

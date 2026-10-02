@@ -54,25 +54,28 @@ function assaulted(seed: number, years: number, bows: boolean): GameState {
  * nada: eso es la propiedad «sin cerco no hay guarnición», y la guarda
  * `tests/fast/garrison.test.ts`.
  */
-const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [23, 25], [11, 25]];
+const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [11, 25], [23, 25], [36, 30]];
 
 /**
- * RD-3 (1 oct 2026) · **La semilla 11 sale de la lista y queda declarada aparte**
- * (`it.fails`, abajo), con la propiedad intacta. Con el catálogo de RD-3 su
+ * RD-3 (1 oct 2026) · **La semilla 11 salió de la lista y quedó declarada aparte**
+ * (`it.fails`), con la propiedad intacta. Con el catálogo de RD-3 su
  * trayectoria cambia y a los veinticinco años —y a los treinta— la partida
  * saquea y se va sin acercarse al cerco: medido, **96 flechas, 0 aciertos**,
  * todas en el suelo a una mediana de 4,3 celdas del asaltante más cercano (la
- * más cercana a 1,2) y ninguna en el muro. Es la puntería contra una partida
- * que no se acerca, no el motor: la 7 (61 flechas, 7 aciertos) y la 23 (55, 11)
- * siguen acertando.
+ * más cercana a 1,2) y ninguna en el muro. Se leyó como puntería contra una
+ * partida que no se acerca.
+ *
+ * **Con el valle de forma natural (v5.73) vuelve a la lista, y la causa era otra**
+ * (2 oct 2026). La semilla 23 cayó igual —36 flechas, 0 aciertos— y mirando
+ * dónde estaba la partida salió lo mismo en las dos: **plantada en la otra
+ * orilla del río**, a 17 celdas de la puerta en la 11 y de 7 a 10 en la 23, al
+ * otro lado del agua. `outsideOf` (`life/raiders.ts`) cogía el campo más grande
+ * del valle y no el de la puerta, y una partida que viene a mirar el cerco
+ * desde donde no llega no se acerca a él por mucho que el cerco dispare. Con la
+ * cara de fuera del portón por delante (`fieldOutside`) la partida llega, y en
+ * esta misma jornada la 11 suelta 29 flechas y acierta 11, la 23 suelta 13 y
+ * acierta 6 y la 36 suelta 7 y acierta 6.
  */
-//
-// **K5 (v5.76, 2 oct 2026) · y se cambian las dos.** Con la sastrería la
-// trayectoria se mueve otra vez: la 11 vuelve a acercarse al cerco y acierta, y
-// la que deja de hacerlo es la 36 a los treinta años —medido: **0 flechas
-// soltadas**, el clan saquea y se va sin ponerse a tiro—. La propiedad es la
-// misma; cambia qué semilla la cumple.
-const MISSING: readonly [number, number] = [36, 30];
 
 describe('D2 · la muralla contesta', () => {
   it('se dispara, y alguna acierta, en los valles que se acercan al cerco', async () => {
@@ -103,20 +106,6 @@ describe('D2 · la muralla contesta', () => {
         .toBeLessThan(60);
       physics.dispose();
     }
-  });
-
-  it.fails('semilla 36 · la partida que no se acerca al cerco también recibe algún acierto (medido: 0 flechas)', async () => {
-    const [seed, years] = MISSING;
-    const state = assaulted(seed, years, true);
-    const physics = await createPhysics(terrainOf(state));
-    expect(physics).not.toBeNull();
-    if (physics === null) return;
-    const life = createVillage(state, 0, { physics });
-    for (let n = 0; n < DAY_STEPS; n += 1) life.step();
-    const { loosed, hits } = life.defence;
-    physics.dispose();
-    expect(loosed).toBeGreaterThan(0);
-    expect(hits, `semilla ${seed}: ${hits} de ${loosed} dieron`).toBeGreaterThan(0);
   });
 
   it('sin arcos no se suelta una sola flecha', async () => {

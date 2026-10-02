@@ -63,19 +63,41 @@ describe('IA-15/17/18 · recursos visibles', () => {
   });
 
   it('una obra de piedra manda al albañil a roca real, carga, descarga y vuelve sin inventario', () => {
-    const state = foundGame(7);
-    const house = state.buildings.find(building => building.kind === 'house')!;
-    state.works = [{
-      id: 77, kind: 'stone_house', x: house.x, y: house.y, w: house.w, h: house.h,
-      bpCost: bpCostOf('stone_house'), bpDone: 0, stoneDone: 0, materialsPaid: true,
-      startedTick: state.tick, upgradeOf: house.id,
-    }];
-    const before = JSON.stringify(state);
-    const life = Array.from({ length: 14 }, (_, day) => createVillage(state, day))
-      .find(candidate => candidate.dwellers.some(dweller =>
-        dweller.dayPlan?.job?.place.startsWith('quarry:') === true));
-    expect(life, 'alguna jornada representa la fracción de cantera de la obra').toBeDefined();
-    if (life === undefined) return;
+    // **En un valle con la roca a mano**, buscado entre varios: con la cantera
+    // a más de catorce celdas de la obra la jornada se le acaba al albañil
+    // antes de cargar (medido el 2 oct 2026: entrega a 4 y a 13 celdas, no a 17
+    // ni a 24). Con el valle de forma natural (v5.73) la roca de la semilla 7
+    // —la única que miraba esta prueba— quedó a 17. La cantera lejana es lo
+    // abierto de la de pie de monte (v5.74), no lo que se guarda aquí.
+    const reach = 14;
+    let state: ReturnType<typeof foundGame> | undefined;
+    let life: ReturnType<typeof createVillage> | undefined;
+    let before = '';
+    for (const seed of [7, 3, 11, 19, 23]) {
+      const candidate = foundGame(seed);
+      const house = candidate.buildings.find(building => building.kind === 'house')!;
+      candidate.works = [{
+        id: 77, kind: 'stone_house', x: house.x, y: house.y, w: house.w, h: house.h,
+        bpCost: bpCostOf('stone_house'), bpDone: 0, stoneDone: 0, materialsPaid: true,
+        startedTick: candidate.tick, upgradeOf: house.id,
+      }];
+      // Antes de montar ninguna jornada: la vida no puede tocar el motor.
+      const snapshot = JSON.stringify(candidate);
+      const day = Array.from({ length: 14 }, (_, n) => createVillage(candidate, n))
+        .find(one => one.dwellers.some(dweller => dweller.dayPlan?.job?.place.startsWith('quarry:') === true));
+      const job = day?.dwellers.find(dweller => dweller.dayPlan?.job?.place.startsWith('quarry:'))?.dayPlan?.job;
+      if (day === undefined || job === undefined || job === null) continue;
+      const cell = Number(job.place.split(':')[1]);
+      const far = Math.hypot(cell % candidate.map.width + 0.5 - (house.x + house.w / 2),
+        Math.floor(cell / candidate.map.width) + 0.5 - (house.y + house.h / 2));
+      if (far > reach) continue;
+      state = candidate;
+      life = day;
+      before = snapshot;
+      break;
+    }
+    expect(life, 'alguna jornada representa la fracción de cantera de la obra, con la roca a mano').toBeDefined();
+    if (life === undefined || state === undefined) return;
 
     const mason = life.dwellers.find(dweller => dweller.dayPlan?.job?.place.startsWith('quarry:'))!;
     let quarrying = false, hauling = false, unloading = false, interrupted = false;

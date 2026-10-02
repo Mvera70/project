@@ -1496,6 +1496,60 @@ export const MAPGEN = {
   ROCK_RIVER_DISTANCE: 5, // TUNE: preferred minimum distance from water.
 } as const;
 
+/**
+ * El contorno del valle productivo (2 oct 2026, `world/valley-shape.ts`).
+ *
+ * Vera: «el valle es muy cuadrado, debería tener una forma más natural, y hay
+ * zonas muy desaprovechadas». El corazón —donde nace el bosque, donde sale la
+ * piedra y donde se construye— era el rectángulo de `WORLD.HEART_WIDTH` ×
+ * `HEART_HEIGHT`, y la montaña subía por la distancia a ese rectángulo. Ahora
+ * es un contorno que sigue al río **con la misma superficie**: la economía se
+ * mide contra esa cifra (`forestLeft`, el bosque de partida) y no contra la
+ * forma, así que ninguno de estos números mueve uno de §12.9.
+ *
+ * TUNE todos, y todos son geometría: mirados en planta y en captura sobre las
+ * semillas 7, 11 y 23 (`docs/medidas/valle-forma-2026-10-02.md`).
+ */
+export const VALLEY_SHAPE = {
+  // Las filas de cada extremo del mapa que son garganta y no valle: la
+  // garganta del render se cierra en las últimas dieciocho (`gorgeAt`), y el
+  // valle tiene que haber acabado antes de que las paredes suban.
+  ENDS: 10,
+  // La media anchura del vientre a cada lado del río, en celdas, **antes** de
+  // recortar a la superficie exacta: decide las proporciones, no el tamaño.
+  HALF: 19,
+  // Cuánto cambia esa media anchura a lo largo del valle, y cada cuántas
+  // filas cambia de idea: un valle con un lado más ancho que el otro, y que
+  // no es el mismo lado de punta a punta.
+  WAVER: 0.3,
+  WAVE: 14,
+  // Lo que queda de anchura en los extremos, en fracción del vientre, y lo
+  // lleno que es el vientre (con 1 sería un seno; menos, más panzudo).
+  NARROW: 0.12,
+  BELLY: 0.7,
+  // Los lóbulos: valles laterales que suben por la ladera. **Dos al norte, a
+  // los lados de la garganta**, que son las laderas que Vera marcó, inclinados
+  // hacia el norte (radianes); y de uno a dos más en la mitad sur.
+  NORTH_LOBE_ROWS: [26, 34],
+  NORTH_LOBE_TILT: [0.15, 0.45],
+  LOBES: [1, 2],
+  LOBE_ROWS: [50, 88],
+  LOBE_SWING: 1,
+  LOBE_LENGTH: [11, 16],
+  LOBE_RADIUS: [5.5, 8],
+  // Dónde nace un lóbulo, en fracción de la media anchura desde el río.
+  LOBE_ROOT: 0.6,
+  // Los espolones: lenguas de ladera que bajan y entran en el valle.
+  SPURS: [1, 2],
+  SPUR_ROWS: [25, 87],
+  SPUR_DEPTH: [5, 9],
+  SPUR_RADIUS: [3, 5],
+  SPUR_CUT: 0.6,
+  // El borde rugoso, a dos escalas en celdas, y lo que pesa cada una.
+  ROUGH_SCALES: [5, 2.5],
+  ROUGH: [0.18, 0.1],
+} as const;
+
 // ---------------------------------------------------------------------------
 // §7.7 · The livestock
 //

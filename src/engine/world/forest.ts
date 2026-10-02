@@ -296,7 +296,7 @@ export function regrowForest(state: GameState): void {
     if (state.map.forestAge[i] === WORLD.BARREN_CLEARING || occupied[i] === 1) continue;
     const x = i % state.map.width;
     const y = Math.floor(i / state.map.width);
-    if (!inHeart(x, y) || state.map.traffic[i]! >= WORLD.PATH_T1 || fromPlaza(state, i) < clear) continue;
+    if (!inHeart(state.map, x, y) || state.map.traffic[i]! >= WORLD.PATH_T1 || fromPlaza(state, i) < clear) continue;
     const neighbours = neighbours4(i).filter((n) => before[n] === TERRAIN_CODE.forest).length;
     if (neighbours === 0) continue;
     if (next(state.rng, 'forest') >= WORLD.FOREST_SPREAD * neighbours) continue;

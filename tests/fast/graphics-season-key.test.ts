@@ -11,7 +11,7 @@ describe('season appearance key', () => {
       width: 72, height: 112,
       terrain: new Uint8Array(cells), traffic: new Uint16Array(cells),
       path: new Uint8Array(cells), ruins: new Uint8Array(cells),
-      forestAge: new Uint8Array(cells), forestStock: new Uint16Array(cells),
+      forestAge: new Uint8Array(cells), forestStock: new Uint16Array(cells), heart: rectangleHeart(),
     };
     let previousPalette = '';
     let previousKey = 0;
@@ -32,6 +32,7 @@ describe('season appearance key', () => {
 // La nieve cuaja y se funde poco a poco (Vera, 25 sep 2026: «entre cambio y
 // cambio de estación el mapa pega un cambio brusco, por ejemplo a la nieve»).
 import { snowCover, SNOW_DEEP } from '@derive/palette';
+import { rectangleHeart } from '@engine/world/tiles';
 
 describe('la nieve llega y se va poco a poco', () => {
   it('ningún salto de una semana a la siguiente pasa de un tercio de la nevada', () => {

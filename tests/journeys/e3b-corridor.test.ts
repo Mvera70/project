@@ -38,6 +38,24 @@ const all: ElevatedRingVariant[] = ['straight', 'turn', 'diagonal', 'mixed',
 //     salen en la 38: no se exigen aquí, el guardia no las necesita);
 //   · traslado planificable a los 2000 ticks, y adarve libre después: RD-1 la 20;
 //     RD-5 la 12, la 26, la 15, la 19 y la 33.
+//
+// **Con el valle de forma natural (v5.73, 2 oct 2026) todas se vuelven a mover**
+// (el mapa entero cambia, y con él la madera, los solares y el momento en que se
+// cierra el cerco: la primera muralla llega 36 h más tarde). Remedido en las
+// semillas 1 a 40 a los 3846 ticks: sólo cinco cierran el anillo (la 3, la 15, la
+// 24, la 26 y la 33), y eso es lo que decide qué villa sirve.
+//   · casa anterior en el pasillo con el anillo cerrado: la 3, y ninguna de las
+//     de arriba (medido en las semillas 1 a 56: la 12, la 21, la 49 y la 56
+//     tienen el tramo `interior` y la casa, pero el anillo sin cerrar; la 44 y
+//     la 46 lo cierran con el tramo, pero sin casa anterior pegada);
+//   · traslado planificable a los 2000 ticks, con el anillo cerrado a los 3846 y
+//     el adarve libre de lo que había: la 3, la 15 y la 33. Las demás con plan
+//     (la 6, la 7, la 9, la 12, la 13, la 17, la 19, la 21, la 22, la 23, la 27,
+//     la 32, la 35, la 36 y la 39) lo planifican y no cierran —la 36 ni siquiera
+//     tiene bastión—, y no sirven: la que iba la primera de la lista, la 32, era
+//     una de ésas.
+// Las dos declaradas en rojo de abajo (árboles y guardia) no se han vuelto a
+// medir: siguen rojas, que es lo que la CI de la rama dice.
 const ringOf = (state: GameState) => state.buildings.find(item => item.kind === 'bastion' && item.lostTick === null);
 // Cada villa se juega una vez por fichero y se entrega copiada: las pruebas
 // la tocan (rasgos, talas, traslados) y la búsqueda de candidatas repite semillas.
@@ -65,7 +83,7 @@ function firstVilla<T>(seeds: readonly number[], what: string,
 
 describe('E3b · pasillo interior de una villa real', () => {
   it('no acredita una casa existente anterior a la reserva del adarve', () => {
-    const { state, found } = firstVilla([39, 35, 20, 11, 15, 21], 'un anillo cerrado con una casa anterior en el pasillo', (candidate) => {
+    const { state, found } = firstVilla([3, 39, 35, 20, 11, 15, 21], 'un anillo cerrado con una casa anterior en el pasillo', (candidate) => {
       const bastion = ringOf(candidate);
       if (bastion === undefined) return null;
       const ring = elevatedRingOf(candidate, bastion, { approvedVariants: all, lane: 'center' });
@@ -262,44 +280,60 @@ describe('E3b · pasillo interior de una villa real', () => {
     // Por eso la lista empieza por la 20, la que sí queda libre, y la prueba
     // mide la propiedad que el traslado promete: no mueve suelo ni identidades y,
     // donde nada se construye encima después, deja el adarve listo.
-    let state: GameState | null = null;
-    let moves: ReturnType<typeof planRingCorridorMoves> = null;
+    //
     // RD-3 · con su catálogo, la primera con plan de la lista de antes lo
     // planifica pero el adarve vuelve a quedar cortado (el hueco del motor de
     // arriba). Planifican traslado y dejan el adarve libre la 31, la 32, la 37
-    // y la 39 (medido el 1 oct 2026 en las semillas 1 a 40): van delante.
-    for (const seed of [31, 32, 37, 39, 20, 12, 26, 15, 19, 33]) {
-      const candidate = played(seed, 2000);
-      const plan = planRingCorridorMoves(candidate);
-      if (plan !== null && plan.length > 0) { state = candidate; moves = plan; break; }
+    // y la 39 (medido el 1 oct 2026 en las semillas 1 a 40): iban delante.
+    //
+    // **Y con el valle de forma natural (v5.73) la precondición incluye que el
+    // anillo cierre.** Hasta aquí se tomaba la primera villa con un plan y se
+    // exigía después que su anillo estuviera cerrado, y con el cerco más tarde
+    // la primera con plan de la lista, la 32, no lo cierra a los 3846 ticks: se
+    // caía por una precondición, no por la propiedad. Ahora se juega cada
+    // candidata con plan —lo que el plan promete (no toca el suelo, no toca las
+    // identidades, es el mismo plan al repetirlo) se exige a **todas**— y la que
+    // cierra el anillo es la que mide lo último, que el pasillo queda libre de
+    // lo que había. Medido el 2 oct 2026 en las semillas 1 a 40: la 3, la 15 y la
+    // 33 (la 3 con dos movimientos, las otras dos con uno).
+    const tried: string[] = [];
+    let measured = false;
+    for (const seed of [3, 15, 33, 31, 32, 37, 39, 20, 12, 26, 19]) {
+      const village = played(seed, 2000);
+      const moves = planRingCorridorMoves(village);
+      if (moves === null || moves.length === 0) { tried.push(`${seed}: sin traslado que planificar`); continue; }
+      const beforeTerrain = village.map.terrain.slice();
+      const beforeBuildings = structuredClone(village.buildings);
+      expect(planRingCorridorMoves(village), `semilla ${seed}: el mismo plan al repetirlo`).toEqual(moves);
+      expect(village.buildings, `semilla ${seed}: planificar no mueve nada`).toEqual(beforeBuildings);
+      for (const move of moves) {
+        const building = village.buildings.find(item => item.id === move.buildingId)!;
+        expect([building.x, building.y], `semilla ${seed}`).toEqual([move.from.x, move.from.y]);
+        expect(move.to, `semilla ${seed}`).not.toEqual(move.from);
+        building.x = move.to.x;
+        building.y = move.to.y;
+      }
+      expect(village.map.terrain, `semilla ${seed}: el traslado no toca el suelo`).toEqual(beforeTerrain);
+      run(village, 1846, 'prudent', CATALOG);
+      const bastion = ringOf(village);
+      const ring = bastion === undefined ? null
+        : elevatedRingOf(village, bastion, { approvedVariants: all, lane: 'center' });
+      if (ring === null || !ring.topologyClosed) {
+        tried.push(`${seed}: plan de ${moves.length}, pero ${ring === null ? 'sin bastión' : 'el anillo no cierra'}`);
+        continue;
+      }
+      // Lo que el traslado promete: **nada de lo que había** vuelve a estar en el
+      // pasillo. Lo que se levante después es el hueco del motor de arriba, y va
+      // aparte (la prueba siguiente). Con RD-0 a RD-6 juntos (v5.52) la primera
+      // candidata con plan es justo una de ésas, y la CI de `main` se puso roja
+      // mirando el adarve entero.
+      const before = new Set(beforeBuildings.map(building => building.id));
+      expect(ringCorridorConflicts(village).filter(building => before.has(building.id)).map(building => building.id),
+        `semilla ${seed}: lo que había sigue fuera del pasillo`).toEqual([]);
+      measured = true;
+      break;
     }
-    expect(state, 'ninguna de las villas 31, 32, 37, 39, 20, 12, 26, 15, 19 y 33 tiene un traslado que planificar').not.toBeNull();
-    const village = state!;
-    const beforeTerrain = village.map.terrain.slice();
-    const beforeBuildings = structuredClone(village.buildings);
-    expect(planRingCorridorMoves(village)).toEqual(moves);
-    expect(village.buildings).toEqual(beforeBuildings);
-    for (const move of moves!) {
-      const building = village.buildings.find(item => item.id === move.buildingId)!;
-      expect([building.x, building.y]).toEqual([move.from.x, move.from.y]);
-      expect(move.to).not.toEqual(move.from);
-      building.x = move.to.x;
-      building.y = move.to.y;
-    }
-    expect(village.map.terrain).toEqual(beforeTerrain);
-    run(village, 1846, 'prudent', CATALOG);
-    const bastion = ringOf(village);
-    expect(bastion).toBeDefined();
-    const ring = elevatedRingOf(village, bastion!, { approvedVariants: all, lane: 'center' });
-    expect(ring.topologyClosed).toBe(true);
-    // Lo que el traslado promete: **nada de lo que había** vuelve a estar en el
-    // pasillo. Lo que se levante después es el hueco del motor de arriba, y va
-    // aparte (la prueba siguiente). Con RD-0 a RD-6 juntos (v5.52) la primera
-    // candidata con plan es justo una de ésas, y la CI de `main` se puso roja
-    // mirando el adarve entero.
-    const before = new Set(beforeBuildings.map(building => building.id));
-    expect(ringCorridorConflicts(village).filter(building => before.has(building.id)).map(building => building.id))
-      .toEqual([]);
+    expect(measured, `ninguna villa planifica un traslado y cierra el anillo (${tried.join('; ')})`).toBe(true);
   });
 
   // El hueco del motor, medido y declarado (1 oct 2026): el traslado aparta lo

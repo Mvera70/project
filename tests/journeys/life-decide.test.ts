@@ -293,7 +293,17 @@ describe('V-06 · elegir', () => {
   // propiedad. K1–K3 mueve la trayectoria de la villa de 40 años y el récord
   // sale **0,136**. No se baja el listón: se declara aquí, con la medida, para
   // que los otros tres asertos sigan guardando lo suyo.
-  it.fails('y dos nunca se acercan a menos de 0,15 en toda la jornada', () => {
+  //
+  // **Y vuelve a `it` con el valle de forma natural (v5.73, 2 oct 2026)**
+  // («Expect test to fail» en la CI): la villa de cuarenta años de la semilla 7
+  // es otra (42 personas; en `main`, 77) y su récord sale **0,162**. Medido el
+  // día 0 de la villa de cuarenta años en ocho semillas (7, 11, 23, 41, 3, 19, 31
+  // y 53): de 0,162 a 0,304 con el contorno, ninguna por debajo del listón, y de
+  // 0,136 a 0,255 en `main`, donde la 7 era la única que se quedaba corta. El
+  // récord de una semilla baila alrededor de 0,15 con cada trayectoria, y por eso
+  // no se toca el listón: si otra trayectoria vuelve a dejarlo por debajo, se
+  // vuelve a declarar aquí con su cifra.
+  it('y dos nunca se acercan a menos de 0,15 en toda la jornada', () => {
     expect(tightestSeen, `lo más cerca que llegan dos es ${tightestSeen.toFixed(3)}`).toBeGreaterThan(0.15);
   });
 });

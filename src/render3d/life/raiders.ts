@@ -196,8 +196,25 @@ function gateOf(state: GameState, heart: Point): Point {
  * De las dos caras de la puerta se coge la de fuera, que es la grande: el
  * interior de un cerco son un par de cientos de celdas y el campo es el resto
  * del valle.
+ *
+ * **Y la cara de fuera de verdad, la que da al portón, va antes que la más
+ * grande del valle** (2 oct 2026, valle de forma natural). «La grande» no es
+ * siempre la de la puerta: el río parte el valle en dos orillas y la del
+ * portón puede ser la pequeña, y entonces la partida se plantaba **en la
+ * otra**, al otro lado del agua (semillas 11 y 23 a los 25 años: a 18 y a 6–8
+ * celdas del portón, cero golpes a la puerta en un asalto y cero aciertos de
+ * las flechas en un saqueo). Medido en 24 semillas a 25 y 35 años, con la
+ * partida de un asalto a más de diez celdas del portón o sin llegar a
+ * montarse: 5 de 44 partidas con portón en el valle rectangular (11 %) y 10 de
+ * 39 en el del contorno (26 %: el cerco sale a la falda y la orilla de la
+ * puerta queda más corta). Con la cara de fuera por delante, 0 de 44 y 2 de
+ * 39: la semilla 22, cuyo portón da a una bolsa de catorce celdas contra la
+ * montaña y cuyo campo abierto empieza a 26,1 celdas, una más allá de
+ * `MAX_ENTRY`. Ver `fieldOutside`.
  */
 function outsideOf(land: Terrain, gate: Point, heart: Point): Uint8Array | null {
+  const own = fieldOutside(land, gate, heart);
+  if (own !== null) return own;
   const candidates: Point[] = [
     { x: gate.x + 1, z: gate.z }, { x: gate.x - 1, z: gate.z },
     { x: gate.x, z: gate.z + 1 }, { x: gate.x, z: gate.z - 1 },
@@ -231,6 +248,44 @@ function outsideOf(land: Terrain, gate: Point, heart: Point): Uint8Array | null 
 
 /** A qué distancia de la plaza se busca campo abierto, en celdas. */
 const OPEN_COUNTRY = 22;
+
+/**
+ * El campo al que da la cara de fuera del portón, o nada si no lleva a ninguna
+ * parte.
+ *
+ * **Se inunda con el portón cerrado**, porque en el suelo de la vida la celda
+ * del portón es pisable (`terrain.ts`: sólo la muralla corta) y abierta unía el
+ * interior del cerco con el campo en una sola región: la inundación «de la
+ * puerta» era el pueblo entero más lo que hubiera fuera, y los cuerpos podían
+ * acabar plantados dentro. La cara de fuera es la que queda más lejos del
+ * corazón que la propia puerta (un palmo de margen: el vecino de al lado, a lo
+ * largo de la muralla, no cuenta). Si ese campo no llega a dar una entrada
+ * (`roadInto`: una celda a diez de la puerta o más) es la bolsa de ocho celdas
+ * de la semilla 7 y lo de siempre manda: el campo más grande que se encuentre.
+ * Sin portón en pie, `gateOf` devuelve el corazón mismo y no hay cara que mirar.
+ */
+function fieldOutside(land: Terrain, gate: Point, heart: Point): Uint8Array | null {
+  if (gate === heart) return null;
+  const shut: Terrain = { ...land, blocked: land.blocked.slice() };
+  shut.blocked[Math.floor(gate.z) * land.width + Math.floor(gate.x)] = 1;
+  const gateFar = Math.hypot(gate.x - heart.x, gate.z - heart.z);
+  let best: Uint8Array | null = null;
+  let bestSize = 0;
+  for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+    const at = { x: gate.x + dx, z: gate.z + dz };
+    if (at.x < 1 || at.z < 1 || at.x > land.width - 2 || at.z > land.height - 2) continue;
+    if (blockedAt(shut, at.x, at.z)) continue;
+    if (Math.hypot(at.x - heart.x, at.z - heart.z) < gateFar + OUTER_MARGIN) continue;
+    const reach = reachableFrom(shut, at);
+    let size = 0;
+    for (let i = 0; i < reach.length; i += 1) size += reach[i]!;
+    if (size > bestSize && roadInto(shut, gate, reach) !== null) { best = reach; bestSize = size; }
+  }
+  return best;
+}
+
+/** Cuánto más lejos del corazón que la puerta tiene que quedar una cara para ser la de fuera, en celdas. */
+const OUTER_MARGIN = 0.3;
 
 /**
  * Por dónde entran: el suelo alcanzable más lejano de la puerta, dentro de lo

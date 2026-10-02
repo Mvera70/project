@@ -157,11 +157,28 @@ export function reachableFrom(land: Terrain, from: Point): Uint8Array {
   return seen;
 }
 
-/** Recupera la orilla del centro aunque el centro geométrico caiga en una casa. */
+/**
+ * Recupera la orilla del centro aunque el centro geométrico caiga en una casa.
+ *
+ * **Y no se queda en un hueco** (2 oct 2026): la primera celda libre alrededor
+ * de una casa puede ser un rincón de una celda entre la casa y una valla, y
+ * desde ahí no se llega a ninguna parte. Pasó en una aldea de veinte con el
+ * valle nuevo —el centro caía en una casa y el rincón de al lado estaba
+ * cerrado—, y sin orilla no nacía ninguna presa: ni perdiz, ni conejo, ni
+ * jabalí. Una orilla es lo que da para andar; un rincón se salta.
+ */
 export function reachableNear(land: Terrain, from: Point): Uint8Array {
   const x0 = Math.floor(from.x), z0 = Math.floor(from.z);
+  let best: Uint8Array | null = null;
+  let bestSize = 0;
+  const consider = (reach: Uint8Array): boolean => {
+    let size = 0;
+    for (const cell of reach) size += cell;
+    if (size > bestSize) { best = reach; bestSize = size; }
+    return size >= MIN_SHORE;
+  };
   if (x0 >= 0 && z0 >= 0 && x0 < land.width && z0 < land.height
-    && land.blocked[z0 * land.width + x0] !== 1) return reachableFrom(land, from);
+    && land.blocked[z0 * land.width + x0] !== 1 && consider(reachableFrom(land, from))) return best!;
   for (let ring = 1; ring <= Math.max(land.width, land.height); ring += 1) {
     for (let dz = -ring; dz <= ring; dz += 1) {
       for (let dx = -ring; dx <= ring; dx += 1) {
@@ -169,12 +186,19 @@ export function reachableNear(land: Terrain, from: Point): Uint8Array {
         const x = x0 + dx, z = z0 + dz;
         if (x < 0 || z < 0 || x >= land.width || z >= land.height
           || !fitsCircle(land, x + 0.5, z + 0.5, 0.38)) continue;
-        return reachableFrom(land, { x: x + 0.5, z: z + 0.5 });
+        if (consider(reachableFrom(land, { x: x + 0.5, z: z + 0.5 }))) return best!;
       }
     }
   }
-  return new Uint8Array(land.width * land.height);
+  return best ?? new Uint8Array(land.width * land.height);
 }
+
+/**
+ * Cuánto suelo tiene que dar una orilla para no ser un rincón, en celdas.
+ * TUNE: dieciséis, un cuadrado de cuatro por cuatro. El rincón que se medía
+ * era de una celda y la orilla de esa aldea, de casi cuatro mil.
+ */
+const MIN_SHORE = 16;
 
 /** Si desde `from` se puede llegar andando a `to`. */
 export function canReach(land: Terrain, reach: Uint8Array, to: Point): boolean {

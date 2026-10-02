@@ -353,6 +353,12 @@ export interface ValleyMap {
    * either takes a whole cell a week or nothing at all.
    */
   forestStock: Uint16Array;
+  /**
+   * El valle productivo, 1 dentro y 0 fuera (2 oct 2026, `world/valley-shape.ts`):
+   * donde nace el bosque, sale la piedra y se construye. Era el rectángulo de
+   * `HEART`, y es el que traen las partidas de antes (esquema 13).
+   */
+  heart: Uint8Array;
 }
 
 export type BuildingId = number;
@@ -982,7 +988,9 @@ export type MigrationEvent =
  */
 // 12: la madera llega de una en una (`woodRun`). Sin migración, por decisión
 // del dueño del diseño (28 sep 2026): una partida del esquema 11 no carga.
-export const SCHEMA_VERSION = 12; // 11 era B1: el clan vecino
+// 13: el contorno del valle (`map.heart`, 2 oct 2026). Con migración: una
+// partida de antes recibe el rectángulo, que es con lo que se generó su mapa.
+export const SCHEMA_VERSION = 13; // 11 era B1: el clan vecino
 // F3a no sube el esquema: `ArchivedGame.ledger` es opcional y lo que falta se
 // recuenta de la crónica, así que una partida vieja carga sin migración.
 

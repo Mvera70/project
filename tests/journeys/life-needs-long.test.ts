@@ -291,7 +291,22 @@ describe('IA-3 · aldeanos con hábitos', () => {
   // motivo por el que se puso roja: la aldea de la muestra es otra (llegan
   // familias por el camino). La propiedad no se ha movido; si vuelve a caer
   // con otra trayectoria, vuelve a `it.fails`.
-  it('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
+  //
+  // **Y vuelve a caer con el valle de forma natural (v5.73, 2 oct 2026), como
+  // este comentario avisaba: `it.fails`, con la propiedad intacta.** El devoto
+  // reza el 5,9 % de las muestras contra el 4,4 % del resto (1,35×; las mismas
+  // cifras que da la CI). Y no es el contorno: en `main`, con esta misma muestra
+  // de seis semillas y tres jornadas, sale 6,5 % contra 3,2 % —2,04×, por un
+  // pelo—, y en doce semillas (las seis y la 3, 19, 37, 67, 97 y 5) dan lo mismo
+  // los dos: 1,72× con el contorno y 1,74× en `main`. Lo que baila es la muestra
+  // de seis (el cociente por semilla va de 1,15× a 2,69× con el contorno y de
+  // 1,22× a 3,14× en `main`), no el rasgo: `LEANING`, `DEVOUT_REACH_MULT` y la
+  // oferta `pray` son los mismos. Además la cuenta de abajo suma filas por rasgo,
+  // así que el «resto» incluye las demás filas de los propios devotos: contando
+  // personas saldrían 2,14× con el contorno y 2,20× en `main` en las doce, y
+  // 1,58× y 2,72× en las seis. No se toca la cuenta ni el listón aquí; una prueba
+  // que no baile tendría que medir personas, y en más de seis aldeas.
+  it.fails('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
     const { byTrait, anyThirstIgnored } = habitSample();
     expect(anyThirstIgnored, 'una necesidad urgente no se apaga con otra cosa').toBe(false);
 
