@@ -16,6 +16,18 @@ ningún valle cae (sin la regla de los cuatro campos trabajados caían 7 de 12).
 villa cerrada de 331 a 350 h. Pruebas: `tests/fast/k5-linen.test.ts` (4 s).
 Captura: `docs/medidas/k-img/k5-tablon-sastreria-390.png`.
 
+**En pausa (2 oct, 14:25 Madrid, por crédito): lo que falta para la PR.**
+Las jornadas enteras dieron 17 fallos en 12 ficheros con la primera versión.
+Arreglados después: los hitos de la sastrería (banco), la sastrería en el
+borde del núcleo y no pegada a la plaza (tapaba el puesto del buhonero y los
+corros), y detrás de las defensas en la cola. **Falta**: volver a correr esos
+12 ficheros (archery, assault, e3b-corridor, life-decide, life-lost-child,
+life-props, life-staging, life-trade, threat-defence, ui-milestones-long,
+visit-sign, works) y tratar lo que siga rojo como en K1–K3 (semilla por
+precondición o `it.fails` con lo medido); traer `main` (#49, #50; mover a
+«Repartidas» las tres ideas de `docs/ideas.md` que esta ronda escribe); la
+suite rápida entera; y abrir la PR. El nivelado del lino va con el de todos.
+
 **Abierto:**
 
 - **De Vera:** qué encargos de la plaza se mudan a su oficio según su regla
