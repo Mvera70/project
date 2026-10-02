@@ -1,5 +1,44 @@
 # The Valley — Registro de cambios
 
+## v5.80 · 2 oct 2026 · El peto se ve en la muralla, y la escena lo sabe
+
+**Por qué.** Desde v5.75 la herrería hace petos de cuero y el motor levanta a la
+mitad de los caídos de un cerco que aguanta, pero la escena del asalto no sabía
+que existían: los del cerco se veían igual y la pelea no los contaba. Para el
+jugador el peto no existía.
+
+**Lo que cambia.** Mientras dura el encargo `jerkins`, todo el cerco lo lleva
+puesto (`Garrison.jerkins`, leído del motor con `orderLive`, la misma lectura
+que hace `settle`): seis cajas colgadas del hueso `spine` —cuero, hombreras que
+ensanchan los hombros y una bandolera clara— que se leen a escala de móvil
+(`render3d/world/jerkin.ts`, una malla y un material para todos). En la pelea,
+`stepMelee` sabe quién lo lleva y **lo cuenta en sombra** (`jerkinTally`:
+golpes al cuero, caídos con peto, cuántos aguantarían ese golpe), y la cuenta
+sale para el sonido en `moments.battle.jerkinBlows` (fila nueva en director §2).
+El banco gana el mando «Petos» —sin, con, y con que deciden aquí— y sus cifras,
+y `battle-report.ts --jerkins` corre cada asalto sin peto, con peto en sombra y
+con peto que decide, y pasa cada parte por el motor de verdad.
+
+**Dónde vive el efecto: en el motor, y en un solo sitio.** La escena no decide
+(el juego llama a `stepMelee` sin golpes de más); hacerlo pediría que el motor
+dejara de levantar caídos cuando hay parte, o el peto contaría dos veces.
+`JERKIN_EXTRA_BLOWS` (1, `TUNE`) queda medido para el banco y el nivelado.
+
+**Medido** (`docs/medidas/k5-petos-asalto-2026-10-02.md`, 4 semillas × 5
+jornadas con relieve, 80 asaltos por rama): la sombra es neutra en todos. En
+las peleas que da la escena caen de 0 a 3 defensores, y con el redondeo hacia
+abajo de `JERKIN_SAVE` **el motor no levantó a nadie en 20 asaltos de la
+configuración del juego** (6 contra 12); si el cerco cae, no mira el parte.
+Dejar que el peto decida en la escena ahorra una o dos décimas de caído por
+asalto, y donde todo es cuerpo a cuerpo (10 lanzas contra 24) los del peto
+tumban un 57 % más de asaltantes (2,9 → 4,55), aunque el cerco cae igual. Para
+el nivelado, no para ahora (Vera: los sistemas primero).
+
+**Abierto**: la pelea con petos vista en un aparato (en el contenedor la escena
+no llega al choque); el caído que se levanta no se ve; un peto modelado si
+Astra lo mejora (`docs/encargos-3d.md`). Sin crónica nueva: no hay imagen que
+pedir.
+
 ## v5.75 · 2 oct 2026 · K5: el cuero de la caza, vendido o hecho peto
 
 **Medido antes** (`docs/medidas/k5-caza-recoleccion-2026-10-02.md`, informe nuevo

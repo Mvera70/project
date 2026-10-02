@@ -1,0 +1,40 @@
+semilla 7 jornada 0: sin peto 2 caídos · en sombra igual (6 golpes al peto) · decidiendo 2 caídos, 11 asaltantes
+semilla 7 jornada 1: sin peto 1 caídos · en sombra igual (5 golpes al peto) · decidiendo 1 caídos, 12 asaltantes
+semilla 7 jornada 2: sin peto 1 caídos · en sombra igual (3 golpes al peto) · decidiendo 1 caídos, 12 asaltantes
+semilla 7 jornada 3: sin peto 0 caídos · en sombra igual (2 golpes al peto) · decidiendo 0 caídos, 12 asaltantes
+semilla 7 jornada 4: sin peto 2 caídos · en sombra igual (6 golpes al peto) · decidiendo 2 caídos, 12 asaltantes
+semilla 11 jornada 0: sin peto 0 caídos · en sombra igual (2 golpes al peto) · decidiendo 0 caídos, 12 asaltantes
+semilla 11 jornada 1: sin peto 0 caídos · en sombra igual (0 golpes al peto) · decidiendo 0 caídos, 10 asaltantes
+semilla 11 jornada 2: sin peto 0 caídos · en sombra igual (0 golpes al peto) · decidiendo 0 caídos, 12 asaltantes
+semilla 11 jornada 3: sin peto 0 caídos · en sombra igual (0 golpes al peto) · decidiendo 0 caídos, 12 asaltantes
+semilla 11 jornada 4: sin peto 0 caídos · en sombra igual (0 golpes al peto) · decidiendo 0 caídos, 10 asaltantes
+semilla 21 jornada 0: sin peto 1 caídos · en sombra igual (3 golpes al peto) · decidiendo 1 caídos, 4 asaltantes
+semilla 21 jornada 1: sin peto 0 caídos · en sombra igual (2 golpes al peto) · decidiendo 0 caídos, 3 asaltantes
+semilla 21 jornada 2: sin peto 0 caídos · en sombra igual (0 golpes al peto) · decidiendo 0 caídos, 0 asaltantes
+semilla 21 jornada 3: sin peto 1 caídos · en sombra igual (3 golpes al peto) · decidiendo 1 caídos, 6 asaltantes
+semilla 21 jornada 4: sin peto 1 caídos · en sombra igual (3 golpes al peto) · decidiendo 0 caídos, 4 asaltantes
+semilla 42 jornada 0: sin peto 0 caídos · en sombra igual (1 golpes al peto) · decidiendo 0 caídos, 12 asaltantes
+semilla 42 jornada 1: sin peto 0 caídos · en sombra igual (2 golpes al peto) · decidiendo 0 caídos, 12 asaltantes
+semilla 42 jornada 2: sin peto 1 caídos · en sombra igual (4 golpes al peto) · decidiendo 1 caídos, 12 asaltantes
+semilla 42 jornada 3: sin peto 1 caídos · en sombra igual (3 golpes al peto) · decidiendo 1 caídos, 8 asaltantes
+semilla 42 jornada 4: sin peto 1 caídos · en sombra igual (4 golpes al peto) · decidiendo 1 caídos, 12 asaltantes
+
+K5 · el peto en la pelea: 20 jornadas (4 semillas × 5), 6 en el cerco (bow) contra 12, año 60, suelo con el relieve del juego
+  sombra neutra: 20 de 20 jornadas dan el mismo resultado con peto en sombra que sin peto
+  sin peto
+    caídos en la escena (lost): media 0.60 · mediana 1 · p90 2 · máx 2
+    asaltantes caídos: media 9.35 · mediana 12 · p90 12 · máx 12 · entraron en 8 de 20
+    el motor: entierra media 3.00 · mediana 1 · p90 7 · máx 7; tomado en 8 de 20
+  peto en sombra (hoy: decide el motor)
+    caídos en la escena (lost): media 0.60 · mediana 1 · p90 2 · máx 2
+    asaltantes caídos: media 9.35 · mediana 12 · p90 12 · máx 12 · entraron en 8 de 20
+    el motor con el encargo: entierra media 3.00 · mediana 1 · p90 7 · máx 7; tomado en 8 de 20; levanta 0 en total
+    en sombra: golpes al peto media 2.45 · mediana 3 · p90 6 · máx 6; caídos con peto 12, de ellos 12 en un golpe que uno más de aguante no habría tumbado
+  peto que decide en la escena (+1 golpe), sin el motor
+    caídos en la escena (lost): media 0.55 · mediana 0 · p90 2 · máx 2
+    asaltantes caídos: media 9.40 · mediana 12 · p90 12 · máx 12 · entraron en 7 de 20
+    el motor: entierra media 2.75 · mediana 1 · p90 7 · máx 7; tomado en 7 de 20
+  peto que decide en la escena y además el motor (doble)
+    caídos en la escena (lost): media 0.55 · mediana 0 · p90 2 · máx 2
+    asaltantes caídos: media 9.40 · mediana 12 · p90 12 · máx 12 · entraron en 7 de 20
+    el motor con el encargo: entierra media 2.70 · mediana 1 · p90 7 · máx 7; tomado en 7 de 20; levanta 1 en total

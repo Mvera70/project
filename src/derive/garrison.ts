@@ -26,6 +26,7 @@
 
 import { THREAT } from '@engine/balance';
 import { alertOf, defenders } from '@engine/world/garrison';
+import { orderLive } from '@engine/world/boards';
 import type { Building, GameState } from '@engine/state';
 
 /** Con qué se ocupa un puesto. */
@@ -57,9 +58,22 @@ export interface Garrison {
   readonly hands: number;
   /** Los puestos que se ocupan hoy, los primeros los que más importan. */
   readonly posts: readonly Post[];
+  /**
+   * K5 · **Si los del cerco llevan peto.** Lo dice el encargo `jerkins` de la
+   * herrería en marcha (`orderLive`), la misma lectura que hace `settle` en el
+   * motor para levantar a la mitad de los caídos: un solo sitio dice si hay
+   * petos, y la escena sólo los enseña. Todos o ninguno: el encargo viste al
+   * cerco, no a una persona.
+   */
+  readonly jerkins: boolean;
 }
 
-const NOBODY: Garrison = { manned: false, why: null, hands: 0, posts: [] };
+const NOBODY: Garrison = { manned: false, why: null, hands: 0, posts: [], jerkins: false };
+
+/** Si el encargo de los petos está en marcha esta semana. */
+export function jerkinsOn(state: GameState): boolean {
+  return orderLive(state, 'jerkins');
+}
 
 /**
  * Los puestos del cerco, por orden de lo que importan.
@@ -105,12 +119,12 @@ export function postsOf(state: GameState): Post[] {
  * el arma que se elijan, sin el tope de `defenders` (§12). El portón se sigue
  * sujetando con lanzas. **Sólo para el banco**: el juego usa `garrisonOf`.
  */
-export function garrisonAs(state: GameState, hands: number, arm: Arm): Garrison {
+export function garrisonAs(state: GameState, hands: number, arm: Arm, jerkins = jerkinsOn(state)): Garrison {
   const posts = postsOf(state)
     .map((post): Post => post.on === 'gate' ? post : { ...post, arm })
     .slice(0, Math.max(0, Math.floor(hands)));
   if (posts.length === 0) return NOBODY;
-  return { manned: true, why: 'arrived', hands: posts.length, posts };
+  return { manned: true, why: 'arrived', hands: posts.length, posts, jerkins };
 }
 
 /**
@@ -123,7 +137,7 @@ export function garrisonOf(state: GameState): Garrison {
   if (hands === 0) return NOBODY;
   const posts = postsOf(state).slice(0, hands);
   if (posts.length === 0) return NOBODY;
-  return { manned: true, why, hands: posts.length, posts };
+  return { manned: true, why, hands: posts.length, posts, jerkins: jerkinsOn(state) };
 }
 
 /**
