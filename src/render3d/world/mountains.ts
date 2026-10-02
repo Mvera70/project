@@ -1129,8 +1129,19 @@ function hullAt(hull: readonly { t: number; y: number }[], t: number): number {
   return hull[hull.length - 1]!.y;
 }
 
-/** Lo que la senda se levanta sobre el suelo, en celdas. TUNE: con 0,02 el suelo, que no es plano entre vértices, la tapaba a trozos. */
-const ROAD_LIFT = 0.07;
+/**
+ * Lo que la senda se levanta sobre el suelo, en celdas.
+ *
+ * TUNE (v5.74): 0,02. Vera, con la senda ya pegada al suelo (v5.70): «el camino
+ * flotando… casi». Iba a 0,07 por encima de lo que se dibuja (el peor vértice a
+ * 0,09) y de lejos se leía como una cinta posada. Con 0,02 el suelo la tapaba a
+ * trozos cuando la cota salía de la fórmula de la sierra; desde que cada vértice
+ * se apoya en la malla dibujada (`surface`) ya no: medido en ocho semillas
+ * (9 025 vértices, `gorge-road-measure.ts`), ninguno por debajo, nada tapado y
+ * el 98,4 % a menos de 0,05; los que pasan, hasta 0,11, están en la costura con
+ * la sierra del borde del mapa. Con 0,07 iban todos a 0,07.
+ */
+const ROAD_LIFT = 0.02;
 /** Lo que la cinta queda, como poco, por encima del suelo entre sus vértices, en celdas. */
 const ROAD_SEAM = 0.01;
 /**

@@ -87,7 +87,8 @@ export const JOURNEY_WEIGHTS: Readonly<Record<string, number>> = {
   'life-orders': 50,
   'raiders': 49,
   'daylife-long': 46,
-  'life-wood-run': 43,
+  // v5.74: doce aldeas y tres jornadas en vez de cuatro y dos; 95 s en local.
+  'life-wood-run': 100,
   'life-commitments-long': 41,
   'visit-sign': 40,
   'marks-long': 37,
