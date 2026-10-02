@@ -15,6 +15,8 @@ import { STRIKE_AT, VILLAGER_CLIPS, type ClipName } from './clips';
 export const ACTION_CLIPS: readonly ClipName[] = [
   'sit', 'talk', 'pray', 'hammer', 'chop', 'mine', 'sow', 'spread', 'douse', 'play', 'throw', 'drink', 'sort', 'shelter',
   'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'spear_thrust_high', 'spear_thrust_low', 'hit_take', 'fall', 'flee',
+  // AR-2 · empujar la vagoneta de la mina.
+  'push',
 ];
 
 export function actionClips(idle: AnimationClip): AnimationClip[] {
@@ -96,6 +98,36 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
           const t = n / 24; times.push(t * duration);
           const drop = Math.max(-0.1, Math.max(extent(1, t), extent(-1, t)) - 2 * LEG);
           values.push(at[0]!, at[1]! + drop + 0.03 * (1 - Math.abs(wave(t))), at[2]!);
+        }
+        clip.tracks = clip.tracks.filter(track => track.name !== root.name);
+        clip.tracks.push(new VectorKeyframeTrack(root.name, times, values));
+      }
+    } else if (name === 'push') {
+      // AR-2 · **Empujar la vagoneta**: una marcha corta y cargada, por suelo
+      // recorrido como `walk`, con los dos brazos rectos al frente a la altura
+      // del pecho (el borde de la caja) y el tronco echado hacia delante, que
+      // es lo que se lee a la distancia del móvil. Las piernas, como la huida
+      // pero a media amplitud, y la cadera baja con la pierna que apoya.
+      const thigh = (side: 1 | -1, t: number): number => 0.42 * side * wave(t);
+      const bend = (side: 1 | -1, t: number): number => 0.2 + 0.55 * Math.max(0, -side * wave(t));
+      turn('thigh.L', x, t => thigh(1, t)); turn('shin.L', x, t => bend(1, t));
+      turn('thigh.R', x, t => thigh(-1, t)); turn('shin.R', x, t => bend(-1, t));
+      for (const side of ['L', 'R']) {
+        turn(`upperarm.${side}`, x, t => -1.2 + 0.05 * wave(t * 2));
+        turn(`forearm.${side}`, x, () => -0.3);
+      }
+      turn('spine', x, t => 0.38 + 0.03 * Math.abs(wave(t)));
+      turn('head', x, () => -0.22);
+      const root = idle.tracks.find(track => track.name === 'hips.position');
+      if (root !== undefined) {
+        const LEG = 0.38, extent = (side: 1 | -1, t: number): number => {
+          const a = thigh(side, t), b = bend(side, t);
+          return LEG * Math.cos(a) + LEG * Math.cos(a - b);
+        };
+        const at = Array.from(root.values.slice(0, 3)), times: number[] = [], values: number[] = [];
+        for (let n = 0; n <= 24; n++) {
+          const t = n / 24; times.push(t * duration);
+          values.push(at[0]!, at[1]! + Math.max(-0.08, Math.max(extent(1, t), extent(-1, t)) - 2 * LEG), at[2]!);
         }
         clip.tracks = clip.tracks.filter(track => track.name !== root.name);
         clip.tracks.push(new VectorKeyframeTrack(root.name, times, values));

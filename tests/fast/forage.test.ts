@@ -153,6 +153,8 @@ describe('el forrajeo no desplaza nada · §4.3', () => {
     const fed = allocateLabour(withGrainYears(village(20), 3));
     const hungry = allocateLabour(withGrainYears(village(20), 0));
     const reserve = fed.workforce * LABOUR.WORKS_RESERVE;
-    expect(hungry.cutters + hungry.builders).toBeGreaterThanOrEqual(reserve * 0.5);
+    // AR-2 · los mineros salen de las manos de la obra (`labour.ts`): siguen
+    // siendo obra a efectos de la reserva, que el forrajeo no puede tocar.
+    expect(hungry.cutters + hungry.builders + hungry.miners).toBeGreaterThanOrEqual(reserve * 0.5);
   });
 });

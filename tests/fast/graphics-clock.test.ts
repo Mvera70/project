@@ -253,9 +253,14 @@ describe('G-04 · los clips del aldeano', () => {
     // Tres: sólo la carrera fabricada anda. Los gestos clonados del `idle` no
     // tienen paso que medir; `flee` es la excepción deliberada de E1, fabricada
     // con piernas y brazos en ciclo y por eso gobernada por suelo recorrido.
+    // AR-2 · y `push`, empujar la vagoneta: la segunda marcha fabricada, por
+    // la misma razón (el minero anda mientras empuja).
     for (const name of ACTION_CLIPS) {
       if (name === 'flee') {
         expect(VILLAGER_CLIPS[name]).toMatchObject({ seconds: 0.8, loop: true, strideLength: 0.7 });
+      } else if (name === 'push') {
+        expect(VILLAGER_CLIPS[name].loop).toBe(true);
+        expect(VILLAGER_CLIPS[name].strideLength).toBeGreaterThan(0);
       } else {
         expect(VILLAGER_CLIPS[name].strideLength, `${name} no puede tener zancada`).toBeNull();
       }

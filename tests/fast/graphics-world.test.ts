@@ -723,6 +723,10 @@ describe('G-10 · cobertura del catálogo', () => {
     const kinds = Object.keys(BUILDINGS) as BuildingKind[];
     expect(kinds.length).toBeGreaterThan(10);
     for (const kind of kinds) {
+      // AR-2 · la mina no se pinta como edificio: la boca, los raíles, el
+      // acopio y la vagoneta los pone `world/mine-works.ts`, con los GLB del
+      // encargo de Astra (bloque 4) o su respaldo procedural.
+      if (kind === 'mine') continue;
       expect(BUILDING_ASSETS[kind], `${kind} no tiene recurso`).toBeDefined();
     }
   });

@@ -217,6 +217,7 @@ export const UI_BANK_ES: Record<string, string> = {
   'building.church': 'iglesia',
   'building.stone_house': 'casa de piedra',
   'building.watchtower': 'torre de vigilancia',
+  'building.mine': 'mina',
   'building.grave_yard': 'cementerio',
   'trait.ambitious': 'ambicioso',
   'trait.devout': 'devoto',

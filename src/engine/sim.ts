@@ -64,6 +64,7 @@ import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
 import { ringClosed } from './world/placement';
 import { advanceThreat, type Battle } from './world/threat';
+import { digOre, forgeOre } from './world/mine';
 import { fellForest, fellForestWithLocation, regrowForest, woodHaul } from './world/forest';
 import { neighbours4 } from './world/tiles';
 import { accrueTraffic, routesFor, upgradePaths } from './world/paths';
@@ -1059,6 +1060,9 @@ export function tick(
   // K8 · y la semana de la misa la aldea pierde el día (`massWorkFactor`).
   const felled = fellForest(state, allocation.cutters * LABOUR.WOOD_PER_CUTTER * axe * haul * massWorkFactor(state));
   const produced = produce(state, allocation, felled);
+  // AR-2 · y el mineral de la mina, hasta llenar el acopio (`world/mine.ts`).
+  digOre(state, allocation, massWorkFactor(state));
+  forgeOre(state);
   // §7.7, v2.92: the hands the allocation sent out come back with food. The
   // forest fraction is read here and passed in because `subsistence/` may not
   // look at `world/`, the same rule that makes `produce` take its wood cap.
@@ -1137,6 +1141,20 @@ export function tick(
   // is decided: a crossroad that grants a watchtower still has to build it.
   const built = advanceWorks(state, produced.buildPoints);
   for (const raised of built) {
+    // AR-2 · **la primera mina abre la Edad del Hierro** (`docs/plan-meta.md`
+    // AR), y eso es cambiar de edad, no terminar un edificio: peso 3 y su
+    // propia línea, una vez en la vida del valle, como el cierre de la villa.
+    // La bandera es permanente; una mina rehecha después se cuenta como obra.
+    if (raised.kind === 'mine' && state.flags['age:iron'] === undefined) {
+      state.flags['age:iron'] = 0;
+      say({
+        kind: 'built',
+        templateKey: 'mine.opened',
+        params: { year: year(), season: season() },
+        weight: 3,
+      });
+      continue;
+    }
     say({
       kind: 'built',
       templateKey: builtKey(raised.kind),
