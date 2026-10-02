@@ -60,6 +60,7 @@ function stateOf(seed: number): GameState {
       stone: 0,
       silver: 0,
       hides: 0,
+      linen: 0,
     },
     people,
     buildings: [],
@@ -185,7 +186,7 @@ describe('rasgos', () => {
   });
 
   it('la tabla de pesos sólo nombra roles y rasgos que existen', () => {
-    const roles: readonly Role[] = [...FOUNDING_ROLES, 'herbalist', 'stranger'];
+    const roles: readonly Role[] = [...FOUNDING_ROLES, 'herbalist', 'stranger', 'weaver'];
     for (const [role, leaning] of Object.entries(TRAIT_WEIGHTS)) {
       expect(roles).toContain(role as Role);
       for (const trait of Object.keys(leaning)) expect(ALL_TRAITS).toContain(trait as Trait);

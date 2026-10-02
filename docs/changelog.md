@@ -1,5 +1,40 @@
 # The Valley — Registro de cambios
 
+## v5.76 · 2 oct 2026 · K5: la sastrería y el lino, comida contra tela
+
+**Medido antes** (`docs/medidas/k5-caza-recoleccion-2026-10-02.md` §7,
+`k5-report.ts --flax`, 12 semillas × 60 años): el grano no sobra nunca —el
+factor no subió ni una vez— y un campo sin grano desde que hay cuatro deja la
+villa cerrada en 49 personas en vez de 61. **Decidido por Vera**: la tela, de
+momento, sólo es ropa; se pide en una sastrería con su tablón; el lino ocupa
+uno de los campos de trigo. Y una **regla general** suya: los encargos se piden
+en el edificio del oficio que los hace, y la plaza queda para lo excepcional
+(§7.19).
+
+**Lo que cambia.** La aldea levanta sola **la sastrería** (`tailor`) con
+herrería y 24 personas: llega a las 70 h a ×1, con el cuarto campo. La trabaja
+**la tejedora** (`weaver`), que se nombra sola. Su tablón tiene dos encargos de
+un año: **un campo de lino** —en la siega, el campo más lejano de la plaza da
+lienzo en vez de trigo— y **ropa nueva** —6 de lienzo, +0,2 de ánimo por semana
+mientras dura—. El lienzo es una existencia (`village.linen`, sin subir el
+esquema) para que mañana sirva para más.
+
+**Por qué el lino pide cuatro campos trabajados**: pidiéndolo siempre, sin esa
+regla caían 7 de 12 valles en 60 años —aldeas menguadas con cuatro campos y
+brazos para dos, donde el lino se llevaba media cosecha—. Con ella, ninguno.
+**Medido después** (`--linen`): pidiendo lino y ropa siempre, la villa cerrada
+queda en 41 personas en vez de 57, con el ánimo en 71 en vez de 61; en la aldea
+los muertos de hambre pasan de 10,6 a 22,6 por cada 100 h. **La sastrería mueve
+la escalera** (`pace-report.ts`, 24 semillas): la villa cerrada de 331 a 350 h,
+la atalaya de 199 a 227.
+
+**Y de paso**: §7.17 (el cuero) se había quedado colgado bajo el encabezado de
+§8 en `design.md`; vuelve a su sitio.
+
+**Abierto, de Vera**: qué encargos de la plaza se mudan a su oficio, y las
+plantas. Lo que no se ve —el taller, la tejedora, el campo azul, el lienzo
+blanqueando—, en `docs/encargos-3d.md` y `docs/encargos/ilustraciones-k5-lino.md`.
+
 ## v5.75 · 2 oct 2026 · K5: el cuero de la caza, vendido o hecho peto
 
 **Medido antes** (`docs/medidas/k5-caza-recoleccion-2026-10-02.md`, informe nuevo

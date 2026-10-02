@@ -227,6 +227,8 @@ const BY_BUILDING: Readonly<Record<string, readonly string[]>> = {
   granary: ['work'],
   field: ['work'],
   smithy: ['watch', 'work'],
+  // K5 · la sastrería: la tejedora trabaja en la puerta, y se le mira coser.
+  tailor: ['watch', 'work'],
   mill: ['watch', 'work'],
   chapel: ['pray'],
   church: ['pray', 'gossip'],

@@ -18,6 +18,11 @@
 //   npx tsx tools/reports/k5-report.ts --seeds 6 --years 40
 //   npx tsx tools/reports/k5-report.ts --after         # el cuero ya hecho (v5.75)
 //   npx tsx tools/reports/k5-report.ts --flax          # antes del lino (v5.76)
+//   npx tsx tools/reports/k5-report.ts --linen         # el lino ya hecho (v5.76)
+//
+// Con `--linen` juega cada valle dos veces: sin pedir nada a la sastrería, y
+// pidiendo el campo de lino y la ropa cada vez que el tablón lo deja. Da, en
+// horas a ×1 y por tramo, el ánimo, la gente, el hambre y el lienzo.
 //
 // Con `--flax` mide lo que decide un campo de lino: cuántos campos tiene la
 // aldea y si está en el tope, cuánto sobra de cada cosecha sobre lo que se
@@ -44,6 +49,7 @@ import { huntOpportunity, type HuntOpportunity, type HuntSpecies } from '../../s
 import { missionsOpen } from '../../src/engine/world/expeditions';
 import { BOARDS, FOOD } from '../../src/engine/balance';
 import { canPlace } from '../../src/engine/world/placement';
+import { tailorOrdersOpen } from '../../src/engine/world/tailor';
 import { hash32 } from '../../src/engine/rng';
 import { alive } from './ladder';
 
@@ -139,6 +145,70 @@ function play(seed: number, hunter: Hunter): { tallies: Map<Phase, Tally>; first
 
 const AFTER = process.argv.includes('--after');
 const FLAX = process.argv.includes('--flax');
+const LINEN = process.argv.includes('--linen');
+
+interface LinenTally { weeks: number; hours: number; lowMorale: number; hungry: number; hungerDeaths: number; linen: number; morale: number[]; people: number[] }
+const linenBlank = (): LinenTally => ({ weeks: 0, hours: 0, lowMorale: 0, hungry: 0, hungerDeaths: 0, linen: 0, morale: [], people: [] });
+
+/** Un valle que pide (`ask`) o no el lino y la ropa cada vez que el tablón lo deja. */
+function linenRun(seed: number, ask: boolean): { tallies: Map<Phase, LinenTally>; ended: boolean; tailorAt: number | null; firstLinen: number | null } {
+  const tallies = new Map(PHASES.map((p) => [p, linenBlank()]));
+  const state = foundGame(seed);
+  let tailorAt: number | null = null;
+  let firstLinen: number | null = null;
+  const acts = (s: GameState): PlayerAct[] => (ask
+    ? tailorOrdersOpen(s).filter((o) => o.refusal === null).map((o) => ({ kind: 'tailor', order: o.id }) as PlayerAct)
+    : []);
+  for (let t = 1; t <= WEEKS && state.ended === null; t += 1) {
+    const tally = tallies.get(phaseOf(state))!;
+    const [report] = run(state, 1, 'prudent', CATALOG, acts);
+    if (report === undefined) break;
+    if (tailorAt === null && alive(state, 'tailor') > 0) tailorAt = hours(state.tick);
+    const made = report.entries.find((e) => e.templateKey === 'tailor.flax.harvest');
+    if (made !== undefined) {
+      tally.linen += Number(made.params['linen']);
+      if (firstLinen === null) firstLinen = hours(state.tick);
+    }
+    const pop = population(state);
+    tally.weeks += 1;
+    if (state.village.morale < 40) tally.lowMorale += 1;
+    if (state.village.grain < pop) tally.hungry += 1;
+    tally.hungerDeaths += report.deaths.filter((d) => d.cause === 'hunger').length;
+    tally.morale.push(Math.round(state.village.morale));
+    tally.people.push(pop);
+  }
+  for (const t of tallies.values()) t.hours = hours(t.weeks);
+  return { tallies, ended: state.ended !== null, tailorAt, firstLinen };
+}
+
+if (LINEN) {
+  for (const ask of [false, true]) {
+    const total = new Map(PHASES.map((p) => [p, linenBlank()]));
+    let ended = 0;
+    const tailors: number[] = [];
+    const linens: number[] = [];
+    for (const seed of SEEDS) {
+      const r = linenRun(seed, ask);
+      if (r.ended) ended += 1;
+      if (r.tailorAt !== null) tailors.push(r.tailorAt);
+      if (r.firstLinen !== null) linens.push(r.firstLinen);
+      for (const p of PHASES) {
+        const a = total.get(p)!; const b = r.tallies.get(p)!;
+        for (const k of ['weeks', 'hours', 'lowMorale', 'hungry', 'hungerDeaths', 'linen'] as const) a[k] += b[k];
+        a.morale.push(...b.morale); a.people.push(...b.people);
+      }
+    }
+    console.log(`\n# Lino · ${ask ? 'pidiendo lino y ropa siempre que se puede' : 'sin pedir nada a la sastrería'} · ${SEEDS.length} semillas × ${YEARS} años · prudent · horas a ×1\n`);
+    console.log(`sastrería: mediana ${fmt(median(tailors))}, ${tailors.length}/${SEEDS.length} valles · primer lienzo: ${linens.length === 0 ? '—' : `mediana ${fmt(median(linens))}`} · partidas acabadas ${ended}/${SEEDS.length}\n`);
+    console.log('| tramo | gente | ánimo (mediana) | ánimo < 40 | hambre (sem.) | muertos de hambre por 100 h | lienzo por 10 h |');
+    console.log('|---|---:|---:|---:|---:|---:|---:|');
+    for (const p of PHASES) {
+      const t = total.get(p)!;
+      const per = (x: number, h: number): string => (t.hours === 0 ? '—' : (h * x / t.hours).toFixed(1));
+      console.log(`| ${p} | ${median(t.people)} | ${median(t.morale)} | ${pct(t.lowMorale, t.weeks)} | ${pct(t.hungry, t.weeks)} | ${per(t.hungerDeaths, 100)} | ${per(t.linen, 10)} |`);
+    }
+  }
+}
 
 interface FlaxTally {
   weeks: number; hours: number; hungry: number; hungerDeaths: number; atCap: number; factor: number;
@@ -258,7 +328,7 @@ if (AFTER) {
   }
 }
 
-for (const hunter of AFTER || FLAX ? [] : (['sling', 'armed'] as const)) {
+for (const hunter of AFTER || FLAX || LINEN ? [] : (['sling', 'armed'] as const)) {
   const total = new Map(PHASES.map((p) => [p, blank()]));
   const hides: number[] = [];
   let ended = 0;

@@ -58,6 +58,7 @@ const ROLES: Record<Role, true> = {
   reeve: true,
   herbalist: true,
   stranger: true,
+  weaver: true,
 };
 
 const MEMORIES: Record<MemoryKind, true> = {

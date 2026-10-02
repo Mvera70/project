@@ -162,6 +162,9 @@ if (root) {
     // de los petos de la herrería y el buhonero que las pide.
     const hides = Number(query.get('hides'));
     if (Number.isFinite(hides) && hides > 0) state.village.hides = Math.floor(hides);
+    // K5 · y `&linen=6` pone lienzo en la sastrería, para fotografiar la ropa.
+    const linen = Number(query.get('linen'));
+    if (Number.isFinite(linen) && linen > 0) state.village.linen = Math.floor(linen);
     // F3 · `&ended=1` acaba la partida, y `&ended=<causa>` acaba de esa manera
     // concreta: `extinction`, `abandoned`, `dispersed` o `stormed`. Hacía falta
     // para poder fotografiar las cuatro lápidas —cada una tiene su capitular y

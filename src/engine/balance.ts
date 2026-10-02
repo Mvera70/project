@@ -1844,6 +1844,54 @@ export const HIDES = {
   PEDLAR_SILVER_PER_HIDE: 2,
 } as const;
 
+/**
+ * K5 · **La sastrería y el lino** (§7.18, v5.76, 2 oct 2026).
+ *
+ * Decisiones de Vera del 2 oct: la tela es, de momento, **sólo ropa** (ánimo);
+ * se pide **en la sastrería**, con su tablón, como la herrería (los encargos se
+ * piden en el edificio del oficio que los hace); el encargo dura un año; y el
+ * lino **ocupa uno de los campos de trigo**: comida contra tela.
+ *
+ * Lo medido antes (`docs/medidas/k5-caza-recoleccion-2026-10-02.md` §7, 12
+ * semillas × 60 años): el grano no sobra nunca (cada cosecha da 1,1–1,4 veces
+ * lo que se come) y un campo sin grano desde que hay cuatro deja la villa en
+ * 49 personas en vez de 61. Ése es el precio del lino.
+ */
+export const TAILOR = {
+  /** Lo que dura un encargo, en semanas: un año, con su siega dentro. */
+  ORDER_WEEKS: 48,
+  /**
+   * Los campos que tiene que haber —y que la aldea tiene que necesitar y
+   * trabajar— para sembrar uno de lino. TUNE, medido: por debajo de cuatro, un
+   * campo es media cosecha o un tercio (el contrafactual de §7 con dos campos
+   * subía el hambre del caserío del 7 al 23 % de las semanas). En la siega se
+   * mira lo **trabajado**: sin esa regla, pidiendo lino siempre, caían 7 de 12
+   * valles en 60 años, aldeas menguadas con cuatro campos y brazos para dos.
+   */
+  FLAX_MIN_FIELDS: 4,
+  /**
+   * Las piezas de lienzo que da un campo entero de lino en una siega normal; se
+   * escala con lo que ese campo habría dado de grano (tiempo, ánimo, manos).
+   * TUNE: doce, el doble de lo que pide la ropa, así que un año de lino viste
+   * dos años al valle.
+   */
+  LINEN_PER_FIELD: 12,
+  /**
+   * Los encargos. El lino no cuesta nada que se pague: cuesta **la cosecha de
+   * un campo**. La ropa cuesta lienzo.
+   */
+  ORDERS: {
+    flax: {},
+    clothes: { linen: 6 },
+  },
+  /**
+   * El ánimo por semana mientras dura la ropa nueva. TUNE: entre la capilla
+   * (`MOOD.MORALE_CHAPEL`, 0,15) y la iglesia (0,3). Con la deriva de
+   * `MOOD.MORALE_DRIFT` (0,02) sube el ánimo de reposo diez puntos.
+   */
+  CLOTHES_MORALE: 0.2,
+} as const;
+
 export const HUNT = {
   // TUNE: probabilidad semanal sobre cien cuando la especie ya está abierta.
   chance: { partridge: 70, rabbit: 48, deer: 18, boar: 12, bear: 0 },
@@ -1927,6 +1975,8 @@ export const CROWN = {
   STYLE_OF_TRADE: {
     smith: 'forge', reeve: 'plough', woodward: 'plough', midwife: 'plough',
     herbalist: 'plough', priest: 'chapel', leader: 'court', stranger: 'court',
+    // K5 · la tejedora es del oficio, como el herrero sin su fragua: del arado.
+    weaver: 'plough',
   } as const,
   /**
    * Cuánto más se siembra con un rey del campo.
@@ -2308,6 +2358,11 @@ export const BUILDINGS = {
   // punto 2b). Arde como cualquier casa de madera: el caos es el juego.
   hall: { w: 3, h: 3, wood: 200, stone: 0, bp: 160, cap: 1, tier: 0, upgradeOf: null, byCrossroad: false }, // CROWN.HALL_BEDS
   grave_yard: { w: 3, h: 2, wood: 0, stone: 0, bp: 25, cap: 1, tier: 0, upgradeOf: null, byCrossroad: true }, // MOOD.MORALE_GRAVEYARD
+  // K5 · **la sastrería** (§7.18): el taller de la tejedora y su tablón. TUNE:
+  // un taller de dos por dos, más barato que la herrería (140/100) porque no
+  // lleva fragua; el pozo es 40/30 y la casa 60/40, así que queda entre los
+  // dos edificios de oficio y la casa.
+  tailor: { w: 2, h: 2, wood: 90, stone: 0, bp: 70, cap: 1, tier: 0, upgradeOf: null, byCrossroad: false }, // TAILOR.*
   wall: { w: 1, h: 1, wood: 0, stone: 40, bp: 60, cap: null, tier: 1, upgradeOf: 'palisade', byCrossroad: false },
   stone_house: { w: 2, h: 2, wood: 0, stone: 50, bp: 70, cap: null, tier: 1, upgradeOf: 'house', byCrossroad: false }, // does not burn
   church: { w: 3, h: 3, wood: 0, stone: 120, bp: 200, cap: 1, tier: 1, upgradeOf: 'chapel', byCrossroad: false }, // MOOD.*_CHURCH
@@ -2378,6 +2433,11 @@ export const BUILDING_RULES = {
   CHAPEL_FAITH: 30, // §7.3 point 5
   SMITHY_PEOPLE: 14, // §7.3 point 6
   MILL_PEOPLE: 18, // §7.3 point 7
+  // K5 · la sastrería, detrás de la herrería. TUNE, en horas de reloj
+  // (`pace-report.ts`, `docs/medidas/k5-caza-recoleccion-2026-10-02.md` §8):
+  // con herrería y esta gente llega cuando la aldea ya tiene cuatro campos,
+  // que es desde cuando un campo de lino es una decisión y no media cosecha.
+  TAILOR_PEOPLE: 24, // §7.3 point 6b
   GRANARY_FULL: 0.8, // §7.3 point 3: grain above 80 % of capacity
   GRANARY_HOUSE_DISTANCE: 6, // §7.4: "a menos de 6 celdas de una casa"
   // TUNE: **cuántas piezas de muralla tiene que tener un tramo para merecer un
@@ -2549,6 +2609,8 @@ export const TRAIT_WEIGHTS = {
   reeve: { greedy: TRAIT_WEIGHT_ROLE, cunning: TRAIT_WEIGHT_ROLE },
   herbalist: { kind: TRAIT_WEIGHT_ROLE, secretive: TRAIT_WEIGHT_ROLE },
   stranger: { ambitious: TRAIT_WEIGHT_ROLE, craven: TRAIT_WEIGHT_ROLE },
+  // K5 · la tejedora: paciente y callada, como quien se pasa el invierno al telar.
+  weaver: { stubborn: TRAIT_WEIGHT_ROLE, secretive: TRAIT_WEIGHT_ROLE },
 } as const;
 
 /** How many traits a named villager gets. design.md §6.3: "3 or 4". */
@@ -2924,6 +2986,8 @@ export const PEOPLE = {
     smith: 20,
     woodward: 18,
     reeve: 22,
+    // K5 · la tejedora: el mismo suelo que el herrero.
+    weaver: 20,
   },
   /**
    * §6.2: the top of the band a vacancy is filled from. Above it, only if

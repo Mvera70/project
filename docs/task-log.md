@@ -1,5 +1,30 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · K5: la sastrería y el lino (v5.76)
+
+Rama `claude/k5-caza-recoleccion`, desde `main` con el cuero (`ea97cc5`).
+Medido antes (`docs/medidas/k5-caza-recoleccion-2026-10-02.md` §7): el grano no
+sobra nunca y un campo sin grano deja la villa en 49 personas en vez de 61.
+Vera decidió: la tela sólo es ropa (de momento), se pide en una sastrería con
+tablón, y el lino ocupa un campo de trigo. Hecho: el edificio `tailor` (70 h a
+×1, con el cuarto campo), la tejedora (`weaver`), `village.linen`, los encargos
+`flax` y `clothes` (`world/tailor.ts`), el lino en la siega y la ropa en el
+ánimo. Medido después (§8): pidiéndolos siempre, la villa en 41 personas en vez
+de 57 y el ánimo en 71 en vez de 61; ningún valle cae (sin la regla de los
+cuatro campos trabajados caían 7 de 12). La sastrería mueve la escalera: la
+villa cerrada de 331 a 350 h. Pruebas: `tests/fast/k5-linen.test.ts` (4 s).
+Captura: `docs/medidas/k-img/k5-tablon-sastreria-390.png`.
+
+**Abierto:**
+
+- **De Vera:** qué encargos de la plaza se mudan a su oficio según su regla
+  (§7.19): las hierbas (herbolaria o la enfermería de K11), la veta alta (el
+  herrero), la lobera (el guardabosques o la caza). No se ha movido nada.
+- **De Vera:** las plantas, el tercer material de K5 (no empezado).
+- **De otros carriles:** el modelo de la sastrería y de la tejedora, el campo
+  azul, las gavillas y el lienzo blanqueando (Astra); las seis ilustraciones y
+  las dos tarjetas (Codex, `docs/encargos/ilustraciones-k5-lino.md`).
+
 ## 2 oct 2026 · K5: el cuero de la caza (v5.75)
 
 Rama `claude/k5-caza-recoleccion`, **versiones reservadas v5.75–v5.79**. Medido

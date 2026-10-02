@@ -58,6 +58,8 @@ const AUTOMATIC_KINDS = [
   // caché de «nada que hacer» no se enteraría de que la aldea ya tiene madera
   // para levantarla.
   'hall',
+  // K5 · la sastrería.
+  'tailor',
 ] as const;
 
 function threatenedNow(state: GameState): boolean {
@@ -273,6 +275,9 @@ export function nextProject(state: GameState, budget: number = woodForWorks(stat
   if (!has(state, 'smithy') && people >= BUILDING_RULES.SMITHY_PEOPLE) wanted.push('smithy');
   // 7 · the mill
   if (!has(state, 'mill') && people >= BUILDING_RULES.MILL_PEOPLE) wanted.push('mill');
+  // 7b · K5 · la sastrería, detrás de la herrería: es el taller de la tejedora
+  // y el sitio donde se pide el lino (§7.18).
+  if (!has(state, 'tailor') && has(state, 'smithy') && people >= BUILDING_RULES.TAILOR_PEOPLE) wanted.push('tailor');
   // 8b · A2 · **el portón, y va delante de la muralla.**
   //
   // Delante porque el anillo se llena: §7.4c planta estacas mientras quede una

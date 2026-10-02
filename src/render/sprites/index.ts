@@ -139,6 +139,8 @@ export const BUILDING_SPRITES: Readonly<Record<BuildingKind, Sprite>> = {
   // este render tiene. El 3D la dibuja con su propio aspecto y su tejado
   // burdeos; aquí basta con que no falte.
   hall: stoneHouse,
+  // K5 · la sastrería, en el camino de reserva: la silueta de la herrería.
+  tailor: smithy,
   // A3 · el bastión, en el camino de reserva: la silueta de la muralla de
   // piedra que ocupa. El 3D es quien tiene la malla de la atalaya prestada.
   bastion: wall,

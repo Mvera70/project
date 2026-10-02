@@ -91,6 +91,8 @@ export function foundGame(
       silver: 0,
       // K5 · las pieles: sólo las trae la caza grande.
       hides: 0,
+      // K5 · el lienzo: sólo lo da un campo de lino.
+      linen: 0,
     },
     people: foundPeople(rng, 0, profile),
     buildings: [],

@@ -110,7 +110,7 @@ describe('M-17 · catálogo visual', () => {
       // A3 · `bastion` reutiliza la silueta de la muralla de piedra, por el
       // mismo motivo que `gate`: aquí es la pieza de muralla que ocupa.
       'bastion', 'chapel', 'church', 'field', 'gate', 'granary', 'grave_yard', 'hall', 'house',
-      'mill', 'palisade', 'smithy', 'stone_house', 'wall', 'watchtower', 'well',
+      'mill', 'palisade', 'smithy', 'stone_house', 'tailor', 'wall', 'watchtower', 'well',
     ]);
   });
 

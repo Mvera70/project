@@ -53,6 +53,8 @@ export const WALLED: ReadonlySet<string> = new Set([
   'smithy', 'mill', 'watchtower', 'palisade', 'wall',
   // K-4 · la sala del rey es una casa: se rodea, no se atraviesa.
   'hall',
+  // K5 · la sastrería es un taller con paredes, como la herrería.
+  'tailor',
   // A3 · el bastión es una pieza de muralla mejorada, no una puerta: se queda
   // con `palisade`/`wall` y no se cruza.
   'bastion',

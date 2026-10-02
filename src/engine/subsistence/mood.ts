@@ -9,7 +9,7 @@
 // endures disasters that would sink a faithless one — which is exactly why the
 // priest is dangerous.
 
-import { CROWN, MOOD, TIME, MEANS } from '../balance';
+import { CROWN, MOOD, TAILOR, TIME, MEANS } from '../balance';
 import { housingCapacity, isHere, population } from '../people/demography';
 import { will } from '../people/crown';
 import { hasTrait } from '../state';
@@ -94,6 +94,8 @@ export function updateMood(state: GameState, ctx: TickContext): void {
   if (church) morale += MOOD.MORALE_CHURCH;
   if (mill) morale += MOOD.MORALE_MILL;
   if (outbreak) morale += MOOD.MORALE_OUTBREAK;
+  // K5 · **la ropa nueva** de la sastrería, mientras dura el encargo (§7.18).
+  if ((state.flags['tailor:clothes'] ?? -1) > state.tick) morale += TAILOR.CLOTHES_MORALE;
   // §5.3's harvest bonus, on the harvest week only.
   if (weekOf(state.tick) === TIME.HARVEST_WEEK) {
     morale += (state.weather.factor - 1) * MOOD.MORALE_HARVEST;

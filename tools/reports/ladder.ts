@@ -28,6 +28,9 @@ export const LADDER: readonly (readonly [string, (s: GameState) => boolean])[] =
   ['muralla', (s) => alive(s, 'palisade') >= 1],
   ['EDAD DE PIEDRA (1ª obra)', (s) => s.buildings.some((b) => b.tier > 0 && b.lostTick === null)],
   ['molino', (s) => alive(s, 'mill') >= 1],
+  // K5 · la sastrería y su tejedora: desde aquí se puede pedir un campo de lino.
+  ['sastrería', (s) => alive(s, 'tailor') >= 1],
+  ['cuatro campos', (s) => alive(s, 'field') >= 4],
   ['corona posible', (s) => crownRefusal(s) !== 'small'],
   ['30 personas', (s) => population(s) >= 30],
   // A1 · el peldaño de la fase 3 (§1b): la villa cerrada, que es lo que un

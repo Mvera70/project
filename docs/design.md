@@ -371,8 +371,9 @@ export interface Clock {
 
 ### 3.3 Estadísticas de aldea
 
-Exactamente siete. Añadir una octava requiere modificar este documento. Eran
-cinco; M-0 metió la piedra y la plata como existencias, y K5 (v5.75) las pieles.
+Exactamente ocho. Añadir una novena requiere modificar este documento. Eran
+cinco; M-0 metió la piedra y la plata como existencias, y K5 las pieles (v5.75)
+y el lienzo (v5.76).
 
 ```ts
 export interface VillageStats {
@@ -383,6 +384,7 @@ export interface VillageStats {
   stone: number;    // M-0 · la piedra canteada, en el montón
   silver: number;   // M-0 · lo único que viene de fuera del valle
   hides: number;    // K5 · las pieles de la caza grande (§7.17)
+  linen: number;    // K5 · el lienzo de un campo de lino (§7.18)
   // 'people' NO se guarda: es people.villagers.filter(alive).length
 }
 ```
@@ -2591,14 +2593,6 @@ dos siegas; que un acto consumiera una tirada; o que el carro siguiera
 vendiendo el hacha con fragua en pie. Las seis tienen prueba en
 `tests/fast/boards.test.ts`.
 
----
-
-## 8. Sistema D — Encrucijadas
-
-El verbo del jugador y el motor de la variedad. No se escriben una a una: se
-generan cruzando los otros tres sistemas.
-
-
 ### 7.17 El cuero de la caza (K5, v5.75, 2 oct 2026)
 
 Lo pidió el dueño del diseño: que la caza y la recolección **dejen materia que
@@ -2646,6 +2640,76 @@ pagarlos en 12 de 12 valles y el que vende en 10 de 12; tocando una de cada
 ocho, a las 46 h y en 12 contra 4. Vender trae de 2,6 a 7,8 de plata por cada
 10 h. **Una partida sin caza no se mueve**: idéntica byte a byte en las
 semillas 7, 23 y 41 a treinta años.
+
+### 7.18 La sastrería y el lino (K5, v5.76, 2 oct 2026)
+
+El segundo material de K5. Vera decidió el 2 oct, con la medida delante
+(`docs/medidas/k5-caza-recoleccion-2026-10-02.md` §7), **las tres cosas**: la
+tela es, de momento, **sólo ropa** (ánimo), aunque se diseña como existencia
+para que mañana sirva para más —las vendas de la enfermería de K11—; se pide
+**en una sastrería**, un edificio con su tablón como la herrería; y el lino
+**ocupa uno de los campos de trigo**: comida contra tela.
+
+**Lo medido antes:** el grano no sobra nunca (el factor, que sube con más de
+dos años en el granero, no subió en 12 valles de 60 años; cada cosecha da
+1,1–1,4 veces lo que se come), y un campo sin grano desde que hay cuatro deja
+la villa cerrada en 49 personas en vez de 61. Ése es el precio del lino.
+
+**La sastrería** (`tailor`, 2×2, 90 de madera y 70 de obra, §7.3 punto 7b): la
+levanta la aldea sola cuando hay herrería y 24 personas
+(`BUILDING_RULES.TAILOR_PEOPLE`). Llega a las **70 h a ×1** (24 semillas × 60
+años), con el cuarto campo (68 h), que es desde cuando un campo de lino es una
+decisión y no media cosecha. La trabaja **la tejedora** (`weaver`), un oficio
+que se nombra solo en cuanto hay sastrería, como el cura con la capilla.
+
+**Su tablón** (`world/tailor.ts`), dos encargos de un año, uno de cada a la vez:
+
+| Encargo | Cuesta | Qué hace |
+|---|---|---|
+| Un campo de lino | La cosecha de un campo | En la siega, el campo más lejano de la plaza da lienzo (12 piezas por campo entero, escalado con lo que habría dado de grano) en vez de trigo |
+| Ropa nueva | 6 de lienzo | +0,2 de ánimo por semana mientras dura: entre la capilla y la iglesia, diez puntos de ánimo de reposo |
+
+**El lino pide cuatro campos que la aldea necesite y trabaje.** El tablón no lo
+deja pedir con menos (negativa `fields`), y en la siega, si la aldea no
+trabaja cuatro, el lino se queda sin sembrar y el trigo entero. Lo obligó la
+medida: sin esa regla, pidiendo lino siempre, caían 7 de 12 valles en 60 años,
+aldeas que habían menguado con cuatro campos y brazos para dos.
+
+**Medido después** (`k5-report.ts --linen`, 12 semillas × 60 años, pidiendo
+lino y ropa siempre que el tablón deja contra no pedir nada): ningún valle cae;
+la villa cerrada se queda en **41 personas en vez de 57**, con el ánimo en
+**71 en vez de 61** (por debajo de 40 el 7 % de las semanas en vez del 12 %); en
+la aldea los muertos de hambre pasan de 10,6 a 22,6 por cada 100 h. El primer
+lienzo llega a las 75 h. Es el dilema que Vera eligió: un valle más contento y
+más pequeño.
+
+**Cómo se ve hoy, y qué falta.** El tablón clavado en la fachada de la sastrería,
+la caja del taller con su pared de lienzo crudo, la tejedora trabajando en su
+puerta y la crónica. Lo que falta —el modelo del taller, el campo azul, las
+gavillas enriándose, el lienzo blanqueando en la hierba, la ropa nueva— está en
+`docs/encargos-3d.md`.
+
+### 7.19 Dónde se pide un encargo (regla de Vera, 2 oct 2026)
+
+> «Los encargos se piden en el edificio del oficio que los hace (herrería,
+> sastrería y los que vengan), no en la plaza del pueblo; la plaza queda para
+> cosas excepcionales.»
+
+Es la regla con la que se ordenan los tablones a partir de K5: cada oficio
+tiene su edificio y su tablón (§7.16, §7.18), y el de la plaza (§7.15) se queda
+para lo que no es de ningún oficio. **Lo que hoy vive en la plaza y la regla
+mudaría** (no se ha movido; es de Vera, `docs/task-log.md`): las hierbas (de la
+herbolaria, o de la enfermería de K11), la veta alta (del herrero) y la lobera
+(del guardabosques, o de la caza). Las setas y el mercado del otro valle se
+pueden leer como excepcionales.
+
+---
+
+## 8. Sistema D — Encrucijadas
+
+El verbo del jugador y el motor de la variedad. No se escriben una a una: se
+generan cruzando los otros tres sistemas.
+
 
 ### 8.1 Esquema de plantilla
 
@@ -5126,6 +5190,17 @@ entre valles 0,22. El detalle y las causas de fin están en `docs/historico/rewo
 | `PEDLAR_MIN_HIDES` | 3 | Desde aquí el buhonero sube a por pieles, aunque falte la leña |
 | `PEDLAR_MAX_HIDES` | 12 | Se las lleva todas hasta aquí: vender es quedarse sin petos |
 | `PEDLAR_SILVER_PER_HIDE` | 2 | Contra 6 de plata por 80 de leña; doce pieles son un arado |
+
+### 12.13 La sastrería y el lino (`TAILOR`, K5)
+
+| Constante | Valor | Por qué |
+|---|---:|---|
+| `BUILDING_RULES.TAILOR_PEOPLE` | 24, con herrería | La sastrería llega a las 70 h a ×1, con el cuarto campo (68 h) |
+| `ORDER_WEEKS` | 48 | Un año, con su siega dentro, como los de la herrería |
+| `FLAX_MIN_FIELDS` | 4 | Con menos, un campo es media cosecha; se mira lo necesitado y lo trabajado |
+| `LINEN_PER_FIELD` | 12 | El doble de lo que pide la ropa: un año de lino viste dos |
+| `ORDERS.clothes` | 6 de lienzo | — |
+| `CLOTHES_MORALE` | 0,2 por semana | Entre la capilla (0,15) y la iglesia (0,3): diez puntos de reposo |
 
 ## 13. Persistencia y letargo
 

@@ -156,3 +156,43 @@ lino en vez de trigo.
   de la plaza. Con la forma natural del valle (otra sesión, v5.60–v5.64) eso
   puede cambiar: si el lino necesita sitio nuevo, se mide de nuevo sobre su
   contorno antes de fusionar.
+
+## 8 · El lino, después (v5.76)
+
+Decidido por Vera (2 oct): la tela sólo es ropa, de momento; se pide en una
+sastrería con su tablón; el lino ocupa uno de los campos de trigo.
+
+**Cuándo llega la sastrería** (`pace-report.ts`, 24 semillas × 60 años,
+prudente): **70 h a ×1** (39–103 h, 22 de 24 valles), con el cuarto campo a las
+68 h. Mueve la escalera, porque se come 90 de madera: la villa cerrada pasa de
+331 a 350 h, la muralla de 157 a 165 h y la atalaya de 199 a 227 h; la
+población final no cambia (mediana 52).
+
+**El dilema** (`k5-report.ts --linen`, 12 semillas × 60 años; «pide» encarga
+lino y ropa cada vez que el tablón lo deja, «no pide» nunca):
+
+| tramo | gente: no pide → pide | ánimo (mediana) | ánimo < 40 | hambre (sem.) | muertos de hambre por 100 h | lienzo por 10 h |
+|---|---:|---:|---:|---:|---:|---:|
+| caserío (< 12) | 6 → 6 | 36 → 36 | 55 % → 55 % | 7 % → 7 % | 3,7 → 3,7 | 0 |
+| aldea, sin herrería | 21 → 22 | 44 → 44 | 38 % → 38 % | 4 % → 8 % | **10,6 → 22,6** | 4,1 |
+| herrería, sin cerco | 41 → 37 | 62 → **69** | 10 % → 10 % | 4 % → 6 % | 12,7 → 17,0 | 6,9 |
+| villa cerrada | **57 → 41** | 61 → **71** | 12 % → **7 %** | 4 % → 6 % | 20,5 → 20,2 | 9,0 |
+
+Primer lienzo a las 75 h. **Ningún valle cae** en ninguna de las dos columnas.
+
+**La primera versión mataba, y la medida lo dijo.** Con el lino quitando un
+campo de los **trabajados** cuando había cuatro **construidos**, pidiéndolo
+siempre caían **7 de 12 valles**: aldeas que habían menguado, con cuatro campos
+y brazos para dos, donde el lino se llevaba media cosecha y entraban en la
+espiral del hambre. Ahora el tablón sólo deja pedirlo si la aldea **necesita**
+cuatro campos, y en la siega el lino sólo se siembra si **trabaja** cuatro; si
+no, se queda sin sembrar y el trigo entero.
+
+**Lo que no llega o no se mide todavía:**
+
+- El campo de lino **no se distingue en pantalla**: se pinta como uno de trigo
+  (`docs/encargos-3d.md`). El dilema se ve en el tablón, en la crónica y en el
+  ánimo, no en el campo.
+- El «pide siempre» es la cota de arriba: no se ha medido un jugador que pida
+  el lino sólo los años de buena cosecha, que es lo que el dilema invita a
+  hacer.

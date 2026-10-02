@@ -59,6 +59,7 @@ import { crownKing, type CrownOutcome } from './world/crown';
 import type { MeansOutcome } from './world/means';
 import { collectTithe, expireOffer, settleOffer } from './world/road';
 import { holdRite, massWorkFactor, orderSmithy, smithyWeek } from './world/boards';
+import { orderTailor, tailorWeek } from './world/tailor';
 import type { OfferOutcome, Tithe } from './world/road';
 import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
@@ -97,7 +98,7 @@ import {
 import { templateOf } from './crossroads/catalog';
 
 /** The offices a village fills on its own. §6.2. */
-const RENEWABLE_ROLES: readonly Role[] = ['smith', 'midwife', 'priest', 'woodward', 'reeve'];
+const RENEWABLE_ROLES: readonly Role[] = ['smith', 'midwife', 'priest', 'woodward', 'reeve', 'weaver'];
 
 /**
  * How well the rest of the village thinks of somebody. §6.2.
@@ -138,6 +139,8 @@ export function fillVacancies(state: GameState): void {
     // §6.2: no chapel, no priest. The office simply stays vacant.
     // A church is a chapel that grew (§7.3 point 9): it still consecrates.
     if (role === 'priest' && count(state, 'chapel') + count(state, 'church') === 0) continue;
+    // K5 · y sin sastrería, no hay tejedora.
+    if (role === 'weaver' && count(state, 'tailor') === 0) continue;
 
     const floor = minAgeFor(role);
     const free = state.people.villagers.filter(
@@ -716,6 +719,12 @@ export function tick(
       const outcome = orderSmithy(state, act.order, yearOf(state.tick));
       state.acts.push({ tick: state.tick, act, done: outcome.done });
       if (outcome.entry !== null) say(outcome.entry);
+    } else if (act.kind === 'tailor') {
+      // K5 · un encargo del tablón de la sastrería: sembrar lino o coser ropa,
+      // por un año (`world/tailor.ts`).
+      const outcome = orderTailor(state, act.order, yearOf(state.tick));
+      state.acts.push({ tick: state.tick, act, done: outcome.done });
+      if (outcome.entry !== null) say(outcome.entry);
     } else if (act.kind === 'rite') {
       // K8 · un rito del tablón de la iglesia: la misa sube el ánimo y cuesta
       // el día de trabajo; la rogativa cuesta fe y bendice la próxima siega.
@@ -749,6 +758,8 @@ export function tick(
   for (const back of returnExpeditions(state, yearOf(state.tick))) say(back.entry);
   // K8 · y la herrería: vende los herrajes del encargo y cuenta el que se acaba.
   for (const entry of smithyWeek(state, yearOf(state.tick))) say(entry);
+  // K5 · y la sastrería: cuenta el encargo que se acaba.
+  for (const entry of tailorWeek(state, yearOf(state.tick))) say(entry);
 
   // ---- 2 · ANNUAL ----------------------------------------------------------
   // Week 0 and week 0 only: the weather of the year, the plague, the fire, the
@@ -1243,6 +1254,15 @@ export function tick(
       },
       weight: harvestWeight(reaped.weatherFactor),
     });
+    // K5 · y el campo de lino, si lo había: lo que dio y lo que costó.
+    if (reaped.linen !== undefined) {
+      say({
+        kind: 'harvest',
+        templateKey: 'tailor.flax.harvest',
+        params: { year: year(), season: season(), linen: reaped.linen, grain: Math.round(reaped.flaxGrain ?? 0) },
+        weight: 2,
+      });
+    }
   }
 
   // ---- 9b · TITHE (M-0) ----------------------------------------------------

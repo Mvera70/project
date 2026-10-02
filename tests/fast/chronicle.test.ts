@@ -60,7 +60,7 @@ function village(seed: number): GameState {
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
     traits: [],
-    village: { grain: 800, wood: 200, morale: 55, faith: 50, stone: 0, silver: 0, hides: 0 },
+    village: { grain: 800, wood: 200, morale: 55, faith: 50, stone: 0, silver: 0, hides: 0, linen: 0 },
     people: foundPeopleTwenty(rng, 0),
     buildings: [],
     works: [],
@@ -340,6 +340,7 @@ describe('render', () => {
       lost: 1,
       wood: 15, // R-1: el buhonero y el tejado hablan de leña
       hides: 3, // K5: las pieles que pide el buhonero o se hacen peto
+      linen: 6, // K5: el lienzo del campo de lino y la ropa
       // A1 · los tramos de muralla que tiene el anillo al cerrarse
       // (medido: de 58 a 103 en doce semillas).
       pieces: 84,

@@ -38,6 +38,8 @@ export interface Milestone {
 
 const TRANSFORMATIVE_KINDS: ReadonlySet<BuildingKind> = new Set<BuildingKind>([
   'stone_house', 'chapel', 'church', 'smithy', 'mill', 'wall',
+  // K5 · la sastrería abre su tablón y un oficio.
+  'tailor',
 ]);
 
 /**
