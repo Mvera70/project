@@ -1,0 +1,16 @@
+{"out":"artifacts/graphics/animales-rehechos/revision/r1.png","title":"revisión: cada uno junto a su referencia","rows":[
+{"label":"","panels":[
+{"title":"caballo","kind":"detail","models":[{"glb":"deliverables/marked-models-trial/horse.glb"}]},
+{"title":"caballo perfil","kind":"profile","models":[{"glb":"deliverables/marked-models-trial/horse.glb"}]},
+{"title":"caballo | mula","kind":"profile","models":[{"glb":"deliverables/marked-models-trial/horse.glb","x":-0.6},{"glb":"public/assets/valley3d/mule.glb","x":0.6}]},
+{"title":"cabeza de cerca","kind":"detail","look":[-0.42,0,0.6],"scale":0.4,"models":[{"glb":"deliverables/marked-models-trial/horse.glb"}]}]},
+{"label":"","panels":[
+{"title":"cigüeña","kind":"detail","models":[{"glb":"deliverables/marked-models-trial/stork.glb"}]},
+{"title":"cigüeña perfil","kind":"profile","models":[{"glb":"deliverables/marked-models-trial/stork.glb"}]},
+{"title":"pollito","kind":"detail","models":[{"glb":"deliverables/marked-models-trial/chick.glb"}]},
+{"title":"pollito | gallina","kind":"detail","models":[{"glb":"deliverables/marked-models-trial/chick.glb"},{"glb":"public/assets/valley3d/hen.glb","z":-0.26}]}]},
+{"label":"","panels":[
+{"title":"grulla","kind":"detail","models":[{"glb":"deliverables/marked-models-trial/crane.glb"}]},
+{"title":"grulla desde abajo","kind":"front","models":[{"glb":"deliverables/marked-models-trial/crane.glb","turn":90}]},
+{"title":"mariposa","kind":"detail","models":[{"glb":"deliverables/marked-models-trial/butterfly.glb"}]},
+{"title":"nido + cigüeña","kind":"detail","models":[{"glb":"deliverables/marked-models-trial/stork-nest.glb"},{"glb":"deliverables/marked-models-trial/stork.glb","lift":0.046}]}]}]}

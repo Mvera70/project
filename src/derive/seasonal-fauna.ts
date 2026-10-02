@@ -22,6 +22,8 @@ import { clockOf, yearOf } from '@engine/time';
 import { valleyCore } from './anchors';
 
 /** Las madres que pueden llevar cría detrás. */
+import type { AnimalKind } from './animals';
+
 export type MotherKind = 'deer' | 'cow' | 'pig' | 'hen';
 
 export interface Litter {
@@ -31,6 +33,11 @@ export interface Litter {
   readonly count: number;
   /** A qué escala se pinta la cría respecto al modelo adulto. */
   readonly scale: number;
+  /**
+   * v5.100 · El modelo de la cría, si tiene uno propio: el polluelo es su
+   * modelo (`chick.glb`) a escala 1, no la gallina encogida. Sin él, la madre.
+   */
+  readonly kind?: AnimalKind;
 }
 
 export interface FaunaSeason {
@@ -75,7 +82,9 @@ const SPRING_LITTERS: Readonly<Record<MotherKind, Litter>> = {
   deer: { share: 0.5, count: 1, scale: 0.55 },
   cow: { share: 0.5, count: 1, scale: 0.5 },
   pig: { share: 0.5, count: 2, scale: 0.45 },
-  hen: { share: 0.34, count: 3, scale: 0.42 },
+  // El polluelo tiene modelo desde v5.100: a su tamaño, no la gallina a 0,42
+  // («se leen mal: son gallinas diminutas», fauna-estaciones-2026-10-02).
+  hen: { share: 0.34, count: 3, scale: 1, kind: 'chick' },
 };
 
 /**

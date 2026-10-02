@@ -98,12 +98,15 @@ for (const season of seasons) {
   const first = (test) => trace.animals.find(test);
   const close = {
     spring: [['cria-ciervo', young.find((a) => a.kind === 'deer')],
-      ['cria-corral', young.find((a) => a.kind === 'hen') ?? young.find((a) => a.kind !== 'deer')]],
+      ['cria-corral', young.find((a) => a.kind === 'chick') ?? young.find((a) => a.kind !== 'deer')]],
     summer: [['vaca', first((a) => a.kind === 'cow')]],
     autumn: [['jabali', first((a) => a.kind === 'boar' && a.id >= 45_000 && a.id < 46_000)]],
     winter: [['ciervo', first((a) => a.kind === 'deer')]],
   }[season] ?? [];
   for (const [name, animal] of close) if (animal !== undefined) await shoot(name, { x: animal.x, z: animal.z }, 0.3);
+  // v5.100 · La primera cigüeña, donde esté ahora (`seasonal.storkLead`).
+  const stork = trace.seasonal?.storkLead ?? null;
+  if (stork !== null) await shoot('ciguena', { x: stork.x, z: stork.z }, 0.18);
   for (const [when, name, at, zoom] of looks) {
     if (when !== season) continue;
     const [x, z] = at.split(',').map(Number);

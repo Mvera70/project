@@ -1,0 +1,313 @@
+{
+ "out": "artifacts/graphics/animales-rehechos/antes-despues.png",
+ "title": "Los animales rehechos: A = Astra, B = nuevo (misma luz, c\u00e1mara de reposo del juego)",
+ "rows": [
+  {
+   "label": "Cig\u00fce\u00f1a",
+   "panels": [
+    {
+     "title": "A \u00b7 Astra",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/stork.glb",
+       "turn": -90
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 nuevo",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/stork/stork.glb"
+      }
+     ]
+    },
+    {
+     "title": "A \u00b7 junto a la vaca",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/stork.glb",
+       "turn": -90
+      },
+      {
+       "glb": "public/assets/valley3d/cow.glb",
+       "z": -0.55
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 junto a la vaca",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/stork/stork.glb"
+      },
+      {
+       "glb": "public/assets/valley3d/cow.glb",
+       "z": -0.55
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "Nido de cig\u00fce\u00f1a",
+   "panels": [
+    {
+     "title": "A \u00b7 Astra",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/stork-nest.glb",
+       "turn": 0
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 nuevo",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/stork-nest/stork-nest.glb"
+      }
+     ]
+    },
+    {
+     "title": "A \u00b7 con la cig\u00fce\u00f1a dentro",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/stork-nest.glb",
+       "turn": 0
+      },
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/stork.glb",
+       "turn": -90,
+       "lift": 0.02
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 con la cig\u00fce\u00f1a dentro",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/stork-nest/stork-nest.glb"
+      },
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/stork/stork.glb",
+       "lift": 0.02
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "Polluelo",
+   "panels": [
+    {
+     "title": "A \u00b7 Astra",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/chick.glb",
+       "turn": -90
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 nuevo",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/chick/chick.glb"
+      }
+     ]
+    },
+    {
+     "title": "A \u00b7 junto a la gallina",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/chick.glb",
+       "turn": -90
+      },
+      {
+       "glb": "public/assets/valley3d/hen.glb",
+       "z": -0.22
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 junto a la gallina",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/chick/chick.glb"
+      },
+      {
+       "glb": "public/assets/valley3d/hen.glb",
+       "z": -0.22
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "Grulla",
+   "panels": [
+    {
+     "title": "A \u00b7 Astra",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/crane.glb",
+       "turn": 0
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 nuevo",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/crane/crane.glb"
+      }
+     ]
+    },
+    {
+     "title": "A \u00b7 junto a la golondrina",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/crane.glb",
+       "turn": 0
+      },
+      {
+       "glb": "public/assets/valley3d/bird.glb",
+       "x": 0.55
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 junto a la golondrina",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/crane/crane.glb"
+      },
+      {
+       "glb": "public/assets/valley3d/bird.glb",
+       "x": 0.55
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "Mariposa",
+   "panels": [
+    {
+     "title": "A \u00b7 Astra",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/butterfly.glb",
+       "turn": 0
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 nuevo",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/butterfly/butterfly.glb"
+      }
+     ]
+    },
+    {
+     "title": "A \u00b7 junto a la gallina",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/butterfly.glb",
+       "turn": 0
+      },
+      {
+       "glb": "public/assets/valley3d/hen.glb",
+       "x": 0.25
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 junto a la gallina",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/butterfly/butterfly.glb"
+      },
+      {
+       "glb": "public/assets/valley3d/hen.glb",
+       "x": 0.25
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "Caballo de tiro",
+   "panels": [
+    {
+     "title": "A \u00b7 Astra",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/horse.glb",
+       "turn": 0
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 nuevo",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/horse/horse.glb"
+      }
+     ]
+    },
+    {
+     "title": "A \u00b7 junto a la mula",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/horse.glb",
+       "turn": 0
+      },
+      {
+       "glb": "public/assets/valley3d/mule.glb",
+       "z": -0.55
+      }
+     ]
+    },
+    {
+     "title": "B \u00b7 junto a la mula",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/horse/horse.glb"
+      },
+      {
+       "glb": "public/assets/valley3d/mule.glb",
+       "z": -0.55
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

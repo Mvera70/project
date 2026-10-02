@@ -1,0 +1,116 @@
+{
+ "out": "artifacts/graphics/animales-rehechos/stork-nest/hoja.png",
+ "title": "Nido de cig\u00fce\u00f1a \u2014 antes (Astra) y despu\u00e9s (nuevo), misma luz y misma c\u00e1mara",
+ "rows": [
+  {
+   "label": "Antes \u00b7 Astra",
+   "panels": [
+    {
+     "title": "c\u00e1mara de reposo",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/stork-nest.glb",
+       "turn": 0
+      }
+     ]
+    },
+    {
+     "title": "perfil",
+     "kind": "profile",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/stork-nest.glb",
+       "turn": 0
+      }
+     ]
+    },
+    {
+     "title": "con la cig\u00fce\u00f1a dentro",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/stork-nest.glb",
+       "turn": 0
+      },
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/stork.glb",
+       "turn": -90,
+       "lift": 0.02
+      }
+     ]
+    },
+    {
+     "title": "a escala de m\u00f3vil (32 px/celda) \u00b7 \u00d74 y 1:1",
+     "kind": "mobile",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/stork-nest.glb",
+       "turn": 0
+      },
+      {
+       "glb": "artifacts/graphics/animales-rehechos/astra/stork.glb",
+       "turn": -90,
+       "lift": 0.02
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "Despu\u00e9s \u00b7 nuevo",
+   "panels": [
+    {
+     "title": "c\u00e1mara de reposo",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/stork-nest/stork-nest.glb",
+       "turn": 0
+      }
+     ]
+    },
+    {
+     "title": "perfil",
+     "kind": "profile",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/stork-nest/stork-nest.glb",
+       "turn": 0
+      }
+     ]
+    },
+    {
+     "title": "con la cig\u00fce\u00f1a dentro",
+     "kind": "detail",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/stork-nest/stork-nest.glb",
+       "turn": 0
+      },
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/stork/stork.glb",
+       "turn": 0,
+       "lift": 0.02
+      }
+     ]
+    },
+    {
+     "title": "a escala de m\u00f3vil (32 px/celda) \u00b7 \u00d74 y 1:1",
+     "kind": "mobile",
+     "models": [
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/stork-nest/stork-nest.glb",
+       "turn": 0
+      },
+      {
+       "glb": "artifacts/graphics/animales-rehechos/approved/stork/stork.glb",
+       "turn": 0,
+       "lift": 0.02
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
