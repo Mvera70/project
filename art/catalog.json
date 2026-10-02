@@ -68,7 +68,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "boar-short",
@@ -146,7 +146,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, boar()); 29 sep 2026: patas acortadas y colmillos mayores a petici\u00f3n suya (BOAR_DROP 0,08, BOAR_TUSK 1,5). Clips de tools/art/rigid-clips.mjs.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, boar()); 29 sep 2026: patas acortadas y colmillos mayores a petición suya (BOAR_DROP 0,08, BOAR_TUSK 1,5). Clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     },
@@ -238,7 +238,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "marked-models-63db59c",
@@ -326,7 +326,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "bear-v4",
@@ -408,7 +408,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "deer-faceted",
@@ -828,7 +828,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Tramo recto E3b con m\u00e9nsulas de piedra, aceptado visualmente por Vera el 22 sep 2026; modelo procedural local.",
+        "source": "Tramo recto E3b con ménsulas de piedra, aceptado visualmente por Vera el 22 sep 2026; modelo procedural local.",
         "license": "Project original"
       }
     },
@@ -889,7 +889,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17\u201320 sep 2026; sin proveedor generativo.",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     },
@@ -949,7 +949,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17\u201320 sep 2026; sin proveedor generativo.",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     },
@@ -1125,7 +1125,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17\u201320 sep 2026; sin proveedor generativo.",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     },
@@ -1184,7 +1184,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17\u201320 sep 2026; sin proveedor generativo.",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     },
@@ -1242,7 +1242,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original para The Valley, encargos de 17\u201320 sep 2026; sin proveedor generativo.",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     },
@@ -1502,7 +1502,7 @@
       "artifactRound": "G-17",
       "status": "study",
       "recipe": "art/recipes/villager/villager.json",
-      "generator": "tools/art/blender-build.py \u00b7 tools/art/bake-clips.mjs",
+      "generator": "tools/art/blender-build.py · tools/art/bake-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "AN-1-bake-2026-09-29",
@@ -1579,7 +1579,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager: redise\u00f1o low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md. AN-1 (29 sep 2026): walk y carry_walk reescritos por art/recipes/villager/plant-gait.mjs y horneados en el GLB de G-17 con tools/art/bake-clips.mjs (sin Blender en la ronda); geometr\u00eda, rig e idle/work_hoe intactos.",
+        "source": "Original villager: rediseño low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md. AN-1 (29 sep 2026): walk y carry_walk reescritos por art/recipes/villager/plant-gait.mjs y horneados en el GLB de G-17 con tools/art/bake-clips.mjs (sin Blender en la ronda); geometría, rig e idle/work_hoe intactos.",
         "license": "Project original"
       }
     },
@@ -1870,7 +1870,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: granero elevado de madera, port\u00f3n doble y cubierta de paja.",
+        "source": "Original G-21: granero elevado de madera, portón doble y cubierta de paja.",
         "license": "Project original"
       }
     },
@@ -1930,7 +1930,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: molino facetado con cuatro aspas de bastidor y pa\u00f1os de paleta com\u00fan.",
+        "source": "Original G-21: molino facetado con cuatro aspas de bastidor y paños de paleta común.",
         "license": "Project original"
       }
     },
@@ -1990,7 +1990,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: herrer\u00eda abierta, tejado de teja, fragua y yunque de formas facetadas.",
+        "source": "Original G-21: herrería abierta, tejado de teja, fragua y yunque de formas facetadas.",
         "license": "Project original"
       }
     },
@@ -2050,7 +2050,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: capilla con espada\u00f1a, campana, contrafuertes y portada de piedra.",
+        "source": "Original G-21: capilla con espadaña, campana, contrafuertes y portada de piedra.",
         "license": "Project original"
       }
     },
@@ -2283,7 +2283,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Revisi\u00f3n original de mamposter\u00eda para The Valley, receta G-41.",
+        "source": "Revisión original de mampostería para The Valley, receta G-41.",
         "license": "Project original"
       }
     },
@@ -2575,7 +2575,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: atalaya de piedra con galer\u00eda abierta y cubierta a cuatro aguas.",
+        "source": "Original G-21: atalaya de piedra con galería abierta y cubierta a cuatro aguas.",
         "license": "Project original"
       }
     },
@@ -2634,7 +2634,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: cementerio con l\u00e1pidas, cruces de madera y sepulturas bajas.",
+        "source": "Original G-21: cementerio con lápidas, cruces de madera y sepulturas bajas.",
         "license": "Project original"
       }
     },
@@ -2753,7 +2753,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: ruina de piedra con hiladas rotas, cascote y tejas ca\u00eddas.",
+        "source": "Original G-21: ruina de piedra con hiladas rotas, cascote y tejas caídas.",
         "license": "Project original"
       }
     },
@@ -2821,7 +2821,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "cow-faceted",
@@ -2895,7 +2895,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "pig-faceted",
@@ -2967,7 +2967,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "hen-faceted",
@@ -3040,7 +3040,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "marked-models-63db59c",
@@ -3120,7 +3120,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "crow-faceted",
@@ -3192,7 +3192,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "fish-trout",
@@ -3690,7 +3690,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Jefe: gorro alto aparente, manto dorado sobre los hombros y t\u00fanica burdeos.",
+        "source": "Original G-18: Jefe: gorro alto aparente, manto dorado sobre los hombros y túnica burdeos.",
         "license": "Project original"
       }
     },
@@ -3783,7 +3783,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager-smith: redise\u00f1o low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md.",
+        "source": "Original villager-smith: rediseño low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md.",
         "license": "Project original"
       }
     },
@@ -3969,7 +3969,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager-priest: redise\u00f1o low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md.",
+        "source": "Original villager-priest: rediseño low-voxel G-17, rig compartido G-04; ver docs/historico/graphics-rounds/G-17.md.",
         "license": "Project original"
       }
     },
@@ -4062,7 +4062,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Guardabosques: capucha y capa corta verde oscuro, cintur\u00f3n de cuero.",
+        "source": "Original G-18: Guardabosques: capucha y capa corta verde oscuro, cinturón de cuero.",
         "license": "Project original"
       }
     },
@@ -4155,7 +4155,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Alguacil: t\u00fanica ocre corta, cintur\u00f3n ancho y cuaderno al cinto; manos libres.",
+        "source": "Original G-18: Alguacil: túnica ocre corta, cinturón ancho y cuaderno al cinto; manos libres.",
         "license": "Project original"
       }
     },
@@ -4248,7 +4248,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Herbolario: t\u00fanica verde hierba y zurr\u00f3n ocre con un haz de plantas.",
+        "source": "Original G-18: Herbolario: túnica verde hierba y zurrón ocre con un haz de plantas.",
         "license": "Project original"
       }
     },
@@ -4365,7 +4365,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: le\u00f1a apilada con corteza, cortes, duramen y grietas.",
+        "source": "Original G-21: leña apilada con corteza, cortes, duramen y grietas.",
         "license": "Project original"
       }
     },
@@ -4610,7 +4610,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Ni\u00f1o: cabeza mayor, brazos y piernas proporcionalmente cortos, t\u00fanica terracota sin herramientas; 0,65 celdas antes de statureAt.",
+        "source": "Original G-18: Niño: cabeza mayor, brazos y piernas proporcionalmente cortos, túnica terracota sin herramientas; 0,65 celdas antes de statureAt.",
         "license": "Project original"
       }
     },
@@ -4703,7 +4703,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Anciano: espalda inclinada en la geometr\u00eda, pelo claro y chal apagado. Sin bast\u00f3n fijo: ambas manos permanecen disponibles para los accesorios del juego.",
+        "source": "Original G-18: Anciano: espalda inclinada en la geometría, pelo claro y chal apagado. Sin bastón fijo: ambas manos permanecen disponibles para los accesorios del juego.",
         "license": "Project original"
       }
     },
@@ -4889,7 +4889,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Le\u00f1ador: chaleco abierto oscuro, mangas arremangadas y hacha guardada al cinto.",
+        "source": "Original G-18: Leñador: chaleco abierto oscuro, mangas arremangadas y hacha guardada al cinto.",
         "license": "Project original"
       }
     },
@@ -4982,7 +4982,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Alba\u00f1il: gorra, delantal marfil y peque\u00f1o bloque sobre un protector de hombro.",
+        "source": "Original G-18: Albañil: gorra, delantal marfil y pequeño bloque sobre un protector de hombro.",
         "license": "Project original"
       }
     },
@@ -5075,7 +5075,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Pastor: sombrero peque\u00f1o, ropa clara, zurr\u00f3n y vara lateral guardada; conectores libres.",
+        "source": "Original G-18: Pastor: sombrero pequeño, ropa clara, zurrón y vara lateral guardada; conectores libres.",
         "license": "Project original"
       }
     },
@@ -5168,7 +5168,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Pescador: camisa azul r\u00edo, botas altas y cesto lateral; manos libres para la acci\u00f3n.",
+        "source": "Original G-18: Pescador: camisa azul río, botas altas y cesto lateral; manos libres para la acción.",
         "license": "Project original"
       }
     },
@@ -5227,7 +5227,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-22: coles con coraz\u00f3n redondeado y hojas verdes abiertas.",
+        "source": "Original G-22: coles con corazón redondeado y hojas verdes abiertas.",
         "license": "Project original"
       }
     },
@@ -5529,7 +5529,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "marked-models-63db59c",
@@ -5600,8 +5600,8 @@
       "id": "fox",
       "artifactRound": "G-40",
       "status": "study",
-      "recipe": "deliverables/fox-model-trial/fox-astra-softened-muzzle.glb \u00b7 tools/art/rig-single-mesh.py",
-      "generator": "deliverables/fox-model-trial/fox-astra-softened-muzzle.glb \u00b7 tools/art/rig-single-mesh.py \u00b7 tools/art/rigid-clips.mjs",
+      "recipe": "deliverables/fox-model-trial/fox-astra-softened-muzzle.glb · tools/art/rig-single-mesh.py",
+      "generator": "deliverables/fox-model-trial/fox-astra-softened-muzzle.glb · tools/art/rig-single-mesh.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "fox-rig",
@@ -5681,7 +5681,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "mule-short",
@@ -5749,7 +5749,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, mule()); 29 sep 2026: patas acortadas a petici\u00f3n suya (MULE_DROP 0,10). Clips idle/walk de tools/art/rigid-clips.mjs.",
+        "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, mule()); 29 sep 2026: patas acortadas a petición suya (MULE_DROP 0,10). Clips idle/walk de tools/art/rigid-clips.mjs.",
         "license": "project-original"
       }
     },
@@ -5758,7 +5758,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
         "runId": "duck-faceted",
@@ -5826,7 +5826,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "\u00c1nade real facetado de The Valley (deliverables/marked-models-trial/build-models.py, duck(); 29 sep 2026), aprobado por Vera; clips de tools/art/rigid-clips.mjs.",
+        "source": "Ánade real facetado de The Valley (deliverables/marked-models-trial/build-models.py, duck(); 29 sep 2026), aprobado por Vera; clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
       }
     },
@@ -6562,7 +6562,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Modelado por Astra para The Valley (art/recipes/hall-candidate, rama art/astra-modelos, commit 725a512): casa larga medieval del l\u00edder, con hall_door.",
+        "source": "Modelado por Astra para The Valley (art/recipes/hall-candidate, rama art/astra-modelos, commit 725a512): casa larga medieval del líder, con hall_door.",
         "license": "project-original"
       }
     },
@@ -6614,7 +6614,7 @@
       },
       "provenance": {
         "kind": "original",
-        "source": "Port\u00f3n de madera G-24 aprobado previamente para The Valley; conservado para la empalizada.",
+        "source": "Portón de madera G-24 aprobado previamente para The Valley; conservado para la empalizada.",
         "license": "Project original"
       }
     },
@@ -8865,7 +8865,7 @@
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "approved": {
         "runId": "animales-rehechos",
         "directory": "artifacts/graphics/animales-rehechos/approved/horse"
@@ -8932,13 +8932,13 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Cig\u00fce\u00f1a blanca en el lenguaje de la gallina de Vera (build-models.py, stork(); 2 oct 2026, v5.100); clips idle/walk de tools/art/rigid-clips.mjs.",
+        "source": "Cigüeña blanca en el lenguaje de la gallina de Vera (build-models.py, stork(); 2 oct 2026, v5.100); clips idle/walk de tools/art/rigid-clips.mjs.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "approved": {
         "runId": "animales-rehechos",
         "directory": "artifacts/graphics/animales-rehechos/approved/stork"
@@ -9003,13 +9003,13 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Polluelo: la gallina de Vera en cr\u00eda, con su receta y su densidad (build-models.py, chick(); 2 oct 2026, v5.100); clips idle/walk de tools/art/rigid-clips.mjs.",
+        "source": "Polluelo: la gallina de Vera en cría, con su receta y su densidad (build-models.py, chick(); 2 oct 2026, v5.100); clips idle/walk de tools/art/rigid-clips.mjs.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
       "status": "study",
       "recipe": "deliverables/marked-models-trial/build-models.py",
-      "generator": "deliverables/marked-models-trial/build-models.py \u00b7 tools/art/rigid-clips.mjs",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
       "approved": {
         "runId": "animales-rehechos",
         "directory": "artifacts/graphics/animales-rehechos/approved/chick"
@@ -9074,7 +9074,7 @@
       "blenderVersion": "5.2.1 LTS",
       "provenance": {
         "kind": "original",
-        "source": "Nido de cig\u00fce\u00f1a, plataforma de ramas (build-models.py, stork_nest(); 2 oct 2026, v5.100). S\u00f3lo modelo.",
+        "source": "Nido de cigüeña, plataforma de ramas (build-models.py, stork_nest(); 2 oct 2026, v5.100). Sólo modelo.",
         "license": "project-original"
       },
       "artifactRound": "G-40",
@@ -9227,6 +9227,312 @@
       },
       "hashes": {
         "butterfly.glb": "95046AFCA8307CFCE1C532A07BB916BC2FB70889B703466D9CED7C21246C555E"
+      }
+    },
+    {
+      "id": "tailor",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B2 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/tailor-candidate/tailor.json",
+      "generator": "art/recipes/tailor-candidate/tailor.json",
+      "approved": {
+        "runId": "astra-b2",
+        "directory": "artifacts/graphics/astra-b2/approved/tailor"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          2,
+          1.458333,
+          -0.003333
+        ],
+        "size": [
+          2,
+          1.458333,
+          1.996667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 960
+      },
+      "hashes": {
+        "tailor.glb": "E62FAAA258440D10139C0147C62B43C0B5D3EE507871AD258163D5D1774CB763",
+        "tailor-preview.png": "3899B76D1AFF4C6A738F978FB84E5F51DE0A20C46C0D44B204327B1DA498AA94"
+      }
+    },
+    {
+      "id": "loom",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B2 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/loom-candidate/loom.json",
+      "generator": "art/recipes/loom-candidate/loom.json",
+      "approved": {
+        "runId": "astra-b2",
+        "directory": "artifacts/graphics/astra-b2/approved/loom"
+      },
+      "bounds": {
+        "min": [
+          -0.288333,
+          0,
+          -0.233333
+        ],
+        "max": [
+          0.288333,
+          0.534167,
+          0.233333
+        ],
+        "size": [
+          0.576667,
+          0.534167,
+          0.466667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 328
+      },
+      "hashes": {
+        "loom.glb": "CFB160EC9F14A40B5E526A96E5BB78B4D0D9D237375FA4BD25FBD08B59359C90",
+        "loom-preview.png": "E6A1C360AE4BFAF1434EF6FD7E5BD3E98DE4B985FA0A11D798EE55E323B6C85B"
+      }
+    },
+    {
+      "id": "field-flax",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B2 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/field-flax-candidate/field-flax.json",
+      "generator": "art/recipes/field-flax-candidate/field-flax.json",
+      "approved": {
+        "runId": "astra-b2",
+        "directory": "artifacts/graphics/astra-b2/approved/field-flax"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          3,
+          0.313,
+          0
+        ],
+        "size": [
+          3,
+          0.313,
+          2
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 4100
+      },
+      "hashes": {
+        "field-flax.glb": "4943C2AAC800B5C57B00EE9B62FECC746C24893F56D06281BB0875F7A4EBC0D2",
+        "field-flax-preview.png": "86C99415CF366793780E831CF74A3F74CF4FE8553FB8B156D08320221DE09E54"
+      }
+    },
+    {
+      "id": "field-flax-cut",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B2 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/field-flax-cut-candidate/field-flax-cut.json",
+      "generator": "art/recipes/field-flax-cut-candidate/field-flax-cut.json",
+      "approved": {
+        "runId": "astra-b2",
+        "directory": "artifacts/graphics/astra-b2/approved/field-flax-cut"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          3,
+          0.316667,
+          0
+        ],
+        "size": [
+          3,
+          0.316667,
+          2
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 212
+      },
+      "hashes": {
+        "field-flax-cut.glb": "1EA623EF1C7F8FE017884EFB179391A70B498389A785B73FF791EB4770BA778F",
+        "field-flax-cut-preview.png": "BDD997228B1F68D7D421C4E758E42FD431ABA6A279D4D3F4342C359AF79DB691"
+      }
+    },
+    {
+      "id": "linen-bolt",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B2 recipe.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/linen-bolt-candidate/linen-bolt.json",
+      "generator": "art/recipes/linen-bolt-candidate/linen-bolt.json",
+      "approved": {
+        "runId": "astra-b2",
+        "directory": "artifacts/graphics/astra-b2/approved/linen-bolt"
+      },
+      "bounds": {
+        "min": [
+          -0.113333,
+          0,
+          -0.053333
+        ],
+        "max": [
+          0.117833,
+          0.106667,
+          0.113333
+        ],
+        "size": [
+          0.231167,
+          0.106667,
+          0.166667
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "valley_vertex"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 60
+      },
+      "hashes": {
+        "linen-bolt.glb": "495DFC0A39B837017AD2E66DD96463FD9C3206614708F10683DC12E0CF2F78B7",
+        "linen-bolt-preview.png": "74FCFF4C7EA8DEDE0050A42680F6EAF764FF5B69F76F3417080365144165CFC8"
+      }
+    },
+    {
+      "id": "tailor-board",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B1 recipe, released after K5.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/notice-board-candidate/tailor-board.json",
+      "generator": "art/recipes/notice-board-candidate/tailor-board.json",
+      "approved": {
+        "runId": "astra-b2",
+        "directory": "artifacts/graphics/astra-b2/approved/tailor-board"
+      },
+      "bounds": {
+        "min": [
+          -0.25,
+          0,
+          -0.035
+        ],
+        "max": [
+          0.25,
+          0.705008,
+          0.099
+        ],
+        "size": [
+          0.5,
+          0.705008,
+          0.134
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "tailor-board_palette"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 1,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 248
+      },
+      "hashes": {
+        "tailor-board.glb": "359AE418086D1375145CEDC087FE109E791C12194D88214B3AC1F4E95BD1CAD3",
+        "tailor-board-preview.png": "17CDCC75D09A919418F25D16D66FCCAF783158A5E063249392AEC67BA14ED561"
       }
     }
   ]

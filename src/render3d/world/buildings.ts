@@ -126,6 +126,7 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
   // descartó la primera por no parecer de la Edad Media), con la hoja
   // `hall_door`. Sin el recurso, la caja más alta con el tejado burdeos.
   hall: 'hall',
+  tailor: 'tailor',
 };
 
 /** Sólo el tablero recto de E3b.1 tiene recurso publicado y validado. */
@@ -253,7 +254,10 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D, walkw
   const tower = planned.rampartShift !== undefined && planned.kind === 'bastion' && !planned.ruin
     ? rampartTower(source, planned.bastionAccess === undefined ? 0 : planned.rampartShift) : undefined;
   if (tower !== undefined) model = tower.object;
-  const fieldMaterials = planned.kind === 'field' && !planned.ruin ? dressField(model, planned) : [];
+  // The flax candidate is one vertex-coloured mesh, including its soil. The
+  // generic crop dresser would hide and scale the entire parcel.
+  const fieldMaterials = planned.kind === 'field' && !planned.ruin && !planned.asset?.startsWith('field-flax')
+    ? dressField(model, planned) : [];
   if (planned.rubbleStage === 'settling') model.scale.y *= 0.55;
   if (planned.ruin && planned.asset?.startsWith('ruin-')) {
     // La misma ruina sustituye parcelas de 1×1, 2×2, 3×2 o 3×3. Ajustar solo

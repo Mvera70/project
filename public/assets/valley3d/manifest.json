@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-02T17:12:30.769Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids stork,chick,crane,butterfly",
+  "generatedAt": "2026-10-02T17:58:14.534Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids tailor,loom,field-flax,field-flax-cut,linen-bolt,tailor-board",
   "assets": [
     {
       "id": "axis-marker",
@@ -2104,6 +2104,72 @@
       "provenance": {
         "kind": "original",
         "source": "Mariposa con los colores elegidos de la de Astra y forma de mariposa (build-models.py, butterfly(); 2 oct 2026, v5.100).",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "tailor",
+      "file": "tailor.glb",
+      "sha256": "E62FAAA258440D10139C0147C62B43C0B5D3EE507871AD258163D5D1774CB763",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B2 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "loom",
+      "file": "loom.glb",
+      "sha256": "CFB160EC9F14A40B5E526A96E5BB78B4D0D9D237375FA4BD25FBD08B59359C90",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B2 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "field-flax",
+      "file": "field-flax.glb",
+      "sha256": "4943C2AAC800B5C57B00EE9B62FECC746C24893F56D06281BB0875F7A4EBC0D2",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B2 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "field-flax-cut",
+      "file": "field-flax-cut.glb",
+      "sha256": "1EA623EF1C7F8FE017884EFB179391A70B498389A785B73FF791EB4770BA778F",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B2 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "linen-bolt",
+      "file": "linen-bolt.glb",
+      "sha256": "495DFC0A39B837017AD2E66DD96463FD9C3206614708F10683DC12E0CF2F78B7",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B2 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "tailor-board",
+      "file": "tailor-board.glb",
+      "sha256": "359AE418086D1375145CEDC087FE109E791C12194D88214B3AC1F4E95BD1CAD3",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B1 recipe, released after K5.",
         "license": "project-original"
       }
     }

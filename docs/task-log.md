@@ -4860,3 +4860,15 @@ decidido por Sol 6: los cinco modelos de sastrería permanecen como candidatos m
 decidido por Sol 6: los modelos de mina permanecen como candidatos aunque AR-2 (#65) ya haya añadido la vida minera; el encargo de esta tanda indica expresamente «mina, sólo modelo».
 
 Hojas revisadas: sastrería, telar, lino florido y segado, lienzo; boca de mina, vagonetas vacía y llena, acopios de cuatro tamaños y raíles. Son legibles a escala de casa y aldeano en `artifacts/graphics/astra/<id>/sheet.png`; el montaje completo de mina está en `artifacts/graphics/astra/mine-mouth/assembly.png`. Presupuestos: sastrería 960/1 500, telar 328/400, lino 4 100 frente a 4 732 de `field`, boca 544/1 200, carros 232 y 280/300, acopio máximo 288/300, raíles 72/80 triángulos. Las recetas B2 pasaron su validador (5/5), `typecheck`, `lint` y `npm run shot` pasaron. No cambian el catálogo publicado ni la escena; al no activarse, añaden cero llamadas y cero triángulos a la partida.
+
+## 2 oct 2026 · Integración de sastrería tras K5 (Bloques 1 y 2)
+
+K5 (#56) entró en `main` y su CI terminó verde. Se publicaron seis modelos: `tailor`, `loom`, `field-flax`, `field-flax-cut`, `linen-bolt` y `tailor-board`. El taller reemplaza la caja de K5; el tablón propio reemplaza el provisional. La escena selecciona los dos estados del campo señalado por `tailor:flax:field` y el rollo se coloca sólo si `village.linen > 0`, en una celda libre junto al taller.
+
+decidido por Sol 6: el campo de lino enseña flores en `grow` y `ripe`; en las demás fases del encargo enseña gavillas. Su malla única incluye tierra y cultivo, así que no se aplica la escala por planta del campo ordinario.
+decidido por Sol 6: el telar suelto se publica pero no se vuelve a poner junto al taller, porque `tailor.glb` ya incorpora uno visible en el porche; así se evita duplicación y una llamada inútil.
+decidido por Sol 6: como máximo aparece un rollo de lienzo fuera del taller cuando hay existencias; usa el filtro de caminos y accesos de `steading.ts`, sin ocupar celdas del motor.
+
+Villa grande, semilla 7/año 60/verano, base `main` con K5: `gl-probe` 8 s **525 → 512 llamadas, 875 140 → 871 383 triángulos dinámicos, 48 → 48 programas**; `scene-report` **472 → 467 mallas, 203 → 197 sombras, 786 222 → 787 354 triángulos**. La caída de triángulos en la sonda depende de la fase de personajes; el recuento estable de escena sube 1 132 por el taller detallado. El cambio de llamadas es −13, sin sobrecoste de render.
+
+Capturas de la misma partida y cámara: `artifacts/graphics/astra-b2-tailor-baseline/tailor-close.png` antes y `artifacts/graphics/astra-b2-tailor/tailor-close.png` después; plano general en `artifacts/graphics/astra-b2-tailor/village.png`. Toma 3D de 12 s a 2 fps con 48 personas y 36 animales: `observe-life` antes/después 0 errores, `meshDrift` 0→0, `peopleMeshDrift` 4→4, `penetratingCircles` 5→5, `blockedCentres` 4→4, `penetratingBeasts` 0→0. Son incidencias previas del mismo valle, no regresiones de esta colocación. Puerta local: `typecheck`, `lint`, 67 pruebas rápidas pertinentes, 5 recetas validadas y `npm run shot`.

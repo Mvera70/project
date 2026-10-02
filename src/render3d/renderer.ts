@@ -248,6 +248,7 @@ export const WANTED = [
   'fiddle', 'pilgrim-hat', 'pilgrim-staff', 'grindstone-pack', 'herb-basket',
   'bundle-pack', 'forage-basket', 'rope-pick', 'trade-pack', 'hide-bundle',
   'notice-board', 'smithy-board', 'chapel-board', 'signpost', 'hide-rack', 'hammer',
+  'tailor-board', 'field-flax', 'field-flax-cut',
   'burnt-house', 'great-oak',
   ...FAUNA,
   // E3 · el plan sustituye el bastión por esta variante cuando cabe su escalera.
@@ -631,12 +632,11 @@ export async function createGraphicsRenderer(
   // (`derive/building-boards.ts`): la misma pieza provisional, más pequeña.
   const smithyBoard = library.instance('smithy-board');
   const chapelBoard = library.instance('chapel-board');
-  // K5 · y el de la sastrería, todavía con la pieza provisional (sin malla
-  // propia: `docs/encargos/ilustraciones-k5-lino.md`).
+  const tailorBoard = library.instance('tailor-board');
   const buildingBoards = {
-    smithy: createNoticeBoard(smithyBoard), church: createNoticeBoard(chapelBoard), tailor: createNoticeBoard(),
+    smithy: createNoticeBoard(smithyBoard), church: createNoticeBoard(chapelBoard), tailor: createNoticeBoard(tailorBoard),
   } as const;
-  const boardModels = { smithy: smithyBoard, church: chapelBoard, tailor: undefined } as const;
+  const boardModels = { smithy: smithyBoard, church: chapelBoard, tailor: tailorBoard } as const;
   for (const [which, mesh] of Object.entries(buildingBoards)) {
     mesh.group.name = `Valley_NoticeBoard_${which}`;
     mesh.group.userData['board'] = which;
