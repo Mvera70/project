@@ -1,5 +1,13 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · El cerco sin salida (v5.89) — en vuelo
+
+Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
+rama `claude/cerco-sin-salida`, **versión v5.89**. Motor: la regla del portón
+en `placement.ts`, para que ningún pueblo quede encerrado por su propio cerco
+(abierto (3) del valle natural, #48). Avisada la sesión de AR-2 (minería), que
+también toca el motor.
+
 ## 2 oct 2026 · La fauna por estaciones (v5.85)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
