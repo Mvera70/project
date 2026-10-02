@@ -94,8 +94,29 @@ mueve byte a byte.
   tarjeta (Codex, `docs/encargos/ilustraciones-k5-cuero.md`); el «+1 piel» sobre
   el cazador.
 
+## 2 oct 2026 · Los usos del cinturón (v5.74)
+
+Rama `ccr-2aad21e1-6aw4u1`, reabierta desde `main` tras fusionar v5.73 (#48).
+Lo que Vera eligió para el
+cinturón —pasto, bosque de ladera y cantera—, **como vida y sin tocar el
+balance**. Hecho: el bosque de ladera (de 172 a 387 pinos y de 93 a 123 robles
+por valle, sin sombra, sus troncos como obstáculo para la vida); el rebaño
+anclado junto en la falda (64 de 64 anclas con cuatro vacas, el 82 % de la
+jornada fuera del contorno); la cantera al pie de la montaña, elegida por ruta
+andando y sin que le quiten la carga al albañil (entrega piedra en 60 valles de
+60; antes en 49, que era lo abierto de v5.73); y la senda de la garganta a 0,02
+del suelo en vez de 0,07 («el camino flotando… casi»). Medidas y hojas:
+`docs/medidas/cinturon-2026-10-02.md`.
+
+**Abierto:** (1) **el pasto casi no se verá**: con la política prudente casi
+ninguna aldea tiene vacas (una muestra de 96, doce valles hasta los sesenta
+años); que haya ganado es del motor y del nivelado, de Vera. (2) Lo que el
+cinturón dará un día (madera de ladera, establos y cercados fuera de la muralla,
+más piedra): bases puestas, nada construido.
+
 ## 2 oct 2026 · El valle con forma natural (v5.73)
 
+**Fusionada (#48, `24683e35`), con los ocho trabajos de la CI en verde.**
 Rama `ccr-2aad21e1-6aw4u1`, **versiones v5.73 (esto) y v5.74 (los usos del
 cinturón)**: v5.71 y v5.72 las tomaron rutas y K7 esta noche. Medido antes en
 `main` y decidido por Vera con las hojas delante (cenital, en su ángulo): la
@@ -124,13 +145,12 @@ alcanzan menos de 500 celdas (1 de 24 en `main`); en la semilla 13 el único
 portón da a la montaña. Es la regla del portón (`placeBuilding` no mira adónde
 da) y va en su propia ronda, porque mueve todas las trayectorias. (4) Cerca de
 la plaza queda la mitad de sitio para campos (unos 245 → 144 sitios de 3×2):
-avisado K5, por el lino.
-**v5.74, los usos del cinturón, está hecha y sin subir**: el commit
-`9bf57322`, sobre `5575f1f5`, guardado en un `git bundle` y un `format-patch` en
-el scratchpad de la sesión (bosque de ladera, pasto de la falda, cantera al pie
-de la montaña y la senda a 0,02). Entra como PR propia cuando #48 esté en
-`main`.
-**Siguiente:** v5.74, los usos del cinturón.
+avisado K5, por el lino. (5) **Las gargantas, más anchas**: en los extremos del
+mapa la pared arranca a 9–14 celdas del río en vez de a 3, porque el contorno
+llega hasta ellas con su falda (las cascadas ya se buscan hasta 14). Y el
+tick, arreglado de paso: las rutas que no llegan se repetían con cada pareja
+de entradas (8,3 ms por semana contra 9,0 de `main`).
+**Siguiente:** v5.74, los usos del cinturón (arriba).
 
 ## 2 oct 2026 · La tanda de la noche, cerrada (director)
 

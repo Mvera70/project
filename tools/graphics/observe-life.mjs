@@ -37,6 +37,9 @@ const happening = opt('happening', '');
 // (`&hunted=`, `huntedNow`): abre las cazas que vienen detrás y la visita del
 // oso, que sólo nace superado el jabalí. Se combina con `--happening`.
 const hunted = opt('hunted', '');
+// v5.74 · `--cows 4` pone esas vacas en el corral (`&cows=`): el rebaño pasta
+// en la falda, y con la política prudente casi ninguna aldea tiene vacas.
+const cows = opt('cows', '');
 // K-5 · `--crown ready` deja la fila de la corona encendida y `--crown <oficio>`
 // corona ya a alguien de ese oficio, para ver la sala y el estilo del valle.
 const crown = opt('crown', '');
@@ -78,12 +81,13 @@ try {
   const progress = opt('progress', '');
   // D3b · `--assault` hace que la partida venga a tirar el porton.
   const assault = args.includes('--assault') ? '1' : '';
-  const debugRoute = means !== '' || happening !== '' || hunted !== '' || crown !== '' || raid !== ''
+  const debugRoute = means !== '' || happening !== '' || hunted !== '' || cows !== '' || crown !== '' || raid !== ''
     || braced !== '' || coming !== '' || warning !== '' || assault !== '' || aftermath !== '' || aftermathControl !== '' || wallwork !== '';
   if (debugRoute) {
     const extra = (means === '' ? '' : `&means=${means}`)
       + (happening === '' ? '' : `&happening=${happening}`)
       + (hunted === '' ? '' : `&hunted=${hunted}`)
+      + (cows === '' ? '' : `&cows=${cows}`)
       + (crown === '' ? '' : `&crown=${crown}`)
       + (raid === '' ? '' : `&raid=${raid}`)
       + (coming === '' ? '' : `&coming=${coming}`)

@@ -35,7 +35,8 @@
 
 import { ANIMALS } from '@engine/balance';
 import { hash32 } from '@engine/rng';
-import type { GameState } from '@engine/state';
+import { TERRAIN_CODE, type GameState } from '@engine/state';
+import { distanceOutside } from '@engine/world/valley-shape';
 import {
   blockedAt, fitsCircle, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
   type Body, type Point, type Terrain,
@@ -507,6 +508,23 @@ const SPREAD_CLEARANCE = 0.9;
  * sitio para picotear, hozar y pastar sin pisarse.
  */
 const OWN_PASTURE_CELLS = 30;
+/**
+ * v5.74 · **El pasto de la falda.** Con el valle de forma natural (v5.73), Vera
+ * eligió que el cinturón de prado alrededor del contorno tuviera uso, y uno de
+ * los tres fue éste: el rebaño sube a pastar a la falda. Las vacas se anclan
+ * juntas en el prado de fuera del valle más cercano —andando— a los campos,
+ * a no más de `FALDA_DEPTH` celdas del borde y a no más de `FALDA_REACH`
+ * pasos del linde de un campo. Si no lo hay, o un cerco sin portón lo deja
+ * fuera, cada una vuelve junto a su campo, como antes.
+ *
+ * TUNE: dos celdas de fondo, porque el bosque de ladera empieza a tres
+ * (`SLOPE_WOOD_REACH`, `forest.ts`) y una vaca pasta hasta 3,2 celdas de su
+ * ancla. Veinticuatro pasos: medido en ocho aldeas a los 5, 15 y 30 años (129
+ * campos), la falda más cercana a un campo queda a 9,2 celdas en línea recta
+ * de mediana, 15,2 en el percentil 90 y 17,9 como mucho; andando es algo más.
+ */
+const FALDA_DEPTH = 2;
+const FALDA_REACH = 24;
 
 /** Dónde nace un animal y qué suelo cuenta como suyo. */
 interface Home { readonly at: Point; readonly reach: Uint8Array }
@@ -654,7 +672,9 @@ export function createBeasts(
   // un tercer animal en la misma celda ya es un montón y busca la de al lado.
   const claimNear = (p: Point, id: number, reach: Uint8Array): Point =>
     (taken.get(cellOf(p)) ?? 0) < 2 ? claim(p) : openSpotNear(p, id, RADIUS.cow, reach) ?? claim(p);
-  const openSpotNear = (from: Point, id: number, clearance: number, reach = shore): Point | null => {
+  const openSpotNear = (
+    from: Point, id: number, clearance: number, reach = shore, allowed: (cell: number) => boolean = () => true,
+  ): Point | null => {
     const startX = Math.floor(from.x), startZ = Math.floor(from.z);
     const found: Point[] = [];
     for (let ring = 0; ring <= SPREAD_RINGS && found.length < SPREAD_CHOICES; ring += 1) {
@@ -664,7 +684,7 @@ export function createBeasts(
           const x = startX + dx, z = startZ + dz;
           if (x < 1 || z < 1 || x >= land.width - 1 || z >= land.height - 1) continue;
           const cell = z * land.width + x;
-          if (reach[cell] !== 1 || taken.has(cell)) continue;
+          if (reach[cell] !== 1 || taken.has(cell) || !allowed(cell)) continue;
           if (!fitsCircle(land, x + 0.5, z + 0.5, clearance)) continue;
           found.push({ x: x + 0.5, z: z + 0.5 });
         }
@@ -694,6 +714,48 @@ export function createBeasts(
     }
     return found.size >= OWN_PASTURE_CELLS ? found.reach : null;
   };
+  // v5.74 · La falda: prado de fuera del valle, pegado a su borde.
+  const outside = state.herd.cows > 0 && !secure ? distanceOutside(state.map.heart) : null;
+  const inFalda = (cell: number): boolean => outside !== null && state.map.heart[cell] === 0
+    && (outside[cell] as number) <= FALDA_DEPTH && state.map.terrain[cell] === TERRAIN_CODE.meadow;
+  // El trozo de falda más cercano andando desde los campos, por la orilla del
+  // ganado: una inundación desde el linde de todos ellos —la puerta de uno
+  // solo puede quedar encajonada entre parcelas— que para en la primera celda
+  // que vale. Si ningún campo toca esa orilla, desde el corazón del ganado.
+  const faldaOf = (): Point | null => {
+    const around = (cell: number): number[] => {
+      const x = cell % land.width, z = Math.floor(cell / land.width);
+      return [x > 0 ? cell - 1 : -1, x + 1 < land.width ? cell + 1 : -1,
+        z > 0 ? cell - land.width : -1, z + 1 < land.height ? cell + land.width : -1].filter((next) => next >= 0);
+    };
+    const sown = new Uint8Array(land.width * land.height);
+    for (const field of fields) {
+      for (let z = Math.max(0, field.y); z < Math.min(land.height, field.y + field.h); z += 1) {
+        for (let x = Math.max(0, field.x); x < Math.min(land.width, field.x + field.w); x += 1) sown[z * land.width + x] = 1;
+      }
+    }
+    const steps = new Int16Array(land.width * land.height).fill(-1);
+    const queue: number[] = [];
+    for (let cell = 0; cell < steps.length; cell += 1) {
+      if (shore[cell] !== 1 || !around(cell).some((next) => sown[next] === 1)) continue;
+      steps[cell] = 0;
+      queue.push(cell);
+    }
+    const middle = cellOf(heart);
+    if (queue.length === 0 && shore[middle] === 1) { steps[middle] = 0; queue.push(middle); }
+    for (let head = 0; head < queue.length; head += 1) {
+      const cell = queue[head] as number;
+      const x = cell % land.width, z = Math.floor(cell / land.width);
+      if (inFalda(cell) && fitsCircle(land, x + 0.5, z + 0.5, SPREAD_CLEARANCE)) return { x: x + 0.5, z: z + 0.5 };
+      if ((steps[cell] as number) >= FALDA_REACH) continue;
+      for (const next of around(cell)) {
+        if (steps[next] !== -1 || shore[next] !== 1) continue;
+        steps[next] = (steps[cell] as number) + 1;
+        queue.push(next);
+      }
+    }
+    return null;
+  };
 
   // Gallinas: dos por casa, como en `render/animals.ts` (`HENS_PER_HOUSE`).
   for (let i = 0; i < state.herd.hens; i += 1) {
@@ -707,12 +769,17 @@ export function createBeasts(
   }
   // Vacas: junto a los campos, dos por cabeza (`FIELDS_PER_COW`). E0a las
   // lleva junto a las mismas casas interiores que ya cobijan al resto de la
-  // cabaña; no desaparecen ni cambia una unidad de `state.herd`.
+  // cabaña; no desaparecen ni cambia una unidad de `state.herd`. Y desde
+  // v5.74, fuera de esa jornada, el rebaño pasta junto en la falda.
+  const falda = secure || state.herd.cows === 0 ? null : faldaOf();
   for (let i = 0; i < state.herd.cows; i += 1) {
     const shelter = secure
       ? houses[(i * ANIMALS.FIELDS_PER_COW) % Math.max(1, houses.length)]
       : fields[(i * ANIMALS.FIELDS_PER_COW) % Math.max(1, fields.length)];
-    spawn('cow', anchorOf(shelter, BEAST_ID_BASE + n));
+    const id = BEAST_ID_BASE + n;
+    const grazing = falda === null ? null : openSpotNear(falda, id, SPREAD_CLEARANCE, shore, inFalda)
+      ?? openSpotNear(falda, id, RADIUS.cow, shore, inFalda);
+    spawn('cow', grazing === null ? anchorOf(shelter, id) : { at: grazing, reach: shore });
   }
 
   return beasts;

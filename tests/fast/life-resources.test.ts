@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { TIME } from '../../src/engine/balance';
 import { foundGame } from '../../src/engine/found';
+import { TERRAIN_CODE } from '../../src/engine/state';
 import { bpCostOf } from '../../src/engine/world/works';
 import { createVillage } from '../../src/render3d/life/village';
 import { castOf } from '../../src/render3d/life/cast';
@@ -62,62 +63,51 @@ describe('IA-15/17/18 · recursos visibles', () => {
     expect(snapshot(1)).toEqual(snapshot(0));
   });
 
-  it('una obra de piedra manda al albañil a roca real, carga, descarga y vuelve sin inventario', () => {
-    // **En un valle con la roca a mano**, buscado entre varios: con la cantera
-    // a más de catorce celdas de la obra la jornada se le acaba al albañil
-    // antes de cargar (medido el 2 oct 2026: entrega a 4 y a 13 celdas, no a 17
-    // ni a 24). Con el valle de forma natural (v5.73) la roca de la semilla 7
-    // —la única que miraba esta prueba— quedó a 17. La cantera lejana es lo
-    // abierto de la de pie de monte (v5.74), no lo que se guarda aquí.
-    const reach = 14;
-    let state: ReturnType<typeof foundGame> | undefined;
-    let life: ReturnType<typeof createVillage> | undefined;
-    let before = '';
-    for (const seed of [7, 3, 11, 19, 23]) {
-      const candidate = foundGame(seed);
-      const house = candidate.buildings.find(building => building.kind === 'house')!;
-      candidate.works = [{
+  it('una obra de piedra manda al cantero al pie de la montaña, carga, descarga y vuelve sin inventario', () => {
+    // v5.74 · **en varios valles, y en los de la cantera lejos.** La piedra
+    // sale del frente al pie de la montaña (Vera, 2 oct 2026), elegido por lo
+    // que se anda; y quien pica termina su porte. Hasta v5.73 esta prueba tenía
+    // que buscar un valle con la roca a menos de catorce celdas, porque más
+    // lejos la jornada se le acababa al albañil antes de cargar: en las
+    // semillas 7 y 19 del valle de forma natural no entregaba nada.
+    for (const seed of [7, 19, 23]) {
+      const state = foundGame(seed);
+      const house = state.buildings.find(building => building.kind === 'house')!;
+      state.works = [{
         id: 77, kind: 'stone_house', x: house.x, y: house.y, w: house.w, h: house.h,
         bpCost: bpCostOf('stone_house'), bpDone: 0, stoneDone: 0, materialsPaid: true,
-        startedTick: candidate.tick, upgradeOf: house.id,
+        startedTick: state.tick, upgradeOf: house.id,
       }];
       // Antes de montar ninguna jornada: la vida no puede tocar el motor.
-      const snapshot = JSON.stringify(candidate);
-      const day = Array.from({ length: 14 }, (_, n) => createVillage(candidate, n))
-        .find(one => one.dwellers.some(dweller => dweller.dayPlan?.job?.place.startsWith('quarry:') === true));
-      const job = day?.dwellers.find(dweller => dweller.dayPlan?.job?.place.startsWith('quarry:'))?.dayPlan?.job;
-      if (day === undefined || job === undefined || job === null) continue;
-      const cell = Number(job.place.split(':')[1]);
-      const far = Math.hypot(cell % candidate.map.width + 0.5 - (house.x + house.w / 2),
-        Math.floor(cell / candidate.map.width) + 0.5 - (house.y + house.h / 2));
-      if (far > reach) continue;
-      state = candidate;
-      life = day;
-      before = snapshot;
-      break;
-    }
-    expect(life, 'alguna jornada representa la fracción de cantera de la obra, con la roca a mano').toBeDefined();
-    if (life === undefined || state === undefined) return;
+      const before = JSON.stringify(state);
+      const life = Array.from({ length: 14 }, (_, day) => createVillage(state, day))
+        .find(candidate => candidate.dwellers.some(dweller =>
+          dweller.dayPlan?.job?.place.startsWith('quarry:') === true));
+      expect(life, `semilla ${seed}: alguna jornada representa la fracción de cantera de la obra`).toBeDefined();
+      if (life === undefined) continue;
 
-    const mason = life.dwellers.find(dweller => dweller.dayPlan?.job?.place.startsWith('quarry:'))!;
-    let quarrying = false, hauling = false, unloading = false, interrupted = false;
-    for (let step = 0; step < 7_200 && life.stoneDeliveries === 0; step += 1) {
-      life.step(0.45);
-      interrupted ||= mason.holding !== null && mason.holding <= -1_000_000 && mason.scene !== null;
-      const actor = castOf(life, step / 30, new Map(), new Set()).find(item => item.id === mason.villager);
-      // IA-anim: en la cantera se pica con pico (`mine`), no con el martillo de la fragua.
-      quarrying ||= actor?.clip === 'mine' && mason.doing?.place.id.startsWith('quarry:') === true;
-      hauling ||= actor?.clip === 'carry_walk' && actor.load === 'stone';
-      unloading ||= actor?.clip === 'sort' && mason.doing?.offer.id === 'deliver-stone';
+      const mason = life.dwellers.find(dweller => dweller.dayPlan?.job?.place.startsWith('quarry:'))!;
+      const cell = Number(mason.dayPlan!.job!.place.split(':')[1]);
+      expect(state.map.terrain[cell], `semilla ${seed}: la cantera es la montaña, no un pedregal del valle`).toBe(TERRAIN_CODE.mountain);
+      let quarrying = false, hauling = false, unloading = false, interrupted = false;
+      for (let step = 0; step < 7_200 && life.stoneDeliveries === 0; step += 1) {
+        life.step(0.45);
+        interrupted ||= mason.holding !== null && mason.holding <= -1_000_000 && mason.scene !== null;
+        const actor = castOf(life, step / 30, new Map(), new Set()).find(item => item.id === mason.villager);
+        // IA-anim: en la cantera se pica con pico (`mine`), no con el martillo de la fragua.
+        quarrying ||= actor?.clip === 'mine' && mason.doing?.place.id.startsWith('quarry:') === true;
+        hauling ||= actor?.clip === 'carry_walk' && actor.load === 'stone';
+        unloading ||= actor?.clip === 'sort' && mason.doing?.offer.id === 'deliver-stone';
+      }
+      expect(quarrying, `semilla ${seed}: pica`).toBe(true);
+      expect(hauling, `semilla ${seed}: carga`).toBe(true);
+      expect(unloading, `semilla ${seed}: descarga`).toBe(true);
+      expect(interrupted, `semilla ${seed}`).toBe(false);
+      expect(life.stoneDeliveries, `semilla ${seed}: entrega`).toBeGreaterThan(0);
+      // IA-piles · la piedra la consume la obra: no queda un canto suelto al lado.
+      expect(life.props.some(prop => prop.kind === 'stone' && prop.held === null), `semilla ${seed}`).toBe(false);
+      expect(JSON.stringify(state), `semilla ${seed}`).toBe(before);
     }
-    expect(quarrying).toBe(true);
-    expect(hauling).toBe(true);
-    expect(unloading).toBe(true);
-    expect(interrupted).toBe(false);
-    expect(life.stoneDeliveries).toBeGreaterThan(0);
-    // IA-piles · la piedra la consume la obra: no queda un canto suelto al lado.
-    expect(life.props.some(prop => prop.kind === 'stone' && prop.held === null)).toBe(false);
-    expect(JSON.stringify(state)).toBe(before);
   });
 
   it('la semana real de cosecha recoge, porta y guarda grano sin volver a producirlo', () => {

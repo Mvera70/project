@@ -553,7 +553,11 @@ export function decide(
       // a su almacén (una rutina de oficio que no es el tajo) la termina antes.
       // Sin esta salvedad se soltaban leña y grano en medio del camino
       // (`life-resources.test.ts`, que juega su jornada al mediodía).
-      const carrying = who.doing !== null && who.doing.offer.routineOnly === true && who.doing.offer.id !== 'work';
+      // v5.74 · y quien acaba de picar en la cantera, que lo siguiente es
+      // cargar la piedra: sin esto, a mediodía la comida le ganaba al porte y
+      // la piedra se quedaba en la ladera (la prueba de recursos juega a 0,45).
+      const carrying = who.doing !== null && ((who.doing.offer.routineOnly === true && who.doing.offer.id !== 'work')
+        || (who.doing.place.id.startsWith('quarry:') && who.doing.there));
       if ((offer.id === 'meal' || offer.id === 'hearth') && !carrying) score = Math.max(score, 1.3);
       // El valle más vivo · **el puesto del buhonero saca a la gente del tajo**,
       // pero sólo a la de alrededor: a menos de `BROWSE_PULL` celdas. Sin suelo,
