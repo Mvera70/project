@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T20:19:37.522Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids mule,boar",
+  "generatedAt": "2026-10-02T15:37:13.924Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids stork,chick,crane,butterfly",
   "assets": [
     {
       "id": "axis-marker",
@@ -1584,6 +1584,76 @@
         "kind": "original",
         "source": "Modelado por Vera para The Valley (deliverables/marked-models-trial/build-models.py, boar()); 29 sep 2026: patas acortadas y colmillos mayores a petición suya (BOAR_DROP 0,08, BOAR_TUSK 1,5). Clips de tools/art/rigid-clips.mjs.",
         "license": "Project original"
+      }
+    },
+    {
+      "id": "stork",
+      "file": "stork.glb",
+      "sha256": "4E2E6885FF2B56C03AD6735E2DD92F2B6E25EE9D6356BB29874AC9CA8DB3D065",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.232
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Cigüeña blanca facetada de The Valley (build-models.py, stork(); 2 oct 2026, v5.100), sobre la estructura de la gallina, en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "chick",
+      "file": "chick.glb",
+      "sha256": "1D0A91EC1DF9CFF4F7F16B91BF843723EAFDB53E929595A9DCAA4785E1EDBE24",
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.021
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Polluelo facetado de The Valley (build-models.py, chick(); 2 oct 2026, v5.100), con los nodos de la gallina, en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "crane",
+      "file": "crane.glb",
+      "sha256": "708D7CFED25679AAC46C977B411FC0877A7183E434325BAE6A95A3F75C39EC18",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Grulla en vuelo facetada de The Valley (build-models.py, crane(); 2 oct 2026, v5.100), con las alas en el hombro como la golondrina, en lugar del candidato de Astra.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "butterfly",
+      "file": "butterfly.glb",
+      "sha256": "2B0E14D6FF4D35AAD8AF100C26DCB3DB33578C4C956A465F1E516B4435582A05",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Mariposa facetada de The Valley (build-models.py, butterfly(); 2 oct 2026, v5.100), dos alas de una cara para teñir por instancia, en lugar del candidato de Astra.",
+        "license": "project-original"
       }
     }
   ]

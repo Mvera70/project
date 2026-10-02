@@ -103,7 +103,7 @@ function clip(name, seconds, spec) {
 const wave = (t, cycles = 1, offset = 0) => Math.sin((t * cycles + offset) * Math.PI * 2);
 // Cuánto abre las patas cada una al andar, en radianes. TUNE: lo que se lee a
 // la distancia de juego sin que el animal parezca que patina ni que salta.
-const QUADS = { wolf: 0.45, dog: 0.5, mule: 0.38, bear: 0.3, boar: 0.4, pig: 0.4, cow: 0.34, deer: 0.26 };
+const QUADS = { wolf: 0.45, dog: 0.5, mule: 0.38, bear: 0.3, boar: 0.4, pig: 0.4, cow: 0.34, deer: 0.26, horse: 0.3 };
 const motion = [];
 // El `rear` del oso es su amenaza, lo que el juego llama `attack`. El `takeoff`
 // de la perdiz se conserva con su nombre: es un despegue de una vez, y el juego
@@ -137,7 +137,9 @@ function legAngle(p, travel, length) {
 // suba y baje. Girar la pata entera desde la cadera (`gait`) sube y baja el
 // casco en el apoyo; en el ciervo eso lo vigila `animal-gait-axis.test.ts`
 // desde que Vera vio que «siguen pareciendo que deslizan» (27 sep 2026).
-const PLANTED = new Set(['deer']);
+// El caballo de tiro (v5.100) nace con el casco plantado: es lo que Vera ya
+// aprobó en el ciervo, y un caballo pesado que patina se ve más que un ciervo.
+const PLANTED = new Set(['deer', 'horse']);
 const CROUCH = 0.025;
 function plantedGait(legs, travel, bob) {
   const rotate = {};
@@ -277,8 +279,8 @@ function bird() {
       [Y, (t) => (t > 0.6 ? 0.35 * Math.sin((Math.PI * (t - 0.6)) / 0.4) : 0)]] },
   });
   motion.push({ name: 'idle', seconds: idleSeconds, loop: true, strideLength: null });
-  // La gallina, el cuervo del campo y el pato no vuelan en el juego: andan y
-  // picotean, y hasta ahí. Sólo la perdiz de caza despega.
+  // La gallina, el cuervo del campo, el pato, la cigüeña y el polluelo no
+  // vuelan en el juego: andan y picotean, y hasta ahí. Sólo la perdiz despega.
   if (species !== 'partridge') return;
   // El vuelo en bucle: las alas arriba y abajo, las patas recogidas. La altura
   // la pone el juego (`altitude`), no el clip.
@@ -329,7 +331,8 @@ function durationOf(animation) {
 }
 
 if (QUADS[species] !== undefined) quadruped(QUADS[species]);
-else if (['partridge', 'hen', 'crow', 'duck'].includes(species)) bird();
+// La cigüeña y el polluelo (v5.100) tienen los nodos de la gallina.
+else if (['partridge', 'hen', 'crow', 'duck', 'stork', 'chick'].includes(species)) bird();
 else if (species === 'fish') fish();
 else throw new Error(`Especie sin clips: ${species}`);
 

@@ -1,5 +1,68 @@
 # The Valley — Registro de cambios
 
+## v5.100 · 2 oct 2026 · Los animales rehechos: los de Astra, con el estilo de los del valle
+
+**Por qué.** Vera, 2 oct 2026: «los modelos de Astra de los animales no me
+gustan, los corregirás tú con el estilo que has ido usando con los últimos».
+Los seis candidatos de Astra de hoy (`art/astra-b6-fauna-polish`,
+`art/astra-b7-village`) se hicieron fuera del camino de los animales del valle:
+mallas rígidas de vértices escritos a mano, sin los nodos de su esqueleto y sin
+clips, y el caballo con el cuerpo de cajas de G-23 que Vera retiró el 29 sep.
+
+**Qué falla en cada uno, comparado con los nuestros** (una línea cada uno):
+
+- **Cigüeña**: huevo de caras planas con el ala negra pegada como una placa, el
+  cuello en una pieza aparte sin esqueleto y sin patas que anden.
+- **Nido**: una palangana de pared recta y fondo plano con astillas en el borde;
+  se lee cesto, no nido de ramas.
+- **Polluelo**: una campana amarilla con el pico pegado, sin cabeza que se
+  distinga del cuerpo y sin nodos para andar detrás de la gallina.
+- **Grulla**: alas de papel con dientes de sierra y cuerpo de huso; de lejos, una
+  cometa gris.
+- **Mariposa**: dos pajaritas con los colores horneados, que el juego no puede
+  teñir por instancia.
+- **Caballo**: patas en salchichas con huecos en las rodillas, tronco de caja y
+  cascos de cubo: el estilo de G-23, no el facetado de la mula y la vaca.
+
+**Lo que se hizo.** Seis funciones en `deliverables/marked-models-trial/build-models.py`
+con las piezas de la mula, la vaca y la gallina (`loft`, `tube`, `ell`, `leaf`),
+el mismo esqueleto de nodos y los clips de `tools/art/rigid-clips.mjs`, dentro del
+presupuesto del encargo: caballo 888/900 (esqueleto de la mula, `walk` con **el
+casco plantado** como el ciervo), cigüeña 238/250 y polluelo 80/80 (nodos de la
+gallina, `walk` e `idle`), nido 188/200, grulla 142/150 (alas en el hombro como la
+golondrina), mariposa 15/16. Admitidos en el catálogo (ronda
+`animales-rehechos`); publicados los cuatro que tienen sitio.
+
+**Integrados** (avisado el director antes): la **cigüeña** (`seasonal-fauna.ts`)
+es su modelo partido por articulación (`effects/baked-parts.ts`): se agacha
+desde la cadera para picar —con el cuello solo, desde su arranque, el pico no
+llegaba al suelo— y **da el paso con las patas por el suelo recorrido**, no por
+reloj. La **mariposa** es su modelo, teñida por instancia como antes. El
+**polluelo** es su modelo a escala 1 detrás de la gallina (`Litter.kind`,
+`AnimalKind 'chick'`), no la gallina a 0,42. La **grulla** de la uve es la grulla
+a 1,8 celdas de envergadura en pantalla, no la golondrina gris ×22. El caballo y
+el nido, sólo modelo (no tienen sitio todavía: `docs/encargos-3d.md`).
+
+**Medido** (`gl-probe`, aldea 11/21 y villa 7/60, antes y después seguidos con la
+máquina sola): llamadas 384 → 386 en primavera y 391 → 393 en verano (las dos
+patas de la cigüeña), 379 → 368 en otoño, villa 491 → 493; triángulos iguales
+(±0,2 %); un programa más (el Lambert con color de vértice de la grulla y la
+mariposa). Hoja de antes y después para que Vera elija:
+`artifacts/graphics/animales-rehechos/antes-despues.png`, y una por animal en su
+carpeta, todas con `tools/art/fauna-sheet.py` (la cámara de reposo del juego, la
+misma luz, a escala de móvil y junto a sus vecinos). Capturas en el juego en
+`artifacts/graphics/animales-rehechos/juego-{before,after}/`. Informe:
+`docs/medidas/animales-rehechos-2026-10-02.md`.
+
+`seasons.mjs` encuadra ahora sola la primera cigüeña (`seasonal.storkLead` en
+`__valleyLife`) y el polluelo de cerca por su clase nueva.
+
+**Prueba**: `tests/fast/rebuilt-fauna.test.ts` (presupuestos, el casco plantado
+del caballo, la cigüeña que pica hasta el suelo y no mete las patas en él, el
+paso igual a 30 o a 360 fotogramas, la grulla con su envergadura y el ala en el
+hombro, el polluelo con los clips de la gallina). `life-seasonal-fauna` acepta
+que una cría tenga modelo propio en vez de ir a escala.
+
 ## v5.85 · 2 oct 2026 · La fauna por estaciones: que cada estación se note en sus animales
 
 **Sólo capa de vida, derive y render** (decisión de Vera): el motor no se toca,

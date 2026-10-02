@@ -843,9 +843,199 @@ def hoe():
     ell('Socket_Rivet',(0,-.910,-1.102),(.018,.010,.018),'ironEdge',seg=8,rings=4)
     save('hoe')
 
+
+# ---------------------------------------------------------------------------
+# Los animales rehechos (2 oct 2026, v5.100). Vera: «los modelos de Astra de
+# los animales no me gustan, los corregirás tú con el estilo que has ido usando
+# con los últimos». Los seis se hacen aquí, con las mismas piezas que la mula,
+# la vaca y la gallina —tronco en `loft`, cuello en `tube`, cabeza en `ell`,
+# orejas y plumas en `leaf`— y con los nodos de su esqueleto: el caballo, los de
+# la mula (`body`, `neck`, `head`, `ear±1`, `foreL`/`foreLLower`/`foreLFoot`…,
+# `tail`); la cigüeña y el polluelo, los de la gallina (`legL`, `footL`…), para
+# que `rigid-clips.mjs` los haga andar igual. La grulla y la mariposa vuelan:
+# llevan las alas en mallas aparte con el origen en el hombro, como la
+# golondrina (`bird_wing_l`/`bird_wing_r`, `wing_l`/`wing_r`), y miran a −Y de
+# Blender (+Z del GLB). Los presupuestos son los del encargo de la tanda
+# (`docs/encargos/encargo-astra-tanda-larga-2026-10-02.md`, bloques 6 y 7), y
+# por eso las esferas y los tubos llevan menos caras que los de la gallina.
+
+def reorigin(o,point):
+    # El origen de una malla en `point`: el ala gira sobre su hombro, no sobre
+    # el centro del cuerpo.
+    from mathutils import Matrix
+    p=Vector(point); bpy.context.view_layer.update(); w=o.matrix_world.copy()
+    o.data.transform(Matrix.Translation(-(w.inverted()@p))); o.matrix_world=w@Matrix.Translation(w.inverted()@p)
+    return o
+
+def flat(n,pts,m,parent=None):
+    # Una lámina sin canto (alas, pies): una sola cara; el material es de dos
+    # caras, así que se ve por los dos lados sin pagar el revés.
+    return mesh(n,list(pts),[tuple(range(len(pts)))],m,parent)
+
+def tetra(n,pts,m,parent=None):
+    # Cuatro caras: el ojo de un ave pequeña o el cuerpo de una mariposa.
+    return mesh(n,list(pts),[(0,1,2),(0,2,3),(0,3,1),(1,3,2)],m,parent)
+
+def join(name,parts):
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in parts: o.select_set(True)
+    bpy.context.view_layer.objects.active=parts[0]; bpy.ops.object.join(); parts[0].name=name; return parts[0]
+
+def turn_to_minus_y(objects):
+    # De «mira a −X» (los cuadrúpedos) a «mira a −Y» (+Z del GLB, la golondrina).
+    from mathutils import Matrix
+    r=Matrix.Rotation(pi/2,4,'Z')
+    for o in objects:
+        if o.type=='MESH': o.data.transform(r)
+
+HORSE_SIZE=1.0  # TUNE: 1 es un caballo de tiro algo mayor que la mula (0,82 celdas de largo)
+
+def horse():
+    # El caballo de tiro: la mula de Vera más grande y más pesada, sin carga.
+    # Tronco hondo, cuello alto y arqueado con la crin negra en la cresta,
+    # cabeza larga con lucero blanco, cascos con calzas blancas y pelo en los
+    # menudillos (lo que dice «tiro» de lejos) y la collera al pecho. Castaño
+    # con las extremidades negras, que es lo que no se confunde con la mula.
+    reset(); mat('coat','3E2214'); mat('coatTop','0D0B0A'); mat('light','E2DCCB'); mat('earInner','4A3426'); mat('collar','8A5A34'); mat('collarPad','3E2E22')
+    body=empty('body',(0,0,.30),ROOT)
+    barrel=[(-.228,.345,.060,.086),(-.170,.340,.112,.128),(-.060,.326,.118,.140),(.070,.330,.114,.134),(.175,.350,.100,.118),(.232,.362,.050,.074)]
+    loft('Draught_Barrel',barrel,'coat',body,12)
+    neck=empty('neck',(-.215,0,.40),body)
+    tube('Arched_Neck',[(-.205,0,.365),(-.258,0,.452),(-.292,0,.524),(-.312,0,.560)],[(.094,.076),(.080,.064),(.060,.050),(.046,.044)],'coat',neck,8)
+    tube('Crest_Mane',[(-.150,0,.452),(-.200,0,.512),(-.243,0,.572),(-.282,0,.612)],[(.020,.028),(.024,.030),(.022,.026),(.012,.016)],'coatTop',neck,4)
+    head=empty('head',(-.305,0,.585),neck)
+    loft('Long_Head',[(-.288,.590,.050,.066),(-.335,.578,.057,.068),(-.385,.528,.046,.052),(-.425,.488,.040,.040),(-.446,.468,.034,.030)],'coat',head,8)
+    ell('Dark_Muzzle',(-.440,0,.462),(.070,.074,.058),'coatTop',head,8,4)
+    # Lucero: la franja blanca de la frente al hocico, sobre la cara.
+    leaf('Blaze',(-.330,0,.612),(-.437,0,.497),.032,.010,'light',head)
+    leaf('Forelock',(-.296,0,.628),(-.336,0,.600),.040,.012,'coatTop',head)
+    for s in (-1,1):
+        ell('Eye_'+str(s),(-.352,s*.054,.582),(.020,.010,.018),'eye',head,6,3)
+        ear('ear'+str(s),(-.296,s*.030,.628),(-.280,s*.050,.700),.036,'coat',head,'earInner')
+    # La collera: un aro de cuero relleno donde el cuello entra en el pecho.
+    from mathutils import Matrix
+    c=ring('Horse_Collar',(0,0,0),.106,.082,.036,'collar',None,8)
+    c.data.transform(Matrix.Translation((-.222,0,.408))@Matrix.Rotation(math.radians(-31),4,'Y')); par(c,neck)
+    for pre,x in [('fore',-.160),('hind',.168)]:
+        for s,l in [(-1,'L'),(1,'R')]:
+            y=s*.068; hip=(x,y,.300); knee=(x+(.006 if pre=='fore' else -.040),y,.168); ankle=(x+(.002 if pre=='fore' else .022),y,.052)
+            p=empty(pre+l,hip,body); tube(pre+l+'_Upper',[hip,knee],[.050,.026],'coat',p,6)
+            q=empty(pre+l+'Lower',knee,p); tube(pre+l+'_Cannon',[knee,(ankle[0],y,.070)],[.026,.024],'coatTop',q,6)
+            # Las calzas: el pelo blanco que cae sobre el casco, más ancho abajo.
+            tube(pre+l+'_Feather',[(ankle[0],y,.098),(ankle[0]-.004,y,.030)],[.022,.040],'light',q,6)
+            f=empty(pre+l+'Foot',ankle,q); box(pre+l+'_Hoof',(ankle[0]-.006,y,.016),(.060,.054,.032),'coatTop',f)
+    tail=empty('tail',(.240,0,.400),body)
+    tube('Full_Tail',[(.240,0,.400),(.272,0,.352),(.284,0,.262),(.280,0,.170)],[.020,.026,.030,.026],'coatTop',tail,6)
+    tube('Tail_End',[(.280,0,.190),(.278,0,.130),(.272,0,.098)],[.028,.022,.004],'coatTop',tail,6)
+    if HORSE_SIZE!=1:
+        ROOT.scale=(HORSE_SIZE,)*3
+    merge_parts(); save('horse')
+
+def stork():
+    # La cigüeña blanca, de pie en el prado: la gallina de Vera estirada. Cuerpo
+    # blanco con las remeras negras plegadas sobre la cola, cuello largo en S
+    # suave, pico y patas rojos. Nodos de la gallina: `body`, `neck`, `head`,
+    # `legL`/`footL`, para que ande y pique como ella.
+    reset(); mat('white','EEEBE2'); mat('black','0B0A09'); mat('red','C4472F'); mat('shade','D4CFC2')
+    body=empty('body',(0,0,.235),ROOT)
+    ell('Body',(.010,0,.262),(.205,.108,.104),'white',body,8,4)
+    for s,l in [(-1,'L'),(1,'R')]:
+        # El ala plegada, como la de la gallina, y negra: las remeras cruzan sobre la cola.
+        tube('Black_Wing_'+l,[(-.020,s*.047,.270),(.060,s*.052,.268),(.130,s*.040,.254),(.178,s*.022,.244)],[(.020,.008),(.036,.014),(.022,.010),(.004,.003)],'black',body,4)
+    flat('White_Tail',[(.090,-.022,.288),(.150,-.010,.276),(.150,.010,.276),(.090,.022,.288)],'shade',body)
+    neck=empty('neck',(-.075,0,.292),body)
+    tube('Long_Neck',[(-.070,0,.290),(-.106,0,.334),(-.110,0,.382),(-.126,0,.418)],[.034,.026,.022,.020],'white',neck,5)
+    head=empty('head',(-.130,0,.422),neck)
+    ell('Head',(-.142,0,.430),(.052,.040,.040),'white',head,6,3)
+    loft('Red_Bill',[(-.162,.428,.010,.012),(-.205,.416,.007,.008),(-.252,.402,.002,.002)],'red',head,4)
+    for s in (-1,1): tetra('Eye_'+str(s),[(-.156,s*.0205,.446),(-.150,s*.0205,.434),(-.144,s*.0205,.446),(-.150,s*.017,.442)],'eye',head)
+    for s,l in [(-1,'L'),(1,'R')]:
+        hip=(.018,s*.030,.222); knee=(.034,s*.030,.118); ankle=(.018,s*.030,.012)
+        p=empty('leg'+l,hip,body); tube('Leg_'+l,[hip,knee,ankle],[.0085,.0065,.0055],'red',p,4)
+        f=empty('foot'+l,ankle,p); flat('Foot_'+l,[(ankle[0]+.012,s*.030,.003),(-.036,s*.030-.016,.003),(-.040,s*.030,.003),(-.036,s*.030+.016,.003)],'red',f)
+    merge_parts(); save('stork')
+
+def stork_nest():
+    # El nido de la cigüeña, para una cumbrera o el campanario: un rodete de
+    # ramas gruesas, hondo en el centro y con las puntas de las ramas saliendo
+    # por el borde, que es lo que lo distingue de un cesto.
+    reset(); mat('twig','3F3122'); mat('twigLight','5C4A34'); mat('lining','2E2318')
+    rim=[(.142*cos(i*2*pi/10+.1*sin(i*2.3)),.142*sin(i*2*pi/10+.1*sin(i*2.3)),.036+.006*sin(i*1.9)) for i in range(11)]; rim[-1]=rim[0]
+    tube('Twig_Rim',rim,[(.044,.040)]*11,'twig',None,4)
+    flat('Nest_Hollow',[(.105*cos(i*2*pi/10),.105*sin(i*2*pi/10),.018) for i in range(10)],'lining')
+    for i in range(12):
+        a=i*2*pi/12+.2*sin(i*1.7); r0,r1=.090+.02*(i%3==0),.200+.025*((i*7)%3)
+        z0,z1=.020+.022*(i%2),.050+.018*((i*5)%3)
+        tube('Twig_'+str(i),[(r0*cos(a),r0*sin(a),z0),(r1*cos(a+.35),r1*sin(a+.35),z1)],[.0105,.0075],'twigLight' if i%2 else 'twig',None,3)
+    merge_parts(); save('stork-nest')
+
+def chick():
+    # El polluelo de la gallina: una bola amarilla con la cabeza encima, pico
+    # y patas naranjas. Ochenta triángulos: sin ojos, que a escala de juego son
+    # menos de un píxel. Nodos de la gallina para que ande y pique detrás de ella.
+    reset(); mat('down','D4A12A'); mat('beak','C4661C')
+    body=empty('body',(0,0,.030),ROOT)
+    ell('Fluff',(.004,0,.040),(.070,.058,.056),'down',body,6,4)
+    neck=empty('neck',(-.020,0,.055),body)
+    head=empty('head',(-.026,0,.068),neck)
+    ell('Head',(-.028,0,.074),(.044,.040,.042),'down',head,6,3)
+    loft('Beak',[(-.048,.073,.007,.006),(-.062,.071,.001,.001)],'beak',head,3)
+    for s,l in [(-1,'L'),(1,'R')]:
+        hip=(.004,s*.012,.020); ankle=(.000,s*.012,.002)
+        # La pata, tres caras sin tapas: con tapas no cabía la cabeza de seis.
+        vs=[(hip[0]+.004*cos(a),hip[1]+.004*sin(a),z) for z in (hip[2],ankle[2]) for a in (0,2*pi/3,4*pi/3)]
+        p=empty('leg'+l,hip,body); mesh('Leg_'+l,vs,[(0,1,4,3),(1,2,5,4),(2,0,3,5)],'beak',p); empty('foot'+l,ankle,p)
+    merge_parts(); save('chick')
+
+def crane():
+    # La grulla común en vuelo, para la uve de otoño: cuello y patas estirados,
+    # alas largas y anchas, gris con las remeras negras y el cuello negro.
+    # Cuerpo y alas en mallas aparte, como la golondrina (`bird.glb`): el ala
+    # gira sobre su hombro. Se construye mirando a −X como los demás y al final
+    # se gira para mirar a −Y de Blender (+Z del GLB).
+    reset(); mat('grey','5A6064'); mat('greyDark','3C4144'); mat('black','0B0B0A'); mat('bill','B8AE86')
+    parts=[]
+    parts.append(loft('Body',[(-.070,0,.020,.022),(-.020,0,.044,.040),(.050,0,.046,.040),(.110,0,.030,.026),(.150,0,.010,.010)],'grey',None,6))
+    parts.append(tube('Neck',[(-.060,0,.006),(-.150,0,.012),(-.215,0,.016)],[.016,.012,.019],'black',None,5))
+    parts.append(loft('Bill',[(-.230,.016,.007,.006),(-.280,.012,.001,.001)],'bill',None,3))
+    parts.append(leaf('Bustle',(.080,0,.030),(.170,0,.024),.060,.010,'black'))
+    for s in (-1,1):
+        parts.append(tube('Trailing_Leg_'+str(s),[(.110,s*.010,-.012),(.270,s*.012,-.008)],[.0055,.0035],'black',None,3))
+    body=join('bird_body',parts)
+    wings=[]
+    for s,name in [(1,'bird_wing_l'),(-1,'bird_wing_r')]:
+        # La envergadura de la grulla, 2,2 m: 0,73 celdas de punta a punta.
+        y=lambda v: s*v
+        # Las cobertoras grises delante; detrás, el borde negro de las remeras,
+        # que en la grulla es negro de la punta a la raíz, y los «dedos» de la punta.
+        w=flat('Wing',[(-.042,y(.030),.012),(-.036,y(.150),.016),(-.014,y(.250),.014),(.026,y(.312),.010),(.052,y(.250),.012),(.048,y(.150),.013),(.040,y(.032),.012)],'grey')
+        b=flat('Flight_Feathers',[(.040,y(.032),.0115),(.048,y(.150),.0125),(.052,y(.250),.0115),(.094,y(.290),.010),(.108,y(.150),.012),(.090,y(.032),.012)],'black')
+        t=flat('Primaries',[(.026,y(.312),.0105),(.004,y(.368),.010),(.040,y(.374),.010),(.070,y(.352),.010),(.094,y(.290),.0105),(.052,y(.250),.011)],'black')
+        k=join(name,[w,b,t]); wings.append((k,(-.020,y(.030),.012)))
+    turn_to_minus_y([body]+[k for k,_ in wings])
+    for k,(x,yy,z) in wings: reorigin(k,(-yy,x,z))
+    save('crane')
+
+def butterfly():
+    # Una mariposa de la col: dos alas planas de dos caras con la punta oscura y
+    # un cuerpo fino. Dieciséis triángulos. El ala es casi blanca para que el
+    # juego la tiña por instancia (blanca, amarilla, naranja, azul).
+    reset(); mat('wing','F4F1E6'); mat('mark','2E2B28')
+    body=tetra('Body',[(0,-.016,.002),(-.002,.012,.0),(.002,.012,.0),(0,.006,.004)],'mark')
+    ant=flat('Antennae',[(-.006,-.027,.006),(0,-.014,.003),(.006,-.027,.006)],'mark')
+    join('body',[body,ant])
+    for s,name in [(1,'wing_l'),(-1,'wing_r')]:
+        x=lambda v: -s*v
+        fore=flat('Forewing',[(x(.002),-.008,.001),(x(.026),-.020,.002),(x(.030),-.006,.002),(x(.004),.002,.001)],'wing')
+        tip=flat('Tip',[(x(.026),-.020,.0021),(x(.031),-.014,.0021),(x(.024),-.016,.0021)],'mark')
+        hind=flat('Hindwing',[(x(.003),.000,.001),(x(.022),.004,.002),(x(.016),.020,.002),(x(.003),.010,.001)],'wing')
+        k=join(name,[fore,hind,tip]); reorigin(k,(x(.002),-.002,.001))
+    save('butterfly')
+
 # `-- bear` construye sólo esos; sin nombres, todos (el oso, en su v4).
 ONLY=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 BUILDS=[('wolf',lambda: canine('wolf')),('dog',lambda: canine('dog')),('boar',boar),('bear',bear),('bear_v3',bear_v3),('mule',mule),
-        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('crow',crow),('duck',duck),('deer',deer),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe)]
+        ('partridge',partridge),('fish',fish),('pig',pig),('cow',cow),('hen',hen),('crow',crow),('duck',duck),('deer',deer),('bucket',bucket),('arrow',arrow),('shield',shield),('pickaxe',pickaxe),('hoe',hoe),
+        ('horse',horse),('stork',stork),('stork-nest',stork_nest),('chick',chick),('crane',crane),('butterfly',butterfly)]
 for name,build in BUILDS:
     if (not ONLY and name!='bear_v3') or name in ONLY: build()

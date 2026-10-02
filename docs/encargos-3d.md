@@ -234,6 +234,19 @@ primitivas de código (`effects/seasonal-fauna.ts`). Nada de esto toca el motor.
 | **Crías de primavera** (cervatillo, ternero, lechones, polluelos) | El modelo adulto a 0,42–0,55 de escala detrás de su madre (`life/young.ts`) | Mallas propias: el cervatillo **con manchas blancas**, el polluelo **amarillo y redondo** (hoy es una gallina diminuta, y a escala de móvil no se distingue), el lechón **rayado** si es de jabalí. Cabeza grande y patas largas, que es lo que lee «cría». Una llamada de dibujo por animal (RV-1). Por encargo, Astra |
 | **La cigüeña** | Primitivas: cuerpo blanco, alas negras, patas y pico rojos, el cuello que se dobla para picar; anda en corro en el prado húmedo | Malla de Astra con clips `walk`, `peck` y el **crotoreo** (el pico hacia atrás, castañeteando), y **el nido en lo alto de la capilla o de la iglesia**, que es la estampa de verdad y aquí no está porque la vida no sabe la altura del tejado |
 | **La bandada que se va en otoño** | Quince golondrinas grises a ×22 en uve, muy altas | Una grulla propia (cuello estirado, patas atrás) y su **graznido** a lo lejos (sonido: `GraphicsStats` no publica todavía cuándo pasa la bandada; se publicaría si Vera la quiere oír) |
+
+**v5.100 (2 oct 2026): la cigüeña, el polluelo, la grulla y la mariposa ya son
+modelos** (`build-models.py`, rehechos con el estilo de los animales del valle
+en lugar de los candidatos de Astra). La cigüeña se agacha desde la cadera para
+picar y da el paso por el suelo recorrido; el polluelo es su modelo detrás de
+la gallina; la grulla de la uve es la grulla. **Queda de las filas de arriba:**
+el **crotoreo** de la cigüeña, **el nido en la capilla** (el modelo `stork-nest`
+existe y está en el catálogo; falta la altura del tejado y que Vera diga
+dónde), las mallas propias del **cervatillo, el ternero y el lechón**, el
+**graznido** de las grullas y **la abeja** (sigue siendo una bolita). El
+**caballo de tiro** (`horse`, con el esqueleto de la mula) es sólo modelo: no
+tiene sitio en el juego todavía (el carro del bloque 7).
+
 | **Mariposas y abejas** | Pajaritas de dos triángulos que aletean y bolitas amarillas, a escala exagerada para que se lean | Una mariposa con textura de ala y una abeja con rayas; quizá la **colmena** de paja junto a una casa, que haría de sitio a las abejas (y de K5, la miel) |
 | **Los jabalíes de otoño** | El jabalí de la caza y su cría del año a 0,75, hozando en la linde más espesa | Un clip `root` (hocico al suelo, removiendo) y la tierra levantada donde han hozado. **No hay robledal**: el bosque es uno solo; si Vera quiere encinas o robles distintos, es del carril de gráficos |
 | **Huellas en la nieve** | Ya existían: todo animal de la vida que anda deja huella en el pisoteo cuando cuaja (`trample.stamp`). Lo nuevo es que el ciervo del invierno baja más cerca de la aldea y se le ve el rastro | Huellas con forma (pezuña, almohadilla) en vez de la mancha redonda de pisoteo |

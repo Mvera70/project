@@ -168,3 +168,32 @@ contra el GLB publicado antes del cambio.
 
 La golondrina y la perdiz se quedan las de siempre: se probaron otras y Vera
 prefirió las suyas.
+
+## Los animales rehechos (2 oct 2026, v5.100)
+
+Vera: «los modelos de Astra de los animales no me gustan, los corregirás tú con
+el estilo que has ido usando con los últimos». Seis funciones nuevas en
+`build-models.py`, con las mismas piezas que la mula, la vaca y la gallina y
+dentro del presupuesto del encargo de la tanda (bloques 6 y 7):
+
+| ID | Qué | Triángulos | Esqueleto y clips |
+|---|---|---|---|
+| `horse` | Caballo de tiro castaño: crin y cola negras, lucero, calzas con pelo y collera | 888 / 900 | El de la mula; `walk` con el casco plantado (como el ciervo) e `idle` |
+| `stork` | Cigüeña blanca de remeras negras, pico y patas rojos | 238 / 250 | El de la gallina (`legL`, `footL`…); `walk` e `idle` |
+| `stork-nest` | Rodete de ramas con las puntas saliendo por el borde | 188 / 200 | — (sólo modelo) |
+| `chick` | Polluelo: bola amarilla con la cabeza encima | 80 / 80 | El de la gallina; `walk` e `idle` |
+| `crane` | Grulla en vuelo, gris con las remeras negras | 142 / 150 | Alas `bird_wing_l`/`bird_wing_r` con el origen en el hombro, como la golondrina |
+| `butterfly` | Mariposa blanca de puntas negras, para teñir por instancia | 15 / 16 | `wing_l`/`wing_r` en el eje del cuerpo |
+
+Reconstruir y publicar (con `pip install bpy==5.0.1`):
+
+```bash
+cd deliverables/marked-models-trial && python3 build-models.py -- horse stork stork-nest chick crane butterfly
+node tools/art/rigid-clips.mjs deliverables/marked-models-trial/horse.glb <salida> horse   # y stork, chick
+node tools/art/adopt-models.mjs <lista.json>     # ronda animales-rehechos
+npx tsx tools/graphics/publish-assets.ts --ids stork,chick,crane,butterfly
+```
+
+El caballo y el nido no se publican: no tienen sitio en el juego todavía. Las
+hojas de antes (Astra) y después están en `artifacts/graphics/animales-rehechos/`
+(`tools/art/fauna-sheet.py`).

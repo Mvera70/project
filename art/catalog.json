@@ -6943,6 +6943,369 @@
         "source": "Modelo original de The Valley, fuente art/recipes/great-oak-candidate/build.py.",
         "license": "Project original"
       }
+    },
+    {
+      "id": "horse",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Caballo de tiro facetado de The Valley (deliverables/marked-models-trial/build-models.py, horse(); 2 oct 2026, v5.100), rehecho sobre la mula de Vera en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs con el casco plantado.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "approved": {
+        "runId": "animales-rehechos",
+        "directory": "artifacts/graphics/animales-rehechos/approved/horse"
+      },
+      "bounds": {
+        "min": [
+          -0.475,
+          0,
+          -0.118
+        ],
+        "max": [
+          0.313971,
+          0.7,
+          0.118
+        ],
+        "size": [
+          0.788971,
+          0.7,
+          0.236
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "coat",
+        "coatTop",
+        "light",
+        "earInner",
+        "eye",
+        "collar"
+      ],
+      "clips": [
+        "walk",
+        "idle"
+      ],
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 1.2,
+          "loop": true,
+          "strideLength": 0.286
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 48,
+        "meshes": 29,
+        "materials": 6,
+        "triangles": 888
+      },
+      "hashes": {
+        "horse.glb": "DFD8EE6A2FA778462B26D868213A159B9A5A64227AB1DC7E9EA6F1B028C296D1"
+      }
+    },
+    {
+      "id": "stork",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Cigüeña blanca facetada de The Valley (build-models.py, stork(); 2 oct 2026, v5.100), sobre la estructura de la gallina, en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "approved": {
+        "runId": "animales-rehechos",
+        "directory": "artifacts/graphics/animales-rehechos/approved/stork"
+      },
+      "bounds": {
+        "min": [
+          -0.252,
+          0.003,
+          -0.065985
+        ],
+        "max": [
+          0.179012,
+          0.45,
+          0.065985
+        ],
+        "size": [
+          0.431012,
+          0.447,
+          0.13197
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "white",
+        "black",
+        "red",
+        "eye_001",
+        "shade"
+      ],
+      "clips": [
+        "walk",
+        "idle"
+      ],
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.232
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 19,
+        "meshes": 11,
+        "materials": 5,
+        "triangles": 238
+      },
+      "hashes": {
+        "stork.glb": "4E2E6885FF2B56C03AD6735E2DD92F2B6E25EE9D6356BB29874AC9CA8DB3D065"
+      }
+    },
+    {
+      "id": "chick",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Polluelo facetado de The Valley (build-models.py, chick(); 2 oct 2026, v5.100), con los nodos de la gallina, en lugar del candidato de Astra; clips idle/walk de tools/art/rigid-clips.mjs.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py · tools/art/rigid-clips.mjs",
+      "approved": {
+        "runId": "animales-rehechos",
+        "directory": "artifacts/graphics/animales-rehechos/approved/chick"
+      },
+      "bounds": {
+        "min": [
+          -0.062,
+          0.002,
+          -0.029
+        ],
+        "max": [
+          0.039,
+          0.095,
+          0.029
+        ],
+        "size": [
+          0.101,
+          0.093,
+          0.058
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "down",
+        "beak"
+      ],
+      "clips": [
+        "walk",
+        "idle"
+      ],
+      "motion": [
+        {
+          "name": "walk",
+          "seconds": 0.6,
+          "loop": true,
+          "strideLength": 0.021
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        }
+      ],
+      "connectors": [],
+      "statistics": {
+        "objects": 13,
+        "meshes": 5,
+        "materials": 2,
+        "triangles": 80
+      },
+      "hashes": {
+        "chick.glb": "1D0A91EC1DF9CFF4F7F16B91BF843723EAFDB53E929595A9DCAA4785E1EDBE24"
+      }
+    },
+    {
+      "id": "stork-nest",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Nido de cigüeña facetado de The Valley (build-models.py, stork_nest(); 2 oct 2026, v5.100), en lugar del candidato de Astra. Sólo modelo.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py",
+      "approved": {
+        "runId": "animales-rehechos",
+        "directory": "artifacts/graphics/animales-rehechos/approved/stork-nest"
+      },
+      "bounds": {
+        "min": [
+          -0.251137,
+          -0.013887,
+          -0.245773
+        ],
+        "max": [
+          0.24554,
+          0.092468,
+          0.252134
+        ],
+        "size": [
+          0.496677,
+          0.106355,
+          0.497907
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "lining",
+        "twig",
+        "twigLight"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 188
+      },
+      "hashes": {
+        "stork-nest.glb": "A60770FB4CD76E3E59C2ADDD967DA71863B228E1190BBBA75A916D5FFF3CCDF9"
+      }
+    },
+    {
+      "id": "crane",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Grulla en vuelo facetada de The Valley (build-models.py, crane(); 2 oct 2026, v5.100), con las alas en el hombro como la golondrina, en lugar del candidato de Astra.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py",
+      "approved": {
+        "runId": "animales-rehechos",
+        "directory": "artifacts/graphics/animales-rehechos/approved/crane"
+      },
+      "bounds": {
+        "min": [
+          -0.374,
+          -0.034641,
+          -0.270082
+        ],
+        "max": [
+          0.374,
+          0.037578,
+          0.28
+        ],
+        "size": [
+          0.748,
+          0.072219,
+          0.550082
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "grey",
+        "black_001",
+        "bill"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 142
+      },
+      "hashes": {
+        "crane.glb": "708D7CFED25679AAC46C977B411FC0877A7183E434325BAE6A95A3F75C39EC18"
+      }
+    },
+    {
+      "id": "butterfly",
+      "blenderVersion": "5.2.1 LTS",
+      "provenance": {
+        "kind": "original",
+        "source": "Mariposa facetada de The Valley (build-models.py, butterfly(); 2 oct 2026, v5.100), dos alas de una cara para teñir por instancia, en lugar del candidato de Astra.",
+        "license": "project-original"
+      },
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "deliverables/marked-models-trial/build-models.py",
+      "generator": "deliverables/marked-models-trial/build-models.py",
+      "approved": {
+        "runId": "animales-rehechos",
+        "directory": "artifacts/graphics/animales-rehechos/approved/butterfly"
+      },
+      "bounds": {
+        "min": [
+          -0.031,
+          0,
+          -0.02
+        ],
+        "max": [
+          0.031,
+          0.006,
+          0.027
+        ],
+        "size": [
+          0.062,
+          0.006,
+          0.047
+        ]
+      },
+      "recipeSha256": null,
+      "materials": [
+        "mark",
+        "wing"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 2,
+        "triangles": 15
+      },
+      "hashes": {
+        "butterfly.glb": "2B0E14D6FF4D35AAD8AF100C26DCB3DB33578C4C956A465F1E516B4435582A05"
+      }
     }
   ]
 }

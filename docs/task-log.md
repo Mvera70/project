@@ -1,5 +1,29 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · Los animales rehechos (v5.100)
+
+Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
+rama `claude/animales-rehechos`, **versiones reservadas v5.100–v5.101** (usada
+v5.100). Rehechos con el camino de los animales del valle (`build-models.py` +
+`rigid-clips.mjs` + `adopt-models.mjs`) los seis de Astra que a Vera no le
+gustaban: cigüeña, nido, polluelo, grulla, mariposa y caballo. Integrados la
+cigüeña, la mariposa, el polluelo y la grulla; el nido y el caballo, sólo
+modelo. Coste: +2 llamadas con cigüeñas a la vista. Hoja de antes y después:
+`artifacts/graphics/animales-rehechos/antes-despues.png`. Informe:
+`docs/medidas/animales-rehechos-2026-10-02.md`.
+
+**Abierto:**
+
+- **De Vera:** cuál le gusta más de cada pareja (A = Astra, B = nuevo). Si elige
+  A en alguno, se publica el de Astra en su lugar por el mismo camino; la
+  integración del juego no cambia.
+- **Sin captura en el juego:** la uve de grullas (en el dibujo por software su
+  reloj real avanza a una décima, como en v5.85) y el polluelo de cerca si la
+  semilla no lo pone en cuadro.
+- **Sin medir:** el coste en el aparato.
+- **La cigüeña queda tapada a medias** por la hierba alta en la semilla 11
+  (antes y después): es del sitio de `storkSpots`, no del modelo.
+
 ## 2 oct 2026 · La fauna por estaciones (v5.85)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
