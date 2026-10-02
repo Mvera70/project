@@ -1852,6 +1852,7 @@ export function boot(
             : fought.slain,
           lost: fought.lost,
           breached: fought.breached,
+          ...(fought.spared === undefined ? {} : { spared: fought.spared }),
         });
       }
     }

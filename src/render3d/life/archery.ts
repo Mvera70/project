@@ -23,6 +23,7 @@
 // nada (D5). Un saqueador alcanzado se para; no hay sangre porque cómo se ve
 // eso es decisión del dueño (E4).
 
+import { strike } from './wounds';
 import type { PhysicalVector } from '../contracts';
 import type { Manned } from './garrison';
 import type { Physics, PhysicsBody } from './physics';
@@ -427,10 +428,17 @@ export function stepArchery(
       if (tracked !== undefined) shadowHit(tracked.entry, physics, arrow, raider, step);
       raider.hits += 1;
       raider.arrowHits = (raider.arrowHits ?? 0) + 1;
-      // **Una flecha basta**, y es la decisión honesta mientras no haya cuerpo
-      // a cuerpo ni ragdoll: un hombre alcanzado en el pecho deja de subir por
-      // la ladera. Cuántas hacen falta de verdad es balance, y el nivelado va
-      // al final y es del dueño.
+      // v5.81 · **Una flecha ya no basta.** Hasta aquí un flechazo tumbaba
+      // («la decisión honesta mientras no haya cuerpo a cuerpo ni ragdoll»);
+      // ahora quita vida (`wounds.ts`, el 15 % que dijo Vera) y lo que lleve
+      // puesto puede pararla o hacerla rebotar. El herido sigue subiendo, con
+      // el gesto de recibir el golpe.
+      const blow = strike(raider, raider.body.id, 'arrow', step);
+      if (blow.ricocheted) raider.ricochets = (raider.ricochets ?? 0) + 1;
+      if (!blow.felled) {
+        raider.hitAt = step;
+        break;
+      }
       raider.phase = 'down';
       raider.downAt = step;
       raider.body.vx = 0;
