@@ -143,3 +143,14 @@ export function fallOf(game: Pick<ArchivedGame, 'cause' | 'chronicle' | 'endedTi
 
   return { cause: game.cause, peakTick, peak, left, links, decision, band };
 }
+
+/**
+ * Lo que más pesó de todo, para decirlo en una línea al fundar el valle
+ * siguiente: la gente que costó, y el clan por las veces que bajó. `null` si la
+ * crónica no sabe nada (una partida podada).
+ */
+export function heaviestOf(story: FallStory): FallLink | null {
+  let best: FallLink | null = null;
+  for (const link of story.links) if (best === null || link.count > best.count) best = link;
+  return best;
+}

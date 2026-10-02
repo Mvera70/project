@@ -27,7 +27,7 @@ import { foundGame } from '@engine/found';
 import { archiveGame } from '@engine/save';
 import { run, type Policy } from '@engine/sim';
 import type { ArchivedGame, EndState } from '@engine/state';
-import { FALL, fallOf, type FallLinkKind } from '@derive/fall';
+import { FALL, fallOf, heaviestOf, type FallLinkKind } from '@derive/fall';
 
 /** Candidatas, en el orden de la banda de `pace-report` donde más se cae. */
 const CANDIDATES = [129, 108, 157, 45, 73, 164, 31, 24];
@@ -105,6 +105,16 @@ describe('K7 · por qué cayó', () => {
     }
   });
 
+  it('lo que se recuerda al fundar el siguiente es lo que más pesó', () => {
+    const game = fallen('stormed', 'worst');
+    expect(game).not.toBeNull();
+    const story = fallOf(game!);
+    const heaviest = heaviestOf(story);
+    expect(heaviest).not.toBeNull();
+    for (const link of story.links) expect(heaviest!.count).toBeGreaterThanOrEqual(link.count);
+    expect(heaviestOf({ ...story, links: [] })).toBeNull();
+  });
+
   it('una crónica podada no cuenta nada que no sepa', () => {
     // Las partidas viejas del archivo guardan sólo los titulares (F3a,
     // decisión 3): sin `people` ni muertes, el relato sale vacío y el epitafio
@@ -119,7 +129,8 @@ describe('K7 · por qué cayó', () => {
     const params = { count: 3, year: 4, silver: 12, grain: 40, peak: 30, band: 40, left: 9 };
     const keys = ['epitaph.why.title', 'epitaph.why.peak', 'epitaph.why.decision',
       ...KINDS.flatMap((k) => [`epitaph.why.${k}`, `epitaph.why.${k}.one`]),
-      ...CAUSES.map((c) => `epitaph.why.end.${c}`), 'epitaph.why.end.abandoned.one'];
+      ...CAUSES.map((c) => `epitaph.why.end.${c}`), 'epitaph.why.end.abandoned.one',
+      ...CAUSES.map((c) => `successor.fell.${c}`)];
     for (const key of keys) {
       const text = renderUiText(key, params);
       expect(text.startsWith('['), key).toBe(false);

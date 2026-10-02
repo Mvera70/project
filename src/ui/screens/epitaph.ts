@@ -2,7 +2,7 @@
 
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import { makeBundle } from '@engine/rng';
-import { fallOf } from '@derive/fall';
+import { fallOf, heaviestOf } from '@derive/fall';
 import { ledgerFromChronicle } from '@engine/chronicle/ledger';
 import type { ArchivedGame, Ledger } from '@engine/state';
 import { yearOf } from '@engine/time';
@@ -323,6 +323,20 @@ function why(game: ArchivedGame): HTMLElement | null {
   });
   box.append(end);
   return box;
+}
+
+/**
+ * K7 · La línea con la que el valle siguiente se acuerda de éste: cómo cayó y,
+ * si la crónica lo sabe, lo que más pesó. La dice `app.ts` al fundarlo.
+ */
+export function rememberFall(game: ArchivedGame): string {
+  const fell = renderUiText(`successor.fell.${game.cause}`, { year: yearOf(game.endedTick) });
+  const link = heaviestOf(fallOf(game));
+  if (link === null) return fell;
+  const why = renderUiText(`epitaph.why.${link.kind}${link.count === 1 ? '.one' : ''}`, {
+    count: link.count, year: yearOf(link.tick), silver: link.silver, grain: link.grain,
+  });
+  return `${fell} ${why}`;
 }
 
 export function openEpitaph(app: App, game: ArchivedGame, beginAgain: () => void): void {

@@ -3141,6 +3141,11 @@ export const UI_BANK: Record<string, string> = {
   'epitaph.why.end.abandoned.one': 'The last one could not hold the valley alone, and walked out.',
   'epitaph.why.end.extinction': 'Then there was no one.',
   'epitaph.why.end.dispersed': 'With no one to lead them, the {left} who were left went their own ways.',
+  // K7 · y al fundar el siguiente, una línea: cómo cayó el anterior.
+  'successor.fell.stormed': 'The last valley was taken in year {year}.',
+  'successor.fell.extinction': 'The last valley died out in year {year}.',
+  'successor.fell.abandoned': 'The last valley was abandoned in year {year}.',
+  'successor.fell.dispersed': 'The last valley broke apart in year {year}.',
   'epitaph.chronicle': 'Read the chronicle',
   'epitaph.begin': 'Begin again',
   'chronicle.source': 'Valley chronicle',
