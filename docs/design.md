@@ -2645,7 +2645,8 @@ semillas 7, 23 y 41 a treinta años.
 
 El segundo material de K5. Vera decidió el 2 oct, con la medida delante
 (`docs/medidas/k5-caza-recoleccion-2026-10-02.md` §7), **las tres cosas**: la
-tela es, de momento, **sólo ropa** (ánimo), aunque se diseña como existencia
+tela es, de momento, **sólo ropa** —y la ropa **abriga en invierno**, «y por
+eso sube el ánimo»—, aunque se diseña como existencia
 para que mañana sirva para más —las vendas de la enfermería de K11—; se pide
 **en una sastrería**, un edificio con su tablón como la herrería; y el lino
 **ocupa uno de los campos de trigo**: comida contra tela.
@@ -2655,7 +2656,7 @@ dos años en el granero, no subió en 12 valles de 60 años; cada cosecha da
 1,1–1,4 veces lo que se come), y un campo sin grano desde que hay cuatro deja
 la villa cerrada en 49 personas en vez de 61. Ése es el precio del lino.
 
-**La sastrería** (`tailor`, 2×2, 90 de madera y 70 de obra, §7.3 punto 7b): la
+**La sastrería** (`tailor`, 2×2, 90 de madera y 70 de obra, §7.3 punto 9, detrás de las defensas; en el borde del núcleo, como la herrería): la
 levanta la aldea sola cuando hay herrería y 24 personas
 (`BUILDING_RULES.TAILOR_PEOPLE`). Llega a las **70 h a ×1** (24 semillas × 60
 años), con el cuarto campo (68 h), que es desde cuando un campo de lino es una
@@ -2667,7 +2668,7 @@ que se nombra solo en cuanto hay sastrería, como el cura con la capilla.
 | Encargo | Cuesta | Qué hace |
 |---|---|---|
 | Un campo de lino | La cosecha de un campo | En la siega, el campo más lejano de la plaza da lienzo (12 piezas por campo entero, escalado con lo que habría dado de grano) en vez de trigo |
-| Ropa nueva | 6 de lienzo | +0,2 de ánimo por semana mientras dura: entre la capilla y la iglesia, diez puntos de ánimo de reposo |
+| Ropa nueva | 6 de lienzo | **Abriga**: mientras dura, el invierno quema un cuarto menos de leña (`overwinter` y la reserva de invierno de la obra) y el ánimo sube +0,6 por semana de invierno, por estar abrigados |
 
 **El lino pide cuatro campos que la aldea necesite y trabaje.** El tablón no lo
 deja pedir con menos (negativa `fields`), y en la siega, si la aldea no
@@ -2675,18 +2676,24 @@ trabaja cuatro, el lino se queda sin sembrar y el trigo entero. Lo obligó la
 medida: sin esa regla, pidiendo lino siempre, caían 7 de 12 valles en 60 años,
 aldeas que habían menguado con cuatro campos y brazos para dos.
 
+**El frío, hoy.** Ninguna semana de invierno se queda sin leña en 12 valles de
+60 años, así que `COLD_MORTALITY` no se dispara nunca; lo que el invierno sí
+pesa es **la leña que se quema**, que es la que la obra espera (K3). Ahí se
+engancha la ropa, sin inventar un castigo de frío nuevo.
+
 **Medido después** (`k5-report.ts --linen`, 12 semillas × 60 años, pidiendo
 lino y ropa siempre que el tablón deja contra no pedir nada): ningún valle cae;
-la villa cerrada se queda en **41 personas en vez de 57**, con el ánimo en
-**71 en vez de 61** (por debajo de 40 el 7 % de las semanas en vez del 12 %); en
-la aldea los muertos de hambre pasan de 10,6 a 22,6 por cada 100 h. El primer
-lienzo llega a las 75 h. Es el dilema que Vera eligió: un valle más contento y
-más pequeño.
+la villa cerrada se queda en **45 personas en vez de 57**, con el ánimo en
+**68 en vez de 61** (70 contra 63 en invierno; por debajo de 40 el 7 % de las
+semanas en vez del 12 %), y **la obra espera madera mucho menos**: del 36 al
+26 % de las semanas en la aldea y del 5 al 1 % en la villa. El primer lienzo
+llega a las 75 h. Es el dilema que Vera eligió: un valle más abrigado y más
+pequeño.
 
 **Cómo se ve hoy, y qué falta.** El tablón clavado en la fachada de la sastrería,
 la caja del taller con su pared de lienzo crudo, la tejedora trabajando en su
 puerta y la crónica. Lo que falta —el modelo del taller, el campo azul, las
-gavillas enriándose, el lienzo blanqueando en la hierba, la ropa nueva— está en
+gavillas enriándose, el lienzo blanqueando en la hierba, la ropa de abrigo— está en
 `docs/encargos-3d.md`.
 
 ### 7.19 Dónde se pide un encargo (regla de Vera, 2 oct 2026)
@@ -5200,7 +5207,8 @@ entre valles 0,22. El detalle y las causas de fin están en `docs/historico/rewo
 | `FLAX_MIN_FIELDS` | 4 | Con menos, un campo es media cosecha; se mira lo necesitado y lo trabajado |
 | `LINEN_PER_FIELD` | 12 | El doble de lo que pide la ropa: un año de lino viste dos |
 | `ORDERS.clothes` | 6 de lienzo | — |
-| `CLOTHES_MORALE` | 0,2 por semana | Entre la capilla (0,15) y la iglesia (0,3): diez puntos de reposo |
+| `CLOTHES_WOOD` | 0,75 | La ropa abriga: un cuarto menos de leña en invierno |
+| `CLOTHES_WINTER_MORALE` | 0,6 por semana de invierno | 0,15 de media en el año, lo de la capilla: el ánimo de estar abrigado |
 
 ## 13. Persistencia y letargo
 

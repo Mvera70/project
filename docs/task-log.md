@@ -8,10 +8,11 @@ sobra nunca y un campo sin grano deja la villa en 49 personas en vez de 61.
 Vera decidió: la tela sólo es ropa (de momento), se pide en una sastrería con
 tablón, y el lino ocupa un campo de trigo. Hecho: el edificio `tailor` (70 h a
 ×1, con el cuarto campo), la tejedora (`weaver`), `village.linen`, los encargos
-`flax` y `clothes` (`world/tailor.ts`), el lino en la siega y la ropa en el
-ánimo. Medido después (§8): pidiéndolos siempre, la villa en 41 personas en vez
-de 57 y el ánimo en 71 en vez de 61; ningún valle cae (sin la regla de los
-cuatro campos trabajados caían 7 de 12). La sastrería mueve la escalera: la
+`flax` y `clothes` (`world/tailor.ts`), el lino en la siega y la ropa que
+abriga (menos leña en invierno y ánimo de estar abrigado). Medido después (§8):
+pidiéndolos siempre, la villa en 45 personas en vez de 57, el ánimo en 68 en
+vez de 61 y la obra esperando madera del 36 al 26 % de las semanas en la aldea;
+ningún valle cae (sin la regla de los cuatro campos trabajados caían 7 de 12). La sastrería mueve la escalera: la
 villa cerrada de 331 a 350 h. Pruebas: `tests/fast/k5-linen.test.ts` (4 s).
 Captura: `docs/medidas/k-img/k5-tablon-sastreria-390.png`.
 

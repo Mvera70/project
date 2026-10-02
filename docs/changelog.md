@@ -15,16 +15,18 @@ en el edificio del oficio que los hace, y la plaza queda para lo excepcional
 herrería y 24 personas: llega a las 70 h a ×1, con el cuarto campo. La trabaja
 **la tejedora** (`weaver`), que se nombra sola. Su tablón tiene dos encargos de
 un año: **un campo de lino** —en la siega, el campo más lejano de la plaza da
-lienzo en vez de trigo— y **ropa nueva** —6 de lienzo, +0,2 de ánimo por semana
-mientras dura—. El lienzo es una existencia (`village.linen`, sin subir el
+lienzo en vez de trigo— y **ropa nueva** —6 de lienzo; abriga—. El lienzo es una existencia (`village.linen`, sin subir el
 esquema) para que mañana sirva para más.
 
 **Por qué el lino pide cuatro campos trabajados**: pidiéndolo siempre, sin esa
 regla caían 7 de 12 valles en 60 años —aldeas menguadas con cuatro campos y
 brazos para dos, donde el lino se llevaba media cosecha—. Con ella, ninguno.
-**Medido después** (`--linen`): pidiendo lino y ropa siempre, la villa cerrada
-queda en 41 personas en vez de 57, con el ánimo en 71 en vez de 61; en la aldea
-los muertos de hambre pasan de 10,6 a 22,6 por cada 100 h. **La sastrería mueve
+**La ropa abriga** (Vera: «por eso sube el ánimo»): mientras dura, el invierno
+quema un cuarto menos de leña y el ánimo sube en invierno. El frío de hoy no
+mata a nadie (ninguna semana sin leña en 12 × 60 años); lo que pesa es la leña,
+y ahí se engancha. **Medido después** (`--linen`): pidiendo lino y ropa siempre,
+la villa cerrada queda en 45 personas en vez de 57, con el ánimo en 68 en vez de
+61, y la obra espera madera menos (del 36 al 26 % de las semanas en la aldea). **La sastrería mueve
 la escalera** (`pace-report.ts`, 24 semillas): la villa cerrada de 331 a 350 h,
 la atalaya de 199 a 227.
 

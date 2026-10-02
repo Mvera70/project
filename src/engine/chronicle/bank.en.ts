@@ -1134,7 +1134,7 @@ export const BANK: Record<string, string[]> = {
   ],
   'tailor.clothes.ordered': [
     'In the {season} of year {year} the weaver cut {linen} bolts into clothes. People walked differently in them.',
-    'New shirts in year {year}, from the valley’s own linen. Spirits rose.',
+    'New clothes in year {year}, from the valley’s own linen. The winter would bite less.',
     'That {season} the loom went quiet and the needles took over: new clothes for whoever needed them.',
   ],
   'tailor.clothes.done': [
@@ -2578,6 +2578,11 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'There is a smith at work in the valley.',
     'The first smithy stands, and the hammer carries.',
   ],
+  'milestone.first_of_kind.tailor': [
+    'There is a loom in the valley, and a weaver at it.',
+    'The tailor’s workshop opens its door.',
+    'The first bolt of the valley’s own cloth is on the loom.',
+  ],
   'milestone.first_of_kind.mill': [
     'The mill is turning.',
     'The first mill stands over the water.',
@@ -2628,6 +2633,11 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'Another forge is lit.',
     'A second smithy stands.',
     'There is more than one hammer in the valley.',
+  ],
+  'milestone.work_done.tailor': [
+    'Another workshop for the loom.',
+    'A second tailor’s workshop stands.',
+    'One more loom clacks in the valley.',
   ],
   'milestone.work_done.well': [
     'Another well is dug.',
@@ -2934,7 +2944,7 @@ export const UI_BANK: Record<string, string> = {
   'tailor.flax.name': 'A field of flax',
   'tailor.flax.what': 'One field of wheat is sown with flax for a year. Linen for the loom, and that much less bread.',
   'tailor.clothes.name': 'New clothes',
-  'tailor.clothes.what': 'The weaver turns linen into clothes. Spirits rise for a year.',
+  'tailor.clothes.what': 'The weaver turns linen into warm clothes for a year: less firewood in winter, and better spirits.',
   'board.why.smithy': 'There is no forge standing.',
   'board.why.smith': 'The forge is cold: no smith at the anvil.',
   'board.why.busy': 'The smith is still at the last commission.',

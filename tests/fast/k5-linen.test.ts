@@ -2,8 +2,8 @@
 // `subsistence/mood.ts`). docs/design.md §7.18; decisiones de Vera del 2 oct 2026.
 //
 // Lo que guardan estas pruebas es el dilema: **un campo de lino es grano que no
-// se cosecha** y a cambio da lienzo; **el lienzo se hace ropa** y la ropa sube el
-// ánimo; y se pide **en la sastrería**, que la aldea levanta sola cuando crece.
+// se cosecha** y a cambio da lienzo; **el lienzo se hace ropa**, que abriga en
+// invierno —menos leña y más ánimo—; y se pide **en la sastrería**, que la aldea levanta sola cuando crece.
 // Y la regla de todos los actos: pedir no tira dados.
 //
 // Las aldeas se buscan entre candidatas por su precondición (sastrería en pie,
@@ -15,6 +15,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { run, tick } from '@engine/sim';
 import type { GameState } from '@engine/state';
 import { tailorOrdersOpen } from '@engine/world/tailor';
+import { seasonOf } from '@engine/time';
 import { foundTwenty } from '../helpers/founding';
 
 const CANDIDATES = [3, 7, 11, 17, 23, 31, 41];
@@ -84,19 +85,35 @@ describe('K5 · comida contra tela', () => {
     }
   });
 
-  it('la ropa gasta lienzo y sube el ánimo mientras dura', () => {
+  it('la ropa gasta lienzo y abriga: en invierno se quema menos leña y el ánimo sube', () => {
+    // Vera: «la ropa no es sólo ánimo; abriga en invierno, y por eso sube el
+    // ánimo». Se pide al llegar el invierno y se compara con el mismo valle sin
+    // pedirla: pedir no tira dados, así que sólo difieren la leña y el ánimo.
     for (const base of villages) {
-      const bare = clone(base);
-      const dressed = clone(base);
-      dressed.village.linen = TAILOR.ORDERS.clothes.linen;
-      bare.village.linen = TAILOR.ORDERS.clothes.linen;
+      const start = clone(base);
+      start.village.linen = TAILOR.ORDERS.clothes.linen;
+      // El primer invierno con la ropa a mano: la tejedora puede faltar unos
+      // meses (el oficio se cubre al empezar el año, §6.2).
+      const canSew = (s: GameState): boolean => tailorOrdersOpen(s).find((o) => o.id === 'clothes')?.refusal === null;
+      for (let i = 0; i < TIME.WEEKS_PER_YEAR * 3 && !(seasonOf(start.tick) === 'winter' && canSew(start)); i += 1) {
+        tick(start, CATALOG);
+        start.village.linen = TAILOR.ORDERS.clothes.linen;
+      }
+      expect(canSew(start), 'un invierno con tejedora y lienzo').toBe(true);
+      const bare = clone(start);
+      const dressed = clone(start);
+      for (const s of [bare, dressed]) {
+        s.village.linen = TAILOR.ORDERS.clothes.linen;
+        s.village.wood = 2000;
+      }
       tick(dressed, CATALOG, undefined, [{ kind: 'tailor', order: 'clothes' }]);
       tick(bare, CATALOG);
       expect(dressed.village.linen, 'el lienzo se cose').toBe(0);
       expect(dressed.chronicle.some((e) => e.templateKey === 'tailor.clothes.ordered')).toBe(true);
-      run(dressed, 12, 'prudent', CATALOG);
-      run(bare, 12, 'prudent', CATALOG);
-      expect(dressed.village.morale, 'tres meses después, más ánimo').toBeGreaterThan(bare.village.morale);
+      run(dressed, 8, 'prudent', CATALOG);
+      run(bare, 8, 'prudent', CATALOG);
+      expect(dressed.village.wood, 'abrigados, el invierno quema menos leña').toBeGreaterThan(bare.village.wood);
+      expect(dressed.village.morale, 'y se está más contento').toBeGreaterThan(bare.village.morale);
     }
   });
 

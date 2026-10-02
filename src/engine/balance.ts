@@ -1885,11 +1885,22 @@ export const TAILOR = {
     clothes: { linen: 6 },
   },
   /**
-   * El ánimo por semana mientras dura la ropa nueva. TUNE: entre la capilla
-   * (`MOOD.MORALE_CHAPEL`, 0,15) y la iglesia (0,3). Con la deriva de
-   * `MOOD.MORALE_DRIFT` (0,02) sube el ánimo de reposo diez puntos.
+   * **La ropa abriga** (Vera, 2 oct: «no es sólo ánimo; abriga en invierno, y
+   * por eso sube el ánimo»). Con el encargo en marcha, el invierno quema esta
+   * parte de la leña de siempre (`LABOUR.WINTER_WOOD`, en `overwinter` y en la
+   * reserva que la obra respeta, `winterReserve`). TUNE: un cuarto menos. Es el
+   * frío que hoy pesa de verdad: medido, ninguna semana de invierno se quedó
+   * sin leña en 12 valles de 60 años (`COLD_MORTALITY` no se dispara nunca),
+   * pero la leña es lo que la obra espera (K3).
    */
-  CLOTHES_MORALE: 0.2,
+  CLOTHES_WOOD: 0.75,
+  /**
+   * Y el ánimo **de estar abrigado**: sólo las semanas de invierno. TUNE: 0,6
+   * por semana de invierno son 0,15 de media en el año, lo de la capilla
+   * (`MOOD.MORALE_CHAPEL`); con la deriva de `MOOD.MORALE_DRIFT` (0,02) el
+   * invierno acaba unos seis puntos por encima.
+   */
+  CLOTHES_WINTER_MORALE: 0.6,
 } as const;
 
 export const HUNT = {
@@ -2437,7 +2448,7 @@ export const BUILDING_RULES = {
   // (`pace-report.ts`, `docs/medidas/k5-caza-recoleccion-2026-10-02.md` §8):
   // con herrería y esta gente llega cuando la aldea ya tiene cuatro campos,
   // que es desde cuando un campo de lino es una decisión y no media cosecha.
-  TAILOR_PEOPLE: 24, // §7.3 point 6b
+  TAILOR_PEOPLE: 24, // §7.3 point 9
   GRANARY_FULL: 0.8, // §7.3 point 3: grain above 80 % of capacity
   GRANARY_HOUSE_DISTANCE: 6, // §7.4: "a menos de 6 celdas de una casa"
   // TUNE: **cuántas piezas de muralla tiene que tener un tramo para merecer un

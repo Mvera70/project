@@ -5,7 +5,7 @@
 // harvest is eaten first and reaped afterwards, which is what makes a bad
 // autumn show up in the granary before the winter rather than after it.
 
-import { CHARACTER, FOOD, LABOUR, TIME } from '../balance';
+import { CHARACTER, FOOD, LABOUR, TAILOR, TIME } from '../balance';
 import { isHere, population } from '../people/demography';
 import { ageOf } from '../people/villagers';
 import { next, weighted } from '../rng';
@@ -115,6 +115,15 @@ export function consume(state: GameState): {
  * queda. No es un número de gusto: es la misma cuenta que `overwinter` quema,
  * con el calendario de §3.2.
  */
+/**
+ * K5 · Si la aldea va abrigada: el encargo de ropa de la sastrería está en
+ * marcha (§7.18). Se lee de la bandera y no de `world/tailor.ts`, por la misma
+ * regla que la rogativa en la siega: `subsistence/` no mira a `world/`.
+ */
+export function clothed(state: GameState): boolean {
+  return (state.flags['tailor:clothes'] ?? -1) > state.tick;
+}
+
 export function winterReserve(state: GameState): number {
   const season = seasonOf(state.tick);
   if (season !== 'autumn' && season !== 'winter') return 0;
@@ -124,7 +133,8 @@ export function winterReserve(state: GameState): number {
   const coldUntil = state.flags['cold_houses'];
   const coldHouses = coldUntil !== undefined && (coldUntil === 0 || coldUntil > state.tick);
   return population(state) * LABOUR.WINTER_WOOD * weeks
-    * (coldHouses ? LABOUR.COLD_HOUSES_WOOD_MULTIPLIER : 1);
+    * (coldHouses ? LABOUR.COLD_HOUSES_WOOD_MULTIPLIER : 1)
+    * (clothed(state) ? TAILOR.CLOTHES_WOOD : 1);
 }
 
 /**
@@ -140,7 +150,7 @@ export function overwinter(state: GameState): { cold: boolean } {
   const coldHouses = coldUntil !== undefined && (coldUntil === 0 || coldUntil > state.tick);
   const need = population(state) * LABOUR.WINTER_WOOD * (
     coldHouses ? LABOUR.COLD_HOUSES_WOOD_MULTIPLIER : 1
-  );
+  ) * (clothed(state) ? TAILOR.CLOTHES_WOOD : 1); // K5 · la ropa abriga
   if (state.village.wood >= need) {
     state.village.wood -= need;
     return { cold: false };

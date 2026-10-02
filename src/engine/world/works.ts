@@ -275,9 +275,6 @@ export function nextProject(state: GameState, budget: number = woodForWorks(stat
   if (!has(state, 'smithy') && people >= BUILDING_RULES.SMITHY_PEOPLE) wanted.push('smithy');
   // 7 · the mill
   if (!has(state, 'mill') && people >= BUILDING_RULES.MILL_PEOPLE) wanted.push('mill');
-  // 7b · K5 · la sastrería, detrás de la herrería: es el taller de la tejedora
-  // y el sitio donde se pide el lino (§7.18).
-  if (!has(state, 'tailor') && has(state, 'smithy') && people >= BUILDING_RULES.TAILOR_PEOPLE) wanted.push('tailor');
   // 8b · A2 · **el portón, y va delante de la muralla.**
   //
   // Delante porque el anillo se llena: §7.4c planta estacas mientras quede una
@@ -357,6 +354,13 @@ export function nextProject(state: GameState, budget: number = woodForWorks(stat
     && withinCap(state, 'watchtower') && canQuarry(state)) {
     wanted.push('watchtower');
   }
+
+  // 9 · K5 · la sastrería, el último de los oficios: es el taller de la
+  // tejedora y el sitio donde se pide el lino (§7.18). **Detrás de la muralla,
+  // el portón y la atalaya**: un taller no corre, y un valle amenazado levanta
+  // antes su cerco (medido: delante de la empalizada, la cola la pedía antes
+  // que la estacada con el clan a la vista, `works.test.ts`).
+  if (!has(state, 'tailor') && has(state, 'smithy') && people >= BUILDING_RULES.TAILOR_PEOPLE) wanted.push('tailor');
 
   // **E3 · lo que el jugador quiere antes va antes.**
   //

@@ -168,15 +168,25 @@ prudente): **70 h a ×1** (39–103 h, 22 de 24 valles), con el cuarto campo a l
 331 a 350 h, la muralla de 157 a 165 h y la atalaya de 199 a 227 h; la
 población final no cambia (mediana 52).
 
+**La ropa abriga** (Vera, 2 oct, después de la primera versión: «no es sólo
+ánimo; abriga en invierno, y por eso sube el ánimo»). El frío de hoy: ninguna
+semana de invierno sin leña en 12 × 60 años, así que la mortalidad del frío no
+se dispara nunca; lo que pesa es la leña que se quema (0,4 por persona y semana
+de invierno). Con ropa, un cuarto menos, y +0,6 de ánimo por semana de
+invierno.
+
 **El dilema** (`k5-report.ts --linen`, 12 semillas × 60 años; «pide» encarga
 lino y ropa cada vez que el tablón lo deja, «no pide» nunca):
 
-| tramo | gente: no pide → pide | ánimo (mediana) | ánimo < 40 | hambre (sem.) | muertos de hambre por 100 h | lienzo por 10 h |
-|---|---:|---:|---:|---:|---:|---:|
-| caserío (< 12) | 6 → 6 | 36 → 36 | 55 % → 55 % | 7 % → 7 % | 3,7 → 3,7 | 0 |
-| aldea, sin herrería | 21 → 22 | 44 → 44 | 38 % → 38 % | 4 % → 8 % | **10,6 → 22,6** | 4,1 |
-| herrería, sin cerco | 41 → 37 | 62 → **69** | 10 % → 10 % | 4 % → 6 % | 12,7 → 17,0 | 6,9 |
-| villa cerrada | **57 → 41** | 61 → **71** | 12 % → **7 %** | 4 % → 6 % | 20,5 → 20,2 | 9,0 |
+| tramo | gente: no pide → pide | ánimo (mediana) | ánimo en invierno | ánimo < 40 | obra esperando madera | muertos de hambre por 100 h | lienzo por 10 h |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| caserío (< 12) | 6 → 6 | 36 → 36 | 33 → 33 | 55 % → 55 % | 1 % → 1 % | 3,7 → 3,7 | 0 |
+| aldea, sin herrería | 21 → 21 | 44 → 43 | 43 → 43 | 38 % → 40 % | **36 % → 26 %** | 10,6 → 10,1 | 2,7 |
+| herrería, sin cerco | 41 → 34 | 62 → **67** | 63 → 68 | 10 % → 10 % | 15 % → 10 % | 12,7 → 16,8 | 6,8 |
+| villa cerrada | **57 → 45** | 61 → **68** | 63 → **70** | 12 % → **7 %** | 5 % → 1 % | 20,5 → 21,6 | 8,5 |
+
+(Con la primera ropa —+0,2 de ánimo todo el año, sin tocar la leña— la villa
+se quedaba en 41 y el ánimo en 71, y la aldea doblaba sus muertos de hambre.)
 
 Primer lienzo a las 75 h. **Ningún valle cae** en ninguna de las dos columnas.
 

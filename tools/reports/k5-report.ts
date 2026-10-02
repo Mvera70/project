@@ -50,6 +50,7 @@ import { missionsOpen } from '../../src/engine/world/expeditions';
 import { BOARDS, FOOD } from '../../src/engine/balance';
 import { canPlace } from '../../src/engine/world/placement';
 import { tailorOrdersOpen } from '../../src/engine/world/tailor';
+import { seasonOf } from '../../src/engine/time';
 import { hash32 } from '../../src/engine/rng';
 import { alive } from './ladder';
 
@@ -147,8 +148,8 @@ const AFTER = process.argv.includes('--after');
 const FLAX = process.argv.includes('--flax');
 const LINEN = process.argv.includes('--linen');
 
-interface LinenTally { weeks: number; hours: number; lowMorale: number; hungry: number; hungerDeaths: number; linen: number; morale: number[]; people: number[] }
-const linenBlank = (): LinenTally => ({ weeks: 0, hours: 0, lowMorale: 0, hungry: 0, hungerDeaths: 0, linen: 0, morale: [], people: [] });
+interface LinenTally { weeks: number; hours: number; lowMorale: number; hungry: number; hungerDeaths: number; linen: number; waitingWood: number; winterMorale: number[]; morale: number[]; people: number[] }
+const linenBlank = (): LinenTally => ({ weeks: 0, hours: 0, lowMorale: 0, hungry: 0, hungerDeaths: 0, linen: 0, waitingWood: 0, winterMorale: [], morale: [], people: [] });
 
 /** Un valle que pide (`ask`) o no el lino y la ropa cada vez que el tablón lo deja. */
 function linenRun(seed: number, ask: boolean): { tallies: Map<Phase, LinenTally>; ended: boolean; tailorAt: number | null; firstLinen: number | null } {
@@ -175,6 +176,8 @@ function linenRun(seed: number, ask: boolean): { tallies: Map<Phase, LinenTally>
     if (state.village.grain < pop) tally.hungry += 1;
     tally.hungerDeaths += report.deaths.filter((d) => d.cause === 'hunger').length;
     tally.morale.push(Math.round(state.village.morale));
+    if (seasonOf(state.tick) === 'winter') tally.winterMorale.push(Math.round(state.village.morale));
+    if (nextProject(state) === null && nextProject({ ...state }, Number.POSITIVE_INFINITY) !== null) tally.waitingWood += 1;
     tally.people.push(pop);
   }
   for (const t of tallies.values()) t.hours = hours(t.weeks);
@@ -194,18 +197,18 @@ if (LINEN) {
       if (r.firstLinen !== null) linens.push(r.firstLinen);
       for (const p of PHASES) {
         const a = total.get(p)!; const b = r.tallies.get(p)!;
-        for (const k of ['weeks', 'hours', 'lowMorale', 'hungry', 'hungerDeaths', 'linen'] as const) a[k] += b[k];
-        a.morale.push(...b.morale); a.people.push(...b.people);
+        for (const k of ['weeks', 'hours', 'lowMorale', 'hungry', 'hungerDeaths', 'linen', 'waitingWood'] as const) a[k] += b[k];
+        a.morale.push(...b.morale); a.winterMorale.push(...b.winterMorale); a.people.push(...b.people);
       }
     }
     console.log(`\n# Lino · ${ask ? 'pidiendo lino y ropa siempre que se puede' : 'sin pedir nada a la sastrería'} · ${SEEDS.length} semillas × ${YEARS} años · prudent · horas a ×1\n`);
     console.log(`sastrería: mediana ${fmt(median(tailors))}, ${tailors.length}/${SEEDS.length} valles · primer lienzo: ${linens.length === 0 ? '—' : `mediana ${fmt(median(linens))}`} · partidas acabadas ${ended}/${SEEDS.length}\n`);
-    console.log('| tramo | gente | ánimo (mediana) | ánimo < 40 | hambre (sem.) | muertos de hambre por 100 h | lienzo por 10 h |');
-    console.log('|---|---:|---:|---:|---:|---:|---:|');
+    console.log('| tramo | gente | ánimo (mediana) | ánimo en invierno | ánimo < 40 | obra esperando madera | hambre (sem.) | muertos de hambre por 100 h | lienzo por 10 h |');
+    console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|');
     for (const p of PHASES) {
       const t = total.get(p)!;
       const per = (x: number, h: number): string => (t.hours === 0 ? '—' : (h * x / t.hours).toFixed(1));
-      console.log(`| ${p} | ${median(t.people)} | ${median(t.morale)} | ${pct(t.lowMorale, t.weeks)} | ${pct(t.hungry, t.weeks)} | ${per(t.hungerDeaths, 100)} | ${per(t.linen, 10)} |`);
+      console.log(`| ${p} | ${median(t.people)} | ${median(t.morale)} | ${median(t.winterMorale)} | ${pct(t.lowMorale, t.weeks)} | ${pct(t.waitingWood, t.weeks)} | ${pct(t.hungry, t.weeks)} | ${per(t.hungerDeaths, 100)} | ${per(t.linen, 10)} |`);
     }
   }
 }
