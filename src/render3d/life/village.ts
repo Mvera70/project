@@ -74,6 +74,7 @@ import { bearPosition, createBear, stepBear } from './bear';
 import { beginFlight, stepFlight, type Flight } from './flee';
 import { createSackScene, sackSnapshot, type SackScene, type SackSnapshot } from './sack';
 import { aftermathProps } from './aftermath';
+import { abandonShift, createMineScene, mineSiteOf, SHIFT_END, startShift, stepShift, underground, type MineScene, type Shaft } from './mine';
 import type { Animal } from '@derive/animals';
 import {
   carryAt, drop, findMate, fling, given, LOFT, PLAYED_OUT, propPlaces, PROP_PLACE_PREFIX,
@@ -144,6 +145,12 @@ export interface Dweller {
    * donde terminó. Efímero; nunca sale al motor.
    */
   hunting?: boolean;
+  /**
+   * AR-2 · En la mina: el turno lo mueve `life/mine.ts` —entrar, desaparecer,
+   * salir con la vagoneta, volcar, picar la ladera— y no su rutina, como la
+   * caza. Efímero; nunca sale al motor.
+   */
+  shaft?: Shaft;
   readonly residence?: HomeRoutine;
   readonly body: Body;
   /** E3a · Estado privado de la escalera; nunca sale al motor ni al router. */
@@ -314,6 +321,8 @@ export interface Village {
   readonly buildDeliveries: number;
   /** Cargas llevadas del pedregal a una obra de piedra durante esta jornada. */
   readonly stoneDeliveries: number;
+  /** AR-2 · La mina de esta jornada (la boca, la vagoneta, lo volcado), o null si no hay. */
+  readonly mine: MineScene | null;
   /** Cargas llevadas del campo al almacén durante la semana real de cosecha. */
   readonly harvestDeliveries: number;
   /** E0a · La decisión de prepararse, reconstruida para esta jornada. */
@@ -821,6 +830,9 @@ const POST_REACH = 1.2;
 export function createVillage(state: GameState, day: number, options: DayOptions = {}): Village {
   const land = options.land ?? terrainOf(state);
   const seed = seedOfDay(state.seed, day);
+  // AR-2 · la boca de la mina y su vagoneta, si hay mina en pie.
+  const pit = mineSiteOf(state, land);
+  const mineScene = pit === null ? null : createMineScene(pit);
   // El valle más vivo (25 sep 2026) · **con lluvia la gente se resguarda.** El
   // cielo de la jornada es puro por día (`skyAt`), el mismo que pinta la
   // lluvia, así que aquí se sabe sin que nadie lo pase. Lloviendo no se ofrece
@@ -1278,7 +1290,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     const sites = tradeSites(state, land, mine, visitor.kind === 'pedlar' ? 'bundle' : 'grain', site.front, String(visitor.body.id));
     const busy = new Set(preparationByVillager.keys());
     const trips = planCarry(state, land, dwellers.filter((dweller) => !busy.has(dweller.villager)
-      && dweller.ageGroup === undefined && !isPost(dweller.dayPlan?.job?.place ?? ''))
+      && dweller.ageGroup === undefined && !isPost(dweller.dayPlan?.job?.place ?? '')
+      // AR-2 · el minero puede estar dentro de la roca cuando el vendedor
+      // llega, y desde allí no hay ruta: el porte se perdía y nadie pagaba.
+      && dweller.dayPlan?.job?.place.startsWith('mine:') !== true)
       .map((dweller) => ({ villager: dweller.villager, at: dweller.body, radius: dweller.body.radius, guarding: false })),
     sites, seed, TRADE_PORTERS);
     tradeLoads.set(`trade:${visitor.body.id}`, []);
@@ -1618,6 +1633,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       woodNow = weekFraction;
     },
     get stoneDeliveries(): number { return stoneDeliveries; },
+    mine: mineScene,
     get buildDeliveries(): number { return buildDeliveries; },
     get harvestDeliveries(): number { return harvestDeliveries; },
     get preparation() {
@@ -2060,6 +2076,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // las ofertas. Al llegar se queda quieto hasta que cese la entrada; no
         // vuelve a trabajar ni reproduce carrera sin avanzar.
         if (dweller.flight !== null && dweller.flight !== undefined) {
+          // AR-2 · quien estaba en la mina sale a la boca antes de huir: la
+          // huida no sabe andar desde dentro de la roca.
+          if (dweller.shaft !== undefined && mineScene !== null) {
+            abandonShift(dweller.shaft, mineScene);
+            delete dweller.shaft;
+            body.x = mineScene.site.stand.x;
+            body.z = mineScene.site.stand.z;
+          }
           const before = { x: body.x, z: body.z };
           const moving = stepFlight(body, dweller.flight, land, around);
           const distance = gap(before, body);
@@ -2070,6 +2094,39 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             moving, withOthers: false, working: false, hunger,
           }, LIFE_STEP);
           continue;
+        }
+
+        // AR-2 · **En la mina, el turno manda sobre la rutina**, como la caza:
+        // quien ha llegado a la boca entra, desaparece y vuelve a salir hasta
+        // que se le acaba la jornada (`SHIFT_END`), y entonces sale a pie y
+        // la rutina de casa le recupera. No se empieza un turno a última hora.
+        // Si otra rutina le ha dado otro encargo (el porte de un trato, la
+        // víspera de un asalto), el turno se suelta: sale a la boca, su
+        // vagoneta vuelve adentro, y el encargo nuevo manda.
+        if (dweller.shaft !== undefined && mineScene !== null
+          && dweller.doing?.place.id.startsWith('mine:') !== true) {
+          abandonShift(dweller.shaft, mineScene);
+          if (underground(dweller.shaft, mineScene.site, body)) {
+            body.x = mineScene.site.stand.x;
+            body.z = mineScene.site.stand.z;
+          }
+          delete dweller.shaft;
+        }
+        if (mineScene !== null && (dweller.shaft !== undefined || (dweller.doing?.there === true
+          && dweller.doing.place.id.startsWith('mine:') && phase < SHIFT_END))) {
+          dweller.shaft ??= startShift(steps);
+          if (phase >= SHIFT_END || (dweller.doing !== null && steps >= dweller.doing.until)) dweller.shaft.ending = true;
+          const turn = stepShift(dweller.shaft, body, mineScene, steps, seed);
+          dweller.travelled += turn.moved;
+          dweller.motionSpeed = turn.moved / LIFE_STEP;
+          dweller.faceAnchor = { x: body.x, z: body.z };
+          drift(dweller.needs, dweller.traits, {
+            moving: turn.moved > 0, withOthers: false, working: true, hunger,
+          }, LIFE_STEP);
+          if (turn.active) continue;
+          delete dweller.shaft;
+          dweller.doing = null;
+          dweller.rethinkAt = steps;
         }
 
         // Quien está en una escena ya ha recibido su velocidad de `play`: sólo
@@ -3277,7 +3334,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'conflict'; readonly data: Scene }
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'greet'; readonly data: Greeting };
 
-      const freeToPropose = (d: Dweller): boolean => !indoors(d) && (d.residence === undefined || ['day', 'returning'].includes(d.residence.stage)) && d.scene === null
+      const freeToPropose = (d: Dweller): boolean => !indoors(d) && d.shaft === undefined && (d.residence === undefined || ['day', 'returning'].includes(d.residence.stage)) && d.scene === null
         && (d.flight === null || d.flight === undefined)
         && (steps >= d.sceneCooldownUntil || isNight(phase) || (!quarrelStaged && quarrelPair?.includes(d.villager) === true))
         && !commitments.busy(actorOf(d));

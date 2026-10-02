@@ -14,7 +14,7 @@ import { isPost } from './garrison';
 export interface DayJob { readonly place: string; readonly offer: string; readonly seat?: number }
 export interface DayPlan { readonly role: Role | null; readonly job: DayJob | null }
 
-type LabourKind = 'field:' | 'felling' | 'hunt:' | 'works:' | 'quarry:';
+type LabourKind = 'field:' | 'felling' | 'hunt:' | 'works:' | 'quarry:' | 'mine:';
 
 const WEEK_DAYS = 7;
 
@@ -171,6 +171,8 @@ export function dayPlans(
     { kind: 'felling', days: Math.max(0, hands.cutters - fixedCutters) * WEEK_DAYS
       + (winter && hasFelling ? farmerDays : 0) },
     { kind: 'quarry:', days: hasQuarry ? buildingDays / 2 : 0 },
+    // AR-2 · los mineros del motor, a la boca de la mina si la hay.
+    { kind: 'mine:', days: places.some(place => place.id.startsWith('mine:')) ? hands.miners * WEEK_DAYS : 0 },
     { kind: 'works:', days: (hasQuarry ? buildingDays / 2 : buildingDays)
       + (winter && !hasFelling && hasWorks ? farmerDays : 0) },
   ], idle.size, day);
@@ -179,6 +181,7 @@ export function dayPlans(
     { prefix: 'hunt:' as const, offer: 'hunt' },
     { prefix: 'felling' as const, offer: 'work' },
     { prefix: 'quarry:' as const, offer: 'work' },
+    { prefix: 'mine:' as const, offer: 'work' },
     { prefix: 'works:' as const, offer: 'work' },
     { prefix: 'field:' as const, offer: fieldOffer },
   ]).map(quota => ({ ...quota, count: roster.get(quota.prefix) ?? 0 }));

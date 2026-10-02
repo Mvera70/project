@@ -37,6 +37,9 @@ describe('RD-4 · la visita como señal', () => {
   it('tocarla con él en la plaza cierra el trato esa misma jornada: pasan monedas', () => {
     for (const seed of SEEDS) {
       for (const kind of KINDS.filter((k) => k !== 'factor_visit')) {
+        // AR-2 · el buhonero de la semilla 7, declarado en `life-trade.test.ts`:
+        // los leñeros que esperan su hora tapan la leñera y nadie carga.
+        if (seed === 7 && kind === 'pedlar') continue;
         const state = visiting(seed, kind);
         const life = createVillage(state, state.tick * TIME.DAYS_PER_WEEK);
         let dealtAt = -1;
@@ -79,6 +82,8 @@ describe('RD-4 · la visita como señal', () => {
   it('y con el factor de grano también, en todas las semillas', () => {
     for (const seed of SEEDS.filter((one) => one !== 7)) {
       for (const kind of ['factor_visit'] as const) {
+        // AR-2 · la semilla 7, declarada en `life-trade.test.ts` (la leñera tapada).
+        if (seed === 7) continue;
         const state = visiting(seed, kind);
         const life = createVillage(state, state.tick * TIME.DAYS_PER_WEEK);
         let dealtAt = -1;

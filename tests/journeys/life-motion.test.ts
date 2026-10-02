@@ -79,6 +79,10 @@ beforeAll(() => {
         life.step();
         if ((n + 1) % SAMPLE_EVERY !== 0) continue;
         for (const d of bodies) {
+          // AR-2 · el turno de la mina mueve el cuerpo a mano por la boca y lo
+          // mete en la roca, como el oso a su cueva (`life/mine.ts`): no es un
+          // cuerpo de la física y no se pinta dentro. Se cuenta al salir.
+          if ((d as { shaft?: unknown }).shaft !== undefined) continue;
           const { body } = d;
           totals.bodySeconds += 1;
           if (blockedAt(land, body.x, body.z)) totals.centreInWall += 1;

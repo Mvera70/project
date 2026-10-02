@@ -93,6 +93,7 @@ export function foundGame(
       hides: 0,
       // K5 · el lienzo: sólo lo da un campo de lino.
       linen: 0,
+      ore: 0,
     },
     people: foundPeople(rng, 0, profile),
     buildings: [],

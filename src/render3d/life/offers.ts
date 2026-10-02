@@ -26,6 +26,7 @@ import type { Point, Terrain } from './body';
 import { blockedAt, fitsCircle, WALL_CLEAR } from './body';
 import type { NeedName } from './needs';
 import { quarryCells, stoneWork, woodStoreCells } from './resource-sites';
+import { mineSiteOf } from './mine';
 import { pathTo } from './navigate';
 import { canReach, reachableFrom } from './terrain';
 import { scatterTransform } from '../world/forest';
@@ -299,6 +300,8 @@ export function strikeTurn(clip: 'chop' | 'mine'): number {
 }
 /** Una tanda breve de pico antes de llevar la carga a la obra. */
 const QUARRY = { ...WORK, seconds: [6, 10] as const, reach: 0.15 };
+/** AR-2 · El turno de mina: largo, porque dentro y fuera se lo reparte `life/mine.ts`. TUNE. */
+const MINE_SHIFT = { ...WORK, seconds: [150, 240] as const, reach: 0.3 };
 /**
  * Cuántas caras de cantera alcanzables se comparan por camino (v5.74). TUNE:
  * doce. Las caras van por distancia en línea recta y la más cercana andando
@@ -610,8 +613,22 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
     }
   }
 
+  // AR-2 · **La mina**, con las manos que el motor manda a ella (`miners`).
+  // La plaza está delante de la boca; lo que pasa después —entrar, salir con
+  // la vagoneta, volcar, picar la ladera— lo lleva el turno de `life/mine.ts`.
+  // Una jornada larga, porque el turno se reparte solo entre dentro y fuera.
+  const pit = mineSiteOf(state, land);
+  if (pit !== null && hands.miners > 0) {
+    const spots = [pit.stand, ...(gapOf(pit.face, pit.stand) > 0.3 ? [pit.face] : [])];
+    const offer = placedOffer({ ...MINE_SHIFT, seats: Math.min(Math.ceil(hands.miners), spots.length) },
+      pit.stand, land, undefined, spots.slice(0, Math.max(1, Math.ceil(hands.miners))));
+    if (offer !== null) places.push({ id: `mine:${pit.id}`, at: pit.stand, offers: [offer] });
+  }
+
   return places;
 }
+
+const gapOf = (a: Point, b: Point): number => Math.hypot(a.x - b.x, a.z - b.z);
 
 /**
  * Cuántas plazas puede llegar a tener un tajo.

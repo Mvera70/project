@@ -14,6 +14,7 @@ import { lostInSight } from './lost-child';
 import { travelling } from './expeditions';
 import { visiting } from './visitors';
 import { indoors } from './home';
+import { shaftGesture, underground } from './mine';
 import { occupationOf } from '../world/models';
 import type { ArrowSighting } from '../world/arrows';
 import type { VillagerId } from '@engine/state';
@@ -37,6 +38,12 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
   // E1: huir no es un gesto de combate. Lo mueve el suelo recorrido y sólo se
   // enseña mientras el cuerpo avanza; al refugiarse vuelve a `idle`.
   if (dweller.flight?.sheltered === true) return 'idle';
+  // AR-2 · el minero: picar, empujar la vagoneta, volcarla o andar a la boca.
+  if (dweller.shaft !== undefined) {
+    const gesture = shaftGesture(dweller.shaft);
+    return gesture === 'push' ? 'push' : gesture === 'unload' ? 'sort' : gesture === 'mine' ? 'mine'
+      : gesture === 'walk' && moving ? 'walk' : 'idle';
+  }
   if (moving && dweller.flight !== null && dweller.flight !== undefined) return 'flee';
   if (moving) return dweller.holding !== null ? 'carry_walk' : 'walk';
   if (talkingOf(dweller)) return 'talk';
@@ -53,7 +60,7 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
     const task = dweller.doing.place.task;
     if (action === 'work' && place.startsWith('field:')) return task === 'spread' ? 'spread' : task === 'sow' ? 'sow' : 'work_hoe';
     if (action === 'work') return place.startsWith('field:') ? 'work_hoe' : place.startsWith('felling:') ? 'chop'
-      : place.startsWith('quarry:') ? 'mine'
+      : place.startsWith('quarry:') || place.startsWith('mine:') ? 'mine'
         : place.startsWith('granary:') || place.startsWith('mill:') ? 'sort' : 'hammer';
     if (action.startsWith('deliver')) return 'sort';
     if (action === 'sit') return 'sit';
@@ -153,6 +160,8 @@ export function castOf(
   const actors: Actor[] = [];
   for (const dweller of life.dwellers) {
     if (indoors(dweller)) continue;
+    // AR-2 · dentro de la mina no se ve: desaparece al pasar la boca.
+    if (life.mine !== null && underground(dweller.shaft, life.mine.site, dweller.body)) continue;
     const { body } = dweller;
     const speed = dweller.motionSpeed ?? Math.hypot(body.vx, body.vz);
     const moving = speed > 0.05;

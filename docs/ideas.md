@@ -157,4 +157,10 @@ empujar y descargar.
 **Repartida → `docs/plan-meta.md`, AR-2** (punto propio, con su cita), y en
 `docs/encargos-3d.md` una fila por pieza: la boca, entrar y salir como el oso,
 la vagoneta, el montón y los tres gestos (v5.81).
+**Y hecha en v5.86** (rama `claude/ar2-mineria`): la veta, la mina, el
+mineral y la Edad del Hierro en el motor (`docs/design.md` §7.20); el minero
+que entra, desaparece y sale, y la vagoneta que sale llena y vuelve vacía, en
+la vida; los modelos, con respaldo procedural hasta que lleguen los de Astra.
+**Queda** el buhonero como fuente secundaria (espera a AR-1, que es quien
+gastará el mineral).
 

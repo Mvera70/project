@@ -382,7 +382,7 @@ function isPlausibleState(value: unknown): value is GameState {
     && record(s['plaza'])
     && finite((s['plaza'] as Record<string, unknown>)['x'])
     && finite((s['plaza'] as Record<string, unknown>)['y'])
-    && record(village) && ['grain', 'wood', 'morale', 'faith', 'stone', 'silver', 'hides', 'linen'].every((key) => finite(village[key]))
+    && record(village) && ['grain', 'wood', 'morale', 'faith', 'stone', 'silver', 'hides', 'linen', 'ore'].every((key) => finite(village[key]))
     && record(s['herd']) && HERD_KINDS.every((kind) => tickValue((s['herd'] as Record<string, unknown>)[kind]))
     // La postura. Se comprueba que sea finita y no que esté en rango:
     // `allocateLabour` ya la recorta, y rechazar una partida entera por una
@@ -621,6 +621,10 @@ export function deserialize(raw: unknown): SaveFile {
   // K5 · y el lienzo, igual: una partida guardada antes no sembró lino nunca.
   if (record(state.village) && (state.village as Partial<GameState['village']>).linen === undefined) {
     state = { ...state, village: { ...state.village, linen: 0 } } as GameState;
+  }
+  // AR-2 · el mineral, igual: sin mina no había ninguno.
+  if (record(state.village) && (state.village as Partial<GameState['village']>).ore === undefined) {
+    state = { ...state, village: { ...state.village, ore: 0 } } as GameState;
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');

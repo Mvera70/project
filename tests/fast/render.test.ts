@@ -112,7 +112,10 @@ describe('M-17 · catálogo visual', () => {
       // mismo motivo que `gate`: aquí es la pieza de muralla que ocupa.
       'bastion', 'chapel', 'church', 'field', 'gate', 'granary', 'grave_yard', 'hall', 'house',
       'mill', 'palisade', 'smithy', 'stone_house', 'tailor', 'wall', 'watchtower', 'well',
-    ]);
+      // AR-2 · `mine` reutiliza la del pozo: una celda de piedra en el camino
+      // de reserva; la boca la enseña el 3D (`world/mine-works.ts`).
+      'mine',
+    ].sort());
   });
 
   it('reserva ocho tonos estables para los personajes nombrados', () => {

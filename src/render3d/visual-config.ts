@@ -89,6 +89,11 @@ export const BUILDING_LOOKS: Readonly<Record<BuildingKind, BuildingLook>> = {
   // la caja de un taller con la pared de lienzo crudo, para que no se lea como
   // una casa. Cuando exista `tailor.glb` esto deja de usarse.
   tailor: { walls: 0.6, roof: 0.38, wallColour: '#D8D0BC', roofColour: THATCH, roofed: true },
+  // AR-2 · **la mina no es una caja**: la boca, los raíles, la vagoneta y el
+  // acopio los pinta `world/mine-works.ts` (con los GLB del encargo de Astra o
+  // su respaldo procedural). Esto es sólo la losa oscura de la huella, a ras
+  // de suelo, para que el respaldo genérico de edificios no levante una casa.
+  mine: { walls: 0.03, roof: 0, wallColour: '#3A3631', roofColour: TILE, roofed: false },
 };
 
 /**

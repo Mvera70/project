@@ -120,6 +120,9 @@ describe('V-06 · elegir', () => {
       for (let n = 0; n < STEPS_PER_DAY; n += 1) {
         life.step();
         for (const dweller of life.dwellers) {
+          // AR-2 · quien está en el turno de la mina entra en la roca a mano,
+          // como el oso a su cueva (`life/mine.ts`): no es un cuerpo suelto.
+          if (dweller.shaft !== undefined) continue;
           expect(blockedAt(life.land, dweller.body.x, dweller.body.z),
             `semilla ${seed}: alguien dentro de un muro en el paso ${n}`).toBe(false);
         }

@@ -144,6 +144,8 @@ export const BUILDING_SPRITES: Readonly<Record<BuildingKind, Sprite>> = {
   // A3 · el bastión, en el camino de reserva: la silueta de la muralla de
   // piedra que ocupa. El 3D es quien tiene la malla de la atalaya prestada.
   bastion: wall,
+  // AR-2 · la mina, en el camino de reserva: una mancha de roca, como el pozo.
+  mine: well,
 };
 
 export const NAMED_TONES = ['#a34f3f', '#3f6fa3', '#7b5aa6', '#b27636', '#3e8063', '#9a4770', '#65733b', '#776154'] as const;

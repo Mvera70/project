@@ -311,6 +311,10 @@ describe('IA-3 · aldeanos con hábitos', () => {
   // la sastrería y el contorno juntos la muestra cambia y el devoto reza el doble.
   // Sale de `it.fails`; la cuenta y el listón siguen sin tocar, y si otra
   // trayectoria lo vuelve a dejar corto, se declara otra vez con su cifra.
+  // **Y vuelve a pasar con la mina (AR-2, v5.86, 2 oct 2026)**: la trayectoria
+  // se mueve desde el año ~5 y la muestra de seis vuelve a dar el doble en la
+  // jornada local («Expect test to fail»). Es el mismo baile de la muestra; si
+  // otra trayectoria lo tumba, vuelve a `it.fails` con lo medido.
   it('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
     const { byTrait, anyThirstIgnored } = habitSample();
     expect(anyThirstIgnored, 'una necesidad urgente no se apaga con otra cosa').toBe(false);

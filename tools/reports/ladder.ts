@@ -31,6 +31,9 @@ export const LADDER: readonly (readonly [string, (s: GameState) => boolean])[] =
   // K5 · la sastrería y su tejedora: desde aquí se puede pedir un campo de lino.
   ['sastrería', (s) => alive(s, 'tailor') >= 1],
   ['cuatro campos', (s) => alive(s, 'field') >= 4],
+  // AR-2 · la primera mina abre la Edad del Hierro (`docs/plan-meta.md` AR):
+  // después de la piedra, con la fragua encendida.
+  ['EDAD DEL HIERRO (mina)', (s) => s.flags['age:iron'] !== undefined],
   ['corona posible', (s) => crownRefusal(s) !== 'small'],
   ['30 personas', (s) => population(s) >= 30],
   // A1 · el peldaño de la fase 3 (§1b): la villa cerrada, que es lo que un

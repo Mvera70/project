@@ -84,10 +84,24 @@ export interface VillageStats {
    * Sin subir el esquema: una partida guardada sin él carga con cero.
    */
   linen: number;
+  /**
+   * AR-2 · **El mineral de hierro de la mina** (2 oct 2026).
+   *
+   * Sale de la veta al pie de la montaña cuando hay mina en pie y mineros en
+   * ella (`world/mine.ts`), y se amontona en el acopio de la boca hasta
+   * `MINE.ORE_STORE`: con el acopio lleno la mina para y sus manos vuelven al
+   * bosque y a la obra, así que no es una barra que crece para siempre. **Es
+   * una existencia para que otros la gasten**, como el cuero de K5: la cota
+   * de malla y el casco de la Edad del Hierro (AR-1) la pedirán en la herrería.
+   * No va en la cabecera: se ve en el montón de la boca.
+   *
+   * Sin subir el esquema: una partida guardada sin él carga con cero (`save.ts`).
+   */
+  ore: number;
 }
 
-/** The statistics an effect can move. design.md §8.4; stone and silver since M-0, hides since K5. */
-export type StatName = 'grain' | 'wood' | 'morale' | 'faith' | 'stone' | 'silver' | 'hides' | 'linen';
+/** The statistics an effect can move. design.md §8.4; stone and silver since M-0, hides since K5, linen since K5, ore since AR-2. */
+export type StatName = 'grain' | 'wood' | 'morale' | 'faith' | 'stone' | 'silver' | 'hides' | 'linen' | 'ore';
 
 /**
  * The village's animals, as counts. design.md §7.7.
@@ -396,7 +410,10 @@ export type BuildingKind =
   // K5 · **la sastrería**: el taller de la tejedora, con su tablón (§7.18). Es
   // donde se pide sembrar lino y coser ropa, por la regla de Vera: los encargos
   // se piden en el edificio del oficio que los hace.
-  | 'tailor';
+  | 'tailor'
+  // AR-2 · **la mina**: la boca en la veta, al pie de la montaña y fuera del
+  // pueblo (`world/mine.ts`). Una por valle; la primera abre la Edad del Hierro.
+  | 'mine';
 
 export interface Building {
   id: BuildingId;
@@ -917,6 +934,12 @@ export interface Allocation {
   fishers: number;
   /** Hands standing in the fields keeping the crows off the grain (§7.7). */
   wardens: number;
+  /**
+   * AR-2 · las manos que bajan a la mina (`MINE.CREW`), sólo con mina en pie y
+   * el acopio sin llenar. Cero en cualquier otro caso, y entonces el reparto
+   * es exactamente el de antes de la mina.
+   */
+  miners: number;
   labourFactor: number; // 0..1, how well the worked fields were manned
 }
 

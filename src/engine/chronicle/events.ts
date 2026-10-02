@@ -104,6 +104,8 @@ const SINGULAR_BUILDINGS: readonly BuildingKind[] = [
   'gate',
   'church',
   'smithy',
+  // AR-2 · la mina rehecha (la primera tiene su propia línea de peso 3).
+  'mine',
   'mill',
   'well',
   // K-4 · la sala del rey se levanta una vez en la vida de un valle: es de las

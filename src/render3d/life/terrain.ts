@@ -58,6 +58,9 @@ export const WALLED: ReadonlySet<string> = new Set([
   // A3 · el bastión es una pieza de muralla mejorada, no una puerta: se queda
   // con `palisade`/`wall` y no se cruza.
   'bastion',
+  // AR-2 · la boca de la mina: la celda es roca entibada y se entra por la
+  // boca, a mano (`life/mine.ts`), como el oso a su cueva; no se cruza.
+  'mine',
 ]);
 
 /**

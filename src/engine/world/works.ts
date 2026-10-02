@@ -21,6 +21,7 @@ import type { BuildingKind, ConstructionWork, GameState } from '../state';
 import { familyOf, houseHomeless, withinCap } from './buildings';
 import type { BuiltEvent } from './buildings';
 import { placeBuilding, wallAt } from './placement';
+import { mineWanted, veinSite } from './mine';
 import { nextUpgrade, upgradeSpot } from './upgrade';
 import type { Upgrade } from './upgrade';
 
@@ -275,6 +276,9 @@ export function nextProject(state: GameState, budget: number = woodForWorks(stat
   if (!has(state, 'smithy') && people >= BUILDING_RULES.SMITHY_PEOPLE) wanted.push('smithy');
   // 7 · the mill
   if (!has(state, 'mill') && people >= BUILDING_RULES.MILL_PEOPLE) wanted.push('mill');
+  // 7b · AR-2 · la mina, después de la piedra y con la fragua encendida
+  // (`world/mine.ts`). Va detrás del molino: primero se come.
+  if (mineWanted(state)) wanted.push('mine');
   // 8b · A2 · **el portón, y va delante de la muralla.**
   //
   // Delante porque el anillo se llena: §7.4c planta estacas mientras quede una
@@ -389,12 +393,20 @@ export function nextProject(state: GameState, budget: number = woodForWorks(stat
   for (const kind of ordered) {
     if (!withinCap(state, kind)) continue;
     if (budget < woodCostOf(state, kind)) continue;
-    if (placeBuilding(state, kind) !== null) return kind;
+    if (spotFor(state, kind) !== null) return kind;
   }
 
   // 9 · stone upgrades, when nothing above could be placed.
   if (!canQuarry(state)) return null;
   return nextUpgrade(state);
+}
+
+/**
+ * Dónde va una obra nueva: §7.4 para todo, y la veta para la mina (AR-2),
+ * que no se coloca contra el pueblo sino contra la roca.
+ */
+function spotFor(state: GameState, kind: BuildingKind): { x: number; y: number } | null {
+  return kind === 'mine' ? veinSite(state) : placeBuilding(state, kind);
 }
 
 /** Open a project. Charges its materials and reserves its plot. */
@@ -406,7 +418,7 @@ function open(state: GameState, project: Project, free = false): ConstructionWor
   let y: number;
   let upgradeOf: number | null = null;
   if (typeof project === 'string') {
-    const spot = placeBuilding(state, kind);
+    const spot = spotFor(state, kind);
     if (spot === null) return null;
     ({ x, y } = spot);
     // A2c · **una puerta abierta en la muralla hecha sustituye a su tramo**, y
