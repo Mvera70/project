@@ -36,6 +36,8 @@ import { yearOf } from '../../src/engine/time';
 import { smithyOrdersOpen } from '../../src/engine/world/boards';
 import { resistance } from '../../src/engine/world/garrison';
 import { worthOf } from '../../src/engine/world/threat';
+import { archiveGame } from '../../src/engine/save';
+import { fallOf, type FallStory } from '../../src/derive/fall';
 
 const arg = (name: string, fallback: number): number => {
   const i = process.argv.indexOf(`--${name}`);
@@ -46,7 +48,12 @@ const SEED_COUNT = arg('seeds', 30);
 const YEARS = arg('years', 100);
 const FROM = arg('from', 3);
 const STEP = arg('step', 7);
-const SEEDS = Array.from({ length: SEED_COUNT }, (_, i) => FROM + i * STEP);
+// `--list 10,17,24` juega sólo esas (para volver a medir las que cayeron).
+const LIST = (() => {
+  const i = process.argv.indexOf('--list');
+  return i >= 0 && process.argv[i + 1] !== undefined ? process.argv[i + 1]!.split(',').map(Number) : null;
+})();
+const SEEDS = LIST ?? Array.from({ length: SEED_COUNT }, (_, i) => FROM + i * STEP);
 /** Cuántas semanas antes del punto de no retorno se mira si el jugador decidió algo. */
 const NEAR_WEEKS = arg('near', TIME.WEEKS_PER_YEAR * 2);
 
@@ -93,6 +100,10 @@ interface Fall {
   headlines: string[]; weight2: number;
   /** Cuántos asaltos/saqueos hubo antes del final. */
   raids: number;
+  /** Lo que contaría el epitafio (`derive/fall.ts`). */
+  story: FallStory;
+  /** La decisión que citaría, como `plantilla:opción`. */
+  quoted: string;
 }
 
 function play(name: string, seed: number): { fall: Fall | null; peak: number } {
@@ -124,9 +135,20 @@ function play(name: string, seed: number): { fall: Fall | null; peak: number } {
     pnr = refusals.at(-3)?.tick ?? end;
   } else {
     // La última semana (antes del final) que no estaba ya perdida.
+    //
+    // **En un asalto se mira hasta el aviso, no hasta el final.** La partida
+    // que entra se decide el día del aviso (`raid.coming`, con su número), y
+    // las semanas de después ya llevan el saqueo encima: sin plata ni grano el
+    // valle «vale» cero y la partida que bajaría parece pequeña, así que el
+    // punto salía pegado al final (medido: mediana de 0 a 6 h) por un artefacto.
+    const comings = state.chronicle.filter((e) => e.templateKey === 'raid.coming' || e.templateKey === 'raid.assault');
+    const cutoff = cause === 'stormed'
+      ? Math.min(end, ([...comings].reverse().find((e) => e.templateKey === 'raid.coming')?.tick
+        ?? (comings.at(-1)?.tick ?? end) - THREAT.WARNING_WEEKS))
+      : end;
     let i = weeks.length - 1;
     // La semana del final ya ha borrado la aldea: se mira desde la anterior.
-    while (i >= 0 && weeks[i]!.tick >= end) i -= 1;
+    while (i >= 0 && weeks[i]!.tick >= cutoff) i -= 1;
     while (i >= 0 && bad(weeks[i]!)) i -= 1;
     pnr = i + 1 < weeks.length ? weeks[i + 1]!.tick : end;
   }
@@ -136,6 +158,7 @@ function play(name: string, seed: number): { fall: Fall | null; peak: number } {
     .filter((d) => d.tick >= pnr - NEAR_WEEKS && d.tick <= pnr)
     .map((d) => `${d.templateId}:${d.optionId} (año ${yearOf(d.tick)})`);
   const window = state.chronicle.filter((e) => e.tick >= pnr && e.tick <= end);
+  const story = fallOf(archiveGame(state));
   return {
     peak,
     fall: {
@@ -144,6 +167,8 @@ function play(name: string, seed: number): { fall: Fall | null; peak: number } {
       headlines: window.filter((e) => e.weight === 3).map((e) => `${e.templateKey} (año ${yearOf(e.tick)})`),
       weight2: window.filter((e) => e.weight === 2).length,
       raids: state.threat.raids,
+      story,
+      quoted: story.decision === null ? '—' : state.chronicle[story.decision]!.templateKey.replace('crossroad.', ''),
     },
   };
 }
@@ -189,4 +214,13 @@ for (const f of falls) {
 console.log('\n### Lo que la crónica dijo entre el punto y el final (titulares)\n');
 for (const f of falls) {
   console.log(`- **${f.strategy} ${f.seed}** (${f.cause}, ${f.leadHours.toFixed(0)} h): ${f.headlines.join('; ') || 'ningún titular'} · y ${f.weight2} líneas de peso 2`);
+}
+
+console.log('\n### Lo que contaría el epitafio (`derive/fall.ts`)\n');
+console.log('| estrategia | semilla | causa | mejor momento | quedaban | lo que se lo llevó | bajaron | decisión citada | del mejor momento al final | de la caída (mitad) al final |');
+console.log('|---|---:|---|---|---:|---|---:|---|---:|---:|');
+for (const f of falls) {
+  const s = f.story;
+  const links = s.links.map((l) => `${l.kind} ${l.count}${l.kind === 'raids' ? ` (${l.silver} plata, ${l.grain} grano)` : ''} desde el año ${yearOf(l.tick)}`).join('; ');
+  console.log(`| ${f.strategy} | ${f.seed} | ${f.cause} | ${s.peak} en el año ${yearOf(s.peakTick)} | ${s.left} | ${links || '—'} | ${s.band ?? '—'} | ${f.quoted} | ${(f.endHours - hours(s.peakTick)).toFixed(0)} h | ${(f.endHours - hours(s.from)).toFixed(0)} h |`);
 }

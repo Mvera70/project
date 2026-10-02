@@ -1,4 +1,7 @@
 // Punto de entrada. M-20 lo sustituye por el armazón real (design.md §17, M-20).
+import { TIME } from '@engine/balance';
+import { CATALOG } from '@engine/crossroads/catalog';
+import { run } from '@engine/sim';
 import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { HAPPENINGS, MEANS_IDS, SCHEMA_VERSION, type HappeningId, type MeansId, type SaveFile } from '@engine/state';
@@ -79,7 +82,14 @@ if (root) {
       openTitle(save, async (choice) => { boot(root, await saveFor(choice, save)); });
     });
   } else if (query.get('live') === '1') {
-    const state = stateAt(request);
+    // K7 · `&policy=worst` juega el valle **desde la fundación** con la
+    // política adversa (§12.9) en vez de la prudente, hasta el año pedido o
+    // hasta que caiga. Es la única manera de fotografiar el epitafio de un
+    // valle asaltado de verdad, con su crónica: `&ended=stormed` lo acaba de
+    // golpe y no hay nada que contar. (Medido: la semilla 129 cae asaltada en
+    // el año 6.)
+    const state = query.get('policy') === 'worst' ? foundGame(request.seed) : stateAt(request);
+    if (query.get('policy') === 'worst') run(state, TIME.WEEKS_PER_YEAR * request.year, 'worst', CATALOG);
     // U-13 · `&weather=` adelanta el valle hasta una jornada con ese cielo, que
     // es la única manera de fotografiarlo: la tormenta sale en el 4 % de los
     // días y la nieve en el 3,5 %. `storm`, `snow` o `wet` (cualquiera de los

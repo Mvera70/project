@@ -1,5 +1,28 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · K7: el epitafio dice por qué cayó (v5.72)
+
+Rama `ccr-372e1786-k4brcp`, después de K8+K9 (#42, fusionada). Medido antes
+(`docs/medidas/k7-caidas-2026-10-02.md`): con la prudente caen 2 de 30 valles en
+cien años, los dos en el arranque y de hambre, ninguno asaltado; con herrajes
+19, con la adversa 10. Hecho sin tocar el motor: `derive/fall.ts` lee la
+crónica archivada y el epitafio cuenta el mejor momento, hasta tres cosas que se
+lo llevaron, la decisión citada y el último golpe; el valle siguiente se acuerda
+en una línea. Prueba: `tests/fast/fall.test.ts` (aldeas que caen de cada causa,
+buscadas entre candidatas; 3 s). Capturas: `docs/medidas/k-img/k7-epitafio-*`
+(extinción, abandono y asalto, a 390 y 750).
+
+**Abierto:**
+
+- **De Vera**: el aviso en vida al cruzar el punto sin vuelta (5–8 h antes del
+  final en un asalto; pediría una marca en el motor y entraría detrás de las
+  rutas); qué cuenta el epitafio; qué se ve al fundar el siguiente.
+- **La dispersión** no salió en ninguna de las 90 partidas medidas: su
+  epitafio está escrito y probado con el banco, no con una caída de verdad.
+- **El recorrido de la tormenta** (`tools/shots/valley.shots.ts:752`) falló una
+  vez en el CI de #42 y pasó al relanzarlo: el reloj falso corre mientras la
+  página carga. Es del carril que lleva ese fichero.
+
 ## 2 oct 2026 · Rutas: que una obra no tire todas las rutas (v5.71)
 
 Rama `claude/rutas-tick`, carril del motor de la tanda nocturna, integrado
