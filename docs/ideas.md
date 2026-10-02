@@ -43,8 +43,29 @@ natural (PR #48). **Encargado** a «Fauna por estaciones» para `plan-meta.md`.
 > espada. … a lo mejor la flecha hace un 15 % de daño y la espada hace un 50 %
 > o un 60 %.»
 
+**Cómo se lee, corregido por Vera el mismo día:** «No quita un 15 %, lo
+entendiste mal: el cuero protege un 15 %, la flecha quita 85.» La tabla arma ×
+pieza dice **cuánto protege la pieza** contra cada arma. A cuerpo descubierto
+una flecha sigue tumbando de un tiro; con peto de cuero se aguanta una y se cae
+con la segunda. Leído al revés («la flecha quita un 15 %»), la muralla dejaba de
+aguantar: 20 de 20 cercos tomados en la medida del 2 oct.
+
 **En curso:** la ronda del daño de la sesión de los petos (v5.81–v5.84): vida
-en porcentaje y una tabla arma × pieza → daño y probabilidad de rebote.
+en porcentaje y una tabla arma × pieza → protección y probabilidad de rebote.
+
+### 2 oct 2026 · Las partes del cuerpo: cabeza, torso, brazos y piernas
+> «¿De momento no hay partes débiles, como cabeza, torso?» — «Sí, apunta.»
+
+Hoy, en el asalto, una flecha o un golpe cuenta igual dé donde dé: el cuerpo es
+una sola pieza. Sólo la caza distingue lo vital del cuarto trasero
+(`VITAL_BACK`, `hunt-encounter.ts`). La propuesta: la **cabeza** multiplica el
+daño, el **torso** es el daño normal y los **brazos y piernas** quitan menos; y
+**cada pieza protege su zona** —el casco la cabeza (y es donde más rebota), el
+peto, la malla y las placas el torso, las grebas las piernas— en vez de un
+porcentaje para todo el cuerpo. Necesita que el impacto de la flecha salga del
+contacto físico, que hoy sólo se mide en sombra (F-0, «la flecha que toca»,
+`docs/diagnostico-fisica-combate-2026-09-29.md`). Va **después** de la ronda del
+daño, como ronda propia, y se apoya en su tabla arma × pieza.
 
 ### 2 oct 2026 · El rebote, con el metal
 > «También como los juegos de balas que hay ricochet. … cuando ya en un futuro
