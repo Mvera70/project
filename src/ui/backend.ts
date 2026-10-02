@@ -1,9 +1,9 @@
 // G-07 · Which renderer paints the valley. design.md D.5, D.7.
 //
-// Canvas is the default and stays the default: D.5 says the pilot does not
-// replace `src/render/` before P3, and G-12 is the round that decides whether it
-// ever does. The 3D backend is opt-in, arrives asynchronously, and if anything
-// about it fails the valley carries on being painted in 2D.
+// Desde G-12 el juego es el 3D. El Canvas 2D de `src/render/` se queda como
+// puerta de vuelta (`?render=canvas`), como el carril de los recorridos de
+// interfaz en un runner sin GPU y como reserva si el 3D no llega; y desde el
+// 2 oct 2026 **se descarga sólo en esos casos**, no en cada partida.
 //
 // **Two canvas elements, not one.** A canvas cannot change context type once it
 // has one, so asking a 2D canvas for WebGL returns nothing and asking a WebGL
@@ -18,12 +18,13 @@ import type { ActorDoing, BattleReport, GraphicsStats } from '../render3d/contra
 import type { InspectTarget } from './inspect';
 import { inspectAt } from './inspect';
 import { renderUiText } from '@engine/chronicle/render';
-import { createRenderer, type ValleyRenderer } from '@render/renderer';
+import type { ValleyRenderer } from '@render/renderer';
 
 export type BackendKind = 'canvas' | 'pilot3d';
 
 interface ValleyBackend {
-  readonly kind: BackendKind;
+  /** `loading` es el hueco mientras llega el render pedido: no pinta nada. */
+  readonly kind: BackendKind | 'loading';
   /** Whether this backend moves its own camera. Canvas does not. */
   readonly movesCamera: boolean;
   /**
@@ -168,26 +169,14 @@ export function backendFrom(search: string, stored: string | null): BackendKind 
   return stored === 'canvas' ? 'canvas' : 'pilot3d';
 }
 
-/** The Canvas backend: what the game has been using all along. */
-function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): ValleyBackend {
-  const renderer: ValleyRenderer = createRenderer(canvas, viewport);
+/**
+ * Lo que no sabe hacer un render sin cámara ni cuerpos: el 2D y el hueco de
+ * carga. Todo pregunta, nada contesta.
+ */
+function inertBackend(canvas: HTMLCanvasElement): Omit<ValleyBackend, 'kind' | 'paint' | 'pick' | 'track' | 'dispose'> {
   return {
-    kind: 'canvas',
     movesCamera: false,
     surface: canvas,
-    paint(state, tickFraction) { renderer.paint(state, tickFraction); },
-    pick(state, xCss, yCss, tickFraction) {
-      const box = canvas.getBoundingClientRect();
-      // The 2D valley is drawn as the whole map grid stretched to the canvas,
-      // so a screen point is a proportion of it.
-      return inspectAt(
-        state,
-        (xCss * WORLD.WIDTH) / Math.max(1, box.width),
-        (yCss * WORLD.HEIGHT) / Math.max(1, box.height),
-        tickFraction,
-      );
-    },
-    track(id) { renderer.track(id); },
     screenOf() { return null; },
     look() { /* El 2D dibuja el mapa entero: no hay a dónde mirar. */ },
     // El 2D pinta puntos desde el estado, no simula cuerpos: no hay a quién
@@ -219,12 +208,60 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     resetView() { /* idem */ },
     flyIn() { /* idem */ },
     stats() { return null; },
+  };
+}
+
+/**
+ * **El 2D ya no viaja en el paquete del juego.** Se pide sólo si alguien lo
+ * quiere —`?render=canvas`, que es lo que usan los recorridos de interfaz en un
+ * runner sin GPU— o si el 3D no llega. Antes se importaba arriba y se montaba
+ * siempre, y pintaba cada fotograma detrás de la placa de carga sin que nadie
+ * lo viera (Vera, 2 oct 2026: «si podemos evitar que se cargue, mejor»).
+ */
+async function loadCanvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Promise<ValleyBackend> {
+  const { createRenderer } = await import('@render/renderer');
+  return canvasBackend(createRenderer(canvas, viewport), canvas);
+}
+
+/**
+ * El hueco mientras llega el render pedido: no pinta, no se toca, no sabe
+ * nada. Lo que se ve es la placa de carga.
+ */
+function idleBackend(canvas: HTMLCanvasElement): ValleyBackend {
+  return {
+    ...inertBackend(canvas),
+    kind: 'loading',
+    paint() { /* nada que pintar todavía */ },
+    pick() { return null; },
+    track() { /* idem */ },
+    dispose() { /* idem */ },
+  };
+}
+
+/** The Canvas backend: the 2D way back, and the rail the interface walks use. */
+function canvasBackend(renderer: ValleyRenderer, canvas: HTMLCanvasElement): ValleyBackend {
+  return {
+    ...inertBackend(canvas),
+    kind: 'canvas',
+    paint(state, tickFraction) { renderer.paint(state, tickFraction); },
+    pick(state, xCss, yCss, tickFraction) {
+      const box = canvas.getBoundingClientRect();
+      // The 2D valley is drawn as the whole map grid stretched to the canvas,
+      // so a screen point is a proportion of it.
+      return inspectAt(
+        state,
+        (xCss * WORLD.WIDTH) / Math.max(1, box.width),
+        (yCss * WORLD.HEIGHT) / Math.max(1, box.height),
+        tickFraction,
+      );
+    },
+    track(id) { renderer.track(id); },
     dispose() { /* The 2D renderer owns nothing that outlives its canvas. */ },
   };
 }
 
 export interface BackendHandle {
-  /** Whatever is painting right now. Starts as Canvas, always. */
+  /** Whatever is painting right now. Starts as the empty `loading` slot. */
   readonly live: ValleyBackend;
   /** What the player asked for, which may still be loading. */
   readonly wanted: BackendKind;
@@ -237,22 +274,22 @@ export interface BackendOptions {
   readonly kind: BackendKind;
   /** Where the GLBs live. `./assets/valley3d/` under the deployed app. */
   readonly assetBaseUrl?: string;
-  /** Called when the 3D backend takes over, or fails. Never called for Canvas. */
+  /** Called when the wanted backend takes over, or when it fails. */
   readonly onSwap?: (handle: BackendHandle) => void;
 }
 
 /**
- * Start painting, and upgrade later if the player asked for 3D.
+ * Start the wanted backend and hand over when it arrives.
  *
- * Canvas paints from the first frame. The 3D backend has to fetch a manifest and
- * a GLB before it can draw anything, and D.5 forbids the application stalling on
- * that: the valley is on screen while it loads, and if the load fails the player
- * keeps a valley instead of an error.
+ * Until then `live` is an empty slot and the loading plate is what shows. The
+ * 3D backend has to fetch a manifest and a GLB before it can draw anything, and
+ * D.5 forbids the application stalling on that; if the load fails, the 2D is
+ * fetched and the player keeps a valley instead of an error.
  */
 export function attachBackend(
   canvas: HTMLCanvasElement, viewport: HTMLElement, options: BackendOptions,
 ): BackendHandle {
-  let live: ValleyBackend = canvasBackend(canvas, viewport);
+  let live: ValleyBackend = idleBackend(canvas);
   let failure: string | null = null;
   let closed = false;
   let solid: HTMLCanvasElement | null = null;
@@ -269,7 +306,25 @@ export function attachBackend(
     },
   };
 
-  if (options.kind !== 'pilot3d') return handle;
+  // El 2D, pedido o de reserva, llega por su propia importación: el juego en
+  // 3D no lo descarga nunca salvo que el 3D falle.
+  const swapToCanvas = async (): Promise<void> => {
+    const next = await loadCanvasBackend(canvas, viewport);
+    if (closed) { next.dispose(); return; }
+    live.dispose();
+    live = next;
+    canvas.style.visibility = 'visible';
+    viewport.style.backgroundColor = '';
+    options.onSwap?.(handle);
+  };
+
+  if (options.kind !== 'pilot3d') {
+    void swapToCanvas().catch((error: unknown) => {
+      failure = error instanceof Error ? error.message : String(error);
+      options.onSwap?.(handle);
+    });
+    return handle;
+  }
 
   // **El 2D no asoma mientras el 3D carga.**
   //
@@ -302,8 +357,8 @@ export function attachBackend(
       const traceStages = import.meta.env.DEV && new URLSearchParams(window.location.search).get('bench-stages') === '1';
       const markStage = (name: string): void => { if (traceStages) performance.mark(`valley3d:${name}`); };
       markStage('backend:imports-start');
-      // Imported here and not at the top: nobody who plays in 2D should pay for
-      // downloading Three.js, and most people play in 2D.
+      // Imported here and not at the top: the loading plate shows while Three.js
+      // arrives, instead of the page waiting on it.
       const [{ createGraphicsRenderer }, { createPresentationClock }] = await Promise.all([
         import('../render3d/renderer'),
         import('../render3d/presentation-clock'),
@@ -486,11 +541,14 @@ export function attachBackend(
       markStage('backend:swap-end');
     } catch (error: unknown) {
       failure = error instanceof Error ? error.message : String(error);
-      // El 3D no llegó: el 2D vuelve a la vista, que es para lo que está.
-      canvas.style.visibility = 'visible';
-      viewport.style.backgroundColor = '';
+      // El 3D no llegó: el 2D se descarga ahora y vuelve a la vista, que es
+      // para lo que está. Si tampoco llega, se queda el hueco y el fallo dicho.
+      try {
+        await swapToCanvas();
+      } catch {
+        options.onSwap?.(handle);
+      }
       loading.done();
-      options.onSwap?.(handle);
     }
   })();
 

@@ -122,6 +122,29 @@ async function await3d(page: Page, clock: boolean): Promise<void> {
   }, { timeout: 150_000, intervals: [250] }).toBe(true);
 }
 
+/** Una hora falsa cualquiera: la tormenta sólo necesita que no corra sola. */
+const STORM_EPOCH = Date.UTC(2026, 5, 1, 12);
+
+/**
+ * Como `await3d`, pero con el reloj falso parado: espera al relevo sin mover
+ * el valle, y sólo deja pasar un fotograma (16 ms) por vuelta para que el
+ * lienzo se mida. Así la hora falsa a la que llega el 3D no depende de lo
+ * lento que sea el runner.
+ */
+async function await3dPaused(page: Page): Promise<void> {
+  await test.expect.poll(async () => {
+    const ready = await page.evaluate(() => {
+      const webgl = document.getElementById('valley3d');
+      return document.documentElement.dataset.render === 'pilot3d'
+        && webgl !== null && webgl.getBoundingClientRect().width > 300;
+    });
+    if (!ready && await page.evaluate(() => document.documentElement.dataset.render === 'pilot3d')) {
+      await page.clock.runFor(16);
+    }
+    return ready;
+  }, { timeout: 150_000, intervals: [250] }).toBe(true);
+}
+
 async function answerAnyCrossroad(page: Page): Promise<void> {
   const options = page.locator('.crossroad-options button');
   if (await options.count() === 0) return;
@@ -393,10 +416,11 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   await page.locator('html[data-app-ready="true"]').waitFor();
   await answerAnyCrossroad(page);
   await test.expect(page.locator('.valley-date')).toContainText('Year 81');
-  // **El lienzo mide lo que mide el valle**, y desde el mapa grande son 72 × 112
-  // celdas: la ruta viva usa `cellFor`, que a 390 px de ancho da cinco píxeles
-  // por celda, así que el lienzo sigue cabiendo en la pantalla igual que antes.
-  await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
+  // Aquí se medía `#valley` a 360 px, y sólo era cierto porque el 2D pintaba
+  // escondido detrás de la placa de carga. Desde el 2 oct 2026 el juego en 3D
+  // no lo descarga: el tamaño del lienzo 2D lo guarda «la aplicación abre el
+  // valle…», que va con `?render=canvas`, y aquí se comprueba lo contrario
+  // después del relevo —que el 2D no ha pintado nunca—.
   // **Y se toca el centro del lienzo, no un punto fijo.** Era (180, 280) —el
   // centro del valle de 36 × 56 a diez píxeles— y con el mapa nuevo ese píxel
   // cayó en el cuadrante noroeste, donde no hay nada que abrir. El centro es
@@ -416,6 +440,9 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // `size()` lo estire. Medido así, el «centro» caía en (150, 75), o sea la
   // esquina de arriba, y ningún toque abría nada.
   await await3d(page, false);
+  // `sizeCanvas` es lo primero que hace el 2D al pintar: sin ancho escrito, no
+  // se ha descargado ni montado.
+  test.expect(await page.locator('#valley').evaluate((el) => (el as HTMLElement).style.width)).toBe('');
   const box = await canvas.boundingBox();
   // `force`, y con razón: contestar la encrucijada de arriba hace que el mapa
   // enfoque y **siga** a alguien de su reparto, y en Canvas eso es cambiar la
@@ -755,13 +782,30 @@ test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ p
   // porque salen en el 4 % de los días y esperarla no es una forma de
   // probarla.
   test.setTimeout(300_000);
-  await page.clock.install();
+  // **El reloj falso, parado antes de cargar, y la jornada a ×64 una vez
+  // vista.** Fallaba a ratos en la CI (#42: `data-bolts` a 0 tras 120 s; el
+  // mismo commit verde en local) y la cuenta lo explica: la ruta abre a ×1,
+  // donde una jornada son unos 120 s de reloj falso, y en la semilla 7 el
+  // primer rayo que queda por caer está en la fase 0,595 de una jornada que el
+  // 3D empieza a pintar en 0,28–0,33. Son unos 38 s falsos, y el reloj de
+  // presentación avanza como mucho un paso corto por fotograma
+  // (`MAX_STEP_SECONDS`): más de mil fotogramas por CPU, que en un runner
+  // lento no caben en 120 s. Con `clock.install()` a secas, además, el reloj
+  // corría solo mientras la página cargaba y la fase de llegada dependía del
+  // runner. Parado, el valle sólo avanza lo que la prueba le manda; a ×64 la
+  // jornada se cruza en unas decenas de fotogramas, y los rayos que se cruzan
+  // entre dos fotogramas cuentan igual (`renderer.ts`). El listón no se mueve:
+  // tormenta en pantalla y al menos un rayo.
+  await page.clock.install({ time: STORM_EPOCH });
+  await page.clock.pauseAt(STORM_EPOCH + 1_000);
   await lowGraphics(page);
   await page.goto('/?debug=1&live=1&weather=storm&seed=7&year=20&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
-  await await3d(page, true);
-  await page.clock.runFor(2_000);
+  await await3dPaused(page);
+  await page.clock.runFor(500);
   await test.expect(page.locator('html')).toHaveAttribute('data-sky', 'storm');
+  await page.locator('.valley-speed-badge').click();
+  await page.getByRole('button', { name: '64×', exact: true }).click();
 
   // Y cae un rayo. Los rayos de la jornada están decididos de antemano, así que
   // esto no espera a tener suerte: avanza el reloj falso a tramos hasta que el
