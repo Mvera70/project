@@ -105,9 +105,9 @@ prueba, y saltársela es lo que costó la auditoría del 15 sep 2026:
 npm run dev          # servidor con recarga en caliente
 npm run typecheck    # tsc --noEmit
 npm test             # suite rápida — **y rápida de verdad**: 262 s en local y
-                     # (CI: pendiente); lo que pasaba de 10 s vive en las jornadas (v5.56)
+                     # 2 min 39 s en CI; lo que pasaba de 10 s vive en las jornadas (v5.56)
 npm run test:journeys # jornadas y siglos en varias semillas — en CI, seis trozos
-                     # repartidos por peso (CI: pendiente); en local, una
+                     # repartidos por peso, de 13 a 19 min cada uno; en local, una
                      # jornada suelta (`npx vitest run --config vitest.journeys.config.ts <fichero>`)
 npm run test:all     # las dos de arriba
 npm run test:balance # siglos en sesenta semillas — minutos, se lanza aparte

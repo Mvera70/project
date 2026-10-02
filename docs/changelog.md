@@ -29,7 +29,7 @@ Vera —ninguna espera de más de media hora— la rompían los dos.
   porque un fichero corre entero en un hilo y eran más largos que un trozo.
 
 **Después, en local** (4 hilos): `npm test` 209 ficheros, 2087 pruebas, **262 s**;
-las 78 jornadas mudadas o partidas, 298 pruebas en verde. **En CI:** pendiente de la primera vuelta de la PR
+las 78 jornadas mudadas o partidas, 298 pruebas en verde. **En CI:** `npm test` **2 min 39 s** (antes 36 min) y el trabajo `fast` entero 3 min 30 s; los seis trozos de jornadas, 18:27, 13:08, 15:22, 16:31, 17:44 y 12:39 (antes 11, 33 y 30 min); la vuelta entera, **19 min** (vuelta 36948242697)
 
 ## v5.55 · 2 oct 2026 · Las piedras de la calzada, en grupos de orilla
 

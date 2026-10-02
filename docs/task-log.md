@@ -8,7 +8,7 @@ tardaba 36 min y los trozos de jornadas 11, 33 y 30 (vuelta 36930779436).
 el mismo cuerpo y el mismo umbral (2343 registros antes y después, título a
 título; 15 `it.fails`; 54 `it.each`); `threat` y `wall-rings` partidas en dos;
 seis trozos repartidos por peso (`tests/journeys/shard-weights.ts`). Medido en
-local: `npm test` 262 s (4 hilos), 2087 pruebas. En CI: pendiente de la primera vuelta de la PR.
+local: `npm test` 262 s (4 hilos), 2087 pruebas. En CI: `npm test` **2 min 39 s** (antes 36 min) y el trabajo `fast` entero 3 min 30 s; los seis trozos de jornadas, 18:27, 13:08, 15:22, 16:31, 17:44 y 12:39 (antes 11, 33 y 30 min); la vuelta entera, **19 min** (vuelta 36948242697).
 **Lo que se aprendió:** el tiempo por fichero de vitest no cuenta la recogida
 (una partida en el cuerpo de un `describe` la paga antes de la primera prueba:
 `catalogue-coverage` decía 0,1 s y gasta 487), y mudar la prueba lenta de una
