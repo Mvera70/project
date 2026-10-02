@@ -48,9 +48,24 @@ const head = (b: { x: number; z: number; facing: number }, clip: 'chop' | 'mine'
 // la peor a 0,19 y el resto a 0,14 o menos. No es un arreglo del corro: es
 // otra trayectoria. Si vuelve a salir un cuerpo a más de 0,2, se declara otra
 // vez con su cifra.
+//
+// **Y con el valle de forma natural (v5.73, 2 oct 2026) salen pocas muestras, no
+// malas.** Con las mismas seis semillas y los tres instantes sólo hay **3**
+// muestras golpeando, y lo que fallaba era el suelo de cuatro («expected 3 to be
+// greater than or equal to 4»): todas a 0,06 o menos. En `main` esas mismas seis
+// dan 10, la peor a 0,14. Baja cuánta gente golpea a media mañana, no el
+// contacto: a los treinta años, cuatro de las seis villas de siempre no tienen
+// tajo de tala ese día (en `main`, dos) y el árbol más cercano al centro del
+// pueblo queda a 16 celdas de media (en `main`, a 13). No se toca el suelo de
+// muestras ni la cota: las villas se buscan por lo que tienen en el instante
+// —alguien golpeando—, las seis de siempre primero y después otras, hasta juntar
+// `ENOUGH` muestras. Medido en catorce semillas × los tres instantes, con el
+// contorno: 6 muestras (semillas 1, 4, 8 y 11), la peor a 0,10.
+const ENOUGH = 6;
 it('la cabeza de la herramienta queda a menos de 0,2 de la superficie que golpea', () => {
   const gaps: number[] = [];
-  for (const seed of [1, 2, 7, 9, 11, 12]) for (const ticks of [21 * 48, 30 * 48, 1418]) {
+  search: for (const seed of [1, 2, 7, 9, 11, 12, 3, 4, 5, 6, 8, 10, 13, 14]) for (const ticks of [21 * 48, 30 * 48, 1418]) {
+    if (gaps.length >= ENOUGH) break search;
     const st = foundGame(seed); run(st, ticks, 'prudent', CATALOG);
     const land = solidTerrain(st, () => undefined);
     const life = createVillage(st, st.tick * 7, { land });
@@ -73,6 +88,6 @@ it('la cabeza de la herramienta queda a menos de 0,2 de la superficie que golpea
       }
     }
   }
-  expect(gaps.length).toBeGreaterThanOrEqual(4);
+  expect(gaps.length, `${gaps.length} muestras golpeando en las villas candidatas`).toBeGreaterThanOrEqual(4);
   for (const gap of gaps) expect(gap).toBeLessThan(0.2);
 });

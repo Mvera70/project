@@ -188,6 +188,21 @@ describe('V-11 · la reunión de §11.8 en la capa de vida', () => {
     // celdas en la semilla 7 y 19,1 en la 23. No es que el corro se desparrame
     // —los que llegan llegan— es que no llegan todos. La cota se queda en 14 y
     // sin tocar: moverla sería tapar justamente lo que hay que arreglar.
+    //
+    // **Y rojo con el valle de forma natural (v5.73, 2 oct 2026), esta vez por el
+    // sitio del corro y no por la aldea.** Con el contorno la reunión de la
+    // capilla sigue juntando a todos —22 de 22 en la semilla 7, 63 de 63 en la 23—
+    // y el corro sigue siendo un corro (radio 4,4 y 4,8), pero plantado a 14
+    // celdas de la capilla: el más lejano quedaba a 18,6 y a 17,4. `meetingPlace`
+    // pedía un claro libre de doce celdas de lado (`staging.ts` leía el 6 como
+    // distancia de búsqueda y es el radio de un disco) y el valle nuevo, con
+    // pedregales y río dentro del corazón, tiene pocos (en la semilla 11, 112
+    // celdas con un claro así contra 401 en `main`) y lejos. Los ochenta cuerpos de
+    // `crowdSeats` caben en 3,3 de radio: el claro es ahora de 3,5
+    // (`MEETING_CLEARING`) y el más lejano vuelve a 7,2 en la semilla 7 y a 13,9
+    // en la 23 —a una décima de la cota; en `main` esa semilla daba 13,7—. Medido
+    // con el claro nuevo en siete valles (7, 11, 23, 31, 3, 41 y 53): de 7,2 a
+    // 13,9, contra de 9,9 a 18,6 con el de seis.
     expect(spread(firstDay(summon(village(12, 7)))), 'semilla 7').toBeLessThan(14);
   });
 

@@ -27,9 +27,11 @@ import {
   BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D,
 } from 'three';
 import { animalPositions, wildlifePositions, type Animal } from '@derive/animals';
+import { valleyCore } from '@derive/anchors';
 import { Fauna } from '../../src/render3d/effects/fauna';
 import { cellColour } from '../../src/render3d/world/ground';
-import { TIME } from '@engine/balance';
+import { ANIMALS, TIME } from '@engine/balance';
+import { TERRAIN_CODE } from '@engine/state';
 import { groundSignature } from '../../src/render3d/world/plan';
 const grown = new Map<string, GameState>();
 /**
@@ -138,7 +140,31 @@ describe('IA-5 · el lobo tiene una sola fuente en 3D', () => {
     // que esta fase quita del 3D. Canvas (`render/renderer.ts`) sigue
     // llamando a `wildlifePositions` directamente y no pasa por `Fauna`, así
     // que su lobo no se toca: se comprueba aquí que la función lo sigue dando.
-    const base = village(20);
+    //
+    // **El valle se busca entre varios, por lo que tiene** (2 oct 2026). Los
+    // lobos de la fórmula bajan de la linde del bosque que queda a
+    // `ANIMALS.WOLF_RANGE` del pueblo, así que la propiedad sólo se puede mirar
+    // en un valle que tenga bosque a ese alcance. Con el valle de forma natural
+    // (v5.73) la aldea de la semilla 7 —la única que miraba esta prueba— ya no
+    // lo guardaba a los veinte años y la fórmula no daba ni un lobo. Es la
+    // misma causa y el mismo arreglo que la prueba gemela de la suite rápida
+    // (`tests/fast/animals.test.ts`, «los lobos son de noche y de invierno»).
+    // Medido a los veinte años en las cinco candidatas: con el contorno sólo la
+    // 11 tiene bosque a ese alcance (94 celdas; el árbol más cercano de las
+    // otras queda a 16–17 del centro del pueblo), y en `main` cuatro de cinco.
+    const near = (candidate: GameState): boolean => {
+      const core = valleyCore(candidate);
+      return candidate.map.terrain.some((terrain, cell) => terrain === TERRAIN_CODE.forest
+        && Math.hypot(cell % candidate.map.width - core.x, Math.floor(cell / candidate.map.width) - core.y)
+          <= ANIMALS.WOLF_RANGE);
+    };
+    let base: GameState | undefined;
+    for (const seed of [7, 3, 11, 19, 23]) {
+      const candidate = village(20, seed);
+      if (near(candidate)) { base = candidate; break; }
+    }
+    expect(base, 'algún valle con bosque cerca del pueblo').toBeDefined();
+    if (base === undefined) return;
     const winter = TIME.WEEKS_PER_SEASON * 3 + 4;
     const moment = atTick(
       base, Math.floor(base.tick / TIME.WEEKS_PER_YEAR) * TIME.WEEKS_PER_YEAR + winter,
