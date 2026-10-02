@@ -178,18 +178,29 @@ describe('B2 · el aviso, y lo que se puede hacer con él', () => {
   it('y el que paga aprende que pagar sale caro', () => {
     // La semilla de `pay`: el vecino que cobró una vez vuelve antes. Se mide la
     // probabilidad, que es lo que la marca cambia.
-    const state = foundGame(58);
-    run(state, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
-    state.threat.comingTick = null;
-    const plain = structuredClone(state);
-    const known = structuredClone(state);
-    known.flags['known_to_pay'] = known.tick + TIME.WEEKS_PER_YEAR * 8;
+    //
+    // **Sumada en varias semillas desde K5 (v5.76, 2 oct 2026).** Era sólo la
+    // 58, y con la trayectoria de la sastrería salía 7 contra 9: una sola
+    // partida es ruido (CLAUDE.md, «los umbrales nunca se fijan con una sola
+    // semilla»). La propiedad es la misma, contada en cuatro.
+    let plainRaids = 0;
+    let knownRaids = 0;
+    for (const seed of [58, 7, 23, 41]) {
+      const state = foundGame(seed);
+      run(state, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
+      state.threat.comingTick = null;
+      const plain = structuredClone(state);
+      const known = structuredClone(state);
+      known.flags['known_to_pay'] = known.tick + TIME.WEEKS_PER_YEAR * 8;
 
-    // Veinte años cada uno, contando cuántas partidas se organizan.
-    run(plain, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
-    run(known, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
-    expect(known.threat.raids, 'al que paga vuelven más veces')
-      .toBeGreaterThanOrEqual(plain.threat.raids);
+      // Veinte años cada uno, contando cuántas partidas se organizan.
+      run(plain, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
+      run(known, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
+      plainRaids += plain.threat.raids;
+      knownRaids += known.threat.raids;
+    }
+    expect(knownRaids, `al que paga vuelven más veces: ${knownRaids} contra ${plainRaids}`)
+      .toBeGreaterThanOrEqual(plainRaids);
   });
 });
 

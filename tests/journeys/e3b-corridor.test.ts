@@ -197,7 +197,12 @@ describe('E3b · pasillo interior de una villa real', () => {
   // candidatas (38, 33, 13, 14, 40 y 47) tiene a los 3846 ticks un anillo
   // candidato con la geometría lista. Se declara con lo medido; falta un barrido
   // de las semillas 1 a 60 como el de RD-3 para encontrar la villa nueva.
-  it.fails('un guardia asignado sube, recorre y regresa por el anillo candidato de una villa lista', () => {
+  //
+  // **K5 (v5.76, 2 oct 2026) · y la sastrería la devuelve**: con su trayectoria
+  // una de las candidatas vuelve a tener a los 3846 ticks el anillo listo y el
+  // guardia sube, recorre y regresa. Sale de `it.fails`; si otro cambio del
+  // motor la vuelve a mover, se declara otra vez con lo medido.
+  it('un guardia asignado sube, recorre y regresa por el anillo candidato de una villa lista', () => {
     // Precondición: un anillo cerrado con la geometría lista. Era la semilla 91
     // y luego la 23, que cerraron en retorno 132 y en nada al moverse la
     // trayectoria; hoy salen las de la lista (con RD-1, la 38 y la 33; con RD-5

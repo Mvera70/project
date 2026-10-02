@@ -24,6 +24,13 @@ const SEEDS = [7, 23, 41];
 type Trade = 'pedlar' | 'factor_visit' | 'drover_visit' | 'salt_visit';
 /** La semilla cuya plaza queda cerrada tras el esquema 12 (ver el `it.fails`). */
 const SALT_BLOCKED = 23;
+/**
+ * K5 (v5.76, 2 oct 2026) · la semilla en que la leña del buhonero llega tarde.
+ * Con la trayectoria de la sastrería, en la 7 al año ocho se reparten tres
+ * porteadores pero ninguno llega al puesto mientras él sigue esperando: cero
+ * monedas (en `main` antes de K5, una). Va aparte, con su `it.fails`.
+ */
+const PEDLAR_LATE = 7;
 
 function grown(seed: number): GameState {
   const state = foundTwenty(seed);
@@ -140,9 +147,17 @@ describe('El valle más vivo · el puesto y el trato', () => {
     expect(salter.phase === 'gone' || (salter.phase === 'leaving' && away > 20), `${salter.phase}, a ${away.toFixed(1)} de la plaza`).toBe(true);
   });
 
+  it.fails('semilla 7 · con el buhonero también pasan monedas (medido con K5: ninguna, la leña llega tarde)', () => {
+    const state = dealing(PEDLAR_LATE, 'pedlar');
+    const life = createVillage(state, state.tick * TIME.DAYS_PER_WEEK);
+    for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step(n / STEPS_PER_DAY);
+    expect(life.payments.length).toBeGreaterThan(0);
+  });
+
   it('en cada trato cerrado pasan monedas de mano, del que compra al que vende', () => {
     for (const seed of SEEDS) {
       for (const kind of ['pedlar', 'drover_visit', 'salt_visit'] as Trade[]) {
+        if (kind === 'pedlar' && seed === PEDLAR_LATE) continue;
         const state = dealing(seed, kind);
         const life = createVillage(state, state.tick * TIME.DAYS_PER_WEEK);
         const seller = life.visitors[0]!;

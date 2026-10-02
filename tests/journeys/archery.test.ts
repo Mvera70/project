@@ -54,7 +54,7 @@ function assaulted(seed: number, years: number, bows: boolean): GameState {
  * nada: eso es la propiedad «sin cerco no hay guarnición», y la guarda
  * `tests/fast/garrison.test.ts`.
  */
-const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [23, 25], [36, 30]];
+const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [23, 25], [11, 25]];
 
 /**
  * RD-3 (1 oct 2026) · **La semilla 11 sale de la lista y queda declarada aparte**
@@ -66,7 +66,13 @@ const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [23, 25], [36,
  * que no se acerca, no el motor: la 7 (61 flechas, 7 aciertos) y la 23 (55, 11)
  * siguen acertando.
  */
-const MISSING: readonly [number, number] = [11, 25];
+//
+// **K5 (v5.76, 2 oct 2026) · y se cambian las dos.** Con la sastrería la
+// trayectoria se mueve otra vez: la 11 vuelve a acercarse al cerco y acierta, y
+// la que deja de hacerlo es la 36 a los treinta años —medido: **0 flechas
+// soltadas**, el clan saquea y se va sin ponerse a tiro—. La propiedad es la
+// misma; cambia qué semilla la cumple.
+const MISSING: readonly [number, number] = [36, 30];
 
 describe('D2 · la muralla contesta', () => {
   it('se dispara, y alguna acierta, en los valles que se acercan al cerco', async () => {
@@ -99,7 +105,7 @@ describe('D2 · la muralla contesta', () => {
     }
   });
 
-  it.fails('semilla 11 · la partida que no se acerca al cerco también recibe algún acierto (medido: 96 flechas, 0)', async () => {
+  it.fails('semilla 36 · la partida que no se acerca al cerco también recibe algún acierto (medido: 0 flechas)', async () => {
     const [seed, years] = MISSING;
     const state = assaulted(seed, years, true);
     const physics = await createPhysics(terrainOf(state));

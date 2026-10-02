@@ -377,7 +377,10 @@ describe('V-09 · trastos', () => {
   // **Y vuelve a `it.fails` con K1–K3 (v5.53, 1 oct 2026).** La trayectoria de
   // cuarenta años se mueve otra vez y le toca a la semilla 23: 0 pases en las
   // diez jornadas. Misma causa 1, otra semilla.
-  it.fails('y en todas las semillas, sin una sola aldea muda', () => {
+  // **K5 (v5.76, 2 oct 2026) · sale de `it.fails`**: con la trayectoria de la
+  // sastrería la propiedad vuelve a cumplirse. Si otro cambio del motor la
+  // mueve, se declara otra vez con lo medido.
+  it('y en todas las semillas, sin una sola aldea muda', () => {
     const DAYS = 10;
     for (const seed of SEEDS) {
       const state = village(seed);
@@ -453,7 +456,10 @@ describe('V-09 · trastos', () => {
   // trayectoria nueva un pase se devuelve en **4** de las 36 jornadas y el
   // listón pide más de 4; no se baja: se declara aquí con la medida, y la
   // prueba de arriba sigue guardando que el pase se devuelve alguna vez.
-  it.fails('y un pase se devuelve en más de cuatro de las 36 jornadas', () => {
+  // **K5 (v5.76, 2 oct 2026) · sale de `it.fails`**: con la trayectoria de la
+  // sastrería la propiedad vuelve a cumplirse. Si otro cambio del motor la
+  // mueve, se declara otra vez con lo medido.
+  it('y un pase se devuelve en más de cuatro de las 36 jornadas', () => {
     expect(returnedSeen, `un pase se devuelve en ${returnedSeen} de 36 jornadas`).toBeGreaterThan(4);
   });
 
@@ -466,7 +472,11 @@ describe('V-09 · trastos', () => {
   //
   // **Y con K1–K3 (v5.53) llega a tres** («Expect test to fail» en la CI del
   // 1 oct 2026): vuelve a `it`, sin tocar `PLAYED_OUT` ni la cota.
-  it('y tres veces seguidas, que es un peloteo largo', () => {
+  //
+  // **Y con K5 (v5.76, 2 oct 2026) vuelve a `it.fails`**: con la sastrería, la
+  // cadena más larga en las seis jornadas de cada semilla es de dos. Es un
+  // récord de una sola jornada, y por eso va en su propia prueba.
+  it.fails('y tres veces seguidas, que es un peloteo largo (medido con K5: dos)', () => {
     // **Esto estaba declarado en rojo y con el mapa grande sale verde.** La
     // medida anterior, en los valles de 36 × 56, era de setenta y dos muestras
     // sin una sola cadena de tres, y quedó escrita con `it.fails` en vez de
