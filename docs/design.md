@@ -2515,7 +2515,7 @@ líder o que quedaran menos de dos adultos; que alguien fuera estuviera en el
 valle; que en muchas salidas no aparecieran los cinco finales; que volver
 tocara otro flujo; o que una partida con gente fuera no se pudiera guardar y
 cargar. Las seis tienen prueba en `tests/fast/expeditions.test.ts`, y lo que
-se ve, en `tests/fast/life-expeditions.test.ts`.
+se ve, en `tests/journeys/life-expeditions.test.ts`.
 
 **Y un defecto que salió al hacerlo:** el guardado no conocía los actos
 `hunt` ni `battle` (`actRecord`), así que **una partida en la que se había
@@ -4524,7 +4524,7 @@ export const TIME = {
 > diez minutos y medio. Es decir: **lo que antes pasaba a ×1 pasa ahora a ×64**,
 > y ×1 es la velocidad de mirar una jornada de la aldea. Tres cosas se mueven
 > con ello y están anotadas donde viven: la densidad de §11.6 se mide a ×64
-> (`tests/fast/density.test.ts`), el techo entre encrucijadas de §8.6 son ciento
+> (`tests/journeys/density.test.ts`), el techo entre encrucijadas de §8.6 son ciento
 > veinte semanas y ya no «media hora real», y el tope del letargo sigue siendo
 > una generación —960 ticks, el caso de esfuerzo de §11.4— pero en la pared son
 > nueve días y medio en vez de cuatro horas. La pestaña oculta, además, recupera
@@ -8647,7 +8647,7 @@ entregó y el número que lo prueba.
 | **V-07** | `life/scenes.ts` | Escenas de dos: charla, rechazo, encaro, pelea devuelta, con papeles distintos | Ninguna aldea de 38 se queda en cero encontronazos, pero varían de 1 a 17 según quién vive en ella. `castOf` no patina: 3 290 tramos, desajuste de orden 10⁻¹⁴ s |
 | **V-08** | `life/beasts.ts` | Gallinas, cerdos y vacas como `Dweller` con impulso propio, y una `Place` móvil que ofrece `pet`/`chase`/`feed` | 0 animales en el agua en 6 semillas; interacción persona-animal en todas las semillas con cabaña (1 411 a 4 895 instantes); `ashore` de 1,08 a 0,326 celdas |
 | **V-10** | `life/places.ts` | La plaza, el vado y el claro: sitios que no son un edificio | Los tres se detectan y son alcanzables en 6 de 6 semillas; tras separar la plaza real del claro y dar a éste contemplación en vez de trabajo inelegible, los tres reciben visita en al menos 3 de 6 jornadas (`docs/medidas/spatial-plaza.md`) |
-| **V-13** | `tests/fast/life-perf.test.ts` | La medida del coste por cuerpo, continua | 0,75 µs con 80, 1,02 µs con 200: sube un 36 % al multiplicar por 2,5 la gente |
+| **V-13** | `tests/journeys/life-perf.test.ts` | La medida del coste por cuerpo, continua | 0,75 µs con 80, 1,02 µs con 200: sube un 36 % al multiplicar por 2,5 la gente |
 | **V-09** (abierta) | `life/props.ts` | Pelota, palo, cubo, haz: se reparten, se cogen, se sueltan, se tiran y ruedan; física del descarte | Un trasto nunca en dos manos, nunca bajo el agua, 6 semillas. Pero 0–0,20 pases por persona contra 0,30 del descarte: jugar gana el concurso de utilidad el 6 % de las veces y el receptor no recoge. Está en `docs/historico/next-plan.md` (V-09b) |
 | **V-14** | `world/ridge.ts` | El cuenco, fuera del mapa | 0 celdas del valle tocadas; 32 % del bosque vive en el borde y habría desaparecido |
 | **(arreglo)** | `life/offers.ts`, `decide.ts` | Las plazas del corro se comprueban al montar el sitio, y `decide` prueba la siguiente oferta si no hay camino | Sin nada que hacer, 33 % → **0 %**; andando, 26 % → **75 %**, que es la cifra del descarte |

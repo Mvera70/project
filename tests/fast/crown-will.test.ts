@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/crown-will-long.test.ts` (v5.56).
+//
 // K-2 · La voluntad del rey. `docs/historico/plan-rey.md` §0.3.
 //
 // **Es la fase que hace que el rey importe**, y lo que se guarda aquí es la
@@ -18,7 +20,6 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { run } from '@engine/sim';
 import { allocateLabour, produce } from '@engine/subsistence/labour';
 import { updateMood } from '@engine/subsistence/mood';
-import { nextProject } from '@engine/world/works';
 import { withinCap } from '@engine/world/buildings';
 import { weightNow } from '@engine/world/fate';
 import { RESTING_WILL, will } from '@engine/people/crown';
@@ -64,48 +65,6 @@ function crowned(state: GameState, trade: Role | null, traits: Trait[] = []): Ga
 function ctx(severity = 0): TickContext {
   return { severity, cold: false, outbreak: null, deaths: 0, unexplainedDeaths: 0 };
 }
-
-describe('K-2 · el rey herrero mira a la muralla', () => {
-  it('la aldea levanta empalizada sin esperar a que haya amenaza', () => {
-    // §7.3 punto 8 pide fragua **y** amenaza; con este rey basta la fragua. Es
-    // lo que «si eliges al herrero, pues haces más armas» significa en un juego
-    // que no tiene armas como montón: la muralla, y el señor que la cuenta.
-    // **Y vuelve a los quince años** (19 sep 2026). Estuvo en dieciocho desde
-    // que la muralla espera a que haya pueblo que amurallar —§7.3 pide once
-    // casas (`PALISADE_HOUSES`) y la 41 no las tenía al año quince—, y el
-    // motivo se ha evaporado solo: con el hueco entre decisiones en un tercio
-    // de año, este valle llega al año quince con **catorce casas**. Medido,
-    // dieciocho ya no sirve para lo que esta prueba mide: para entonces el
-    // anillo está lleno, `placeBuilding('palisade')` no encuentra sitio para
-    // ninguno de los dos y **los dos valles caen en la misma mejora a piedra**,
-    // que es la vía de escape de §7.3 y no la voluntad de nadie. En el quince
-    // el contraste es el que la fila describe: el rey pide estaca, el valle sin
-    // rey no pide nada. **Y al catorce desde v4.94**: con el camino del valle
-    // pisado desde la fundación los aldeanos lo prefieren y la aldea se hace
-    // un año antes —dieciséis casas al quince, el anillo lleno, y los dos
-    // valles otra vez en la mejora a piedra—; al catorce hay quince casas y el
-    // contraste está intacto (medido del año 10 al 18).
-    const plain = village(41, 14);
-    const forge = crowned(village(41, 14), 'smith');
-    for (const state of [plain, forge]) {
-      delete state.flags['threatened'];
-      state.village.wood = 4_000;
-    }
-    expect(will(forge).style).toBe<CrownStyle>('forge');
-    expect(will(forge).arms).toBe(true);
-    expect(will(plain).arms).toBe(false);
-    // Con fragua en pie, el rey herrero la pide y el valle sin rey no.
-    if (plain.buildings.some((b) => b.kind === 'smithy' && b.lostTick === null)) {
-      expect(nextProject(forge)).toBe('palisade');
-      expect(nextProject(plain)).not.toBe('palisade');
-    }
-  });
-
-  it('y la familia de la defensa va delante en la cola', () => {
-    const forge = crowned(village(), 'smith');
-    expect(will(forge).priority).toBe('defence');
-  });
-});
 
 describe('K-2 · el rey del campo siembra más ancho', () => {
   it('rotura tierra que el valle no tenía permiso de roturar', () => {

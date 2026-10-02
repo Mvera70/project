@@ -79,7 +79,7 @@ las encrucijadas y con ellas se van sus consecuencias y sus obras. Se juega con
 | `life-traits-report.ts` | Cuánto tiempo pasa cada rasgo en cada actividad, y si una persona se parece a sí misma de un día a otro | `npx tsx tools/reports/life-traits-report.ts` |
 | `physics-report.ts` | Lo que cuesta la física del asedio: microsegundos por paso con N cuerpos, y lo que pesa Rapier | `npx tsx tools/reports/physics-report.ts [--bodies 200]` |
 | `map-dump.ts` | El volcado ASCII del mapa: el valle con su río y sus edificios, por consola | `npm run map -- --seed 7 --years 0` |
-| `reader-packet.ts` · `reader-packet-content.ts` | El paquete ciego del hito 0: tres crónicas y una pregunta para un lector de fuera. **El hito está descartado**; se conserva porque su contenido lo prueba `tests/fast/reader-packet.test.ts` | `npm run reader:packet` |
+| `reader-packet.ts` · `reader-packet-content.ts` | El paquete ciego del hito 0: tres crónicas y una pregunta para un lector de fuera. **El hito está descartado**; se conserva porque su contenido lo prueba `tests/journeys/reader-packet.test.ts` | `npm run reader:packet` |
 
 **Lo que un informe de fuera no ve.** Ninguno de éstos abre el navegador, así
 que ninguno mide la capa de vida **como la corre el juego**: `life-report.ts`

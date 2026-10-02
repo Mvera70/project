@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/means-long.test.ts` (v5.56).
+//
 // M-2 · Los medios: lo que el jugador mete en el valle.
 // `docs/historico/plan-medios.md` §3, brief en `docs/historico/rework.md` §4b.
 //
@@ -15,7 +17,7 @@ import { foundGame } from '@engine/found';
 import { run, tick } from '@engine/sim';
 import { MEANS_IDS, type GameState, type MeansId, type PlayerAct } from '@engine/state';
 import { weightNow } from '@engine/world/fate';
-import { MEANS_SPEC, canGive, giveMeans, refusalFor } from '@engine/world/means';
+import { canGive, giveMeans, refusalFor } from '@engine/world/means';
 import { herdCapacity } from '@engine/subsistence/herd';
 import { animalPositions } from '@derive/animals';
 import { foundTwenty } from '../helpers/founding';
@@ -48,35 +50,6 @@ function rich(seed = 7): GameState {
 }
 
 /**
- * A2c · **Y una aldea con muralla y puerta, para el portón.**
- *
- * El portón es el único medio que necesita algo que no está en la despensa: un
- * cerco que atravesar. La aldea de cuatro años de `rich()` no lo tiene, así que
- * la negativa que salía era `room` y estas dos pruebas —que miden el
- * **precio**— no llegaban a mirarlo. Es el mismo remedio que las dos casas de
- * más: se le da al valle lo que el medio necesita y el precio deja de quedar
- * tapado.
- *
- * Treinta y dos años en la semilla 47 es lo primero que hay, medido en diez
- * semillas: antes de eso la aldea ni siquiera ha cerrado un tramo de muralla
- * donde quepa una segunda puerta. Se guarda hecha y se clona, que es lo que
- * hace `crown-will.test.ts` por lo mismo.
- */
-let walledBase: GameState | undefined;
-function walled(): GameState {
-  if (walledBase === undefined) {
-    walledBase = foundTwenty(47);
-    run(walledBase, TIME.WEEKS_PER_YEAR * 32, 'prudent', CATALOG);
-  }
-  const state = structuredClone(walledBase);
-  state.village.grain = 5000;
-  state.village.wood = 5000;
-  state.village.silver = 500;
-  state.village.stone = 5000;
-  return state;
-}
-
-/**
  * K8 (2 oct 2026) · **El hacha y el arado del carro son de antes de la
  * fragua**: con herrería se encargan allí (`world/boards.ts`) y el carro dice
  * por qué no (`'smithy'`). La aldea de cuatro años de `rich()` ya tiene
@@ -88,37 +61,7 @@ function forgeless(state: GameState): GameState {
   return state;
 }
 
-/** La aldea que cada medio necesita para que lo único que estorbe sea el precio. */
-function payer(id: MeansId): GameState {
-  return id === 'gate' ? walled() : id === 'axe' || id === 'plough' ? forgeless(rich()) : rich();
-}
-
 describe('dar un medio', () => {
-  it('cuesta exactamente lo que dice, y nada más', () => {
-    for (const id of MEANS_IDS) {
-      const state = payer(id);
-      const before = { ...state.village };
-      const outcome = giveMeans(state, id, 'spring', 4);
-      expect(outcome.given, id).toBe(true);
-      for (const stat of ['grain', 'wood', 'stone', 'silver'] as const) {
-        const cost = MEANS_SPEC[id].cost[stat] ?? 0;
-        expect(state.village[stat], `${id}: ${stat}`).toBe(before[stat] - cost);
-      }
-    }
-  });
-
-  it('no se puede dar lo que no se puede pagar, y no se cobra a medias', () => {
-    for (const id of MEANS_IDS) {
-      const state = payer(id);
-      state.village.silver = 0;
-      const before = { ...state.village };
-      expect(refusalFor(state, id), id).toBe('cost');
-      const outcome = giveMeans(state, id, 'spring', 4);
-      expect(outcome.given, id).toBe(false);
-      expect(state.village, id).toEqual(before);
-    }
-  });
-
   it('el arado no se da dos veces: es un rasgo del valle', () => {
     const state = forgeless(rich());
     expect(canGive(state, 'plough')).toBe(true);

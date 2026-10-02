@@ -84,6 +84,37 @@ Pruebas: la adaptativa con un modelo de aparato (CPU, GPU y a medias, y con
 ruido de ±10 % en doce semillas) y el suelo de High y Medium
 (`adaptive-scale`, `graphics-profile`).
 
+## v5.56 · 1 oct 2026 · La suite rápida vuelve a ser rápida: lo lento, a las jornadas
+
+**Medido antes, en CI** (vuelta 36930779436 del 1 oct 2026): el trabajo `fast`
+tardaba **36 min** (`npm test`, 2172 s de reloj, 5808 s de prueba sumada en
+240 ficheros) y 71 ficheros pasaban de 10 s; los tres trozos de `journeys`,
+**11, 33 y 30 min**, desequilibrados porque vitest reparte por el hash de la
+ruta y uno se llevaba `threat` entera (1994 s en un solo hilo). La regla de
+Vera —ninguna espera de más de media hora— la rompían los dos.
+
+- **A las jornadas, con el mismo cuerpo y el mismo umbral**: 31 ficheros
+  enteros y lo lento de otros 43, que se parten en `tests/journeys/<nombre>-long.test.ts`
+  (lo barato se queda en `fast`). Ninguna prueba quitada ni convertida en
+  `skip`: 2343 registros antes y después, título a título, con los 15
+  `it.fails` y los 54 `it.each`. Cada fichero mudado dice de dónde viene y
+  cuánto tardaba.
+- **Dos trampas que el informe por fichero no enseña.** Una caché compartida
+  (`grown.get(...)`) la paga la primera prueba que la pide: al mudar la lenta,
+  la siguiente pasaba a tardar lo mismo, así que salen todas las que piden esa
+  aldea. Y **la recogida**: `ui-milestones`, `fate`, `life-beasts` y
+  `demography` juegan sus partidas en el cuerpo del `describe` (189, 148, 31 y
+  10 s en local) y ese tiempo no sale en el tiempo por fichero; en las
+  jornadas, `catalogue-coverage` (487 s) y `founding` (242 s) apuntaban 0,1 s.
+- **Seis trozos repartidos por peso** (`tests/journeys/shard-weights.ts` y un
+  secuenciador en `vitest.journeys.config.ts`): el más pesado primero, al trozo
+  que menos lleva, y dentro de cada trozo el largo empieza antes. `threat` y
+  `wall-rings` se parten en dos (`threat-defence`, `wall-rings-gates-era`)
+  porque un fichero corre entero en un hilo y eran más largos que un trozo.
+
+**Después, en local** (4 hilos): `npm test` 209 ficheros, 2087 pruebas, **262 s**;
+las 78 jornadas mudadas o partidas, 298 pruebas en verde. **En CI:** `npm test` **2 min 39 s** (antes 36 min) y el trabajo `fast` entero 3 min 30 s; los seis trozos de jornadas, 18:27, 13:08, 15:22, 16:31, 17:44 y 12:39 (antes 11, 33 y 30 min); la vuelta entera, **19 min** (vuelta 36948242697)
+
 ## v5.55 · 2 oct 2026 · Las piedras de la calzada, en grupos de orilla
 
 Vera, sobre los cantos de v5.54: «haz grupos más realistas, típicas del río,

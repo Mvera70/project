@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/trade-long.test.ts` (v5.56).
+//
 // M-30 · design.md §7.8 — los comerciantes del camino.
 //
 // Lo que se protege: que un trato mueva de verdad el rebaño y no sólo el
@@ -11,8 +13,6 @@ import { FOOD, ANIMALS, TIME } from '@engine/balance';
 import { BANK, CROSSROAD_BANK } from '@engine/chronicle/bank.en';
 import { CATALOG, TRADE_TEMPLATES } from '@engine/crossroads/catalog';
 import { applyEffect } from '@engine/crossroads/resolve';
-import { OFFER } from '@engine/balance';
-import { postOffer } from '@engine/world/road';
 import { run } from '@engine/sim';
 import { herdCapacity } from '@engine/subsistence/herd';
 import { consume } from '@engine/subsistence/consumption';
@@ -50,13 +50,6 @@ function trade(state: GameState, kind: 'hens' | 'pigs' | 'cows', delta: number):
 const OPTIONS = TRADE_TEMPLATES.flatMap((t) => t.options.map((o) => ({ t, o })));
 
 describe('el trato mueve el rebaño · §7.8', () => {
-  it('comprar la vaca deja una vaca más', () => {
-    const state = village(20);
-    state.herd.cows = 0;
-    trade(state, 'cows', 1);
-    expect(state.herd.cows).toBe(1);
-  });
-
   it('vender cerdos deja dos cerdos menos y no baja de cero', () => {
     const state = village(20);
     state.herd.pigs = 3;
@@ -243,24 +236,6 @@ describe('las visitas del camino · M-0', () => {
     for (const t of TRADE_TEMPLATES) expect(ids.has(t.id), t.id).toBe(false);
   });
 
-  it('nadie sube a vender a una aldea hostil, ni con otra oferta esperando', () => {
-    const state = driverWelcome();
-    state.flags['hostile'] = 0;
-    // Desde aquí: el valle de estas pruebas viene de veinte años jugados y ya
-    // tiene visitas en su historia. Lo que se mide es lo que pasa **después**.
-    const before = state.happenings.length;
-    run(state, TIME.WEEKS_PER_YEAR * 5, 'prudent', CATALOG);
-    expect(state.happenings.slice(before)
-      .some((h) => (VISITS as readonly string[]).includes(h.id))).toBe(false);
-    // Y con una oferta en pie no sube otro: `state.offer` es una sola casilla,
-    // así que una segunda visita borraría la primera sin que nadie la viera.
-    const busy = driverWelcome();
-    postOffer(busy, 'pedlar', [], []);
-    const posted = busy.offer;
-    run(busy, TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
-    if (busy.offer !== null) expect(busy.offer.postedTick).toBe(posted?.postedTick);
-  });
-
   it('nadie sube a vender con una encrucijada sin responder', () => {
     const state = driverWelcome();
     state.crossroad = {
@@ -271,19 +246,6 @@ describe('las visitas del camino · M-0', () => {
     const visits = state.happenings.slice(before)
       .filter((h) => (VISITS as readonly string[]).includes(h.id));
     expect(visits).toEqual([]);
-  });
-
-  it('una visita no repite hasta que pasa su plazo', () => {
-    // Medido: sin plazo, el factor subía 1 181 veces en dieciséis partidas de
-    // sesenta años y tapaba al resto de los sucesos.
-    const state = driverWelcome();
-    run(state, TIME.WEEKS_PER_YEAR * 40, 'prudent', CATALOG);
-    for (const id of VISITS) {
-      const ticks = state.happenings.filter((h) => h.id === id).map((h) => h.tick);
-      for (let i = 1; i < ticks.length; i += 1) {
-        expect((ticks[i] ?? 0) - (ticks[i - 1] ?? 0), id).toBeGreaterThanOrEqual(OFFER.AGAIN_WEEKS[id]);
-      }
-    }
   });
 
   it('una visita tira sólo del flujo de los sucesos', () => {
