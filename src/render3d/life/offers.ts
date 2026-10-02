@@ -299,6 +299,13 @@ export function strikeTurn(clip: 'chop' | 'mine'): number {
 }
 /** Una tanda breve de pico antes de llevar la carga a la obra. */
 const QUARRY = { ...WORK, seconds: [6, 10] as const, reach: 0.15 };
+/**
+ * Cuántas caras de cantera alcanzables se comparan por camino (v5.74). TUNE:
+ * doce. Las caras van por distancia en línea recta y la más cercana andando
+ * está casi siempre entre las primeras; doce rutas de A* por jornada con obra
+ * de piedra no se notan.
+ */
+const QUARRY_CHOICES = 12;
 
 /** Un sitio del valle, con lo que da. */
 export interface Place {
@@ -570,7 +577,16 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
       // Una sola inundación desde la obra: descartar aquí las caras sin suelo
       // alcanzable al lado evita trazar una ruta por cada celda de montaña.
       const region = workAt === null ? null : reachableFrom(land, workAt);
+      // v5.74 · **la cantera más cerca andando, no en línea recta.** Las caras
+      // vienen ordenadas por distancia a la obra (`quarryCells`), pero una
+      // cara a veinte celdas en la otra orilla son cuarenta de camino por el
+      // vado: medido, el cantero de la semilla 19 no llegaba a entregar. Se
+      // miran las `QUARRY_CHOICES` primeras alcanzables y gana la de ruta más
+      // corta; a igualdad, la que venía antes.
+      let best: { cell: number; at: { x: number; z: number }; offer: NonNullable<ReturnType<typeof placedOffer>>; walk: number } | null = null;
+      let tried = 0;
       for (const cell of quarryCells(state)) {
+        if (tried >= QUARRY_CHOICES) break;
         const cx = cell % state.map.width, cz = Math.floor(cell / state.map.width);
         if (region === null || ![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dz]) =>
           canReach(land, region, { x: cx + dx! + 0.5, z: cz + dz! + 0.5 }))) continue;
@@ -582,10 +598,15 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
         })).filter(spot => fitsCircle(land, spot.x, spot.z, 0.32) && canReach(land, region, spot));
         const offer = placedOffer({ ...QUARRY, seats: Math.min(building, MOST_SEATS) }, at, land, undefined,
           faces.length > 0 ? faces.slice(0, Math.min(building, MOST_SEATS)) : undefined);
-        if (offer === null || workAt === null || pathTo(land, workAt, offer.at, 0.32) === null) continue;
-        places.push({ id: `quarry:${cell}`, at, offers: [offer] });
-        break;
+        const route = offer === null || workAt === null ? null : pathTo(land, workAt, offer.at, 0.32);
+        if (offer === null || route === null) continue;
+        tried += 1;
+        let walk = 0;
+        let from = workAt!;
+        for (const step of route) { walk += Math.hypot(step.x - from.x, step.z - from.z); from = step; }
+        if (best === null || walk < best.walk) best = { cell, at, offer, walk };
       }
+      if (best !== null) places.push({ id: `quarry:${best.cell}`, at: best.at, offers: [best.offer] });
     }
   }
 

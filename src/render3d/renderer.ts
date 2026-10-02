@@ -1241,8 +1241,9 @@ export async function createGraphicsRenderer(
     }
     const sapling = library.get(TREE);
     if (sapling === undefined) return;
+    // Con el bosque de ladera alrededor del valle (v5.74): lo que el juego planta.
     forest = buildForest(state, sapling.original as Object3D, palette, treeFalls.suppressed,
-      library.get(TREE_PINE)?.original as Object3D | undefined);
+      library.get(TREE_PINE)?.original as Object3D | undefined, true);
     world.add(forest.group);
   }
 

@@ -208,6 +208,44 @@ del cuero; y la escena del asalto todavía no sabe del peto (carril de combate).
 Lo que no se ve, en `docs/encargos-3d.md`; las imágenes y modelos, en
 `docs/encargos/ilustraciones-k5-cuero.md`.
 
+## v5.74 · 2 oct 2026 · Los usos del cinturón: bosque de ladera, pasto y cantera
+
+Lo que Vera eligió para el cinturón con el valle de forma natural delante
+(v5.73): **pasto, bosque de ladera y cantera, como vida y sin tocar el balance**.
+Ninguno da recursos: son las bases, y lo que un día den va por
+`docs/plan-meta.md` con su nivelado. Medidas: `docs/medidas/cinturon-2026-10-02.md`.
+
+- **El bosque de ladera** (`forest.ts`, `slopeWoodCells`). Pinos en la ladera
+  baja y robles en el prado del pie, en arboledas, de 3 a 13 celdas fuera del
+  contorno: de 172 a 387 pinos y de 93 a 123 robles por valle (doce valles).
+  Nunca dentro del valle, sobre una obra, una senda, el agua, las gargantas ni
+  la senda de las visitas. Sin sombra y en seis piezas instanciadas: de 51 a 67
+  mil triángulos más, la misma malla. **Y sus troncos paran a quien anda**
+  (`solidTerrain`): sin eso el oso, los de fuera y el rebaño los cruzaban.
+- **El pasto de la falda** (`beasts.ts`). El rebaño se ancla junto en el prado
+  de fuera del contorno más cercano andando a los campos, y pasta allí: con
+  cuatro vacas, 64 anclas de 64 en la falda (ocho aldeas) y el 82 % de la
+  jornada fuera del contorno. La víspera de un asedio, junto a las casas, como
+  antes. **Dato para Vera:** con la política prudente casi ninguna aldea tiene
+  vacas (una muestra de 96 en doce valles hasta los sesenta años), así que el
+  pasto sólo se verá cuando haya ganado. Para grabarlo, `&cows=4` y `--cows 4`.
+- **La cantera, al pie de la montaña** (`resource-sites.ts`, `offers.ts`,
+  `village.ts`, `decide.ts`). Primero las caras de la montaña, y de las doce más
+  cercanas la de menor ruta andando (la línea recta cruzaba el río); y nadie le
+  quita la carga al albañil: pica hasta la fase 0,68 y, con la piedra al hombro,
+  sigue hasta dejarla. En sesenta valles entrega piedra en su jornada en los 60
+  (antes, en 49). Cierra lo que v5.73 dejó abierto.
+- **La senda de la garganta, a ras** (`mountains.ts`, `ROAD_LIFT` 0,07 → 0,02).
+  Vera: «el camino flotando… casi». En ocho semillas, ningún vértice bajo el
+  suelo, nada tapado y el 98,4 % a menos de 0,05 de lo que se dibuja.
+- **Pruebas** nuevas: `belt-uses.test.ts` (el bosque por el camino del juego, y
+  cada árbol en suelo de andar es un tronco para la vida) y `life-falda.test.ts`
+  (el rebaño en la falda); el cantero de `life-resources.test.ts` pasa a
+  mirarse al pie de la montaña en tres valles. Y la de los porteadores de leña
+  (`life-wood-run`) se cuenta en doce aldeas y tres jornadas: con cuatro y dos
+  se debían 14 haces y una jornada movía un 7 % (11 de 14 en `main`, 10 de 14
+  con la cantera); en la muestra grande, 42 de 51 contra 43 de 51.
+
 ## v5.73 · 2 oct 2026 · El valle con forma natural
 
 Vera: «el valle es muy cuadrado, debería tener una forma más natural, y hay
