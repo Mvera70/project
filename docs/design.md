@@ -2522,6 +2522,63 @@ se ve, en `tests/fast/life-expeditions.test.ts`.
 cazado o visto un asalto no cargaba** —`loadSave` la daba por corrupta y el
 juego empezaba otra—. Arreglado, con prueba.
 
+### 7.16 Los tablones de la herrería y de la capilla (K8+K9, v5.60, 2 oct 2026)
+
+Lo pidió el dueño del diseño: «cada edificio con sentido y su propio tablón,
+como el de misiones de la plaza: la herrería con encargos o mejoras pagadas;
+la iglesia, donde el cura reza o convoca misa y sube la moral». Y K9: inclinar
+«un pelín» hacia qué recurso se tira, **sin deslizador**: las palancas de
+órdenes de v2.0 se retiraron por trampa (sólo vivía la postura de fábrica).
+Es el patrón de §7.15 aplicado a dos edificios más: se toca en el mundo, se
+elige, la aldea actúa y el resultado vuelve.
+
+**Cuándo existen** (`docs/medidas/k8-k9-edificios-2026-10-02.md`, 12 semillas ×
+60 años, prudente): la capilla a las 33 h a ×1 con 20 personas, la herrería a
+las 40 h con 22, la iglesia de piedra a las 65 h; las tres antes de la edad de
+piedra en los doce valles.
+
+**El tablón de la herrería** (`world/boards.ts`): tres **encargos de
+temporada**, uno cada vez, por un año (`BOARDS.ORDER_WEEKS`), que piden una
+herrería encendida y un herrero:
+
+| Encargo | Cuesta | Inclina hacia |
+|---|---|---|
+| Hachas | 25 madera, 8 plata | la madera: el efecto del hacha del carro (`MEANS.AXE_WOOD`, `AXE_WORKS`) |
+| Rejas de arado | 25 madera, 8 plata | el grano: el del arado (`MEANS.PLOUGH_CREW`) |
+| Herrajes para vender | 60 madera | la plata: 4 cada 8 semanas, 24 en el año |
+
+**Con herrería, el hacha y el arado salen del carro** (negativa `'smithy'`):
+el carro trae lo que el valle no sabe hacer, y con fragua eso lo hace el
+herrero. Dos sitios para lo mismo es lo que no se quiere. Lo ya dado sigue.
+
+**El tablón de la capilla** (capilla o iglesia en pie y un cura):
+
+- **La misa** sube el ánimo `BOARDS.MASS_MORALE · fe/100` y **nunca sale
+  mal**: lo que cuesta es el día de trabajo, un séptimo de la obra y de la leña
+  de esa semana (`MASS_WORK_LOSS`). Una por temporada (`MASS_EVERY`). Se ve:
+  la aldea se junta en la capilla un día (`derive/gatherings.ts`).
+- **La rogativa** cuesta 20 de fe (que sobra con capilla: ~89 de mediana) y
+  la próxima siega rinde 1,15, como el molino, una sola vez. Se ve: la aldea
+  va detrás del cura al campo más cercano a la plaza, dos días.
+
+**Todo por la puerta de los actos** (`{kind:'smithy', order}`,
+`{kind:'rite', rite}`, paso 1b), sin tirada, y guardado en `state.flags` (no
+sube el esquema). La crónica los cuenta como `means`, lo que el valle hizo.
+
+**Dónde están:** el mismo tablón provisional de la plaza, a 0,72, clavado en
+la fachada que mira a la plaza (`derive/building-boards.ts`), dentro de la
+huella del edificio para que nadie tenga que rodearlo. Tocarlo abre la misma
+ventana de madera (`ui/redesign/board.ts`) con los avisos de ese edificio.
+
+**K9, medido contra la trampa de v2.0:** {K9}
+
+**Qué falsaría esto:** que se pudiera encargar sin herrería o sin herrero, o
+dos encargos a la vez; que un encargo durara más de un año o no se cobrara;
+que la misa bajara el ánimo o no costara trabajo; que la rogativa bendijera
+dos siegas; que un acto consumiera una tirada; o que el carro siguiera
+vendiendo el hacha con fragua en pie. Las seis tienen prueba en
+`tests/fast/boards.test.ts`.
+
 ---
 
 ## 8. Sistema D — Encrucijadas
@@ -4983,6 +5040,20 @@ entre valles 0,22. El detalle y las causas de fin están en `docs/historico/rewo
 §2.5 y §2.6.
 
 ---
+
+### 12.11 Los tablones de la herrería y de la capilla (`BOARDS`, K8+K9)
+
+| Constante | Valor | Por qué |
+|---|---:|---|
+| `ORDER_WEEKS` | 48 | Un encargo dura un año: con menos no llega a una cosecha |
+| `ORDERS.axes` / `ORDERS.ploughshares` | 25 madera, 8 plata | Por debajo del carro (18 y 20 de plata) porque duran un año |
+| `ORDERS.ironware` | 60 madera | La única forma de convertir madera en plata |
+| `WARES_EVERY` / `WARES_SILVER` | 8 semanas / 4 | 24 de plata al año: la que el camino trae en una década (M-0) |
+| `MASS_MORALE` | 10 · fe/100 | El doble de una boda (`FATE.WEDDING_MORALE`): la aldea entera reunida |
+| `MASS_WORK_LOSS` | 1/7 | El día de trabajo |
+| `MASS_EVERY` | 12 semanas | Una misa por temporada |
+| `ROGATION_FAITH` | 20 | La fe sobra en cuanto hay capilla (~89 de mediana) |
+| `ROGATION_YIELD` | 1,15 | Lo mismo que el molino (`FOOD.MILL_BONUS`), por una siega |
 
 ## 13. Persistencia y letargo
 
