@@ -20,18 +20,42 @@ import type { GameState } from '@engine/state';
 const SEEDS = [3, 14, 25, 36, 47, 58];
 const YEARS = 80;
 
-/** Una partida jugada, con las entradas de asalto que salieron. */
-function played(seed: number, years = YEARS): { state: GameState; raids: string[] } {
+/** Una semana con una partida en camino, tal como estaba al acabar el tick. */
+interface Coming { tick: number; comingTick: number; band: number; strength: number }
+
+/**
+ * Una partida jugada, con las entradas de asalto que salieron y **cada semana
+ * con una partida en camino**. Se juega una vez por fichero: tres pruebas
+ * jugaban cada una las mismas seis partidas de ochenta años, dieciocho donde
+ * bastan seis (docs/medidas/ci-lentitud-2026-10-02.md §6.2). Lo que miraban
+ * semana a semana se apunta aquí y lo comprueban con los mismos asertos.
+ */
+const PLAYED = new Map<string, { state: GameState; raids: string[]; coming: Coming[] }>();
+function played(seed: number, years = YEARS): { state: GameState; raids: string[]; coming: Coming[] } {
+  const key = `${seed}/${years}`;
+  const known = PLAYED.get(key);
+  if (known !== undefined) return known;
   const state = foundGame(seed);
   const raids: string[] = [];
+  const coming: Coming[] = [];
   for (let week = 0; week < years * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
     for (const report of run(state, 1, 'prudent', CATALOG)) {
       for (const entry of report.entries) {
         if (entry.kind === 'raid') raids.push(entry.templateKey);
       }
     }
+    if (state.threat.comingTick !== null) {
+      coming.push({
+        tick: state.tick,
+        comingTick: state.threat.comingTick,
+        band: state.threat.comingBand,
+        strength: state.threat.strength,
+      });
+    }
   }
-  return { state, raids };
+  const out = { state, raids, coming };
+  PLAYED.set(key, out);
+  return out;
 }
 
 describe('B1 · el clan crece por su cuenta', () => {
@@ -89,27 +113,19 @@ describe('B1 · y baja por lo que tú has juntado', () => {
 
   it('la partida que baja no es más grande de lo que el clan puede armar', () => {
     for (const seed of SEEDS) {
-      const state = foundGame(seed);
-      for (let week = 0; week < YEARS * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
-        run(state, 1, 'prudent', CATALOG);
-        if (state.threat.comingTick === null) continue;
-        expect(state.threat.comingBand, `semilla ${seed}`)
-          .toBeLessThanOrEqual(Math.max(THREAT.BAND_MIN, Math.round(state.threat.strength)));
+      for (const week of played(seed).coming) {
+        expect(week.band, `semilla ${seed}`)
+          .toBeLessThanOrEqual(Math.max(THREAT.BAND_MIN, Math.round(week.strength)));
       }
     }
   });
 
   it('avisa antes de llegar, que es donde B2 meterá el aviso', () => {
-    const state = foundGame(25);
-    for (let week = 0; week < YEARS * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
-      run(state, 1, 'prudent', CATALOG);
-      if (state.threat.comingTick === null) continue;
-      expect(state.threat.comingTick - state.tick,
-        'entre la decisión y la llegada hay semanas de margen')
-        .toBeLessThanOrEqual(THREAT.WARNING_WEEKS);
-      expect(state.threat.comingTick).toBeGreaterThanOrEqual(state.tick);
-      return;
-    }
-    throw new Error('la semilla 25 no recibió ninguna partida en ochenta años');
+    const first = played(25).coming[0];
+    if (first === undefined) throw new Error('la semilla 25 no recibió ninguna partida en ochenta años');
+    expect(first.comingTick - first.tick,
+      'entre la decisión y la llegada hay semanas de margen')
+      .toBeLessThanOrEqual(THREAT.WARNING_WEEKS);
+    expect(first.comingTick).toBeGreaterThanOrEqual(first.tick);
   });
 });

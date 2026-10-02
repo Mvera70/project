@@ -158,6 +158,39 @@ sigo viendo baldosas de madera mal puestas».
   `it.fails` del factor de grano pasan**: llega antes (0,32–0,36), los
   porteadores con él, y la moneda pasa entre 0,49 y 0,61.
 
+## v5.68 · 2 oct 2026 · Por qué la CI tardaba 36 minutos, y lo que se arregla sin tocar el motor
+
+**El diagnóstico** (`docs/medidas/ci-lentitud-2026-10-02.md`). El servidor de
+CI no es más lento que local: `ledger.test.ts` tarda 689 s allí y 666 s aquí,
+en un hilo. Lo que pasó fue que **el tick se encareció unas diez veces** entre
+el 16 sep y el 1 oct (de 0,78 a 8,3 ms por semana de juego) y que **los
+ficheros de `tests/fast/` que juegan décadas pasaron de 15 a 58**. El escalón
+mayor del tick está en un solo commit, `6fa7fda1` (21 sep): ×2,3 con aldeas
+del mismo tamaño, porque `walkingGround()` tira todas las rutas con cada obra
+que se abre o se cierra. Con eso salen 9,5 búsquedas A\* por semana, y bajo
+vitest A\* es el 54 % del tick. La v5.56 (#38) arregló lo segundo; lo primero
+lo lleva la rama `claude/rutas-tick` (v5.71), con el parche medido aquí:
+−31 % del tick, misma crónica.
+
+**Lo arreglado, sin tocar el motor:**
+
+- **La suite rápida, sin aislar cada fichero** (`isolate: false`): de 249 a
+  180 s en local. Cada fichero volvía a importar Three, Rapier y el motor y lo
+  corría con el JIT en frío. Las 2079 pruebas pasan en tres órdenes distintos.
+- **Un tope por fichero en la suite rápida**: 30 s × `VALLEY_TIMING_SCALE`,
+  contando la recogida (`tests/helpers/fast-budget-reporter.ts`). Un fichero
+  que se pase sale rojo con su nombre el día que llega; se muda a las
+  jornadas, no se sube el tope. El más lento de hoy tarda 21 s.
+- **Cada partida una vez por fichero** en `ledger` (677 → 161 s) y `threat`
+  (1167 → 470 s), con los mismos asertos. Sus pesos en `shard-weights.ts`,
+  al día.
+- **`tools/reports/tick-bench.ts`**: el banco del tick en ms por semana, con
+  los vivos al final de cada valle. Se pasa antes de subir un tope de CI.
+- **`ci.yml`** ya no dice que el servidor va cinco veces más lento.
+
+**Abierto:** `catchUp` (960 ticks en menos de 2 s) da 2,05–2,26 s en local a
+escala 1. Es el tick caro; lo arregla el parche de rutas, no un umbral.
+
 ## v5.65 · 2 oct 2026 · Dientes de sierra en la tablet: la resolución sólo baja si bajar sirve
 
 Vera, con su tablet (iPlay 70 mini Ultra, Adreno 725, Medium @60): «se ve muy
