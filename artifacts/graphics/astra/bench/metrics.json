@@ -1,0 +1,20 @@
+{
+  "triangles": 96,
+  "limit": 100,
+  "meshCount": 1,
+  "primitives": 1,
+  "dimensionsCells": [
+    0.550000011920929,
+    0.3266666531562805,
+    0.15416666120290756
+  ],
+  "pivotsMetres": {
+    "bench": [
+      0,
+      0,
+      0
+    ]
+  },
+  "vertexColors": true,
+  "textures": 0
+}
