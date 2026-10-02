@@ -1,73 +1,64 @@
 # The Valley — Registro de cambios
 
-## v5.73 · 2 oct 2026 · El valle con forma natural
+## v5.85 · 2 oct 2026 · La fauna por estaciones: que cada estación se note en sus animales
 
-Vera: «el valle es muy cuadrado, debería tener una forma más natural, y hay
-zonas muy desaprovechadas» (marcó las dos laderas grandes del norte, a los lados
-de la garganta). **Medido antes en `main`** (`docs/medidas/valle-forma-2026-10-02.md`):
-no faltaba sitio —la aldea usa el 31 % del corazón en sesenta años— y lo que
-sobraba se veía: 1 823 celdas de prado alrededor del rectángulo que en el 97 %
-no pisa nadie nunca. Con la propuesta delante, en su ángulo (cenital), Vera
-decidió: **la misma superficie, con falda de prado**; y para el cinturón, pasto,
-bosque de ladera y cantera como vida, sin tocar el balance (eso va en v5.74).
+**Sólo capa de vida, derive y render** (decisión de Vera): el motor no se toca,
+ninguna partida cambia, `state.herd` y la caza siguen igual. **Medido antes en
+`main`:** los lobos sólo salían las noches de invierno, el oso en verano y
+otoño (suceso del motor) y los cuervos con el grano madurando; ciervos,
+conejos, perdices, jabalíes y peces eran iguales todo el año, la primavera no
+tenía nada propio y **las golondrinas cruzaban el cielo de enero igual que el
+de junio**.
 
-- **El contorno** (`world/valley-shape.ts`, §7.1 paso 2b). Crece desde el claro
-  de fundación por la vecina mejor puntuada hasta la superficie del rectángulo:
-  sigue al río, ancho en el centro y cerrándose hacia las gargantas, con
-  lóbulos —dos al norte, a los lados de la garganta— y espolones, y lo que queda
-  cercado se rellena. Las constantes, todas geometría, en `VALLEY_SHAPE`.
-- **Lo guarda el mapa** (`map.heart`, **esquema 13**), y con él cambia
-  `inHeart(map, x, y)`: el bosque, la roca y el brote del bosque, dentro; el
-  lago y la montaña, por la distancia al contorno (`distanceOutside`); los
-  solares, en la caja del contorno y con la huella entera dentro. **Migración**:
-  una partida del esquema 12 recibe el rectángulo, que es con lo que se generó
-  su mapa.
-- **La economía no se entera**: el bosque de partida y `forestLeft` siguen
-  midiéndose contra `HEART_WIDTH × HEART_HEIGHT`. Escalera (24 semillas, horas
-  a ×1): edad de piedra 63 → 61 h, villa cerrada 331 → 329 h, población final
-  52 → 56, las mismas dos partidas acabadas. Lo que se mueve es la primera
-  muralla (157 → 193 h): el cerco ya no cabe dentro del contorno y se levanta en
-  la falda.
-- **El relieve sube desde el borde del valle** (`risesOf`, `ground.ts`) y no
-  desde el eje del río, que levantaba dos paredes paralelas a él estuviera donde
-  estuviera el valle. Y el rayo cae dentro del contorno.
-- **Un fallo de verdad, destapado**: `reachableNear` (`life/terrain.ts`) se
-  quedaba en un rincón de una celda cuando el centro del pueblo caía en una
-  casa, y en esa aldea no nacía ninguna presa. Ahora se salta los rincones.
-- **Pruebas.** Nuevas: `valley-shape.test.ts` (una pieza, sin agujeros, la
-  superficie, el claro dentro, el terreno en su sitio, un borde que no es el
-  del rectángulo, las laderas del norte dentro en la mayoría, la falda de prado)
-  y la migración en `save.test.ts`. Las que se mueven, cada una con su causa:
-  los lobos, el albañil y el jabalí se miran en un valle que cumple su
-  condición, buscado entre varios (la semilla 7 ya no la cumplía); los trastos
-  del corral se suman en cinco valles; la tala corta árboles hechos y no
-  plantones; la prueba de rutas absorbe lo abaratado antes de medir; y
-  `module-graph` aprende los dos módulos nuevos del mapa. Suite rápida entera en
-  local: 213 ficheros, 2 107 pruebas.
-- **Y las jornadas de la CI** (diecinueve rojas en trece ficheros): cuatro
-  regresiones de verdad, arregladas en el código. El corro de las reuniones
-  pedía un claro libre de doce celdas de lado y se plantaba a 14 de la capilla
-  (`MEETING_CLEARING` = 3,5). Las cascadas: la falda ensancha las gargantas y
-  once de 120 se quedaban sin la suya; se busca hasta 14 celdas por la
-  pendiente, 120 de 120. El zorro al amanecer, cuyo tope se medía en línea
-  recta. Y la partida que asalta, que se plantaba en la otra orilla del río
-  cuando la del portón era la pequeña (de 10 de 39 a 2 de 39). Lo demás es
-  trayectoria y va con su causa escrita en cada prueba
-  (`docs/medidas/valle-forma-2026-10-02.md` §5).
-- **El tick**, medido como pide `CLAUDE.md` al tocar `placement.ts`. Salía un
-  26 % más lento que `main` (de 8,8 a 11,1 ms por semana), y lo pagaban las
-  rutas que no llegan. Con más pueblos encerrados por su cerco, A* fallaba
-  hasta trece veces más, y `routeBetween` repetía cada búsqueda imposible con
-  todas las parejas de entradas. Ahora la que falla dice qué alcanzó y las
-  demás se saltan (`paths.ts`, `astar.ts`). Es exacto: las cinco huellas de
-  `tick-bench` son idénticas. Queda en 8,3 contra 9,0 de `main`.
-- **Abierto**: la cantera lejana (con la roca a más de catorce celdas, al
-  albañil se le acaba la jornada antes de cargar: 15 valles de 60 en `main`, 20
-  con el contorno; es de v5.74); la muralla en la falda, si pide nivelado; los
-  pueblos que su propio cerco deja sin salida (a los cuarenta años, 3 de 24
-  valles por debajo de 500 celdas alcanzables, 1 de 24 en `main`: es la regla
-  del portón, en su propia ronda); y la mitad de sitio para campos cerca de la
-  plaza (unos 245 → 144 sitios de 3×2 a 18 celdas).
+**Lo que Vera eligió, las cuatro cosas, y cómo quedan.** La estación se lee del
+estado (`faunaSeason`, `derive/seasonal-fauna.ts`), nunca del reloj del
+navegador, y toda la variación sale de un hash de la semilla:
+
+1. **Primavera, crías** (`life/young.ts`): la cierva con su cervatillo (la
+   primera siempre), la mitad de las vacas con ternero, la mitad de las cerdas
+   con dos lechones y un tercio de las gallinas con tres polluelos, **sólo si la
+   aldea tiene esa cabaña**. Son el adulto a escala (`Animal.scale`) detrás de
+   la madre, con la zancada a su escala para que no patinen; no son cabezas
+   nuevas y desaparecen con la primavera. Van en `village.young`, aparte de
+   `wildlife`.
+2. **Aves de paso**: las golondrinas de Astra sólo en primavera y verano; en
+   otoño, **una uve de grullas** (la misma ave, gris y grande) que cruza hacia
+   el sur; y en primavera y verano, **dos cigüeñas** picando en el prado húmedo
+   más cercano a la aldea (primitivas de código, `effects/seasonal-fauna.ts`).
+3. **Invierno escaso**: un ciervo en vez de dos, que **baja al prado** (pasta a
+   nueve celdas del corazón en vez de doce, el más cercano primero; la
+   distancia a cada casa no cambia), un conejo en vez de tres y que huye a vez
+   y media de distancia. Las huellas en la nieve ya existían para todo animal
+   que anda; ahora se ven más cerca.
+4. **Verano y otoño**: mariposas y abejas sobre los campos y el prado de la
+   aldea (a medio gas desde la segunda mitad de la primavera, llenas en
+   verano), y **en otoño dos jabalíes**, la hembra y su cría del año (sin
+   colmillos), hozando a dos pasos de la linde más espesa y sin bosque entre
+   ellos y la cámara —en la primera captura las copas los tapaban—
+   (`life/rooting-boars.ts`); no embisten, se meten en el bosque si ven gente,
+   y no son la presa de la caza.
+
+**Medido** (8 semillas, aldea de veinte a mitad de cada estación, una jornada
+de 240 pasos): en primavera 59 crías (13 cervatillos, 42 polluelos, 4
+terneros; ningún lechón porque esas aldeas no tienen cerdos) y ninguna el resto
+del año; ciervos y conejos a la vista, 16 y 24 en primavera, verano y otoño y
+**8 y 8 en invierno**, con el ciervo a 15,8 celdas del centro contra 19,4; 16
+jabalíes en otoño y ninguno fuera de él; 16 cigüeñas en primavera y verano;
+mariposas y abejas 48+32 en primavera, 128+64 en verano, ninguna en otoño ni en
+invierno. Coste: cuatro llamadas de dibujo con todo encendido (cigüeñas,
+cuellos, alas, abejas) y tres más para las grullas, sólo en su estación.
+
+**Prueba**: `tests/fast/life-seasonal-fauna.test.ts` (una propiedad por
+estación, cuatro semillas sumadas, y que ningún id se repita entre especies: la
+primera versión daba al jabalí el id del perro; 3 s). **Capturas** de las cuatro
+estaciones en `docs/medidas/fauna-estaciones-2026-10-02.md` con la herramienta
+nueva `tools/graphics/seasons.mjs`; **la uve de grullas no tiene captura** (en
+el dibujo por software su reloj real avanza a una décima) y hay que mirarla en
+el aparato. **Lo que no se ve todavía** (mallas
+propias de las crías, la cigüeña de verdad y su nido en la capilla, el clip de
+hozar), en `docs/encargos-3d.md`. **Y apuntada, no hecha**, la idea de Vera del
+ganado en invierno —establos, cercas fuera de la muralla y el asalto que lo
+encuentra—, como **K12** en `docs/plan-meta.md`, con sus cinco preguntas.
 
 ## v5.81 · 2 oct 2026 · La vida en porcentaje, y lo que protege cada pieza
 
@@ -179,6 +170,75 @@ cosas (nivelado, de Vera); no se ha medido cuántos asaltos de más trae la plat
 del cuero; y la escena del asalto todavía no sabe del peto (carril de combate).
 Lo que no se ve, en `docs/encargos-3d.md`; las imágenes y modelos, en
 `docs/encargos/ilustraciones-k5-cuero.md`.
+
+## v5.73 · 2 oct 2026 · El valle con forma natural
+
+Vera: «el valle es muy cuadrado, debería tener una forma más natural, y hay
+zonas muy desaprovechadas» (marcó las dos laderas grandes del norte, a los lados
+de la garganta). **Medido antes en `main`** (`docs/medidas/valle-forma-2026-10-02.md`):
+no faltaba sitio —la aldea usa el 31 % del corazón en sesenta años— y lo que
+sobraba se veía: 1 823 celdas de prado alrededor del rectángulo que en el 97 %
+no pisa nadie nunca. Con la propuesta delante, en su ángulo (cenital), Vera
+decidió: **la misma superficie, con falda de prado**; y para el cinturón, pasto,
+bosque de ladera y cantera como vida, sin tocar el balance (eso va en v5.74).
+
+- **El contorno** (`world/valley-shape.ts`, §7.1 paso 2b). Crece desde el claro
+  de fundación por la vecina mejor puntuada hasta la superficie del rectángulo:
+  sigue al río, ancho en el centro y cerrándose hacia las gargantas, con
+  lóbulos —dos al norte, a los lados de la garganta— y espolones, y lo que queda
+  cercado se rellena. Las constantes, todas geometría, en `VALLEY_SHAPE`.
+- **Lo guarda el mapa** (`map.heart`, **esquema 13**), y con él cambia
+  `inHeart(map, x, y)`: el bosque, la roca y el brote del bosque, dentro; el
+  lago y la montaña, por la distancia al contorno (`distanceOutside`); los
+  solares, en la caja del contorno y con la huella entera dentro. **Migración**:
+  una partida del esquema 12 recibe el rectángulo, que es con lo que se generó
+  su mapa.
+- **La economía no se entera**: el bosque de partida y `forestLeft` siguen
+  midiéndose contra `HEART_WIDTH × HEART_HEIGHT`. Escalera (24 semillas, horas
+  a ×1): edad de piedra 63 → 61 h, villa cerrada 331 → 329 h, población final
+  52 → 56, las mismas dos partidas acabadas. Lo que se mueve es la primera
+  muralla (157 → 193 h): el cerco ya no cabe dentro del contorno y se levanta en
+  la falda.
+- **El relieve sube desde el borde del valle** (`risesOf`, `ground.ts`) y no
+  desde el eje del río, que levantaba dos paredes paralelas a él estuviera donde
+  estuviera el valle. Y el rayo cae dentro del contorno.
+- **Un fallo de verdad, destapado**: `reachableNear` (`life/terrain.ts`) se
+  quedaba en un rincón de una celda cuando el centro del pueblo caía en una
+  casa, y en esa aldea no nacía ninguna presa. Ahora se salta los rincones.
+- **Pruebas.** Nuevas: `valley-shape.test.ts` (una pieza, sin agujeros, la
+  superficie, el claro dentro, el terreno en su sitio, un borde que no es el
+  del rectángulo, las laderas del norte dentro en la mayoría, la falda de prado)
+  y la migración en `save.test.ts`. Las que se mueven, cada una con su causa:
+  los lobos, el albañil y el jabalí se miran en un valle que cumple su
+  condición, buscado entre varios (la semilla 7 ya no la cumplía); los trastos
+  del corral se suman en cinco valles; la tala corta árboles hechos y no
+  plantones; la prueba de rutas absorbe lo abaratado antes de medir; y
+  `module-graph` aprende los dos módulos nuevos del mapa. Suite rápida entera en
+  local: 213 ficheros, 2 107 pruebas.
+- **Y las jornadas de la CI** (diecinueve rojas en trece ficheros): cuatro
+  regresiones de verdad, arregladas en el código. El corro de las reuniones
+  pedía un claro libre de doce celdas de lado y se plantaba a 14 de la capilla
+  (`MEETING_CLEARING` = 3,5). Las cascadas: la falda ensancha las gargantas y
+  once de 120 se quedaban sin la suya; se busca hasta 14 celdas por la
+  pendiente, 120 de 120. El zorro al amanecer, cuyo tope se medía en línea
+  recta. Y la partida que asalta, que se plantaba en la otra orilla del río
+  cuando la del portón era la pequeña (de 10 de 39 a 2 de 39). Lo demás es
+  trayectoria y va con su causa escrita en cada prueba
+  (`docs/medidas/valle-forma-2026-10-02.md` §5).
+- **El tick**, medido como pide `CLAUDE.md` al tocar `placement.ts`. Salía un
+  26 % más lento que `main` (de 8,8 a 11,1 ms por semana), y lo pagaban las
+  rutas que no llegan. Con más pueblos encerrados por su cerco, A* fallaba
+  hasta trece veces más, y `routeBetween` repetía cada búsqueda imposible con
+  todas las parejas de entradas. Ahora la que falla dice qué alcanzó y las
+  demás se saltan (`paths.ts`, `astar.ts`). Es exacto: las cinco huellas de
+  `tick-bench` son idénticas. Queda en 8,3 contra 9,0 de `main`.
+- **Abierto**: la cantera lejana (con la roca a más de catorce celdas, al
+  albañil se le acaba la jornada antes de cargar: 15 valles de 60 en `main`, 20
+  con el contorno; es de v5.74); la muralla en la falda, si pide nivelado; los
+  pueblos que su propio cerco deja sin salida (a los cuarenta años, 3 de 24
+  valles por debajo de 500 celdas alcanzables, 1 de 24 en `main`: es la regla
+  del portón, en su propia ronda); y la mitad de sitio para campos cerca de la
+  plaza (unos 245 → 144 sitios de 3×2 a 18 celdas).
 
 ## v5.72 · 2 oct 2026 · K7: el epitafio dice por qué cayó el valle
 

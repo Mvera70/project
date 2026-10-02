@@ -284,7 +284,7 @@ export class Fauna {
         const floor = animal.kind === 'fish' ? FISH_LEVEL : this.ground(animal.x, animal.y);
         this.position.set(animal.x, floor, animal.y);
         this.turn.setFromAxisAngle(this.up, this.headingOf(animal));
-        this.matrix.compose(this.position, this.turn, this.size);
+        this.matrix.compose(this.position, this.turn, this.size.setScalar(animal.scale ?? 1));
         piece.setMatrixAt(slot, this.matrix);
       }
       piece.instanceMatrix.needsUpdate = true;

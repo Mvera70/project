@@ -1,42 +1,32 @@
 # Cuaderno de tareas — el rework
 
-## 2 oct 2026 · El valle con forma natural (v5.73)
+## 2 oct 2026 · La fauna por estaciones (v5.85)
 
-Rama `ccr-2aad21e1-6aw4u1`, **versiones v5.73 (esto) y v5.74 (los usos del
-cinturón)**: v5.71 y v5.72 las tomaron rutas y K7 esta noche. Medido antes en
-`main` y decidido por Vera con las hojas delante (cenital, en su ángulo): la
-misma superficie, con falda de prado; en el cinturón, pasto, bosque de ladera y
-cantera, como vida y sin tocar el balance. Hecho: el corazón es un contorno que
-sigue al río (`world/valley-shape.ts`, `map.heart`, esquema 13 con migración
-al rectángulo), la montaña y el lago se miden desde él y el relieve 3D sube
-desde su borde. Escalera (24 semillas): edad de piedra 61 h (63), villa
-cerrada 329 h (331); la primera muralla, 193 h (157), porque el cerco sale a la
-falda. Medidas y hojas: `docs/medidas/valle-forma-2026-10-02.md`. Destapado y
-arreglado: `reachableNear` se quedaba en un rincón y la aldea se quedaba sin
-presas. Suite rápida entera en local, 2 107 en verde; las jornadas, en CI.
+Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
+rama `claude/fauna-estaciones`, **versiones reservadas v5.85–v5.89** (usada
+v5.85). **Sólo vida, derive y render**: el motor no se toca. Hecho lo que Vera
+eligió, las cuatro cosas: crías en primavera (`life/young.ts`, detrás de la
+madre y a su escala, sin cuerna ni ubre), golondrinas sólo en primavera y
+verano y una uve de grullas en otoño (`effects/ambience.ts`), cigüeñas,
+mariposas y abejas (`effects/seasonal-fauna.ts`), invierno escaso (un ciervo
+que baja al prado, un conejo más arisco) y jabalíes hozando en otoño
+(`life/rooting-boars.ts`). Qué toca cada estación, en `derive/seasonal-fauna.ts`.
+Medido en ocho semillas y con capturas de las cuatro estaciones:
+`docs/medidas/fauna-estaciones-2026-10-02.md`. Prueba:
+`tests/fast/life-seasonal-fauna.test.ts` (3 s). No se ha tocado el anclaje de
+las vacas de `beasts.ts` (#48): las crías leen el cuerpo de la madre desde
+`village.ts`.
 
-**Las jornadas de la CI** (19 rojas en 13 ficheros), diagnosticadas en tres
-tandas contra `main`: cuatro regresiones arregladas (el corro de las
-reuniones, las cascadas de las gargantas, el zorro al amanecer y la partida que
-asalta desde la otra orilla) y el resto de trayectoria, cada una con su causa
-en la prueba (`valle-forma-2026-10-02.md` §5).
+**Abierto:**
 
-**Abierto:** (1) **la cantera lejana**: con la roca a más de catorce celdas al
-albañil se le acaba la jornada antes de cargar (15 de 60 valles en `main`, 20
-con el contorno); va con la cantera al pie de la montaña, en v5.74. (2) La
-muralla en la falda llega 36 h más tarde: si pide nivelado, es de Vera. (3)
-**Pueblos sin salida por su propio cerco**: a los cuarenta años, 3 de 24 valles
-alcanzan menos de 500 celdas (1 de 24 en `main`); en la semilla 13 el único
-portón da a la montaña. Es la regla del portón (`placeBuilding` no mira adónde
-da) y va en su propia ronda, porque mueve todas las trayectorias. (4) Cerca de
-la plaza queda la mitad de sitio para campos (unos 245 → 144 sitios de 3×2):
-avisado K5, por el lino.
-**v5.74, los usos del cinturón, está hecha y sin subir**: el commit
-`9bf57322`, sobre `5575f1f5`, guardado en un `git bundle` y un `format-patch` en
-el scratchpad de la sesión (bosque de ladera, pasto de la falda, cantera al pie
-de la montaña y la senda a 0,02). Entra como PR propia cuando #48 esté en
-`main`.
-**Siguiente:** v5.74, los usos del cinturón.
+- **De Vera:** K12, el ganado en invierno (establos, cercas fuera de la
+  muralla, el asalto que lo encuentra), apuntado en `docs/plan-meta.md` con
+  cinco preguntas; y si la cigüeña debe anidar en la capilla (pide malla y
+  saber la altura del tejado).
+- **Lo que no se ve bien** (`docs/encargos-3d.md`): los polluelos son gallinas
+  diminutas y no se leen; la cigüeña es de primitivas; no hay clip de hozar.
+- **Sin medir:** el coste en el aparato (cuatro llamadas más con todo
+  encendido, tres más con las grullas).
 
 ## 2 oct 2026 · La ronda del daño (v5.81, carril de combate)
 
@@ -103,6 +93,44 @@ mueve byte a byte.
   bastidor, el fardo y el peto en el torso (Astra); las seis ilustraciones y la
   tarjeta (Codex, `docs/encargos/ilustraciones-k5-cuero.md`); el «+1 piel» sobre
   el cazador.
+
+## 2 oct 2026 · El valle con forma natural (v5.73)
+
+Rama `ccr-2aad21e1-6aw4u1`, **versiones v5.73 (esto) y v5.74 (los usos del
+cinturón)**: v5.71 y v5.72 las tomaron rutas y K7 esta noche. Medido antes en
+`main` y decidido por Vera con las hojas delante (cenital, en su ángulo): la
+misma superficie, con falda de prado; en el cinturón, pasto, bosque de ladera y
+cantera, como vida y sin tocar el balance. Hecho: el corazón es un contorno que
+sigue al río (`world/valley-shape.ts`, `map.heart`, esquema 13 con migración
+al rectángulo), la montaña y el lago se miden desde él y el relieve 3D sube
+desde su borde. Escalera (24 semillas): edad de piedra 61 h (63), villa
+cerrada 329 h (331); la primera muralla, 193 h (157), porque el cerco sale a la
+falda. Medidas y hojas: `docs/medidas/valle-forma-2026-10-02.md`. Destapado y
+arreglado: `reachableNear` se quedaba en un rincón y la aldea se quedaba sin
+presas. Suite rápida entera en local, 2 107 en verde; las jornadas, en CI.
+
+**Las jornadas de la CI** (19 rojas en 13 ficheros), diagnosticadas en tres
+tandas contra `main`: cuatro regresiones arregladas (el corro de las
+reuniones, las cascadas de las gargantas, el zorro al amanecer y la partida que
+asalta desde la otra orilla) y el resto de trayectoria, cada una con su causa
+en la prueba (`valle-forma-2026-10-02.md` §5).
+
+**Abierto:** (1) **la cantera lejana**: con la roca a más de catorce celdas al
+albañil se le acaba la jornada antes de cargar (15 de 60 valles en `main`, 20
+con el contorno); va con la cantera al pie de la montaña, en v5.74. (2) La
+muralla en la falda llega 36 h más tarde: si pide nivelado, es de Vera. (3)
+**Pueblos sin salida por su propio cerco**: a los cuarenta años, 3 de 24 valles
+alcanzan menos de 500 celdas (1 de 24 en `main`); en la semilla 13 el único
+portón da a la montaña. Es la regla del portón (`placeBuilding` no mira adónde
+da) y va en su propia ronda, porque mueve todas las trayectorias. (4) Cerca de
+la plaza queda la mitad de sitio para campos (unos 245 → 144 sitios de 3×2):
+avisado K5, por el lino.
+**v5.74, los usos del cinturón, está hecha y sin subir**: el commit
+`9bf57322`, sobre `5575f1f5`, guardado en un `git bundle` y un `format-patch` en
+el scratchpad de la sesión (bosque de ladera, pasto de la falda, cantera al pie
+de la montaña y la senda a 0,02). Entra como PR propia cuando #48 esté en
+`main`.
+**Siguiente:** v5.74, los usos del cinturón.
 
 ## 2 oct 2026 · La tanda de la noche, cerrada (director)
 
