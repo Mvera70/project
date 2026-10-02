@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · AR-2, la minería (v5.86–v5.88, en vuelo)
+
+Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
+rama `claude/ar2-mineria`, **versiones reservadas v5.86–v5.88**. Encargo: la
+veta al pie de la montaña, la mina como obra, el oficio de minero, la
+existencia `ore`, la Edad del Hierro con la primera mina; en la vida, el
+minero que entra por la boca y desaparece, y las vagonetas que salen llenas y
+vuelven vacías; respaldos procedurales con los nombres del encargo de Astra
+(bloque 4). **Toca el motor** (`balance.ts`, `labour.ts`, `works.ts`,
+`state.ts`); **no toca `placement.ts`** (la veta se elige en `world/mine.ts`).
+
 ## 2 oct 2026 · La fauna por estaciones (v5.85)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
