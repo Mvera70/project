@@ -14,6 +14,7 @@
 //
 //   npx tsx tools/reports/tilt-report.ts                 # 8 semillas × 40 años
 //   npx tsx tools/reports/tilt-report.ts --seeds 12 --years 60
+//   npx tsx tools/reports/tilt-report.ts --only nada,hachas   # sólo esas
 
 import { TIME } from '../../src/engine/balance';
 import { CATALOG } from '../../src/engine/crossroads/catalog';
@@ -23,6 +24,7 @@ import { run } from '../../src/engine/sim';
 import type { GameState, PlayerAct } from '../../src/engine/state';
 import { ritesOpen, smithyOrdersOpen } from '../../src/engine/world/boards';
 import { nextProject } from '../../src/engine/world/works';
+import { ringClosed } from '../../src/engine/world/placement';
 
 const arg = (name: string, fallback: number): number => {
   const i = process.argv.indexOf(`--${name}`);
@@ -45,6 +47,10 @@ const STRATEGIES: Record<Strategy, (s: GameState) => readonly PlayerAct[]> = {
 interface Row {
   ended: number; pop: number[]; acts: number[]; waitingWood: number; hungry: number; lowMorale: number; weeks: number;
   silver: number[]; grain: number[]; morale: number[]; built: number[];
+  /** Horas a ×1 hasta cerrar la villa, de los valles que la cierran. */
+  ring: number[];
+  /** Causas con que acaban las partidas que acaban. */
+  causes: string[];
 }
 const median = (xs: readonly number[]): number => {
   const s = [...xs].sort((a, b) => a - b);
@@ -52,12 +58,17 @@ const median = (xs: readonly number[]): number => {
 };
 const mean = (xs: readonly number[]): number => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 
+const only = (() => {
+  const i = process.argv.indexOf('--only');
+  return i >= 0 && process.argv[i + 1] !== undefined ? new Set(process.argv[i + 1]!.split(',')) : null;
+})();
 const rows = new Map<Strategy, Row>();
-for (const name of Object.keys(STRATEGIES) as Strategy[]) {
-  const row: Row = { ended: 0, pop: [], acts: [], waitingWood: 0, hungry: 0, lowMorale: 0, weeks: 0, silver: [], grain: [], morale: [], built: [] };
+for (const name of (Object.keys(STRATEGIES) as Strategy[]).filter((n) => only === null || only.has(n))) {
+  const row: Row = { ended: 0, pop: [], acts: [], waitingWood: 0, hungry: 0, lowMorale: 0, weeks: 0, silver: [], grain: [], morale: [], built: [], ring: [], causes: [] };
   for (const seed of SEEDS) {
     const state = foundGame(seed);
     let acts = 0;
+    let ring = -1;
     const silver: number[] = [], grain: number[] = [], morale: number[] = [];
     for (let t = 1; t <= YEARS * TIME.WEEKS_PER_YEAR && state.ended === null; t += 1) {
       run(state, 1, 'prudent', CATALOG, (s) => { const a = STRATEGIES[name](s); acts += a.length; return a; });
@@ -66,8 +77,10 @@ for (const name of Object.keys(STRATEGIES) as Strategy[]) {
       if (nextProject(state) === null && nextProject({ ...state }, Number.POSITIVE_INFINITY) !== null) row.waitingWood += 1;
       if (state.village.morale < 40) row.lowMorale += 1;
       silver.push(state.village.silver); grain.push(state.village.grain); morale.push(state.village.morale);
+      if (ring < 0 && ringClosed(state)) ring = state.tick;
     }
-    if (state.ended !== null) row.ended += 1;
+    if (state.ended !== null) { row.ended += 1; row.causes.push(state.ended.cause); }
+    if (ring >= 0) row.ring.push((ring * TIME.REAL_MS_PER_TICK) / 3_600_000);
     row.pop.push(population(state));
     row.acts.push(acts);
     row.silver.push(mean(silver)); row.grain.push(mean(grain)); row.morale.push(mean(morale));
@@ -79,10 +92,11 @@ for (const name of Object.keys(STRATEGIES) as Strategy[]) {
 
 const pct = (a: number, b: number): string => `${Math.round((100 * a) / Math.max(1, b))} %`;
 console.log(`\n## K9 · cada opción pedida siempre que se pueda · ${SEEDS.length} semillas × ${YEARS} años · prudent\n`);
-console.log('| estrategia | actos (mediana) | acabadas | gente al final | edificios | obra esperando madera | hambre | ánimo < 40 | plata media | grano medio | ánimo medio |');
-console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
+console.log('| estrategia | actos (mediana) | acabadas | gente al final | edificios | villa cerrada | obra esperando madera | hambre | ánimo < 40 | plata media | grano medio | ánimo medio |');
+console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
 for (const [name, r] of rows) {
-  console.log(`| ${name} | ${median(r.acts)} | ${r.ended}/${SEEDS.length} | ${median(r.pop)} | ${median(r.built)} | ${pct(r.waitingWood, r.weeks)} | ${pct(r.hungry, r.weeks)} | ${pct(r.lowMorale, r.weeks)} | ${mean(r.silver).toFixed(1)} | ${Math.round(mean(r.grain))} | ${mean(r.morale).toFixed(1)} |`);
+  const ended = r.ended === 0 ? '0' : `${r.ended} (${r.causes.join(', ')})`;
+  console.log(`| ${name} | ${median(r.acts)} | ${ended}/${SEEDS.length} | ${median(r.pop)} | ${median(r.built)} | ${r.ring.length}/${SEEDS.length}, ${Number.isNaN(median(r.ring)) ? '—' : `${median(r.ring).toFixed(0)} h`} | ${pct(r.waitingWood, r.weeks)} | ${pct(r.hungry, r.weeks)} | ${pct(r.lowMorale, r.weeks)} | ${mean(r.silver).toFixed(1)} | ${Math.round(mean(r.grain))} | ${mean(r.morale).toFixed(1)} |`);
 }
 // Quién gana en qué: la mejor estrategia por cada medida.
 const best = (label: string, value: (r: Row) => number, higher: boolean): void => {
@@ -96,3 +110,4 @@ best('más plata media', (r) => mean(r.silver), true);
 best('más ánimo medio', (r) => mean(r.morale), true);
 best('más grano medio', (r) => mean(r.grain), true);
 best('más gente al final (mediana)', (r) => median(r.pop), true);
+best('más valles con la villa cerrada', (r) => r.ring.length, true);

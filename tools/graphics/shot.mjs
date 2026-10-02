@@ -413,6 +413,14 @@ if (open === 'board') {
   console.log('tablón en pantalla:', JSON.stringify(at), 'abierto:', await tab.locator('.valley-board').count(),
     'hoja:', await tab.evaluate(() => document.querySelector('.ui-shell-content')?.hidden === false ? document.querySelector('.ui-shell-content')?.textContent?.slice(0, 80) : 'cerrada'));
 }
+// K8 · `--open board-smithy` / `--open board-church` abre la ventana del tablón
+// de la herrería o de la capilla por su gancho (`__valleyOpenBoard`): la foto
+// prueba la ventana; el tablón clavado en la fachada se mira con `--look`.
+if (open === 'board-smithy' || open === 'board-church') {
+  await tab.evaluate((which) => window.__valleyOpenBoard?.(which), open.slice('board-'.length));
+  await tab.locator('.valley-board').waitFor({ timeout: 4000 }).catch(() => {});
+  console.log('tablón abierto:', await tab.locator('.valley-board').count(), 'avisos:', await tab.locator('.valley-note').count());
+}
 if (open) await tab.waitForTimeout(300);
 
 let sceneImage = null;

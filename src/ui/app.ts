@@ -1739,7 +1739,10 @@ export function boot(
    * comprobar que su cierre suena una vez. Por `navigate` y no por
    * `actions.navigate`: abrirlo así no es un toque y no suena.
    */
-  window.__valleyOpenBoard = (): void => { navigate({ kind: 'board' }); };
+  // K8 · y el de la herrería o la capilla, con `which`.
+  window.__valleyOpenBoard = (which?: 'smithy' | 'church'): void => {
+    navigate(which === undefined ? { kind: 'board' } : { kind: 'board', which });
+  };
 
   window.__valleyEnd = (cause: string): void => {
     if (state.ended !== null) return;
@@ -2056,7 +2059,7 @@ declare global {
     __valleyTimeScale?: (value: number) => void;
     __valleyLook?: (x: number, y: number) => void;
     __valleyHoldTicks?: (on: boolean) => void;
-    __valleyOpenBoard?: () => void;
+    __valleyOpenBoard?: (which?: 'smithy' | 'church') => void;
     __valleyHouseOnScreen?: (look?: boolean) => { x: number; y: number } | null;
   }
 }

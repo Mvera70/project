@@ -27,6 +27,7 @@ import type { ChronicleEntry, GameState, Rite, SmithyOrder, VillageStats } from 
 import { RITES, SMITHY_ORDERS } from '../state';
 import { seasonOf, weekOf } from '../time';
 import { standing, smithyWorking } from '../subsistence/building-counts';
+import { winterReserve } from '../subsistence/consumption';
 
 /** Por qué no se puede pedir un encargo. */
 export type OrderRefusal = 'ended' | 'smithy' | 'smith' | 'busy' | 'cost';
@@ -74,7 +75,12 @@ export function smithyOrdersOpen(state: GameState): OrderOpen[] {
       : standing(state, 'smithy').length === 0 ? 'smithy'
         : !smithyWorking(state) || !someone(state, 'smith') ? 'smith'
           : live !== null ? 'busy'
-            : Object.entries(cost).some(([stat, amount]) => state.village[stat as keyof VillageStats] < amount) ? 'cost'
+            : Object.entries(cost).some(([stat, amount]) => state.village[stat as keyof VillageStats] < amount)
+              // Y nunca la leña del invierno: la fragua no quema la que la aldea
+              // necesita para no helarse, la misma regla que K3a puso a las obras
+              // (`winterReserve`). Medido: con herrajes sin parar, una semilla
+              // pasó 46 semanas con la leñera vacía.
+              || state.village.wood - cost.wood < winterReserve(state) ? 'cost'
               : null;
     return { id, cost, refusal, live };
   });

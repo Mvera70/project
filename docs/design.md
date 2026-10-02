@@ -2570,7 +2570,15 @@ la fachada que mira a la plaza (`derive/building-boards.ts`), dentro de la
 huella del edificio para que nadie tenga que rodearlo. Tocarlo abre la misma
 ventana de madera (`ui/redesign/board.ts`) con los avisos de ese edificio.
 
-**K9, medido contra la trampa de v2.0:** {K9}
+**K9, medido contra la trampa de v2.0:** cada opción pedida siempre que se pueda, 8 semillas × 40 años
+(`tools/reports/tilt-report.ts`, `docs/medidas/k8-k9-edificios-2026-10-02.md`).
+**Cada una es la mejor en algo y ninguna en todo**: las rejas dejan menos obra
+esperando madera, la rogativa da menos hambre y más grano, los herrajes la
+plata, la misa el ánimo y la gente, y las hachas cierran la villa antes (en las
+8 semillas, y en los 8 valles frente a 6). **Los herrajes acaban 2 de 8
+aldeas asaltadas**: la plata amontonada tienta al clan (`THREAT.WORTH_PER_SILVER`).
+Es su cara mala y Vera decidió dejarla. Y ningún encargo quema la leña del
+invierno (`winterReserve`): una semilla pasó 46 semanas sin ella.
 
 **Qué falsaría esto:** que se pudiera encargar sin herrería o sin herrero, o
 dos encargos a la vez; que un encargo durara más de un año o no se cobrara;

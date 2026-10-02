@@ -15,6 +15,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { run, tick } from '@engine/sim';
 import { produce, allocateLabour } from '@engine/subsistence/labour';
 import { harvest } from '@engine/subsistence/harvest';
+import { winterReserve } from '@engine/subsistence/consumption';
 import { deserialize, serialize } from '@engine/save';
 import type { GameState } from '@engine/state';
 import { holdRite, liveOrder, orderSmithy, ritesOpen, smithyOrdersOpen, smithyWeek } from '@engine/world/boards';
@@ -95,6 +96,19 @@ describe('K8 · el tablón de la herrería', () => {
       const ploughed = clone(base);
       orderSmithy(ploughed, 'ploughshares', 1);
       expect(allocateLabour(ploughed).farmers, 'el arado libera manos del campo').toBeLessThan(allocateLabour(clone(base)).farmers);
+    }
+  });
+
+  it('la fragua no quema la leña del invierno', () => {
+    // Medido (2 oct 2026): con herrajes sin parar, una semilla pasó 46 semanas
+    // con la leñera vacía. La misma regla que K3a puso a las obras.
+    for (const base of villages) {
+      const s = clone(base);
+      s.tick = s.tick - (s.tick % TIME.WEEKS_PER_YEAR) + TIME.WEEKS_PER_SEASON * 2; // otoño
+      s.village.wood = winterReserve(s) + BOARDS.ORDERS.ironware.wood - 1;
+      expect(smithyOrdersOpen(s).find((o) => o.id === 'ironware')!.refusal).toBe('cost');
+      s.village.wood += 1;
+      expect(smithyOrdersOpen(s).find((o) => o.id === 'ironware')!.refusal).toBeNull();
     }
   });
 
