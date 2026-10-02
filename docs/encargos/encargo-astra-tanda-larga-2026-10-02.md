@@ -72,7 +72,7 @@ texturas, color por material de `palette.json`. Origen en la base y frente a
 | 2 (sastrería) | Se integra **cuando la PR de K5 (sastrería y lino) esté en `main`**; la lleva otra sesión hoy, no se toca antes |
 | 5, 6, 7 | Se integra lo que tenga ya un sitio en el código (accesorios de visitantes, cigüeña, polluelo, mariposa, banco, carro); lo demás, sólo modelo |
 | 3 y 4 (armaduras, mina) | **Sólo modelo**: la mecánica todavía no existe (`docs/plan-meta.md`, AR). El peto de cuero (12) sí se integra, porque ya existe en el juego |
-| 8 | Sólo si Vera lo pide |
+| 8 | Sólo si todo lo demás está hecho: mejorar los candidatos, no rehacerlos |
 
 ### Bloque 0 · La aldea y el valle con más cosas — lo primero
 
@@ -211,6 +211,15 @@ Three.js (repositorio en D:\DESARROLLO\PROYECTOS\VALLEY\project; trae main
 antes de empezar). Es una SESIÓN LARGA: hay que gastar el crédito que queda
 haciendo todos los modelos que se pueda.
 
+SIN PARAR: Vera no va a estar para contestar. Nadie se para a preguntar.
+Lo que no diga el brief lo decide Sol 6 con estos criterios: que se lea
+desde la cámara de reposo, que quepa en el presupuesto de rendimiento, que
+case con lo que ya hay en el valle, y en la duda, lo más sencillo. Cada
+decisión tomada así se apunta en una línea en docs/task-log.md («decidido
+por Sol 6: …») para que Vera la revise después. Lo único que NO se decide
+sin ella: sangre y fuego (no), y tocar el motor (no). El Bloque 8 (roble y
+casa quemada) entra sólo si todo lo demás está hecho.
+
 Papeles:
 - SOL 6 dirige. Reparte, revisa e integra en el juego.
 - ASTRA hace todos los modelos, con agentes en paralelo (un bloque por agente
@@ -262,8 +271,8 @@ Reglas que no se negocian:
   los trastos de src/render3d/world/steading.ts.
 - La sastrería no se integra hasta que la PR de K5 (otra sesión, hoy) esté en
   main. Las armaduras y la mina, sólo modelo.
-- Si falta un dato, no se inventa ni se para: se apunta como pregunta para
-  Vera y se sigue.
+- Si falta un dato, Sol 6 decide con los criterios de arriba, lo apunta y se
+  sigue.
 - Commits por rutas explícitas, nunca git add -A.
 
 Al acabar, en español: qué modelos están, cuáles se integraron, las cifras de
