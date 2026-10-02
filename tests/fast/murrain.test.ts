@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/murrain-long.test.ts` (v5.56).
+//
 // M-29 · design.md §7.7 — la peste del ganado.
 //
 // Lo que se protege: que un rebaño apretado enferme más que uno holgado, que
@@ -8,9 +10,8 @@ import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
-import { population } from '@engine/people/demography';
 import { run, tick } from '@engine/sim';
-import { herdCapacity, herdDensity, murrainChance, tendHerd } from '@engine/subsistence/herd';
+import { herdCapacity, murrainChance, tendHerd } from '@engine/subsistence/herd';
 import { HERD_KINDS, type GameState } from '@engine/state';
 
 // Una sola aldea por (años, semilla) y copias para cada prueba: correr mil
@@ -42,15 +43,6 @@ function outbreaks(state: GameState, weeks: number, fill: (s: GameState) => void
 }
 
 describe('la densidad es lo que enferma · §7.7', () => {
-  it('el corral lleno da 1 y el vacío da 0', () => {
-    const state = village(12);
-    for (const kind of HERD_KINDS) state.herd[kind] = 0;
-    expect(herdDensity(state)).toBe(0);
-    const capacity = herdCapacity(state);
-    for (const kind of HERD_KINDS) state.herd[kind] = capacity[kind];
-    expect(herdDensity(state)).toBe(1);
-  });
-
   it('un rebaño apretado corre más riesgo que uno holgado', () => {
     // Medido sobre el riesgo y no contando brotes: con una tasa anual del
     // orden del 4 % harían falta decenas de miles de ticks para tener señal, y
@@ -163,19 +155,6 @@ describe('lo que se lleva · §7.7', () => {
 });
 
 describe('la peste no desplaza nada · §4.3', () => {
-  it('su flujo propio no mueve ni un lobo ni una muerte', () => {
-    // Dos partidas iguales salvo por el flujo `murrain`: todo lo demás debe
-    // seguir idéntico, incluidos los lobos, que tiran de `animals`.
-    const a = foundGame(7);
-    const b = foundGame(7);
-    b.rng.murrain = (b.rng.murrain + 999) >>> 0;
-    for (let n = 0; n < 400; n += 1) { tick(a, CATALOG); tick(b, CATALOG); }
-    expect(a.rng.animals).toBe(b.rng.animals);
-    expect(a.rng.deaths).toBe(b.rng.deaths);
-    expect(a.rng.births).toBe(b.rng.births);
-    expect(population(a)).toBe(population(b));
-  });
-
   it('la peste gasta su propio flujo y no el de los animales', () => {
     // Este hueco lo destapó una mutación: tirar de `animals` en vez de
     // `murrain` pasaba las once pruebas anteriores, porque perturbar un flujo
@@ -184,12 +163,5 @@ describe('la peste no desplaza nada · §4.3', () => {
     const start = state.rng.murrain;
     for (let n = 0; n < 50; n += 1) tick(state, CATALOG);
     expect(state.rng.murrain).not.toBe(start);
-  });
-
-  it('dos partidas con la misma semilla enferman igual', () => {
-    const a = village(40);
-    const b = village(40);
-    expect(a.herd).toEqual(b.herd);
-    expect(a.rng.murrain).toBe(b.rng.murrain);
   });
 });

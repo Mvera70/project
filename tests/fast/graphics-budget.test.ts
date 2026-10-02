@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/graphics-budget-long.test.ts` (v5.56).
+//
 // G-09 · design.md D.9 — presupuesto antes de ampliar.
 //
 // El banco de verdad corre en un navegador y no cabe aquí. Lo que sí cabe, y es
@@ -73,20 +75,6 @@ describe('G-10 · el bosque', () => {
     return tree;
   }
 
-  it('cuesta una malla por material, no una por árbol', () => {
-    // D.9 nombra este caso: instanciar árboles. Un objeto suelto por celda de
-    // bosque serían varios cientos de llamadas de dibujo en un valle maduro.
-    const state = village(16);
-    const forest = buildForest(state, sapling());
-    expect(forest.count).toBeGreaterThan(200);
-    expect(forest.group.children.length).toBe(3);
-    for (const child of forest.group.children) {
-      expect((child as { isInstancedMesh?: boolean }).isInstancedMesh).toBe(true);
-    }
-    forest.dispose();
-    expect(forest.group.children.length).toBe(0);
-  });
-
   it('hay un árbol por celda de bosque libre y ni uno debajo de lo construido', () => {
     const state = village(16);
     const woods = forestLooks(state).filter(look => look.stage === 'standing').length;
@@ -161,15 +149,6 @@ describe('G-09 · el ciclo de recursos', () => {
       expect(tells.count).toBe(0);
     }
     tells.dispose();
-  });
-
-  it('el suelo se suelta entero, y soltarlo dos veces no rompe', () => {
-    const state = village(8);
-    for (let round = 0; round < 20; round += 1) {
-      const ground = buildGround(state.map, PALETTES.summer);
-      ground.dispose();
-      ground.dispose();
-    }
   });
 
   it('cuánto cuesta la escena está en el plan, no en una cuenta aparte', () => {

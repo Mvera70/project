@@ -58,6 +58,18 @@ function placeOf(state: GameState, where: 'square' | 'chapel' | 'ford'): { x: nu
   return { x: state.plaza.x, y: state.plaza.y };
 }
 
+/** K8 · lo que dura la reunión de cada rito, en ticks (un tick es un día a ×1). */
+const RITE_DAYS = { mass: 1, rogation: 2 } as const;
+
+/** Los campos, para la procesión: el centro del campo en pie más cercano a la plaza. */
+function fieldsOf(state: GameState): { x: number; y: number } {
+  const fields = standing(state, 'field');
+  if (fields.length === 0) return { x: state.plaza.x, y: state.plaza.y };
+  const centre = (b: (typeof fields)[number]): { x: number; y: number } => ({ x: b.x + b.w * 0.5, y: b.y + b.h * 0.5 });
+  return fields.map(centre).sort((a, b) =>
+    Math.hypot(a.x - state.plaza.x, a.y - state.plaza.y) - Math.hypot(b.x - state.plaza.x, b.y - state.plaza.y))[0]!;
+}
+
 /**
  * Las reuniones vivas ahora mismo.
  *
@@ -88,6 +100,15 @@ export function gatheringsAt(
       const point = placeOf(state, effect.where);
       out.push({ x: point.x, y: point.y, sinceTick: decision.tick, ticks: effect.days });
     }
+  }
+  // K8 · y los ritos del tablón de la iglesia, que también los pide el
+  // jugador: la misa junta a la aldea en la capilla un día, y la rogativa la
+  // lleva a los campos detrás del cura. La marca la deja `world/boards.ts`.
+  for (const [rite, days] of [['mass', RITE_DAYS.mass], ['rogation', RITE_DAYS.rogation]] as const) {
+    const at = state.flags[`rite:${rite}:at`];
+    if (at === undefined || at > state.tick || at + days <= sinceTick) continue;
+    const point = rite === 'mass' ? placeOf(state, 'chapel') : fieldsOf(state);
+    out.push({ x: point.x, y: point.y, sinceTick: at, ticks: days });
   }
   // R-1 · y los sucesos del valle (§7.10) juntan a la gente igual que una
   // decisión: una boda, la fiesta de la cosecha, el corro de una riña. Mismo

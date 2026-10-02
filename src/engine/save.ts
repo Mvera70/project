@@ -7,7 +7,7 @@ import { population } from './people/demography';
 import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import { herdCapacity } from './subsistence/herd';
-import { EXPEDITION_ENDS, HAPPENINGS, HERD_KINDS, MEANS_IDS, MISSION_IDS, SCHEMA_VERSION, TERRAIN_CODE, valleyTraits } from './state';
+import { EXPEDITION_ENDS, HAPPENINGS, HERD_KINDS, MEANS_IDS, MISSION_IDS, RITES, SCHEMA_VERSION, SMITHY_ORDERS, TERRAIN_CODE, valleyTraits } from './state';
 import { ledgerOf } from './chronicle/ledger';
 import { choosePlaza } from './world/plaza';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
@@ -151,6 +151,9 @@ function actRecord(value: unknown): boolean {
   if (act['kind'] === 'search') {
     return tickValue(act['sourceTick']) && tickValue(act['child']) && tickValue(act['searcher']);
   }
+  // K8 · un encargo de la herrería y un rito de la iglesia.
+  if (act['kind'] === 'smithy') return (SMITHY_ORDERS as readonly string[]).includes(act['order'] as string);
+  if (act['kind'] === 'rite') return (RITES as readonly string[]).includes(act['rite'] as string);
   // §7.15 · mandar gente a una misión.
   if (act['kind'] === 'expedition') {
     return (MISSION_IDS as readonly string[]).includes(act['mission'] as string) && tickValue(act['count']);

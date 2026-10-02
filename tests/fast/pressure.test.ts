@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/pressure-long.test.ts` (v5.56).
+//
 // M-1 · El mundo contesta a lo que hay. `docs/historico/rework.md` §4b, brief M-1.
 //
 // **Lo que se guarda aquí no es que el mundo mate**: es que lo que puede romper
@@ -89,39 +91,6 @@ describe('la riada va con el bosque que ya no está · M-1', () => {
     }
     fellForest(felled, 20_000);
     expect(weightNow(felled, 'river_flood')).toBeGreaterThan(before);
-  });
-});
-
-describe('un rayo no deja a la aldea sin techo · M-1', () => {
-  it('con una sola casa en pie, el rayo cae en otra cosa', () => {
-    // Es la frase del dueño del diseño hecha aserto. Se fuerza el suceso en vez
-    // de esperar la tormenta: lo que se mide es a qué se lleva, no si cae.
-    for (const seed of [7, 11, 23, 2024]) {
-      const state = foundGame(seed);
-      run(state, TIME.WEEKS_PER_YEAR * 6, 'prudent', CATALOG);
-      const roofs = () => state.buildings.filter(
-        (b) => b.lostTick === null && (b.kind === 'house' || b.kind === 'stone_house')).length;
-      if (roofs() === 0) continue;
-      // Se deja una sola casa en pie y se tira el rayo cien veces.
-      let first = true;
-      for (const b of state.buildings) {
-        if (b.lostTick !== null) continue;
-        if (b.kind === 'house' || b.kind === 'stone_house') {
-          if (first) { first = false; continue; }
-          b.lostTick = state.tick;
-        }
-      }
-      expect(roofs(), `semilla ${seed}`).toBe(1);
-      for (let n = 0; n < 100; n += 1) {
-        state.tick += 1;
-        // `happen` no es público: el rayo se provoca por el camino de siempre,
-        // con el peso a mano, y lo que se comprueba es el estado después.
-        const before = roofs();
-        run(state, 1, 'prudent', CATALOG);
-        expect(roofs(), `semilla ${seed}: nunca se queda sin techo`).toBeGreaterThan(0);
-        expect(before, 'y el techo no desaparece de golpe').toBeGreaterThan(0);
-      }
-    }
   });
 });
 

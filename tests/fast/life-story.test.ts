@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/life-story-long.test.ts` (v5.56).
+//
 // IA-6 · Historia visible: la riña de la plaza. docs/design.md §7.10,
 // docs/historico/rework.md §4 (R-2, punto 1), docs/visual-reference/README.md §2.
 //
@@ -135,39 +137,6 @@ describe('IA-6 · la riña real, en la aldea entera', () => {
     expect(quarrelToday(later)).toBeNull();
   });
 
-  it('con la riña real puesta, la aldea la escenifica sin colgarse en algún día de la semana', () => {
-    // **Medido, no supuesto**: un solo día no basta. La reunión convoca a toda
-    // la aldea (`visible: gather`), pero el aforo de cuarenta plazas reparte a
-    // la gente en un corro ancho — los dos nombrados de verdad pueden pasarse
-    // el día entero sin cruzarse a menos de `SCENE_EARSHOT`. La semana del
-    // suceso son siete jornadas (`DAYS_PER_WEEK`, el estado sigue congelado en
-    // el mismo `tick`), y cada una es una tirada independiente de la misma
-    // convocatoria. En una muestra de diez semillas la escena salió en algún
-    // día de la semana las diez veces, con una media de 1 a 3 días de 7; nunca
-    // colgada. Aquí se comprueba con cinco, para no alargar la suite rápida.
-    for (const seed of [7, 23, 41]) {
-      const { state } = withQuarrel(seed);
-      let startedAnyDay = 0;
-      let stuckAnyDay = 0;
-      // Sale en cuanto se ve una vez: no hace falta agotar los siete días para
-      // saber que la semana la muestra, y la suite rápida no puede permitirse
-      // recorrer siete jornadas completas por semilla sin necesidad
-      // (`CLAUDE.md`: menos de 30 s la suite entera).
-      for (let day = 0; day < 7 && startedAnyDay === 0; day += 1) {
-        const life = createVillage(state, day);
-        while (life.steps < STEPS_PER_DAY) life.step();
-        expect(life.stories.triggerTick, `semilla ${seed}, día ${day}`).toBe(state.tick);
-        // A lo sumo una vez al día (`quarrelStaged`): el hecho pasó una vez
-        // esta semana en el motor, no varias veces en la misma jornada.
-        expect(life.stories.started, `semilla ${seed}, día ${day}`).toBeLessThanOrEqual(1);
-        startedAnyDay += life.stories.started;
-        stuckAnyDay += life.stories.stuck;
-      }
-      expect(startedAnyDay, `semilla ${seed}: ningún día de la semana la monta`).toBeGreaterThanOrEqual(1);
-      expect(stuckAnyDay, `semilla ${seed}: colgada algún día`).toBe(0);
-    }
-  });
-
   it('si a uno de los dos ya no se le encuentra, no se inventa la escena: se cancela', () => {
     // "no inventes... espectadores globales": si el segundo nombrado ha
     // muerto, la escena no se monta con un doble ni con cualquier otro —
@@ -177,14 +146,5 @@ describe('IA-6 · la riña real, en la aldea entera', () => {
     while (life.steps < STEPS_PER_DAY) life.step();
     expect(life.stories.triggerTick).toBe(state.tick);
     expect(life.stories.started).toBe(0);
-  });
-
-  it('reconstruir la misma jornada con la misma semilla monta la misma historia', () => {
-    const { state } = withQuarrel(7);
-    const first = createVillage(state, 0);
-    while (first.steps < STEPS_PER_DAY) first.step();
-    const second = createVillage(state, 0);
-    while (second.steps < STEPS_PER_DAY) second.step();
-    expect(second.stories).toEqual(first.stories);
   });
 });

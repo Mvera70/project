@@ -33,7 +33,7 @@ import { GROUND_BIAS } from '../visual-config';
 import { elevationAt, groundBorderNormalAt, groundColourAt } from './ground';
 import { valleyShoulder } from './valley-profile';
 import { paintFacets } from './mountains';
-import { riverExtensionAt } from './river-extension';
+import { riverBend, riverExtensionAt, riverMouthCentre } from './river-extension';
 
 /**
  * Lo ancho que es la falda, en celdas, desde el borde del mapa hacia fuera.
@@ -71,6 +71,17 @@ const FAR_STRIDE = 4;
 const JITTER = 0.42;
 /** Hasta dónde, desde el borde del mapa, la sierra se queda en su rejilla (el empalme). */
 const JITTER_SEAM = 4;
+
+/**
+ * El cañón de cada garganta, en celdas a cada lado del río donde sale por el
+ * borde (2 oct 2026). TUNE visual: en `CANYON_FINE` la sierra lleva una
+ * columna por celda —el río y sus orillas son ±3 y el pie de la pared llega a
+ * ±5,5— y en `CANYON_STILL` sus vértices no se apartan a lo ancho. Cuesta
+ * unos mil triángulos en la misma llamada de dibujo: medido en las semillas 3,
+ * 7, 11, 23 y 41, de 18 268 a entre 19 180 y 19 294 (un 5 %).
+ */
+const CANYON_FINE = 7;
+const CANYON_STILL = 10;
 
 /**
  * Una textura mineral muy pequeña, creada una sola vez al montar la sierra.
@@ -155,6 +166,13 @@ export function ridgeAt(map: ValleyMap, seed: number, x: number, z: number): num
   const outX = Math.max(0, Math.max(-x, x - map.width));
   const outZ = Math.max(0, Math.max(-z, z - map.height));
   const out = Math.hypot(outX, outZ);
+  // **Y el cañón sigue al río** (2 oct 2026). Por los extremos, el perfil del
+  // valle —el borde del mapa que se prolonga y el hombro de la garganta— se
+  // mide desde donde va el río y no desde la recta por donde salía: con el
+  // suelo recto y el río curvándose hasta 2,8 celdas, el agua se comía la
+  // orilla de un lado, la senda subía por la pared del otro y, en la semilla
+  // 11, una muestra rozaba un cortado de veinte celdas.
+  const along = canyonX(map, seed, x, z);
 
   // **Y arranca desde la cota del borde del mapa, no desde cero.** Desde el mapa
   // grande el cinturón de montaña llega hasta el borde levantado seis celdas
@@ -162,7 +180,7 @@ export function ridgeAt(map: ValleyMap, seed: number, x: number, z: number): num
   // escalón de dieciocho metros justo en el borde: la roca de dentro quedaba
   // **más alta** que la sierra de fuera, y el valle se leía como una tarta. Se
   // vio en una captura al alejarse del todo.
-  const edge = elevationAt(map, clamp(x, 0, map.width), clamp(z, 0, map.height));
+  const edge = elevationAt(map, clamp(along, 0, map.width), clamp(z, 0, map.height));
   // Dentro del rectángulo jugable, la sierra **es** el suelo: así el vértice del
   // borde vale lo mismo en las dos mallas y la junta no existe. Devolver cero
   // aquí era un escalón de seis celdas —los dieciocho metros que el cinturón de
@@ -190,7 +208,18 @@ export function ridgeAt(map: ValleyMap, seed: number, x: number, z: number): num
   // En la salida del río la ribera se mantiene bajo su lámina de agua.
   const wet = exteriorWaterAt(map, seed, x, z, 2.8);
   if (wet) return edge * (1 - eased) - 0.16 * eased;
-  return edge * (1 - eased) + profile * PEAK * rough * valleyShoulder(map, x, z);
+  return edge * (1 - eased) + profile * PEAK * rough * valleyShoulder(map, along, z);
+}
+
+/**
+ * Dónde cae un punto respecto al cañón: su `x` con la curva del río quitada.
+ * Dentro del mapa, y en las faldas de los lados, es la misma `x`; por los
+ * extremos, la del río en el borde más lo lejos que está del río de aquí. La
+ * sierra mueve sus vértices al revés (`buildRidge`), así que sus columnas van
+ * por el cañón y el fondo que pisa la senda es plano también entre vértices.
+ */
+export function canyonX(map: ValleyMap, seed: number, x: number, z: number): number {
+  return x - riverBend(map, seed, z);
 }
 
 /** Ruido periodico: el primer y ultimo texel empalman al repetirse la piedra. */
@@ -282,7 +311,7 @@ const SEAM = 3;
  */
 export function buildRidge(map: ValleyMap, seed: number, palette: Palette = PALETTES.spring, snow = 0): Mesh {
   // Tres celdas a cada lado del empalme tienen paso uno; lejos, dos y seis.
-  const axis = (size: number): number[] => {
+  const axis = (size: number, fine: readonly number[] = []): number[] => {
     const values = new Set<number>([0, size, -SKIRT, size + SKIRT]);
     for (let at = -SKIRT; at <= -12; at += FAR_STRIDE) values.add(at);
     for (let at = -12; at <= -3; at += STRIDE) values.add(at);
@@ -291,9 +320,19 @@ export function buildRidge(map: ValleyMap, seed: number, palette: Palette = PALE
     for (let at = size - 3; at <= size + 3; at += 1) values.add(at);
     for (let at = size + 3; at <= size + 12; at += STRIDE) values.add(at);
     for (let at = size + 12; at <= size + SKIRT; at += FAR_STRIDE) values.add(at);
+    // Y paso uno a lo ancho del cañón de cada garganta, en celdas enteras como
+    // el suelo: el río, sus dos orillas y el pie de las paredes caben en una
+    // columna por celda, así que el fondo por donde va la senda es plano en la
+    // malla y no un plano inclinado entre la orilla y la pared.
+    for (const centre of fine) {
+      for (let at = Math.ceil(centre - CANYON_FINE); at <= Math.floor(centre + CANYON_FINE); at += 1) {
+        if (at > 0 && at < size) values.add(at);
+      }
+    }
     return [...values].sort((a, b) => a - b);
   };
-  const xs = axis(map.width), zs = axis(map.height);
+  const mouths = ([0, 1] as const).map((end) => riverMouthCentre(map, end));
+  const xs = axis(map.width, mouths.filter((centre): centre is number => centre !== null)), zs = axis(map.height);
   const cols = xs.length, rows = zs.length;
 
   const points = new Float32Array(cols * rows * 3);
@@ -312,8 +351,14 @@ export function buildRidge(map: ValleyMap, seed: number, palette: Palette = PALE
       const spanX = Math.min(xs[Math.min(cols - 1, col + 1)]! - gx || Infinity, gx - xs[Math.max(0, col - 1)]! || Infinity);
       const spanZ = Math.min(zs[Math.min(rows - 1, row + 1)]! - gz || Infinity, gz - zs[Math.max(0, row - 1)]! || Infinity);
       const loose = away > JITTER_SEAM ? Math.min(1, (away - JITTER_SEAM) / 4) : 0;
-      const x = edgeCol ? gx : gx + (hash32(seed, `ridge-jx:${col}:${row}`) / 4_294_967_296 - 0.5) * JITTER * spanX * loose;
       const z = edgeRow ? gz : gz + (hash32(seed, `ridge-jz:${col}:${row}`) / 4_294_967_296 - 0.5) * JITTER * spanZ * loose;
+      // En el cañón, los vértices siguen al río (`canyonX`) y no se apartan a lo
+      // ancho: una columna de la orilla movida media celda hacia la pared
+      // volvía a dibujar el fondo inclinado.
+      const mouth = gz < 0 ? mouths[0] : gz > map.height ? mouths[1] : null;
+      const canyon = mouth !== null && mouth !== undefined && Math.abs(gx - mouth) <= CANYON_STILL;
+      const x = (edgeCol || canyon ? gx : gx + (hash32(seed, `ridge-jx:${col}:${row}`) / 4_294_967_296 - 0.5) * JITTER * spanX * loose)
+        + riverBend(map, seed, z);
       const y = ridgeAt(map, seed, x, z);
       const pointAt = (row * cols + col) * 3;
       points[pointAt] = x;

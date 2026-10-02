@@ -1,3 +1,5 @@
+// Lo lento de este fichero vive en `tests/journeys/ui-annals-long.test.ts` (v5.56).
+//
 // F3d · El cronicón, en lo que se puede probar sin DOM.
 //
 // **El proyecto no trae `jsdom`** (`docs/ui-redesign/rounds/UI-R1.md` §4), así
@@ -14,12 +16,6 @@
 
 import { describe, expect, it } from 'vitest';
 import { renderUiText, setLocale } from '@engine/chronicle/render';
-import { ledgerFromChronicle } from '@engine/chronicle/ledger';
-import { TIME } from '@engine/balance';
-import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
-import { archiveGame } from '@engine/save';
-import { run } from '@engine/sim';
 import type { EndState } from '@engine/state';
 
 /** Las cuatro maneras de acabar, que son las cuatro lápidas del índice. */
@@ -80,29 +76,5 @@ describe('F3d · el cronicón dice lo que tiene que decir', () => {
     expect(anno).toContain('39');
     expect(figures.toLowerCase(), 'la línea de cifras vuelve a hablar de años')
       .not.toMatch(/year|año/u);
-  });
-});
-
-describe('F3d · y lee el archivo como lo lee el epitafio', () => {
-  it('una partida sin libro de cuentas se recuenta de su crónica', () => {
-    // Un valle archivado **antes** de F3a no lleva `ledger`, y el índice usa el
-    // mismo respaldo que el epitafio (`ledgerFromChronicle`). Dos maneras de
-    // leer un archivo viejo serían dos respuestas a la misma pregunta.
-    const state = foundGame(31);
-    for (let week = 0; week < 60 * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
-      run(state, 1, 'prudent', CATALOG);
-    }
-    if (state.ended === null) state.ended = { tick: state.tick, cause: 'abandoned', lastId: null };
-    const game = archiveGame(state);
-    expect(game.ledger, 'una partida archivada hoy sí lo trae').toBeDefined();
-
-    const recounted = ledgerFromChronicle(game.chronicle, game.endedTick, game.peakPeople);
-    // Lo que la crónica sabe recontar tiene que coincidir con lo que se guardó.
-    // Lo que **no** sabe —qué quedó en pie el último día— viene `null`, y una
-    // fila nula no se enseña: decir «0 casas» de un valle que tenía dieciséis
-    // sería mentir.
-    expect(recounted.years).toBe(game.ledger!.years);
-    expect(recounted.peak).toBe(game.ledger!.peak);
-    expect(recounted.built).toBe(game.ledger!.built);
   });
 });

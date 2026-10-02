@@ -1,6 +1,6 @@
 # The Valley — Registro de cambios
 
-## v5.70 · 2 oct 2026 · El 2D deja de viajar en el paquete del juego
+## v5.69 · 2 oct 2026 · El 2D deja de viajar en el paquete del juego
 
 Vera, 2 oct: «si podemos evitar que se cargue [el 2D] mejor; si no se puede
 eliminar, no pasa nada». No se elimina —lo usan los recorridos de interfaz en
@@ -25,6 +25,137 @@ escondido detrás de la placa de carga.
 - El recorrido «la ruta viva abre un valle maduro…» medía `#valley` a 360 px en
   3D, cierto sólo porque el 2D pintaba escondido: ahora comprueba lo contrario,
   que tras el relevo el 2D no ha pintado nunca.
+- **Y la tormenta deja de depender del runner** (encargo del director, tras
+  fallar a ratos en la CI de #42 con `data-bolts` a 0 tras 120 s). La ruta abre
+  a ×1, donde una jornada son unos 120 s de reloj falso, y en la semilla 7 el
+  primer rayo pendiente cae en la fase 0,595 de una jornada que el 3D empieza
+  a pintar en 0,28–0,33: unos 38 s falsos, más de mil fotogramas por CPU con
+  el paso máximo del reloj de presentación. Ahora el reloj falso se para antes
+  de cargar y, comprobada la tormenta, el valle va a ×64. Mismo listón; 3/3 en
+  serie y 4/4 con cuatro a la vez, unos 36 s cada uno (antes 2,7 min).
+
+## v5.57 · 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón, y desde ellas inclinar hacia un recurso
+
+**Medido antes, en `main`** (`docs/medidas/k8-k9-edificios-2026-10-02.md`,
+informe nuevo `tools/reports/k8-report.ts`): la capilla llega a las 33 h a ×1
+con 20 personas, la herrería a las 40 h con 22 y la iglesia de piedra a las
+65 h. Las tres llegan antes de la edad de piedra en los doce valles, así que
+ninguna llega tarde para que su tablón importe. La madera espera la obra el
+38 % de las semanas justo al llegar la herrería, la plata escasea siempre
+(2–9) y la piedra y la fe sobran (210 y ~89).
+
+**Decisiones de Vera:** encargos de temporada en la herrería, y el hacha y el
+arado salen del carro cuando hay fragua; misa y rogativa en la capilla; la misa
+no sale mal nunca, cuesta el día de trabajo; y la cara mala de los herrajes
+(la plata amontonada tienta al clan) se queda.
+
+- **El tablón de la herrería** (`world/boards.ts`, `BOARDS`): hachas (25
+  madera, 8 plata), rejas de arado (lo mismo) y herrajes para vender (60
+  madera, 24 de plata en el año). Uno cada vez, un año, con herrería encendida y
+  herrero. Las hachas y las rejas valen lo que el hacha y el arado del carro
+  (`toolInHand`), que con fragua dice «Ask at the forge» (`'smithy'`). Ningún
+  encargo quema la leña del invierno (`winterReserve`).
+- **El tablón de la capilla:**
+  - **Misa:** ánimo `10 · fe/100` por un séptimo del trabajo de esa semana, una
+    por temporada. La aldea se junta en la capilla un día.
+  - **Rogativa:** 20 de fe para que la próxima siega rinda 1,15. La aldea va
+    detrás del cura al campo.
+- **Por la puerta de los actos** (`{kind:'smithy'}`, `{kind:'rite'}`), sin
+  tirada, guardado en `state.flags`, sin subir el esquema. La crónica lo cuenta
+  como `means`.
+- **Se tocan en el mundo:**
+  - Dos tablones provisionales, como el de la plaza, a 0,72, clavados en la
+    fachada que mira a la plaza (`derive/building-boards.ts`).
+  - La misma ventana de madera (`ui/redesign/board.ts`) pinta los avisos de
+    cada uno.
+  - Capturas a 390 y 750 px en `docs/medidas/k-img/k8-*`.
+
+**K9, medido contra la trampa de v2.0** (`tools/reports/tilt-report.ts`, cada
+opción pedida siempre que se pueda, 8 semillas × 40 años):
+- **Cada opción gana en lo suyo:**
+  - rejas: la menor espera de madera;
+  - rogativa: la menor hambre y el mayor grano;
+  - herrajes: la plata;
+  - misa: el ánimo y la gente;
+  - hachas: cerrar la villa antes, en las 8 semillas, y los 8 valles la
+    cierran frente a 6 sin hachas.
+- **Los herrajes acaban 2 de 8 aldeas asaltadas**, por la plata amontonada.
+- **La misa es fuerte:** el ánimo medio pasa de 59 a 80. Nivelarla es de Vera.
+
+Encargos: las ilustraciones de las ocho líneas nuevas de crónica, las cinco
+tarjetas y los dos tablones de verdad, en `docs/encargos/ilustraciones-k8-k9.md`.
+Va ahí y no en `plan-arte-pendiente.md` mientras Codex trabaja en ese fichero.
+Lo que aún no se ve está en `docs/encargos-3d.md`.
+
+## v5.70 · 2 oct 2026 · La senda de la garganta, pegada al suelo, y los de fuera bajan por ella
+
+Vera: «el camino sigue flotando… no sé cómo llegan las visitas al valle». Y con
+la ronda a la vista: «se ve roto el puente» y «la unión con el puente es rara y
+sigo viendo baldosas de madera mal puestas».
+
+- **Medido antes**, contra las mallas tal como se dibujan y no contra sus
+  fórmulas (`tools/reports/gorge-road-report.ts`, nuevo: un rayo por vértice):
+  en ocho semillas el 75,8 % de los vértices de la cinta iba más de 0,35
+  celdas por encima de lo que se ve, el peor a 30,2 (semilla 5); en 7, 11 y 23,
+  el 61, 87 y 96 %, el peor a 22, como traía el diagnóstico. Y el extremo de
+  dentro quedaba hasta a 7,1 celdas del camino pintado.
+- **El cañón sigue al río** (`canyonX`, `ridge.ts`). Fuera del mapa el suelo
+  iba recto y el río se curvaba hasta 2,8 celdas: la senda, en seco junto al
+  agua, no cabía y subía por la pared; en la semilla 11 una muestra rozaba un
+  cortado de veinte celdas. Ahora el perfil del borde que se prolonga y el
+  hombro de la garganta se miden desde donde va el río, y **la sierra mueve
+  sus vértices con la misma curva** y lleva una columna por celda a ±7 del río
+  (`CANYON_FINE`): de 18 268 a entre 19 180 y 19 294 triángulos, un 5 %, en la
+  misma llamada de dibujo.
+- **La cinta se apoya en lo que se dibuja** (`meshSurface`, nuevo: los
+  triángulos de la malla real, por cubos de una celda). Cinco vértices por
+  sección, cada uno en el suelo de debajo, y donde una arista asoma entre
+  vértices se sube **ese** triángulo y nada más (`ROAD_SEAM`). Se van la
+  plataforma, el promedio de cotas y `ROAD_GRADE`, la rampa que sólo subía y
+  levantaba decenas de celdas de calzada. La luz se reparte por la cinta para
+  que no se lea en losas.
+- **El trazado, por la orilla**: a 0,9 del agua, en una banda por fila que no
+  pisa el agua ni sube a la roca, con las muestras a un cuarto de celda de la
+  frontera entre filas (el río de la garganta salta una celda de una fila a la
+  otra) y un suavizado que no se sale de la banda. **De la boca del camino
+  pintado hacia fuera**: si la boca del motor queda lejos de la orilla —31 de
+  80 gargantas en cuarenta semillas, porque la marisma corta la orilla para el
+  A*—, la senda la busca por donde menos sube (`turnToMouth`). Dentro de la
+  garganta se moja con la riada, como el camino pintado: fuera de la riada no
+  cabía, y por eso trepaba.
+- **El puente, de una pieza y en arco.** Las tablas eran cajas sueltas, una
+  por tramo y girada a su tramo; con la senda ya apoyada en el suelo copiaban
+  cada bache, y donde el puente doblaba se montaban en escalón. Ahora el
+  tablero es una malla que va recta de estribo a estribo, en arco con la flecha
+  justa para salvar la cascada (de 0,12 a 0,6 celdas) y las tablas se marcan
+  por el color.
+- **Los de fuera bajan por ella** (`life/visitors.ts`, `gorgeWay`, `setOff`).
+  El camino entero no cabe en una jornada —de la boca a la plaza hay de 39 a
+  71 celdas y la garganta suma otras 15 a 25—, así que cada visita sale lo más
+  lejos que le deje estar en la plaza a su hora (0,32 a 0,37, la de antes), de
+  noche si hace falta, por la garganta cuyo camino pintado es más corto. Por la
+  senda anda sin navegar —fuera del mapa no hay rejilla y la marisma corta la
+  orilla— y se va por donde vino. **El paso de los visitantes sube de 1,1 a
+  1,4** celdas por segundo (TUNE: el de la partida; los vecinos van de 1,05 a
+  1,65): con 1,1 sólo bajaba por la garganta 1 de cada 12, con 1,3 siete y con
+  1,4 nueve. Quien anda por la senda, persona o animal, la pisa: el render les
+  da su cota y, fuera del mapa, la de la sierra dibujada.
+- **Medido después**: dieciséis semillas, ningún vértice por encima de 0,35,
+  el peor a 0,25; ninguno bajo el suelo; los 32 extremos en la boca del camino
+  pintado. Visitas: en doce valles de veinte vecinos con buhonero, en la plaza
+  entre 0,30 y 0,37; bajan por la garganta hacia el alba (la boca, de 0,01 a
+  0,08) y vuelven a subirla al atardecer.
+- **Pruebas.** Nuevas, en las jornadas porque pesan seis y diez segundos (el
+  criterio de la #38): `journeys/gorge-road-ground.test.ts` (la cinta no flota
+  ni se entierra, fuera del mapa no trepa, empieza en la boca y el puente sube y
+  baja una vez; las tres primeras caen en `main`) y
+  `journeys/visitors-gorge.test.ts`. Las
+  que se mueven, cada una con su causa: el eje del cañón de `graphics-ridge` se
+  mide en el río y no en la recta; `valley-road` y `graphics-mountains` llaman
+  a la cinta con su firma nueva; el salinero de la semilla 23 y el buhonero de
+  `life-visitors` acaban la jornada yéndose por la senda, no «idos»; y **los dos
+  `it.fails` del factor de grano pasan**: llega antes (0,32–0,36), los
+  porteadores con él, y la moneda pasa entre 0,49 y 0,61.
 
 ## v5.65 · 2 oct 2026 · Dientes de sierra en la tablet: la resolución sólo baja si bajar sirve
 
@@ -57,6 +188,37 @@ Medidas y hojas antes/después a 390 y 750:
 Pruebas: la adaptativa con un modelo de aparato (CPU, GPU y a medias, y con
 ruido de ±10 % en doce semillas) y el suelo de High y Medium
 (`adaptive-scale`, `graphics-profile`).
+
+## v5.56 · 1 oct 2026 · La suite rápida vuelve a ser rápida: lo lento, a las jornadas
+
+**Medido antes, en CI** (vuelta 36930779436 del 1 oct 2026): el trabajo `fast`
+tardaba **36 min** (`npm test`, 2172 s de reloj, 5808 s de prueba sumada en
+240 ficheros) y 71 ficheros pasaban de 10 s; los tres trozos de `journeys`,
+**11, 33 y 30 min**, desequilibrados porque vitest reparte por el hash de la
+ruta y uno se llevaba `threat` entera (1994 s en un solo hilo). La regla de
+Vera —ninguna espera de más de media hora— la rompían los dos.
+
+- **A las jornadas, con el mismo cuerpo y el mismo umbral**: 31 ficheros
+  enteros y lo lento de otros 43, que se parten en `tests/journeys/<nombre>-long.test.ts`
+  (lo barato se queda en `fast`). Ninguna prueba quitada ni convertida en
+  `skip`: 2343 registros antes y después, título a título, con los 15
+  `it.fails` y los 54 `it.each`. Cada fichero mudado dice de dónde viene y
+  cuánto tardaba.
+- **Dos trampas que el informe por fichero no enseña.** Una caché compartida
+  (`grown.get(...)`) la paga la primera prueba que la pide: al mudar la lenta,
+  la siguiente pasaba a tardar lo mismo, así que salen todas las que piden esa
+  aldea. Y **la recogida**: `ui-milestones`, `fate`, `life-beasts` y
+  `demography` juegan sus partidas en el cuerpo del `describe` (189, 148, 31 y
+  10 s en local) y ese tiempo no sale en el tiempo por fichero; en las
+  jornadas, `catalogue-coverage` (487 s) y `founding` (242 s) apuntaban 0,1 s.
+- **Seis trozos repartidos por peso** (`tests/journeys/shard-weights.ts` y un
+  secuenciador en `vitest.journeys.config.ts`): el más pesado primero, al trozo
+  que menos lleva, y dentro de cada trozo el largo empieza antes. `threat` y
+  `wall-rings` se parten en dos (`threat-defence`, `wall-rings-gates-era`)
+  porque un fichero corre entero en un hilo y eran más largos que un trozo.
+
+**Después, en local** (4 hilos): `npm test` 209 ficheros, 2087 pruebas, **262 s**;
+las 78 jornadas mudadas o partidas, 298 pruebas en verde. **En CI:** `npm test` **2 min 39 s** (antes 36 min) y el trabajo `fast` entero 3 min 30 s; los seis trozos de jornadas, 18:27, 13:08, 15:22, 16:31, 17:44 y 12:39 (antes 11, 33 y 30 min); la vuelta entera, **19 min** (vuelta 36948242697)
 
 ## v5.55 · 2 oct 2026 · Las piedras de la calzada, en grupos de orilla
 
