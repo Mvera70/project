@@ -1,0 +1,572 @@
+{
+  "schemaVersion": 1,
+  "id": "tailor-board",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros Blender; Z arriba, frente -Y; glTF Y arriba, frente +Z. Una celda = 3 m.",
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": false,
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.92
+    },
+    {
+      "name": "dark",
+      "role": "timberDark",
+      "roughness": 0.92
+    },
+    {
+      "name": "paper",
+      "role": "saltWhite",
+      "roughness": 0.92
+    },
+    {
+      "name": "linen",
+      "role": "neighborLinen",
+      "roughness": 0.92
+    },
+    {
+      "name": "iron",
+      "role": "elderGrey",
+      "roughness": 0.92
+    },
+    {
+      "name": "hide",
+      "role": "soil",
+      "roughness": 0.92
+    },
+    {
+      "name": "hideLight",
+      "role": "trunk",
+      "roughness": 0.92
+    },
+    {
+      "name": "accent",
+      "role": "clothAccent",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "leg_-1",
+      "location": [
+        -0.5700000000000001,
+        0.045,
+        0.72
+      ],
+      "dimensions": [
+        0.12,
+        0.12,
+        1.44
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "leg_1",
+      "location": [
+        0.5700000000000001,
+        0.045,
+        0.72
+      ],
+      "dimensions": [
+        0.12,
+        0.12,
+        1.44
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "panel_0",
+      "location": [
+        -0.44999999999999996,
+        0,
+        1.26
+      ],
+      "dimensions": [
+        0.43499999999999994,
+        0.195,
+        1.2000000000000002
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "panel_1",
+      "location": [
+        0.0,
+        0,
+        1.26
+      ],
+      "dimensions": [
+        0.43499999999999994,
+        0.195,
+        1.2000000000000002
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "panel_2",
+      "location": [
+        0.44999999999999996,
+        0,
+        1.26
+      ],
+      "dimensions": [
+        0.43499999999999994,
+        0.195,
+        1.2000000000000002
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "rim",
+      "location": [
+        0,
+        -0.10500000000000001,
+        0.675
+      ],
+      "dimensions": [
+        1.5,
+        0.10500000000000001,
+        0.10500000000000001
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "notice",
+      "location": [
+        -0.27,
+        -0.159,
+        1.2000000000000002
+      ],
+      "dimensions": [
+        0.42000000000000004,
+        0.024,
+        0.72
+      ],
+      "material": "paper",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        -3
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "notice_pin",
+      "location": [
+        -0.27,
+        -0.183,
+        1.4664000000000001
+      ],
+      "radius": 0.026999999999999996,
+      "depth": 0.039,
+      "vertices": 6,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "small_notice",
+      "location": [
+        0.28500000000000003,
+        -0.159,
+        1.1099999999999999
+      ],
+      "dimensions": [
+        0.39,
+        0.024,
+        0.54
+      ],
+      "material": "paper",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        3
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "small_notice_pin",
+      "location": [
+        0.28500000000000003,
+        -0.183,
+        1.3098
+      ],
+      "radius": 0.026999999999999996,
+      "depth": 0.039,
+      "vertices": 6,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "flax_skein",
+      "location": [
+        -0.21000000000000002,
+        -0.189,
+        1.7999999999999998
+      ],
+      "radius": 0.10799999999999998,
+      "depth": 0.44999999999999996,
+      "vertices": 6,
+      "material": "linen",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        12,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "flax_tie",
+      "location": [
+        -0.195,
+        -0.27,
+        1.7999999999999998
+      ],
+      "dimensions": [
+        0.30000000000000004,
+        0.051000000000000004,
+        0.05399999999999999
+      ],
+      "material": "accent",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "scissor_blade_-1",
+      "location": [
+        0.1875,
+        -0.20400000000000001,
+        1.9499999999999997
+      ],
+      "radius": 0.036000000000000004,
+      "depth": 0.3423813663153997,
+      "vertices": 3,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        -28.810793742973065,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "scissor_loop_-10",
+      "location": [
+        0.16500000000000004,
+        -0.20400000000000001,
+        1.7249999999999999
+      ],
+      "radius": 0.024,
+      "depth": 0.0933380951166243,
+      "vertices": 3,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        -135.00000000000003,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "scissor_loop_-11",
+      "location": [
+        0.16500000000000004,
+        -0.20400000000000001,
+        1.6589999999999998
+      ],
+      "radius": 0.024,
+      "depth": 0.0933380951166243,
+      "vertices": 3,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        135.00000000000003,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "scissor_loop_-12",
+      "location": [
+        0.23099999999999998,
+        -0.20400000000000001,
+        1.6589999999999998
+      ],
+      "radius": 0.024,
+      "depth": 0.0933380951166243,
+      "vertices": 3,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        44.999999999999964,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "scissor_loop_-13",
+      "location": [
+        0.23099999999999998,
+        -0.20400000000000001,
+        1.7249999999999999
+      ],
+      "radius": 0.024,
+      "depth": 0.0933380951166243,
+      "vertices": 3,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        -44.999999999999964,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "scissor_blade_1",
+      "location": [
+        0.3525,
+        -0.20400000000000001,
+        1.9499999999999997
+      ],
+      "radius": 0.036000000000000004,
+      "depth": 0.3423813663153997,
+      "vertices": 3,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        28.810793742973065,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "scissor_loop_10",
+      "location": [
+        0.309,
+        -0.20400000000000001,
+        1.7249999999999999
+      ],
+      "radius": 0.024,
+      "depth": 0.0933380951166243,
+      "vertices": 3,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        -135.00000000000006,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "scissor_loop_11",
+      "location": [
+        0.309,
+        -0.20400000000000001,
+        1.6589999999999998
+      ],
+      "radius": 0.024,
+      "depth": 0.0933380951166243,
+      "vertices": 3,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        135.00000000000006,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "scissor_loop_12",
+      "location": [
+        0.37499999999999994,
+        -0.20400000000000001,
+        1.6589999999999998
+      ],
+      "radius": 0.024,
+      "depth": 0.0933380951166243,
+      "vertices": 3,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        44.999999999999964,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "scissor_loop_13",
+      "location": [
+        0.37499999999999994,
+        -0.20400000000000001,
+        1.7249999999999999
+      ],
+      "radius": 0.024,
+      "depth": 0.0933380951166243,
+      "vertices": 3,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        -44.999999999999964,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "tailor-board",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Candidato Bloque 1. Exportaci\u00f3n por build.py: color de v\u00e9rtice, material \u00fanico; m\u00e1ximo 250 tri\u00e1ngulos."
+  },
+  "referenceRender": {
+    "width": 600,
+    "height": 600,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.6
+    ],
+    "orthoScale": 2,
+    "worldRole": "sky"
+  },
+  "triangleBudget": 250
+}

@@ -1,0 +1,23 @@
+{
+  "id": "hide-rack",
+  "triangles": 384,
+  "budget": 400,
+  "meshes": [
+    "frame",
+    "hide_1",
+    "hide_2",
+    "hide_3",
+    "hide_4"
+  ],
+  "materials": 1,
+  "textures": 0,
+  "sizeGltf": [
+    0.989999920129776,
+    0.9000000357627869,
+    0.3999999761581421
+  ],
+  "origin": "base",
+  "front": "+Z",
+  "glbBytes": 35732,
+  "sha256": "150fa21996c9027fa4556256b8c9ef4a1a37990fb27e93fcd92d3c39d9ee87d2"
+}
