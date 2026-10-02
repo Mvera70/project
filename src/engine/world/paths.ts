@@ -10,15 +10,16 @@
 // out on its own — which is exactly what happens to the track to an abandoned
 // field.
 
-import { WORLD, LABOUR } from '../balance';
+import { WORLD, LABOUR, PATHING } from '../balance';
 import { isHere, workforce } from '../people/demography';
 import { seasonOf } from '../time';
 import { allocateLabour } from '../subsistence/labour';
 import { smithyWorking } from '../subsistence/building-counts';
 import { TERRAIN_CODE } from '../state';
 import type { GameState, PathEvent, Villager, VillagerId } from '../state';
-import { route } from './astar';
-import { wearValleyRoad } from './valley-road';
+import { lastSearchBounds, route, stepCost } from './astar';
+import type { SearchBounds } from './astar';
+import { valleyRoadCells, wearValleyRoad } from './valley-road';
 import { plotAccess, solidKind, walkingBlocked, walkingMap } from './spatial';
 import type { ValleyMap } from '../state';
 
@@ -40,6 +41,7 @@ interface CachedRoute {
   from: number;
   to: number;
   ground: number;
+  blocks: number;
   cells: number[];
 }
 const CACHE = new WeakMap<GameState, Map<VillagerId, CachedRoute>>();
@@ -57,7 +59,33 @@ const CACHE = new WeakMap<GameState, Map<VillagerId, CachedRoute>>();
  * personas que van del mismo sitio al mismo sitio, y sobre todo se reutiliza al
  * volver el verano, porque la ruta al campo sigue guardada.
  */
-const PAIRS = new WeakMap<GameState, Map<string, { ground: number; cells: number[] }>>();
+/**
+ * v5.71 · Una ruta guardada lleva con qué suelo se calculó (`ground`), con qué
+ * casas y obras (`blocks`), cuánto costaba (`cost`), qué parcela había en cada
+ * extremo (`ends`) y cuántas veces se había abaratado el mapa (`cheaper`).
+ * Con eso `routeBetween` sabe, sin lanzar A*, si la ruta sigue siendo la que A*
+ * daría hoy. Ver `stillCheapest`.
+ */
+interface PairRoute {
+  ground: number;
+  blocks: number;
+  cheaper: number;
+  cost: number;
+  ends: string;
+  /** Lo que miró la búsqueda que la encontró (`lastSearchBounds`). */
+  bounds: SearchBounds;
+  cells: number[];
+}
+/** Una tanda de celdas que pasaron a costar menos, con su número de orden. */
+interface Cheapening {
+  version: number;
+  /** Alguna se podía no pisar y ahora sí: puede unir lo que estaba separado. */
+  opened: boolean;
+  cells: number[];
+}
+/** Lo que se guarda de las últimas tandas; una ruta más vieja que eso se recalcula. */
+const CHEAPENINGS_KEPT = 256;
+const PAIRS = new WeakMap<GameState, Map<string, PairRoute>>();
 const WALKING = new WeakMap<GameState, { key: string; forest: number; map: ValleyMap; blocked: Uint8Array }>();
 
 /** Una obra nueva también corta una ruta: invalidar sólo por desgaste dejaba caminos bajo las casas. */
@@ -70,35 +98,167 @@ function walkingGround(state: GameState): { map: ValleyMap; blocked: Uint8Array 
   const forest = FOREST_VERSION.get(state) ?? 0;
   if (known?.key === key) {
     if (known.forest !== forest) {
-      known.map = walkingMap(state, known.blocked);
+      const map = walkingMap(state, known.blocked);
+      noteCheaper(state, known.map, map);
+      known.map = map;
       known.forest = forest;
     }
     return known;
   }
   const blocked = walkingBlocked(state);
   const next = { key, forest, blocked, map: walkingMap(state, blocked) };
+  if (known !== undefined) noteCheaper(state, known.map, next.map);
   WALKING.set(state, next);
-  invalidateRoutes(state);
+  // v5.71 · Antes esto era `invalidateRoutes`: cada obra abierta o acabada
+  // tiraba **todas** las rutas y A* volvía a correr para la aldea entera —0,24
+  // veces por semana, el ×2,3 del tick de 6fa7fda1
+  // (`docs/medidas/ci-lentitud-2026-10-02.md`). Ahora sólo sube la versión de
+  // las casas, y cada ruta decide si le afecta (`routeBetween`).
+  bump(BLOCKS, state);
   return next;
+}
+
+function bump(counter: WeakMap<GameState, number>, state: GameState): void {
+  counter.set(state, (counter.get(state) ?? 0) + 1);
+}
+
+/** Apunta las celdas que cuestan ahora menos que antes, o que antes no se pisaban. */
+function noteCheaper(state: GameState, before: ValleyMap, after: ValleyMap): void {
+  const cells: number[] = [];
+  let opened = false;
+  for (let i = 0; i < after.terrain.length; i += 1) {
+    if (before.terrain[i] === after.terrain[i]) continue;
+    const was = stepCost(before, i);
+    const now = stepCost(after, i);
+    if (now === null || (was !== null && now >= was)) continue;
+    cells.push(i);
+    if (was === null) opened = true;
+  }
+  logCheaper(state, cells, opened);
+}
+
+function logCheaper(state: GameState, cells: number[], opened: boolean): void {
+  if (cells.length === 0) return;
+  let log = CHEAPER.get(state);
+  if (log === undefined) { log = { version: 0, entries: [] }; CHEAPER.set(state, log); }
+  log.version += 1;
+  log.entries.push({ version: log.version, opened, cells });
+  if (log.entries.length > CHEAPENINGS_KEPT) log.entries.shift();
+}
+
+function cheaperVersion(state: GameState): number {
+  return CHEAPER.get(state)?.version ?? 0;
+}
+
+/**
+ * ¿Puede alguna celda abaratada desde `since` cambiar la ruta de `a` a `b`, que
+ * cuesta `cost`? No puede si queda **fuera de lo que su búsqueda miró**
+ * (`bounds`): A* no leyó su coste, así que la misma búsqueda daría la misma
+ * ruta. Y tampoco si **ni pagando `MIN_STEP` por paso** —la cota que hace
+ * admisible la heurística— una ruta por ella llega a costar `cost`.
+ *
+ * Una celda que antes no se pisaba recalcula siempre: puede unir lo que estaba
+ * separado o abrir una fachada nueva en un extremo.
+ */
+function cheaperNearby(state: GameState, since: number, a: number, b: number, cost: number,
+  bounds: SearchBounds): boolean {
+  const log = CHEAPER.get(state);
+  if (log === undefined || log.version === since) return false;
+  const oldest = log.entries[0];
+  if (oldest === undefined || oldest.version > since + 1) return true;
+  const width = state.map.width;
+  const ax = a % width, ay = Math.floor(a / width), bx = b % width, by = Math.floor(b / width);
+  for (let e = log.entries.length - 1; e >= 0; e -= 1) {
+    const entry = log.entries[e] as Cheapening;
+    if (entry.version <= since) break;
+    if (entry.opened) return true;
+    for (const c of entry.cells) {
+      const cx = c % width, cy = Math.floor(c / width);
+      if (cx < bounds.x0 || cx > bounds.x1 || cy < bounds.y0 || cy > bounds.y1) continue;
+      const steps = Math.abs(cx - ax) + Math.abs(cy - ay) + Math.abs(cx - bx) + Math.abs(cy - by);
+      if (steps * PATHING.MIN_STEP <= cost) return true;
+    }
+  }
+  return false;
+}
+
+/** Lo que cuesta andar una ruta sobre el mapa de hoy, o -1 si ya no se puede. */
+function costOf(map: ValleyMap, cells: readonly number[]): number {
+  let total = 0;
+  for (let i = 1; i < cells.length; i += 1) {
+    const step = stepCost(map, cells[i] as number);
+    if (step === null) return -1;
+    total += step;
+  }
+  return cells.length > 0 && stepCost(map, cells[0] as number) === null ? -1 : total;
+}
+
+/** La parcela que tapa una celda, o nada: decide desde qué fachadas se sale. */
+function plotUnder(state: GameState, cell: number): { kind: string; x: number; y: number; w: number; h: number } | undefined {
+  const x = cell % state.map.width, y = Math.floor(cell / state.map.width);
+  return [...state.buildings.filter(b => b.lostTick === null), ...state.works]
+    .find(b => solidKind(b.kind) && x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h);
+}
+
+function endsOf(state: GameState, blocked: Uint8Array, from: number, to: number): string {
+  const one = (cell: number): string => {
+    if (blocked[cell] === 0) return 'open';
+    const plot = plotUnder(state, cell);
+    return plot === undefined ? 'none' : `${plot.x},${plot.y},${plot.w},${plot.h}`;
+  };
+  return `${one(from)}>${one(to)}`;
+}
+
+/**
+ * v5.71 · Si una ruta guardada es todavía la que A* daría hoy, sin lanzarlo.
+ *
+ * Lo es cuando **lo que cuesta no ha cambiado** (ninguna celda suya ha quedado
+ * debajo de una casa, ha vuelto a ser bosque o ha cambiado de senda), **sus
+ * extremos salen de las mismas parcelas**, y **ninguna celda abaratada desde
+ * que se calculó** (árbol talado, senda mejorada; una casa derribada, nunca)
+ * **le queda tan cerca que una ruta por ella pudiera salir igual de barata**.
+ * Entonces las demás rutas sólo pueden haberse encarecido o seguir más caras,
+ * y A* devolvería la misma.
+ *
+ * No basta con «ninguna celda suya bloqueada», que es lo que proponía el
+ * diagnóstico: una tala de hace tres semanas que el viejo recálculo
+ * aprovechaba al abrirse una obra se perdía, y `map.traffic` salía distinto
+ * en dos de tres semillas. Con esta condición la partida sale idéntica.
+ */
+function stillCheapest(state: GameState, known: PairRoute, walking: { map: ValleyMap; blocked: Uint8Array },
+  from: number, to: number): boolean {
+  if (known.cells.length === 0) return false;
+  if (costOf(walking.map, known.cells) !== known.cost) return false;
+  if (endsOf(state, walking.blocked, from, to) !== known.ends) return false;
+  return !cheaperNearby(state, known.cheaper, known.cells[0] as number,
+    known.cells[known.cells.length - 1] as number, known.cost, known.bounds);
 }
 
 /** La ruta entre dos celdas, calculada una vez por partida y suelo. */
 function routeBetween(state: GameState, from: number, to: number, ground: number): number[] {
   let pairs = PAIRS.get(state);
   if (pairs === undefined) {
-    pairs = new Map<string, { ground: number; cells: number[] }>();
+    pairs = new Map<string, PairRoute>();
     PAIRS.set(state, pairs);
   }
   const key = `${from}>${to}`;
   const known = pairs.get(key);
-  if (known !== undefined && known.ground === ground) return known.cells;
-
   const walking = WALKING.get(state) ?? walkingGround(state);
+  const blocks = BLOCKS.get(state) ?? 0;
+  if (known !== undefined) {
+    if (known.ground === ground && known.blocks === blocks) return known.cells;
+    if (stillCheapest(state, known, walking, from, to)) {
+      known.ground = ground;
+      known.blocks = blocks;
+      known.cheaper = cheaperVersion(state);
+      return known.cells;
+    }
+  }
+
+  bump(SEARCHES, state);
   const endpoints = (cell: number): number[] => {
     if (walking.blocked[cell] === 0) return [cell];
-    const x = cell % state.map.width, y = Math.floor(cell / state.map.width);
-    const plot = [...state.buildings.filter(b => b.lostTick === null), ...state.works]
-      .find(b => solidKind(b.kind) && x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h);
+    const plot = plotUnder(state, cell);
     return plot === undefined ? [] : plotAccess(state.map, walking.blocked, plot);
   };
   const pairsToTry = endpoints(from).flatMap(a => endpoints(to).map(b => ({ a, b,
@@ -106,17 +266,59 @@ function routeBetween(state: GameState, from: number, to: number, ground: number
       + Math.abs(Math.floor(a / state.map.width) - Math.floor(b / state.map.width)),
   }))).sort((a, b) => a.distance - b.distance || a.a - b.a || a.b - b.b);
   let cells: number[] = [];
+  let bounds = lastSearchBounds();
   for (const pair of pairsToTry) {
     cells = route(walking.map, pair.a, pair.b);
+    bounds = lastSearchBounds();
     if (cells.length > 0) break;
   }
   // Un tope generoso: una aldea grande no llega a mil pares distintos, y sin
   // él una partida de dos siglos acumularía memoria sin necesidad.
   if (pairs.size > 4000) pairs.clear();
-  pairs.set(key, { ground, cells });
+  pairs.set(key, {
+    ground, blocks, cheaper: cheaperVersion(state), cost: costOf(walking.map, cells),
+    ends: endsOf(state, walking.blocked, from, to), bounds, cells,
+  });
   return cells;
 }
+/** Sube cuando cambia lo que cuesta un camino: una senda mejorada o borrada. */
 const GROUND = new WeakMap<GameState, number>();
+/** v5.71 · Sube cuando se mueve una casa, una obra o la plaza. */
+const BLOCKS = new WeakMap<GameState, number>();
+/** v5.71 · Las celdas que han pasado a costar menos: lo único que puede mover una ruta. */
+const CHEAPER = new WeakMap<GameState, { version: number; entries: Cheapening[] }>();
+/** v5.71 · Búsquedas A* de rutas de trabajo: la medida del coste, y su prueba. */
+const SEARCHES = new WeakMap<GameState, number>();
+const ROAD = new WeakMap<GameState, { key: string; cells: readonly number[][] }>();
+
+/**
+ * La versión del suelo tal como la veían las cachés de destinos antes de
+ * v5.71, cuando una obra subía `GROUND`. Las claves de `nearestCached` y de
+ * `destinations` siguen sumándola igual, para que den las mismas listas y
+ * choquen igual que antes: cambiarlas movería la partida.
+ */
+function legacyGround(state: GameState): number {
+  return (GROUND.get(state) ?? 0) + (BLOCKS.get(state) ?? 0);
+}
+
+/** Cuántas rutas de trabajo se han buscado con A* en esta partida. Medida, no estado. */
+export function routeSearches(state: GameState): number {
+  return SEARCHES.get(state) ?? 0;
+}
+
+/**
+ * v5.71 · El camino del valle, calculado una vez por suelo. `valleyRoadCells`
+ * lanza un A* por boca de punta a punta del mapa **cada semana**, y sólo
+ * depende del terreno (bosque), de las sendas (`GROUND`) y de la plaza.
+ */
+function valleyRoad(state: GameState): readonly number[][] {
+  const key = `${GROUND.get(state) ?? 0}/${FOREST_VERSION.get(state) ?? 0}/${state.plaza.x},${state.plaza.y}`;
+  const known = ROAD.get(state);
+  if (known?.key === key) return known.cells;
+  const cells = valleyRoadCells(state.map, state.terrainSeed, state.plaza);
+  ROAD.set(state, { key, cells });
+  return cells;
+}
 const TREES = new WeakMap<GameState, { version: number; cells: number[] }>();
 const BANKS = new WeakMap<GameState, { version: number; cells: number[] }>();
 const WHERE = new WeakMap<GameState, {
@@ -141,9 +343,11 @@ function activeTraffic(state: GameState): Set<number> {
 }
 
 /**
- * Say that what the ground costs has changed: a path upgraded, a building went
- * up or came down. Every route is recomputed after this; a changed destination
- * does not need it, because the destination is part of the key.
+ * Say that what the ground costs has changed: a path upgraded or wiped. Before
+ * v5.71 every route was recomputed after this; now each one is checked against
+ * what got cheaper (`stillCheapest`). A changed destination does not need it,
+ * because the destination is part of the key. A building going up or coming
+ * down is `BLOCKS`, not this.
  */
 function invalidateRoutes(state: GameState): void {
   GROUND.set(state, (GROUND.get(state) ?? 0) + 1);
@@ -185,7 +389,7 @@ function treesOf(state: GameState): number[] {
  * así que pescan desde la orilla, que es la misma solución que ya usa el vado.
  */
 function banksOf(state: GameState): number[] {
-  const version = GROUND.get(state) ?? 0;
+  const version = legacyGround(state);
   const known = BANKS.get(state);
   if (known !== undefined && known.version === version) return known.cells;
 
@@ -334,7 +538,7 @@ function destinations(
   // aldea entera al bosque.
   const heart = centreOfVillage(state, homes);
   const forestVersion = FOREST_VERSION.get(state) ?? 0;
-  const groundVersion = GROUND.get(state) ?? 0;
+  const groundVersion = legacyGround(state);
   const wood = nearestCached(
     state, openTargets(state, treesOf(state)), heart, LABOUR.WOOD_CHOICES, forestVersion + groundVersion, 'wood',
   );
@@ -370,7 +574,7 @@ function destinations(
   mix(wardens * 1000 + hunters);
   mix(fishers * 1000 + (winter ? 1 : 0));
   mix(FOREST_VERSION.get(state) ?? 0);
-  mix(GROUND.get(state) ?? 0);
+  mix(legacyGround(state));
   for (const cell of fields) mix(cell);
   for (const cell of sites) mix(cell);
   const known = WHERE.get(state);
@@ -447,6 +651,7 @@ function destinations(
 export function routesFor(state: GameState): Map<VillagerId, number[]> {
   walkingGround(state);
   const ground = GROUND.get(state) ?? 0;
+  const blocks = BLOCKS.get(state) ?? 0;
   let cache = CACHE.get(state);
   if (cache === undefined) {
     cache = new Map<VillagerId, CachedRoute>();
@@ -462,12 +667,13 @@ export function routesFor(state: GameState): Map<VillagerId, number[]> {
   const targets = destinations(state, homes);
   for (const [id, { from, to }] of targets) {
     const known = cache.get(id);
-    if (known !== undefined && known.from === from && known.to === to && known.ground === ground) {
+    if (known !== undefined && known.from === from && known.to === to && known.ground === ground
+      && known.blocks === blocks) {
       if (known.cells.length > 0) out.set(id, known.cells);
       continue;
     }
     const cells = routeBetween(state, from, to, ground);
-    cache.set(id, { from, to, ground, cells });
+    cache.set(id, { from, to, ground, blocks, cells });
     if (cells.length > 0) out.set(id, cells);
   }
 
@@ -507,7 +713,7 @@ export function accrueTraffic(state: GameState): void {
     }
   }
   // Y los de fuera, por el camino del valle (`valley-road.ts`).
-  for (const cell of wearValleyRoad(state)) active.add(cell);
+  for (const cell of wearValleyRoad(state, valleyRoad(state))) active.add(cell);
 }
 
 /**
@@ -545,7 +751,9 @@ export function upgradePaths(state: GameState): PathEvent[] {
     }
     if (wear === 0 && want === 0) active.delete(i);
   }
-  // A changed path changes what A* costs, so every route is stale.
+  // A changed path changes what A* costs. v5.71: only a path made better can
+  // move a route that does not cross it, and `routeBetween` checks which.
+  logCheaper(state, events.filter(e => e.to > e.from).map(e => e.cell), false);
   if (events.length > 0) invalidateRoutes(state);
   return events;
 }
