@@ -204,7 +204,10 @@ Ninguno da recursos: son las bases, y lo que un día den va por
 - **Pruebas** nuevas: `belt-uses.test.ts` (el bosque por el camino del juego, y
   cada árbol en suelo de andar es un tronco para la vida) y `life-falda.test.ts`
   (el rebaño en la falda); el cantero de `life-resources.test.ts` pasa a
-  mirarse al pie de la montaña en tres valles.
+  mirarse al pie de la montaña en tres valles. Y la de los porteadores de leña
+  (`life-wood-run`) se cuenta en doce aldeas y tres jornadas: con cuatro y dos
+  se debían 14 haces y una jornada movía un 7 % (11 de 14 en `main`, 10 de 14
+  con la cantera); en la muestra grande, 42 de 51 contra 43 de 51.
 
 ## v5.73 · 2 oct 2026 · El valle con forma natural
 
