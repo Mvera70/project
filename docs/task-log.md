@@ -30,7 +30,16 @@ portón da a la montaña. Es la regla del portón (`placeBuilding` no mira adón
 da) y va en su propia ronda, porque mueve todas las trayectorias. (4) Cerca de
 la plaza queda la mitad de sitio para campos (unos 245 → 144 sitios de 3×2):
 avisado K5, por el lino.
-**Siguiente:** v5.74, los usos del cinturón.
+**Pausa por crédito (2 oct, 14:25 de Madrid).** Lo que queda de #48: las
+jornadas de defensa (asalto, arco, obras, E3b), que estaba diagnosticando un
+agente parado a medias; lo que hiciera vive en su árbol de trabajo
+(`.claude/worktrees/agent-a489572e6a39341a5`) y en el informe que no llegó a
+entregar. **v5.74, los usos del cinturón, está hecha y sin subir**: el commit
+`9bf57322`, sobre `5575f1f5`, guardado en un `git bundle` y un `format-patch` en
+el scratchpad de la sesión (código, pruebas y papel: bosque de ladera, pasto de
+la falda, cantera al pie de la montaña y la senda a 0,02). Entra como PR propia
+cuando #48 esté en `main`.
+**Siguiente:** las jornadas de defensa de #48; después, v5.74.
 
 ## 2 oct 2026 · El peto en el asalto (v5.80, carril de combate)
 
