@@ -3136,7 +3136,7 @@ export const UI_BANK: Record<string, string> = {
   'epitaph.why.raids': 'The clan came down {count} times from year {year}, and carried off {silver} silver and {grain} grain.',
   'epitaph.why.raids.one': 'The clan came down in year {year}, and carried off {silver} silver and {grain} grain.',
   'epitaph.why.decision': 'And in year {year}, the chronicle wrote:',
-  'epitaph.why.end.stormed': 'The last time, {band} came over the wall against the {left} who were left.',
+  'epitaph.why.end.stormed': 'The last time, {band} came down against the {left} who were left.',
   'epitaph.why.end.abandoned': 'The {left} who were left could not hold the valley, and walked out.',
   'epitaph.why.end.abandoned.one': 'The last one could not hold the valley alone, and walked out.',
   'epitaph.why.end.extinction': 'Then there was no one.',
