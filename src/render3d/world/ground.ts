@@ -443,6 +443,49 @@ function risesOf(map: ValleyMap): Float32Array {
  */
 const RUT: readonly number[] = [0, -0.02, -0.035, -0.05];
 
+/** A partir de qué altura una celda de montaña lleva piel facetada (`mountains.ts`): el pie se deja al suelo, que lo funde con el prado. */
+const SKIN_FROM = 0.35;
+/**
+ * Cuánto se hunde el suelo bajo la piel, en celdas.
+ *
+ * La piel va un pelo por encima del suelo (0,012), pero los dos cortan la
+ * celda por diagonales distintas y el suelo además mueve sus esquinas
+ * (`wobbleAt`): en una ladera eso son décimas de celda, y el suelo asomaba a
+ * trozos por la piel. Desde arriba se leía como manchas dentadas y verde
+ * colándose entre la roca (Vera, 2 oct 2026: «no se mezclan lo suficiente los
+ * colores; desde arriba es muy feo»). Bajo la piel el suelo no se ve, así que
+ * se hunde donde ella lo tapa entero: un margen fijo más el mayor desnivel con
+ * las esquinas vecinas, porque una esquina movida cae, como mucho, una celda
+ * más allá, y en las paredes de la garganta eso son varias celdas de altura
+ * (con medio metro fijo asomaba allí, semilla 7). TUNE: el margen.
+ */
+const SKIN_SINK = 0.1;
+
+/** Cuánto se hunde una esquina bajo la piel: nada fuera de ella. */
+function skinSink(map: ValleyMap, x: number, z: number): number {
+  if (!underSkin(map, x, z)) return 0;
+  const here = heightAt(map, x, z);
+  let drop = 0;
+  for (let dz = -1; dz <= 1; dz += 1) {
+    for (let dx = -1; dx <= 1; dx += 1) drop = Math.max(drop, here - heightAt(map, x + dx, z + dz));
+  }
+  return SKIN_SINK + drop;
+}
+
+/** Si la celda de montaña lleva piel: es montaña y alguna esquina pasa de `SKIN_FROM`. */
+export function skinnedCell(map: ValleyMap, x: number, z: number): boolean {
+  if (x < 0 || z < 0 || x >= map.width || z >= map.height) return false;
+  if (map.terrain[z * map.width + x] !== TERRAIN_CODE.mountain) return false;
+  return Math.max(heightAt(map, x, z), heightAt(map, x + 1, z), heightAt(map, x, z + 1), heightAt(map, x + 1, z + 1)) >= SKIN_FROM;
+}
+
+/** Si la esquina sólo toca celdas con piel: ahí el suelo se hunde. El borde del mapa no. */
+export function underSkin(map: ValleyMap, x: number, z: number): boolean {
+  if (x <= 0 || z <= 0 || x >= map.width || z >= map.height) return false;
+  return skinnedCell(map, x - 1, z - 1) && skinnedCell(map, x, z - 1)
+    && skinnedCell(map, x - 1, z) && skinnedCell(map, x, z);
+}
+
 /** La cota de una **esquina** de celda, promediando las celdas que la tocan. */
 function heightAt(map: ValleyMap, x: number, z: number): number {
   const rises = risesOf(map);
@@ -856,7 +899,7 @@ export function buildGround(
       const at = (z * columns + x) * 3;
       const moved = wobbleAt(map, x, z);
       positions[at] = moved.x;
-      positions[at + 1] = GROUND_BIAS + heightAt(map, x, z);
+      positions[at + 1] = GROUND_BIAS + heightAt(map, x, z) - skinSink(map, x, z);
       positions[at + 2] = moved.z;
       cornerColour(map, x, z, palette, tint, plaza, era, road);
       if (meadow !== undefined) {

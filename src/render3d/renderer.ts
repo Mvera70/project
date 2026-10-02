@@ -50,7 +50,7 @@ import {
 } from './world/contact-shade';
 import { aaTrialOf, createScreenAa, type ScreenAa } from './effects/screen-aa';
 import { adaptScale, adaptWindow } from './adaptive-scale';
-import { buildRoadStones, buildSignposts, valleyRoad } from './world/road';
+import { buildRoadStones, buildSignposts, townCells, valleyRoad } from './world/road';
 import { createTrampleMap, setTramplers, snowTracks, SNOW_FROM, type TrampleMap, type Trampler } from './effects/trample';
 import { cloudsFor, stepClouds } from './effects/clouds';
 import { createAmbience, type Ambience } from './effects/ambience';
@@ -1253,9 +1253,11 @@ export async function createGraphicsRenderer(
       snowing < 0.5 ? (x, z) => meadowWeight(terrainSeed, x, z) : undefined, road.wear);
     if (signposts !== null) world.remove(signposts);
     signposts = buildSignposts(road.signposts, (x, z) => elevationAt(state.map, x, z));
-    // Y en la villa, piedras sueltas por la calzada, con la forma de un peñasco de Astra.
-    const roadStones = buildRoadStones(road, state.map, terrainSeed, rockGeometry(library.get('crag-2')?.original) ?? null,
-      (x, z) => elevationAt(state.map, x, z), palette.stone);
+    // Y en la villa, piedras por la calzada, en grupos de canto rodado.
+    // Fuera del pueblo: entre las casas y en la plaza la calle está barrida
+    // (Vera, 2 oct 2026: «hay también que quitarlas del pueblo»).
+    const roadStones = buildRoadStones(road, state.map, terrainSeed,
+      (x, z) => elevationAt(state.map, x, z), palette.stone, townCells(state, plazaOf(state)));
     if (roadStones !== null) signposts.add(roadStones);
     world.add(signposts);
     if (trample === null) trample = createTrampleMap(state.map.width, state.map.height);

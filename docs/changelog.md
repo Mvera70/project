@@ -1,5 +1,68 @@
 # The Valley — Registro de cambios
 
+## v5.55 · 2 oct 2026 · Las piedras de la calzada, en grupos de orilla
+
+Vera, sobre los cantos de v5.54: «haz grupos más realistas, típicas del río,
+algunas más grandes, otras más pequeñas; cuidado con el rendimiento». Fuera el
+peñasco de Astra, que es anguloso: un canto rodado propio (icosaedro de 80
+caras, vértices movidos un poco), aplastado por piedra. En una celda de cada
+tres, un canto grande (0,2–0,38 de celda), una mediana arrimada y de dos a
+cinco pequeñas **amontonadas hacia un lado**, casi tocándose (en anillo
+alrededor del grande salía una flor); en otras, un guijarro suelto. Cada
+piedra con su tono (`setColorAt`). Sigue siendo una malla instanciada, una
+llamada de dibujo, y la prueba pone el techo de triángulos en 40 000.
+Captura: `docs/medidas/k-img/piedras-grupos.png`.
+
+**El zorro vuelve andando al bosque al amanecer** (Vera: «por la noche se
+acerca a la aldea, correcto; pero luego desaparece al amanecer, no se ve irse
+al bosque»). `stepFox` lo llevaba a la madriguera de un salto en cuanto dejaba
+de ser de noche. Ahora, si el amanecer lo pilla fuera, vuelve andando a su
+linde y desaparece al entrar; de día no sale nunca. Hay un tope de seguridad
+por si la ruta se pierde: el doble de lo que tardaría en línea recta. Con un
+tope fijo de 600 pasos (12 celdas), la semilla 23 se quedaba a medio camino.
+
+Y las dos tomas que K1–K3 dejó pendientes en `encargos-3d.md`: los plantones
+(`k2-plantones.png`, se leen como bosque joven) y el frente de tala lejano
+(`k3-tala-lejos.png`, sin haz al hombro: sigue en encargo).
+
+## v5.54 · 2 oct 2026 · Lo que Vera vio en la tablet: laderas, piedras, crónica y encrucijada
+
+Cuatro cosas que Vera marcó jugando la versión publicada, en la tablet.
+
+- **Las laderas desde arriba** («no se mezclan los colores; desde arriba es
+  muy feo»). La causa era el dibujo y no el color: la piel facetada de la
+  montaña iba 0,012 de celda por encima del suelo, y los dos cortan la celda
+  por diagonales distintas, además de que el suelo mueve sus esquinas. En la
+  ladera el suelo asomaba a trozos: manchas dentadas y verde colándose entre
+  la roca. Ahora el suelo se hunde bajo la piel donde ella lo tapa entera, más
+  hondo cuanto más empinado (`skinSink`, `ground.ts`). La prueba nueva la
+  pidió en las paredes de la garganta, donde medio metro fijo no bastaba.
+  Antes y después de cerca: `docs/medidas/k-img/laderas-{antes,despues}.png`.
+- **Las piedras de la calzada** («muy para arriba, puntiagudas»). Usaban el
+  peñasco de Astra, que está hecho para ir de pie, escalado igual en los tres
+  ejes. Ahora son cantos: el ancho sale de la planta del modelo, el alto es de
+  0,38 a 0,55 de ese ancho, y van medio hundidos. **Y fuera del pueblo** («hay
+  también que quitarlas del pueblo»): ninguna a tres celdas o menos de algo
+  construido, ni en la plaza con ese margen (`townCells`, `road.ts`).
+- **La crónica cortaba caras** («darle más altura»). El hueco de la viñeta
+  era una franja de 130 px y los grabados son 5:4. Ahora es 2:1, hasta 260 px,
+  con el recorte al 28 % de alto en vez de al centro. El óvalo de respaldo
+  sigue como estaba.
+
+- **La encrucijada, como la hoja del carro** («similar a estas», viendo las
+  dos en la tablet). Era papel de documento a todo el ancho con el canto
+  rasgado de Codex estirado encima, que en la tablet se leía como un recuadro
+  vacío sobre el título; y el texto se iba al canto izquierdo porque el atajo
+  `margin: 12px 0 18px` de `wood.css` pisaba el `margin-inline: auto` de la
+  columna de 390. Ahora lleva el pergamino de loseta de las hojas de la
+  carcasa, sus esquinas de 14 px, su sombra y su tirador (deslizar la cabecera
+  aparca la decisión, §11.2), y título, texto y opciones van en la misma
+  columna. Capturado a 390, 750 y 1024 px.
+
+Pruebas nuevas: «el suelo no asoma por la piel de la montaña»
+(`graphics-mountains`) y «las piedras de la calzada son cantos bajos y no hay
+ninguna en el pueblo» (`valley-road`).
+
 ## v5.53 · 1 oct 2026 · K1–K3: el bosque se gasta, se reproduce y la madera pesa
 
 **Medido antes, en `main`** (`docs/medidas/k1-k3-madera-2026-10-01.md`, informe

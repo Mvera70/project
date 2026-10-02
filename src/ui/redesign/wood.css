@@ -1259,35 +1259,45 @@ html:has(.valley-board-veil) .valley-compass { visibility: hidden; }
    (`strip-status.png`, nueve partes; la versión final de Codex), el verbo
    arriba y el precio debajo, en Garamond como todo lo que se lee. Sin sello: el título ya dice que es una
    decisión, y el lacre queda para el riesgo. */
+:root .crossroad-head .skin-seal { display: none; }
+/* **La hoja del carro, no un documento a sangre** (Vera, 2 oct 2026, viendo la
+   decisión en la tablet al lado del carro: «similar a estas»). El mismo
+   pergamino de loseta que las cuatro hojas de la carcasa, sus esquinas de
+   14 px, su sombra y su tirador. Antes era papel de documento a todo el ancho
+   con el canto rasgado de Codex encima, y en la tablet se leía como otra
+   pantalla: el canto, estirado, era un recuadro vacío sobre el título. El
+   tirador no engaña: deslizar la cabecera hacia abajo aparca la decisión
+   (§11.2, `crossroad.ts`). */
+/* Y con su ancho: a 600 px como mucho, centrada, con valle a los lados en la
+   tablet (Vera, 2 oct 2026: «descentrado y sin margen» a todo el ancho;
+   «600 o así creo que valdrán»). La franja de arriba va con ella. */
+:root .crossroad,
+:root .crossroad-fade { width: min(100%, 600px); }
 :root .crossroad {
-  border-radius: 0;
-  background-color: #efe0c0;
-  background-image: var(--paper-document);
+  padding-top: 34px;
+  border-radius: 14px 14px 0 0;
+  background-color: #f1e4c8;
+  background-image: var(--parchment-sheet);
   background-size: 512px 512px;
   background-repeat: repeat;
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, .35);
 }
-:root .crossroad-head .skin-seal { display: none; }
-/* El canto rasgado de arriba, como en la maqueta de Codex: una tira de 24 px
-   sobre el papel, con la rotura contra el propio documento. Lo dejó abierto su
-   auditoría del 29 sep («falta el canto rasgado superior ya existente»). Es
-   parte del documento y se desplaza con él, que es lo que hace un canto. */
-:root .crossroad { padding-top: 34px; }
 :root .crossroad::before {
   content: '';
   display: block;
   position: absolute;
   z-index: 4;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 24px;
-  border-style: solid;
-  border-color: transparent;
-  border-width: 8px 16px;
-  border-image: var(--parchment-sheet-edge) 16 32 fill stretch;
-  border-image-width: 8px 16px;
-  border-radius: 0;
-  background: none;
+  top: 10px;
+  left: 50%;
+  right: auto;
+  width: 46px;
+  height: 5px;
+  transform: translateX(-50%);
+  border: 0;
+  border-image: none;
+  border-radius: 999px;
+  background: var(--wood-plank-deep);
+  opacity: .55;
   box-shadow: none;
   pointer-events: none;
 }
@@ -1296,7 +1306,11 @@ html:has(.valley-board-veil) .valley-compass { visibility: hidden; }
   font: 700 22px/1.2 var(--skin-font-display);
   letter-spacing: .02em;
 }
-:root .crossroad p.crossroad-body { margin: 12px 0 18px; font: 400 18px/1.4 var(--skin-font-story); color: #34302B; }
+/* Sólo el margen de arriba y abajo: el atajo `margin: 12px 0 18px` pisaba el
+   `margin-inline: auto` de la columna de 390 (`skin.css`), y en la tablet el
+   texto se iba al canto izquierdo mientras el título y las opciones seguían en
+   la columna (Vera, 2 oct 2026, sobre la captura a 800 px). */
+:root .crossroad p.crossroad-body { margin-block: 12px 18px; font: 400 18px/1.4 var(--skin-font-story); color: #34302B; }
 :root .crossroad-options { gap: 12px; }
 :root .crossroad-options button {
   flex-direction: column;
