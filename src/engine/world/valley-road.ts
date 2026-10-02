@@ -151,9 +151,13 @@ export function valleyRoadCells(map: ValleyMap, seed: number, plaza: { readonly 
  * Paso 14 · los de fuera pisan el camino esta semana. Va con el desgaste de la
  * aldea: el mismo decaimiento y los mismos umbrales lo asientan.
  */
-export function wearValleyRoad(state: GameState): Set<number> {
+export function wearValleyRoad(
+  state: GameState,
+  // v5.71 · `paths.ts` las guarda por suelo: calcularlas eran dos A* por semana.
+  road: readonly number[][] = valleyRoadCells(state.map, state.terrainSeed, state.plaza),
+): Set<number> {
   const worn = new Set<number>();
-  for (const cells of valleyRoadCells(state.map, state.terrainSeed, state.plaza)) {
+  for (const cells of road) {
     for (const cell of cells) {
       const t = state.map.traffic[cell] as number;
       state.map.traffic[cell] = Math.min(65535, t + WORLD.ROAD_TRAFFIC);
