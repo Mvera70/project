@@ -23,7 +23,8 @@ import {
   InstancedMesh, Matrix4, Quaternion, Vector3, Group,
   type Object3D,
 } from 'three';
-import { TERRAIN_CODE, type Building, type ValleyMap, type VillageStats } from '@engine/state';
+import { TERRAIN_CODE, type Building, type GameState, type ValleyMap } from '@engine/state';
+import { seasonOf } from '@engine/time';
 import { terrainOf } from '../life/terrain';
 import { homeRoutine } from '../life/home';
 import { hash32 } from '@engine/rng';
@@ -32,8 +33,17 @@ import { PLAZA } from '@engine/balance';
 import { plazaCentre } from '@engine/world/plaza';
 
 /** Qué se deja por el valle, y contra qué se apoya. */
-export const STEADING_ASSETS = ['haystack', 'log-pile', 'handcart', 'shed'] as const;
+export const STEADING_ASSETS = [
+  'haystack', 'log-pile', 'handcart', 'shed',
+  'barrel', 'crate', 'sack-pile', 'tool-rack', 'washing-line', 'flower-pot', 'herb-bed',
+  'beehive', 'scarecrow', 'trough', 'chicken-coop', 'wood-chopping', 'stump', 'fallen-log',
+  'bush', 'wildflowers', 'mushrooms', 'stone-wall', 'wayside-shrine', 'lantern-post', 'market-awning',
+] as const;
 export type SteadingAsset = (typeof STEADING_ASSETS)[number];
+const SMALL_SCENIC = new Set<SteadingAsset>([
+  'barrel', 'crate', 'sack-pile', 'flower-pot', 'herb-bed', 'beehive', 'stump',
+  'bush', 'wildflowers', 'mushrooms',
+]);
 
 /**
  * Cuántos se ponen de cada cosa, como mucho.
@@ -49,6 +59,11 @@ export const MOST_STEADED: Readonly<Record<SteadingAsset, number>> = {
   'log-pile': 6,
   handcart: 2,
   shed: 2,
+  barrel: 3, crate: 3, 'sack-pile': 3, 'tool-rack': 2, 'washing-line': 2,
+  'flower-pot': 4, 'herb-bed': 2, beehive: 3, scarecrow: 2, trough: 2,
+  'chicken-coop': 2, 'wood-chopping': 2, stump: 5, 'fallen-log': 3,
+  bush: 6, wildflowers: 6, mushrooms: 4, 'stone-wall': 3,
+  'wayside-shrine': 2, 'lantern-post': 2, 'market-awning': 1,
 };
 
 /**
@@ -68,6 +83,13 @@ export interface Steaded {
   readonly cell: number;
   /** Radianes sobre la vertical. Sale del `cell`, así que no cambia nunca. */
   readonly facing: number;
+}
+
+/** La misma escala en el dibujo y en la huella de navegación. */
+export function steadingScale(place: Steaded): number {
+  return SMALL_SCENIC.has(place.asset)
+    ? [0.8, 1, 1.2][hash32(place.cell, `scenic:size:${place.asset}`) % 3]!
+    : 1;
 }
 
 interface Field { readonly x: number; readonly y: number; readonly w: number; readonly h: number }
@@ -96,16 +118,7 @@ function ringOf(map: ValleyMap, box: Field): number[] {
  * Puro y determinista: mismo estado, mismos sitios. El orden sale de `cell`, no
  * de una tirada, así que dos pintadas seguidas no mueven nada.
  */
-export function steadingOf(
-  state: {
-    buildings: readonly Building[];
-    map: ValleyMap;
-    village: Pick<VillageStats, 'grain' | 'wood'>;
-    tick: number;
-    plaza: { x: number; y: number };
-  },
-  seed: number,
-): Steaded[] {
+export function steadingOf(state: GameState, seed: number): Steaded[] {
   const { map } = state;
   const square = plazaCentre(state.plaza);
   const taken = new Set<number>();
@@ -233,6 +246,66 @@ export function steadingOf(
   );
   place('handcart', [...road, ...stores.flatMap((one) => ringOf(map, one))]);
 
+  // Tanda v5.90: variedad discreta, siempre relacionada con algo del estado.
+  // Los límites son por tipo; una malla instanciada por tipo mantiene acotadas
+  // las llamadas aunque una villa tenga decenas de casas.
+  const around = (...kinds: Building['kind'][]): number[] => state.buildings
+    .filter(one => one.lostTick === null && kinds.includes(one.kind))
+    .flatMap(one => ringOf(map, one));
+  const tradeYards = around('granary', 'mill', 'smithy');
+  const homes = around('house', 'stone_house');
+  const farms = fields.flatMap(one => ringOf(map, one));
+  place('barrel', tradeYards);
+  place('crate', tradeYards);
+  place('sack-pile', tradeYards);
+  place('tool-rack', around('smithy', 'house', 'stone_house'));
+  if (seasonOf(state.tick) !== 'winter') place('washing-line', homes);
+  place('flower-pot', homes);
+  place('herb-bed', homes);
+  place('beehive', farms);
+  if (seasonOf(state.tick) === 'summer') place('scarecrow', farms);
+  place('trough', around('well'));
+  if (state.herd.hens > 0) place('chicken-coop', homes);
+  place('wood-chopping', yard);
+
+  // La linde aporta objetos de naturaleza; sólo se prueba una muestra estable
+  // de celdas para no recorrer todas las casas por cada prado del mapa.
+  const fringe: number[] = [];
+  for (let cell = 0; cell < map.terrain.length; cell += 1) {
+    if (map.terrain[cell] !== TERRAIN_CODE.meadow && map.terrain[cell] !== TERRAIN_CODE.cleared) continue;
+    const x = cell % map.width, z = Math.floor(cell / map.width);
+    if (x === 0 || z === 0 || x === map.width - 1 || z === map.height - 1) continue;
+    if ([cell - 1, cell + 1, cell - map.width, cell + map.width]
+      .some(next => map.terrain[next] === TERRAIN_CODE.forest)
+      && hash32(seed, `scenic:fringe:${cell}`) % 5 === 0) fringe.push(cell);
+  }
+  place('stump', fringe);
+  place('fallen-log', fringe);
+  place('bush', fringe);
+  place('wildflowers', fringe);
+  if (seasonOf(state.tick) === 'autumn') place('mushrooms', fringe);
+  if (state.buildings.some(one => one.kind === 'smithy')) place('stone-wall', farms);
+  const shrineCandidates = [...map.path.entries()]
+    .filter(([cell, wear]) => wear >= 2 && (Math.floor(cell / map.width) < map.height / 3
+      || Math.floor(cell / map.width) > map.height * 2 / 3))
+    .sort(([a], [b]) => Math.min(Math.floor(a / map.width), map.height - 1 - Math.floor(a / map.width))
+      - Math.min(Math.floor(b / map.width), map.height - 1 - Math.floor(b / map.width)))
+    .slice(0, 80).flatMap(([cell]) => [cell - 1, cell + 1]);
+  place('wayside-shrine', shrineCandidates);
+  if (state.flags['wall_closed'] !== undefined) {
+    const px = state.plaza.x, pz = state.plaza.y;
+    const squareEdges = [
+      [px - 4, pz], [px + 4, pz], [px, pz - 4], [px, pz + 4],
+      [px - 3, pz - 3], [px + 3, pz + 3],
+    ].filter(([x, z]) => x !== undefined && z !== undefined && x >= 0 && z >= 0 && x < map.width && z < map.height)
+      .map(([x, z]) => z! * map.width + x!);
+    place('lantern-post', squareEdges);
+    if (state.happenings.some(one => one.tick === state.tick &&
+      (one.id.includes('pedlar') || one.id.includes('trader') || one.id.includes('stranger')))) {
+      place('market-awning', squareEdges);
+    }
+  }
+
   return out;
 }
 
@@ -277,9 +350,12 @@ export class Steading {
       const original = source(asset);
       if (original === undefined) continue;
       for (const piece of piecesOf(original)) {
+        piece.geometry.computeBoundingBox();
         const instanced = new InstancedMesh(piece.geometry, piece.material, mine.length);
         instanced.name = `Steading_${asset}`;
-        instanced.castShadow = true;
+        instanced.castShadow = asset === 'haystack' || asset === 'log-pile' || asset === 'handcart'
+          || asset === 'shed' || (!SMALL_SCENIC.has(asset) && piece.geometry.boundingBox?.max.y !== undefined
+            && piece.geometry.boundingBox.max.y > 1);
         instanced.receiveShadow = true;
         mine.forEach((one, slot) => {
           // El centro de la celda, no su esquina: lo que se deja en el suelo se
@@ -288,7 +364,7 @@ export class Steading {
           const z = Math.floor(one.cell / width) + 0.5;
           position.set(x, ground(x, z), z);
           turn.setFromAxisAngle(up, one.facing);
-          instanced.setMatrixAt(slot, matrix.compose(position, turn, size));
+          instanced.setMatrixAt(slot, matrix.compose(position, turn, size.setScalar(steadingScale(one))));
         });
         instanced.instanceMatrix.needsUpdate = true;
         this.owned.push(instanced);

@@ -21,6 +21,9 @@ Ficheros compartidos (`docs/changelog.md`, `docs/task-log.md`, `docs/plan-meta.m
 
 decidido por Sol 6: se inicia en paralelo 0, 1 y 6 porque son independientes y el Bloque 0 conserva prioridad de revisión e integración.
 decidido por Sol 6: el Bloque 8 espera a que los bloques 0–7 estén completos; el roble no se modifica sin petición expresa de Vera, como indica el brief.
+decidido por Sol 6: las recetas toman los colores de `art/recipes/palette.json`; la ruta `public/assets/models/palette.json` citada en el encargo no existe en `main`.
+
+Línea base antes de integrar, `main` `aba7889b`, empaquetado local `artifacts/graphics/astra-baseline/game/valley.html`, sonda `gl-probe` 8 s con `debug=1&live=1`: villa 7/año 60/verano **494 llamadas, 798 955 triángulos, 46 programas**; aldea 11/año 21/verano **355 llamadas, 694 465 triángulos, 47 programas**. `scene-report` en las mismas escenas: villa 469 mallas visibles, 202 con sombra, 695 138 triángulos; aldea 409, 139, 601 034. Estas cifras sustituyen para esta tanda las referencias históricas de septiembre; SwiftShader sólo sirve para comparación, no para FPS en la tablet. CI de `main` `aba7889b`: verde.
 
 ## 2 oct 2026 · La fauna por estaciones (v5.85)
 
