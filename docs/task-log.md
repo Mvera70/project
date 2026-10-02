@@ -28,6 +28,26 @@ las vacas de `beasts.ts` (#48): las crías leen el cuerpo de la madre desde
 - **Sin medir:** el coste en el aparato (cuatro llamadas más con todo
   encendido, tres más con las grullas).
 
+## 2 oct 2026 · La ronda del daño (v5.81, carril de combate)
+
+Rama `claude/petos-asalto` rehecha desde `main` tras #49, **versiones
+reservadas v5.81–v5.84**. Hecho: la vida en porcentaje y la tabla pieza × arma
+con rebote y zonas (`render3d/life/wounds.ts`), el peto decidiendo en la escena
+y el parte con `spared` (motor: `settle` ya no lo aplica dos veces). Sin peto
+el asalto no se mueve ni una décima. Medida en
+`docs/medidas/dano-por-arma-2026-10-02.md`; la armadura de metal (AR) y la
+minería, apuntadas en `plan-meta.md` y `encargos-3d.md`. Suite rápida entera en
+local: 215 ficheros, 2118 pruebas.
+
+**Abierto:**
+
+- **De Vera:** si el rey y el castillo pasan a la Edad de los Caballeros
+  (`design.md` v4.66); las cifras `TUNE` de la lanza, la espada y el metal.
+- **Sin ver:** el herido en pie no se distingue; el rebote no se ve
+  (`encargos-3d.md`); la pelea en un aparato.
+- **Lo siguiente, en `docs/ideas.md`:** las partes del cuerpo (la tabla ya sabe
+  qué zona cubre cada pieza), que pide el contacto físico de F-0/F-1.
+
 ## 2 oct 2026 · El peto en el asalto (v5.80, carril de combate)
 
 Rama `claude/petos-asalto`, **versiones reservadas v5.80–v5.84**, encargo del

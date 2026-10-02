@@ -23,21 +23,13 @@ import { MEANS_IDS, SCHEMA_VERSION, type MeansId } from '@engine/state';
 import { boot } from './app';
 import { giveNow, raidNow, stateAt } from './debug';
 import type { BattleStats } from '../render3d/renderer';
-import { BOARDS } from '@engine/balance';
-import { JERKIN_EXTRA_BLOWS } from '../render3d/life/melee';
 
 /**
- * K5 · Los petos en el banco (2 oct 2026, v5.80): sin ellos; puestos, que es
- * el juego —se ven y se cuentan, y decide el motor (`settle` levanta la mitad
- * de los caídos de un cerco que aguanta)—; o puestos **y decidiendo en la
- * escena**, con `JERKIN_TRIAL_BLOWS` golpes de más para tumbar a quien lo
- * lleva. Esta última no existe en el juego: es para medir y enseñar a Vera
- * qué haría si decidiera.
+ * K5 · Los petos en el banco (2 oct 2026, v5.80): sin ellos, o puestos en todo
+ * el cerco, como el juego mientras dura el encargo de la herrería. Desde v5.81
+ * el peto **decide** en la pelea con la tabla de `wounds.ts`.
  */
-export type JerkinMode = 'off' | 'worn' | 'decide';
-
-/** Golpes de más del peto cuando el banco lo deja decidir (`JERKIN_EXTRA_BLOWS`, con su TUNE). */
-export const JERKIN_TRIAL_BLOWS = JERKIN_EXTRA_BLOWS;
+export type JerkinMode = 'off' | 'worn';
 
 export interface BattleSetup {
   readonly seed: number;
@@ -52,7 +44,7 @@ export interface BattleSetup {
    * coincidiría el contacto. Es la medida del aparato que F-1 necesita.
    */
   readonly shadow?: number;
-  /** K5 · `&jerkins=on|decide`: los del cerco con peto (`JerkinMode`). */
+  /** K5 · `&jerkins=on`: los del cerco con peto (`JerkinMode`). */
   readonly jerkins: JerkinMode;
 }
 
@@ -69,7 +61,7 @@ export function battleSetupFrom(search: string): BattleSetup {
     defenders: number('defenders', 6, 0, 60),
     arm: query.get('arm') === 'spear' ? 'spear' : 'bow',
     raiders: number('raiders', 12, 1, 80),
-    jerkins: query.get('jerkins') === 'on' ? 'worn' : query.get('jerkins') === 'decide' ? 'decide' : 'off',
+    jerkins: query.get('jerkins') === 'on' ? 'worn' : 'off',
     ...(shadowFrom(query.get('shadow'))),
   };
 }
@@ -86,7 +78,7 @@ export function battleUrl(setup: BattleSetup, path: string = location.pathname):
     sandbox: 'battle', seed: String(setup.seed), year: String(setup.year),
     defenders: String(setup.defenders), arm: setup.arm, raiders: String(setup.raiders),
     ...(setup.shadow === undefined ? {} : { shadow: String(setup.shadow) }),
-    ...(setup.jerkins === 'off' ? {} : { jerkins: setup.jerkins === 'worn' ? 'on' : 'decide' }),
+    ...(setup.jerkins === 'off' ? {} : { jerkins: 'on' }),
   });
   return `${path}?${query.toString()}`;
 }
@@ -106,13 +98,14 @@ export interface BattleSummary {
   readonly entered: boolean;
   readonly fps: number;
   readonly physicsMs: number;
+  /** v5.81 · Asaltantes heridos que siguen en pie: la vida en porcentaje (`wounds.ts`). */
+  readonly raidersWounded: number;
   /**
-   * K5 · El peto: cuántos lo llevan, golpes que se llevó, caídos con él, de
-   * ellos los que un golpe más de aguante habría dejado en pie en ese golpe
-   * (sombra), y cuántos levantaría el motor con este parte si el cerco aguanta.
+   * K5/v5.81 · El peto: cuántos lo llevan, golpes que se llevó, cuántos
+   * rebotaron, caídos con él, y los que siguen en pie gracias a él (sombra).
    */
-  readonly jerkins?: { readonly worn: number; readonly blows: number; readonly fallen: number;
-    readonly delayed: number; readonly motorRaises: number };
+  readonly jerkins?: { readonly worn: number; readonly blows: number; readonly ricochets: number;
+    readonly fallen: number; readonly spared: number };
   /** F-0 · con sondas: ms por paso de Rapier y de las sondas, en total de la batalla, y el acuerdo. */
   readonly probes?: { readonly stepMs: number; readonly probeMs: number; readonly arrows: number;
     readonly cylinder: number; readonly rapier: number; readonly same: number };
@@ -205,8 +198,7 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
         <option value="spear"${setup.arm === 'spear' ? ' selected' : ''}>Lanza</option></select></label>
       <label>Asaltantes <input type="number" min="1" max="80" data-set="raiders" value="${setup.raiders}"></label>
       <label>Petos <select data-set="jerkins" style="width:132px"><option value="off"${setup.jerkins === 'off' ? ' selected' : ''}>Sin</option>
-        <option value="worn"${setup.jerkins === 'worn' ? ' selected' : ''}>Con</option>
-        <option value="decide"${setup.jerkins === 'decide' ? ' selected' : ''}>Con, deciden (+${JERKIN_TRIAL_BLOWS})</option></select></label>
+        <option value="worn"${setup.jerkins === 'worn' ? ' selected' : ''}>Con</option></select></label>
       <div class="row"><button type="button" data-act="launch">Lanzar asalto</button>
         <button type="button" data-act="restart">Reiniciar</button></div>
       <h2>Tiempo</h2>
@@ -289,10 +281,8 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
       fps: Math.round(fps),
       physicsMs: Math.round((last?.physics?.stepMsAverage ?? 0) * 100) / 100,
       ...(probed() === null ? {} : { probes: probed()! }),
-      ...(setup.jerkins === 'off' || d === null ? {} : { jerkins: {
-        ...d.jerkins,
-        motorRaises: jerkinsRaised(setup.jerkins, d.lost, last === null ? 'waiting' : battleOutcome(last, enteredEver)),
-      } }),
+      raidersWounded: d?.wounded ?? 0,
+      ...(setup.jerkins === 'off' || d === null ? {} : { jerkins: { ...d.jerkins } }),
     };
   };
   // F-0 · lo que cuestan las sondas y en cuántos aciertos coincidiría el contacto.
@@ -311,8 +301,7 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
     if (!told && window.__valleyBattle !== undefined) {
       window.__valleyBattle({ raiders: setup.raiders, hands: setup.defenders, arm: setup.arm,
         ...(setup.shadow === undefined ? {} : { shadow: setup.shadow }),
-        jerkins: setup.jerkins !== 'off',
-        ...(setup.jerkins === 'decide' ? { jerkinBlows: JERKIN_TRIAL_BLOWS } : {}) });
+        jerkins: setup.jerkins !== 'off' });
       if (gate !== null) window.__valleyLook?.(gate.x, gate.y);
       told = true;
     }
@@ -340,12 +329,10 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
       ['Bajas (def · asalt)', `${s.defendersLost} · ${s.raidersDown}`],
       ['Flechas · aciertos', `${s.arrowsLoosed} · ${s.arrowHits} (${s.arrowsLoosed === 0 ? 0 : Math.round((100 * s.arrowHits) / s.arrowsLoosed)} %)`],
       ['Golpes de lanza', `${s.spearHits}`],
+      ['Asaltantes heridos en pie', `${s.raidersWounded}`],
       ...(s.jerkins === undefined ? [] : [
-        ['Petos en su puesto', `${s.jerkins.worn} · ${s.jerkins.blows} golpes al cuero`] as [string, string],
-        ['Caídos con peto', setup.jerkins === 'decide' ? `${s.jerkins.fallen} (aguantan uno más)`
-          : `${s.jerkins.fallen} · sombra: ${s.jerkins.delayed} aguantarían ese golpe`] as [string, string],
-        ['El motor levanta', setup.jerkins === 'decide' ? '— (ya decidió la escena)'
-          : `${s.jerkins.motorRaises} de ${s.defendersLost}${s.outcome === 'held' ? '' : ' si aguantan'}`] as [string, string],
+        ['Petos en su puesto', `${s.jerkins.worn} · ${s.jerkins.blows} golpes al cuero · ${s.jerkins.ricochets} rebotes`] as [string, string],
+        ['Caídos con peto', `${s.jerkins.fallen} · en pie gracias a él: ${s.jerkins.spared}`] as [string, string],
       ]),
       ['Portón', `${s.gateHits} / 60 golpes${s.gateBroken ? ' · roto' : ''}${enteredEver ? ' · han entrado' : ''}`],
       ['FPS', `${s.fps}`],
@@ -367,18 +354,7 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
 }
 
 function jerkinModeOf(value: string): JerkinMode {
-  return value === 'worn' ? 'worn' : value === 'decide' ? 'decide' : 'off';
-}
-
-/**
- * K5 · Cuántos de los caídos levantaría el motor con este parte: la mitad, si
- * el cerco aguanta y el peto no ha decidido ya en la escena (`settle`,
- * `BOARDS.JERKIN_SAVE`). Puro, para la prueba. Durante la pelea se enseña lo
- * que levantaría si aguantaran.
- */
-export function jerkinsRaised(mode: JerkinMode, lost: number, outcome: ReturnType<typeof battleOutcome>): number {
-  if (mode !== 'worn' || outcome === 'stormed') return 0;
-  return Math.floor(lost * BOARDS.JERKIN_SAVE);
+  return value === 'worn' ? 'worn' : 'off';
 }
 
 /** Al portapapeles; si el navegador no deja, se enseña para copiarlo a mano. */

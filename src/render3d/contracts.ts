@@ -226,6 +226,8 @@ export interface BattleReport {
   readonly lost: number;
   /** Si la escena vio entrar a alguien. Hoy nunca: romper el portón es D5. */
   readonly breached: boolean;
+  /** v5.81 · Los nuestros en pie gracias a la armadura (`jerkinTally`): el motor ya no la aplica otra vez. */
+  readonly spared?: number;
 }
 
 export interface GraphicsRenderer {

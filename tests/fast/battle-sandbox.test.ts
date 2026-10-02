@@ -9,7 +9,7 @@ import { TERRAIN_CODE, type Building, type GameState } from '@engine/state';
 import { foundTwenty } from '../helpers/founding';
 import { createVillage } from '../../src/render3d/life/village';
 import { garrisonAs, garrisonOf } from '../../src/derive/garrison';
-import { battleOutcome, battleSetupFrom, battleUrl, jerkinsRaised } from '../../src/ui/sandbox';
+import { battleOutcome, battleSetupFrom, battleUrl } from '../../src/ui/sandbox';
 import type { BattleStats } from '../../src/render3d/renderer';
 
 /** Un cerco llano con portón, atalaya y muralla, y un asalto que llega hoy. */
@@ -54,7 +54,7 @@ describe('el banco de batallas', () => {
   });
 
   it('K5 · el mando de los petos: se lee, se escribe, viste al cerco y el motor sigue sin enterarse', () => {
-    for (const [query, mode] of [['on', 'worn'], ['decide', 'decide'], ['nada', 'off']] as const) {
+    for (const [query, mode] of [['on', 'worn'], ['nada', 'off']] as const) {
       const setup = battleSetupFrom(`?sandbox=battle&jerkins=${query}`);
       expect(setup.jerkins).toBe(mode);
       const url = battleUrl(setup, '/project/');
@@ -73,14 +73,6 @@ describe('el banco de batallas', () => {
     // Y con el encargo en marcha, la guarnición del juego lo lleva.
     state.flags['smithy:jerkins'] = state.tick + 52;
     expect(garrisonOf(state).jerkins).toBe(true);
-  });
-
-  it('K5 · lo que levantaría el motor: la mitad, sólo si aguantan y si el peto no decidió ya', () => {
-    expect(jerkinsRaised('worn', 5, 'held')).toBe(2);
-    expect(jerkinsRaised('worn', 5, 'fighting'), 'durante la pelea, si aguantaran').toBe(2);
-    expect(jerkinsRaised('worn', 5, 'stormed'), 'si entran no levanta a nadie').toBe(0);
-    expect(jerkinsRaised('decide', 5, 'held'), 'sin doble cuenta').toBe(0);
-    expect(jerkinsRaised('off', 5, 'held')).toBe(0);
   });
 
   it('sube las manos que se piden, con su arma, y el portón sigue con lanza', () => {

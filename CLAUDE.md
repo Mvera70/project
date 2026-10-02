@@ -301,8 +301,10 @@ el motor sigue siendo determinista *dadas sus entradas* y la batalla no lo es.
 Si nadie mira la pelea, decide la cuenta de B3. Si el portón cede y alguien
 entra y sigue en pie, `ended.cause = 'stormed'` y la partida se acaba.
 
-**Tres reglas de esa maquinaria que cuesta tiempo olvidar:** una flecha basta y
-un golpe de mano no (tres); un portón roto con la partida entera en el suelo
+**Tres reglas de esa maquinaria que cuesta tiempo olvidar:** desde v5.81 lo que
+tumba es la vida, no la cuenta de golpes —a cuerpo descubierto una flecha tumba y
+una lanza quita el 34 %; la armadura protege una parte (el cuero, un 15 % de la
+flecha) o hace rebotar el golpe (`life/wounds.ts`)—; un portón roto con la partida entera en el suelo
 **no** es un valle tomado; y el parte de la batalla **no salva por existir**,
 salva si adelgazó la partida —si no, mirar la pantalla volvería al valle
 inmortal. Medido: sin dar defensa caen 3 de 12 valles en ochenta años; con la
@@ -361,7 +363,22 @@ Tres cosas del dueño que mandan sobre cualquier otra regla de este fichero:
 **el caos es el juego** («que haya partidas que se rompan es la idea»: las dos
 puertas del rayo que R-1 puso hay que quitarlas, `docs/historico/rework.md` §2.6); **los planes
 de prueba y el nivelado van después**, la puerta es la suite rápida y las
-jornadas y nada más; y **las jornadas rojas por la trayectoria nueva ya
+jornadas y nada más —y antes de afinar una cifra se mira `docs/plan-meta.md`:
+si una ronda futura la va a mover, se deja con su `// TUNE:` y se sigue («a
+veces se tiran mucho tiempo rebalanceando cuando eso mismo, con otra medida
+nueva, se va a quitar o a descolocar … una base sólida, un sistema que funcione
+y tenga sentido», Vera, 2 oct 2026, por la sastrería de K5). **Y es un
+equilibrio, no una licencia** («no hay que ser tampoco súper permisivo y
+dejarlo todo para adelante»): lo que rompe la partida o deja el sistema sin
+sentido se arregla en la ronda —como la flecha al 15 % que hacía caer 20 cercos
+de 20—; lo que sólo pide el valor fino, y otra ronda va a mover, espera. Para que
+esperar sea posible, **cada sistema se diseña para convivir con los demás y
+poder reajustarse**, en la medida de lo posible y no a cualquier precio (Vera,
+mismo día): sus cifras en `balance.ts` y no
+repartidas, lo que produce como existencia que otros puedan gastar (el lienzo
+servirá también para vendas), sus tablas abiertas a filas nuevas (la armadura
+admite el metal y las zonas del cuerpo sin rehacerse), y ningún sistema da por
+hecho el valor de otro—; y **las jornadas rojas por la trayectoria nueva ya
 están resueltas**: eran once (`docs/historico/rework.md` §2.8) y quedan dos,
 rojas a propósito y declaradas —la de los catorce avisos y la de la palanca del
 bosque— (`docs/task-log.md`, «Las jornadas rojas», 128 de 130 en 284 s). **Y desde v3.75 la aldea de veinte años de cualquier semilla ya no
