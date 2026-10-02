@@ -1,5 +1,37 @@
 # The Valley — Registro de cambios
 
+## v5.72 · 2 oct 2026 · K7: el epitafio dice por qué cayó el valle
+
+**Medido antes** (`docs/medidas/k7-caidas-2026-10-02.md`, informe nuevo
+`tools/reports/fall-report.ts`, 30 semillas × 100 años): con la política
+prudente caen **2 de 30**, las dos en el arranque y de hambre, y **ninguna
+asaltada**; pidiendo herrajes sin parar, 19 (17 asaltadas); con la adversa, 10
+(8 asaltadas). La cadena se repite —el mejor momento, el hambre, la peste o el
+clan que baja a por la plata, y el último asalto contra lo que queda—, y la
+decisión que la crónica apunta cerca es `raiders_coming` en 20 de las 25
+asaltadas.
+
+**Lo que cambia.** El epitafio gana «How it came to this» (`derive/fall.ts`,
+§13.3b): el mejor momento, hasta tres cosas que se lo llevaron, la decisión
+citada tal como la escribió la crónica y el último golpe. Todo sale de la
+crónica archivada: ni un campo en el guardado ni una tirada, así que no toca el
+motor. Y al fundar el valle siguiente, una línea recuerda cómo cayó el
+anterior. Para fotografiarlo, la ruta de depuración gana `&policy=worst`, que
+juega el valle con la política adversa desde la fundación.
+
+**Por qué la ventana es la que es**: contando desde el mejor momento salían
+mesetas de décadas («158 murieron de hambre desde el año 34»); con cinco años
+fijos se cortaba el hambre del primer otoño de un caserío; con la mitad del
+mejor momento, siete valles fuertes tomados de golpe no tenían nada que contar.
+Lo que antes llegue de las dos cuenta los 29 (`FALL`, con su `TUNE`).
+
+**Abierto, de Vera**: el aviso en vida al cruzar el punto sin vuelta. En un
+asalto llega 5–8 h de reloj antes del final, con el valle ya vaciado, y pediría
+una marca en el motor.
+
+Sin ilustraciones que pedir: K7 no añade líneas de crónica, sólo textos de
+pantalla (`epitaph.why.*`, `successor.fell.*`).
+
 ## v5.71 · 2 oct 2026 · Que una obra no tire todas las rutas
 
 El diagnóstico de la CI (`docs/medidas/ci-lentitud-2026-10-02.md`) encontró el

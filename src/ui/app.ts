@@ -56,7 +56,7 @@ import { noticeText } from './notice';
 import { chroniclePanel, closeChronicle } from './screens/chronicle';
 import { closeCrossroad, conceal, isConcealed, isDeferred, openCrossroad, openDeferred, reveal } from './screens/crossroad';
 import { FOUNDING_CROSSROAD } from '@engine/crossroads/catalog/hamlet';
-import { openEpitaph } from './screens/epitaph';
+import { openEpitaph, rememberFall } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
 import { accentFor, playerAnswer, routeCue, sound, speedCue } from './sound';
 import { cellsBetween, mixFor, nearness, riverCellsFrom, thunderFor, type WorldSound } from './ambience';
@@ -1699,6 +1699,10 @@ export function boot(
       persist();
       finishing = false;
       beginLoop();
+      // K7 · **y el valle nuevo se acuerda del anterior**, en una línea: cómo
+      // cayó y lo que más pesó. Ni una mejora ni un desbloqueo; lo aprendido es
+      // de quien juega, y esto sólo se lo recuerda donde están las ruinas.
+      say('milestone', rememberFall(game!));
     });
 
     // D6 · sólo una derrota `stormed` nacida en esta sesión puede tener una
