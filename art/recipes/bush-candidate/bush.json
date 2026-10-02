@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "id": "bush",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "foliage",
+      "role": "foliage",
+      "color": "#62864F",
+      "roughness": 0.92
+    },
+    {
+      "name": "foliagelight",
+      "role": "foliageLight",
+      "color": "#7F9F64",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "bush",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "Crown0",
+      "location": [
+        -0.22,
+        0,
+        0.25
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.53,
+        0.4399,
+        0.53
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Crown1",
+      "location": [
+        0.2,
+        0.08,
+        0.3
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.62,
+        0.5146,
+        0.62
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "foliage",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Crown2",
+      "location": [
+        0,
+        -0.16,
+        0.37
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.55,
+        0.4565,
+        0.55
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

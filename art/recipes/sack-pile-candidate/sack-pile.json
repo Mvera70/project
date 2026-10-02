@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "id": "sack-pile",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.92
+    },
+    {
+      "name": "trunk",
+      "role": "trunk",
+      "color": "#735338",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "sack-pile",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "Sack0",
+      "location": [
+        -0.23,
+        0,
+        0.21
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.52,
+        0.4,
+        0.43
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Tie0",
+      "location": [
+        -0.23,
+        0,
+        0.42
+      ],
+      "radius": 0.065,
+      "depth": 0.055,
+      "vertices": 4,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Sack1",
+      "location": [
+        0.24,
+        0.08,
+        0.19
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.468,
+        0.36000000000000004,
+        0.387
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Tie1",
+      "location": [
+        0.24,
+        0.08,
+        0.379
+      ],
+      "radius": 0.065,
+      "depth": 0.055,
+      "vertices": 4,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Sack2",
+      "location": [
+        0,
+        0,
+        0.49
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.41600000000000004,
+        0.32000000000000006,
+        0.34400000000000003
+      ],
+      "segments": 6,
+      "rings": 3,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Tie2",
+      "location": [
+        0,
+        0,
+        0.658
+      ],
+      "radius": 0.065,
+      "depth": 0.055,
+      "vertices": 4,
+      "material": "trunk",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}
