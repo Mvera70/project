@@ -1,0 +1,18 @@
+{
+  "sharedCartGeometry": true,
+  "wheelGaugeMetres": 1.2,
+  "railTopCells": 0.06333333333333334,
+  "cartRootOnRailsCells": 0.06333333333333334,
+  "wheelRadiusCells": 0.07666666666666667,
+  "clearOpeningMetres": [
+    2.68,
+    3.18
+  ],
+  "oreStateTriangles": [
+    48,
+    96,
+    192,
+    288
+  ],
+  "fullWithoutOreMatchesEmpty": true
+}

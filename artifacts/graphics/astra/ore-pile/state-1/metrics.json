@@ -1,0 +1,20 @@
+{
+  "triangles": 48,
+  "limit": 300,
+  "meshCount": 1,
+  "primitives": 1,
+  "dimensionsCells": [
+    0.42207686603069305,
+    0.1452813297510147,
+    0.1954658031463623
+  ],
+  "pivotsMetres": {
+    "ore_pile": [
+      0,
+      0,
+      0
+    ]
+  },
+  "vertexColors": true,
+  "textures": 0
+}
