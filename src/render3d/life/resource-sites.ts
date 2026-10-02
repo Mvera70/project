@@ -23,13 +23,19 @@ export function stoneWork(state: Pick<GameState, 'works'>): ConstructionWork | n
 }
 
 /**
- * Pedregales ordenados por cercanía a la obra real, y después la ladera.
+ * La cantera: el pie de la montaña, ordenado por cercanía a la obra real, y
+ * los pedregales del valle sólo detrás.
  *
  * IA-anim · **La montaña también es cantera.** En la semilla 7 (semana 1418)
  * las veinte rocas quedaban fuera de la zona a la que la aldea llega andando, y
- * la cantera no aparecía nunca aunque el motor sí producía piedra. La roca
- * suelta va primero; la cara de la montaña, detrás. La alcanzabilidad se
- * comprueba al poner la oferta.
+ * la cantera no aparecía nunca aunque el motor sí producía piedra.
+ *
+ * v5.74 · **y es la cantera de verdad.** Con el valle de forma natural delante,
+ * Vera eligió que la piedra saliera «de un frente al pie de la montaña, y los
+ * canteros suben allí, en vez de sacarla de los pedregales del valle». Así que
+ * va primero la cara de la montaña y la roca suelta queda de reserva, por si
+ * ninguna cara se alcanza andando. Esto es el orden; cuál se pica lo decide el
+ * camino (`offers.ts`), que es lo que se anda y no la línea recta.
  */
 export function quarryCells(state: Pick<GameState, 'map' | 'works'>): number[] {
   const work = stoneWork(state);
@@ -46,7 +52,7 @@ export function quarryCells(state: Pick<GameState, 'map' | 'works'>): number[] {
     const bx = b % state.map.width + 0.5, bz = Math.floor(b / state.map.width) + 0.5;
     return Math.hypot(ax - centreX, az - centreZ) - Math.hypot(bx - centreX, bz - centreZ) || a - b;
   };
-  return [...rocks.sort(near), ...faces.sort(near)];
+  return [...faces.sort(near), ...rocks.sort(near)];
 }
 
 function ringOf(map: ValleyMap, building: Building): number[] {

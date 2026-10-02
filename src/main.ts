@@ -132,6 +132,11 @@ if (root) {
     // grabar las cazas que vienen detrás y la visita del oso (`huntedNow`).
     const hunted = query.get('hunted');
     if (hunted !== null) huntedNow(state, hunted.split(','));
+    // v5.74 · y `&cows=4` pone esas vacas en el corral, para ver el rebaño
+    // pastando en la falda: con la política prudente casi ninguna aldea las
+    // tiene (una muestra de 96, en doce valles hasta los sesenta años).
+    const cows = Number(query.get('cows'));
+    if (Number.isInteger(cows) && cows > 0) state.herd.cows = cows;
     // K-5 · `&crown=ready` deja la fila de la corona encendida, y
     // `&crown=<oficio>` corona ya a alguien de ese oficio para ver lo que viene
     // después (la sala, la palabra «king», el estilo del valle).
