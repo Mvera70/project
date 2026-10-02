@@ -99,13 +99,55 @@ describe('El valle más vivo · el perro, el zorro, los patos y la mula', () => 
       stepFox(fox, land, seed, step, false, []);
       expect(away(), `semilla ${seed}: no salta a la madriguera`).toBeGreaterThan(start - 0.5);
       expect(fox.phase, `semilla ${seed}`).toBe('back');
-      const cap = foxDawnSteps(start);
+      // El tope de seguridad es el que el propio zorro se fija al ver que
+      // amanece (`dawnBy`): lo que tarda la ruta, no la recta. Con el valle de
+      // forma natural (2 oct 2026) la semilla 23 pasó de un rodeo de 1,3 veces
+      // la recta a 2,7 (entre el gallinero y la madriguera quedaron el río y
+      // el cerco) y se daba por llegada en el tope; antes se medía sobre la
+      // recta (`foxDawnSteps`).
+      expect(fox.dawnBy, `semilla ${seed}: se fija un tope al amanecer`).not.toBeNull();
+      const cap = fox.dawnBy! - step;
       let steps = 0;
       while (fox.phase !== 'den' && steps < cap + 10) { step += 1; steps += 1; stepFox(fox, land, seed, step, false, []); }
       expect(fox.phase, `semilla ${seed}: llega`).toBe('den');
       // Llega andando, no por el tope de seguridad.
       expect(steps, `semilla ${seed}: pasos hasta la linde`).toBeLessThan(cap - 1);
     }
+  });
+
+  it('y si la ruta a su linde da un rodeo largo, llega igual andando: el tope va por la ruta y no por la recta', () => {
+    // La madriguera se elige por la recta al gallinero (`createFox`) y el río o
+    // el cerco de por medio alargan la ruta (en los seis valles de abajo la
+    // recta cruza agua). Medido en 28 valles de veinte vecinos con el tope sobre
+    // la recta: el zorro llegaba al tope, y se le daba por llegado a medias, en
+    // cinco valles de `main` (5, 8, 20, 21, 25) y en cinco con el valle de forma
+    // natural (5, 8, 11, 12, 25). **Las semillas se buscan entre las
+    // candidatas por su precondición** —que la ruta tarde más de lo que el tope
+    // de la recta dejaba (`foxDawnSteps(start)`)—, y no por su número: un cambio
+    // del mapa las mueve.
+    const candidates = [5, 8, 11, 12, 23, 25];
+    let detours = 0;
+    for (const seed of candidates) {
+      const state = grown(seed);
+      const land = terrainOf(state);
+      const heart = { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 };
+      const fox = createFox(state, land, seed, heart, heart);
+      if (fox === null) continue;
+      // La fase como texto: `stepFox` la cambia y el compilador no lo sabe.
+      const phase = (): string => fox.phase;
+      let step = 0;
+      for (; step < 3000 && phase() !== 'watching'; step += 1) stepFox(fox, land, seed, step, true, []);
+      if (phase() !== 'watching') continue;
+      const start = Math.hypot(fox.body.x - fox.den.x, fox.body.z - fox.den.z);
+      stepFox(fox, land, seed, step, false, []);
+      const cap = fox.dawnBy! - step;
+      let steps = 0;
+      while (phase() !== 'den' && steps < cap + 10) { step += 1; steps += 1; stepFox(fox, land, seed, step, false, []); }
+      expect(phase(), `semilla ${seed}: llega`).toBe('den');
+      expect(steps, `semilla ${seed}: llega andando y no por el tope`).toBeLessThan(cap - 1);
+      if (steps >= foxDawnSteps(start) - 1) detours += 1;
+    }
+    expect(detours, 'hay valles donde el rodeo pasaba del tope de la recta').toBeGreaterThanOrEqual(2);
   });
 
   it('el perro sale a ver al forastero, y el zorro huye de quien se acerca', () => {
