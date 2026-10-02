@@ -8,10 +8,30 @@
 // traffic on a different cell, which after a century is a different village.
 // The tie-break is the lower cell index, for the same reason.
 
-import { PATHING } from '../balance';
+import { PATHING, WORLD } from '../balance';
 import { TERRAIN_CODE } from '../state';
 import type { ValleyMap } from '../state';
-import { neighbours4 } from './tiles';
+
+/**
+ * v5.71 · Lo que cuesta pisar cada clase de terreno antes del descuento de la
+ * senda, o -1 si no se pisa: la misma cuenta de `stepCost`, hecha una vez. Bajo
+ * vitest cada `TERRAIN_CODE.x` y `PATHING.x` es un *getter* del módulo, y A*
+ * los leía ocho veces por vecino: era la cuarta parte de su tiempo.
+ */
+let BASE: Int16Array | null = null;
+function baseCosts(): Int16Array {
+  if (BASE !== null) return BASE;
+  // Los 256 códigos que caben en el `Uint8Array` del terreno, no sólo los que
+  // hoy tienen nombre: uno sin nombre cuesta lo que diga `stepCost`, igual.
+  const base = new Int16Array(256);
+  const probe = { terrain: new Uint8Array(1), path: new Uint8Array(1) } as unknown as ValleyMap;
+  for (let code = 0; code < 256; code += 1) {
+    (probe.terrain as Uint8Array)[0] = code;
+    base[code] = stepCost(probe, 0) ?? -1;
+  }
+  BASE = base;
+  return base;
+}
 
 /** What it costs to step into a cell, or null if it cannot be stepped into. */
 export function stepCost(map: ValleyMap, cell: number): number | null {
@@ -129,6 +149,21 @@ interface Scratch {
 }
 let SCRATCH: Scratch | null = null;
 
+/**
+ * v5.71 · El rectángulo de las celdas que la última búsqueda llegó a mirar:
+ * las que sacó de la frontera y sus vecinas. Una celda de fuera no influyó en
+ * nada de lo que hizo, así que si cambia de coste la misma búsqueda daría la
+ * misma ruta. `paths.ts` lo usa para no repetir A* cuando se tala un árbol
+ * lejos de una ruta.
+ */
+export interface SearchBounds { x0: number; y0: number; x1: number; y1: number }
+let BOUNDS: SearchBounds = { x0: 0, y0: 0, x1: -1, y1: -1 };
+
+/** Lo que miró la última llamada a `route`. Borrador compartido, como `SCRATCH`. */
+export function lastSearchBounds(): SearchBounds {
+  return BOUNDS;
+}
+
 function scratchFor(cells: number): Scratch {
   if (SCRATCH === null || SCRATCH.gScore.length < cells) {
     SCRATCH = {
@@ -151,7 +186,10 @@ function scratchFor(cells: number): Scratch {
  * the day somebody tuned `PATH_DISCOUNT`.
  */
 export function route(map: ValleyMap, from: number, to: number): number[] {
-  if (from === to) return [from];
+  if (from === to) {
+    BOUNDS = { x0: from % map.width, y0: Math.floor(from / map.width), x1: from % map.width, y1: Math.floor(from / map.width) };
+    return [from];
+  }
   if (stepCost(map, to) === null) return [];
 
   const cells = map.terrain.length;
@@ -162,13 +200,30 @@ export function route(map: ValleyMap, from: number, to: number): number[] {
   const visit = VISIT;
   const scoreOf = (cell: number): number => (seen[cell] === visit ? gScore[cell] as number : -1);
 
+  const toX = to % width, toY = Math.floor(to / width), floor = PATHING.MIN_STEP;
   const heuristic = (cell: number): number => {
-    const dx = Math.abs((cell % width) - (to % width));
-    const dy = Math.abs(Math.floor(cell / width) - Math.floor(to / width));
-    return (dx + dy) * PATHING.MIN_STEP;
+    const dx = Math.abs((cell % width) - toX);
+    const dy = Math.abs(Math.floor(cell / width) - toY);
+    return (dx + dy) * floor;
+  };
+
+  const base = baseCosts();
+  const discount = PATHING.PATH_DISCOUNT as readonly number[];
+  const minStep = PATHING.MIN_STEP;
+  const terrain = map.terrain, worn = map.path;
+  // La topología de `neighbours4`, en línea y sin un array por celda: el mismo
+  // orden (arriba, izquierda, derecha, abajo) para empatar igual.
+  const gridW = WORLD.WIDTH, gridH = WORLD.HEIGHT;
+  const costOf = (cell: number): number => {
+    const t = terrain[cell] as number;
+    const b = base[t] as number;
+    if (b < 0) return -1;
+    const c = b - (discount[worn[cell] ?? 0] ?? 0);
+    return c > minStep ? c : minStep;
   };
 
   const frontier = new Frontier();
+  let x0 = from % width, x1 = x0, y0 = Math.floor(from / width), y1 = y0;
   gScore[from] = 0;
   seen[from] = visit;
   frontier.push(from, heuristic(from));
@@ -178,14 +233,23 @@ export function route(map: ValleyMap, from: number, to: number): number[] {
     if (current === to) break;
     if (done[current] === visit) continue;
     done[current] = visit;
+    const cx = current % width, cy = (current - cx) / width;
+    if (cx < x0) x0 = cx; else if (cx > x1) x1 = cx;
+    if (cy < y0) y0 = cy; else if (cy > y1) y1 = cy;
 
-    for (const next of neighbours4(current)) {
+    const here = gScore[current] as number;
+    const nx = current % gridW, ny = (current - nx) / gridW;
+    for (let k = 0; k < 4; k += 1) {
+      let next: number;
+      if (k === 0) { if (ny === 0) continue; next = current - gridW; }
+      else if (k === 1) { if (nx === 0) continue; next = current - 1; }
+      else if (k === 2) { if (nx + 1 >= gridW) continue; next = current + 1; }
+      else { if (ny + 1 >= gridH) continue; next = current + gridW; }
       if (done[next] === visit) continue;
-      const cost = stepCost(map, next);
-      if (cost === null) continue;
-      const tentative = scoreOf(current) + cost;
-      const known = scoreOf(next);
-      if (known !== -1 && tentative >= known) continue;
+      const cost = costOf(next);
+      if (cost < 0) continue;
+      const tentative = here + cost;
+      if (seen[next] === visit && tentative >= (gScore[next] as number)) continue;
       gScore[next] = tentative;
       seen[next] = visit;
       cameFrom[next] = current;
@@ -193,6 +257,8 @@ export function route(map: ValleyMap, from: number, to: number): number[] {
     }
   }
 
+  // Las vecinas de lo expandido también se miraron: un borde de una celda.
+  BOUNDS = { x0: x0 - 1, y0: y0 - 1, x1: x1 + 1, y1: y1 + 1 };
   if (scoreOf(to) === -1) return [];
   const path: number[] = [];
   for (let at = to; at !== -1; at = seen[at] === visit ? cameFrom[at] as number : -1) {

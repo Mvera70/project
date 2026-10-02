@@ -1,5 +1,25 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · Rutas: que una obra no tire todas las rutas (v5.71)
+
+Rama `claude/rutas-tick`, carril del motor de la tanda nocturna, integrado
+detrás de #43 (diagnóstico de CI). Hecho el arreglo de rutas del diagnóstico, más fino: una ruta
+guardada se conserva mientras A\* daría la misma (coste igual, mismas
+parcelas en los extremos, nada abaratado en lo que su búsqueda miró), y A\*
+sin *getters* en el bucle. **−44 % del tick bajo vitest** (6,81 → 3,80 ms por
+semana, cinco semillas a 40 años) y la partida **idéntica byte a byte**, tráfico
+incluido: no mueve ninguna jornada. Vuelto a comprobar sobre `main` con K8+K9
+y #43 dentro (`843d923`): los mismos resúmenes en las cinco semillas, 4,84 →
+4,17 ms por semana bajo `tsx`. `docs/medidas/rutas-tick-2026-10-02.md`.
+**Cerrado el «Abierto» del parche de rutas que dejó el carril de CI (v5.68):**
+el parche está dentro, y `catchUp` de `save.test.ts` (960 semanas de veinte
+personas, tope de 2 s) mide 1,06–1,35 s en la rama contra 1,33–1,55 s en
+`main`, tres pasadas cada uno, solo en la máquina; los 2,05–2,26 s eran con la
+suite entera corriendo al lado. A esa edad la aldea es pequeña y A\* pesa
+poco: lo que gana el parche crece con la gente.
+**Abierto:** lo que queda del tick es la población (un A\* por origen y no por
+pareja sería un brief) y `placeBuilding` (16 % del perfil).
+
 ## 2 oct 2026 · El 2D fuera del paquete del juego (v5.69)
 
 Rama `claude/sin-2d-en-el-paquete`, tanda nocturna. El Canvas 2D (`src/render/`)
@@ -78,8 +98,8 @@ bajo vitest). Y los ficheros de `fast` que juegan décadas pasaron de 15 a 58.
 comentario de `ci.yml`. **El parche de rutas** (−31 % del tick, crónica,
 gente y edificios iguales a 40 años en 7/23/41; cambia `map.traffic` en dos
 semillas) **lo lleva la rama `claude/rutas-tick` (v5.71)**, aprobado por Vera.
-**Abierto:** (1) `catchUp` en `save.test.ts` da 2,05–2,26 s contra 2 s en
-local a escala 1; se cierra con el parche de rutas. (2) El mismo patrón de
+**Abierto:** (1) ~~`catchUp` en `save.test.ts` da 2,05–2,26 s contra 2 s en
+local a escala 1; se cierra con el parche de rutas.~~ Cerrado en v5.71 (arriba). (2) El mismo patrón de
 partida repetida en cada `it` está en unos ochenta ficheros más (la lista sale
 del guion de §6.2 del documento), casi todos baratos o con aldeas que la prueba
 modifica; si una jornada vuelve a pesar, se mira primero ahí.
