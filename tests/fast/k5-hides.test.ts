@@ -188,4 +188,22 @@ describe('K5 · y el peto levanta a los que caen en el cerco', () => {
       expect(wearing!.said?.params['count'], 'y la crónica cuenta a los que se levantaron').toBe(up);
     }
   });
+
+  it('v5.81 · con un parte que trae `spared`, el peto ya obró en la escena: no se levanta nadie más, y se cuenta', () => {
+    for (const seed of SEEDS) {
+      const state = assaulted(seed);
+      state.flags['smithy:jerkins'] = state.tick + BOARDS.ORDER_WEEKS;
+      tick(state, CATALOG);
+      const dead = state.people.villagers.filter((v) => v.causeOfDeath === 'violence').length;
+      const lost = defenders(state);
+      tick(state, CATALOG, undefined, [{
+        kind: 'battle', slain: Math.round(state.threat.lastBand * 0.6), lost, breached: false, spared: 2,
+      }]);
+      expect(state.ended, `semilla ${seed}: el cerco aguantó`).toBeNull();
+      const fell = state.people.villagers.filter((v) => v.causeOfDeath === 'violence').length - dead;
+      expect(fell, `semilla ${seed}: caen todos los del parte, sin levantar a la mitad otra vez`).toBe(lost);
+      const said = state.chronicle.find((e) => e.templateKey === 'raid.held.jerkins');
+      expect(said?.params['count'], 'la crónica cuenta a los que el peto dejó en pie').toBe(2);
+    }
+  });
 });

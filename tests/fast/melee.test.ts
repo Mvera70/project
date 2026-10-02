@@ -10,10 +10,11 @@
 // de una jornada de verdad la mide `tests/journeys/assault.test.ts`.
 
 import { describe, expect, it } from 'vitest';
-import { fallenDefenders, meleePose, stepMelee, type Defender } from '../../src/render3d/life/melee';
+import { fallenDefenders, jerkinTally, meleePose, stepMelee, type Defender } from '../../src/render3d/life/melee';
 import type { Manned } from '../../src/render3d/life/garrison';
 import type { Raider } from '../../src/render3d/life/raiders';
 import type { Arm } from '@derive/garrison';
+import { blowsToFell } from '../../src/render3d/life/wounds';
 
 /** Un saqueador de juguete, donde se le diga. */
 function raider(x: number, z: number): Raider {
@@ -33,13 +34,13 @@ function raider(x: number, z: number): Raider {
 }
 
 /** Un defensor de juguete, con su arma. */
-function defender(x: number, z: number, arm: Arm): Defender {
+function defender(x: number, z: number, arm: Arm, jerkin = false): Defender {
   const post = {
     place: { id: `post:wall:${x},${z}`, at: { x, z }, offers: [] },
     post: { x, y: z, arm, on: 'wall' as const },
     facing: { x, z },
   } as unknown as Manned;
-  return { at: { x, z }, post, hits: 0, down: false };
+  return { at: { x, z }, post, hits: 0, down: false, ...(jerkin ? { armour: 'jerkin' as const } : {}) };
 }
 
 /** Pasos suficientes para que se repartan unos cuantos golpes. */
@@ -148,5 +149,36 @@ describe('D4 · el cuerpo a cuerpo', () => {
     const us = [defender(10.5, 10, 'spear')];
     brawl(them, us, 600);
     expect(us[0]?.hits, 'un saqueador en el suelo no pega').toBe(0);
+  });
+
+  it('v5.81 · la vida en porcentaje: tres lanzazos tumban, y con peto, cuatro', () => {
+    const bare = defender(10.2, 10, 'spear');
+    const worn = defender(10.2, 10, 'spear', true);
+    for (const target of [bare, worn]) {
+      // Un saqueador que no cae, para ver cuánto aguanta el defensor solo.
+      const enemy = raider(10, 10);
+      enemy.health = 1e9;
+      for (let step = 0; step <= 900 && !target.down; step += 1) stepMelee([enemy], [target], step);
+    }
+    expect(bare.down && worn.down).toBe(true);
+    expect(bare.hits, 'sin nada encima, a los tres, como antes de la vida en porcentaje').toBe(3);
+    // El cuero contra la lanza no rebota (`GUARD.jerkin.spear`): cuatro exactos.
+    expect(worn.hits, 'con peto, a los cuatro').toBe(blowsToFell('spear', 'jerkin'));
+    expect(worn.hits).toBe(4);
+  });
+
+  it('v5.81 · la cuenta del peto: golpes, caídos y los que siguen en pie gracias a él', () => {
+    const enemy = raider(10, 10);
+    enemy.health = 1e9;
+    const worn = defender(10.2, 10, 'spear', true);
+    // Tres golpes: sin peto estaría en el suelo; con él, sigue.
+    for (let step = 0; step <= 44; step += 1) stepMelee([enemy], [worn], step);
+    expect(worn.hits).toBe(3);
+    expect(worn.down).toBe(false);
+    expect(jerkinTally([worn])).toEqual({ worn: 1, blows: 3, ricochets: 0, fallen: 0, spared: 1 });
+    // Y el cuarto lo tumba: ya no está en pie gracias a nada.
+    for (let step = 45; step <= 59; step += 1) stepMelee([enemy], [worn], step);
+    expect(jerkinTally([worn])).toMatchObject({ fallen: 1, spared: 0 });
+    expect(jerkinTally([defender(10, 10, 'spear')])).toEqual({ worn: 0, blows: 0, ricochets: 0, fallen: 0, spared: 0 });
   });
 });

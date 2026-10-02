@@ -16,18 +16,6 @@ ningún valle cae (sin la regla de los cuatro campos trabajados caían 7 de 12).
 villa cerrada de 331 a 350 h. Pruebas: `tests/fast/k5-linen.test.ts` (4 s).
 Captura: `docs/medidas/k-img/k5-tablon-sastreria-390.png`.
 
-**En pausa (2 oct, 14:25 Madrid, por crédito): lo que falta para la PR.**
-Las jornadas enteras dieron 17 fallos en 12 ficheros con la primera versión.
-Arreglados después: los hitos de la sastrería (banco), la sastrería en el
-borde del núcleo y no pegada a la plaza (tapaba el puesto del buhonero y los
-corros), y detrás de las defensas en la cola. **Falta**: volver a correr esos
-12 ficheros (archery, assault, e3b-corridor, life-decide, life-lost-child,
-life-props, life-staging, life-trade, threat-defence, ui-milestones-long,
-visit-sign, works) y tratar lo que siga rojo como en K1–K3 (semilla por
-precondición o `it.fails` con lo medido); traer `main` (#49, #50; mover a
-«Repartidas» las tres ideas de `docs/ideas.md` que esta ronda escribe); la
-suite rápida entera; y abrir la PR. El nivelado del lino va con el de todos.
-
 **Abierto:**
 
 - **De Vera:** qué encargos de la plaza se mudan a su oficio según su regla
@@ -37,6 +25,48 @@ suite rápida entera; y abrir la PR. El nivelado del lino va con el de todos.
 - **De otros carriles:** el modelo de la sastrería y de la tejedora, el campo
   azul, las gavillas y el lienzo blanqueando (Astra); las seis ilustraciones y
   las dos tarjetas (Codex, `docs/encargos/ilustraciones-k5-lino.md`).
+
+## 2 oct 2026 · La ronda del daño (v5.81, carril de combate)
+
+Rama `claude/petos-asalto` rehecha desde `main` tras #49, **versiones
+reservadas v5.81–v5.84**. Hecho: la vida en porcentaje y la tabla pieza × arma
+con rebote y zonas (`render3d/life/wounds.ts`), el peto decidiendo en la escena
+y el parte con `spared` (motor: `settle` ya no lo aplica dos veces). Sin peto
+el asalto no se mueve ni una décima. Medida en
+`docs/medidas/dano-por-arma-2026-10-02.md`; la armadura de metal (AR) y la
+minería, apuntadas en `plan-meta.md` y `encargos-3d.md`. Suite rápida entera en
+local: 215 ficheros, 2118 pruebas.
+
+**Abierto:**
+
+- **De Vera:** si el rey y el castillo pasan a la Edad de los Caballeros
+  (`design.md` v4.66); las cifras `TUNE` de la lanza, la espada y el metal.
+- **Sin ver:** el herido en pie no se distingue; el rebote no se ve
+  (`encargos-3d.md`); la pelea en un aparato.
+- **Lo siguiente, en `docs/ideas.md`:** las partes del cuerpo (la tabla ya sabe
+  qué zona cubre cada pieza), que pide el contacto físico de F-0/F-1.
+
+## 2 oct 2026 · El peto en el asalto (v5.80, carril de combate)
+
+Rama `claude/petos-asalto`, **versiones reservadas v5.80–v5.84**, encargo del
+director. Hecho: el peto en el torso de todo el cerco mientras dura el encargo
+(`render3d/world/jerkin.ts`), la pelea que lo cuenta en sombra (`jerkinTally`,
+`moments.battle.jerkinBlows`), el mando «Petos» del banco y
+`battle-report.ts --jerkins`. **El efecto sigue en el motor**: la escena no
+decide. Medida en `docs/medidas/k5-petos-asalto-2026-10-02.md`; capturas en
+`docs/medidas/k-img/k5-petos-*.jpg`. Pruebas: `melee`, `battle-sandbox`,
+`jerkin-piece`. No toca el motor.
+
+**Abierto:**
+
+- **Para el nivelado:** con 0–3 bajas por asalto, `floor(caídos × 0,5)` no
+  levanta a nadie en la configuración del juego (0 de 20); si el peto ha de
+  pesar, o se redondea de otra forma o decide la escena (`JERKIN_EXTRA_BLOWS`),
+  y lo segundo pide quitar el efecto del motor cuando hay parte (motor, no combate).
+- **Sin ver:** la pelea con petos en un aparato (el contenedor no llega al
+  choque); el caído que se levanta.
+- **De otros carriles:** el golpe sobre cuero que suene distinto (sonido, la
+  cuenta ya está publicada); un peto modelado (Astra).
 
 ## 2 oct 2026 · K5: el cuero de la caza (v5.75)
 

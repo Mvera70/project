@@ -256,8 +256,8 @@ enseña:
 |---|---|---|---|
 | **Las pieles** | Cada ciervo o jabalí cazado deja una piel, el oso dos (`HIDES.PER_KILL`), en `village.hides` | Sólo la cuenta en el aviso de los petos del tablón de la herrería («N on the racks»); ningún objeto en el valle | **El bastidor de pieles** junto a la casa del cazador, con más o menos pieles según la cuenta (`docs/encargos/ilustraciones-k5-cuero.md` §3, Astra). Y un «+1» con icono de piel sobre el cazador al cobrar la pieza, al lado del «+N» de grano (`renderer.ts`, `wood-gains.ts`): falta el icono `#hide` en el sprite |
 | **El buhonero que compra pieles** | Si hay 3 o más, las pide todas (hasta 12) por 2 de plata cada una | El mismo buhonero con el mismo fardo de leña | Que cargue un fardo de pieles (`life/village.ts` `tradeSites`: hoy `bundle` o `grain`) |
-| **Los petos** | Encargo `jerkins` de la herrería: 6 pieles y 4 de plata, un año | La línea de crónica y el aviso del tablón | El peto en el torso de los del cerco mientras dura (Astra) |
-| **El peto en la pelea** | De los que el parte da por caídos en un cerco que aguanta, se levanta la mitad (`settle`, `BOARDS.JERKIN_SAVE`) | La escena los tumba igual (ragdoll) y la semana siguiente están vivos; la crónica lo cuenta (`raid.held.jerkins`) | Que la escena lo sepa: un golpe sobre peto que no tumba, o el caído que se levanta. **Es del carril de física y combate** (`melee.ts`, `archery.ts`, skill `fisica-combate`), no de K5 |
+| **Los petos** | Encargo `jerkins` de la herrería: 6 pieles y 4 de plata, un año | **Desde v5.80**, todo el cerco lleva un peto de cuero mientras dura el encargo: pieza procedural colgada del hueso `spine` (`render3d/world/jerkin.ts`), cuero, hombreras y bandolera clara; se lee a escala de móvil (`docs/medidas/k-img/k5-petos-*.jpg`) | Un peto modelado en el GLB, si Astra lo hace mejor que las seis cajas de hoy. Un sonido de golpe sobre cuero: la cuenta ya está publicada (`moments.battle.jerkinBlows`, carril de sonido) |
+| **El peto en la pelea** | De los que el parte da por caídos en un cerco que aguanta, se levanta la mitad (`settle`, `BOARDS.JERKIN_SAVE`) | **Desde v5.81 decide la escena** (`life/wounds.ts`): el peto protege un 15 % de la flecha y un 10 % de la lanza, así que quien lo lleva aguanta un flechazo y cuatro lanzazos en vez de tres; el parte trae a los que siguen en pie gracias a él (`spared`) y el motor ya no levanta a la mitad, sólo lo cuenta en la crónica | Nada que se lea de lejos: quien aguanta el cuarto golpe recibe el mismo gesto que los demás. Un golpe sordo sobre cuero (sonido, `moments.battle.jerkinBlows`) |
 
 ## Los tablones de la herrería y de la capilla (2 oct 2026, K8+K9, v5.57)
 
@@ -386,3 +386,24 @@ que quedan apuntadas aquí, con lo que su sonido esperaría:
 | **Que el oso se alce y gruña** | Se alza (`bear.warnings`, `moments.bear`) y **no suena**: un gruñido sintético está descartado | El gruñido, con voces grabadas o generadas |
 | **Dónde caen las cascadas** | Existen (hasta tres: dos gargantas y una al lago) y **el sonido no sabe dónde están**: `waterfallSites` necesita la altura del terreno, que sólo tiene el renderer. El lecho `amb_waterfall` está fabricado y hoy nunca suena | La cascada, por proximidad |
 | **En qué día va cada fuego** | `data-fire-days` publica el del **primero**, así que con dos incendios a la vez el sonido usa el día de uno y la distancia de otro. Raro, pero escrito | Llama contra brasas, por incendio |
+
+## La armadura y la minería (propuesto, 2 oct 2026, v5.81)
+
+Las piezas de la escalera de la armadura (`docs/plan-meta.md`, AR) y la mina.
+**Ninguna existe todavía**; se apuntan ahora para que no se olviden (Vera). Las
+piezas cuelgan del hueso del tronco o de la cabeza, como el peto
+(`render3d/world/jerkin.ts`), y su efecto ya está en la tabla de
+`render3d/life/wounds.ts`. Lo que falta es lo que se ve.
+
+| Qué | Qué hará el motor | Qué se ve hoy | Qué haría falta |
+|---|---|---|---|
+| **La vida en porcentaje** (v5.81) | Nada: vive en la escena; el parte entra por `PlayerAct` | El herido sigue en pie con el gesto de recibir el golpe (`hit_take`); ninguna marca de cuánta vida le queda | Algo que diga «herido» a distancia sin sangre (no autorizada): un andar más torpe, una mano al costado. Y la flecha que se queda clavada en quien sigue en pie (F-1) |
+| **El rebote** (v5.81) | — | Nada: la flecha que rebota sigue su vuelo como si hubiera fallado | Una chispa o un desvío visible de la flecha que rebota en metal, y un sonido metálico (la cuenta, para sonido: `ricochets` de `jerkinTally` y de los asaltantes) |
+| **Cota de malla y casco de hierro** (AR-1, Edad del Hierro) | Encargo `mail` de la herrería | — | La cota sobre el torso (gris, con caída hasta medio muslo) y un casco cónico con nasal: las dos piezas, en el hueso del tronco y en la cabeza (Astra) |
+| **Placas** (AR-3, Edad del Acero) | Encargo `plate` | — | Pechera de acero y grebas sobre la malla; tiene que leerse más claro y más brillante que la cota a 20 px (Astra) |
+| **Arnés completo** (AR-4, Edad de los Caballeros) | Encargo `harness` | — | El arnés entero con yelmo cerrado: la silueta del caballero, distinta de todas las demás (Astra) |
+| **La boca de la mina** (AR-2) | Una veta en la montaña y el oficio de minero | — | Vera: **«que la mina tuviese una entrada que se viese como la cueva del oso, más grande, y que entrasen y se viesen entrar, desaparecer y salir; carruajes con el mineral: que lleguen llenos, se descarguen y salgan vacíos para adentro»**. La boca, partiendo de la malla de la cueva del oso (`art/recipes/bear-den`, `bear-den.glb`) escalada y hundida en la ladera como ella (AN-4d) (Astra) |
+| **Entrar y salir de la mina** (AR-2) | — | — | En la capa de vida, el minero entra por la boca, **desaparece dentro** y vuelve a salir, como hace hoy el oso con su cueva (`life/bear.ts`: `den`, el centro dentro de la roca donde desaparece, y la boca por delante) |
+| **La vagoneta** (AR-2) | El mineral como existencia nueva, que va a la fragua | — | La vagoneta o carreta **llena** de mineral y **vacía**: sale llena de la boca, se descarga en el acopio o la herrería y vuelve a entrar vacía (Astra) |
+| **El montón de mineral** (AR-2) | La cuenta de mineral | — | El acopio junto a la herrería, más grande o más pequeño según la cuenta, como el bastidor de pieles (Astra) |
+| **Picar, empujar y descargar** (AR-2) | — | — | Tres gestos: picar la veta (hay un pico de respaldo en `hand-tools.ts`, el de la cantera), empujar la vagoneta y volcarla en el acopio (skill `animacion`) |

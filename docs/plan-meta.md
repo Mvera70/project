@@ -372,6 +372,44 @@ cuenta. **El criterio para todo K:** pocas decisiones con mucho peso, nunca una
 barra más que vigilar. Antes de ampliar mucho, una medida de rendimiento en el
 aparato de Vera.
 
+### AR · La armadura y la minería (propuesto, 2 oct 2026)
+
+Dicho por Vera el 2 oct 2026, al cerrar los petos (v5.80) y abrir la vida en
+porcentaje (v5.81): «apuntad, que no se olvide». **Es un punto propuesto: no
+se implementa ahora.** Lo que ya existe es la base: la herrería con su tablón
+(K8), el peto de cuero (K5) y la tabla arma × pieza de `render3d/life/wounds.ts`
+—daño por arma, cuánto pasa cada pieza y **la probabilidad de que el golpe
+rebote**, como el rebote de los juegos de balas—, que ya trae las cuatro piezas
+escritas para que la llegada de cada una sea una fila y no un rediseño.
+
+**Las cuatro edades de la armadura**, nombres elegidos por Vera («no hay que
+ser súper fiel, pero intentar replicar» la Edad Media), y sus hitos, que
+también decidió ella (opción «escalera actual»):
+
+| Edad | En el juego | Lo que pide la herrería | Se abre con | Clave en `wounds.ts` |
+|---|---|---|---|---|
+| del Cuero | Age of Leather | peto de cuero y acolchado | **hay herrería** (hecho, K5) | `jerkin` |
+| del Hierro | Age of Iron | cota de malla y casco de hierro | **la primera mina** (AR-2) | `mail` |
+| del Acero | Age of Steel | placas sobre la malla: pechera, grebas o brigantina | **la villa cerrada con muralla de piedra** (fase 3 de §1b) | `plate` |
+| de los Caballeros | Age of Knights | arnés completo | **después de la villa**: el castillo y el rey | `harness` |
+
+Cada pieza se pide **en la herrería, como el peto**: un encargo pagado del
+tablón, que viste al cerco mientras dura. Y cada una tiene su fila en la tabla:
+cuánto pasa de cada arma y con qué probabilidad rebota (la flecha, más que el
+filo). Las cifras de hoy son `TUNE` y las nivela Vera con todo lo demás.
+
+| Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
+|---|---|---|---|---|---|
+| ~~AR-0 · La vida en porcentaje y la tabla arma × pieza~~ · **hecha v5.81** | Vida de 1 a 0, daño por arma a cuerpo descubierto (flecha 100 %, lanza 34 %, espada 55 %), la tabla de **lo que protege cada pieza** contra cada arma (el cuero, un 15 % de la flecha: «el cuero protege un 15 %, la flecha quita 85», Vera) y el rebote, con las cuatro piezas; el peto decide en la escena y el motor ya no lo cuenta dos veces. Medida en `docs/medidas/dano-por-arma-2026-10-02.md` | Hecho | Media | Claude | K5 |
+| AR-1 · La cota de malla y el casco | El encargo `mail` de la herrería, con su precio en metal; la pieza en el torso y la cabeza (`docs/encargos-3d.md`); la fila `mail` de la tabla, ya escrita | P2 | Media | Claude + Astra (malla) | AR-2 |
+| AR-2 · La minería | **Punto propio**: el metal sale sobre todo de la mina, «bonita de ver y de manejar como la tala de árboles», y el buhonero queda de fuente secundaria. Cómo la quiere ver Vera: «que la mina tuviese una entrada que se viese como la cueva del oso, más grande, y que entrasen y se viesen entrar, desaparecer y salir; carruajes con el mineral: que lleguen llenos, se descarguen y salgan vacíos para adentro». Una veta en la montaña (§7.15), el oficio de minero con sus gestos (picar, empujar, descargar), las vagonetas que salen llenas y vuelven vacías, el acopio y la existencia nueva; las piezas, en `docs/encargos-3d.md`. Se cruza con K4 (los metales) | P2 | Alta | Claude + Astra | K4 |
+| AR-3 · Las placas | El encargo `plate`, al cerrar la villa con piedra | P3 | Media | Claude + Astra | AR-1 |
+| AR-4 · El arnés completo | El encargo `harness`, con el castillo y el rey | P3 | Media | Claude + Astra | AR-3, el castillo |
+
+**Abierto, de Vera:** si el rey y el castillo pasan a llegar con la Edad de los
+Caballeros. Hoy `docs/design.md` (v4.66) dice «leader», no «king», «hasta la
+Edad del Hierro», y con estos nombres la del Hierro es la segunda.
+
 ### H · Deuda medida (el cuaderno)
 
 Lo que `docs/task-log.md` §4 lleva anotado con su medida y **no bloquea la

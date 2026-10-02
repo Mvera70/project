@@ -24,6 +24,13 @@ import { boot } from './app';
 import { giveNow, raidNow, stateAt } from './debug';
 import type { BattleStats } from '../render3d/renderer';
 
+/**
+ * K5 · Los petos en el banco (2 oct 2026, v5.80): sin ellos, o puestos en todo
+ * el cerco, como el juego mientras dura el encargo de la herrería. Desde v5.81
+ * el peto **decide** en la pelea con la tabla de `wounds.ts`.
+ */
+export type JerkinMode = 'off' | 'worn';
+
 export interface BattleSetup {
   readonly seed: number;
   readonly year: number;
@@ -37,6 +44,8 @@ export interface BattleSetup {
    * coincidiría el contacto. Es la medida del aparato que F-1 necesita.
    */
   readonly shadow?: number;
+  /** K5 · `&jerkins=on`: los del cerco con peto (`JerkinMode`). */
+  readonly jerkins: JerkinMode;
 }
 
 /** Lo que pide la dirección, con valores por omisión que dan una batalla corta. */
@@ -52,6 +61,7 @@ export function battleSetupFrom(search: string): BattleSetup {
     defenders: number('defenders', 6, 0, 60),
     arm: query.get('arm') === 'spear' ? 'spear' : 'bow',
     raiders: number('raiders', 12, 1, 80),
+    jerkins: query.get('jerkins') === 'on' ? 'worn' : 'off',
     ...(shadowFrom(query.get('shadow'))),
   };
 }
@@ -68,6 +78,7 @@ export function battleUrl(setup: BattleSetup, path: string = location.pathname):
     sandbox: 'battle', seed: String(setup.seed), year: String(setup.year),
     defenders: String(setup.defenders), arm: setup.arm, raiders: String(setup.raiders),
     ...(setup.shadow === undefined ? {} : { shadow: String(setup.shadow) }),
+    ...(setup.jerkins === 'off' ? {} : { jerkins: 'on' }),
   });
   return `${path}?${query.toString()}`;
 }
@@ -87,6 +98,14 @@ export interface BattleSummary {
   readonly entered: boolean;
   readonly fps: number;
   readonly physicsMs: number;
+  /** v5.81 · Asaltantes heridos que siguen en pie: la vida en porcentaje (`wounds.ts`). */
+  readonly raidersWounded: number;
+  /**
+   * K5/v5.81 · El peto: cuántos lo llevan, golpes que se llevó, cuántos
+   * rebotaron, caídos con él, y los que siguen en pie gracias a él (sombra).
+   */
+  readonly jerkins?: { readonly worn: number; readonly blows: number; readonly ricochets: number;
+    readonly fallen: number; readonly spared: number };
   /** F-0 · con sondas: ms por paso de Rapier y de las sondas, en total de la batalla, y el acuerdo. */
   readonly probes?: { readonly stepMs: number; readonly probeMs: number; readonly arrows: number;
     readonly cylinder: number; readonly rapier: number; readonly same: number };
@@ -178,6 +197,8 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
       <label>Arma <select data-set="arm"><option value="bow"${setup.arm === 'bow' ? ' selected' : ''}>Arco</option>
         <option value="spear"${setup.arm === 'spear' ? ' selected' : ''}>Lanza</option></select></label>
       <label>Asaltantes <input type="number" min="1" max="80" data-set="raiders" value="${setup.raiders}"></label>
+      <label>Petos <select data-set="jerkins" style="width:132px"><option value="off"${setup.jerkins === 'off' ? ' selected' : ''}>Sin</option>
+        <option value="worn"${setup.jerkins === 'worn' ? ' selected' : ''}>Con</option></select></label>
       <div class="row"><button type="button" data-act="launch">Lanzar asalto</button>
         <button type="button" data-act="restart">Reiniciar</button></div>
       <h2>Tiempo</h2>
@@ -204,6 +225,7 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
     defenders: Number(panel.querySelector<HTMLInputElement>('[data-set="defenders"]')!.value) || 0,
     arm: panel.querySelector<HTMLSelectElement>('[data-set="arm"]')!.value === 'spear' ? 'spear' : 'bow',
     raiders: Number(panel.querySelector<HTMLInputElement>('[data-set="raiders"]')!.value) || 1,
+    jerkins: jerkinModeOf(panel.querySelector<HTMLSelectElement>('[data-set="jerkins"]')!.value),
   });
   panel.addEventListener('click', (event) => {
     const target = (event.target as HTMLElement).closest('button');
@@ -259,6 +281,8 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
       fps: Math.round(fps),
       physicsMs: Math.round((last?.physics?.stepMsAverage ?? 0) * 100) / 100,
       ...(probed() === null ? {} : { probes: probed()! }),
+      raidersWounded: d?.wounded ?? 0,
+      ...(setup.jerkins === 'off' || d === null ? {} : { jerkins: { ...d.jerkins } }),
     };
   };
   // F-0 · lo que cuestan las sondas y en cuántos aciertos coincidiría el contacto.
@@ -276,7 +300,8 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
   const tick = (): void => {
     if (!told && window.__valleyBattle !== undefined) {
       window.__valleyBattle({ raiders: setup.raiders, hands: setup.defenders, arm: setup.arm,
-        ...(setup.shadow === undefined ? {} : { shadow: setup.shadow }) });
+        ...(setup.shadow === undefined ? {} : { shadow: setup.shadow }),
+        jerkins: setup.jerkins !== 'off' });
       if (gate !== null) window.__valleyLook?.(gate.x, gate.y);
       told = true;
     }
@@ -304,6 +329,11 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
       ['Bajas (def · asalt)', `${s.defendersLost} · ${s.raidersDown}`],
       ['Flechas · aciertos', `${s.arrowsLoosed} · ${s.arrowHits} (${s.arrowsLoosed === 0 ? 0 : Math.round((100 * s.arrowHits) / s.arrowsLoosed)} %)`],
       ['Golpes de lanza', `${s.spearHits}`],
+      ['Asaltantes heridos en pie', `${s.raidersWounded}`],
+      ...(s.jerkins === undefined ? [] : [
+        ['Petos en su puesto', `${s.jerkins.worn} · ${s.jerkins.blows} golpes al cuero · ${s.jerkins.ricochets} rebotes`] as [string, string],
+        ['Caídos con peto', `${s.jerkins.fallen} · en pie gracias a él: ${s.jerkins.spared}`] as [string, string],
+      ]),
       ['Portón', `${s.gateHits} / 60 golpes${s.gateBroken ? ' · roto' : ''}${enteredEver ? ' · han entrado' : ''}`],
       ['FPS', `${s.fps}`],
       ['Física por paso', physics === null ? 'arranca al llegar' : `${physics.stepMs.toFixed(2)} ms (media ${physics.stepMsAverage.toFixed(2)})`],
@@ -321,6 +351,10 @@ function mountPanel(setup: BattleSetup, gate: { x: number; y: number } | null): 
       + `${Math.max(0, (last?.raiders ?? 0) - s.raidersDown)} · ${s.arrowsLoosed} flechas · portón ${s.gateHits}/60 · ${s.fps} fps`;
   };
   window.setInterval(tick, 250);
+}
+
+function jerkinModeOf(value: string): JerkinMode {
+  return value === 'worn' ? 'worn' : 'off';
 }
 
 /** Al portapapeles; si el navegador no deja, se enseña para copiarlo a mano. */

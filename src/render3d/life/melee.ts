@@ -26,6 +26,7 @@ import type { Manned } from './garrison';
 import type { Raider } from './raiders';
 import { VILLAGER_CLIPS } from '../clips';
 import { LIFE_STEP } from './clock';
+import { strike, type Armour } from './wounds';
 
 /** Fechas visuales: no cambian daño, alcance, velocidades ni selección. */
 export interface MeleeGesture {
@@ -55,15 +56,25 @@ export function meleePose(body: MeleeGesture, step: number):
 
 /** Lo que hace falta saber de quien defiende un puesto, sin conocer `Dweller`. */
 export interface Defender extends MeleeGesture {
+  /** v5.81 · La vida, de 1 a 0 (`wounds.ts`). Sin campo, entero. */
+  health?: number;
+  /** v5.81 · Lo que lleva puesto: el peto de cuero si el encargo dura (`Manned.jerkin`). */
+  readonly armour?: Armour;
+  /** v5.81 · Sombra: la vida que le quedaría sin nada encima. No decide nada. */
+  bareHealth?: number;
+  /** v5.81 · Golpes que rebotaron enteros en lo que lleva puesto. */
+  ricochets?: number;
   downAt?: number;
   /** El cuerpo, para medir distancias. */
   readonly at: { readonly x: number; readonly y?: number; readonly z: number };
   /** Qué puesto ocupa: con lanza se pelea mejor que con un arco tensado. */
   readonly post: Manned;
-  /** Los golpes que lleva encima. */
+  /** Los golpes que lleva encima, contados: lo que tumba es la vida. */
   hits: number;
   /** Si ya ha caído. La jornada lo deja en el suelo; el motor lo entierra. */
   down: boolean;
+  /** K5 · Golpes recibidos con armadura puesta. */
+  padded?: number;
 }
 
 /**
@@ -78,13 +89,14 @@ export interface Defender extends MeleeGesture {
 const REACH = 0.9;
 
 /**
- * Cada cuántos pasos se da un golpe, y cuántos aguanta una persona.
+ * Cada cuántos pasos se da un golpe.
  *
- * TUNE: un golpe cada medio segundo (quince pasos) y tres golpes para caer, y
- * los dos salen de lo que ya hay medido: el portón recibe un golpe por hombre y
- * por segundo, y un hombre se mueve más deprisa que una puerta. Tres golpes
- * son un segundo y medio de pelea perdida, que a la escala de esta escena —una
- * jornada son ciento veinte segundos— es un intercambio y no un desmayo.
+ * TUNE: un golpe cada medio segundo (quince pasos), que sale de lo que ya hay
+ * medido: el portón recibe un golpe por hombre y por segundo, y un hombre se
+ * mueve más deprisa que una puerta. **Cuántos aguanta una persona ya no se
+ * cuenta aquí**: lo dice la vida (`wounds.ts`, v5.81). Una lanza quita el 34 %,
+ * así que sin nada encima siguen siendo tres golpes —un segundo y medio de
+ * pelea perdida, un intercambio y no un desmayo— y con peto, cuatro.
  *
  * Y el que defiende con **lanza** pega igual que el que ataca; el **arquero**
  * pega la mitad de veces, porque está soltando un arco cuando le llegan encima.
@@ -92,7 +104,6 @@ const REACH = 0.9;
  * las dos cosas (C1: lanzas **y** arcos).
  */
 const BLOW_STEPS = 15;
-const BLOWS_TO_FALL = 3;
 const ARCHER_PENALTY = 2;
 
 /**
@@ -127,11 +138,17 @@ export function stepMelee(
     if (target === null) continue;
 
     target.hits += 1;
+    // v5.81 · La lanza del clan contra lo que lleve puesto, y la sombra de lo
+    // que habría hecho contra el cuerpo desnudo (lo que la armadura paró).
+    const blow = strike(target, raider.body.id * 7919 + 1, 'spear', step);
+    target.bareHealth = Math.max(0, (target.bareHealth ?? 1) - blow.bare);
+    if (target.armour !== undefined) target.padded = (target.padded ?? 0) + 1;
+    if (blow.ricocheted) target.ricochets = (target.ricochets ?? 0) + 1;
     raider.thrustAt = step;
     target.hitAt = step;
     raider.meleeFacing = Math.atan2(target.at.x - raider.body.x, target.at.z - raider.body.z);
     target.meleeFacing = Math.atan2(raider.body.x - target.at.x, raider.body.z - target.at.z);
-    if (target.hits >= BLOWS_TO_FALL) { target.down = true; target.downAt = step; }
+    if (blow.felled) { target.down = true; target.downAt = step; }
 
     // **Y le devuelve el golpe.** El arquero, la mitad de veces: tensar un arco
     // con alguien encima es lo que le pasa a un arquero.
@@ -140,13 +157,49 @@ export function stepMelee(
     raider.hits += 1;
     target.thrustAt = step;
     raider.hitAt = step;
-    if (raider.hits >= BLOWS_TO_FALL) {
+    // TUNE: el arquero con alguien encima pega con lo que tenga a mano, y se
+    // cuenta como una lanza: lo que le hace peor es que pega la mitad de veces.
+    if (strike(raider, raider.body.id * 7919 + 2, 'spear', step).felled) {
       raider.phase = 'down';
       raider.downAt = step;
       raider.body.vx = 0;
       raider.body.vz = 0;
     }
   }
+}
+
+/**
+ * K5/v5.81 · Lo que hizo la armadura hoy en la pelea. Desde v5.81 **decide**
+ * (`wounds.ts`): esto lo cuenta, y la sombra dice lo que habría pasado sin ella.
+ */
+export interface JerkinTally {
+  /** Defensores con armadura que han llegado a su puesto. */
+  readonly worn: number;
+  /** Golpes que han ido a parar a una armadura. */
+  readonly blows: number;
+  /** De esos, los que rebotaron enteros. */
+  readonly ricochets: number;
+  /** Caídos con armadura. */
+  readonly fallen: number;
+  /**
+   * Sombra: en pie gracias a ella. Siguen de pie, y con los mismos golpes sin
+   * nada encima ya estarían en el suelo. Es lo que el motor cuenta en la crónica
+   * (`raid.held.jerkins`) cuando el cerco aguanta.
+   */
+  readonly spared: number;
+}
+
+export function jerkinTally(defenders: readonly Defender[]): JerkinTally {
+  let worn = 0; let blows = 0; let ricochets = 0; let fallen = 0; let spared = 0;
+  for (const defender of defenders) {
+    if (defender.armour === undefined) continue;
+    worn += 1;
+    blows += defender.padded ?? 0;
+    ricochets += defender.ricochets ?? 0;
+    if (defender.down) fallen += 1;
+    else if ((defender.bareHealth ?? 1) <= 1e-6) spared += 1;
+  }
+  return { worn, blows, ricochets, fallen, spared };
 }
 
 /** Cuántos de los nuestros han caído. Es el `lost` del parte de B4. */

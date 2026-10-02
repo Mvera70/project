@@ -32,8 +32,8 @@ function walled(seed: number): GameState {
 describe('el banco de batallas', () => {
   it('lee la dirección con topes y la vuelve a escribir igual', () => {
     const setup = battleSetupFrom('?sandbox=battle&defenders=30&arm=spear&raiders=500&seed=11&year=70');
-    expect(setup).toEqual({ seed: 11, year: 70, defenders: 30, arm: 'spear', raiders: 80 });
-    expect(battleSetupFrom('?sandbox=battle')).toEqual({ seed: 7, year: 60, defenders: 6, arm: 'bow', raiders: 12 });
+    expect(setup).toEqual({ seed: 11, year: 70, defenders: 30, arm: 'spear', raiders: 80, jerkins: 'off' });
+    expect(battleSetupFrom('?sandbox=battle')).toEqual({ seed: 7, year: 60, defenders: 6, arm: 'bow', raiders: 12, jerkins: 'off' });
     const url = battleUrl(setup, '/project/');
     expect(battleSetupFrom(url.slice(url.indexOf('?')))).toEqual(setup);
   });
@@ -51,6 +51,28 @@ describe('el banco de batallas', () => {
     expect(createVillage(state, 0, { battle: { raiders: 12, garrison } }).shadow).toBeNull();
     expect(createVillage(walled(7), 0, { battle: { raiders: 12, garrison }, shadow: { radius: 0.12, height: 0.65 } }).shadow)
       .not.toBeNull();
+  });
+
+  it('K5 · el mando de los petos: se lee, se escribe, viste al cerco y el motor sigue sin enterarse', () => {
+    for (const [query, mode] of [['on', 'worn'], ['nada', 'off']] as const) {
+      const setup = battleSetupFrom(`?sandbox=battle&jerkins=${query}`);
+      expect(setup.jerkins).toBe(mode);
+      const url = battleUrl(setup, '/project/');
+      expect(battleSetupFrom(url.slice(url.indexOf('?')))).toEqual(setup);
+    }
+    const state = walled(7);
+    // Sin encargo de la herrería, el juego no los pone; el banco, si se pide.
+    expect(garrisonOf(state).jerkins).toBe(false);
+    expect(garrisonAs(state, 6, 'bow').jerkins).toBe(false);
+    const before = JSON.stringify(state);
+    const life = createVillage(state, 0, { battle: { raiders: 12, garrison: garrisonAs(state, 6, 'bow', true) } });
+    expect(life.manned.length).toBeGreaterThan(0);
+    expect(life.manned.every((post) => post.jerkin), 'todo el cerco con peto').toBe(true);
+    for (let step = 0; step < 20; step += 1) life.step();
+    expect(JSON.stringify(state), 'el motor no se entera').toBe(before);
+    // Y con el encargo en marcha, la guarnición del juego lo lleva.
+    state.flags['smithy:jerkins'] = state.tick + 52;
+    expect(garrisonOf(state).jerkins).toBe(true);
   });
 
   it('sube las manos que se piden, con su arma, y el portón sigue con lanza', () => {

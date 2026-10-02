@@ -36,7 +36,7 @@ import { doorOf, OFFERS, placedOffer, placesOf, seatAt, seatKey, strikeTurn, typ
 import { garrisonPlaces, isPost, mannedPlatformCells, type Manned, type RampartSelector, type RingSelector, type WalkwaySelector } from './garrison';
 import { advanceElevated, type ElevatedPoint, type ElevatedPost } from './elevated-post';
 import { archersOf, archeryShadow, stepArchery, type Archer, type ArcheryShadow, type Arrow } from './archery';
-import { fallenDefenders, meleePose, stepMelee, type Defender } from './melee';
+import { fallenDefenders, jerkinTally, meleePose, stepMelee, type Defender, type JerkinTally } from './melee';
 import { bastionParapetObstacles, bastionWalkwayParapetObstacles, createPhysics, type Physics, type PhysicsOptions, type PhysicsSnapshot, type ProbeShape } from './physics';
 import type { RagdollSeed } from '../contracts';
 import { commons } from './places';
@@ -445,8 +445,16 @@ export interface Village {
     /** De `hits`, los de flecha (el resto son de lanza). */
     readonly arrowHits: number;
     readonly fallen: number;
+    /** v5.81 · Los del clan tocados que siguen en pie (`wounds.ts`). */
+    readonly wounded: number;
     /** D4 · Los de la aldea que han caído defendiendo su puesto. */
     readonly lost: number;
+    /**
+     * K5/v5.81 · La armadura en la pelea (`jerkinTally`): decide con la tabla de
+     * `wounds.ts`, y `spared` —los que siguen en pie gracias a ella— entra en
+     * el parte para la crónica.
+     */
+    readonly jerkins: JerkinTally;
     /**
      * D5 · Los golpes que lleva el portón y si ha cedido, cuando hay asalto.
      *
@@ -532,7 +540,10 @@ export interface DayOptions {
    * su arma. **Nunca lo pone el juego**: sólo el banco, para ver y corregir el
    * combate con el número de cuerpos que se quiera.
    */
-  readonly battle?: { readonly raiders: number; readonly garrison: Garrison };
+  readonly battle?: {
+    readonly raiders: number;
+    readonly garrison: Garrison;
+  };
   /**
    * F-0 · **La flecha que toca, en sombra** (29 sep 2026,
    * `docs/diagnostico-fisica-combate-2026-09-29.md` §3): una cápsula de Rapier
@@ -1674,9 +1685,13 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         hits: raiders.reduce((sum, raider) => sum + raider.hits, 0),
         arrowHits: raiders.reduce((sum, raider) => sum + (raider.arrowHits ?? 0), 0),
         fallen: raiders.filter((raider) => raider.phase === 'down').length,
+        // v5.81 · tocados y en pie: con la vida en porcentaje, una flecha ya no tumba.
+        wounded: raiders.filter((raider) => raider.phase !== 'down' && raider.phase !== 'gone'
+          && (raider.health ?? 1) < 1).length,
         // D4 · los nuestros que han caído defendiendo. Es el `lost` del parte
         // de B4, y es la primera vez que este número no es cero.
         lost: fallenDefenders([...wounded.values()]),
+        jerkins: jerkinTally([...wounded.values()]),
         gate: gate === null ? null : {
           at: { ...gate.at },
           hitAt: gate.hitAt ?? null,
@@ -3028,6 +3043,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           const already = wounded.get(there.villager);
           const defender: Defender = already ?? {
             at: there.body, post, hits: 0, down: false,
+            // v5.81 · el peto, si el encargo dura: ya decide (`wounds.ts`).
+            ...(post.jerkin ? { armour: 'jerkin' as const } : {}),
           };
           wounded.set(there.villager, defender);
           defenders.push(defender);

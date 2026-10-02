@@ -165,6 +165,9 @@ if (root) {
     // K5 · y `&linen=6` pone lienzo en la sastrería, para fotografiar la ropa.
     const linen = Number(query.get('linen'));
     if (Number.isFinite(linen) && linen > 0) state.village.linen = Math.floor(linen);
+    // K5 · `&jerkins=1` deja el encargo de los petos en marcha un año, para
+    // fotografiar el cerco con ellos puestos (`Garrison.jerkins`).
+    if (query.get('jerkins') === '1') state.flags['smithy:jerkins'] = state.tick + TIME.WEEKS_PER_YEAR;
     // F3 · `&ended=1` acaba la partida, y `&ended=<causa>` acaba de esa manera
     // concreta: `extinction`, `abandoned`, `dispersed` o `stormed`. Hacía falta
     // para poder fotografiar las cuatro lápidas —cada una tiene su capitular y
