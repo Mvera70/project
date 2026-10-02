@@ -4892,3 +4892,31 @@ decidido por Sol 6: como máximo aparece un rollo de lienzo fuera del taller cua
 Villa grande, semilla 7/año 60/verano, base `main` con K5: `gl-probe` 8 s **525 → 512 llamadas, 875 140 → 871 383 triángulos dinámicos, 48 → 48 programas**; `scene-report` **472 → 467 mallas, 203 → 197 sombras, 786 222 → 787 354 triángulos**. La caída de triángulos en la sonda depende de la fase de personajes; el recuento estable de escena sube 1 132 por el taller detallado. El cambio de llamadas es −13, sin sobrecoste de render.
 
 Capturas de la misma partida y cámara: `artifacts/graphics/astra-b2-tailor-baseline/tailor-close.png` antes y `artifacts/graphics/astra-b2-tailor/tailor-close.png` después; plano general en `artifacts/graphics/astra-b2-tailor/village.png`. Toma 3D de 12 s a 2 fps con 48 personas y 36 animales: `observe-life` antes/después 0 errores, `meshDrift` 0→0, `peopleMeshDrift` 4→4, `penetratingCircles` 5→5, `blockedCentres` 4→4, `penetratingBeasts` 0→0. Son incidencias previas del mismo valle, no regresiones de esta colocación. Puerta local: `typecheck`, `lint`, 67 pruebas rápidas pertinentes, 5 recetas validadas y `npm run shot`.
+
+## 2 oct 2026 · Decisiones de malla de viviendas V2
+
+decidido por Sol 6: diferenciar las cinco viviendas mediante dobles hastiales desiguales, pirámide de paja, cubierta transversal baja con porche, cruz elevada y altillo doméstico de 7,46 m; conservar literalmente las tres ventanas y todas las piezas de puerta, su bisagra y parcela 6×6 m. La altura del altillo se usa para que sobreviva la diferencia a escala de móvil; no añade ventanas ni almenas.
+
+## 2 oct 2026 · Corrección V3 de viviendas, tras rechazo de Vera (v5.102)
+
+Vera rechazó la V2 porque parecía inventada y pidió basarse en algo real. La
+V2 queda como antecedente del proceso, no como arte aprobado. Informe completo:
+`docs/historico/graphics-rounds/G-43.md`.
+Rama de integración `codex/house-variants-grounded`, desde `main` `2525e173`;
+ASTRA modeló en `7561abaa` y Sol 6 publicó y midió en esta rama.
+
+decidido por Sol 6: reemplazar las siluetas V2 por rasgos de cinco edificios documentados (Bayleaf, Boarhunt, Hangleton, Church Farmhouse y Sea Hill); los IDs técnicos heredados permanecen para no cambiar el selector de la escena.
+decidido por Sol 6: mantener la casa básica byte a byte, la parcela de 6×6 m y el acceso con el mismo pivote; permitir tres ventanas de tamaños y posiciones desiguales porque copiar los huecos V2 impedía representar las referencias.
+decidido por Sol 6: conservar la paja en las cuatro referencias que la muestran o la documentan, aunque el conjunto de piedra resulte menos variado por color; la diferencia se busca en masa y fachada sin introducir materiales ajenos a la paleta.
+decidido por Sol 6: admitir la cubierta sencilla de Hangleton como hipótesis de juego, explícitamente señalada como conjetural por el museo, y no presentar como medievales las partes reformadas de Church Farmhouse y Sea Hill.
+
+ASTRA reconstruyó cinco GLB con 884, 506, 734, 1090 y 842 triángulos; hojas
+individuales y comparación de cámara de reposo revisadas. La villa grande pasó
+de 549 a 553 llamadas y de 787 354 a 782 700 triángulos estables; aldea,
+430 a 426 llamadas y 723 528 a 720 382 triángulos estables. Mallas y sombras
+no subieron. Pasaron `typecheck`, `lint`, 15 pruebas rápidas, validador V3 y
+`npm run shot`. Capturas reales antes/después de caserío, aldea y villa en
+`artifacts/graphics/G-43/`.
+El control rápido de CI encontró una altura de contacto de piedra aún fijada
+al GLB antiguo; se actualizó en la capa de vida 3D, sin tocar `src/engine/`.
+Después pasaron las 2 175 pruebas rápidas con cuatro workers (225 ficheros).

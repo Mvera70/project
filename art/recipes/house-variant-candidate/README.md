@@ -1,30 +1,32 @@
-# Viviendas candidatas · GLB y mampostería
+# Viviendas V3 · referencias vernáculas
 
-27 sep 2026. Cuatro variantes y mejora de muros para stone-house, sin cambiar parcela, capacidad, puerta ni las tres ventanas originales.
+2 oct 2026. Esta revisión sustituye la propuesta V2 rechazada. Los cinco ID antiguos se conservan por compatibilidad; sus nombres no describen necesariamente la forma nueva. La básica `house.glb` permanece intacta.
 
-| Modelo | Silueta | Triángulos GLB | Límite |
+| ID | Referencia y rasgo traducido | Triángulos | Mallas |
 |---|---|---:|---:|
-| house-twin-gable | Dos crujías y cumbreras paralelas de paja | 708 | 900 |
-| house-hip-roof | Cubierta piramidal de cuatro aguas | 664 | 900 |
-| stone-house-cross-gable | Hastial transversal elevado | 1176 | 1200 |
-| stone-house-tower-loft | Altillo lateral con cubierta propia | 1198 | 1200 |
-| stone-house | Silueta original, nuevas juntas y relieve | 1048 | 1200 |
+| house-twin-gable | Bayleaf: extremos volados, salón retraído y teja | 884 | 6 |
+| house-hip-roof | Boarhunt: hall bajo, paja y cadera lateral | 506 | 6 |
+| stone-house | Hangleton: mampostería humilde, paja, huecos pequeños | 734 | 5 |
+| stone-house-cross-gable | Church Farmhouse: hall y ala transversal desde suelo | 1090 | 5 |
+| stone-house-tower-loft | Sea Hill: cuarto bajo sobre porche con dos apoyos | 842 | 5 |
+
+Las referencias, fotos efectivamente examinadas y simplificaciones están en cada `artifacts/graphics/astra/<id>/README.md` y en `reference` dentro de cada JSON. Son adaptaciones comprimidas dentro de parcela 6×6 m, no reproducciones a escala de los edificios. Hangleton tiene cubierta conjetural; Church Farmhouse y Sea Hill tienen reformas posteriores a su origen medieval. Para estos dos últimos se empleó únicamente la descripción de Historic England, sin atribuir detalles a una foto no verificada.
 
 ## Reproducción
 
 1. `node art/recipes/house-variant-candidate/design.mjs`
 2. `blender --background --python art/recipes/house-variant-candidate/build-candidates.py`
+3. `blender --background --python art/recipes/house-variant-candidate/comparison-v3.py`
+4. `npx tsx art/recipes/house-variant-candidate/validate-v3.ts`
 
-El generador produce los cinco JSON de esta carpeta a partir de las recetas originales. El adaptador Blender consume también `candidateBuild`: juntas, biseles, eliminación de caras enterradas y pivote. Es necesario usar este adaptador para reproducir los GLB: el constructor genérico no aplica esa extensión. Se puede construir uno pasando `-- <id>` después del script.
+El adaptador usa `customMesh` para cascarones facetados de cubierta con alero de espesor, cumbrera horizontal y extremos de cadera. También aplica `candidateBuild`: juntas pétreas, retirada de caras enterradas y bisagra. No basta el constructor genérico para reproducir estas extensiones. La entrada antigua validate-v2.ts redirige a V3.
 
-Salida por modelo: `artifacts/graphics/astra/<id>/`, con `<id>.glb`, `sheet.png`, cuatro capturas individuales, `metrics.json` y `README.md`. Las hojas muestran tres cuartos, frente, frente opuesto y comparación a escala con aldeano, house y stone-house publicados. Dimensiones precisas y materiales en cada README y metrics.json.
+## Contrato y evidencia
 
-## Geometría y contrato
+Recetas en metros, exportación a 1/3: 1 celda = 3 m. Parcela 2×2, origen original, frente Blender −Y. Piezas de puerta y bisagra originales verificadas; madera `[2.5, .28, 0]` m, piedra `[2.475, .25, 0]` m. El umbral heredado baja 0,0025 celdas. Las ventanas ya NO conservan sus medidas/posiciones originales: hay exactamente tres primitivas `House_Window_A/B/C` o `Stone_Window_A/B/C`, con tamaños y alturas asimétricos. Material `window` conserva también fondo de puerta; no todo ese material debe emitir luz.
 
-Parcela 6×6 m = 2×2 celdas. Receta en metros, Blender Z arriba, exportación a escala 1/3. Se conservan origen y orientación originales. El fondo del umbral heredado alcanza −0,0025 celdas; no se altera. Las pequeñas desviaciones del límite 2,0 en los GLB son precisión de coma flotante.
+Los nombres de materiales se mantienen, sin texturas. Bayleaf usa la paleta tiled por su teja; las demás la thatched por su cubierta documentada. Una malla por material y puerta independiente. Los presupuestos son 900 para madera y 1200 para piedra.
 
-La puerta es la malla `<id>_door`, con origen en la bisagra izquierda: madera `[2.5, 0.28, 0]` m; piedra `[2.475, 0.25, 0]` m, en Blender. Las piezas de puerta y las tres ventanas conservan exactamente sus primitivas, dimensiones y posiciones respecto a los modelos base. No hay ventanas nuevas. El material `window` incluye también fondos oscuros heredados: la integración no debe convertir todo ese material en emisivo.
+`house-variants-v3/comparison-rest.png` compara los seis GLB con cámara del juego y escala común. Fila inferior reducida a unos 55 px de ancho por casa y ampliada ×4; `comparison-small.png` es 1:1. Cada sheet.png tiene tres cuartos, frente, perfil y escala con aldeano y casas publicadas.
 
-La piedra incorpora hiladas alternadas, juntas retranqueadas y biseles de 2,5–3,5 cm. Usa el mismo material `stone`, sin texturas ni nuevos colores. Se eliminan solo polígonos enteros estrictamente contenidos en otro sólido; puertas y huecos oscuros quedan excluidos. Los pequeños puntos oscuros en cumbreras y marcos son sombras de contacto: una reconstrucción frontal de house-twin-gable conservando todas sus caras originales produjo una captura idéntica píxel a píxel.
-
-Recuento de triángulos, nombres de puerta, pivotes y ausencia de texturas comprobados directamente en los cinco GLB. Sin preguntas de diseño pendientes. La revisión cubre recetas, GLB y capturas; integración, emisión nocturna y estaciones corresponden a la sesión principal. No se han ejecutado tests ni modificado los modelos publicados.
+Validadas recetas y GLB con herramientas del proyecto, tres huecos, piezas originales de puerta, pivote exportado, presupuesto y ausencia de texturas. Reimportación Blender y revisión visual completadas. Integración, prueba nocturna y estaciones pertenecen al director; este carril no publica.

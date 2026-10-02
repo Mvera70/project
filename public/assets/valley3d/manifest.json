@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-02T17:58:14.534Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids tailor,loom,field-flax,field-flax-cut,linen-bolt,tailor-board",
+  "generatedAt": "2026-10-02T21:02:37.662Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids house-twin-gable,house-hip-roof,stone-house,stone-house-cross-gable,stone-house-tower-loft",
   "assets": [
     {
       "id": "axis-marker",
@@ -86,17 +86,6 @@
       "file": "shed.glb",
       "sha256": "C5CCD1EAB317043B1FE2E11C6D342B4FFED796BA4FCDD27D94F010A260307260",
       "motion": []
-    },
-    {
-      "id": "stone-house",
-      "file": "stone-house.glb",
-      "sha256": "1FDBB0252A67B294E94D99A596B22264FCD2DB249C47A83E13B8757D9CF6A599",
-      "motion": [],
-      "provenance": {
-        "kind": "original",
-        "source": "Revisión original de mampostería para The Valley, receta G-41.",
-        "license": "Project original"
-      }
     },
     {
       "id": "field",
@@ -1197,50 +1186,6 @@
       }
     },
     {
-      "id": "house-twin-gable",
-      "file": "house-twin-gable.glb",
-      "sha256": "1CA974DB811E5FE1F695F3A3F99A93A899D2DD9C9BA29C14061DF7D6CE35C278",
-      "motion": [],
-      "provenance": {
-        "kind": "original",
-        "source": "Variante original de house para The Valley, receta G-41.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "house-hip-roof",
-      "file": "house-hip-roof.glb",
-      "sha256": "FE50B95E7424526A60359271DB733426698DE2436797C20A5C881D8532316C9F",
-      "motion": [],
-      "provenance": {
-        "kind": "original",
-        "source": "Variante original de house para The Valley, receta G-41.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "stone-house-cross-gable",
-      "file": "stone-house-cross-gable.glb",
-      "sha256": "60FAF162B003CED0FA9D51BE804C3805A0B9BE1A27B0035DF1CD54BCFEF3F216",
-      "motion": [],
-      "provenance": {
-        "kind": "original",
-        "source": "Variante original de stone-house para The Valley, receta G-41.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "stone-house-tower-loft",
-      "file": "stone-house-tower-loft.glb",
-      "sha256": "F2FC99979406D6826280D80CED2B77D218F4BB8114BD7BEE149DA037C53D0F95",
-      "motion": [],
-      "provenance": {
-        "kind": "original",
-        "source": "Variante original de stone-house para The Valley, receta G-41.",
-        "license": "Project original"
-      }
-    },
-    {
       "id": "burnt-house",
       "file": "burnt-house.glb",
       "sha256": "7B489DB61B304A7281040264147CDDE7305437D7768288C4D122179526079018",
@@ -2171,6 +2116,61 @@
         "kind": "original",
         "source": "Original The Valley model from the reproducible B1 recipe, released after K5.",
         "license": "project-original"
+      }
+    },
+    {
+      "id": "house-twin-gable",
+      "file": "house-twin-gable.glb",
+      "sha256": "D5D32A32BE826A1E4D00577DE1F374A8B07189E38A9407BCC659F02FD3C6A800",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de house para The Valley, receta G-43.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "house-hip-roof",
+      "file": "house-hip-roof.glb",
+      "sha256": "9142D6E1BF417B7E946598011C1BB728F7B0D48970A89E7F76E0BFBA3F268675",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de house para The Valley, receta G-43.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "stone-house",
+      "file": "stone-house.glb",
+      "sha256": "183E55A5077B2EAC02AD093CCF980C6F723722A6D9824670D5EB3732E7515478",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Revisión original de mampostería para The Valley, receta G-43.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "stone-house-cross-gable",
+      "file": "stone-house-cross-gable.glb",
+      "sha256": "B049CD1EEDFB86DCC8E796FB87B55F57939EC8E03C918D863C854A4F0023F959",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de stone-house para The Valley, receta G-43.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "stone-house-tower-loft",
+      "file": "stone-house-tower-loft.glb",
+      "sha256": "B76CF17C42763121315013CF8AFB2CDBBF4AD9B05FB2CAA246F7D00F1CA7AA38",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Variante original de stone-house para The Valley, receta G-43.",
+        "license": "Project original"
       }
     }
   ]

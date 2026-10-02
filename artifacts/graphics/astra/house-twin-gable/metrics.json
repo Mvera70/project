@@ -1,23 +1,24 @@
 {
+  "meshes": 6,
   "id": "house-twin-gable",
-  "triangles": 708,
+  "triangles": 884,
   "triangleLimit": 900,
-  "recipePrimitiveTriangles": 736,
+  "recipePrimitiveTriangles": 988,
   "dimensionsMetres": [
-    6.000000715255737,
-    4.690500050783157,
-    6.000000089406967
+    6.0,
+    5.3075003027915955,
+    5.045000217854977
   ],
   "boundsBlenderCells": {
     "min": [
       0.0,
-      -2.9802322387695312e-08,
-      -0.0025000274181365967
+      -0.0016666725277900696,
+      -0.002499997615814209
     ],
     "max": [
-      2.000000238418579,
       2.0,
-      1.5609999895095825
+      1.6800000667572021,
+      1.7666667699813843
     ]
   },
   "doorPivotMetres": [
@@ -26,11 +27,11 @@
     0
   ],
   "materials": {
-    "plaster": "#E2CC9B",
-    "roof": "#C7984A",
-    "wood": "#9A744C",
+    "plaster": "#D2B98A",
+    "roof": "#7A382B",
+    "wood": "#6B4932",
     "stone": "#9B958A",
-    "window": "#6B4C32",
-    "door": "#9A744C"
+    "window": "#3F2B22",
+    "door": "#6B4932"
   }
 }

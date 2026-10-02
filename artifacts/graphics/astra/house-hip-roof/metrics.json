@@ -1,23 +1,24 @@
 {
+  "meshes": 6,
   "id": "house-hip-roof",
-  "triangles": 664,
+  "triangles": 506,
   "triangleLimit": 900,
-  "recipePrimitiveTriangles": 702,
+  "recipePrimitiveTriangles": 544,
   "dimensionsMetres": [
-    5.999999821186066,
-    4.9675003588199615,
-    5.999999821186066
+    6.0,
+    4.397500097751617,
+    4.440000057220459
   ],
   "boundsBlenderCells": {
     "min": [
-      5.960464477539063e-08,
-      5.960464477539063e-08,
-      -0.0025000274181365967
+      0.0,
+      0.0,
+      -0.002499997615814209
     ],
     "max": [
       2.0,
-      2.0,
-      1.6533334255218506
+      1.4800000190734863,
+      1.4633333683013916
     ]
   },
   "doorPivotMetres": [

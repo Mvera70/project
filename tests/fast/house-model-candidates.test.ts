@@ -22,7 +22,7 @@ function recipe(path: string): Recipe {
 
 const variants = [
   { base: 'house', other: ['house-twin-gable', 'house-hip-roof'], prefix: 'House' },
-  { base: 'stone-house', other: ['stone-house-cross-gable', 'stone-house-tower-loft'], prefix: 'Stone' },
+  { base: 'stone-house', other: ['stone-house', 'stone-house-cross-gable', 'stone-house-tower-loft'], prefix: 'Stone' },
 ] as const;
 
 describe('nuevas siluetas de vivienda', () => {
@@ -30,18 +30,25 @@ describe('nuevas siluetas de vivienda', () => {
     const original = recipe(`art/recipes/${base}/${base}.json`);
     for (const id of other) {
       const candidate = recipe(`art/recipes/house-variant-candidate/${id}.json`);
-      it(`${id} conserva parcela, puerta y tres ventanas para la noche`, () => {
+      it(`${id} conserva parcela y acceso, con tres ventanas visibles para la noche`, () => {
         expect(candidate.id).toBe(id);
         expect(candidate.metadata.footprint).toEqual([2, 2]);
         const parts = (source: Recipe, names: readonly string[]) => source.primitives
           .filter(part => names.includes(part.name))
           .map(({ name, material, location, dimensions }) => ({ name, material, location, dimensions }));
-        const openingNames = [`${prefix}_Door`, ...['A', 'B', 'C'].map(letter => `${prefix}_Window_${letter}`)];
-        expect(parts(candidate, openingNames)).toEqual(parts(original, openingNames));
-        expect(parts(candidate, openingNames)).toHaveLength(4);
-        expect(candidate.primitives.filter(part => part.material === 'window')).toHaveLength(
-          original.primitives.filter(part => part.material === 'window').length,
-        );
+        const doorName = `${prefix}_Door`;
+        expect(parts(candidate, [doorName])).toEqual(parts(original, [doorName]));
+        expect(parts(candidate, [doorName])).toHaveLength(1);
+        const windowNames = ['A', 'B', 'C'].map(letter => `${prefix}_Window_${letter}`);
+        const windows = parts(candidate, windowNames);
+        expect(windows).toHaveLength(3);
+        for (const window of windows) {
+          expect(window.material).toBe('window');
+          expect(window.location).toHaveLength(3);
+          expect(window.dimensions).toHaveLength(3);
+          expect(window.dimensions?.every(size => size > 0)).toBe(true);
+        }
+        expect(candidate.primitives.filter(part => part.material === 'window')).toHaveLength(4);
         expect(candidate.materials.find(material => material.name === 'window'))
           .toEqual(original.materials.find(material => material.name === 'window'));
       });

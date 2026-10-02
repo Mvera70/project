@@ -12,7 +12,7 @@
       2,
       2
     ],
-    "note": "Segunda variante original: cuerpo alto de entramado bajo cubierta piramidal de cuatro aguas. Exactamente tres ventanas y puerta originales; sin huecos nuevos."
+    "note": "V3: adaptación documentada de Hall from Boarhunt; ID heredado por compatibilidad. Tres huecos asimétricos, acceso original."
   },
   "materials": [
     {
@@ -60,22 +60,6 @@
   "primitives": [
     {
       "type": "cube",
-      "name": "House_Walls",
-      "location": [
-        3,
-        3,
-        1.42
-      ],
-      "dimensions": [
-        5.16,
-        5.16,
-        2.84
-      ],
-      "material": "plaster",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
       "name": "House_Door",
       "location": [
         3,
@@ -89,326 +73,6 @@
       ],
       "material": "door",
       "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_Window_A",
-      "location": [
-        1.45,
-        0.36,
-        1.4
-      ],
-      "dimensions": [
-        0.8,
-        0.12,
-        0.7
-      ],
-      "material": "window",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_Window_B",
-      "location": [
-        4.55,
-        0.36,
-        1.4
-      ],
-      "dimensions": [
-        0.8,
-        0.12,
-        0.7
-      ],
-      "material": "window",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_Window_C",
-      "location": [
-        0.36,
-        3.4,
-        1.4
-      ],
-      "dimensions": [
-        0.12,
-        0.8,
-        0.7
-      ],
-      "material": "window",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_Foundation",
-      "location": [
-        3,
-        3,
-        0.14
-      ],
-      "dimensions": [
-        5.35,
-        5.35,
-        0.28
-      ],
-      "material": "stone",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_FrontPost_0_45",
-      "location": [
-        0.45,
-        0.4,
-        1.52
-      ],
-      "dimensions": [
-        0.16,
-        0.15,
-        2.57
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_BackPost_0_45",
-      "location": [
-        0.45,
-        5.6,
-        1.52
-      ],
-      "dimensions": [
-        0.16,
-        0.15,
-        2.57
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_BackPost_3",
-      "location": [
-        3,
-        5.6,
-        1.52
-      ],
-      "dimensions": [
-        0.16,
-        0.15,
-        2.57
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_FrontPost_5_55",
-      "location": [
-        5.55,
-        0.4,
-        1.52
-      ],
-      "dimensions": [
-        0.16,
-        0.15,
-        2.57
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_BackPost_5_55",
-      "location": [
-        5.55,
-        5.6,
-        1.52
-      ],
-      "dimensions": [
-        0.16,
-        0.15,
-        2.57
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_Sill_0_4",
-      "location": [
-        3,
-        0.4,
-        0.34
-      ],
-      "dimensions": [
-        5.32,
-        0.16,
-        0.16
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_Lintel_0_4",
-      "location": [
-        3,
-        0.4,
-        2.77
-      ],
-      "dimensions": [
-        5.34,
-        0.17,
-        0.17
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_Sill_5_6",
-      "location": [
-        3,
-        5.6,
-        0.34
-      ],
-      "dimensions": [
-        5.32,
-        0.16,
-        0.16
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_Lintel_5_6",
-      "location": [
-        3,
-        5.6,
-        2.77
-      ],
-      "dimensions": [
-        5.34,
-        0.17,
-        0.17
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_SideSill_0_4",
-      "location": [
-        0.4,
-        3,
-        0.34
-      ],
-      "dimensions": [
-        0.16,
-        5.3,
-        0.16
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_SideLintel_0_4",
-      "location": [
-        0.4,
-        3,
-        2.77
-      ],
-      "dimensions": [
-        0.17,
-        5.3,
-        0.17
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_SidePost_0_4",
-      "location": [
-        0.4,
-        3,
-        1.52
-      ],
-      "dimensions": [
-        0.16,
-        0.16,
-        2.57
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_SideSill_5_6",
-      "location": [
-        5.6,
-        3,
-        0.34
-      ],
-      "dimensions": [
-        0.16,
-        5.3,
-        0.16
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_SideLintel_5_6",
-      "location": [
-        5.6,
-        3,
-        2.77
-      ],
-      "dimensions": [
-        0.17,
-        5.3,
-        0.17
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_SidePost_5_6",
-      "location": [
-        5.6,
-        3,
-        1.52
-      ],
-      "dimensions": [
-        0.16,
-        0.16,
-        2.57
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
     },
     {
       "type": "cube",
@@ -480,23 +144,6 @@
     },
     {
       "type": "cube",
-      "name": "House_DoorBrace",
-      "location": [
-        3,
-        0.175,
-        0.73
-      ],
-      "dimensions": [
-        0.88,
-        0.055,
-        0.11
-      ],
-      "material": "window",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
       "name": "House_DoorHandle",
       "location": [
         3.34,
@@ -509,261 +156,6 @@
         0.11
       ],
       "material": "door",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_FrameSill_0",
-      "location": [
-        1.45,
-        0.275,
-        1.025
-      ],
-      "dimensions": [
-        1.03,
-        0.25,
-        0.1
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_FrameTop_0",
-      "location": [
-        1.45,
-        0.285,
-        1.8
-      ],
-      "dimensions": [
-        1.03,
-        0.2,
-        0.1
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_Shutter_0_L",
-      "location": [
-        0.8899999999999999,
-        0.3,
-        1.4
-      ],
-      "dimensions": [
-        0.25,
-        0.12,
-        0.73
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_Shutter_0_R",
-      "location": [
-        2.01,
-        0.3,
-        1.4
-      ],
-      "dimensions": [
-        0.25,
-        0.12,
-        0.73
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_FrameMullion_0",
-      "location": [
-        1.45,
-        0.285,
-        1.4
-      ],
-      "dimensions": [
-        0.065,
-        0.065,
-        0.69
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_FrameSill_1",
-      "location": [
-        4.55,
-        0.275,
-        1.025
-      ],
-      "dimensions": [
-        1.03,
-        0.25,
-        0.1
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_FrameTop_1",
-      "location": [
-        4.55,
-        0.285,
-        1.8
-      ],
-      "dimensions": [
-        1.03,
-        0.2,
-        0.1
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_Shutter_1_L",
-      "location": [
-        3.9899999999999998,
-        0.3,
-        1.4
-      ],
-      "dimensions": [
-        0.25,
-        0.12,
-        0.73
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_Shutter_1_R",
-      "location": [
-        5.109999999999999,
-        0.3,
-        1.4
-      ],
-      "dimensions": [
-        0.25,
-        0.12,
-        0.73
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_FrameMullion_1",
-      "location": [
-        4.55,
-        0.285,
-        1.4
-      ],
-      "dimensions": [
-        0.065,
-        0.065,
-        0.69
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_SideFrameSill",
-      "location": [
-        0.28,
-        3.4,
-        1.025
-      ],
-      "dimensions": [
-        0.25,
-        1.02,
-        0.1
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_SideFrameTop",
-      "location": [
-        0.285,
-        3.4,
-        1.8
-      ],
-      "dimensions": [
-        0.2,
-        1.02,
-        0.1
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_SideShutter_2_85",
-      "location": [
-        0.3,
-        2.85,
-        1.4
-      ],
-      "dimensions": [
-        0.12,
-        0.25,
-        0.73
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_SideShutter_3_95",
-      "location": [
-        0.3,
-        3.95,
-        1.4
-      ],
-      "dimensions": [
-        0.12,
-        0.25,
-        0.73
-      ],
-      "material": "wood",
-      "parent": "Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "House_SideMullion",
-      "location": [
-        0.285,
-        3.4,
-        1.4
-      ],
-      "dimensions": [
-        0.065,
-        0.065,
-        0.69
-      ],
-      "material": "wood",
       "parent": "Root",
       "bevel": 0
     },
@@ -784,263 +176,734 @@
       "parent": "Root"
     },
     {
-      "type": "cone",
-      "name": "House_HipRoof",
+      "type": "cube",
+      "name": "Foundation",
       "location": [
         3,
-        3,
-        3.9
+        2.23,
+        0.1
       ],
-      "radius": 4.242640687119285,
-      "depth": 2.12,
-      "vertices": 4,
+      "dimensions": [
+        5.21,
+        3.71,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "HallWalls",
+      "location": [
+        3,
+        2.23,
+        1.08
+      ],
+      "dimensions": [
+        5.2,
+        3.7,
+        2.16
+      ],
+      "material": "plaster",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Sill_9",
+      "location": [
+        3,
+        0.35,
+        0.17
+      ],
+      "dimensions": [
+        5.16,
+        0.14,
+        0.18
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Plate_10",
+      "location": [
+        3,
+        0.35,
+        2.0900000000000003
+      ],
+      "dimensions": [
+        5.16,
+        0.14,
+        0.16
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Post_11",
+      "location": [
+        0.42,
+        0.35,
+        1.08
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        2.16
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Post_12",
+      "location": [
+        2.14,
+        0.35,
+        1.08
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        2.16
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Post_13",
+      "location": [
+        3.8600000000000003,
+        0.35,
+        1.08
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        2.16
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Post_14",
+      "location": [
+        5.58,
+        0.35,
+        1.08
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        2.16
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Sill_15",
+      "location": [
+        3,
+        4.1,
+        0.17
+      ],
+      "dimensions": [
+        5.16,
+        0.14,
+        0.18
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Plate_16",
+      "location": [
+        3,
+        4.1,
+        2.0900000000000003
+      ],
+      "dimensions": [
+        5.16,
+        0.14,
+        0.16
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Post_17",
+      "location": [
+        0.42,
+        4.1,
+        1.08
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        2.16
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Post_18",
+      "location": [
+        2.14,
+        4.1,
+        1.08
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        2.16
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Post_19",
+      "location": [
+        3.8600000000000003,
+        4.1,
+        1.08
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        2.16
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Post_20",
+      "location": [
+        5.58,
+        4.1,
+        1.08
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        2.16
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "EndSill_0_42",
+      "location": [
+        0.42,
+        2.2249999999999996,
+        0.17
+      ],
+      "dimensions": [
+        0.14,
+        3.7499999999999996,
+        0.18
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "EndSill_5_58",
+      "location": [
+        5.58,
+        2.2249999999999996,
+        0.17
+      ],
+      "dimensions": [
+        0.14,
+        3.7499999999999996,
+        0.18
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BraceRight",
+      "location": [
+        5.21,
+        0.32,
+        1.625
+      ],
+      "dimensions": [
+        0.16,
+        0.16,
+        1.1800423721205944
+      ],
+      "material": "wood",
+      "parent": "Root",
       "rotationDegrees": [
         0,
+        -36.384351815835856,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "BraceLeft",
+      "location": [
+        0.775,
+        0.32,
+        1.61
+      ],
+      "dimensions": [
+        0.16,
+        0.16,
+        1.1871394189394944
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
         0,
-        45
+        34.35938029758943,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "BoarhuntThatch",
+      "location": [
+        3,
+        2.22,
+        2.15
+      ],
+      "dimensions": [
+        6,
+        4.44,
+        2.2
       ],
       "material": "roof",
       "parent": "Root",
-      "smooth": false
+      "customMesh": {
+        "vertices": [
+          [
+            -3,
+            -2.22,
+            0
+          ],
+          [
+            3,
+            -2.22,
+            0
+          ],
+          [
+            3,
+            2.22,
+            0
+          ],
+          [
+            -3,
+            2.22,
+            0
+          ],
+          [
+            -3,
+            -2.22,
+            0.16
+          ],
+          [
+            3,
+            -2.22,
+            0.16
+          ],
+          [
+            3,
+            2.22,
+            0.16
+          ],
+          [
+            -3,
+            2.22,
+            0.16
+          ],
+          [
+            -3,
+            0,
+            2.2
+          ],
+          [
+            1.75,
+            0,
+            2.2
+          ]
+        ],
+        "faces": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ],
+          [
+            2,
+            3,
+            7,
+            6
+          ],
+          [
+            3,
+            0,
+            4,
+            7
+          ],
+          [
+            4,
+            5,
+            9,
+            8
+          ],
+          [
+            7,
+            8,
+            9,
+            6
+          ],
+          [
+            4,
+            8,
+            7
+          ],
+          [
+            5,
+            6,
+            9
+          ]
+        ]
+      },
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
     },
     {
       "type": "cube",
-      "name": "House_HipCourseX_0_25_n1",
+      "name": "BoarhuntThatch_Ridge",
       "location": [
-        3,
-        0.75,
-        3.395
+        2.375,
+        2.22,
+        4.3149999999999995
       ],
       "dimensions": [
-        4.57,
-        0.09,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseY_0_25_n1",
-      "location": [
-        0.75,
-        3,
-        3.395
-      ],
-      "dimensions": [
-        0.09,
-        4.57,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseX_0_25_1",
-      "location": [
-        3,
-        5.25,
-        3.395
-      ],
-      "dimensions": [
-        4.57,
-        0.09,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseY_0_25_1",
-      "location": [
-        5.25,
-        3,
-        3.395
-      ],
-      "dimensions": [
-        0.09,
-        4.57,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseX_0_55_n1",
-      "location": [
-        3,
-        1.6500000000000001,
-        4.031000000000001
-      ],
-      "dimensions": [
-        2.7699999999999996,
-        0.09,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseY_0_55_n1",
-      "location": [
-        1.6500000000000001,
-        3,
-        4.031000000000001
-      ],
-      "dimensions": [
-        0.09,
-        2.7699999999999996,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseX_0_55_1",
-      "location": [
-        3,
-        4.35,
-        4.031000000000001
-      ],
-      "dimensions": [
-        2.7699999999999996,
-        0.09,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseY_0_55_1",
-      "location": [
-        4.35,
-        3,
-        4.031000000000001
-      ],
-      "dimensions": [
-        0.09,
-        2.7699999999999996,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseX_0_8_n1",
-      "location": [
-        3,
-        2.4000000000000004,
-        4.561
-      ],
-      "dimensions": [
-        1.2699999999999998,
-        0.09,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseY_0_8_n1",
-      "location": [
-        2.4000000000000004,
-        3,
-        4.561
-      ],
-      "dimensions": [
-        0.09,
-        1.2699999999999998,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseX_0_8_1",
-      "location": [
-        3,
-        3.5999999999999996,
-        4.561
-      ],
-      "dimensions": [
-        1.2699999999999998,
-        0.09,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_HipCourseY_0_8_1",
-      "location": [
-        3.5999999999999996,
-        3,
-        4.561
-      ],
-      "dimensions": [
-        0.09,
-        1.2699999999999998,
-        0.07
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_Chimney",
-      "location": [
-        4.55,
-        4.55,
-        3.65
-      ],
-      "dimensions": [
-        0.45,
-        0.45,
-        1.7
-      ],
-      "material": "stone",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "House_ChimneyCap",
-      "location": [
-        4.55,
-        4.55,
-        4.47
-      ],
-      "dimensions": [
-        0.61,
-        0.61,
+        4.65,
+        0.2,
         0.15
       ],
-      "material": "stone",
+      "material": "roof",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "House_ChimneyOpening",
+      "name": "House_Window_A",
       "location": [
-        4.55,
-        4.55,
-        4.554
+        1.65,
+        0.305,
+        1.19
       ],
       "dimensions": [
-        0.34,
-        0.34,
-        0.018
+        0.72,
+        0.065,
+        0.71
       ],
       "material": "window",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_A_Postn1",
+      "location": [
+        1.25,
+        0.305,
+        1.19
+      ],
+      "dimensions": [
+        0.09,
+        0.13,
+        0.8899999999999999
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_A_Post1",
+      "location": [
+        2.05,
+        0.305,
+        1.19
+      ],
+      "dimensions": [
+        0.09,
+        0.13,
+        0.8899999999999999
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_A_Railn1",
+      "location": [
+        1.65,
+        0.305,
+        0.7949999999999999
+      ],
+      "dimensions": [
+        0.8999999999999999,
+        0.13,
+        0.09
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_A_Rail1",
+      "location": [
+        1.65,
+        0.305,
+        1.585
+      ],
+      "dimensions": [
+        0.8999999999999999,
+        0.13,
+        0.09
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_A_Mullion",
+      "location": [
+        1.65,
+        0.27999999999999997,
+        1.19
+      ],
+      "dimensions": [
+        0.045,
+        0.14,
+        0.71
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Window_B",
+      "location": [
+        4.55,
+        0.305,
+        1.33
+      ],
+      "dimensions": [
+        0.39,
+        0.065,
+        0.46
+      ],
+      "material": "window",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_B_Postn1",
+      "location": [
+        4.3149999999999995,
+        0.305,
+        1.33
+      ],
+      "dimensions": [
+        0.09,
+        0.13,
+        0.64
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_B_Post1",
+      "location": [
+        4.785,
+        0.305,
+        1.33
+      ],
+      "dimensions": [
+        0.09,
+        0.13,
+        0.64
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_B_Railn1",
+      "location": [
+        4.55,
+        0.305,
+        1.06
+      ],
+      "dimensions": [
+        0.5700000000000001,
+        0.13,
+        0.09
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_B_Rail1",
+      "location": [
+        4.55,
+        0.305,
+        1.6
+      ],
+      "dimensions": [
+        0.5700000000000001,
+        0.13,
+        0.09
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_B_Mullion",
+      "location": [
+        4.55,
+        0.27999999999999997,
+        1.33
+      ],
+      "dimensions": [
+        0.045,
+        0.14,
+        0.46
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Window_C",
+      "location": [
+        0.36,
+        2.62,
+        1.16
+      ],
+      "dimensions": [
+        0.065,
+        0.49,
+        0.57
+      ],
+      "material": "window",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_C_Postn1",
+      "location": [
+        0.36,
+        2.335,
+        1.16
+      ],
+      "dimensions": [
+        0.13,
+        0.09,
+        0.75
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_C_Post1",
+      "location": [
+        0.36,
+        2.9050000000000002,
+        1.16
+      ],
+      "dimensions": [
+        0.13,
+        0.09,
+        0.75
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_C_Railn1",
+      "location": [
+        0.36,
+        2.62,
+        0.835
+      ],
+      "dimensions": [
+        0.13,
+        0.6699999999999999,
+        0.09
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_C_Rail1",
+      "location": [
+        0.36,
+        2.62,
+        1.4849999999999999
+      ],
+      "dimensions": [
+        0.13,
+        0.6699999999999999,
+        0.09
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Frame_C_Mullion",
+      "location": [
+        0.36,
+        2.595,
+        1.16
+      ],
+      "dimensions": [
+        0.14,
+        0.045,
+        0.57
+      ],
+      "material": "wood",
       "parent": "Root"
     }
   ],
@@ -1061,6 +924,12 @@
     ],
     "orthoScale": 3.7,
     "worldRole": "sky"
+  },
+  "reference": {
+    "name": "Hall from Boarhunt",
+    "page": "https://www.wealddown.co.uk/buildings/hall-house-boarhunt/",
+    "photo": "https://www.wealddown.co.uk/wp-content/uploads/2020/12/52-Hall-from-Boarhunt-v2-scaled.jpg",
+    "adaptation": "Hall bajo alargado, crujías de entramado, paja con espesor y cadera en un extremo. Se omiten las cerchas cruck interiores y se reduce la longitud. Museo: extremo perdido y parte de los huecos son reconstrucción conjetural; esta versión es una adaptación visual, no una restitución."
   },
   "candidateBuild": {
     "adapter": "build-candidates.py",

@@ -1,5 +1,17 @@
 # The Valley — Registro de cambios
 
+## v5.102 · 2 oct 2026 · Viviendas reconstruidas desde referencias
+
+Las cinco variantes de `house` y `stone-house` sustituyen la propuesta V2 que
+Vera rechazó: salón retraído de Bayleaf, cadera de Boarhunt, casa baja de
+Hangleton, ala transversal de Church Farmhouse y porche apoyado de Sea Hill.
+Las formas están adaptadas a la parcela del juego y documentan los rasgos
+históricos y los conjeturales; `house.glb` básico y `src/engine/` no cambian.
+Accesos y bisagras conservados, tres huecos asimétricos por casa. Medición
+villa grande: 549 → 553 llamadas, 787 354 → 782 700 triángulos estables;
+aldea: 430 → 426 llamadas, 723 528 → 720 382 triángulos estables.
+Capturas, fuentes y pruebas en `docs/historico/graphics-rounds/G-43.md`.
+
 ## v5.91–v5.92 · 2 oct 2026 · Modelos de sastrería tras K5
 
 **Arte publicado.** `tailor`, `loom`, `field-flax`, `field-flax-cut`, `linen-bolt` y `tailor-board` entran en el catálogo y el manifiesto tras K5 (#56). El taller sustituye la caja provisional y lleva su propio telar visible; el telar suelto queda publicado sin duplicarse en la escena. El tablón de fachada cambia su pieza provisional por el GLB. El campo señalado por el encargo de lino muestra flores durante crecimiento y madurez, y gavillas en las demás fases. Si hay lienzo almacenado, aparece un rollo junto al taller en una celda libre. Todo se deduce del estado, sin cambios en `src/engine/`.
