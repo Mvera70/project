@@ -369,7 +369,13 @@ y tenga sentido», Vera, 2 oct 2026, por la sastrería de K5). **Y es un
 equilibrio, no una licencia** («no hay que ser tampoco súper permisivo y
 dejarlo todo para adelante»): lo que rompe la partida o deja el sistema sin
 sentido se arregla en la ronda —como la flecha al 15 % que hacía caer 20 cercos
-de 20—; lo que sólo pide el valor fino, y otra ronda va a mover, espera—; y **las jornadas rojas por la trayectoria nueva ya
+de 20—; lo que sólo pide el valor fino, y otra ronda va a mover, espera. Para que
+esperar sea posible, **cada sistema se diseña para convivir con los demás y
+poder reajustarse** (Vera, mismo día): sus cifras en `balance.ts` y no
+repartidas, lo que produce como existencia que otros puedan gastar (el lienzo
+servirá también para vendas), sus tablas abiertas a filas nuevas (la armadura
+admite el metal y las zonas del cuerpo sin rehacerse), y ningún sistema da por
+hecho el valor de otro—; y **las jornadas rojas por la trayectoria nueva ya
 están resueltas**: eran once (`docs/historico/rework.md` §2.8) y quedan dos,
 rojas a propósito y declaradas —la de los catorce avisos y la de la palanca del
 bosque— (`docs/task-log.md`, «Las jornadas rojas», 128 de 130 en 284 s). **Y desde v3.75 la aldea de veinte años de cualquier semilla ya no
