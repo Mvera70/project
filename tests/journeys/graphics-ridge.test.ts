@@ -18,7 +18,6 @@ import { BoxGeometry, Mesh, MeshStandardMaterial } from 'three';
 import { elevationAt } from '../../src/render3d/world/ground';
 import { GROUND_BIAS } from '../../src/render3d/visual-config';
 import { buildRidge, exteriorWaterAt, ridgeAt } from '../../src/render3d/world/ridge';
-import { valleyAxis } from '../../src/render3d/world/valley-profile';
 import { buildBackdrop } from '../../src/render3d/world/backdrop';
 import { riverSection } from '../../src/render3d/world/river-extension';
 
@@ -62,8 +61,11 @@ describe('V-14 · el valle', () => {
     const state = village(7);
     const { width, height } = state.map;
     const high = (x: number, z: number): number => ridgeAt(state.map, state.terrainSeed, x, z);
+    // El eje, fuera del mapa, es el del río: desde el 2 oct 2026 el cañón sigue
+    // su curva (`canyonX`), y la recta por donde salía ya no es su fondo.
     for (const z of [-26, height + 26]) {
-      const x = valleyAxis(state.map, z);
+      const river = riverSection(state.map, state.terrainSeed, z)!;
+      const x = (river.left + river.right) / 2;
       expect(high(x, z), `el extremo del eje queda alto en ${x},${z}`).toBeLessThan(4);
     }
     for (const x of [-26, width + 26]) {

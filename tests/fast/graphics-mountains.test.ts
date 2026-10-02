@@ -123,9 +123,7 @@ describe('el camino que sale por la garganta', () => {
   it('sale del valle por las dos entradas, por tierra y sin mojarse', () => {
     for (const seed of SEEDS) {
       const { map, terrainSeed } = foundGame(seed);
-      const roads = buildGorgeRoads(map, terrainSeed, PALETTES.spring, (x, z) => ridgeAt(map, terrainSeed, x, z),
-        (x, z) => exteriorWaterAt(map, terrainSeed, x, z, 1.4),
-        (z) => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))));
+      const roads = buildGorgeRoads(map, terrainSeed, PALETTES.spring, (x, z) => ridgeAt(map, terrainSeed, x, z));
       const position = roads.mesh.geometry.getAttribute('position');
       let north = false, south = false, inside = 0;
       for (let i = 0; i < position.count; i += 1) {

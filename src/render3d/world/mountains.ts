@@ -31,8 +31,8 @@ import { TERRAIN_CODE, type ValleyMap } from '@engine/state';
 import { roadMouths } from '@engine/world/valley-road';
 import type { Palette } from '@derive/palette';
 import { GROUND_BIAS } from '../visual-config';
-import { elevationAt, floodReach, groundColourAt, groundSurfaceAt, skinnedCell, underSkin } from './ground';
-import { riverExtensionAt } from './river-extension';
+import { elevationAt, groundColourAt, groundSurfaceAt, skinnedCell, underSkin } from './ground';
+import { riverBend, riverMouthCentre } from './river-extension';
 import { valleyAxis } from './valley-profile';
 
 /** Lo alto que llega la sierra de fuera, en celdas (`ridge.ts`): la escala de las franjas. */
@@ -472,12 +472,26 @@ export function buildCairns(
 
 /**
  * La senda de tierra que se va del valle por cada garganta (Vera la eligió con
- * ella: «un camino que sale»). Arranca dentro del mapa, en la ribera del paso,
- * y sigue la orilla hasta perderse en la sierra: una cinta de tierra pegada al
- * suelo, del color de los caminos del pueblo, que se afina y se funde al irse.
+ * ella: «un camino que sale»). Arranca en la **boca**, donde empieza el camino
+ * pintado del valle (`road.ts`), baja por la orilla de la garganta, sale del
+ * mapa y sigue el río hasta perderse en la sierra: una cinta de tierra del
+ * color de los caminos del pueblo, que se afina y se funde al irse.
  *
- * Decorado: no es un camino de la partida ni de la capa de vida. Por eso sólo
- * pisa la ribera de la garganta, donde no se levanta nunca nada.
+ * **Y pegada al suelo que se dibuja** (2 oct 2026). Vera: «el camino sigue
+ * flotando… no sé cómo llegan las visitas al valle». Medido en ocho semillas
+ * (`tools/reports/gorge-road-report.ts`): el 76 % de los vértices de la cinta
+ * iba más de 0,35 celdas por encima de la malla que se ve, el peor a 30. Tres
+ * causas, de menos a más honda: la cota salía de la fórmula de la sierra y no
+ * de su malla; una rampa que sólo subía levantaba decenas de celdas de calzada
+ * cuando una muestra rozaba un cortado; y fuera del mapa el cañón iba recto
+ * mientras el río se curvaba, así que la senda no cabía en el fondo y trepaba
+ * por la pared. Ahora el cañón sigue al río (`canyonX`, `ridge.ts`), la senda
+ * va por la orilla a una distancia fija del agua, y cada vértice de la cinta
+ * se apoya en lo que se dibuja (`surface`): ni plataformas ni rampas.
+ *
+ * Para el motor es decorado: no es un camino de la partida. Pero **es por
+ * donde entran los de fuera** (`life/visitors.ts`): bajan por ella hasta la
+ * boca y de ahí siguen por el camino pintado.
  */
 export interface GorgeRoads {
   mesh: Mesh;
@@ -487,109 +501,309 @@ export interface GorgeRoads {
   dispose(): void;
 }
 
-/** El puente de la garganta, en celdas: tablas, barandas y lo que sube sobre la senda. TUNE visual. */
-const BRIDGE = { deck: 0.05, over: 0.12, arch: 0.3, rail: 0.14, post: 0.04, timber: '#6b4a2e', planks: '#8f6b45' } as const;
+/**
+ * El puente de la garganta, en celdas: tablas, barandas, lo que el tablero se
+ * despega de lo que salva (`over`) y la flecha del arco entre estribos, la
+ * mínima y la máxima (`arch`, `archMax`). TUNE visual, en capturas del 2 oct
+ * 2026: con la flecha fija de 0,3 y sólo donde hacía falta, el tablero copiaba
+ * los baches.
+ */
+const BRIDGE = { deck: 0.05, over: 0.12, arch: 0.12, archMax: 0.6, rail: 0.14, post: 0.04, timber: '#6b4a2e', planks: '#8f6b45' } as const;
 
-/** Hasta dónde entra en el mapa y hasta dónde se aleja por fuera, en celdas. TUNE visual. */
-const ROAD_IN = 14;
+/** Hasta dónde se aleja por fuera del mapa, en celdas. TUNE visual. */
 const ROAD_OUT = 42;
-/** Ancho de la senda, y su distancia al eje del río. TUNE visual: el río ocupa dos celdas. */
+/** Hasta dónde entra si el valle no tiene boca por ese extremo, en celdas. */
+const ROAD_IN = 14;
+/** Ancho de la senda, en celdas. TUNE visual. */
 const ROAD_WIDTH = 0.6;
-/** Lo más cerca del eje que va la senda aunque no haya agua, en celdas. */
-const ROAD_MIN = 1.9;
-/** El paso de muestreo de la senda y cuántas muestras a cada lado promedia el suavizado. */
+/**
+ * Lo lejos del agua que va el eje de la senda, en celdas. TUNE visual: la
+ * orilla de la garganta es de dos celdas (el mapa), y la de fuera ya es ladera
+ * —su esquina promedia la subida de la montaña—, así que la senda va por la
+ * celda pegada al agua (capturas del 2 oct 2026).
+ */
+const ROAD_BANK = 0.9;
+/** El paso de muestreo de la senda; cuántas muestras a cada lado promedia el suavizado del trazado, y cuántas veces. */
 const ROAD_STEP = 0.5;
-const ROAD_SMOOTH = 4;
-/** Cuántas muestras a cada lado promedia la cota de la senda. */
-const ROAD_LEVEL = 6;
-/** Hasta dónde a cada lado del eje se busca el agua, en celdas. */
-const ROAD_SEARCH = 6;
+const ROAD_SMOOTH = 2;
+const ROAD_PASSES = 24;
+/**
+ * Lo que se aparta del agua el borde de la cinta, como poco; lo que se aparta
+ * de la roca; hasta dónde puede alejarse del agua el eje, en celdas; y cuánto
+ * tira cada muestra de vuelta a su sitio al suavizar (de 0 a 1). TUNE visual.
+ */
+const ROAD_CLEAR = 0.1;
+const ROAD_ROCK = 0.5;
+const ROAD_SPREAD = 2;
+const ROAD_PULL = 0.3;
+/**
+ * Cuántas filas antes de la boca puede dejar la orilla para ir a ella. En 31
+ * de 80 gargantas (40 semillas) la boca del motor queda a más de una celda y
+ * media de la orilla —la orilla de la garganta la cortan filas de marisma, que
+ * el A* del motor no pisa—, y la senda tiene que cruzar hasta ella.
+ */
+const ROAD_TURN = 8;
+/** Lo que pesa subir en el cruce hasta la boca: cada celda de cota cuenta como tantas de camino. TUNE. */
+const ROAD_CLIMB = 4;
 
-/** Trazado único: la senda y el decorado reservan exactamente el mismo corredor. */
-export function gorgeRoadPaths(
-  map: ValleyMap, seed: number,
-  wet?: (x: number, z: number) => boolean,
-  axis: (z: number) => number = z => valleyAxis(map, Math.max(0, Math.min(map.height - 1, z))),
-): { x: number; z: number }[][] {
-  // El suelo que pisa la senda dentro del mapa: el prado o el cinturón de
-  // montaña. Va aquí y no como parámetro para que **todos** los que trazan la
-  // senda —la cinta, los pinos, el bosque, el camino del valle— saquen el
-  // mismo trazado; fuera del mapa la sierra sube suave y no hace falta buscar.
-  const floorAt = (x: number, z: number): number => x >= 0 && z >= 0 && x <= map.width && z <= map.height
-    ? Math.max(elevationAt(map, x, z), mountainSurfaceAt(map, x, z)) : Number.NEGATIVE_INFINITY;
-  const reach = floodReach(map);
-  const water = wet ?? ((x: number, z: number): boolean => {
-    const col = Math.floor(x), row = Math.floor(z);
-    return riverExtensionAt(map, seed, x, z, 1.4)
-      || (col >= 0 && row >= 0 && col < map.width && row < map.height && reach[row * map.width + col]! >= 0);
-  });
-  const paths: { x: number; z: number }[][] = [];
+export interface RoadPoint { readonly x: number; readonly z: number }
+
+/**
+ * El trazado de cada senda, **de la boca hacia fuera**: el primer punto es el
+ * centro de la celda donde empieza el camino pintado, el último el extremo que
+ * se pierde en la sierra. Trazado único: la cinta, los pinos, el bosque y
+ * quien anda por ella sacan el mismo.
+ */
+export function gorgeRoadPaths(map: ValleyMap, seed: number): RoadPoint[][] {
+  const paths: RoadPoint[][] = [];
   const mouths = roadMouths(map, seed);
   for (const end of [0, 1] as const) {
-    // Y entra hasta donde el valle se abre (`gorgeMouthDepth`): con catorce
-    // celdas fijas se quedaba dentro del cinturón de montaña, donde el A* del
-    // motor no pisa, y el camino del valle no tenía de dónde salir.
-    const mouth = mouths.find((one) => one.end === end);
-    const depth = mouth?.depth ?? ROAD_IN;
-    // Cada entrada saca su senda por la orilla que conecta con el valle en la
-    // boca (`roadMouths`); con el hash solo, en la semilla 7 salía por la
-    // orilla cerrada y el camino pintado arrancaba en la otra, sin juntarse.
+    const mouth = mouths.find((one) => one.end === end) ?? null;
     const side: 1 | -1 = mouth?.side ?? (unit(seed, `road:${end}`) > 0.5 ? 1 : -1);
-    const count = Math.round((depth + ROAD_OUT) / ROAD_STEP);
-    const zOf = (t: number): number => (end === 0 ? depth - t : map.height - depth + t);
-    // Primero lo lejos del eje que puede ir sin mojarse, muestra a muestra; y
-    // luego suavizado, que con los saltos de una orilla a otra la senda salía
-    // en zigzag y trepaba por la pared (captura del 26 sep).
-    // Lo lejos del eje que va la senda en cada muestra: justo pasada la orilla
-    // real del río, que no es el eje del valle —el cauce serpentea— y medido
-    // con la propia agua, dentro del mapa y fuera.
-    const offsets: number[] = [];
-    for (let i = 0; i <= count; i += 1) {
-      const z = zOf(i * ROAD_STEP);
-      const centre = axis(z);
-      let bank = -Infinity;
-      for (let d = -ROAD_SEARCH; d <= ROAD_SEARCH; d += 0.1) {
-        const x = centre + side * d;
-        if (water(x, z) || soggy(map, x, z)) bank = Math.max(bank, d);
+    const centre = riverMouthCentre(map, end);
+    if (centre === null) continue;
+    const half = riverHalfWidth(map, end === 0 ? 0 : map.height - 1);
+    // «Hacia dentro», en celdas desde el borde: negativo, fuera del mapa.
+    const zAt = (inward: number): number => (end === 0 ? inward : map.height - inward);
+    // Por dónde puede ir en cada muestra, a lo ancho: fuera, de la orilla del
+    // cauce que sigue la curva del río; dentro, de la orilla de cada fila, sin
+    // pisar el agua ni subirse a la roca. En el borde las dos son la misma.
+    const bandAt = (inward: number): Band => {
+      const z = zAt(inward);
+      if (inward <= 0) return bankBand(centre + riverBend(map, seed, z) + side * half, side, ROAD_SPREAD);
+      return rowBand(map, z, side);
+    };
+    const bankAt = (inward: number): RoadPoint => ({ x: bandAt(inward).aim, z: zAt(inward) });
+    // Hasta la boca: la orilla mientras se pueda, y el cruce de menos roca hasta
+    // ella. Sin boca, la orilla hasta `ROAD_IN` celdas.
+    const turn = mouth === null ? null : turnToMouth(map, mouth.cell, end, bankAt);
+    const reach = turn === null ? ROAD_IN : turn.from;
+    const samples: Sample[] = [];
+    if (turn !== null) {
+      // El cruce, cada media celda, con medio paso de holgura para redondear.
+      for (const point of resampled([...turn.cells, bankAt(reach)]).slice(0, -1)) {
+        samples.push({ x: point.x, z: point.z, lo: point.x - 0.45, hi: point.x + 0.45, aim: point.x });
       }
-      let dry = bank === -Infinity ? ROAD_MIN : Math.max(ROAD_MIN, bank + ROAD_WIDTH * 0.5 + ROAD_SMOOTH_SLACK);
-      // **Y por el fondo del desfiladero**, no pegada al agua: de la orilla
-      // hacia fuera, el sitio más bajo. Pegada a la orilla, donde la garganta
-      // se estrecha la senda pisaba la pared y la plataforma se subía a la
-      // roca: el muro vertical de la captura de Vera (28 sep 2026).
-      {
-        let lowest = Infinity;
-        let best = dry;
-        for (let d = dry; d <= dry + ROAD_FLOOR_SEARCH; d += 0.25) {
-          const floor = floorAt(centre + side * d, z);
-          if (floor < lowest - 0.02) { lowest = floor; best = d; }
-        }
-        dry = best;
-      }
-      offsets.push(dry);
     }
-    // Suave y sin mojarse: primero cada muestra toma lo más lejos que pida
-    // cualquiera de sus vecinas y después se promedia. Así el promedio nunca
-    // queda más cerca del agua que ninguna muestra cruda. Con el máximo
-    // aplicado después del promedio, los saltos volvían y la senda doblaba en
-    // zigzag (captura del 26 sep).
-    const window = (i: number): [number, number] => [Math.max(0, i - ROAD_SMOOTH), Math.min(count, i + ROAD_SMOOTH)];
-    const wide = offsets.map((_, i) => {
-      const [from, to] = window(i);
-      return Math.max(...offsets.slice(from, to + 1));
-    });
-    const centre = wide.map((_, i) => {
-      const [from, to] = window(i);
-      let sum = 0;
-      for (let k = from; k <= to; k += 1) sum += wide[k]!;
-      const z = zOf(i * ROAD_STEP);
-      // Y un vaivén suave, siempre hacia fuera del río.
-      const sway = (Math.sin(i * 0.23 + unit(seed, `road:w:${end}`) * 6) + 1) * 0.1;
-      return { x: axis(z) + side * (sum / (to - from + 1) + sway), z };
-    });
-    paths.push(centre);
+    // Las muestras de la orilla, a un cuarto de celda de la frontera entre
+    // filas: así cada una cae en una sola fila. En la frontera misma, la banda
+    // era lo que valía para las dos, y donde el río salta una celda eso eran
+    // dos décimas pegadas a la roca de una de ellas (semilla 19, fila 4).
+    const first = Math.floor(reach - 0.25) + 0.25;
+    for (let inward = first; inward >= -ROAD_OUT; inward -= ROAD_STEP) {
+      const band = bandAt(inward);
+      samples.push({ x: band.aim, z: zAt(inward), lo: band.lo, hi: band.hi, aim: band.aim });
+    }
+    // La boca no se mueve: ahí empalma el camino pintado.
+    samples[0] = { ...samples[0]!, lo: samples[0]!.x, hi: samples[0]!.x, aim: samples[0]!.x };
+    paths.push(settled(samples));
   }
   return paths;
+}
+
+/** Una muestra del trazado y lo que puede moverse a lo ancho (`x` de mundo). */
+interface Sample { x: number; readonly z: number; readonly lo: number; readonly hi: number; readonly aim: number }
+interface Band { readonly lo: number; readonly hi: number; readonly aim: number }
+
+/**
+ * Lo que la senda puede apartarse de la orilla, más allá de su medio ancho y
+ * un margen: desde la orilla del agua hasta `ROAD_SPREAD` celdas más allá.
+ * Apunta a `ROAD_BANK` del agua.
+ */
+function bankBand(edge: number, side: 1 | -1, room: number): Band {
+  const near = ROAD_WIDTH / 2 + ROAD_CLEAR;
+  // Del lado de la roca, más margen: la esquina que toca una celda de montaña
+  // promedia su subida, y la mitad de fuera de la orilla ya es ladera (semilla
+  // 11, tras el puente: la senda iba a 0,64 por la mitad de fuera).
+  const far = Math.max(near, Math.min(room, ROAD_SPREAD) - ROAD_WIDTH / 2 - ROAD_ROCK);
+  const aim = Math.max(near, Math.min(far, ROAD_BANK));
+  const a = edge + side * near, b = edge + side * far;
+  return { lo: Math.min(a, b), hi: Math.max(a, b), aim: edge + side * aim };
+}
+
+/**
+ * La banda de una muestra dentro del mapa: la orilla de la fila —donde acaba
+ * el agua y cuántas celdas secas siguen antes de la roca—, y a menos de un
+ * cuarto de celda del borde entre dos filas, lo que valga para las dos.
+ * **Por filas y no por el eje**: el río de la garganta salta una celda de una
+ * fila a la siguiente, y con el eje promediado la cinta pisaba el agua en el
+ * salto (semilla 7, fila 6).
+ */
+function rowBand(map: ValleyMap, z: number, side: 1 | -1): Band {
+  let lo = -Infinity, hi = Infinity, aim = 0, rows = 0;
+  for (let row = Math.floor(z - 0.24); row <= Math.floor(z + 0.24); row += 1) {
+    const r = Math.max(0, Math.min(map.height - 1, row));
+    const { edge, room } = rowBank(map, r, side);
+    const band = bankBand(edge, side, room);
+    lo = Math.max(lo, band.lo);
+    hi = Math.min(hi, band.hi);
+    aim += band.aim;
+    rows += 1;
+  }
+  // Si las dos filas no dejan sitio, manda no pisar el agua.
+  if (hi < lo) {
+    if (side > 0) hi = lo;
+    else lo = hi;
+  }
+  return { lo, hi, aim: Math.max(lo, Math.min(hi, aim / rows)) };
+}
+
+/** Dónde acaba el agua de una fila por ese lado, y cuántas celdas secas siguen antes de la roca (hasta tres). */
+function rowBank(map: ValleyMap, row: number, side: 1 | -1): { edge: number; room: number } {
+  const axis = valleyAxis(map, row);
+  let first = Infinity, last = -Infinity;
+  for (let x = Math.floor(axis - 5); x <= Math.ceil(axis + 5); x += 1) {
+    if (x < 0 || x >= map.width) continue;
+    const t = map.terrain[row * map.width + x];
+    if (t === TERRAIN_CODE.water || t === TERRAIN_CODE.ford) { first = Math.min(first, x); last = Math.max(last, x); }
+  }
+  if (!Number.isFinite(first)) { first = Math.floor(axis) - 1; last = Math.floor(axis); }
+  const edge = side > 0 ? last + 1 : first;
+  let room = 0;
+  for (let k = 0; k < 3; k += 1) {
+    const x = side > 0 ? edge + k : edge - 1 - k;
+    if (x < 0 || x >= map.width) break;
+    const t = map.terrain[row * map.width + x];
+    if (t === TERRAIN_CODE.mountain || t === TERRAIN_CODE.water || t === TERRAIN_CODE.lake || t === TERRAIN_CODE.ford) break;
+    room += 1;
+  }
+  return { edge, room };
+}
+
+/**
+ * El trazado suave dentro de sus bandas: se promedia con las vecinas y se
+ * devuelve a la banda, unas cuantas veces. Así la senda no hace zigzag con los
+ * saltos del río y tampoco se mete en él para alisarlos.
+ */
+function settled(samples: Sample[]): RoadPoint[] {
+  const xs = samples.map((s) => s.x);
+  for (let pass = 0; pass < ROAD_PASSES; pass += 1) {
+    const next = xs.map((_, i) => {
+      const reach = Math.min(ROAD_SMOOTH, i, xs.length - 1 - i);
+      let sum = 0;
+      for (let k = i - reach; k <= i + reach; k += 1) sum += xs[k]!;
+      const s = samples[i]!;
+      // Con un tirón hacia su sitio: sólo con el promedio, la orilla de dentro
+      // del mapa y la de fuera se arrastraban la una a la otra hasta el borde
+      // de la banda.
+      const mean = sum / (reach * 2 + 1);
+      return Math.max(s.lo, Math.min(s.hi, mean + (s.aim - mean) * ROAD_PULL));
+    });
+    for (let i = 0; i < xs.length; i += 1) xs[i] = next[i]!;
+  }
+  return samples.map((s, i) => ({ x: xs[i]!, z: s.z }));
+}
+
+/** La mitad del ancho del río en una fila: sus celdas de agua (y vado) cerca del eje, entre dos. */
+function riverHalfWidth(map: ValleyMap, row: number): number {
+  const axis = valleyAxis(map, row);
+  let count = 0;
+  for (let x = Math.floor(axis - 5); x <= Math.ceil(axis + 5); x += 1) {
+    if (x < 0 || x >= map.width) continue;
+    const t = map.terrain[row * map.width + x];
+    if (t === TERRAIN_CODE.water || t === TERRAIN_CODE.ford) count += 1;
+  }
+  return Math.max(1, count) / 2;
+}
+
+/**
+ * El cruce de la orilla a la boca: el camino de menos subida, por celdas, desde
+ * cualquier celda de la orilla de las últimas `ROAD_TURN` filas hasta la boca.
+ * Nunca por el agua. Devuelve los centros de celda **de la boca hacia fuera** y
+ * desde qué fila (en celdas hacia dentro) sigue la orilla.
+ */
+function turnToMouth(
+  map: ValleyMap, mouthCell: number, end: 0 | 1, bankAt: (inward: number) => RoadPoint,
+): { cells: RoadPoint[]; from: number } | null {
+  const mx = mouthCell % map.width, mz = Math.floor(mouthCell / map.width);
+  const inwardOf = (row: number): number => (end === 0 ? row + 0.5 : map.height - row - 0.5);
+  const mouthIn = inwardOf(mz);
+  // La caja donde se busca: de la orilla a la boca, con margen.
+  const bankRows: number[] = [];
+  for (let k = 0; k <= ROAD_TURN; k += 1) {
+    const row = end === 0 ? mz - k : mz + k;
+    if (row >= 0 && row < map.height) bankRows.push(row);
+  }
+  const xs = bankRows.map((row) => bankAt(inwardOf(row)).x);
+  const x0 = Math.max(0, Math.floor(Math.min(mx, ...xs)) - 3), x1 = Math.min(map.width - 1, Math.ceil(Math.max(mx, ...xs)) + 3);
+  const z0 = Math.max(0, Math.min(mz, ...bankRows) - 2), z1 = Math.min(map.height - 1, Math.max(mz, ...bankRows) + 2);
+  const w = x1 - x0 + 1, h = z1 - z0 + 1;
+  const local = (x: number, z: number): number => (z - z0) * w + (x - x0);
+  const open = (x: number, z: number): boolean => {
+    const t = map.terrain[z * map.width + x];
+    return t !== TERRAIN_CODE.water && t !== TERRAIN_CODE.lake && t !== TERRAIN_CODE.ford;
+  };
+  // Lo que cuesta pisar una celda: su esquina más alta, para rodear la roca.
+  const rise = (x: number, z: number): number => Math.max(0, Math.max(
+    elevationAt(map, x, z), elevationAt(map, x + 1, z), elevationAt(map, x, z + 1), elevationAt(map, x + 1, z + 1)));
+  const cost = new Float64Array(w * h).fill(Number.POSITIVE_INFINITY);
+  const from = new Int32Array(w * h).fill(-1);
+  const done = new Uint8Array(w * h);
+  // Salida: la celda de la orilla en cada fila de la caja, gratis; andar por la
+  // orilla es lo que la senda ya hace.
+  const source = new Map<number, number>();
+  for (const row of bankRows) {
+    const x = Math.floor(bankAt(inwardOf(row)).x);
+    if (x < x0 || x > x1 || !open(x, row)) continue;
+    cost[local(x, row)] = 0;
+    source.set(local(x, row), inwardOf(row));
+  }
+  if (source.size === 0) return null;
+  const goal = local(mx, mz);
+  // Dijkstra sencillo: la caja tiene unas doscientas celdas.
+  for (;;) {
+    let best = -1;
+    for (let i = 0; i < w * h; i += 1) if (done[i] === 0 && cost[i]! < (best < 0 ? Infinity : cost[best]!)) best = i;
+    if (best < 0 || best === goal) break;
+    done[best] = 1;
+    const bx = best % w + x0, bz = Math.floor(best / w) + z0;
+    for (let dz = -1; dz <= 1; dz += 1) {
+      for (let dx = -1; dx <= 1; dx += 1) {
+        if (dx === 0 && dz === 0) continue;
+        const nx = bx + dx, nz = bz + dz;
+        if (nx < x0 || nx > x1 || nz < z0 || nz > z1 || !open(nx, nz)) continue;
+        // En diagonal no se corta una esquina de agua.
+        if (dx !== 0 && dz !== 0 && (!open(bx + dx, bz) || !open(bx, bz + dz))) continue;
+        const next = local(nx, nz);
+        const step = Math.hypot(dx, dz) * (1 + ROAD_CLIMB * Math.max(0, rise(nx, nz) - 0.15));
+        if (cost[best]! + step < cost[next]!) { cost[next] = cost[best]! + step; from[next] = best; }
+      }
+    }
+  }
+  if (!Number.isFinite(cost[goal]!)) return null;
+  // De la boca hacia atrás. La boca va siempre, aunque esté en la orilla: es
+  // donde empieza el camino pintado; la celda de la orilla donde sale el cruce
+  // no, que la pone la orilla misma.
+  const centreOf = (cell: number): RoadPoint => ({ x: cell % w + x0 + 0.5, z: Math.floor(cell / w) + z0 + 0.5 });
+  const cells: RoadPoint[] = [centreOf(goal)];
+  let at = goal;
+  while (!source.has(at)) {
+    at = from[at]!;
+    if (at < 0) return null;
+    if (!source.has(at)) cells.push(centreOf(at));
+  }
+  return { cells, from: Math.min(source.get(at)!, mouthIn) };
+}
+
+/** Los puntos, a `ROAD_STEP` de distancia a lo largo de la línea que forman. */
+function resampled(points: readonly RoadPoint[]): RoadPoint[] {
+  if (points.length < 2) return [...points];
+  const out: RoadPoint[] = [points[0]!];
+  let carry = 0;
+  for (let i = 1; i < points.length; i += 1) {
+    const a = points[i - 1]!, b = points[i]!;
+    const length = Math.hypot(b.x - a.x, b.z - a.z);
+    let along = ROAD_STEP - carry;
+    while (along <= length) {
+      const t = along / length;
+      out.push({ x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t });
+      along += ROAD_STEP;
+    }
+    carry = length - (along - ROAD_STEP);
+  }
+  const last = points[points.length - 1]!;
+  if (Math.hypot(last.x - out[out.length - 1]!.x, last.z - out[out.length - 1]!.z) > ROAD_STEP * 0.25) out.push(last);
+  return out;
 }
 
 // La boca de cada desfiladero la decide el motor (`world/valley-road.ts`): la
@@ -611,19 +825,25 @@ export function clearsGorgeRoad(
   }));
 }
 
+/**
+ * La cinta de las dos sendas. `surface` es la cota de lo que se dibuja en cada
+ * punto —el suelo y la piel dentro del mapa, la malla de la sierra fuera—, y
+ * cada vértice se apoya en ella: tres por sección, para que la cinta siga
+ * también la ladera a lo ancho. `crossing` dice dónde cae una cascada.
+ */
 export function buildGorgeRoads(
-  map: ValleyMap, seed: number, palette: Palette, heightAt: (x: number, z: number) => number,
-  wet: (x: number, z: number) => boolean, axis: (z: number) => number,
+  map: ValleyMap, seed: number, palette: Palette, surface: (x: number, z: number) => number,
   crossing: (x: number, z: number) => boolean = () => false,
 ): GorgeRoads {
   const points: number[] = [];
   const fades: number[] = [];
+  const corners: number[] = [];
   // Los puentes (Vera, 27 sep 2026: «podrías poner un puente»): donde la senda
   // cruza el corredor de una cascada, unas tablas con baranda por encima del
   // agua, y el agua pasa por debajo. Antes la senda tapaba la cinta.
   const bridges = new Group();
   bridges.name = 'Valley_Gorge_Bridges';
-  const planks = new MeshStandardMaterial({ color: BRIDGE.planks, roughness: 0.9, metalness: 0 });
+  const planks = new MeshStandardMaterial({ color: BRIDGE.planks, vertexColors: true, roughness: 0.9, metalness: 0, side: DoubleSide });
   const timber = new MeshStandardMaterial({ color: BRIDGE.timber, roughness: 0.9, metalness: 0 });
   const bridgeGeometries: BufferGeometry[] = [];
   // El puente sigue la senda: un tablero por tramo, de muestra en muestra, en
@@ -637,7 +857,7 @@ export function buildGorgeRoads(
     piece.quaternion.setFromUnitVectors(new Vector3(1, 0, 0), run.normalize());
     return piece;
   };
-  const bridgeAt = (samples: readonly { x: number; z: number; y: number }[], peak: number): void => {
+  const bridgeAt = (samples: readonly { x: number; z: number; y: number }[]): void => {
     const bridge = new Group();
     // Cuatro tablas por tramo de senda: con uno solo, el arco salía en pico.
     const path: { x: number; z: number; y: number }[] = [];
@@ -648,29 +868,55 @@ export function buildGorgeRoads(
       }
     }
     path.push(samples[samples.length - 1]!);
-    // Y en planta, suavizado: la senda trae quiebros de muestra a muestra, y
-    // un puente de tablas no dobla en ángulo. Los estribos no se mueven.
-    for (let pass = 0; pass < 6; pass += 1) {
-      for (let k = 1; k < path.length - 1; k += 1) {
-        path[k] = { ...path[k]!, x: (path[k - 1]!.x + path[k]!.x * 2 + path[k + 1]!.x) / 4, z: (path[k - 1]!.z + path[k]!.z * 2 + path[k + 1]!.z) / 4 };
-      }
-    }
+    // Y en planta, recto de estribo a estribo: la senda trae curvas de muestra
+    // a muestra, y un tablero que dobla pliega su canto en escalón (captura del
+    // 2 oct 2026). Una pasarela de tres o cuatro celdas va recta.
     const last = path.length - 1;
-    const deckAt = path.map((p, k) => {
+    for (let k = 1; k < last; k += 1) {
       const t = k / last;
-      // Lo que sube sobre la recta entre los dos estribos, no sobre cada punto.
-      const base = path[0]!.y + (path[last]!.y - path[0]!.y) * t;
-      const rise = Math.min(BRIDGE.arch, Math.max(0, peak - base));
-      return new Vector3(p.x, Math.max(p.y, base + rise * Math.sin(Math.PI * t)), p.z);
+      path[k] = { ...path[k]!, x: path[0]!.x + (path[last]!.x - path[0]!.x) * t, z: path[0]!.z + (path[last]!.z - path[0]!.z) * t };
+    }
+    // **El tablero es un arco, no la senda en alto** (Vera, 2 oct 2026: «se ve
+    // roto el puente»). Con la senda apoyada en el suelo, cada tabla tomaba el
+    // bache que tenía debajo y el tablero subía, bajaba y volvía a subir en
+    // tres palmos: el estribo parecía partido. Ahora cada punto pide lo que
+    // tiene que salvar —el suelo y la cascada, con un palmo de holgura— y un
+    // arco mínimo sobre la recta de estribo a estribo, y el tablero es la
+    // envolvente cóncava de todo eso: sube y baja una vez, nunca hace dientes.
+    const ends = { from: path[0]!.y, to: path[last]!.y };
+    const base = (t: number): number => ends.from + (ends.to - ends.from) * t;
+    const need = path.map((p) => surface(p.x, p.z) + BRIDGE.over);
+    // La flecha del arco: la justa para salvar lo de en medio, entre la mínima
+    // y la máxima. Con la envolvente sola, el tablero subía de golpe sobre un
+    // bulto junto al estribo y luego se aplanaba, y el canto hacía rodilla.
+    let rise: number = BRIDGE.arch;
+    path.forEach((_, k) => {
+      const t = k / last;
+      if (t >= 0.15 && t <= 0.85) rise = Math.max(rise, (need[k]! - base(t)) / Math.sin(Math.PI * t));
     });
+    rise = Math.min(rise, BRIDGE.archMax);
+    const wanted = path.map((_, k) => {
+      const t = k / last;
+      if (k === 0 || k === last) return { t, y: k === 0 ? ends.from : ends.to };
+      return { t, y: Math.max(need[k]!, base(t) + rise * Math.sin(Math.PI * t)) };
+    });
+    const arch = upperHull(wanted);
+    const deckAt = path.map((p, k) => new Vector3(p.x, hullAt(arch, k / last), p.z));
     const sideAt = (k: number): Vector3 => {
       const a = deckAt[Math.max(0, k - 1)]!, b = deckAt[Math.min(last, k + 1)]!;
       return new Vector3(-(b.z - a.z), 0, b.x - a.x).normalize().multiplyScalar(ROAD_WIDTH / 2 + 0.04);
     };
+    // **Un tablero de una pieza** (Vera, 2 oct 2026: «sigo viendo baldosas de
+    // madera mal puestas»). Eran cajas sueltas, una por tramo y girada cada una
+    // a su tramo: donde el puente dobla y sube se montaban en escalón. Ahora es
+    // una sola malla que sigue el arco, y las tablas se ven por el color.
+    const deck = new Mesh(deckGeometry(deckAt, ROAD_WIDTH / 2 + 0.06, BRIDGE.deck), planks);
+    deck.name = 'Valley_Gorge_Bridge_Deck';
+    // Por dónde va, de estribo a estribo: lo leen las pruebas del arco.
+    deck.userData.centre = deckAt.map((point) => point.clone());
+    deck.castShadow = true;
+    bridge.add(deck);
     for (let k = 0; k < last; k += 1) {
-      const deck = plank(deckAt[k]!, deckAt[k + 1]!, ROAD_WIDTH + 0.12, BRIDGE.deck, planks);
-      deck.castShadow = true;
-      bridge.add(deck);
       for (const side of [-1, 1]) {
         const up = new Vector3(0, BRIDGE.rail, 0);
         const from = deckAt[k]!.clone().addScaledVector(sideAt(k), side).add(up);
@@ -689,88 +935,98 @@ export function buildGorgeRoads(
     bridge.traverse((node) => { if (node instanceof Mesh) bridgeGeometries.push(node.geometry as BufferGeometry); });
     bridges.add(bridge);
   };
-  const length = ROAD_IN + ROAD_OUT;
-  const count = Math.round(length / ROAD_STEP);
-  const paths = gorgeRoadPaths(map, seed, wet, axis);
-  for (const end of [0, 1] as const) {
-    const centre = paths[end]!;
-    const fadeAt = (i: number): number => Math.max(0, Math.min(1, (length - i * ROAD_STEP) / 12));
-    // Y por dentro no empieza de golpe: se afila hasta morir en la hierba a
-    // lo largo de tres celdas. Un corte recto en mitad del prado era una de
-    // las sendas que se cortan de las capturas de Vera (27 sep).
-    const startAt = (i: number): number => Math.max(0.08, Math.min(1, (i * ROAD_STEP) / 3));
-    // La cota va suavizada a lo largo y plana de lado a lado, como una
-    // plataforma: copiando cada bache de la ladera, con la cámara en diagonal
-    // cada subida se leía como un quiebro y la senda salía en dientes de sierra
-    // (captura del 26 sep, semilla 11).
-    // La plataforma reserva todo su ancho, incluido el margen del tablero.
-    // Medir sólo el eje dejaba el borde exterior bajo la faceta de la ladera.
-    const raw = centre.map((p) => Math.max(...[-0.36, -0.18, 0, 0.18, 0.36]
-      .map(offset => heightAt(p.x + offset, p.z))));
-    const level = raw.map((_, i) => {
-      let sum = 0, n = 0;
-      for (let k = Math.max(0, i - ROAD_LEVEL); k <= Math.min(count, i + ROAD_LEVEL); k += 1) { sum += raw[k]!; n += 1; }
-      // Nivelada, pero nunca por debajo de la roca que pisa: el promedio se
-      // hundía en la piel de la sierra y la senda salía a trozos entre las
-      // facetas («los caminos se cortan», capturas de Vera, 27 sep).
-      return Math.max(sum / n, raw[i]!);
-    });
-    // También entre muestras: una arista de roca puede cruzar el interior
-    // del tramo aunque sus cuatro esquinas estén libres. La misma elevación
-    // en ambos extremos mantiene el camino unido y plano transversalmente.
-    for (let i = 0; i < count; i += 1) {
-      let lift = 0;
-      for (const t of [0.25, 0.5, 0.75]) {
-        const a = centre[i]!, b = centre[i + 1]!;
-        for (const offset of [-0.36, -0.18, 0, 0.18, 0.36]) {
-          const floor = heightAt(a.x + (b.x - a.x) * t + offset, a.z + (b.z - a.z) * t);
-          lift = Math.max(lift, floor - (level[i]! * (1 - t) + level[i + 1]! * t));
+  for (const centre of gorgeRoadPaths(map, seed)) {
+    const count = centre.length - 1;
+    if (count < 1) continue;
+    // Lo andado desde la boca, para el afilado de dentro y el fundido de fuera.
+    const walked: number[] = [0];
+    for (let i = 1; i <= count; i += 1) walked.push(walked[i - 1]! + Math.hypot(centre[i]!.x - centre[i - 1]!.x, centre[i]!.z - centre[i - 1]!.z));
+    const length = walked[count]!;
+    // Al irse se afina y se funde con la pedrera a lo largo de doce celdas; y
+    // por dentro no empieza de golpe: se afila hasta morir en el camino pintado
+    // a lo largo de tres (un corte recto era una de las sendas que se cortan de
+    // las capturas de Vera, 27 sep).
+    const fadeAt = (i: number): number => Math.max(0, Math.min(1, (length - walked[i]!) / 12));
+    const startAt = (i: number): number => Math.max(0.08, Math.min(1, walked[i]! / 3));
+    const across = (i: number): { x: number; z: number } => {
+      const a = centre[Math.max(0, i - 1)]!, b = centre[Math.min(count, i + 1)]!;
+      const run = Math.hypot(b.x - a.x, b.z - a.z) || 1;
+      return { x: -(b.z - a.z) / run, z: (b.x - a.x) / run };
+    };
+    // Cinco vértices por sección, cada uno en el suelo que se dibuja bajo él.
+    const section = (i: number): number[][] => {
+      const p = centre[i]!, n = across(i);
+      const half = ROAD_WIDTH * 0.5 * (0.5 + 0.5 * fadeAt(i)) * startAt(i);
+      return ROAD_ACROSS.map((s) => {
+        const x = p.x + n.x * half * s, z = p.z + n.z * half * s;
+        return [x, surface(x, z) + ROAD_LIFT, z];
+      });
+    };
+    const sections = centre.map((_, i) => section(i));
+    // Y entre vértices: una arista del suelo puede asomar por el medio de un
+    // triángulo de la cinta aunque sus esquinas estén apoyadas («los caminos se
+    // cortan», capturas de Vera, 27 sep). Se sube **ese** triángulo lo que
+    // asome, y nada más: la rampa larga de antes levantaba decenas de celdas.
+    for (let pass = 0; pass < 3; pass += 1) {
+      for (let i = 0; i < count; i += 1) {
+        const here = sections[i]!, next = sections[i + 1]!;
+        for (let lane = 0; lane < ROAD_ACROSS.length - 1; lane += 1) {
+          for (const corners of [[here[lane]!, next[lane]!, here[lane + 1]!], [here[lane + 1]!, next[lane]!, next[lane + 1]!]]) {
+            for (const weights of [[0.5, 0.5, 0], [0, 0.5, 0.5], [0.5, 0, 0.5], [1 / 3, 1 / 3, 1 / 3]] as const) {
+              const [a, b, c] = corners as [number[], number[], number[]];
+              const [u, v, w] = weights;
+              const x = a[0]! * u + b[0]! * v + c[0]! * w, z = a[2]! * u + b[2]! * v + c[2]! * w;
+              const poke = surface(x, z) + ROAD_SEAM - (a[1]! * u + b[1]! * v + c[1]! * w);
+              if (poke <= 0) continue;
+              // Cada esquina sube en proporción a lo que pesa en ese punto: lo
+              // justo para tapar el pliegue, y la esquina lejana se queda en su sitio.
+              const norm = u * u + v * v + w * w;
+              corners.forEach((corner, k) => { corner[1] = corner[1]! + poke * weights[k]! / norm; });
+            }
+          }
         }
       }
-      level[i] = level[i]! + lift;
-      level[i + 1] = level[i + 1]! + lift;
     }
-    // Y nunca un muro: entre dos muestras la senda sube como mucho
-    // `ROAD_GRADE`, y lo que falte se levanta en rampa hacia los dos lados
-    // (sólo se sube, nunca por debajo de la roca). Un salto de cinco celdas
-    // entre dos muestras se pintaba como una pared de pie (28 sep 2026).
-    for (let i = 0; i < count; i += 1) level[i + 1] = Math.max(level[i + 1]!, level[i]! - ROAD_GRADE);
-    for (let i = count; i > 0; i -= 1) level[i - 1] = Math.max(level[i - 1]!, level[i]! - ROAD_GRADE);
-    const edge = (i: number, s: number): number[] => {
-      const p = centre[i]!;
-      const x = p.x + s * ROAD_WIDTH * 0.5 * (0.5 + 0.5 * fadeAt(i)) * startAt(i);
-      return [x, level[i]! + GROUND_BIAS + ROAD_LIFT, p.z];
-    };
     // Los tramos que caen dentro de una cascada, con una muestra de margen a
     // cada lado: ahí va el puente y **no** se pinta la senda, que tapaba el
-    // agua. El tablero sube hasta un palmo sobre la roca más alta del tramo.
+    // agua. El tablero sube hasta un palmo sobre el suelo del tramo.
     const bridged = new Set<number>();
     for (let i = 0; i < count; i += 1) {
       if (!crossing(centre[i]!.x, centre[i]!.z)) continue;
       let j = i;
       while (j + 1 < count && crossing(centre[j + 1]!.x, centre[j + 1]!.z)) j += 1;
       const a = Math.max(0, i - 2), b = Math.min(count, j + 2);
-      // Un palmo sobre el agua que cruza, no sobre toda la ladera del tramo.
-      let peak = -Infinity;
-      for (let k = i; k <= j; k += 1) peak = Math.max(peak, GROUND_BIAS + raw[k]! + BRIDGE.over);
       const path = [];
-      for (let k = a; k <= b; k += 1) path.push({ ...centre[k]!, y: GROUND_BIAS + level[k]! + ROAD_LIFT });
-      bridgeAt(path, peak);
+      for (let k = a; k <= b; k += 1) path.push({ ...centre[k]!, y: sections[k]![ROAD_MIDDLE]![1]! });
+      bridgeAt(path);
       for (let k = a; k < b; k += 1) bridged.add(k);
       i = j;
     }
+    // Los vértices se comparten de sección a sección, para que la luz se
+    // reparta por la cinta y no cambie en cada faceta del suelo que pisa: con
+    // una normal por triángulo, la senda sobre una ladera facetada se leía como
+    // losas sueltas (Vera, 2 oct 2026).
+    const base = points.length / 3;
+    sections.forEach((section, i) => { for (const corner of section) { points.push(...corner); fades.push(fadeAt(i)); } });
+    const lanes = ROAD_ACROSS.length;
     for (let i = 0; i < count; i += 1) {
       if (bridged.has(i)) continue;
-      const a = edge(i, -1), b = edge(i, 1), c = edge(i + 1, -1), d = edge(i + 1, 1);
-      points.push(...a, ...c, ...b, ...b, ...c, ...d);
-      const f0 = fadeAt(i), f1 = fadeAt(i + 1);
-      fades.push(f0, f1, f0, f0, f1, f1);
+      for (let lane = 0; lane < lanes - 1; lane += 1) {
+        const a = base + i * lanes + lane, b = a + 1, c = a + lanes, d = c + 1;
+        corners.push(a, c, b, b, c, d);
+      }
     }
   }
-  const geometry = new BufferGeometry();
-  geometry.setAttribute('position', new BufferAttribute(new Float32Array(points), 3));
-  geometry.setAttribute('color', new BufferAttribute(new Float32Array(points.length), 3));
-  geometry.computeVertexNormals();
+  const shared = new BufferGeometry();
+  shared.setAttribute('position', new BufferAttribute(new Float32Array(points), 3));
+  shared.setAttribute('fade', new BufferAttribute(new Float32Array(fades), 1));
+  shared.setAttribute('color', new BufferAttribute(new Float32Array(points.length), 3));
+  shared.setIndex(corners);
+  shared.computeVertexNormals();
+  // Y suelta por triángulos, con las normales ya repartidas: quien lee la cinta
+  // la lee de tres en tres, como antes.
+  const geometry = shared.toNonIndexed();
+  shared.dispose();
   const material = new MeshStandardMaterial({
     vertexColors: true, roughness: 1, metalness: 0, side: DoubleSide,
     // Encima del suelo sin pelearse con él por la profundidad.
@@ -781,12 +1037,13 @@ export function buildGorgeRoads(
   mesh.receiveShadow = true;
   const season = (next: Palette): void => {
     const colour = geometry.getAttribute('color') as BufferAttribute;
+    const fade = geometry.getAttribute('fade') as BufferAttribute;
     const dirt = new Color(next.path);
     const rock = new Color(next.rock);
     const tint = new Color();
-    for (let i = 0; i < fades.length; i += 1) {
+    for (let i = 0; i < fade.count; i += 1) {
       // Al irse se funde con la pedrera, en vez de acabar de golpe.
-      tint.copy(rock).lerp(dirt, fades[i]!);
+      tint.copy(rock).lerp(dirt, fade.getX(i));
       colour.setXYZ(i, tint.r, tint.g, tint.b);
     }
     colour.needsUpdate = true;
@@ -804,23 +1061,83 @@ export function buildGorgeRoads(
   };
 }
 
-/** El margen que se deja al agua porque el suavizado puede acercar la senda a la orilla. */
-const ROAD_SMOOTH_SLACK = 0.12;
-/** Desde la orilla hacia fuera, hasta dónde se busca el fondo del desfiladero, en celdas. */
-const ROAD_FLOOR_SEARCH = 3;
-/** Lo más que sube la senda entre dos muestras (media celda), en celdas: unos 24°. */
-const ROAD_GRADE = 0.22;
+/**
+ * El tablero de un puente, de una pieza: una losa de `thick` de grueso y
+ * `half` de medio ancho que sigue la línea `centre` por arriba. Cada tramo es
+ * una tabla, un poco más clara o más oscura que la de al lado; los cantos y la
+ * cara de abajo, en sombra.
+ */
+function deckGeometry(centre: readonly Vector3[], half: number, thick: number): BufferGeometry {
+  const last = centre.length - 1;
+  const across = (k: number): Vector3 => {
+    const a = centre[Math.max(0, k - 1)]!, b = centre[Math.min(last, k + 1)]!;
+    return new Vector3(-(b.z - a.z), 0, b.x - a.x).normalize().multiplyScalar(half);
+  };
+  const positions: number[] = [];
+  const colours: number[] = [];
+  const at = (k: number, side: number, low: boolean): number[] => {
+    const point = centre[k]!.clone().addScaledVector(across(k), side);
+    return [point.x, point.y - (low ? thick : 0), point.z];
+  };
+  const face = (shade: number, ...points: number[][]): void => {
+    for (const point of points) { positions.push(...point); colours.push(shade, shade, shade); }
+  };
+  for (let k = 0; k < last; k += 1) {
+    const plank = k % 2 === 0 ? 1 : 0.86;
+    const tl = at(k, 1, false), tr = at(k, -1, false), nl = at(k + 1, 1, false), nr = at(k + 1, -1, false);
+    const bl = at(k, 1, true), br = at(k, -1, true), ml = at(k + 1, 1, true), mr = at(k + 1, -1, true);
+    face(plank, tl, nl, tr, tr, nl, nr);
+    face(plank * 0.62, tl, bl, nl, nl, bl, ml);
+    face(plank * 0.62, tr, nr, br, br, nr, mr);
+    face(0.5, bl, ml, br, br, ml, mr);
+  }
+  for (const k of [0, last]) {
+    const tl = at(k, 1, false), tr = at(k, -1, false), bl = at(k, 1, true), br = at(k, -1, true);
+    face(0.62, tl, bl, tr, tr, bl, br);
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
+  geometry.setAttribute('color', new BufferAttribute(new Float32Array(colours), 3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
 
 /**
- * Si en ese punto del mapa hay agua; fuera del mapa, nunca (eso lo mira `wet`).
- * La marisma no cuenta: una senda la cruza, y en la garganta, donde la ribera
- * es de dos celdas y a veces toda marisma, contarla la subía por la pared.
+ * La envolvente superior y cóncava de unos puntos ordenados por `t`: la cuerda
+ * más baja que pasa por encima de todos y que nunca hace valle.
  */
-function soggy(map: ValleyMap, x: number, z: number): boolean {
-  if (x < 0 || z < 0 || x >= map.width || z >= map.height) return false;
-  const t = map.terrain[Math.floor(z) * map.width + Math.floor(x)];
-  return t === TERRAIN_CODE.water || t === TERRAIN_CODE.lake || t === TERRAIN_CODE.ford;
+function upperHull(points: readonly { t: number; y: number }[]): { t: number; y: number }[] {
+  const hull: { t: number; y: number }[] = [];
+  for (const point of points) {
+    while (hull.length >= 2) {
+      const a = hull[hull.length - 2]!, b = hull[hull.length - 1]!;
+      // Se quita `b` si queda por debajo (o encima) de la cuerda de `a` al nuevo.
+      if ((b.t - a.t) * (point.y - a.y) - (b.y - a.y) * (point.t - a.t) >= 0) hull.pop();
+      else break;
+    }
+    hull.push(point);
+  }
+  return hull;
+}
+
+/** La envolvente en `t`, de tramo en tramo. */
+function hullAt(hull: readonly { t: number; y: number }[], t: number): number {
+  for (let k = 1; k < hull.length; k += 1) {
+    const a = hull[k - 1]!, b = hull[k]!;
+    if (t <= b.t) return a.y + (b.y - a.y) * ((t - a.t) / ((b.t - a.t) || 1));
+  }
+  return hull[hull.length - 1]!.y;
 }
 
 /** Lo que la senda se levanta sobre el suelo, en celdas. TUNE: con 0,02 el suelo, que no es plano entre vértices, la tapaba a trozos. */
 const ROAD_LIFT = 0.07;
+/** Lo que la cinta queda, como poco, por encima del suelo entre sus vértices, en celdas. */
+const ROAD_SEAM = 0.01;
+/**
+ * Dónde van los vértices de cada sección, de un borde al otro, en medios
+ * anchos. Cinco y no dos: con los dos bordes solos, la cinta tendía un plano
+ * sobre la orilla y una arista del suelo asomaba por el medio; con tres,
+ * quedaban vértices medio palmo por encima del suyo (semilla 19, 0,43 celdas).
+ */
+const ROAD_ACROSS = [-1, -0.5, 0, 0.5, 1] as const;
+const ROAD_MIDDLE = 2;
