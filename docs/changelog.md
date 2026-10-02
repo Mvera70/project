@@ -1,5 +1,11 @@
 # The Valley — Registro de cambios
 
+## v5.92, v5.94 y v5.95 · 2 oct 2026 · Sastrería y mina en candidatos; visitantes vestidos
+
+**Arte candidato (Bloques 2 y 4).** La sastrería, el telar, el lino florido y segado y el rollo de lienzo tienen receta, GLB y hoja comparada con casa y aldeano. La mina añade boca rocosa entibada, vagoneta vacía y llena con mineral desmontable, cuatro estados de acopio y un tramo de raíles. La sastrería espera que K5 (#56) entre en `main`; el encargo mantiene la mina sólo como modelo. Estos candidatos no se publican y no añaden llamadas de dibujo a la partida.
+
+**Visitantes (Bloque 5, PR #66).** Diez accesorios publicados distinguen al juglar, peregrinos, calderero, curandera, familia refugiada y retornos de expedición. Se cuelgan de mano, cabeza o espalda según su conector y se deducen del suceso o la misión visible, sin estado nuevo en el motor. El render deja de dar lanza y escudo a los visitantes civiles por compartir IDs negativos con los asaltantes. Diez pruebas de anclaje y ocho jornadas pertinentes pasaron; en las villas de referencia sin visita activa, llamadas y sombras permanecieron iguales antes y después (medidas en `docs/task-log.md`).
+
 ## v5.89 · 2 oct 2026 · El cerco sin salida: el portón da al valle, no a la montaña
 
 **Motor** (`world/placement.ts`, la regla del portón). Lo pidió Vera con su
