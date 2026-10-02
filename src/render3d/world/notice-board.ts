@@ -6,7 +6,7 @@
 // pedido a Astra (`docs/encargos/visitantes-y-expediciones.md`, `notice-board`);
 // cuando llegue, esto se sustituye por `library.instance('notice-board')`.
 
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
+import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
 
 /** Cuántos papeles se clavan: los que el tablón anuncia, hasta tres. */
 const MAX_NOTES = 3;
@@ -17,10 +17,35 @@ export interface NoticeBoardMesh {
   place(x: number, y: number, z: number, yaw: number, notes: number): void;
 }
 
-export function createNoticeBoard(): NoticeBoardMesh {
+export function createNoticeBoard(model?: Object3D): NoticeBoardMesh {
   const group = new Group();
   group.name = 'Valley_NoticeBoard';
   group.userData['noticeBoard'] = true;
+  if (model !== undefined) {
+    group.add(model);
+    const namedNotes = Array.from({ length: 4 }, (_, i) => model.getObjectByName(`note_${i + 1}`)).filter(
+      (note): note is Object3D => note !== undefined,
+    );
+    // The facade boards are single-mesh models. Their small papers still
+    // reflect the current offer count without changing the published mesh.
+    const notes = namedNotes.length > 0 ? namedNotes : Array.from({ length: MAX_NOTES }, (_, i) => {
+      const note = new Mesh(new BoxGeometry(0.11, 0.14, 0.006), new MeshStandardMaterial({ color: '#efe4c8', roughness: 1 }));
+      note.position.set((i - 1) * 0.13, 0.34 + (i % 2) * 0.03, 0.055);
+      note.rotation.z = (i - 1) * 0.08;
+      group.add(note);
+      return note;
+    });
+    group.visible = false;
+    return {
+      group,
+      place(x, y, z, yaw, count): void {
+        group.visible = true;
+        group.position.set(x, y, z);
+        group.rotation.y = yaw;
+        notes.forEach((note, i) => { note.visible = i < count; });
+      },
+    };
+  }
   const timber = new MeshStandardMaterial({ color: '#5e3f25', roughness: 0.95, metalness: 0 });
   const plank = new MeshStandardMaterial({ color: '#8a6038', roughness: 0.9, metalness: 0 });
   const paper = new MeshStandardMaterial({ color: '#efe4c8', roughness: 1, metalness: 0 });

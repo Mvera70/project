@@ -87,6 +87,7 @@ export function scatterTransform(width: number, cell: number, extra = 0): { x: n
 }
 
 export interface Piece {
+  readonly name: string;
   readonly geometry: BufferGeometry;
   readonly material: Material;
 }
@@ -102,7 +103,7 @@ export function piecesOf(source: Object3D): Piece[] {
     // la instancia sólo tenga que colocar el árbol entero.
     const geometry = mesh.geometry.clone();
     geometry.applyMatrix4(mesh.matrixWorld);
-    pieces.push({ geometry, material: mesh.material });
+    pieces.push({ name: mesh.name, geometry, material: mesh.material });
   });
   return pieces;
 }
