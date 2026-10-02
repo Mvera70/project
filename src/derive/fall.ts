@@ -19,7 +19,7 @@
 // igual que `chronicle/ledger.ts`, y deja el texto al banco.
 
 import type { ArchivedGame, ChronicleEntry } from '@engine/state';
-import { TIME } from '@engine/balance';
+import { MIGRATION, TIME } from '@engine/balance';
 
 /** Qué se llevó al valle desde su mejor momento. */
 export type FallLinkKind =
@@ -42,7 +42,7 @@ export interface FallStory {
   /** El mejor momento: cuándo y con cuánta gente. Desde ahí se cuenta la caída. */
   readonly peakTick: number;
   readonly peak: number;
-  /** Desde cuándo se cuenta lo que se lo llevó: la última vez que tuvo la mitad (`FALL.HALF`). */
+  /** Desde cuándo se cuenta lo que se lo llevó (`FALL.HALF`, `FALL.WINDOW_YEARS`). */
   readonly from: number;
   /** La gente que quedaba al final, antes del último golpe. */
   readonly left: number;
@@ -58,24 +58,25 @@ export interface FallStory {
 }
 
 /**
- * TUNE: cuántas cosas cuenta el epitafio, desde qué parte de su mejor momento
- * se cuenta la caída, y cuántos años antes de eso se busca una decisión.
+ * TUNE: cuántas cosas cuenta el epitafio, desde cuándo se cuenta la caída, y
+ * cuántos años antes de eso se busca una decisión.
  *
  *  · `LINKS` 3: lo que cabe en la columna de 390 px sin que el «por qué» tape
  *    la lápida.
- *  · `HALF` 0,5: medido el 2 oct 2026 en los 29 valles caídos de
- *    `fall-report` (herrajes y adversa, 30 semillas × 100 años). Contando desde
- *    el mejor momento, el relato abarcaba de 0 a 674 h a ×1 —hasta sesenta años
- *    de meseta— y sumaba décadas («158 murieron de hambre desde el año 34»).
- *    Con una ventana fija de cinco años se cortaba el arranque de los caseríos
- *    que se abandonan (108: «uno se marchó», sin las tres muertes de hambre
- *    del primer otoño). La última vez que tuvo la mitad es la caída misma, en
- *    los dos casos.
+ *  · `HALF` 0,5 y `WINDOW_YEARS` 5, juntos: medido el 2 oct 2026 en los 29
+ *    valles caídos de `fall-report` (herrajes y adversa, 30 semillas × 100
+ *    años). Contando desde el mejor momento, el relato abarcaba de 0 a 674 h a
+ *    ×1 —hasta sesenta años de meseta— y sumaba décadas («158 murieron de
+ *    hambre desde el año 34»). Sólo con la mitad, 7 de los 29 —valles fuertes
+ *    tomados de golpe— no tenían nada que contar, y el caserío 108 perdía sus
+ *    tres muertes de hambre del primer otoño. Sólo con cinco años, la peste
+ *    del año 2 que vació el 45 se quedaba fuera. Lo que antes llegue de las
+ *    dos cuenta los 29.
  *  · `DECISION_YEARS` 2: la pregunta que torció la partida suele llegar antes
  *    del descenso; en 28 de los 29 la que se cita es `raiders_coming`,
  *    `succession` o el forastero del vado.
  */
-export const FALL = { LINKS: 3, HALF: 0.5, DECISION_YEARS: 2 } as const;
+export const FALL = { LINKS: 3, HALF: 0.5, WINDOW_YEARS: 5, DECISION_YEARS: 2 } as const;
 
 const DEATH = /^death\.(hunger|plague|cold|fire|violence|natural|old_age)\.(named|anon\.one|anon\.many)$/;
 const RAIDS = new Set(['raid.open', 'raid.walled', 'raid.assault']);
@@ -138,17 +139,20 @@ export function fallOf(game: Pick<ArchivedGame, 'cause' | 'chronicle' | 'endedTi
   // El último golpe no es una causa: es el final, y el epitafio ya lo dice.
   const last = [...chronicle].reverse().find((e) => e.templateKey === 'raid.stormed');
   const band = game.cause === 'stormed' && last !== undefined ? headsIn(last) : null;
-  // **Desde cuándo se cuenta: la última vez que tuvo la mitad de su mejor
-  // momento** (`FALL.HALF`), o el mejor momento si nunca bajó de ahí. Una
-  // meseta de décadas no es la caída, y una ventana de años fijos tampoco
-  // sirve: corta el primer otoño de hambre de un caserío que se abandona cinco
-  // años después (§5.7 espera `ABANDON_YEARS`) y abarca medio siglo de una
-  // villa que cae en dos. Lo que se mide es la caída misma.
-  let from = peakTick;
+  // **Desde cuándo se cuenta la caída: lo que antes llegue de dos cosas**, y
+  // nunca antes del mejor momento. Una es la última vez que tuvo la mitad de
+  // su mejor momento (`FALL.HALF`): la caída misma, cuando la hay. La otra son
+  // los últimos `WINDOW_YEARS`, más los `ABANDON_YEARS` que §5.7 espera antes
+  // de dar un caserío por abandonado: lo que pasó justo antes, para el valle
+  // fuerte que cae de golpe sin haber bajado nunca de la mitad. Cada una sola
+  // dejaba casos sin contar (ver `FALL`).
+  let half = peakTick;
   for (const entry of chronicle) {
     const people = entry.params['people'];
-    if (typeof people === 'number' && entry.tick >= peakTick && people >= peak * FALL.HALF) from = entry.tick;
+    if (typeof people === 'number' && entry.tick >= peakTick && people >= peak * FALL.HALF) half = entry.tick;
   }
+  const years = FALL.WINDOW_YEARS + (game.cause === 'abandoned' ? MIGRATION.ABANDON_YEARS : 0);
+  const from = Math.max(peakTick, Math.min(half, end - years * TIME.WEEKS_PER_YEAR));
   const all = linksSince(chronicle, from, game.cause === 'stormed' && last !== undefined ? last.tick - 1 : end);
   const weight = (l: FallLink): number => (l.kind === 'old_age' || l.kind === 'natural' ? l.count / 4 : l.count);
   const links = all
