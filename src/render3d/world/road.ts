@@ -232,9 +232,8 @@ function unit(seed: number, key: string): number {
 }
 
 /**
- * Los carteles, provisionales: un poste y una tablilla de madera. El modelo de
- * verdad está pedido a Astra (`docs/encargos/cartel-del-camino.md`); cuando
- * llegue se instancia aquí con el mismo `yaw`.
+ * Road signs use Astra's single-mesh model when published; the two boxes
+ * remain as a fallback for older asset manifests.
  */
 export function buildSignposts(signs: readonly Signpost[], ground: (x: number, z: number) => number, model?: Object3D): Group {
   const group = new Group();

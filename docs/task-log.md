@@ -31,6 +31,17 @@ decidido por Sol 6: los 21 tipos del Bloque 0 usan una malla instanciada por tip
 decidido por Sol 6: el modelo de lavado y el de bancal pueden convivir con los elementos procedurales anteriores cuando hay sitio libre; el mismo filtro de celdas libres impide tapar accesos.
 
 Bloque 0 candidato integrado, comparado contra `main` `24683e35` con la misma semilla/año/estación: villa `gl-probe` **511 llamadas (+17), 763 963 triángulos (+1 462), 48 programas (+1)**; `scene-report` **492 mallas (+28), 207 sombras (=), 730 672 triángulos (+3 698)**. Aldea `gl-probe` **411 llamadas (+11), 747 635 triángulos** (la diferencia bruta varía con animaciones); `scene-report` **425 mallas (+15), 160 sombras (=), 646 842 triángulos (+2 374)**. El Bloque 0 queda por debajo de +30 llamadas y +60 000 triángulos en villa. Captura a cámara de reposo de la zona de casas: `artifacts/graphics/astra-b0-integrated/village-close.png`, comparada con `artifacts/graphics/astra-baseline-main/village-close.png`.
+
+Bloque 0 integrado en `main` por PR #57 (modelos) y #59 (escena), ambas con CI verde. Al entrar el cerco v5.89 de otra sesión se resolvieron sus conflictos sin cambiar el motor en este carril.
+
+decidido por Sol 6: el tablón de plaza usa las cuatro mallas de avisos del GLB y conserva su marcador de toque; los tablones de fachada, de una sola malla, reciben papeles ligeros según el número de encargos. El cartel de entrada reemplaza dos cajas por una malla. Las cajas quedan sólo como respaldo para manifiestos antiguos.
+decidido por Sol 6: el bastidor de pieles se sitúa en una celda libre junto a casa u oficio, fuera de la plaza y de los caminos; el marco persiste vacío y las cuatro pieles se activan por los rangos del inventario existente. No hay dato nuevo en el motor.
+decidido por Sol 6: el tablón de sastrería espera a la PR #56 de K5, aún abierta; sólo se publican en este paso los otros seis recursos del Bloque 1.
+Vera delegó expresamente la revisión de animales en Claude Code; en esta tanda Sol 6 deja sin integrar la fauna del Bloque 6 y el caballo del Bloque 7.
+decidido por Sol 6: tras modelar los bloques 0–7 se mejoran los dos candidatos del Bloque 8 sin integrarlos ni añadir fuego. El roble queda en `art/astra-b8-oak` y la casa en `art/astra-b8-house`; Vera revisará la decisión y las comparaciones.
+
+Bloque 1 antes/después contra Bloque 0 ya integrado, villa semilla 7/año 60/verano, misma consulta de `gl-probe` de 8 s: **522 → 494–499 llamadas (−23 a −28), 835 467 → 829 951–835 955 triángulos** (los personajes y animales cambian entre fotogramas), **48 → 48 programas**. `scene-report` tras el ajuste final de colocación: **503 → 490 mallas (−13), 207 → 188 sombras (−19), 796 668 → 797 180 triángulos (+512)**. SwiftShader sirve para comparar geometría y llamadas, no FPS. Capturas locales: `artifacts/graphics/astra-b1-integrated/village-rest.png` y `village-close-final.png`; siete hojas individuales en `artifacts/graphics/astra/<id>/sheet.png`.
+
 ## 2 oct 2026 · El cerco sin salida (v5.89)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),

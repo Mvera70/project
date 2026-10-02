@@ -1,10 +1,5 @@
-// §7.15 · El tablón de misiones de la plaza, provisional (28 sep 2026).
-//
-// Dos postes, una tabla, un tejadillo y tres papeles clavados, hechos de
-// cajas: se lee como tablón de avisos desde la vista de juego y se puede tocar
-// (`userData.noticeBoard`, que `renderer.pick` busca). El modelo de verdad está
-// pedido a Astra (`docs/encargos/visitantes-y-expediciones.md`, `notice-board`);
-// cuando llegue, esto se sustituye por `library.instance('notice-board')`.
+// §7.15 · Interactive notice boards. Astra GLBs replace the box fallback;
+// the group keeps the picking marker and exposes the current paper count.
 
 import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
 
@@ -13,7 +8,7 @@ const MAX_NOTES = 3;
 
 export interface NoticeBoardMesh {
   readonly group: Group;
-  /** Pone el tablón en su sitio y enseña tantos papeles como misiones haya. */
+  /** Position the board and show as many papers as current offers. */
   place(x: number, y: number, z: number, yaw: number, notes: number): void;
 }
 

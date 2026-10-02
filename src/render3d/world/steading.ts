@@ -171,6 +171,11 @@ export function steadingOf(state: GameState, seed: number): Steaded[] {
   const place = (asset: SteadingAsset, candidates: readonly number[], limit = MOST_STEADED[asset]): void => {
     for (const cell of candidates) {
       if (out.filter((one) => one.asset === asset).length >= limit) return;
+      if (asset === 'hide-rack') {
+        const x = cell % map.width + 0.5, z = Math.floor(cell / map.width) + 0.5;
+        // A drying rack belongs by a workshop, outside the busy square.
+        if (Math.hypot(x - square.x, z - square.y) <= PLAZA.RADIUS + 1) continue;
+      }
       if (asset === 'shed') {
         const x = cell % map.width + 0.5, z = Math.floor(cell / map.width) + 0.5;
         // El cobertizo ocupa una parcela entera y no pertenece a la plaza:
@@ -260,7 +265,6 @@ export function steadingOf(state: GameState, seed: number): Steaded[] {
   place('crate', tradeYards);
   place('sack-pile', tradeYards);
   place('tool-rack', around('smithy', 'house', 'stone_house'));
-  place('hide-rack', around('smithy', 'house', 'stone_house'));
   if (seasonOf(state.tick) !== 'winter') place('washing-line', homes);
   place('flower-pot', homes);
   place('herb-bed', homes);
@@ -308,6 +312,8 @@ export function steadingOf(state: GameState, seed: number): Steaded[] {
     }
   }
 
+  // Added last so the established homes and paths keep their scenic places.
+  place('hide-rack', around('smithy', 'house', 'stone_house'));
   return out;
 }
 
