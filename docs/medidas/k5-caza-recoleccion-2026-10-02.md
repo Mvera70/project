@@ -79,3 +79,49 @@ siembra; las plantas piden la enfermería de K11.
 si el peto es de la aldea (lo usa sola cuando avisa el clan) o se pide en el
 tablón de la herrería (K8). El nivelado —cuánto vale una piel, cuánto salva un
 peto— es suyo y va al final.
+
+## 5 · Decidido por Vera (2 oct 2026, por el director)
+
+Cuero primero, con el dilema tal cual: vender al buhonero por plata, que tienta
+al clan, o guardar para petos. **El peto se pide en el tablón de la herrería**,
+pagado, como las hachas y los herrajes; la aldea no se lo pone sola. Lino y
+plantas esperan.
+
+## 6 · Después (v5.75)
+
+`npx tsx tools/reports/k5-report.ts --after --tap N`: 12 semillas × 60 años,
+arco y lanza dados en la fundación, el jugador toca una de cada N señales de
+caza (sorteadas con `hash32`, la misma en las dos columnas) y acierta siempre;
+**guarda** no acepta nunca al buhonero de las pieles, **vende** lo acepta
+siempre.
+
+| señales tocadas | jugador | seis pieles (petos) | pieles al primer aviso del clan (mediana) | petos pagables al aviso | buhonero pidiendo pieles, por 10 h | plata del cuero, por 10 h |
+|---|---|---:|---:|---:|---:|---:|
+| todas | guarda | 6,5 h | 176 | 12/12 | 0,37 | 0 |
+| todas | vende | 6,5 h | 73 | 12/12 | 0,32 | 7,8 |
+| una de 3 | guarda | 18 h | 75 | 12/12 | 0,37 | 0 |
+| una de 3 | vende | 20 h | 10 | **10/12** | 0,31 | 6,5 |
+| una de 8 | guarda | 46 h | 26 | 12/12 | 0,32 | 0 |
+| una de 8 | vende | 49 h | 4 | **4/12** | 0,22 | 2,6 |
+
+**La primera versión no tenía dilema, y la medida lo dijo.** Con el buhonero
+llevándose tres pieles por visita, el que vendía llegaba al aviso del clan con
+86 pieles y el que guardaba con 92 (2 semillas × 10 años, todas las señales):
+sube 0,4 veces por cada 10 h y la caza trae 12. Ahora se lleva **todas** (hasta
+12), y vender es quedarse sin petos cuando el clan avisa, que es la mitad del
+dilema que Vera eligió.
+
+**Lo que no llega o no se mide todavía:**
+
+- El cazador que toca **todas** las señales tiene pieles de sobra para las dos
+  cosas: la caza grande da 12 por cada 10 h y nada se pudre. Si eso es un
+  problema es nivelado (de Vera): `PER_KILL`, `PEDLAR_MAX_HIDES`, o que las
+  pieles se estropeen.
+- La plata vendida **tienta** al clan (`WORTH_PER_SILVER`), pero no se ha
+  medido cuántos asaltos de más trae: con la política prudente y sin batalla
+  física, un asalto entra siempre, y la cuenta saldría del dado y no del cuero.
+- El peto sólo pesa **en un cerco que aguanta con parte de batalla**: sin nadie
+  mirando, el asalto entra y el peto no cambia nada (B3). La propiedad está
+  probada con el parte (`tests/fast/k5-hides.test.ts`).
+- **Una partida sin caza no se mueve**: idéntica byte a byte (SHA-1 del estado
+  a 30 años, semillas 7, 23 y 41) contra `main` en `02b7a87`.

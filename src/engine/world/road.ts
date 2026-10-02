@@ -64,6 +64,16 @@ function apply(state: GameState, good: OfferGood, sign: 1 | -1): void {
   }
 }
 
+/**
+ * K5 · la clave de crónica de una oferta: la del buhonero que pide pieles
+ * tiene sus propias líneas (`offer.pedlar.hides.*`), porque lo que se va por
+ * el camino no es leña.
+ */
+export function offerKey(offer: Offer): string {
+  return offer.takes.some((good) => good.k === 'stat' && good.stat === 'hides')
+    ? `offer.${offer.id}.hides` : `offer.${offer.id}`;
+}
+
 /** Lo que un trato deja escrito: las cifras de la oferta, con el nombre de su bien. */
 function paramsOf(offer: Offer): Record<string, number> {
   const params: Record<string, number> = {};
@@ -106,7 +116,7 @@ export function settleOffer(state: GameState, accept: boolean, season: string, y
     refused: false,
     entry: {
       kind: 'road',
-      templateKey: `offer.${offer.id}.taken`,
+      templateKey: `${offerKey(offer)}.taken`,
       params: { ...paramsOf(offer), season, year },
       weight: 2,
     },
@@ -118,7 +128,7 @@ export function expireOffer(state: GameState, season: string, year: number): Omi
   const offer = state.offer;
   if (offer === null || state.tick <= offer.expiresTick) return null;
   state.offer = null;
-  return { kind: 'road', templateKey: `offer.${offer.id}.gone`, params: { season, year }, weight: 1 };
+  return { kind: 'road', templateKey: `${offerKey(offer)}.gone`, params: { season, year }, weight: 1 };
 }
 
 export interface Tithe {

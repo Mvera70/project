@@ -1,5 +1,39 @@
 # The Valley — Registro de cambios
 
+## v5.75 · 2 oct 2026 · K5: el cuero de la caza, vendido o hecho peto
+
+**Medido antes** (`docs/medidas/k5-caza-recoleccion-2026-10-02.md`, informe nuevo
+`tools/reports/k5-report.ts`, 12 semillas × 60 años, horas a ×1): con la honda
+sola la caza **no da nunca** ciervo, jabalí ni oso (0 de 12 valles); con arco y
+lanza dados, 11–12 piezas grandes por cada 10 h tocando todas las señales. **El
+frío no mata a nadie** (ni un invierno sin leña), así que un cuero o un lino
+«para abrigar» no resolvería nada; el hambre es lo que más mata (12–18 por cada
+100 h) y la plata falta toda la partida (mediana 2–8). Propuesto el cuero
+primero y **decidido por Vera**: el dilema es vender o guardar, y el peto se
+pide en el tablón de la herrería. Lino y plantas esperan.
+
+**Lo que cambia.** `village.hides`, la séptima existencia (§3.3, sin subir el
+esquema: una partida guardada carga con cero). Cada ciervo o jabalí cazado deja
+una piel y el oso dos. **El buhonero**, si hay tres o más, sube aunque falte la
+leña y **las pide todas** (hasta 12, a 2 de plata). **Los petos** son el cuarto
+encargo de la herrería: 6 pieles y 4 de plata, sin madera, por un año; mientras
+duran, de los caídos en un cerco que aguanta se levanta la mitad (§7.17,
+§12.12). Las pieles se cuentan en el aviso de los petos, no en la cabecera.
+
+**Por qué «todas»**: con el buhonero llevándose tres por visita, el que vendía
+llegaba al primer aviso del clan con 86 pieles y el que guardaba con 92; no
+había dilema. **Medido después** (`--after`): tocando una de cada tres señales,
+al primer aviso del clan puede pagar los petos el que guarda en 12 de 12 valles
+y el que vende en 10 de 12; tocando una de cada ocho, 12 contra 4. **Una partida
+sin caza queda idéntica byte a byte** (semillas 7, 23 y 41 a treinta años,
+contra `02b7a87`).
+
+**Abierto**: el cazador que toca todas las señales tiene pieles para las dos
+cosas (nivelado, de Vera); no se ha medido cuántos asaltos de más trae la plata
+del cuero; y la escena del asalto todavía no sabe del peto (carril de combate).
+Lo que no se ve, en `docs/encargos-3d.md`; las imágenes y modelos, en
+`docs/encargos/ilustraciones-k5-cuero.md`.
+
 ## v5.72 · 2 oct 2026 · K7: el epitafio dice por qué cayó el valle
 
 **Medido antes** (`docs/medidas/k7-caidas-2026-10-02.md`, informe nuevo

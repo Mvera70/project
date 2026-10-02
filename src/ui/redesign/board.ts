@@ -96,7 +96,7 @@ const CSS = `
   background-image: var(--res-silver); background-position: center; background-size: contain; background-repeat: no-repeat; }
 /* K8 · el precio de un encargo en madera lleva su icono; el de la fe, ninguno. */
 .valley-cost-chip.wood::before { background-image: var(--res-wood); }
-.valley-cost-chip.faith::before { display: none; }
+.valley-cost-chip.faith::before, .valley-cost-chip.hides::before { display: none; }
 .valley-note-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .valley-step { display: flex; align-items: center; gap: 6px; }
 .valley-step button { width: 40px; height: 40px; padding: 0; color: #3d3020; font: 700 22px/1 var(--skin-font-voice); cursor: pointer;
@@ -125,13 +125,16 @@ function riskKey(open: MissionOpen): string {
   return death === 0 ? 'board.risk.none' : death < 0.05 ? 'board.risk.low' : 'board.risk.high';
 }
 
-/** Un precio en su ficha: plata o madera con su icono, y la fe en letra. */
-function chip(kind: 'silver' | 'wood' | 'faith', amount: number): HTMLSpanElement {
+/** Un precio en su ficha: plata o madera con su icono, y la fe y las pieles en letra. */
+function chip(kind: 'silver' | 'wood' | 'faith' | 'hides', amount: number): HTMLSpanElement {
   const cost = document.createElement('span');
   cost.className = `valley-cost-chip ${kind}`;
-  cost.textContent = kind === 'faith' ? renderUiText('board.cost.faith', { faith: amount }) : String(amount);
-  cost.setAttribute('aria-label', kind === 'silver' ? renderUiText('board.silver', { silver: amount })
-    : kind === 'wood' ? renderUiText('board.cost.wood', { wood: amount }) : renderUiText('board.cost.faith', { faith: amount }));
+  const text = kind === 'silver' ? renderUiText('board.silver', { silver: amount })
+    : kind === 'wood' ? renderUiText('board.cost.wood', { wood: amount })
+      : kind === 'faith' ? renderUiText('board.cost.faith', { faith: amount })
+        : renderUiText('board.cost.hides', { hides: amount });
+  cost.textContent = kind === 'faith' || kind === 'hides' ? text : String(amount);
+  cost.setAttribute('aria-label', text);
   return cost;
 }
 
@@ -219,16 +222,27 @@ export function boardPanel(actions: UiActions): UiPanel & { show(which: BoardWhi
     close.textContent = renderUiText('board.close');
     close.addEventListener('click', () => actions.navigate({ kind: 'valley' }));
     const nodes: HTMLElement[] = [title, close];
-    // K8 · la fragua: tres encargos, uno cada vez, por un año.
+    // K8 · la fragua: cuatro encargos (K5 añadió los petos), uno cada vez, por un año.
     if (which === 'smithy') {
       for (const order of smithyOrdersOpen(state)) {
         const costs = [
           ...(order.cost.wood !== undefined && order.cost.wood > 0 ? [chip('wood', order.cost.wood)] : []),
           ...(order.cost.silver !== undefined && order.cost.silver > 0 ? [chip('silver', order.cost.silver)] : []),
+          ...('hides' in order.cost && order.cost.hides !== undefined && order.cost.hides > 0 ? [chip('hides', order.cost.hides)] : []),
         ];
         const live = order.live !== null && order.live.order === order.id ? untilText(order.live.until) : renderUiText('board.lasts');
-        nodes.push(buildingNote(`order.${order.id}`, costs, live, order.refusal, 'board.order',
-          () => actions.smithy(order.id as SmithyOrder)));
+        const note = buildingNote(`order.${order.id}`, costs, live, order.refusal, 'board.order',
+          () => actions.smithy(order.id as SmithyOrder));
+        // K5 · cuántas pieles hay en los bastidores, en su propia línea: el
+        // único sitio donde se cuentan, sin una cifra más en la cabecera. (En la
+        // línea del precio se cortaba a 390 px.)
+        if (order.id === 'jerkins') {
+          const racks = document.createElement('p');
+          racks.className = 'valley-note-why';
+          racks.textContent = renderUiText('board.hides.have', { hides: Math.floor(state.village.hides) });
+          note.querySelector('.valley-note-facts')?.after(racks);
+        }
+        nodes.push(note);
       }
       board.replaceChildren(...nodes);
       return;
@@ -344,7 +358,7 @@ export function boardPanel(actions: UiActions): UiPanel & { show(which: BoardWhi
   let key = '';
   const update = (snapshot: UiSnapshot): void => {
     const { state } = snapshot;
-    const next = `${which}:${state.tick}:${state.expeditions.length}:${Math.floor(state.village.silver)}:${Math.floor(state.village.wood)}:${Math.floor(state.village.faith)}:${liveOrder(state)?.order ?? ''}:${state.flags['rite:mass'] ?? ''}:${state.flags['rite:rogation'] ?? ''}:${[...wanted].join(',')}`;
+    const next = `${which}:${state.tick}:${state.expeditions.length}:${Math.floor(state.village.silver)}:${Math.floor(state.village.wood)}:${Math.floor(state.village.faith)}:${Math.floor(state.village.hides)}:${liveOrder(state)?.order ?? ''}:${state.flags['rite:mass'] ?? ''}:${state.flags['rite:rogation'] ?? ''}:${[...wanted].join(',')}`;
     if (next === key && last !== null) { last = snapshot; return; }
     key = next;
     paint(snapshot);

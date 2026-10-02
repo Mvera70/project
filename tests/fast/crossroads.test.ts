@@ -60,7 +60,7 @@ function village(seed: number, houses = 12): GameState {
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
     traits: [],
-    village: { grain: 4000, wood: 400, morale: 55, faith: 50, stone: 0, silver: 0 },
+    village: { grain: 4000, wood: 400, morale: 55, faith: 50, stone: 0, silver: 0, hides: 0 },
     people: foundPeopleTwenty(rng, 0),
     buildings: Array.from({ length: houses }, () => build('house')),
     works: [],

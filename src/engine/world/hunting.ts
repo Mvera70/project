@@ -1,7 +1,7 @@
 // La caza física entrega resultados al motor; la partida decide cuándo hay
 // ocasión, qué armas existen y qué premio corresponde a una presa real.
 
-import { HUNT } from '../balance';
+import { HIDES, HUNT } from '../balance';
 import { ratioOf } from '../crossroads/conditions';
 import { hash32 } from '../rng';
 import type { GameState, PlayerAct } from '../state';
@@ -59,6 +59,8 @@ export function settleHunt(state: GameState, act: HuntAct): boolean {
   if (act.killed) {
     if (act.hits < 1) return false;
     state.village.grain += HUNT.meat[act.species];
+    // K5 · y la piel, si la pieza es grande: lo que se vende o se hace peto.
+    state.village.hides += HIDES.PER_KILL[act.species];
     state.flags[`hunt:${act.species}`] = 0;
   }
   return true;

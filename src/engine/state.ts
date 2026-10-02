@@ -56,10 +56,26 @@ export interface VillageStats {
    * eso es la que hace que el camino importe (`docs/historico/plan-medios.md` §6.3).
    */
   silver: number;
+  /**
+   * K5 · **Las pieles de la caza** (2 oct 2026).
+   *
+   * Sólo las dejan las piezas grandes —ciervo, jabalí, oso—, y ésas sólo se
+   * cazan con el arco o la lanza que el jugador dio (`world/hunting.ts`): con
+   * la honda sola no sale ninguna (medido, `docs/medidas/k5-caza-recoleccion-2026-10-02.md`).
+   * Sirven para una cosa u otra, y ésa es la decisión de Vera: **venderlas al
+   * buhonero** por la plata que siempre falta (y que tienta al clan), o
+   * **pedir petos en la herrería** para los del cerco. No se comen ni abrigan:
+   * el frío no mata a nadie, y una existencia que no se gasta en nada sería una
+   * barra más que vigilar.
+   *
+   * Sin subir el esquema: una partida guardada sin ellas carga con cero
+   * (`save.ts`).
+   */
+  hides: number;
 }
 
-/** The statistics an effect can move. design.md §8.4; stone and silver since M-0. */
-export type StatName = 'grain' | 'wood' | 'morale' | 'faith' | 'stone' | 'silver';
+/** The statistics an effect can move. design.md §8.4; stone and silver since M-0, hides since K5. */
+export type StatName = 'grain' | 'wood' | 'morale' | 'faith' | 'stone' | 'silver' | 'hides';
 
 /**
  * The village's animals, as counts. design.md §7.7.
@@ -628,7 +644,8 @@ export type PlayerAct =
   };
 
 /** K8 · los encargos de la herrería, en orden estable (el tablón los pinta así). */
-export const SMITHY_ORDERS = ['axes', 'ploughshares', 'ironware'] as const;
+// K5 · los petos de cuero, al final: se pagan con las pieles de la caza.
+export const SMITHY_ORDERS = ['axes', 'ploughshares', 'ironware', 'jerkins'] as const;
 export type SmithyOrder = (typeof SMITHY_ORDERS)[number];
 
 /** K8 · los ritos de la iglesia, en orden estable. */

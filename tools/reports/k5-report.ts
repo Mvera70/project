@@ -16,6 +16,13 @@
 //
 //   npx tsx tools/reports/k5-report.ts                 # 12 semillas × 60 años
 //   npx tsx tools/reports/k5-report.ts --seeds 6 --years 40
+//   npx tsx tools/reports/k5-report.ts --after         # el cuero ya hecho (v5.75)
+//
+// Con `--after` mide el cuero: un jugador que dio arco y lanza y toca una de
+// cada `--tap` señales (1 = todas, la cota de arriba), y que **guarda** las
+// pieles o **las vende** al buhonero. Da, en horas a ×1, cuándo junta las seis
+// de los petos, cuántas tiene cuando el clan avisa por primera vez, y cuánta
+// plata trae el cuero vendido.
 
 import { TIME } from '../../src/engine/balance';
 import { CATALOG } from '../../src/engine/crossroads/catalog';
@@ -27,6 +34,8 @@ import { ringClosed } from '../../src/engine/world/placement';
 import { nextProject } from '../../src/engine/world/works';
 import { huntOpportunity, type HuntOpportunity, type HuntSpecies } from '../../src/engine/world/hunting';
 import { missionsOpen } from '../../src/engine/world/expeditions';
+import { BOARDS } from '../../src/engine/balance';
+import { hash32 } from '../../src/engine/rng';
 import { alive } from './ladder';
 
 const arg = (name: string, fallback: number): number => {
@@ -119,7 +128,55 @@ function play(seed: number, hunter: Hunter): { tallies: Map<Phase, Tally>; first
   return { tallies, firstHide, ended: state.ended !== null };
 }
 
-for (const hunter of ['sling', 'armed'] as const) {
+const AFTER = process.argv.includes('--after');
+
+/** K5 · el cuero, ya hecho: ¿hay petos a tiempo, y cuánto da venderlo? */
+function leather(seed: number, tap: number, sell: boolean): {
+  sixHides: number | null; atWarning: number | null; silverFromHides: number; pedlarHides: number; hours: number;
+} {
+  const state = foundGame(seed);
+  state.traits.push('bows', 'arms');
+  let pending: HuntOpportunity | null = null;
+  let sixHides: number | null = null;
+  let atWarning: number | null = null;
+  let silverFromHides = 0;
+  let pedlarHides = 0;
+  for (let t = 1; t <= WEEKS && state.ended === null; t += 1) {
+    const offered = pending !== null && hash32(seed, `k5:tap:${pending.tick}`) % tap === 0 ? pending : null;
+    const acts: PlayerAct[] = offered === null ? [] : [{
+      kind: 'hunt', sourceTick: offered.tick, species: offered.species,
+      weapon: offered.weapons[offered.weapons.length - 1]!, hits: 1, killed: true,
+    }];
+    const asksHides = state.offer?.id === 'pedlar' && state.offer.takes.some((g) => g.k === 'stat' && g.stat === 'hides');
+    if (sell && asksHides) acts.push({ kind: 'offer', accept: true });
+    const before = state.village.silver;
+    const [report] = run(state, 1, 'prudent', CATALOG, () => acts);
+    if (report === undefined) break;
+    if (report.entries.some((e) => e.templateKey === 'fate.pedlar.hides')) pedlarHides += 1;
+    if (report.offer?.accepted === true && asksHides) silverFromHides += state.village.silver - before;
+    if (sixHides === null && state.village.hides >= BOARDS.ORDERS.jerkins.hides) sixHides = hours(state.tick);
+    if (atWarning === null && report.entries.some((e) => e.templateKey === 'raid.coming')) atWarning = state.village.hides;
+    pending = huntOpportunity(state);
+  }
+  return { sixHides, atWarning, silverFromHides, pedlarHides, hours: hours(state.tick) };
+}
+
+if (AFTER) {
+  const tap = arg('tap', 3);
+  console.log(`\n# K5 · el cuero · ${SEEDS.length} semillas × ${YEARS} años · arco y lanza dados · una de cada ${tap} señales · horas a ×1\n`);
+  console.log('| jugador | seis pieles (petos) | valles | pieles al primer aviso del clan (mediana) | con petos pagables al aviso | buhonero pidiendo pieles, por 10 h | plata del cuero, por 10 h |');
+  console.log('|---|---:|---:|---:|---:|---:|---:|');
+  for (const sell of [false, true]) {
+    const rows = SEEDS.map((seed) => leather(seed, tap, sell));
+    const six = rows.flatMap((r) => (r.sixHides === null ? [] : [r.sixHides]));
+    const warned = rows.flatMap((r) => (r.atWarning === null ? [] : [r.atWarning]));
+    const totalHours = rows.reduce((n, r) => n + r.hours, 0);
+    const per10 = (x: number): string => (10 * x / totalHours).toFixed(2);
+    console.log(`| ${sell ? 'vende al buhonero' : 'guarda'} | ${fmt(median(six))} | ${six.length}/${rows.length} | ${median(warned)} | ${warned.filter((h) => h >= BOARDS.ORDERS.jerkins.hides).length}/${warned.length} | ${per10(rows.reduce((n, r) => n + r.pedlarHides, 0))} | ${per10(rows.reduce((n, r) => n + r.silverFromHides, 0))} |`);
+  }
+}
+
+for (const hunter of AFTER ? [] : (['sling', 'armed'] as const)) {
   const total = new Map(PHASES.map((p) => [p, blank()]));
   const hides: number[] = [];
   let ended = 0;

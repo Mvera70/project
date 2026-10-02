@@ -1766,7 +1766,25 @@ export const BOARDS = {
      * que espera la obra. Es la única forma de convertir madera en plata.
      */
     ironware: { wood: 60, silver: 0 },
+    /**
+     * K5 · Los petos de cuero para los del cerco: se pagan con **las pieles
+     * de la caza** y un poco de plata por el trabajo del herrero (Vera, 2 oct
+     * 2026: «pagado, como las hachas y los herrajes»). Sin madera: el cuero
+     * no pasa por la fragua. Mientras dura el encargo, de los que caen en la
+     * muralla se levanta `JERKIN_SAVE` (`world/threat.ts`). TUNE: seis pieles
+     * son 12 de plata que no se le venden al buhonero
+     * (`HIDES.PEDLAR_SILVER_PER_HIDE`), y 4 más por el trabajo.
+     */
+    jerkins: { wood: 0, silver: 4, hides: 6 },
   },
+  /**
+   * K5 · La parte de los caídos en el cerco que el peto levanta, redondeada
+   * hacia abajo: con dos caídos se levanta uno, con uno solo ninguno. TUNE y
+   * **sin nivelar** (el nivelado es de Vera): la mitad, como el portón
+   * (`THREAT.WALLED_SACK`) hace con el botín. Sólo cuenta en un asalto que
+   * aguanta: si entran, entran (`settle`).
+   */
+  JERKIN_SAVE: 0.5,
   /** Cada cuántas semanas vende la herrería un lote de herrajes. */
   WARES_EVERY: 8,
   /** Lo que da cada lote. TUNE (ver `ORDERS.ironware`). */
@@ -1792,6 +1810,38 @@ export const BOARDS = {
    */
   ROGATION_FAITH: 20,
   ROGATION_YIELD: 1.15,
+} as const;
+
+/**
+ * K5 · **Las pieles de la caza** (2 oct 2026). Lo que se midió antes de poner
+ * un número (`docs/medidas/k5-caza-recoleccion-2026-10-02.md`, 12 semillas ×
+ * 60 años, prudente, horas a ×1): con la honda sola la caza no da **nunca** una
+ * pieza grande (0 de 12 valles); con arco y lanza dados, 11–12 piezas grandes
+ * por cada 10 h si se tocan todas las señales y se acierta siempre (la cota de
+ * arriba). La plata vive en 2–8 toda la partida.
+ */
+export const HIDES = {
+  /**
+   * Pieles por pieza cobrada. TUNE: una por pieza grande y dos el oso; la
+   * perdiz y el conejo no dan nada que se pueda curtir para un peto.
+   */
+  PER_KILL: { partridge: 0, rabbit: 0, deer: 1, boar: 1, bear: 2 },
+  /**
+   * El buhonero, si hay pieles, pide pieles y no leña: el cuero paga más.
+   * **Y se las lleva todas**, hasta un tope: medido con el buhonero comprando
+   * tres por visita, el valle que vendía tenía al primer aviso del clan 86
+   * pieles contra 92 del que guardaba (2 semillas × 10 años, todas las señales
+   * tocadas): sube 0,4 veces por cada 10 h y la caza grande trae 12, así que
+   * vender no vaciaba nada y el dilema no existía. Vendiendo todas, vender es
+   * quedarse sin petos.
+   *
+   * TUNE: sube desde 3 pieles; paga 2 de plata cada una (el buhonero da 6 por
+   * 80 de leña, `OFFER.PEDLAR_*`, y el arado cuesta 20); como mucho 12, que
+   * son 24 de plata, la de un arado y algo, de una vez.
+   */
+  PEDLAR_MIN_HIDES: 3,
+  PEDLAR_MAX_HIDES: 12,
+  PEDLAR_SILVER_PER_HIDE: 2,
 } as const;
 
 export const HUNT = {
