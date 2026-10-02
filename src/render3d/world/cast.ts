@@ -22,6 +22,7 @@ import { WorkChips } from '../effects/work-chips';
 import { WaterThrows } from '../effects/water-throws';
 import { Stains } from '../effects/stains';
 import { handTool } from '../hand-tools';
+import { jerkinPiece } from './jerkin';
 import { displayScaleFor, modelFor } from './models';
 
 type Action = NonNullable<ReturnType<AnimationMixer['clipAction']>>;
@@ -603,7 +604,18 @@ export class Cast {
         player.held.set(item.key, tool);
       }
     }
+    // K5 · El peto no va en la mano: cuelga del tronco, y es del valle.
+    if (actor.jerkin === true && !player.held.has('jerkin')) {
+      const spine = player.object.getObjectByName('spine');
+      if (spine !== undefined) {
+        const piece = jerkinPiece();
+        piece.userData.villagerId = player.object.userData.villagerId;
+        spine.add(piece);
+        player.held.set('jerkin', piece);
+      }
+    }
     const visible = new Set(wanted.map(item => item.key));
+    if (actor.jerkin === true) visible.add('jerkin');
     for (const [name, tool] of player.held) tool.visible = visible.has(name);
   }
 

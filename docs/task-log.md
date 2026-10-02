@@ -1,5 +1,27 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · El peto en el asalto (v5.80, carril de combate)
+
+Rama `claude/petos-asalto`, **versiones reservadas v5.80–v5.84**, encargo del
+director. Hecho: el peto en el torso de todo el cerco mientras dura el encargo
+(`render3d/world/jerkin.ts`), la pelea que lo cuenta en sombra (`jerkinTally`,
+`moments.battle.jerkinBlows`), el mando «Petos» del banco y
+`battle-report.ts --jerkins`. **El efecto sigue en el motor**: la escena no
+decide. Medida en `docs/medidas/k5-petos-asalto-2026-10-02.md`; capturas en
+`docs/medidas/k-img/k5-petos-*.jpg`. Pruebas: `melee`, `battle-sandbox`,
+`jerkin-piece`. No toca el motor.
+
+**Abierto:**
+
+- **Para el nivelado:** con 0–3 bajas por asalto, `floor(caídos × 0,5)` no
+  levanta a nadie en la configuración del juego (0 de 20); si el peto ha de
+  pesar, o se redondea de otra forma o decide la escena (`JERKIN_EXTRA_BLOWS`),
+  y lo segundo pide quitar el efecto del motor cuando hay parte (motor, no combate).
+- **Sin ver:** la pelea con petos en un aparato (el contenedor no llega al
+  choque); el caído que se levanta.
+- **De otros carriles:** el golpe sobre cuero que suene distinto (sonido, la
+  cuenta ya está publicada); un peto modelado (Astra).
+
 ## 2 oct 2026 · K5: el cuero de la caza (v5.75)
 
 Rama `claude/k5-caza-recoleccion`, **versiones reservadas v5.75–v5.79**. Medido

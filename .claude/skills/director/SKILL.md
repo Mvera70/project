@@ -65,6 +65,7 @@ y prueba, o no existe.** Las que hay:
 |---|---|---|---|
 | Motor → todo | El estado es plano y se lee, nunca se escribe desde fuera; la batalla entra por `PlayerAct` | ESLint (`src/engine/` no importa de fuera), `CLAUDE.md` | Sólo el motor, subiendo `SCHEMA_VERSION` |
 | Vida/combate → sonido | `GraphicsStats.moments`: cuentas que sólo suben (flechas, aciertos, golpes, caídos, portón, caza, oso) | `ui/moments.ts` y sus pruebas (v5.22) | Quien añade un suceso **publica su cuenta**; sonido decide si suena |
+| Combate → sonido (K5) | `moments.battle.jerkinBlows`: golpes que los del cerco reciben sobre un peto de cuero (opcional; v5.80) | `tests/fast/melee.test.ts` (la cuenta sale de `jerkinTally`) | Combate; sonido decide si el golpe sobre cuero suena distinto |
 | Render → sonido | `GraphicsStats` (`contracts.ts`): cámara, fase del sol, cielo | `sound.test.ts` | Gráficos avisa si renombra |
 | Modelos → caza | La cápsula de cada presa sale del tronco del GLB | `hunt-bodies.test.ts` | Modelos: **un modelo nuevo mide su tronco** |
 | Modelos → rendimiento | Una llamada de dibujo por animal (RV-1, PR #11) | la prueba de RV-1 | Modelos |

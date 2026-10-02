@@ -54,6 +54,11 @@ export interface Actor {
   readonly weapon?: 'bow' | 'spear' | 'sling' | null;
   /** El escudo acompaña a la lanza; separado para no inventar un arma nueva. */
   readonly shield?: boolean;
+  /**
+   * K5 · Lleva el peto de cuero de la herrería (`Garrison.jerkins`): sólo los
+   * del cerco mientras dura el encargo. Efímero como el arma.
+   */
+  readonly jerkin?: boolean;
   /** En qué segundo de su propio clip hay que ponerlo. */
   readonly clipSeconds: number;
   readonly poseSeconds?: number;
@@ -460,6 +465,12 @@ export interface WorldMoments {
     /** Del clan en el suelo, y de la aldea caídos defendiendo. */
     readonly fallen: number;
     readonly lost: number;
+    /**
+     * K5 · Golpes que los del cerco han recibido sobre un peto de cuero —no
+     * están en `hits`, que son los que recibe el clan—: el golpe sordo sobre
+     * cuero. Opcional para quien no lo publique.
+     */
+    readonly jerkinBlows?: number;
     readonly gate: { readonly at: { readonly x: number; readonly z: number };
       readonly hits: number; readonly broken: boolean } | null;
   } | null;

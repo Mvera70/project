@@ -10,7 +10,7 @@
 // de una jornada de verdad la mide `tests/journeys/assault.test.ts`.
 
 import { describe, expect, it } from 'vitest';
-import { fallenDefenders, meleePose, stepMelee, type Defender } from '../../src/render3d/life/melee';
+import { fallenDefenders, jerkinTally, meleePose, stepMelee, type Defender } from '../../src/render3d/life/melee';
 import type { Manned } from '../../src/render3d/life/garrison';
 import type { Raider } from '../../src/render3d/life/raiders';
 import type { Arm } from '@derive/garrison';
@@ -33,13 +33,13 @@ function raider(x: number, z: number): Raider {
 }
 
 /** Un defensor de juguete, con su arma. */
-function defender(x: number, z: number, arm: Arm): Defender {
+function defender(x: number, z: number, arm: Arm, jerkin = false): Defender {
   const post = {
     place: { id: `post:wall:${x},${z}`, at: { x, z }, offers: [] },
     post: { x, y: z, arm, on: 'wall' as const },
     facing: { x, z },
   } as unknown as Manned;
-  return { at: { x, z }, post, hits: 0, down: false };
+  return { at: { x, z }, post, hits: 0, down: false, ...(jerkin ? { jerkin } : {}) };
 }
 
 /** Pasos suficientes para que se repartan unos cuantos golpes. */
@@ -148,5 +148,44 @@ describe('D4 · el cuerpo a cuerpo', () => {
     const us = [defender(10.5, 10, 'spear')];
     brawl(them, us, 600);
     expect(us[0]?.hits, 'un saqueador en el suelo no pega').toBe(0);
+  });
+
+  it('K5 · el peto en sombra no cambia la pelea: los mismos golpes y las mismas caídas, contadas', () => {
+    // La propiedad de `fisica-combate` §2.2: lo que se mide en sombra no decide.
+    // Varias disposiciones, no una: el que está solo, el que tiene compañía, arco y lanza.
+    for (const [crowd, arm] of [[12, 'spear'], [3, 'bow'], [1, 'spear'], [6, 'bow']] as const) {
+      const fight = (jerkin: boolean): { them: Raider[]; us: Defender[] } => {
+        const them = Array.from({ length: crowd }, (_, n) => raider(10 + n * 0.05, 10));
+        const us = [defender(10.2, 10, arm, jerkin), defender(10.4, 10.3, 'spear', jerkin)];
+        brawl(them, us, 600);
+        return { them, us };
+      };
+      const bare = fight(false);
+      const worn = fight(true);
+      const strip = (us: readonly Defender[]) => us.map(({ hits, down, downAt }) => ({ hits, down, downAt }));
+      expect(strip(worn.us), `${crowd} contra dos, ${arm}`).toEqual(strip(bare.us));
+      expect(worn.them.map((r) => [r.hits, r.phase])).toEqual(bare.them.map((r) => [r.hits, r.phase]));
+      const tally = jerkinTally(worn.us);
+      expect(tally.worn).toBe(2);
+      expect(tally.blows, 'cada golpe recibido con peto se cuenta').toBe(worn.us.reduce((sum, d) => sum + d.hits, 0));
+      expect(tally.fallen).toBe(fallenDefenders(worn.us));
+      expect(tally.delayed, 'con la regla apagada, cada caído con peto lo habría retrasado').toBe(tally.fallen);
+      expect(jerkinTally(bare.us)).toEqual({ worn: 0, blows: 0, fallen: 0, delayed: 0 });
+    }
+  });
+
+  it('K5 · con la regla puesta (sólo banco e informe), el peto aguanta los golpes de más', () => {
+    const ally = defender(10.2, 10, 'spear', true);
+    const bare = defender(10.2, 10, 'spear');
+    for (const target of [ally, bare]) {
+      // Un saqueador que no cae, para ver cuánto aguanta el defensor solo.
+      const enemy = raider(10, 10);
+      enemy.hits = -1000;
+      for (let step = 0; step <= 600 && !target.down; step += 1) stepMelee([enemy], [target], step, 1);
+    }
+    expect(bare.down && ally.down).toBe(true);
+    expect(bare.hits, 'sin peto, a los tres').toBe(3);
+    expect(ally.hits, 'con peto y un golpe de más, a los cuatro').toBe(4);
+    expect(ally.delayed, 'con la regla puesta no hay sombra que contar').toBeUndefined();
   });
 });
