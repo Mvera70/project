@@ -1,0 +1,74 @@
+{
+  "meshCount": 1,
+  "bones": [
+    "body",
+    "foreL",
+    "foreLLower",
+    "foreLFoot",
+    "foreR",
+    "foreRLower",
+    "foreRFoot",
+    "hindL",
+    "hindLLower",
+    "hindLFoot",
+    "hindR",
+    "hindRLower",
+    "hindRFoot",
+    "neck",
+    "head",
+    "ear1",
+    "ear-1",
+    "tail"
+  ],
+  "clips": [
+    {
+      "name": "idle",
+      "seconds": 8.041666984558105,
+      "loopError": 0,
+      "feet": {
+        "foreLFoot": {
+          "xRange": 0,
+          "yRange": 0
+        },
+        "foreRFoot": {
+          "xRange": 0,
+          "yRange": 0
+        },
+        "hindLFoot": {
+          "xRange": 0,
+          "yRange": 0
+        },
+        "hindRFoot": {
+          "xRange": 0,
+          "yRange": 0
+        }
+      },
+      "strideCells": null
+    },
+    {
+      "name": "walk",
+      "seconds": 2.7083332538604736,
+      "loopError": 0,
+      "feet": {
+        "foreLFoot": {
+          "xRange": 0.1680417090485295,
+          "yRange": 0.06104598468675622
+        },
+        "foreRFoot": {
+          "xRange": 0.16840696572496885,
+          "yRange": 0.06107101220829175
+        },
+        "hindLFoot": {
+          "xRange": 0.1687218291513485,
+          "yRange": 0.06118365421429775
+        },
+        "hindRFoot": {
+          "xRange": 0.16775800179780023,
+          "yRange": 0.061037685326792226
+        }
+      },
+      "strideCells": 0.2832
+    }
+  ],
+  "previewOnly": true
+}

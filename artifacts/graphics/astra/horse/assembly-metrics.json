@@ -1,0 +1,14 @@
+{
+  "shaftInnerWidthMetres": 0.945,
+  "horseMaximumWidthMetres": 0.8341312408447266,
+  "totalLateralClearanceMetres": 0.11086875915527339,
+  "wheelRadiusMetres": 0.6,
+  "wheelAxis": "X",
+  "cartShaftTipZCells": 0.7733333333333333,
+  "horseRotationYDegrees": -90,
+  "horseRootZCells": 0.5,
+  "hitchZCells": 0.7753333333333333,
+  "shaftHeightMetres": 1.08,
+  "hitchHeightMetres": 1.1092,
+  "pending": "Hitch requires two short traces/straps or future runtime attachment; shafts clear flank, no rigid direct join. Preview only."
+}
