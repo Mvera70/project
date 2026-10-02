@@ -1414,6 +1414,25 @@ aldea sin que nadie la diseñe.
 
 ### 7.7 Los animales del valle
 
+**La fauna por estaciones (2 oct 2026, v5.85).** Cada estación se nota en sus
+animales, sin tocar el motor: qué toca lo dice `faunaSeason(state)`
+(`derive/seasonal-fauna.ts`), que lee la semana del estado y nunca el reloj
+del navegador. **Primavera:** crías detrás de las madres que haya —la primera
+cierva siempre con su cervatillo, la mitad de las vacas con ternero, la mitad
+de las cerdas con dos lechones, un tercio de las gallinas con tres polluelos—,
+estables por semilla, madre y año (`life/young.ts`, `village.young`); son el
+adulto a escala (`Animal.scale`) sin cuerna, cuernos, ubre ni colmillos, **no
+son cabezas de `state.herd`** y desaparecen con la estación. **Primavera y
+verano:** golondrinas en el cielo y dos cigüeñas en el prado húmedo; mariposas
+y abejas sobre campos y prado (a medio gas en la segunda mitad de la
+primavera). **Otoño:** las golondrinas se van y cruza una uve de grullas; dos
+jabalíes (la hembra y la cría del año) hozan a unos pasos de la linde más
+espesa, huyen de la gente y no embisten (`life/rooting-boars.ts`, ids 45 000).
+**Invierno:** un ciervo en vez de dos, que baja al prado (nueve celdas del
+corazón en vez de doce, sin acercarse a menos de ocho de una casa), y un conejo
+en vez de tres, que huye de vez y media más lejos. Las crías van en el rango de
+ids 100 000 + 4 · id de la madre. Nada de esto toca la caza ni consume azar.
+
 **Oso de la linde (23 sep 2026).** El suceso existente `bear_in_the_wood`
 activa una visita visible durante sus dos semanas de bandera `bear`. Hay como
 máximo un oso: sale de un bosque transitable, cruza un claro, hoza y se retira

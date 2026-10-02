@@ -65,6 +65,8 @@ import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } f
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
 import { createDeer, deerPositions, stepDeer } from './deer';
 import { createRabbits, rabbitPositions, stepRabbits } from './rabbits';
+import { createRootingBoars, rootingBoarPositions, stepRootingBoars } from './rooting-boars';
+import { youngOf, type Mother } from './young';
 import {
   createDog, createDucks, createFox, dogPosition, duckPositions, foxPosition, stepDog, stepDucks, stepFox,
 } from './companions';
@@ -358,6 +360,12 @@ export interface Village {
    * tipo sólo para esto: una fuente en vivo en vez de la fórmula de siempre.
    */
   readonly wildlife: readonly Animal[];
+  /**
+   * v5.85 · Las crías de primavera detrás de sus madres —cervatillos, terneros,
+   * lechones y polluelos— (`young.ts`). Aparte de `wildlife` a propósito: no son
+   * cabezas de la cabaña ni presas, son cuerpos que se ven y nada las cuenta.
+   */
+  readonly young: readonly Animal[];
   /** El oso que hay ahora en el valle y cuántas veces se ha alzado a avisar (AN-5d), o `null`. */
   readonly bearAlert: { readonly warnings: number; readonly x: number; readonly z: number } | null;
   /** Entrada exterior de la guarida; no existe interior navegable. */
@@ -895,6 +903,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const deer = createDeer(state, land, seed, heart);
   // El valle más vivo · conejos en la linde, al alba y al atardecer.
   const rabbits = createRabbits(state, land, seed, heart);
+  // v5.85 · Y en otoño, los jabalíes hozando en la linde del bosque.
+  const boars = createRootingBoars(state, land, seed, heart);
   const bear = createBear(state, land, heart, options.ground);
   // IA-5 · El lobo del corral (§7.10, `wolves_at_the_coop`): si el motor lo
   // soltó esta semana (`wolfRaidToday`, `staging.ts`), hay visita esta
@@ -1690,10 +1700,22 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     },
 
     get wildlife(): readonly Animal[] {
-      return [...deerPositions(deer), ...rabbitPositions(rabbits, steps), ...dogPosition(dog),
+      return [...deerPositions(deer), ...rabbitPositions(rabbits, steps), ...rootingBoarPositions(boars), ...dogPosition(dog),
         ...foxPosition(fox), ...duckPositions(ducks), ...visitors.flatMap(beastOf), ...bearPosition(bear), ...(wolf !== null && wolf.phase !== 'gone'
         ? [{ id: wolf.body.id, kind: 'wolf' as const, x: wolf.body.x, y: wolf.body.z, facing: wolf.body.facing }]
         : [])];
+    },
+    get young(): readonly Animal[] {
+      const order = new Map<string, number>();
+      const mothers: Mother[] = [];
+      const add = (kind: Mother['kind'], body: Mother['body']): void => {
+        const n = order.get(kind) ?? 0;
+        order.set(kind, n + 1);
+        mothers.push({ kind, body, order: n });
+      };
+      for (const animal of deer) add('deer', animal.body);
+      for (const beast of beasts) add(beast.kind, beast.dweller.body);
+      return youngOf(state, mothers, land, steps);
     },
     get bearAlert() {
       if (bear === null || bear.phase === 'gone') return null;
@@ -3140,6 +3162,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         bear !== null && bear.phase !== 'gone' ? bear.body : null);
       const abroad = dwellers.filter((dweller) => !indoors(dweller));
       stepRabbits(rabbits, land, seed, steps, phase, abroad);
+      stepRootingBoars(boars, land, seed, steps, abroad);
       const foxOut = fox !== null && fox.phase !== 'den' ? fox.body : null;
       stepDog(dog, land, seed, steps, isNight(phase),
         abroad.filter((dweller) => dweller.ageGroup === 'child').map((dweller) => dweller.body),

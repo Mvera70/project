@@ -223,6 +223,21 @@ pantalla todavía no enseña del todo:
 | **La entrega sin leñadores** | Entra igual, a su hora | El «+1» sale sin nadie delante los días en que el reparto no pone a nadie en el bosque (3 de 38 entregas medidas) | Que el reparto de la jornada (`life/day.ts`) ponga un leñador los días con entregas |
 | **La piedra y el grano** | Siguen entrando por semanas enteras | La piedra se acarrea sin «+1»; el grano sube de golpe | Lo mismo que la madera: entregas con hora, porteador y aviso. Pedido por el dueño del diseño el 28 sep 2026, para después de probar la madera |
 
+## La fauna por estaciones (2 oct 2026, v5.85)
+
+Hecho con lo que había: las crías son el adulto a escala, la grulla es la
+golondrina de Astra en gris y grande, y la cigüeña, la mariposa y la abeja son
+primitivas de código (`effects/seasonal-fauna.ts`). Nada de esto toca el motor.
+
+| Qué | Qué se ve hoy | Qué haría falta |
+|---|---|---|
+| **Crías de primavera** (cervatillo, ternero, lechones, polluelos) | El modelo adulto a 0,42–0,55 de escala detrás de su madre (`life/young.ts`) | Mallas propias: el cervatillo **con manchas blancas**, el polluelo **amarillo y redondo** (hoy es una gallina diminuta, y a escala de móvil no se distingue), el lechón **rayado** si es de jabalí. Cabeza grande y patas largas, que es lo que lee «cría». Una llamada de dibujo por animal (RV-1). Por encargo, Astra |
+| **La cigüeña** | Primitivas: cuerpo blanco, alas negras, patas y pico rojos, el cuello que se dobla para picar; anda en corro en el prado húmedo | Malla de Astra con clips `walk`, `peck` y el **crotoreo** (el pico hacia atrás, castañeteando), y **el nido en lo alto de la capilla o de la iglesia**, que es la estampa de verdad y aquí no está porque la vida no sabe la altura del tejado |
+| **La bandada que se va en otoño** | Quince golondrinas grises a ×22 en uve, muy altas | Una grulla propia (cuello estirado, patas atrás) y su **graznido** a lo lejos (sonido: `GraphicsStats` no publica todavía cuándo pasa la bandada; se publicaría si Vera la quiere oír) |
+| **Mariposas y abejas** | Pajaritas de dos triángulos que aletean y bolitas amarillas, a escala exagerada para que se lean | Una mariposa con textura de ala y una abeja con rayas; quizá la **colmena** de paja junto a una casa, que haría de sitio a las abejas (y de K5, la miel) |
+| **Los jabalíes de otoño** | El jabalí de la caza y su cría del año a 0,75, hozando en la linde más espesa | Un clip `root` (hocico al suelo, removiendo) y la tierra levantada donde han hozado. **No hay robledal**: el bosque es uno solo; si Vera quiere encinas o robles distintos, es del carril de gráficos |
+| **Huellas en la nieve** | Ya existían: todo animal de la vida que anda deja huella en el pisoteo cuando cuaja (`trample.stamp`). Lo nuevo es que el ciervo del invierno baja más cerca de la aldea y se le ve el rastro | Huellas con forma (pezuña, almohadilla) en vez de la mancha redonda de pisoteo |
+
 ## Por qué cayó (2 oct 2026, K7, v5.72)
 
 El epitafio ya cuenta por qué cayó un valle, pero **en el valle no se ve la
