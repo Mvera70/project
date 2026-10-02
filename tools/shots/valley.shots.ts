@@ -907,7 +907,7 @@ test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {
   await test.expect(page.locator('.valley-panel:not(.valley-orders)')).toBeHidden();
 });
 
-test('la encrucijada muestra el precio de las tres opciones sin desplazar, y decidir enfoca el mapa', async ({ page }) => {
+test('la encrucijada muestra el precio de cada opción sin desplazar, y decidir enfoca el mapa', async ({ page }) => {
   // **M-0 · se pide el estado, en vez de esperarlo.**
   //
   // VZ-6 quitó el instante fijo que tenía («60 ticks a 16×») y puso un sondeo
@@ -939,8 +939,15 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
   const titulo = await page.locator('.crossroad h1').innerText();
   test.expect(titulo.length).toBeGreaterThan(3);
   test.expect(titulo).not.toMatch(/\{\w+\}/u);
+  // **Un precio por opción, no «tres».** K5 (v5.76, 2 oct 2026): con la
+  // trayectoria de la sastrería la semilla 7 plantea `feud_inherited` con dos
+  // de sus tres opciones (la tercera no cabe en ese valle), y el catálogo ya
+  // tiene plantillas de dos (`breaking_ground`, `first_stone`, `quiet_years`).
+  // Lo que §11.2 promete es que se lee el precio de cada una sin desplazar.
   const costs = page.locator('.crossroad-cost');
-  await test.expect(costs).toHaveCount(3);
+  const options = await page.locator('.crossroad-options button').count();
+  test.expect(options).toBeGreaterThanOrEqual(2);
+  await test.expect(costs).toHaveCount(options);
   // El precio de cada opción, en pantalla junto al verbo, sin que haga falta
   // desplazar nada para leerlo (§11.2, §17 M-22).
   for (const cost of await costs.all()) await test.expect(cost).toBeInViewport();

@@ -306,7 +306,12 @@ describe('IA-3 · aldeanos con hábitos', () => {
   // personas saldrían 2,14× con el contorno y 2,20× en `main` en las doce, y
   // 1,58× y 2,72× en las seis. No se toca la cuenta ni el listón aquí; una prueba
   // que no baile tendría que medir personas, y en más de seis aldeas.
-  it.fails('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
+  //
+  // **Y con K5 (v5.76, 2 oct 2026) llega** («Expect test to fail» en la CI): con
+  // la sastrería y el contorno juntos la muestra cambia y el devoto reza el doble.
+  // Sale de `it.fails`; la cuenta y el listón siguen sin tocar, y si otra
+  // trayectoria lo vuelve a dejar corto, se declara otra vez con su cifra.
+  it('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
     const { byTrait, anyThirstIgnored } = habitSample();
     expect(anyThirstIgnored, 'una necesidad urgente no se apaga con otra cosa').toBe(false);
 
