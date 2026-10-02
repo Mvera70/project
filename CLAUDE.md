@@ -401,6 +401,7 @@ cada cosa y qué entregó.
 | Cómo se llegó a ellas | `docs/changelog.md` — el motivo de cada revisión |
 | En qué estado exacto está todo | `docs/task-log.md`; las trampas viejas, con su porqué, en `docs/historico/handover.md` (foto del 15 sep) |
 | **El plan hacia la meta: puntos, fases, prioridad, dificultad y a qué agente** | **`docs/plan-meta.md`** |
+| **Una idea de Vera que no es de la ronda** — se copia con sus palabras el mismo día; «apuntado» es escrito en `main`, no encargado | **`docs/ideas.md`** |
 | **Lo que el juego no enseña todavía** — mallas, animaciones y **mecánicas que no se ven**; se apunta **en la misma ronda** que se diseña | **`docs/encargos-3d.md`** |
 | Qué falta en total | `docs/plan-meta.md` (la sección H es la deuda medida); las decisiones del 15 sep, en `docs/historico/roadmap.md` |
 | Cómo se delega y se audita | `docs/agents.md` |
