@@ -371,7 +371,8 @@ dejarlo todo para adelante»): lo que rompe la partida o deja el sistema sin
 sentido se arregla en la ronda —como la flecha al 15 % que hacía caer 20 cercos
 de 20—; lo que sólo pide el valor fino, y otra ronda va a mover, espera. Para que
 esperar sea posible, **cada sistema se diseña para convivir con los demás y
-poder reajustarse** (Vera, mismo día): sus cifras en `balance.ts` y no
+poder reajustarse**, en la medida de lo posible y no a cualquier precio (Vera,
+mismo día): sus cifras en `balance.ts` y no
 repartidas, lo que produce como existencia que otros puedan gastar (el lienzo
 servirá también para vendas), sus tablas abiertas a filas nuevas (la armadura
 admite el metal y las zonas del cuerpo sin rehacerse), y ningún sistema da por
