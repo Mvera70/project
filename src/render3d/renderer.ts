@@ -37,7 +37,7 @@ import type {
   Actor, ActorDoing, BattleReport, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats, WorldMoments,
   GraphicsTarget, GraphicsViewport,
 } from './contracts';
-import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
+import { GROUND_BIAS, SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
 import { DEFAULT_GRAPHICS, resolveProfile } from './profile';
 import { quantizeReach, stepSun } from './effects/sun-steps';
 import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './world/ground';
@@ -69,7 +69,6 @@ import { buildGreatOak, type GreatOak } from './world/great-oak';
 import { buildWaterfalls, type Waterfalls } from './world/waterfalls';
 import { greatOakCell } from '@derive/landmark';
 import { mountainWolves } from './world/mountain-wolves';
-import { ridgeAt } from './world/ridge';
 import { buildFord, type Ford } from './world/ford';
 import {
   buildForest, builtCells, scatterCells, scatterOn, scatterTransform, scrubCells, shoreCells, type Forest,
@@ -1373,9 +1372,17 @@ export async function createGraphicsRenderer(
     const map = state.map;
     const floor = (x: number, z: number): number => elevationAt(map, x, z);
     groundFloor = floor;
-    cast.standOn(floor);
-    fauna.standOn((x, z) => x < 0 || x > map.width || z < 0 || z > map.height
-      ? ridgeAt(map, state.terrainSeed, x, z) : floor(x, z));
+    // Y quien anda por la senda de la garganta la pisa (2 oct 2026): los de
+    // fuera bajan por ella hasta la boca (`life/visitors.ts`), y fuera del
+    // mapa el suelo es la sierra que se dibuja, no su fórmula.
+    const outer = backdrop;
+    const walk = (x: number, z: number): number => {
+      const inside = x >= 0 && z >= 0 && x <= map.width && z <= map.height;
+      const ground = inside ? floor(x, z) : outer.surfaceAt(x, z) - GROUND_BIAS;
+      return Math.max(ground, outer.roadAt(x, z) - GROUND_BIAS);
+    };
+    cast.standOn(walk);
+    fauna.standOn(walk);
     treeFalls.standOn(floor);
     mapWidth = state.map.width;
     mapHeight = state.map.height;

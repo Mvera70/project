@@ -46,8 +46,13 @@ describe('El valle más vivo · los visitantes del camino', () => {
       // El que monta puesto se pone a tres celdas del centro (`STALL_RADIUS`),
       // fuera de la fuente: llegar es quedar a menos de cuatro y media.
       if (closest < 4.5) reached += 1;
-      // Al acabar el día se ha ido.
-      expect(life.visitors.every((v) => v.phase === 'gone'), `semilla ${seed}`).toBe(true);
+      // Al acabar el día se ha ido. Desde el 2 oct 2026 se va por la senda de
+      // la garganta por la que vino, y a medianoche puede ir todavía por ella:
+      // vale también yéndose, lejos de la plaza.
+      for (const visitor of life.visitors) {
+        const away = Math.hypot(visitor.body.x - plaza.x, visitor.body.z - plaza.z);
+        expect(visitor.phase === 'gone' || (visitor.phase === 'leaving' && away > 20), `semilla ${seed}: ${visitor.phase} a ${away.toFixed(1)}`).toBe(true);
+      }
       expect(JSON.stringify(state), 'la visita no escribe en el motor').toBe(before);
     }
     expect(reached).toBe(3);

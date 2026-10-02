@@ -53,15 +53,12 @@ describe('RD-4 · la visita como señal', () => {
     }
   });
 
-  // **El factor de grano en la semilla 7, declarado** (1 oct 2026, K1–K3, v5.53).
-  // Con la trayectoria nueva, la aldea de ocho años de la semilla 7 saca el grano
-  // del granero de (28, 57), en el otro extremo de la plaza: de los tres
-  // porteadores, dos cogen la carga y no salen de la puerta del granero, y el
-  // tercero llega al puesto en la fase 0,65; el factor se va en la 0,66, antes de
-  // que la carga cuente, y no pasan monedas (lo mide `life-trade.test.ts`). Es la capa de vida —un porte que se
-  // queda sin ruta desde la puerta del granero—, no la madera. La propiedad se
-  // queda escrita, intacta, hasta que una ronda de vida lo arregle.
-  it.fails('y con el factor de grano también, en todas las semillas', () => {
+  // **El factor de grano en la semilla 7** (1 oct 2026, K1–K3, v5.53): se iba
+  // en la fase 0,66 antes de que la carga contara, y estuvo declarado con
+  // `it.fails`. **Desde el 2 oct 2026 pasa**: viene por la senda de la
+  // garganta saliendo a la hora que le hace estar en la plaza a la suya, llega
+  // antes y los porteadores con él (lo mide `life-trade.test.ts`).
+  it('y con el factor de grano también, en todas las semillas', () => {
     for (const seed of SEEDS) {
       for (const kind of ['factor_visit'] as const) {
         const state = visiting(seed, kind);

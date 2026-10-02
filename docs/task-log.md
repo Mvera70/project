@@ -1,5 +1,29 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · La senda de la garganta, pegada; los de fuera bajan por ella (v5.70)
+
+Rama `ccr-2aad21e1-6aw4u1`, **versiones reservadas v5.70–v5.74** (había otras
+sesiones con v5.56, v5.60, v5.65 y v5.66–v5.67 en vuelo). Cierra el primero de
+los dos abiertos de la entrada de v5.55 («el camino de la garganta flota»). Medido contra las mallas
+que se dibujan (`tools/reports/gorge-road-report.ts`): **antes**, ocho
+semillas, el 75,8 % de los vértices de la cinta más de 0,35 celdas por encima,
+el peor a 30,2, y el extremo de dentro hasta a 7,1 del camino pintado;
+**después**, dieciséis semillas, ninguno, el peor a 0,25, nada enterrado y los
+32 extremos en la boca. El cañón sigue al río, la sierra lleva columnas por el
+cañón (+5 % de triángulos), la cinta se apoya en lo dibujado y el puente es
+de una pieza y en arco (dos vueltas de capturas con Vera). Las visitas bajan
+por la senda: 9 de 12 valles, hacia el alba, en la plaza a 0,30–0,37, con el
+paso de visitante de 1,1 a 1,4. Capturas en `docs/medidas/garganta-img/`.
+
+**Abierto:** (1) **de día se les ve en el camino pintado** y, al irse,
+subiendo la garganta al atardecer: el camino entero no cabe en la jornada, y
+verlos bajar la garganta a plena luz pediría que llegaran a la plaza más tarde
+(el trato necesita que estén antes de ~0,40). Es de Vera. (2) Los viajeros de
+las expediciones siguen perdiéndose en la boca, sin subir la senda. (3) El
+forastero del vado sigue entrando por el camino pintado: RD-1 fija su hora.
+Siguiente: **el valle con forma natural** (el segundo abierto de v5.55), que
+es del motor y se mide antes de proponer nada.
+
 ## 2 oct 2026 · Lo que Vera vio en la tablet (v5.54)
 
 Hecho y en PR: las laderas sin el suelo asomando por la piel, las piedras de la

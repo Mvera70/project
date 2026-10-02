@@ -71,12 +71,13 @@ describe('el camino del valle', () => {
   it('la senda del desfiladero no tiene muros: ningún triángulo sube más de media celda', () => {
     for (const seed of SEEDS) {
       const { map, terrainSeed } = foundGame(seed);
+      // Desde el 2 oct 2026 la cinta se apoya en lo que se dibuja; aquí, en la
+      // fórmula del suelo y de la sierra, que es lo más empinado que podría ir.
       const floor = (x: number, z: number): number => {
         const inside = x >= 0 && z >= 0 && x <= map.width && z <= map.height;
         return inside ? Math.max(ridgeAt(map, terrainSeed, x, z), mountainSurfaceAt(map, x, z)) : ridgeAt(map, terrainSeed, x, z);
       };
-      const roads = buildGorgeRoads(map, terrainSeed, PALETTES.spring, floor, () => false,
-        () => map.width / 2);
+      const roads = buildGorgeRoads(map, terrainSeed, PALETTES.spring, floor);
       const position = roads.mesh.geometry.getAttribute('position');
       let steepest = 0;
       for (let tri = 0; tri + 2 < position.count; tri += 3) {
