@@ -1,0 +1,9653 @@
+{
+  "schemaVersion": 1,
+  "id": "field-flax",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "foliagelight",
+      "role": "foliageLight",
+      "color": "#7F9F64",
+      "roughness": 0.94
+    },
+    {
+      "name": "riverblue",
+      "role": "riverBlue",
+      "color": "#496E79",
+      "roughness": 0.94
+    },
+    {
+      "name": "saltwhite",
+      "role": "saltWhite",
+      "color": "#F4F2EC",
+      "roughness": 0.94
+    },
+    {
+      "name": "soil",
+      "role": "soil",
+      "color": "#866044",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "field-flax",
+    "footprint": [
+      3,
+      2
+    ],
+    "note": "Bloque 2: sastrer\u00eda y lino; modelo est\u00e1tico pendiente de K5. Unidades fuente en metros; celda=3m. Frente glTF +Z. Edificio/campos conservan esquina frontal izquierda como la casa/campo can\u00f3nicos; accesorios centrados."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      4,
+      -5,
+      4
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 4,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Soil",
+      "location": [
+        4.5,
+        3,
+        0.04
+      ],
+      "dimensions": [
+        9,
+        6,
+        0.08
+      ],
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "Furrow0",
+      "location": [
+        4.5,
+        0.46,
+        0.08
+      ],
+      "width": 0.6,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_0",
+      "location": [
+        0.45,
+        0.46,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_0",
+      "location": [
+        0.515,
+        0.46,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_0",
+      "location": [
+        0.45,
+        0.46,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_0",
+      "location": [
+        0.45,
+        0.46,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_1",
+      "location": [
+        0.99,
+        0.46,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_1",
+      "location": [
+        1.055,
+        0.46,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_1",
+      "location": [
+        0.99,
+        0.46,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_1",
+      "location": [
+        0.99,
+        0.46,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_2",
+      "location": [
+        1.53,
+        0.46,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_2",
+      "location": [
+        1.595,
+        0.46,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_2",
+      "location": [
+        1.53,
+        0.46,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_2",
+      "location": [
+        1.53,
+        0.46,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_3",
+      "location": [
+        2.0700000000000003,
+        0.46,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_3",
+      "location": [
+        2.1350000000000002,
+        0.46,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_3",
+      "location": [
+        2.0700000000000003,
+        0.46,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_3",
+      "location": [
+        2.0700000000000003,
+        0.46,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_4",
+      "location": [
+        2.6100000000000003,
+        0.46,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_4",
+      "location": [
+        2.6750000000000003,
+        0.46,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_4",
+      "location": [
+        2.6100000000000003,
+        0.46,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_4",
+      "location": [
+        2.6100000000000003,
+        0.46,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_5",
+      "location": [
+        3.1500000000000004,
+        0.46,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_5",
+      "location": [
+        3.2150000000000003,
+        0.46,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_5",
+      "location": [
+        3.1500000000000004,
+        0.46,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_5",
+      "location": [
+        3.1500000000000004,
+        0.46,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_6",
+      "location": [
+        3.6900000000000004,
+        0.46,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_6",
+      "location": [
+        3.7550000000000003,
+        0.46,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_6",
+      "location": [
+        3.6900000000000004,
+        0.46,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_6",
+      "location": [
+        3.6900000000000004,
+        0.46,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_7",
+      "location": [
+        4.23,
+        0.46,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_7",
+      "location": [
+        4.295000000000001,
+        0.46,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_7",
+      "location": [
+        4.23,
+        0.46,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_7",
+      "location": [
+        4.23,
+        0.46,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_8",
+      "location": [
+        4.7700000000000005,
+        0.46,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_8",
+      "location": [
+        4.835000000000001,
+        0.46,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_8",
+      "location": [
+        4.7700000000000005,
+        0.46,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_8",
+      "location": [
+        4.7700000000000005,
+        0.46,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_9",
+      "location": [
+        5.3100000000000005,
+        0.46,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_9",
+      "location": [
+        5.375000000000001,
+        0.46,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_9",
+      "location": [
+        5.3100000000000005,
+        0.46,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_9",
+      "location": [
+        5.3100000000000005,
+        0.46,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_10",
+      "location": [
+        5.8500000000000005,
+        0.46,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_10",
+      "location": [
+        5.915000000000001,
+        0.46,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_10",
+      "location": [
+        5.8500000000000005,
+        0.46,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_10",
+      "location": [
+        5.8500000000000005,
+        0.46,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_11",
+      "location": [
+        6.390000000000001,
+        0.46,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_11",
+      "location": [
+        6.455000000000001,
+        0.46,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_11",
+      "location": [
+        6.390000000000001,
+        0.46,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_11",
+      "location": [
+        6.390000000000001,
+        0.46,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_12",
+      "location": [
+        6.930000000000001,
+        0.46,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_12",
+      "location": [
+        6.995000000000001,
+        0.46,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_12",
+      "location": [
+        6.930000000000001,
+        0.46,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_12",
+      "location": [
+        6.930000000000001,
+        0.46,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_13",
+      "location": [
+        7.470000000000001,
+        0.46,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_13",
+      "location": [
+        7.535000000000001,
+        0.46,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_13",
+      "location": [
+        7.470000000000001,
+        0.46,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_13",
+      "location": [
+        7.470000000000001,
+        0.46,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_14",
+      "location": [
+        8.01,
+        0.46,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_14",
+      "location": [
+        8.075,
+        0.46,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_14",
+      "location": [
+        8.01,
+        0.46,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_14",
+      "location": [
+        8.01,
+        0.46,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_0_15",
+      "location": [
+        8.55,
+        0.46,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_0_15",
+      "location": [
+        8.615,
+        0.46,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_0_15",
+      "location": [
+        8.55,
+        0.46,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_0_15",
+      "location": [
+        8.55,
+        0.46,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "Furrow1",
+      "location": [
+        4.5,
+        1.3,
+        0.08
+      ],
+      "width": 0.6,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_0",
+      "location": [
+        0.45,
+        1.3,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_0",
+      "location": [
+        0.515,
+        1.3,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_0",
+      "location": [
+        0.45,
+        1.3,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_0",
+      "location": [
+        0.45,
+        1.3,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_1",
+      "location": [
+        0.99,
+        1.3,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_1",
+      "location": [
+        1.055,
+        1.3,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_1",
+      "location": [
+        0.99,
+        1.3,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_1",
+      "location": [
+        0.99,
+        1.3,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_2",
+      "location": [
+        1.53,
+        1.3,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_2",
+      "location": [
+        1.595,
+        1.3,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_2",
+      "location": [
+        1.53,
+        1.3,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_2",
+      "location": [
+        1.53,
+        1.3,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_3",
+      "location": [
+        2.0700000000000003,
+        1.3,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_3",
+      "location": [
+        2.1350000000000002,
+        1.3,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_3",
+      "location": [
+        2.0700000000000003,
+        1.3,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_3",
+      "location": [
+        2.0700000000000003,
+        1.3,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_4",
+      "location": [
+        2.6100000000000003,
+        1.3,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_4",
+      "location": [
+        2.6750000000000003,
+        1.3,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_4",
+      "location": [
+        2.6100000000000003,
+        1.3,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_4",
+      "location": [
+        2.6100000000000003,
+        1.3,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_5",
+      "location": [
+        3.1500000000000004,
+        1.3,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_5",
+      "location": [
+        3.2150000000000003,
+        1.3,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_5",
+      "location": [
+        3.1500000000000004,
+        1.3,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_5",
+      "location": [
+        3.1500000000000004,
+        1.3,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_6",
+      "location": [
+        3.6900000000000004,
+        1.3,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_6",
+      "location": [
+        3.7550000000000003,
+        1.3,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_6",
+      "location": [
+        3.6900000000000004,
+        1.3,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_6",
+      "location": [
+        3.6900000000000004,
+        1.3,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_7",
+      "location": [
+        4.23,
+        1.3,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_7",
+      "location": [
+        4.295000000000001,
+        1.3,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_7",
+      "location": [
+        4.23,
+        1.3,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_7",
+      "location": [
+        4.23,
+        1.3,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_8",
+      "location": [
+        4.7700000000000005,
+        1.3,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_8",
+      "location": [
+        4.835000000000001,
+        1.3,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_8",
+      "location": [
+        4.7700000000000005,
+        1.3,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_8",
+      "location": [
+        4.7700000000000005,
+        1.3,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_9",
+      "location": [
+        5.3100000000000005,
+        1.3,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_9",
+      "location": [
+        5.375000000000001,
+        1.3,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_9",
+      "location": [
+        5.3100000000000005,
+        1.3,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_9",
+      "location": [
+        5.3100000000000005,
+        1.3,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_10",
+      "location": [
+        5.8500000000000005,
+        1.3,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_10",
+      "location": [
+        5.915000000000001,
+        1.3,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_10",
+      "location": [
+        5.8500000000000005,
+        1.3,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_10",
+      "location": [
+        5.8500000000000005,
+        1.3,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_11",
+      "location": [
+        6.390000000000001,
+        1.3,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_11",
+      "location": [
+        6.455000000000001,
+        1.3,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_11",
+      "location": [
+        6.390000000000001,
+        1.3,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_11",
+      "location": [
+        6.390000000000001,
+        1.3,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_12",
+      "location": [
+        6.930000000000001,
+        1.3,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_12",
+      "location": [
+        6.995000000000001,
+        1.3,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_12",
+      "location": [
+        6.930000000000001,
+        1.3,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_12",
+      "location": [
+        6.930000000000001,
+        1.3,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_13",
+      "location": [
+        7.470000000000001,
+        1.3,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_13",
+      "location": [
+        7.535000000000001,
+        1.3,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_13",
+      "location": [
+        7.470000000000001,
+        1.3,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_13",
+      "location": [
+        7.470000000000001,
+        1.3,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_14",
+      "location": [
+        8.01,
+        1.3,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_14",
+      "location": [
+        8.075,
+        1.3,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_14",
+      "location": [
+        8.01,
+        1.3,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_14",
+      "location": [
+        8.01,
+        1.3,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_1_15",
+      "location": [
+        8.55,
+        1.3,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_1_15",
+      "location": [
+        8.615,
+        1.3,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_1_15",
+      "location": [
+        8.55,
+        1.3,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_1_15",
+      "location": [
+        8.55,
+        1.3,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "Furrow2",
+      "location": [
+        4.5,
+        2.14,
+        0.08
+      ],
+      "width": 0.6,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_0",
+      "location": [
+        0.45,
+        2.14,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_0",
+      "location": [
+        0.515,
+        2.14,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_0",
+      "location": [
+        0.45,
+        2.14,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_0",
+      "location": [
+        0.45,
+        2.14,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_1",
+      "location": [
+        0.99,
+        2.14,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_1",
+      "location": [
+        1.055,
+        2.14,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_1",
+      "location": [
+        0.99,
+        2.14,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_1",
+      "location": [
+        0.99,
+        2.14,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_2",
+      "location": [
+        1.53,
+        2.14,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_2",
+      "location": [
+        1.595,
+        2.14,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_2",
+      "location": [
+        1.53,
+        2.14,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_2",
+      "location": [
+        1.53,
+        2.14,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_3",
+      "location": [
+        2.0700000000000003,
+        2.14,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_3",
+      "location": [
+        2.1350000000000002,
+        2.14,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_3",
+      "location": [
+        2.0700000000000003,
+        2.14,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_3",
+      "location": [
+        2.0700000000000003,
+        2.14,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_4",
+      "location": [
+        2.6100000000000003,
+        2.14,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_4",
+      "location": [
+        2.6750000000000003,
+        2.14,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_4",
+      "location": [
+        2.6100000000000003,
+        2.14,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_4",
+      "location": [
+        2.6100000000000003,
+        2.14,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_5",
+      "location": [
+        3.1500000000000004,
+        2.14,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_5",
+      "location": [
+        3.2150000000000003,
+        2.14,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_5",
+      "location": [
+        3.1500000000000004,
+        2.14,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_5",
+      "location": [
+        3.1500000000000004,
+        2.14,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_6",
+      "location": [
+        3.6900000000000004,
+        2.14,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_6",
+      "location": [
+        3.7550000000000003,
+        2.14,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_6",
+      "location": [
+        3.6900000000000004,
+        2.14,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_6",
+      "location": [
+        3.6900000000000004,
+        2.14,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_7",
+      "location": [
+        4.23,
+        2.14,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_7",
+      "location": [
+        4.295000000000001,
+        2.14,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_7",
+      "location": [
+        4.23,
+        2.14,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_7",
+      "location": [
+        4.23,
+        2.14,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_8",
+      "location": [
+        4.7700000000000005,
+        2.14,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_8",
+      "location": [
+        4.835000000000001,
+        2.14,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_8",
+      "location": [
+        4.7700000000000005,
+        2.14,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_8",
+      "location": [
+        4.7700000000000005,
+        2.14,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_9",
+      "location": [
+        5.3100000000000005,
+        2.14,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_9",
+      "location": [
+        5.375000000000001,
+        2.14,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_9",
+      "location": [
+        5.3100000000000005,
+        2.14,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_9",
+      "location": [
+        5.3100000000000005,
+        2.14,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_10",
+      "location": [
+        5.8500000000000005,
+        2.14,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_10",
+      "location": [
+        5.915000000000001,
+        2.14,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_10",
+      "location": [
+        5.8500000000000005,
+        2.14,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_10",
+      "location": [
+        5.8500000000000005,
+        2.14,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_11",
+      "location": [
+        6.390000000000001,
+        2.14,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_11",
+      "location": [
+        6.455000000000001,
+        2.14,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_11",
+      "location": [
+        6.390000000000001,
+        2.14,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_11",
+      "location": [
+        6.390000000000001,
+        2.14,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_12",
+      "location": [
+        6.930000000000001,
+        2.14,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_12",
+      "location": [
+        6.995000000000001,
+        2.14,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_12",
+      "location": [
+        6.930000000000001,
+        2.14,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_12",
+      "location": [
+        6.930000000000001,
+        2.14,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_13",
+      "location": [
+        7.470000000000001,
+        2.14,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_13",
+      "location": [
+        7.535000000000001,
+        2.14,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_13",
+      "location": [
+        7.470000000000001,
+        2.14,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_13",
+      "location": [
+        7.470000000000001,
+        2.14,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_14",
+      "location": [
+        8.01,
+        2.14,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_14",
+      "location": [
+        8.075,
+        2.14,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_14",
+      "location": [
+        8.01,
+        2.14,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_14",
+      "location": [
+        8.01,
+        2.14,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_2_15",
+      "location": [
+        8.55,
+        2.14,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_2_15",
+      "location": [
+        8.615,
+        2.14,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_2_15",
+      "location": [
+        8.55,
+        2.14,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_2_15",
+      "location": [
+        8.55,
+        2.14,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "Furrow3",
+      "location": [
+        4.5,
+        2.98,
+        0.08
+      ],
+      "width": 0.6,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_0",
+      "location": [
+        0.45,
+        2.98,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_0",
+      "location": [
+        0.515,
+        2.98,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_0",
+      "location": [
+        0.45,
+        2.98,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_0",
+      "location": [
+        0.45,
+        2.98,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_1",
+      "location": [
+        0.99,
+        2.98,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_1",
+      "location": [
+        1.055,
+        2.98,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_1",
+      "location": [
+        0.99,
+        2.98,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_1",
+      "location": [
+        0.99,
+        2.98,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_2",
+      "location": [
+        1.53,
+        2.98,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_2",
+      "location": [
+        1.595,
+        2.98,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_2",
+      "location": [
+        1.53,
+        2.98,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_2",
+      "location": [
+        1.53,
+        2.98,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_3",
+      "location": [
+        2.0700000000000003,
+        2.98,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_3",
+      "location": [
+        2.1350000000000002,
+        2.98,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_3",
+      "location": [
+        2.0700000000000003,
+        2.98,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_3",
+      "location": [
+        2.0700000000000003,
+        2.98,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_4",
+      "location": [
+        2.6100000000000003,
+        2.98,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_4",
+      "location": [
+        2.6750000000000003,
+        2.98,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_4",
+      "location": [
+        2.6100000000000003,
+        2.98,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_4",
+      "location": [
+        2.6100000000000003,
+        2.98,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_5",
+      "location": [
+        3.1500000000000004,
+        2.98,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_5",
+      "location": [
+        3.2150000000000003,
+        2.98,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_5",
+      "location": [
+        3.1500000000000004,
+        2.98,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_5",
+      "location": [
+        3.1500000000000004,
+        2.98,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_6",
+      "location": [
+        3.6900000000000004,
+        2.98,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_6",
+      "location": [
+        3.7550000000000003,
+        2.98,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_6",
+      "location": [
+        3.6900000000000004,
+        2.98,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_6",
+      "location": [
+        3.6900000000000004,
+        2.98,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_7",
+      "location": [
+        4.23,
+        2.98,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_7",
+      "location": [
+        4.295000000000001,
+        2.98,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_7",
+      "location": [
+        4.23,
+        2.98,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_7",
+      "location": [
+        4.23,
+        2.98,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_8",
+      "location": [
+        4.7700000000000005,
+        2.98,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_8",
+      "location": [
+        4.835000000000001,
+        2.98,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_8",
+      "location": [
+        4.7700000000000005,
+        2.98,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_8",
+      "location": [
+        4.7700000000000005,
+        2.98,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_9",
+      "location": [
+        5.3100000000000005,
+        2.98,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_9",
+      "location": [
+        5.375000000000001,
+        2.98,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_9",
+      "location": [
+        5.3100000000000005,
+        2.98,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_9",
+      "location": [
+        5.3100000000000005,
+        2.98,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_10",
+      "location": [
+        5.8500000000000005,
+        2.98,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_10",
+      "location": [
+        5.915000000000001,
+        2.98,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_10",
+      "location": [
+        5.8500000000000005,
+        2.98,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_10",
+      "location": [
+        5.8500000000000005,
+        2.98,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_11",
+      "location": [
+        6.390000000000001,
+        2.98,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_11",
+      "location": [
+        6.455000000000001,
+        2.98,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_11",
+      "location": [
+        6.390000000000001,
+        2.98,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_11",
+      "location": [
+        6.390000000000001,
+        2.98,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_12",
+      "location": [
+        6.930000000000001,
+        2.98,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_12",
+      "location": [
+        6.995000000000001,
+        2.98,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_12",
+      "location": [
+        6.930000000000001,
+        2.98,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_12",
+      "location": [
+        6.930000000000001,
+        2.98,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_13",
+      "location": [
+        7.470000000000001,
+        2.98,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_13",
+      "location": [
+        7.535000000000001,
+        2.98,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_13",
+      "location": [
+        7.470000000000001,
+        2.98,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_13",
+      "location": [
+        7.470000000000001,
+        2.98,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_14",
+      "location": [
+        8.01,
+        2.98,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_14",
+      "location": [
+        8.075,
+        2.98,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_14",
+      "location": [
+        8.01,
+        2.98,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_14",
+      "location": [
+        8.01,
+        2.98,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_3_15",
+      "location": [
+        8.55,
+        2.98,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_3_15",
+      "location": [
+        8.615,
+        2.98,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_3_15",
+      "location": [
+        8.55,
+        2.98,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_3_15",
+      "location": [
+        8.55,
+        2.98,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "Furrow4",
+      "location": [
+        4.5,
+        3.82,
+        0.08
+      ],
+      "width": 0.6,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_0",
+      "location": [
+        0.45,
+        3.82,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_0",
+      "location": [
+        0.515,
+        3.82,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_0",
+      "location": [
+        0.45,
+        3.82,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_0",
+      "location": [
+        0.45,
+        3.82,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_1",
+      "location": [
+        0.99,
+        3.82,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_1",
+      "location": [
+        1.055,
+        3.82,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_1",
+      "location": [
+        0.99,
+        3.82,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_1",
+      "location": [
+        0.99,
+        3.82,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_2",
+      "location": [
+        1.53,
+        3.82,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_2",
+      "location": [
+        1.595,
+        3.82,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_2",
+      "location": [
+        1.53,
+        3.82,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_2",
+      "location": [
+        1.53,
+        3.82,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_3",
+      "location": [
+        2.0700000000000003,
+        3.82,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_3",
+      "location": [
+        2.1350000000000002,
+        3.82,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_3",
+      "location": [
+        2.0700000000000003,
+        3.82,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_3",
+      "location": [
+        2.0700000000000003,
+        3.82,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_4",
+      "location": [
+        2.6100000000000003,
+        3.82,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_4",
+      "location": [
+        2.6750000000000003,
+        3.82,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_4",
+      "location": [
+        2.6100000000000003,
+        3.82,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_4",
+      "location": [
+        2.6100000000000003,
+        3.82,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_5",
+      "location": [
+        3.1500000000000004,
+        3.82,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_5",
+      "location": [
+        3.2150000000000003,
+        3.82,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_5",
+      "location": [
+        3.1500000000000004,
+        3.82,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_5",
+      "location": [
+        3.1500000000000004,
+        3.82,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_6",
+      "location": [
+        3.6900000000000004,
+        3.82,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_6",
+      "location": [
+        3.7550000000000003,
+        3.82,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_6",
+      "location": [
+        3.6900000000000004,
+        3.82,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_6",
+      "location": [
+        3.6900000000000004,
+        3.82,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_7",
+      "location": [
+        4.23,
+        3.82,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_7",
+      "location": [
+        4.295000000000001,
+        3.82,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_7",
+      "location": [
+        4.23,
+        3.82,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_7",
+      "location": [
+        4.23,
+        3.82,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_8",
+      "location": [
+        4.7700000000000005,
+        3.82,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_8",
+      "location": [
+        4.835000000000001,
+        3.82,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_8",
+      "location": [
+        4.7700000000000005,
+        3.82,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_8",
+      "location": [
+        4.7700000000000005,
+        3.82,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_9",
+      "location": [
+        5.3100000000000005,
+        3.82,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_9",
+      "location": [
+        5.375000000000001,
+        3.82,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_9",
+      "location": [
+        5.3100000000000005,
+        3.82,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_9",
+      "location": [
+        5.3100000000000005,
+        3.82,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_10",
+      "location": [
+        5.8500000000000005,
+        3.82,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_10",
+      "location": [
+        5.915000000000001,
+        3.82,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_10",
+      "location": [
+        5.8500000000000005,
+        3.82,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_10",
+      "location": [
+        5.8500000000000005,
+        3.82,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_11",
+      "location": [
+        6.390000000000001,
+        3.82,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_11",
+      "location": [
+        6.455000000000001,
+        3.82,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_11",
+      "location": [
+        6.390000000000001,
+        3.82,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_11",
+      "location": [
+        6.390000000000001,
+        3.82,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_12",
+      "location": [
+        6.930000000000001,
+        3.82,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_12",
+      "location": [
+        6.995000000000001,
+        3.82,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_12",
+      "location": [
+        6.930000000000001,
+        3.82,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_12",
+      "location": [
+        6.930000000000001,
+        3.82,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_13",
+      "location": [
+        7.470000000000001,
+        3.82,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_13",
+      "location": [
+        7.535000000000001,
+        3.82,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_13",
+      "location": [
+        7.470000000000001,
+        3.82,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_13",
+      "location": [
+        7.470000000000001,
+        3.82,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_14",
+      "location": [
+        8.01,
+        3.82,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_14",
+      "location": [
+        8.075,
+        3.82,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_14",
+      "location": [
+        8.01,
+        3.82,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_14",
+      "location": [
+        8.01,
+        3.82,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_4_15",
+      "location": [
+        8.55,
+        3.82,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_4_15",
+      "location": [
+        8.615,
+        3.82,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_4_15",
+      "location": [
+        8.55,
+        3.82,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_4_15",
+      "location": [
+        8.55,
+        3.82,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "Furrow5",
+      "location": [
+        4.5,
+        4.66,
+        0.08
+      ],
+      "width": 0.6,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_0",
+      "location": [
+        0.45,
+        4.66,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_0",
+      "location": [
+        0.515,
+        4.66,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_0",
+      "location": [
+        0.45,
+        4.66,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_0",
+      "location": [
+        0.45,
+        4.66,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_1",
+      "location": [
+        0.99,
+        4.66,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_1",
+      "location": [
+        1.055,
+        4.66,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_1",
+      "location": [
+        0.99,
+        4.66,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_1",
+      "location": [
+        0.99,
+        4.66,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_2",
+      "location": [
+        1.53,
+        4.66,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_2",
+      "location": [
+        1.595,
+        4.66,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_2",
+      "location": [
+        1.53,
+        4.66,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_2",
+      "location": [
+        1.53,
+        4.66,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_3",
+      "location": [
+        2.0700000000000003,
+        4.66,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_3",
+      "location": [
+        2.1350000000000002,
+        4.66,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_3",
+      "location": [
+        2.0700000000000003,
+        4.66,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_3",
+      "location": [
+        2.0700000000000003,
+        4.66,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_4",
+      "location": [
+        2.6100000000000003,
+        4.66,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_4",
+      "location": [
+        2.6750000000000003,
+        4.66,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_4",
+      "location": [
+        2.6100000000000003,
+        4.66,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_4",
+      "location": [
+        2.6100000000000003,
+        4.66,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_5",
+      "location": [
+        3.1500000000000004,
+        4.66,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_5",
+      "location": [
+        3.2150000000000003,
+        4.66,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_5",
+      "location": [
+        3.1500000000000004,
+        4.66,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_5",
+      "location": [
+        3.1500000000000004,
+        4.66,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_6",
+      "location": [
+        3.6900000000000004,
+        4.66,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_6",
+      "location": [
+        3.7550000000000003,
+        4.66,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_6",
+      "location": [
+        3.6900000000000004,
+        4.66,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_6",
+      "location": [
+        3.6900000000000004,
+        4.66,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_7",
+      "location": [
+        4.23,
+        4.66,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_7",
+      "location": [
+        4.295000000000001,
+        4.66,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_7",
+      "location": [
+        4.23,
+        4.66,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_7",
+      "location": [
+        4.23,
+        4.66,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_8",
+      "location": [
+        4.7700000000000005,
+        4.66,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_8",
+      "location": [
+        4.835000000000001,
+        4.66,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_8",
+      "location": [
+        4.7700000000000005,
+        4.66,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_8",
+      "location": [
+        4.7700000000000005,
+        4.66,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_9",
+      "location": [
+        5.3100000000000005,
+        4.66,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_9",
+      "location": [
+        5.375000000000001,
+        4.66,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_9",
+      "location": [
+        5.3100000000000005,
+        4.66,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_9",
+      "location": [
+        5.3100000000000005,
+        4.66,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_10",
+      "location": [
+        5.8500000000000005,
+        4.66,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_10",
+      "location": [
+        5.915000000000001,
+        4.66,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_10",
+      "location": [
+        5.8500000000000005,
+        4.66,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_10",
+      "location": [
+        5.8500000000000005,
+        4.66,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_11",
+      "location": [
+        6.390000000000001,
+        4.66,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_11",
+      "location": [
+        6.455000000000001,
+        4.66,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_11",
+      "location": [
+        6.390000000000001,
+        4.66,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_11",
+      "location": [
+        6.390000000000001,
+        4.66,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_12",
+      "location": [
+        6.930000000000001,
+        4.66,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_12",
+      "location": [
+        6.995000000000001,
+        4.66,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_12",
+      "location": [
+        6.930000000000001,
+        4.66,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_12",
+      "location": [
+        6.930000000000001,
+        4.66,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_13",
+      "location": [
+        7.470000000000001,
+        4.66,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_13",
+      "location": [
+        7.535000000000001,
+        4.66,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_13",
+      "location": [
+        7.470000000000001,
+        4.66,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_13",
+      "location": [
+        7.470000000000001,
+        4.66,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_14",
+      "location": [
+        8.01,
+        4.66,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_14",
+      "location": [
+        8.075,
+        4.66,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_14",
+      "location": [
+        8.01,
+        4.66,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_14",
+      "location": [
+        8.01,
+        4.66,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_5_15",
+      "location": [
+        8.55,
+        4.66,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_5_15",
+      "location": [
+        8.615,
+        4.66,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_5_15",
+      "location": [
+        8.55,
+        4.66,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_5_15",
+      "location": [
+        8.55,
+        4.66,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "gable",
+      "name": "Furrow6",
+      "location": [
+        4.5,
+        5.5,
+        0.08
+      ],
+      "width": 0.6,
+      "depth": 8.45,
+      "height": 0.075,
+      "material": "soil",
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_0",
+      "location": [
+        0.45,
+        5.5,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_0",
+      "location": [
+        0.515,
+        5.5,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_0",
+      "location": [
+        0.45,
+        5.5,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_0",
+      "location": [
+        0.45,
+        5.5,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_1",
+      "location": [
+        0.99,
+        5.5,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_1",
+      "location": [
+        1.055,
+        5.5,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_1",
+      "location": [
+        0.99,
+        5.5,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_1",
+      "location": [
+        0.99,
+        5.5,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_2",
+      "location": [
+        1.53,
+        5.5,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_2",
+      "location": [
+        1.595,
+        5.5,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_2",
+      "location": [
+        1.53,
+        5.5,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_2",
+      "location": [
+        1.53,
+        5.5,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_3",
+      "location": [
+        2.0700000000000003,
+        5.5,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_3",
+      "location": [
+        2.1350000000000002,
+        5.5,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_3",
+      "location": [
+        2.0700000000000003,
+        5.5,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_3",
+      "location": [
+        2.0700000000000003,
+        5.5,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_4",
+      "location": [
+        2.6100000000000003,
+        5.5,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_4",
+      "location": [
+        2.6750000000000003,
+        5.5,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_4",
+      "location": [
+        2.6100000000000003,
+        5.5,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_4",
+      "location": [
+        2.6100000000000003,
+        5.5,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_5",
+      "location": [
+        3.1500000000000004,
+        5.5,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_5",
+      "location": [
+        3.2150000000000003,
+        5.5,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_5",
+      "location": [
+        3.1500000000000004,
+        5.5,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_5",
+      "location": [
+        3.1500000000000004,
+        5.5,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_6",
+      "location": [
+        3.6900000000000004,
+        5.5,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_6",
+      "location": [
+        3.7550000000000003,
+        5.5,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_6",
+      "location": [
+        3.6900000000000004,
+        5.5,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_6",
+      "location": [
+        3.6900000000000004,
+        5.5,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_7",
+      "location": [
+        4.23,
+        5.5,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_7",
+      "location": [
+        4.295000000000001,
+        5.5,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_7",
+      "location": [
+        4.23,
+        5.5,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_7",
+      "location": [
+        4.23,
+        5.5,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_8",
+      "location": [
+        4.7700000000000005,
+        5.5,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_8",
+      "location": [
+        4.835000000000001,
+        5.5,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_8",
+      "location": [
+        4.7700000000000005,
+        5.5,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_8",
+      "location": [
+        4.7700000000000005,
+        5.5,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_9",
+      "location": [
+        5.3100000000000005,
+        5.5,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_9",
+      "location": [
+        5.375000000000001,
+        5.5,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_9",
+      "location": [
+        5.3100000000000005,
+        5.5,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_9",
+      "location": [
+        5.3100000000000005,
+        5.5,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_10",
+      "location": [
+        5.8500000000000005,
+        5.5,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_10",
+      "location": [
+        5.915000000000001,
+        5.5,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_10",
+      "location": [
+        5.8500000000000005,
+        5.5,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_10",
+      "location": [
+        5.8500000000000005,
+        5.5,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_11",
+      "location": [
+        6.390000000000001,
+        5.5,
+        0.41500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.67,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_11",
+      "location": [
+        6.455000000000001,
+        5.5,
+        0.4418000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_11",
+      "location": [
+        6.390000000000001,
+        5.5,
+        0.77
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_11",
+      "location": [
+        6.390000000000001,
+        5.5,
+        0.785
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_12",
+      "location": [
+        6.930000000000001,
+        5.5,
+        0.4675
+      ],
+      "radius": 0.014,
+      "depth": 0.775,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_12",
+      "location": [
+        6.995000000000001,
+        5.5,
+        0.49850000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_12",
+      "location": [
+        6.930000000000001,
+        5.5,
+        0.875
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_12",
+      "location": [
+        6.930000000000001,
+        5.5,
+        0.89
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_13",
+      "location": [
+        7.470000000000001,
+        5.5,
+        0.43250000000000005
+      ],
+      "radius": 0.014,
+      "depth": 0.7050000000000001,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_13",
+      "location": [
+        7.535000000000001,
+        5.5,
+        0.46070000000000005
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_13",
+      "location": [
+        7.470000000000001,
+        5.5,
+        0.805
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_13",
+      "location": [
+        7.470000000000001,
+        5.5,
+        0.8200000000000001
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_14",
+      "location": [
+        8.01,
+        5.5,
+        0.48500000000000004
+      ],
+      "radius": 0.014,
+      "depth": 0.81,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_14",
+      "location": [
+        8.075,
+        5.5,
+        0.5174000000000001
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_14",
+      "location": [
+        8.01,
+        5.5,
+        0.91
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_14",
+      "location": [
+        8.01,
+        5.5,
+        0.925
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Stem_6_15",
+      "location": [
+        8.55,
+        5.5,
+        0.45
+      ],
+      "radius": 0.014,
+      "depth": 0.74,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Leaf_6_15",
+      "location": [
+        8.615,
+        5.5,
+        0.4796
+      ],
+      "radius": 0.035,
+      "depth": 0.28,
+      "vertices": 3,
+      "material": "foliagelight",
+      "rotationDegrees": [
+        0,
+        35,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Flower_6_15",
+      "location": [
+        8.55,
+        5.5,
+        0.84
+      ],
+      "radius": 0.155,
+      "depth": 0.025,
+      "vertices": 5,
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Pollen_6_15",
+      "location": [
+        8.55,
+        5.5,
+        0.855
+      ],
+      "radius": 0.027,
+      "depth": 0.028,
+      "vertices": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

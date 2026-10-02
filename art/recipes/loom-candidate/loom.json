@@ -1,0 +1,669 @@
+{
+  "schemaVersion": 1,
+  "id": "loom",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.94
+    },
+    {
+      "name": "saltwhite",
+      "role": "saltWhite",
+      "color": "#F4F2EC",
+      "roughness": 0.94
+    },
+    {
+      "name": "timber",
+      "role": "timber",
+      "color": "#9A744C",
+      "roughness": 0.94
+    },
+    {
+      "name": "timberdark",
+      "role": "timberDark",
+      "color": "#6B4C32",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "loom",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 2: sastrer\u00eda y lino; modelo est\u00e1tico pendiente de K5. Unidades fuente en metros; celda=3m. Frente glTF +Z. Edificio/campos conservan esquina frontal izquierda como la casa/campo can\u00f3nicos; accesorios centrados."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      4,
+      -5,
+      4
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 4,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Upright0",
+      "location": [
+        -0.78,
+        -0.48,
+        0.69
+      ],
+      "dimensions": [
+        0.11,
+        0.11,
+        1.38
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Upright1",
+      "location": [
+        0.78,
+        -0.48,
+        0.69
+      ],
+      "dimensions": [
+        0.11,
+        0.11,
+        1.38
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Upright2",
+      "location": [
+        -0.78,
+        0.52,
+        0.69
+      ],
+      "dimensions": [
+        0.11,
+        0.11,
+        1.38
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Upright3",
+      "location": [
+        0.78,
+        0.52,
+        0.69
+      ],
+      "dimensions": [
+        0.11,
+        0.11,
+        1.38
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Foot0",
+      "location": [
+        -0.78,
+        0,
+        0.065
+      ],
+      "dimensions": [
+        0.17,
+        1.4,
+        0.13
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "SideRail0",
+      "location": [
+        -0.78,
+        0,
+        0.92
+      ],
+      "dimensions": [
+        0.09,
+        1.15,
+        0.09
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Foot1",
+      "location": [
+        0.78,
+        0,
+        0.065
+      ],
+      "dimensions": [
+        0.17,
+        1.4,
+        0.13
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "SideRail1",
+      "location": [
+        0.78,
+        0,
+        0.92
+      ],
+      "dimensions": [
+        0.09,
+        1.15,
+        0.09
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Roller0",
+      "location": [
+        0,
+        -0.5,
+        1.07
+      ],
+      "radius": 0.095,
+      "depth": 1.65,
+      "vertices": 6,
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "BaseBeam0",
+      "location": [
+        0,
+        -0.5,
+        0.28
+      ],
+      "dimensions": [
+        1.65,
+        0.09,
+        0.09
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Roller1",
+      "location": [
+        0,
+        0.53,
+        1.07
+      ],
+      "radius": 0.095,
+      "depth": 1.65,
+      "vertices": 6,
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "BaseBeam1",
+      "location": [
+        0,
+        0.53,
+        0.28
+      ],
+      "dimensions": [
+        1.65,
+        0.09,
+        0.09
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "WovenLinen",
+      "location": [
+        0,
+        -0.32,
+        1.075
+      ],
+      "dimensions": [
+        1.3,
+        0.43,
+        0.026
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Warp0",
+      "location": [
+        -0.6,
+        0.19,
+        1.075
+      ],
+      "dimensions": [
+        0.024,
+        0.62,
+        0.013
+      ],
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Warp1",
+      "location": [
+        -0.4,
+        0.19,
+        1.075
+      ],
+      "dimensions": [
+        0.024,
+        0.62,
+        0.013
+      ],
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Warp2",
+      "location": [
+        -0.2,
+        0.19,
+        1.075
+      ],
+      "dimensions": [
+        0.024,
+        0.62,
+        0.013
+      ],
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Warp3",
+      "location": [
+        0,
+        0.19,
+        1.075
+      ],
+      "dimensions": [
+        0.024,
+        0.62,
+        0.013
+      ],
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Warp4",
+      "location": [
+        0.2,
+        0.19,
+        1.075
+      ],
+      "dimensions": [
+        0.024,
+        0.62,
+        0.013
+      ],
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Warp5",
+      "location": [
+        0.4,
+        0.19,
+        1.075
+      ],
+      "dimensions": [
+        0.024,
+        0.62,
+        0.013
+      ],
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Warp6",
+      "location": [
+        0.6,
+        0.19,
+        1.075
+      ],
+      "dimensions": [
+        0.024,
+        0.62,
+        0.013
+      ],
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "ReedPost0",
+      "location": [
+        -0.7,
+        -0.065,
+        1.32
+      ],
+      "dimensions": [
+        0.05,
+        0.045,
+        0.56
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "ReedPost1",
+      "location": [
+        0.7,
+        -0.065,
+        1.32
+      ],
+      "dimensions": [
+        0.05,
+        0.045,
+        0.56
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "ReedBeam",
+      "location": [
+        0,
+        -0.065,
+        1.57
+      ],
+      "dimensions": [
+        1.48,
+        0.06,
+        0.065
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Treadle0",
+      "location": [
+        -0.28,
+        -0.22,
+        0.18
+      ],
+      "dimensions": [
+        0.13,
+        0.72,
+        0.05
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        9,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Treadle1",
+      "location": [
+        0.28,
+        -0.22,
+        0.18
+      ],
+      "dimensions": [
+        0.13,
+        0.72,
+        0.05
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        9,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Shuttle",
+      "location": [
+        0.21,
+        -0.26,
+        1.13
+      ],
+      "dimensions": [
+        0.34,
+        0.07,
+        0.06
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}
