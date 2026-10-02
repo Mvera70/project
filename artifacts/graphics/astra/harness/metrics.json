@@ -1,0 +1,43 @@
+{
+  "id": "harness",
+  "triangles": 452,
+  "budget": 600,
+  "mount": {
+    "harness_spine": "spine",
+    "harness_shin_L": "shin.L",
+    "harness_shin_R": "shin.R",
+    "harness_upperarm_L": "upperarm.L",
+    "harness_forearm_L": "forearm.L",
+    "harness_thigh_L": "thigh.L",
+    "harness_foot_L": "foot.L",
+    "harness_upperarm_R": "upperarm.R",
+    "harness_forearm_R": "forearm.R",
+    "harness_thigh_R": "thigh.R",
+    "harness_foot_R": "foot.R"
+  },
+  "materials": 1,
+  "textures": 0,
+  "rigSha256": "cbc336551f462700a5ba04e94b76504718ee42a6a4b90864eebbeca6a6ef6d66",
+  "mountBoundsError": 7.450580596923828e-09,
+  "mountedBoundsBlender": [
+    [
+      -0.1783333420753479,
+      -0.12083333730697632,
+      0.004999995231628418
+    ],
+    [
+      0.1783333420753479,
+      0.0833333432674408,
+      0.5049999952316284
+    ]
+  ],
+  "localUnits": "metres: use the bone scale, no extra scale",
+  "status": "candidate, metal model only",
+  "sha256": "c22871f26c85a0654291588c4f81ff9314e7dd2cb87559d26a35a2e545bf4d6c",
+  "bytes": 46380,
+  "mountedSizeGltfCells": [
+    0.3566666841506958,
+    0.5,
+    0.20416668057441711
+  ]
+}
