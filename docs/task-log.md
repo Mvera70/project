@@ -1,5 +1,29 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón (v5.57)
+
+Rama `ccr-372e1786-k4brcp`. Medido antes en `main`, decidido con Vera y hecho:
+los encargos de la herrería y los ritos de la capilla, por `PlayerAct`, con su
+tablón en la fachada y la misma ventana que el de la plaza. K9 medido con cada
+opción pedida siempre: cada una gana en lo suyo; los herrajes acaban 2 de 8
+asaltadas por la plata amontonada, y Vera lo deja. Todo en
+`docs/medidas/k8-k9-edificios-2026-10-02.md`.
+
+**Abierto, de esta ronda:**
+
+- **La misa es fuerte** (ánimo medio de 59 a 80 pedida cada temporada): es
+  nivelado, de Vera (`BOARDS.MASS_MORALE`, `MASS_EVERY`).
+- **Lo que no se ve todavía** (`docs/encargos-3d.md`, «Los tablones de la
+  herrería y de la capilla»): qué hace el encargo en marcha, la venta de
+  herrajes, la gente entrando en la capilla y la procesión que recorre los
+  campos (hoy es un corro quieto en el campo más cercano).
+- **El toque de los tablones en 3D** no tiene recorrido de navegador: las
+  capturas abren la ventana por su gancho (`--open board-smithy`), no
+  tocándola. El de la plaza sí lo tiene (`--open board`).
+- **Las ilustraciones y los modelos**, encargados en
+  `docs/encargos/ilustraciones-k8-k9.md`; pasan a `plan-arte-pendiente.md`
+  cuando Codex suelte ese fichero.
+
 ## 2 oct 2026 · La senda de la garganta, pegada; los de fuera bajan por ella (v5.70)
 
 Rama `ccr-2aad21e1-6aw4u1`, **versiones reservadas v5.70–v5.74** (había otras

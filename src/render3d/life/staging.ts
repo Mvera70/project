@@ -12,7 +12,7 @@
 // pantalla. Hasta G-11 lo cumplía `actorsFor`: el día que había reunión, nadie
 // iba al tajo y todos compartían destino. G-12 puso esta capa por defecto,
 // `actorsFor` dejó de ejecutarse, y nadie lo vio porque la prueba que lo
-// vigilaba llamaba a `actorsFor` directamente. `tests/fast/life-staging.test.ts`
+// vigilaba llamaba a `actorsFor` directamente. `tests/journeys/life-staging.test.ts`
 // lo dejó escrito en rojo: el más lejano se quedaba a más de tres celdas del
 // sitio de la reunión, porque la vida repartía a cada uno por sus propias
 // ofertas y no había oído la orden.

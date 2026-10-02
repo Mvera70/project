@@ -36,7 +36,7 @@ import type {
   Villager,
   VillagerId,
 } from './state';
-import { TERRAIN_CODE, hasTrait } from './state';
+import { TERRAIN_CODE, toolInHand } from './state';
 import { seasonOf, weekOf, yearOf } from './time';
 import { count } from './subsistence/building-counts';
 import { allocateLabour, produce } from './subsistence/labour';
@@ -58,6 +58,7 @@ import { giveMeans } from './world/means';
 import { crownKing, type CrownOutcome } from './world/crown';
 import type { MeansOutcome } from './world/means';
 import { collectTithe, expireOffer, settleOffer } from './world/road';
+import { holdRite, massWorkFactor, orderSmithy, smithyWeek } from './world/boards';
 import type { OfferOutcome, Tithe } from './world/road';
 import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
@@ -709,6 +710,18 @@ export function tick(
           : `${act.hits > 0 ? 'hunt.wounded' : 'hunt.escape'}.${act.species}`,
         params: { year: year(), weapon: act.weapon },
         weight: firstKill ? 3 : 2 });
+    } else if (act.kind === 'smithy') {
+      // K8 · un encargo del tablón de la herrería: se paga y dura un año
+      // (`world/boards.ts`). Es la inclinación de K9 hacia un recurso.
+      const outcome = orderSmithy(state, act.order, yearOf(state.tick));
+      state.acts.push({ tick: state.tick, act, done: outcome.done });
+      if (outcome.entry !== null) say(outcome.entry);
+    } else if (act.kind === 'rite') {
+      // K8 · un rito del tablón de la iglesia: la misa sube el ánimo y cuesta
+      // el día de trabajo; la rogativa cuesta fe y bendice la próxima siega.
+      const outcome = holdRite(state, act.rite, yearOf(state.tick));
+      state.acts.push({ tick: state.tick, act, done: outcome.done });
+      if (outcome.entry !== null) say(outcome.entry);
     } else {
       // B4 · **lo que el mundo hizo.** El único acto que no hace el jugador: el
       // parte de la batalla física de la semana pasada (§1b). No se aplica
@@ -734,6 +747,8 @@ export function tick(
   // Vuelven los que tocaba, con lo que traigan o sin alguno. Antes de lo
   // anual y de la comida: quien vuelve esta semana ya come en casa.
   for (const back of returnExpeditions(state, yearOf(state.tick))) say(back.entry);
+  // K8 · y la herrería: vende los herrajes del encargo y cuenta el que se acaba.
+  for (const entry of smithyWeek(state, yearOf(state.tick))) say(entry);
 
   // ---- 2 · ANNUAL ----------------------------------------------------------
   // Week 0 and week 0 only: the weather of the year, the plague, the fire, the
@@ -1031,8 +1046,9 @@ export function tick(
   // M-4 · **el hacha buena** del carro (§7.12): cada leñador trae más leña, y
   // el bosque del corazón retrocede más rápido. Lo segundo no hay que
   // escribirlo aquí: la riada ya pesa con el bosque que ya no está (M-1).
-  const axe = hasTrait(state, 'axe') ? MEANS.AXE_WOOD : 1;
-  const felled = fellForest(state, allocation.cutters * LABOUR.WOOD_PER_CUTTER * axe * haul);
+  const axe = toolInHand(state, 'axe') ? MEANS.AXE_WOOD : 1;
+  // K8 · y la semana de la misa la aldea pierde el día (`massWorkFactor`).
+  const felled = fellForest(state, allocation.cutters * LABOUR.WOOD_PER_CUTTER * axe * haul * massWorkFactor(state));
   const produced = produce(state, allocation, felled);
   // §7.7, v2.92: the hands the allocation sent out come back with food. The
   // forest fraction is read here and passed in because `subsistence/` may not
