@@ -4789,3 +4789,10 @@ portón siga alcanzable desde la plaza: en la semilla 37 una obra de iglesia en
 en las jornadas. (2) El leñador que se queda a 0,5 de su plaza de contacto con
 `there` en verdadero (semilla 11, tick 1008). (3) **Del dueño**: por dónde
 muerde el mundo, que `fate-chaos` vuelve a pedir.
+
+## 2 oct 2026 · Candidatos de sastrería y mina (Bloques 2 y 4)
+
+decidido por Sol 6: los cinco modelos de sastrería permanecen como candidatos mientras K5 (#56) no esté en `main`; ni el edificio ni el campo de lino se publican en esta PR.
+decidido por Sol 6: los modelos de mina permanecen como candidatos aunque AR-2 (#65) ya haya añadido la vida minera; el encargo de esta tanda indica expresamente «mina, sólo modelo».
+
+Hojas revisadas: sastrería, telar, lino florido y segado, lienzo; boca de mina, vagonetas vacía y llena, acopios de cuatro tamaños y raíles. Son legibles a escala de casa y aldeano en `artifacts/graphics/astra/<id>/sheet.png`; el montaje completo de mina está en `artifacts/graphics/astra/mine-mouth/assembly.png`. Presupuestos: sastrería 960/1 500, telar 328/400, lino 4 100 frente a 4 732 de `field`, boca 544/1 200, carros 232 y 280/300, acopio máximo 288/300, raíles 72/80 triángulos. Las recetas B2 pasaron su validador (5/5), `typecheck`, `lint` y `npm run shot` pasaron. No cambian el catálogo publicado ni la escena; al no activarse, añaden cero llamadas y cero triángulos a la partida.
