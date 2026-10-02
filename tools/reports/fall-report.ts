@@ -217,10 +217,10 @@ for (const f of falls) {
 }
 
 console.log('\n### Lo que contaría el epitafio (`derive/fall.ts`)\n');
-console.log('| estrategia | semilla | causa | mejor momento | quedaban | lo que se lo llevó | bajaron | decisión citada | del mejor momento al final |');
-console.log('|---|---:|---|---|---:|---|---:|---|---:|');
+console.log('| estrategia | semilla | causa | mejor momento | quedaban | lo que se lo llevó | bajaron | decisión citada | del mejor momento al final | de la caída (mitad) al final |');
+console.log('|---|---:|---|---|---:|---|---:|---|---:|---:|');
 for (const f of falls) {
   const s = f.story;
   const links = s.links.map((l) => `${l.kind} ${l.count}${l.kind === 'raids' ? ` (${l.silver} plata, ${l.grain} grano)` : ''} desde el año ${yearOf(l.tick)}`).join('; ');
-  console.log(`| ${f.strategy} | ${f.seed} | ${f.cause} | ${s.peak} en el año ${yearOf(s.peakTick)} | ${s.left} | ${links || '—'} | ${s.band ?? '—'} | ${f.quoted} | ${(f.endHours - hours(s.peakTick)).toFixed(0)} h |`);
+  console.log(`| ${f.strategy} | ${f.seed} | ${f.cause} | ${s.peak} en el año ${yearOf(s.peakTick)} | ${s.left} | ${links || '—'} | ${s.band ?? '—'} | ${f.quoted} | ${(f.endHours - hours(s.peakTick)).toFixed(0)} h | ${(f.endHours - hours(s.from)).toFixed(0)} h |`);
 }

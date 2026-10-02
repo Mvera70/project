@@ -42,7 +42,7 @@ export interface FallStory {
   /** El mejor momento: cuándo y con cuánta gente. Desde ahí se cuenta la caída. */
   readonly peakTick: number;
   readonly peak: number;
-  /** Desde cuándo se cuenta lo que se lo llevó (`FALL.WINDOW_YEARS`). */
+  /** Desde cuándo se cuenta lo que se lo llevó: la última vez que tuvo la mitad (`FALL.HALF`). */
   readonly from: number;
   /** La gente que quedaba al final, antes del último golpe. */
   readonly left: number;
@@ -58,24 +58,24 @@ export interface FallStory {
 }
 
 /**
- * TUNE: cuántas cosas cuenta el epitafio, cuántos años antes del final mira, y
- * cuántos años antes de esa ventana se busca una decisión.
+ * TUNE: cuántas cosas cuenta el epitafio, desde qué parte de su mejor momento
+ * se cuenta la caída, y cuántos años antes de eso se busca una decisión.
  *
  *  · `LINKS` 3: lo que cabe en la columna de 390 px sin que el «por qué» tape
  *    la lápida.
- *  · `WINDOW_YEARS` 5: medido el 2 oct 2026 en los 29 valles caídos de
- *    `fall-report` (herrajes y adversa, 30 semillas × 100 años), del mejor
- *    momento al final van de 0 a 674 h a ×1 —hasta sesenta años de meseta—, y
- *    contando desde ahí el relato sumaba décadas («158 murieron de hambre
- *    desde el año 34»). Lo que acaba con un valle pasa en sus últimos años: el
- *    momento en que cualquier partida del clan ya entraba precede al final en
- *    5–8 h de mediana, y el hambre y las bajadas que lo dejan así, en los
- *    cinco años de antes.
+ *  · `HALF` 0,5: medido el 2 oct 2026 en los 29 valles caídos de
+ *    `fall-report` (herrajes y adversa, 30 semillas × 100 años). Contando desde
+ *    el mejor momento, el relato abarcaba de 0 a 674 h a ×1 —hasta sesenta años
+ *    de meseta— y sumaba décadas («158 murieron de hambre desde el año 34»).
+ *    Con una ventana fija de cinco años se cortaba el arranque de los caseríos
+ *    que se abandonan (108: «uno se marchó», sin las tres muertes de hambre
+ *    del primer otoño). La última vez que tuvo la mitad es la caída misma, en
+ *    los dos casos.
  *  · `DECISION_YEARS` 2: la pregunta que torció la partida suele llegar antes
  *    del descenso; en 28 de los 29 la que se cita es `raiders_coming`,
  *    `succession` o el forastero del vado.
  */
-export const FALL = { LINKS: 3, WINDOW_YEARS: 5, DECISION_YEARS: 2 } as const;
+export const FALL = { LINKS: 3, HALF: 0.5, DECISION_YEARS: 2 } as const;
 
 const DEATH = /^death\.(hunger|plague|cold|fire|violence|natural|old_age)\.(named|anon\.one|anon\.many)$/;
 const RAIDS = new Set(['raid.open', 'raid.walled', 'raid.assault']);
@@ -138,9 +138,17 @@ export function fallOf(game: Pick<ArchivedGame, 'cause' | 'chronicle' | 'endedTi
   // El último golpe no es una causa: es el final, y el epitafio ya lo dice.
   const last = [...chronicle].reverse().find((e) => e.templateKey === 'raid.stormed');
   const band = game.cause === 'stormed' && last !== undefined ? headsIn(last) : null;
-  // Se cuenta desde el mejor momento o desde los últimos `WINDOW_YEARS`, lo
-  // que esté más cerca del final: una meseta de décadas no es la caída.
-  const from = Math.max(peakTick, end - FALL.WINDOW_YEARS * TIME.WEEKS_PER_YEAR);
+  // **Desde cuándo se cuenta: la última vez que tuvo la mitad de su mejor
+  // momento** (`FALL.HALF`), o el mejor momento si nunca bajó de ahí. Una
+  // meseta de décadas no es la caída, y una ventana de años fijos tampoco
+  // sirve: corta el primer otoño de hambre de un caserío que se abandona cinco
+  // años después (§5.7 espera `ABANDON_YEARS`) y abarca medio siglo de una
+  // villa que cae en dos. Lo que se mide es la caída misma.
+  let from = peakTick;
+  for (const entry of chronicle) {
+    const people = entry.params['people'];
+    if (typeof people === 'number' && entry.tick >= peakTick && people >= peak * FALL.HALF) from = entry.tick;
+  }
   const all = linksSince(chronicle, from, game.cause === 'stormed' && last !== undefined ? last.tick - 1 : end);
   const weight = (l: FallLink): number => (l.kind === 'old_age' || l.kind === 'natural' ? l.count / 4 : l.count);
   const links = all
