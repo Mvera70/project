@@ -608,7 +608,7 @@ export class Cast {
     if (actor.jerkin === true && !player.held.has('jerkin')) {
       const spine = player.object.getObjectByName('spine');
       if (spine !== undefined) {
-        const piece = jerkinPiece();
+        const piece = this.prop?.('jerkin') ?? jerkinPiece();
         piece.userData.villagerId = player.object.userData.villagerId;
         spine.add(piece);
         player.held.set('jerkin', piece);
