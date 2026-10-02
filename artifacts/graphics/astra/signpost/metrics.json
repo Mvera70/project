@@ -1,0 +1,19 @@
+{
+  "id": "signpost",
+  "triangles": 96,
+  "budget": 150,
+  "meshes": [
+    "signpost"
+  ],
+  "materials": 1,
+  "textures": 0,
+  "sizeGltf": [
+    0.5725871920585632,
+    1.100000023841858,
+    0.13499999046325684
+  ],
+  "origin": "base",
+  "front": "+Z",
+  "glbBytes": 10052,
+  "sha256": "9b355379e5c7f6a3867108c590d995e18220fe4f55dcf4e7cb5f91081e931c44"
+}

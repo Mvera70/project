@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "id": "hammer",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros Blender; Z arriba, frente -Y; glTF Y arriba, frente +Z. Una celda = 3 m.",
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": false,
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.92
+    },
+    {
+      "name": "dark",
+      "role": "timberDark",
+      "roughness": 0.92
+    },
+    {
+      "name": "paper",
+      "role": "saltWhite",
+      "roughness": 0.92
+    },
+    {
+      "name": "linen",
+      "role": "neighborLinen",
+      "roughness": 0.92
+    },
+    {
+      "name": "iron",
+      "role": "elderGrey",
+      "roughness": 0.92
+    },
+    {
+      "name": "hide",
+      "role": "soil",
+      "roughness": 0.92
+    },
+    {
+      "name": "hideLight",
+      "role": "trunk",
+      "roughness": 0.92
+    },
+    {
+      "name": "accent",
+      "role": "clothAccent",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "grip",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "handle",
+      "location": [
+        0,
+        0,
+        0.165
+      ],
+      "radius": 0.036000000000000004,
+      "depth": 0.5700000000000001,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "head",
+      "location": [
+        0,
+        0,
+        0.43799999999999994
+      ],
+      "dimensions": [
+        0.28200000000000003,
+        0.138,
+        0.15000000000000002
+      ],
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "striking_face",
+      "location": [
+        -0.14400000000000002,
+        0,
+        0.43799999999999994
+      ],
+      "dimensions": [
+        0.045,
+        0.162,
+        0.17400000000000002
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "wedge",
+      "location": [
+        0,
+        0,
+        0.522
+      ],
+      "dimensions": [
+        0.042,
+        0.06,
+        0.018000000000000002
+      ],
+      "material": "linen",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false
+    }
+  ],
+  "clips": [],
+  "connectors": [
+    "grip"
+  ],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "hammer",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Candidato Bloque 1. Exportaci\u00f3n por build.py: color de v\u00e9rtice, material \u00fanico; m\u00e1ximo 120 tri\u00e1ngulos."
+  },
+  "referenceRender": {
+    "width": 600,
+    "height": 600,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.6
+    ],
+    "orthoScale": 2,
+    "worldRole": "sky"
+  },
+  "triangleBudget": 120
+}
