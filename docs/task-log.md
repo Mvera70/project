@@ -112,7 +112,11 @@ del suelo en vez de 0,07 («el camino flotando… casi»). Medidas y hojas:
 ninguna aldea tiene vacas (una muestra de 96, doce valles hasta los sesenta
 años); que haya ganado es del motor y del nivelado, de Vera. (2) Lo que el
 cinturón dará un día (madera de ladera, establos y cercados fuera de la muralla,
-más piedra): bases puestas, nada construido.
+más piedra): bases puestas, nada construido. (3) Que los usos entren como usos
+de un mismo cinturón, sin código aparte para cada uno (principio de Vera del
+2 oct): hoy cada uno lee el contorno con `distanceOutside` y ninguno depende de
+su tamaño exacto; juntarlos en una tabla de bandas es de la ronda de los
+recursos. PR #58.
 
 ## 2 oct 2026 · El valle con forma natural (v5.73)
 
