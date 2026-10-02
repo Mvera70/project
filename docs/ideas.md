@@ -43,8 +43,15 @@ natural (PR #48). **Encargado** a «Fauna por estaciones» para `plan-meta.md`.
 > espada. … a lo mejor la flecha hace un 15 % de daño y la espada hace un 50 %
 > o un 60 %.»
 
+**Cómo se lee, corregido por Vera el mismo día:** «No quita un 15 %, lo
+entendiste mal: el cuero protege un 15 %, la flecha quita 85.» La tabla arma ×
+pieza dice **cuánto protege la pieza** contra cada arma. A cuerpo descubierto
+una flecha sigue tumbando de un tiro; con peto de cuero se aguanta una y se cae
+con la segunda. Leído al revés («la flecha quita un 15 %»), la muralla dejaba de
+aguantar: 20 de 20 cercos tomados en la medida del 2 oct.
+
 **En curso:** la ronda del daño de la sesión de los petos (v5.81–v5.84): vida
-en porcentaje y una tabla arma × pieza → daño y probabilidad de rebote.
+en porcentaje y una tabla arma × pieza → protección y probabilidad de rebote.
 
 ### 2 oct 2026 · El rebote, con el metal
 > «También como los juegos de balas que hay ricochet. … cuando ya en un futuro
