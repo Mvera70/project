@@ -52,6 +52,7 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `changelog.md` | **El porqué de cada revisión.** Antes de deshacer una decisión, se busca aquí |
 | `task-log.md` | **El cuaderno de tareas.** El punto exacto: en vuelo, cifras, abierto |
 | `plan-meta.md` | **El plan hacia la meta** (§1b), con prioridad, dificultad y agente |
+| `ideas.md` | **El buzón de ideas de Vera**: lo que dice de pasada y no es de la ronda, con sus palabras y el mismo día; el director lo reparte a `plan-meta.md` o `encargos-3d.md` al cerrar cada tanda |
 | `plan-monetizacion-y-publicacion-2026-09-29.md` | **Plan comercial vivo**: precio, ofertas, canales, promoción y requisitos de publicación; decisiones pendientes y aprendizaje registrado |
 | `encargos-3d.md` | **Todo lo que el juego no enseña todavía**: mallas, animaciones y mecánicas sin representación, apuntado en la misma ronda en que se descubre |
 | `interfaz/` | **La interfaz, versión a versión**: una carpeta por fecha con todas las pantallas y estados del juego (skill `press-kit`), para comparar qué cambió |
