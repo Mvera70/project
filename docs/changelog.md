@@ -52,6 +52,13 @@ bosque de ladera y cantera como vida, sin tocar el balance (eso va en v5.74).
   pendiente, 120 de 120. Y el zorro al amanecer, cuyo tope se medía en línea
   recta. Lo demás es trayectoria y va con su causa escrita en cada prueba
   (`docs/medidas/valle-forma-2026-10-02.md` §5).
+- **El tick**, medido como pide `CLAUDE.md` al tocar `placement.ts`. Salía un
+  26 % más lento que `main` (de 8,8 a 11,1 ms por semana), y lo pagaban las
+  rutas que no llegan. Con más pueblos encerrados por su cerco, A* fallaba
+  hasta trece veces más, y `routeBetween` repetía cada búsqueda imposible con
+  todas las parejas de entradas. Ahora la que falla dice qué alcanzó y las
+  demás se saltan (`paths.ts`, `astar.ts`). Es exacto: las cinco huellas de
+  `tick-bench` son idénticas. Queda en 8,3 contra 9,0 de `main`.
 - **Abierto**: la cantera lejana (con la roca a más de catorce celdas, al
   albañil se le acaba la jornada antes de cargar: 15 valles de 60 en `main`, 20
   con el contorno; es de v5.74); la muralla en la falda, si pide nivelado; los

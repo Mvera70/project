@@ -159,6 +159,31 @@ diagnosticaron en tres tandas, cada una contra `main` con la misma sonda:
   - las visitas por la garganta se cuentan en doce valles: 9 de 12, y 10 en
     `main`.
 
+**Y el tick.** La regla de `CLAUDE.md` pide medirlo al tocar `placement.ts`
+(`tools/reports/tick-bench.ts`, semillas 7, 23 y 41, cuarenta años). Contra el
+`main` de hoy salía un 26 % más lento, con aldeas del mismo tamaño (de 8,8 a
+11,1 ms por semana; la semilla 7, cerca del 45 %). **Lo pagaban las rutas que
+no llegan.** En la semilla 7, A* fallaba 23 204 veces en cuarenta años (1 713
+en `main`), y cada fallo recorre entera la zona alcanzable. Hay más fallos
+porque hay más pueblos que su cerco deja sin salida (§6). Además
+`routeBetween` repetía la búsqueda imposible con cada pareja de entradas de
+las dos parcelas.
+
+Ahora la búsqueda que falla dice qué alcanzó, y las parejas que no pueden
+llegar se saltan (`paths.ts`, `astar.ts`). Es exacto: las cinco huellas de la
+partida —crónica, gente, edificios, tráfico y sendas— salen idénticas. Medido
+alternando las dos ramas semilla a semilla, dos vueltas:
+
+| ms por semana | `main` | contorno |
+|---|---:|---:|
+| semilla 7 | 6,9 | 8,3 |
+| semilla 23 | 11,7 | 8,7 |
+| semilla 41 | 8,4 | 7,9 |
+| **media** | **9,0** | **8,3** |
+
+La 7 sigue un 21 % por encima: es la aldea que su cerco encierra, y tiene 80
+vecinos contra 82.
+
 ## 6 · Abierto
 
 - **La cantera lejana.** Con la roca a más de catorce celdas de la obra, al
