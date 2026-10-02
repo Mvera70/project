@@ -43,7 +43,9 @@ export interface ClipMotion {
 }
 
 export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'mine' | 'sow' | 'spread' | 'douse' | 'play' | 'throw' | 'drink' | 'sort' | 'shelter'
-  | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'spear_thrust' | 'spear_thrust_high' | 'spear_thrust_low' | 'hit_take' | 'fall' | 'flee';
+  | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'spear_thrust' | 'spear_thrust_high' | 'spear_thrust_low' | 'hit_take' | 'fall' | 'flee'
+  // AR-2 · empujar la vagoneta (`life/mine.ts`).
+  | 'push';
 
 /**
  * IA-anim · En qué fracción del ciclo pega la herramienta. Lo lee el clip para
@@ -79,6 +81,11 @@ export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
   // 1,6–2,6 celdas/s (un esprint) daba 3,7–5,8 ciclos por segundo; ahora
   // 2,3–3,7, con dos vuelos por ciclo en el clip.
   flee: { seconds: 0.8, loop: true, strideLength: 0.7 },
+  // AR-2 · empujar la vagoneta: marcha corta y cargada, por suelo recorrido.
+  // TUNE: la zancada de `carry_walk` (0,339) un poco más corta, que es el paso
+  // de quien apoya el peso en lo que empuja; a `PUSH_PACE` (0,55 del paso)
+  // sale a ~1 ciclo por segundo, el paseo humano de la skill `animacion`.
+  push: { seconds: 4 / 3, loop: true, strideLength: 0.3 },
   spear_thrust: { seconds: 0.9, loop: false, strideLength: null },
   // AN-5b · La misma estocada con los brazos altos, para la presa cuyo tronco
   // queda por encima de la baja: el ciervo (0,37–0,63) sobre la punta a 0,35.

@@ -27,7 +27,7 @@
 // y el forrajeo, que son emergencias y se sirven antes que cualquier postura.
 // Un jugador puede equivocarse; no puede saltarse la aritmética del hambre.
 
-import { BOARDS, CROWN, FOOD, FORAGE, LABOUR, TIME, MEANS } from '../balance';
+import { BOARDS, CROWN, FOOD, FORAGE, LABOUR, TIME, MEANS, MINE } from '../balance';
 import { population, workforce } from '../people/demography';
 import { toolInHand } from '../state';
 import { will } from '../people/crown';
@@ -142,6 +142,7 @@ export function allocateLabour(state: GameState, haul = 1): Allocation {
   const hunters = river ? foragers * 0.5 : foragers;
   const fishers = river ? foragers - hunters : 0;
 
+
   // **La aldea corta la leña que necesita, no una cuota.**
   //
   // Aquí vivía `spare * intent.timber`: una parte fija de lo que sobra iba al
@@ -172,7 +173,19 @@ export function allocateLabour(state: GameState, haul = 1): Allocation {
     spare * LABOUR.CUTTER_CAP_SHARE,
     Math.max(spare * LABOUR.CUTTER_FLOOR_SHARE, wanted),
   );
-  const builders = spare - cutters;
+  // AR-2 · **la mina se trabaja con las manos de la obra, después del
+  // bosque.** Medido (12 semillas × 60 años, `docs/medidas/ar2-mina-2026-10-02.md`):
+  // sacar a los mineros de lo que sobra **antes** que a los leñadores bajaba
+  // la población final de 53 a 37 de mediana —la leña es lo que aprieta (K3) y
+  // una mano menos en el bosque se notaba cincuenta años—; sacándolos de la
+  // parte de la obra, 48, dentro del ruido, y la mina trabaja el 95 % de las
+  // semanas. Sólo con la obra parada (la regla de la cantera de M-0) daba 46
+  // y la mina parada un tercio del tiempo: queda como interruptor
+  // (`MINE.IDLE_YARD_ONLY`), apagado.
+  const idleYard = !MINE.IDLE_YARD_ONLY || state.works.length === 0;
+  const miners = count(state, 'mine') > 0 && state.village.ore < MINE.ORE_STORE && idleYard
+    ? Math.min(MINE.CREW, (spare - cutters) * MINE.MAX_SHARE) : 0;
+  const builders = spare - cutters - miners;
 
   return {
     workforce: w,
@@ -183,6 +196,7 @@ export function allocateLabour(state: GameState, haul = 1): Allocation {
     hunters,
     fishers,
     wardens,
+    miners,
     // No fields worked means no harvest at all, so the factor is 0 rather than
     // a division by zero.
     labourFactor: farmDemand > 0 ? farmers / farmDemand : 0,

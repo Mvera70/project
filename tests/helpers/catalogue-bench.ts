@@ -77,7 +77,7 @@ function founded(seed: number): GameState {
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
     traits: [],
-    village: { grain: TWENTY.GRAIN, wood: 900, morale: TWENTY.MORALE, faith: TWENTY.FAITH, stone: 0, silver: 0, hides: 0 },
+    village: { grain: TWENTY.GRAIN, wood: 900, morale: TWENTY.MORALE, faith: TWENTY.FAITH, stone: 0, silver: 0, hides: 0, ore: 0 },
     people: foundPeopleTwenty(rng, 0),
     buildings: [
       ...Array.from({ length: 14 }, () => build('house')),

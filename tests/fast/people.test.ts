@@ -61,6 +61,7 @@ function stateOf(seed: number): GameState {
       stone: 0,
       silver: 0,
       hides: 0,
+      ore: 0,
     },
     people,
     buildings: [],

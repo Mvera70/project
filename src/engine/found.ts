@@ -91,6 +91,7 @@ export function foundGame(
       silver: 0,
       // K5 · las pieles: sólo las trae la caza grande.
       hides: 0,
+      ore: 0,
     },
     people: foundPeople(rng, 0, profile),
     buildings: [],

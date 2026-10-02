@@ -186,7 +186,11 @@ describe('los oficios se ven · §11.9', () => {
   const forgeVillage = (): { state: GameState; smithId: number; forge: { x: number; y: number } } | null => {
     for (const seed of [7, 11, 23, 41, 97]) {
       const state = workweek(village(25, seed));
-      const smith = state.people.villagers.find((v) => v.role === 'smith' && v.diedTick === null && v.leftTick === null);
+      // AR-2 · **y con casa**: el camino de su taller sale de su puerta
+      // (`crowd.ts`, `workdayPaths`), y un herrero sin techo va a la plaza.
+      // Con la mina (v5.86) el de la semilla 7 se queda sin casa a los 25 años.
+      const smith = state.people.villagers.find((v) => v.role === 'smith' && v.diedTick === null
+        && v.leftTick === null && v.homeId !== null);
       const forge = centreOf(state, 'smithy');
       if (smith !== undefined && forge !== undefined) return { state, smithId: smith.id, forge };
     }

@@ -28,6 +28,9 @@ export const LADDER: readonly (readonly [string, (s: GameState) => boolean])[] =
   ['muralla', (s) => alive(s, 'palisade') >= 1],
   ['EDAD DE PIEDRA (1ª obra)', (s) => s.buildings.some((b) => b.tier > 0 && b.lostTick === null)],
   ['molino', (s) => alive(s, 'mill') >= 1],
+  // AR-2 · la primera mina abre la Edad del Hierro (`docs/plan-meta.md` AR):
+  // después de la piedra, con la fragua encendida.
+  ['EDAD DEL HIERRO (mina)', (s) => s.flags['age:iron'] !== undefined],
   ['corona posible', (s) => crownRefusal(s) !== 'small'],
   ['30 personas', (s) => population(s) >= 30],
   // A1 · el peldaño de la fase 3 (§1b): la villa cerrada, que es lo que un

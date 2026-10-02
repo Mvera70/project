@@ -1,5 +1,38 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · AR-2, la minería (v5.86)
+
+Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
+rama `claude/ar2-mineria`, **versiones reservadas v5.86–v5.88** (usada v5.86).
+**Toca el motor** (`balance.ts`, `labour.ts`, `works.ts`, `state.ts`, `sim.ts`);
+**no toca `placement.ts`** (la veta se elige en `world/mine.ts`). Hecho: la
+veta, la mina como obra tras la edad de piedra, `village.ore` con su acopio y
+el gasto de la fragua, la Edad del Hierro con la primera mina
+(`flags['age:iron']`, `mine.opened`); en la vida, entrar, desaparecer, salir
+con la vagoneta llena, volcar y volver vacía, y picar la ladera (`life/mine.ts`,
+clip `push`); respaldos procedurales con los nombres del encargo de Astra
+(`world/mine-works.ts`). Diseño en `design.md` §7.18; medidas en
+`docs/medidas/ar2-mina-2026-10-02.md`: **Edad del Hierro a las 71 h a ×1**
+(24 semillas), villa cerrada 329 → 362 h, población final 56 → 50, letalidad
+igual. Suite rápida entera en local: 219 ficheros, 2 141 pruebas; las
+jornadas, en local antes de la PR, con sus 18 rojas resueltas o declaradas
+(changelog v5.86).
+
+**Abierto:**
+
+- **De vida (avisado al director):** en la semilla 7 a los ocho años dos
+  leñeros que esperan la hora de su entrega tapan las plazas de la leñera, y
+  los porteadores del buhonero y del factor no cargan (`life-trade.test.ts`,
+  declarada).
+
+- **De Vera:** el precio de la mina (la villa 33 h más tarde, la población
+  final −6) es nivelado; y si el rey se queda sin traer con `age:iron`
+  (`design.md` dice «leader hasta la Edad del Hierro»).
+- **Lo siguiente:** AR-1 (la cota y el casco, primer gasto del mineral) y, con
+  él, el buhonero que vende mineral.
+- **Sin ver:** los GLB de Astra (`mine-mouth`, `minecart`/`-full`, `ore-pile`,
+  `rails`); el marco del respaldo a un lado del hueco de la cueva; las ruedas
+  que no giran; un gesto propio de volcar; la mina en el aparato.
 ## 2 oct 2026 · Tanda larga de modelos (dirección Sol 6)
 
 Base: `origin/main` en `aba7889b` (brief #55). Trabajo aislado de la copia local `art/astra-modelos`. Prioridad: Bloque 0 completo dentro de +30 llamadas y +60 000 triángulos en la villa grande. El motor queda fuera del alcance. Cada carril trae `main` antes de su PR y hace commit y push al acabar su bloque.
