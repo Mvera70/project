@@ -27,9 +27,9 @@
 // y el forrajeo, que son emergencias y se sirven antes que cualquier postura.
 // Un jugador puede equivocarse; no puede saltarse la aritmética del hambre.
 
-import { CROWN, FOOD, FORAGE, LABOUR, TIME, MEANS } from '../balance';
+import { BOARDS, CROWN, FOOD, FORAGE, LABOUR, TIME, MEANS } from '../balance';
 import { population, workforce } from '../people/demography';
-import { hasTrait } from '../state';
+import { toolInHand } from '../state';
 import { will } from '../people/crown';
 import type { Allocation, GameState } from '../state';
 import { count, smithyWorking } from './building-counts';
@@ -105,7 +105,7 @@ export function allocateLabour(state: GameState, haul = 1): Allocation {
   // brazos y el reparto de abajo los manda donde haga falta —al bosque, a la
   // obra, a la cantera—. No sube la cosecha: eso sería un número mejor y no un
   // medio; lo que cambia es **quién queda libre**, y eso lo decide la aldea.
-  const crew = FOOD.FIELD_CREW * (hasTrait(state, 'plough') ? MEANS.PLOUGH_CREW : 1);
+  const crew = FOOD.FIELD_CREW * (toolInHand(state, 'plough') ? MEANS.PLOUGH_CREW : 1);
   const farmDemand = workedFields * crew;
 
   let farmers = Math.min(w, farmDemand);
@@ -162,7 +162,7 @@ export function allocateLabour(state: GameState, haul = 1): Allocation {
   // `woodHaul`; se pasa porque `subsistence/` no mira `world/`). Con el bosque
   // lejos la misma necesidad pide más manos, hasta el techo, y lo que no llega
   // es escasez: la obra espera y la tira lo dice.
-  const perCutter = LABOUR.WOOD_PER_CUTTER * (hasTrait(state, 'axe') ? MEANS.AXE_WOOD : 1) * haul;
+  const perCutter = LABOUR.WOOD_PER_CUTTER * (toolInHand(state, 'axe') ? MEANS.AXE_WOOD : 1) * haul;
   const want = people * LABOUR.WINTER_WOOD * LABOUR.WOOD_TARGET_WEEKS + LABOUR.WOOD_WORKS_STOCK;
   const missing = Math.max(0, want - state.village.wood);
   const wanted = perCutter > 0 ? missing / (perCutter * LABOUR.WOOD_CATCH_UP_WEEKS) : 0;
@@ -213,7 +213,10 @@ export function produce(
   // menos leñadores: sin ella aquí, el hacha mandaba menos manos al bosque y la
   // leñera recibía lo de un leñador sin hacha, así que el medio de M-4 **daba
   // menos leña**. Lo que el bosque no da —lejos, o ya talado— lo recorta `woodCap`.
-  const cut = a.cutters * LABOUR.WOOD_PER_CUTTER * (hasTrait(state, 'axe') ? MEANS.AXE_WOOD : 1);
+  // K8 · la semana de la misa la aldea pierde el día de trabajo: es lo que
+  // cuesta, y lo único (Vera, 2 oct 2026: la misa no sale mal nunca).
+  const mass = state.flags['rite:mass:at'] === state.tick ? 1 - BOARDS.MASS_WORK_LOSS : 1;
+  const cut = a.cutters * LABOUR.WOOD_PER_CUTTER * (toolInHand(state, 'axe') ? MEANS.AXE_WOOD : 1) * mass;
   const wood = Math.max(0, Math.min(cut, woodCap));
   state.woodRun = planWoodRun(state, wood);
 
@@ -234,7 +237,7 @@ export function produce(
   // desde el primer día y nadie había escrito (`CROWN.AMBITIOUS_WORKS`).
   const buildPoints = a.builders * LABOUR.BP_PER_BUILDER *
     (smithyWorking(state) ? LABOUR.SMITHY_BONUS : 1)
-    * (hasTrait(state, 'axe') ? MEANS.AXE_WORKS : 1) * will(state).works * worksFactor;
+    * (toolInHand(state, 'axe') ? MEANS.AXE_WORKS : 1) * will(state).works * worksFactor * mass;
 
   return { wood, buildPoints };
 }

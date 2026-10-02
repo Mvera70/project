@@ -1,5 +1,6 @@
 // G-01 · Public boundary between the simulation, presentation owner and 3D renderer.
 
+import type { BoardWhich } from '@derive/building-boards';
 import type { GraphicsSettings } from './profile';
 import type { SkyKind } from '../derive/weather';
 import type { GameState, HappeningId, PlayerAct, Role, VillagerId } from '../engine/state';
@@ -166,8 +167,9 @@ export interface RagdollPose {
 export type GraphicsTarget =
   | { kind: 'building'; id: number }
   | { kind: 'villager'; id: number }
-  // §7.15 · el tablón de misiones de la plaza.
-  | { kind: 'board' }
+  // §7.15 · el tablón de misiones de la plaza; K8 · y el de la herrería y el de
+  // la capilla (`which`; sin él, el de la plaza).
+  | { kind: 'board'; which?: BoardWhich }
   | { kind: 'terrain'; x: number; y: number };
 
 export interface GraphicsFrame {

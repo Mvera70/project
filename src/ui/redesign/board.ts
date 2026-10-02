@@ -15,8 +15,11 @@
 // para pintarse, con el motivo escrito cuando no.
 
 import { renderUiText } from '@engine/chronicle/render';
-import { TIME } from '@engine/balance';
-import type { MissionId } from '@engine/state';
+import { BOARDS, TIME } from '@engine/balance';
+import { seasonOf } from '@engine/time';
+import type { MissionId, Rite, SmithyOrder } from '@engine/state';
+import { liveOrder, ritesOpen, smithyOrdersOpen } from '@engine/world/boards';
+import type { BoardWhich } from '@derive/building-boards';
 import { missionsOpen, outNow, type MissionOpen } from '@engine/world/expeditions';
 import type { UiActions, UiPanel, UiSnapshot } from './contracts';
 // **Las imágenes de la piel, importadas y no por token.** En el sitio publicado
@@ -33,12 +36,13 @@ import nail from './nail.png';
 import nailBent from './nail-bent.png';
 import chipCost from './chip-cost.png';
 import resSilver from './res-silver.png';
+import resWood from './res-wood.png';
 
 const STYLE_ID = 'valley-board-style';
 
 const CSS = `
 .valley-board-veil { --wood-board: url(${woodBoard}); --btn-close: url(${btnClose}); --frame-parchment: url(${frameParchment});
-  --nail: url(${nail}); --nail-bent: url(${nailBent}); --chip-cost: url(${chipCost}); --res-silver: url(${resSilver}); }
+  --nail: url(${nail}); --nail-bent: url(${nailBent}); --chip-cost: url(${chipCost}); --res-silver: url(${resSilver}); --res-wood: url(${resWood}); }
 /* Entre la cabecera y la barra, como en la lámina v8: ni tapa las cifras ni la
    navegación. --ui-hud-height lo publica la cabecera (hud.ts). */
 /* **Recibe los toques a propósito.** Cuelga de \`.ui-shell\`, que los deja pasar
@@ -90,6 +94,9 @@ const CSS = `
   color: var(--skin-ink); font: 700 15px/1 var(--skin-font-display); }
 .valley-cost-chip:not(.free)::before { content: ''; width: 18px; height: 18px; flex: 0 0 18px;
   background-image: var(--res-silver); background-position: center; background-size: contain; background-repeat: no-repeat; }
+/* K8 · el precio de un encargo en madera lleva su icono; el de la fe, ninguno. */
+.valley-cost-chip.wood::before { background-image: var(--res-wood); }
+.valley-cost-chip.faith::before { display: none; }
 .valley-note-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .valley-step { display: flex; align-items: center; gap: 6px; }
 .valley-step button { width: 40px; height: 40px; padding: 0; color: #3d3020; font: 700 22px/1 var(--skin-font-voice); cursor: pointer;
@@ -118,8 +125,69 @@ function riskKey(open: MissionOpen): string {
   return death === 0 ? 'board.risk.none' : death < 0.05 ? 'board.risk.low' : 'board.risk.high';
 }
 
-export function boardPanel(actions: UiActions): UiPanel {
+/** Un precio en su ficha: plata o madera con su icono, y la fe en letra. */
+function chip(kind: 'silver' | 'wood' | 'faith', amount: number): HTMLSpanElement {
+  const cost = document.createElement('span');
+  cost.className = `valley-cost-chip ${kind}`;
+  cost.textContent = kind === 'faith' ? renderUiText('board.cost.faith', { faith: amount }) : String(amount);
+  cost.setAttribute('aria-label', kind === 'silver' ? renderUiText('board.silver', { silver: amount })
+    : kind === 'wood' ? renderUiText('board.cost.wood', { wood: amount }) : renderUiText('board.cost.faith', { faith: amount }));
+  return cost;
+}
+
+/**
+ * K8 · un aviso de los tablones de la herrería y de la capilla: el mismo
+ * pergamino clavado que una misión, con su nombre, qué hace, lo que cuesta y
+ * el botón de actuar, o el motivo escrito si no se puede.
+ */
+function buildingNote(
+  key: string, costs: readonly HTMLElement[], facts: string, refusal: string | null, act: string, onAct: () => void,
+): HTMLElement {
+  const note = document.createElement('article');
+  note.className = 'valley-note';
+  note.dataset['note'] = key;
+  const nail = document.createElement('span');
+  nail.className = 'valley-note-nail';
+  const name = document.createElement('h3');
+  name.className = 'valley-note-name';
+  name.textContent = renderUiText(`${key}.name`);
+  const what = document.createElement('p');
+  what.className = 'valley-note-what';
+  what.textContent = renderUiText(`${key}.what`);
+  const line = document.createElement('p');
+  line.className = 'valley-note-facts';
+  line.append(...costs.flatMap((c, i) => (i === 0 ? [c] : [' ', c])), costs.length > 0 && facts !== '' ? ' · ' : '', facts);
+  note.append(nail, name, what, line);
+  if (refusal === null) {
+    const foot = document.createElement('div');
+    foot.className = 'valley-note-foot';
+    const go = document.createElement('button');
+    go.type = 'button';
+    go.className = 'skin-button skin-button--wood valley-note-send';
+    go.textContent = renderUiText(act);
+    go.addEventListener('click', onAct);
+    foot.append(document.createElement('span'), go);
+    note.append(foot);
+  } else {
+    const why = document.createElement('p');
+    why.className = 'valley-note-why';
+    why.textContent = renderUiText(`board.why.${refusal}`);
+    note.append(why);
+  }
+  return note;
+}
+
+const ROGATION_FAITH = BOARDS.ROGATION_FAITH;
+const untilText = (tick: number): string => renderUiText('board.until', {
+  season: renderUiText(`app.season.${seasonOf(tick)}`).toLowerCase(),
+  year: Math.floor(tick / TIME.WEEKS_PER_YEAR),
+});
+
+export function boardPanel(actions: UiActions): UiPanel & { show(which: BoardWhich): void } {
   ensureStyle();
+  /** K8 · qué tablón se está mirando: el de la plaza, la fragua o la capilla. */
+  let which: BoardWhich = 'plaza';
+  const titleKey = (): string => (which === 'smithy' ? 'board.smithy.title' : which === 'church' ? 'board.church.title' : 'board.title');
   const element = document.createElement('div');
   element.className = 'valley-board-veil';
   element.setAttribute('role', 'dialog');
@@ -143,13 +211,39 @@ export function boardPanel(actions: UiActions): UiPanel {
     const { state } = snapshot;
     const title = document.createElement('h2');
     title.className = 'valley-board-title';
-    title.textContent = renderUiText('board.title');
+    title.textContent = renderUiText(titleKey());
+    element.setAttribute('aria-label', renderUiText(titleKey()));
     const close = document.createElement('button');
     close.type = 'button';
     close.className = 'valley-board-close';
     close.textContent = renderUiText('board.close');
     close.addEventListener('click', () => actions.navigate({ kind: 'valley' }));
     const nodes: HTMLElement[] = [title, close];
+    // K8 · la fragua: tres encargos, uno cada vez, por un año.
+    if (which === 'smithy') {
+      for (const order of smithyOrdersOpen(state)) {
+        const costs = [
+          ...(order.cost.wood !== undefined && order.cost.wood > 0 ? [chip('wood', order.cost.wood)] : []),
+          ...(order.cost.silver !== undefined && order.cost.silver > 0 ? [chip('silver', order.cost.silver)] : []),
+        ];
+        const live = order.live !== null && order.live.order === order.id ? untilText(order.live.until) : renderUiText('board.lasts');
+        nodes.push(buildingNote(`order.${order.id}`, costs, live, order.refusal, 'board.order',
+          () => actions.smithy(order.id as SmithyOrder)));
+      }
+      board.replaceChildren(...nodes);
+      return;
+    }
+    // K8 · la capilla: la misa y la rogativa.
+    if (which === 'church') {
+      for (const rite of ritesOpen(state)) {
+        const costs = rite.id === 'rogation' ? [chip('faith', ROGATION_FAITH)] : [];
+        const facts = rite.until !== null ? untilText(rite.until) : '';
+        nodes.push(buildingNote(`rite.${rite.id}`, costs, facts, rite.refusal, 'board.rite',
+          () => actions.rite(rite.id as Rite)));
+      }
+      board.replaceChildren(...nodes);
+      return;
+    }
     const open = missionsOpen(state);
     if (open.length === 0) {
       const empty = document.createElement('p');
@@ -250,7 +344,7 @@ export function boardPanel(actions: UiActions): UiPanel {
   let key = '';
   const update = (snapshot: UiSnapshot): void => {
     const { state } = snapshot;
-    const next = `${state.tick}:${state.expeditions.length}:${Math.floor(state.village.silver)}:${[...wanted].join(',')}`;
+    const next = `${which}:${state.tick}:${state.expeditions.length}:${Math.floor(state.village.silver)}:${Math.floor(state.village.wood)}:${Math.floor(state.village.faith)}:${liveOrder(state)?.order ?? ''}:${state.flags['rite:mass'] ?? ''}:${state.flags['rite:rogation'] ?? ''}:${[...wanted].join(',')}`;
     if (next === key && last !== null) { last = snapshot; return; }
     key = next;
     paint(snapshot);
@@ -259,6 +353,10 @@ export function boardPanel(actions: UiActions): UiPanel {
   return {
     element,
     update,
+    show(next: BoardWhich): void {
+      if (next !== which) key = '';
+      which = next;
+    },
     dispose(): void { element.remove(); },
   };
 }

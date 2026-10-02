@@ -73,9 +73,22 @@ function walled(): GameState {
   return state;
 }
 
+/**
+ * K8 (2 oct 2026) · **El hacha y el arado del carro son de antes de la
+ * fragua**: con herrería se encargan allí (`world/boards.ts`) y el carro dice
+ * por qué no (`'smithy'`). La aldea de cuatro años de `rich()` ya tiene
+ * herrería desde K1–K3 (llega a las 40 h a ×1), así que para medir el precio
+ * de esos dos se le quita: es la aldea a la que el carro se los vende. La
+ * misma que en `tests/fast/means.test.ts`.
+ */
+function forgeless(state: GameState): GameState {
+  state.buildings = state.buildings.filter((b) => b.kind !== 'smithy');
+  return state;
+}
+
 /** La aldea que cada medio necesita para que lo único que estorbe sea el precio. */
 function payer(id: MeansId): GameState {
-  return id === 'gate' ? walled() : rich();
+  return id === 'gate' ? walled() : id === 'axe' || id === 'plough' ? forgeless(rich()) : rich();
 }
 
 describe('dar un medio', () => {

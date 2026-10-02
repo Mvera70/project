@@ -27,10 +27,64 @@ Medido bajo vitest, cinco semillas a 40 años: **6,81 → 3,80 ms por semana
 tráfico, sendas, el estado entero— en 7, 23, 41, 11 y 99. No mueve ninguna
 trayectoria. Prueba nueva: `tests/fast/route-invalidation.test.ts` (tras cada
 cambio de casas, obras o sendas, las rutas son las de un cálculo desde cero;
-una obra lejos de toda ruta no lanza ni un A\*). Herramienta nueva:
-`tools/reports/tick-bench.ts`, y la regla en `CLAUDE.md` de pasarla al tocar
-`paths`, `astar`, `placement` o `works`. Medidas y perfil:
+una obra lejos de toda ruta no lanza ni un A\*). El banco del tick de v5.68
+(`tools/reports/tick-bench.ts`) imprime además un resumen de la partida, y la
+regla de `CLAUDE.md` junta la de v5.68 con la de pasarlo antes y después de
+tocar `paths`, `astar`, `placement` o `works`. Medidas y perfil:
 `docs/medidas/rutas-tick-2026-10-02.md`.
+
+## v5.57 · 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón, y desde ellas inclinar hacia un recurso
+
+**Medido antes, en `main`** (`docs/medidas/k8-k9-edificios-2026-10-02.md`,
+informe nuevo `tools/reports/k8-report.ts`): la capilla llega a las 33 h a ×1
+con 20 personas, la herrería a las 40 h con 22 y la iglesia de piedra a las
+65 h. Las tres llegan antes de la edad de piedra en los doce valles, así que
+ninguna llega tarde para que su tablón importe. La madera espera la obra el
+38 % de las semanas justo al llegar la herrería, la plata escasea siempre
+(2–9) y la piedra y la fe sobran (210 y ~89).
+
+**Decisiones de Vera:** encargos de temporada en la herrería, y el hacha y el
+arado salen del carro cuando hay fragua; misa y rogativa en la capilla; la misa
+no sale mal nunca, cuesta el día de trabajo; y la cara mala de los herrajes
+(la plata amontonada tienta al clan) se queda.
+
+- **El tablón de la herrería** (`world/boards.ts`, `BOARDS`): hachas (25
+  madera, 8 plata), rejas de arado (lo mismo) y herrajes para vender (60
+  madera, 24 de plata en el año). Uno cada vez, un año, con herrería encendida y
+  herrero. Las hachas y las rejas valen lo que el hacha y el arado del carro
+  (`toolInHand`), que con fragua dice «Ask at the forge» (`'smithy'`). Ningún
+  encargo quema la leña del invierno (`winterReserve`).
+- **El tablón de la capilla:**
+  - **Misa:** ánimo `10 · fe/100` por un séptimo del trabajo de esa semana, una
+    por temporada. La aldea se junta en la capilla un día.
+  - **Rogativa:** 20 de fe para que la próxima siega rinda 1,15. La aldea va
+    detrás del cura al campo.
+- **Por la puerta de los actos** (`{kind:'smithy'}`, `{kind:'rite'}`), sin
+  tirada, guardado en `state.flags`, sin subir el esquema. La crónica lo cuenta
+  como `means`.
+- **Se tocan en el mundo:**
+  - Dos tablones provisionales, como el de la plaza, a 0,72, clavados en la
+    fachada que mira a la plaza (`derive/building-boards.ts`).
+  - La misma ventana de madera (`ui/redesign/board.ts`) pinta los avisos de
+    cada uno.
+  - Capturas a 390 y 750 px en `docs/medidas/k-img/k8-*`.
+
+**K9, medido contra la trampa de v2.0** (`tools/reports/tilt-report.ts`, cada
+opción pedida siempre que se pueda, 8 semillas × 40 años):
+- **Cada opción gana en lo suyo:**
+  - rejas: la menor espera de madera;
+  - rogativa: la menor hambre y el mayor grano;
+  - herrajes: la plata;
+  - misa: el ánimo y la gente;
+  - hachas: cerrar la villa antes, en las 8 semillas, y los 8 valles la
+    cierran frente a 6 sin hachas.
+- **Los herrajes acaban 2 de 8 aldeas asaltadas**, por la plata amontonada.
+- **La misa es fuerte:** el ánimo medio pasa de 59 a 80. Nivelarla es de Vera.
+
+Encargos: las ilustraciones de las ocho líneas nuevas de crónica, las cinco
+tarjetas y los dos tablones de verdad, en `docs/encargos/ilustraciones-k8-k9.md`.
+Va ahí y no en `plan-arte-pendiente.md` mientras Codex trabaja en ese fichero.
+Lo que aún no se ve está en `docs/encargos-3d.md`.
 
 ## v5.70 · 2 oct 2026 · La senda de la garganta, pegada al suelo, y los de fuera bajan por ella
 
@@ -101,6 +155,39 @@ sigo viendo baldosas de madera mal puestas».
   `life-visitors` acaban la jornada yéndose por la senda, no «idos»; y **los dos
   `it.fails` del factor de grano pasan**: llega antes (0,32–0,36), los
   porteadores con él, y la moneda pasa entre 0,49 y 0,61.
+
+## v5.68 · 2 oct 2026 · Por qué la CI tardaba 36 minutos, y lo que se arregla sin tocar el motor
+
+**El diagnóstico** (`docs/medidas/ci-lentitud-2026-10-02.md`). El servidor de
+CI no es más lento que local: `ledger.test.ts` tarda 689 s allí y 666 s aquí,
+en un hilo. Lo que pasó fue que **el tick se encareció unas diez veces** entre
+el 16 sep y el 1 oct (de 0,78 a 8,3 ms por semana de juego) y que **los
+ficheros de `tests/fast/` que juegan décadas pasaron de 15 a 58**. El escalón
+mayor del tick está en un solo commit, `6fa7fda1` (21 sep): ×2,3 con aldeas
+del mismo tamaño, porque `walkingGround()` tira todas las rutas con cada obra
+que se abre o se cierra. Con eso salen 9,5 búsquedas A\* por semana, y bajo
+vitest A\* es el 54 % del tick. La v5.56 (#38) arregló lo segundo; lo primero
+lo lleva la rama `claude/rutas-tick` (v5.71), con el parche medido aquí:
+−31 % del tick, misma crónica.
+
+**Lo arreglado, sin tocar el motor:**
+
+- **La suite rápida, sin aislar cada fichero** (`isolate: false`): de 249 a
+  180 s en local. Cada fichero volvía a importar Three, Rapier y el motor y lo
+  corría con el JIT en frío. Las 2079 pruebas pasan en tres órdenes distintos.
+- **Un tope por fichero en la suite rápida**: 30 s × `VALLEY_TIMING_SCALE`,
+  contando la recogida (`tests/helpers/fast-budget-reporter.ts`). Un fichero
+  que se pase sale rojo con su nombre el día que llega; se muda a las
+  jornadas, no se sube el tope. El más lento de hoy tarda 21 s.
+- **Cada partida una vez por fichero** en `ledger` (677 → 161 s) y `threat`
+  (1167 → 470 s), con los mismos asertos. Sus pesos en `shard-weights.ts`,
+  al día.
+- **`tools/reports/tick-bench.ts`**: el banco del tick en ms por semana, con
+  los vivos al final de cada valle. Se pasa antes de subir un tope de CI.
+- **`ci.yml`** ya no dice que el servidor va cinco veces más lento.
+
+**Abierto:** `catchUp` (960 ticks en menos de 2 s) da 2,05–2,26 s en local a
+escala 1. Es el tick caro; lo arregla el parche de rutas, no un umbral.
 
 ## v5.65 · 2 oct 2026 · Dientes de sierra en la tablet: la resolución sólo baja si bajar sirve
 

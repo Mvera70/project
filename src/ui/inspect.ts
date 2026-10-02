@@ -1,5 +1,6 @@
 // M-21 · Hit testing and panel content without DOM dependencies.
 
+import type { BoardWhich } from '@derive/building-boards';
 import { population, isHere } from '@engine/people/demography';
 import { renderUiText } from '@engine/chronicle/render';
 import { ageOf } from '@engine/people/villagers';
@@ -12,7 +13,7 @@ export type InspectTarget =
   | { kind: 'building'; id: number }
   | { kind: 'villager'; id: number }
   // §7.15 · el tablón de misiones: no abre ficha, abre su ventana (`app.ts`).
-  | { kind: 'board' }
+  | { kind: 'board'; which?: BoardWhich }
   | { kind: 'terrain'; x: number; y: number };
 export interface PanelModel { title: string; lines: string[] }
 

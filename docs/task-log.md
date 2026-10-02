@@ -2,15 +2,47 @@
 
 ## 2 oct 2026 · Rutas: que una obra no tire todas las rutas (v5.71)
 
-Rama `claude/rutas-tick`, carril del motor de la tanda nocturna, el último en
-integrarse. Hecho el arreglo de rutas del diagnóstico de CI, más fino: una ruta
+Rama `claude/rutas-tick`, carril del motor de la tanda nocturna, integrado
+detrás de #43 (diagnóstico de CI). Hecho el arreglo de rutas del diagnóstico, más fino: una ruta
 guardada se conserva mientras A\* daría la misma (coste igual, mismas
 parcelas en los extremos, nada abaratado en lo que su búsqueda miró), y A\*
 sin *getters* en el bucle. **−44 % del tick bajo vitest** (6,81 → 3,80 ms por
 semana, cinco semillas a 40 años) y la partida **idéntica byte a byte**, tráfico
-incluido: no mueve ninguna jornada. `docs/medidas/rutas-tick-2026-10-02.md`.
+incluido: no mueve ninguna jornada. Vuelto a comprobar sobre `main` con K8+K9
+y #43 dentro (`843d923`): los mismos resúmenes en las cinco semillas, 4,84 →
+4,17 ms por semana bajo `tsx`. `docs/medidas/rutas-tick-2026-10-02.md`.
+**Cerrado el «Abierto» del parche de rutas que dejó el carril de CI (v5.68):**
+el parche está dentro, y `catchUp` de `save.test.ts` (960 semanas de veinte
+personas, tope de 2 s) mide 1,06–1,35 s en la rama contra 1,33–1,55 s en
+`main`, tres pasadas cada uno, solo en la máquina; los 2,05–2,26 s eran con la
+suite entera corriendo al lado. A esa edad la aldea es pequeña y A\* pesa
+poco: lo que gana el parche crece con la gente.
 **Abierto:** lo que queda del tick es la población (un A\* por origen y no por
 pareja sería un brief) y `placeBuilding` (16 % del perfil).
+
+## 2 oct 2026 · K8+K9: la herrería y la capilla con su tablón (v5.57)
+
+Rama `ccr-372e1786-k4brcp`. Medido antes en `main`, decidido con Vera y hecho:
+los encargos de la herrería y los ritos de la capilla, por `PlayerAct`, con su
+tablón en la fachada y la misma ventana que el de la plaza. K9 medido con cada
+opción pedida siempre: cada una gana en lo suyo; los herrajes acaban 2 de 8
+asaltadas por la plata amontonada, y Vera lo deja. Todo en
+`docs/medidas/k8-k9-edificios-2026-10-02.md`.
+
+**Abierto, de esta ronda:**
+
+- **La misa es fuerte** (ánimo medio de 59 a 80 pedida cada temporada): es
+  nivelado, de Vera (`BOARDS.MASS_MORALE`, `MASS_EVERY`).
+- **Lo que no se ve todavía** (`docs/encargos-3d.md`, «Los tablones de la
+  herrería y de la capilla»): qué hace el encargo en marcha, la venta de
+  herrajes, la gente entrando en la capilla y la procesión que recorre los
+  campos (hoy es un corro quieto en el campo más cercano).
+- **El toque de los tablones en 3D** no tiene recorrido de navegador: las
+  capturas abren la ventana por su gancho (`--open board-smithy`), no
+  tocándola. El de la plaza sí lo tiene (`--open board`).
+- **Las ilustraciones y los modelos**, encargados en
+  `docs/encargos/ilustraciones-k8-k9.md`; pasan a `plan-arte-pendiente.md`
+  cuando Codex suelte ese fichero.
 
 ## 2 oct 2026 · La senda de la garganta, pegada; los de fuera bajan por ella (v5.70)
 
@@ -40,6 +72,27 @@ las expediciones siguen perdiéndose en la boca, sin subir la senda. (3) El
 forastero del vado sigue entrando por el camino pintado: RD-1 fija su hora.
 Siguiente: **el valle con forma natural** (el segundo abierto de v5.55), que
 es del motor y se mide antes de proponer nada.
+
+## 2 oct 2026 · Por qué la CI tardaba 36 minutos (v5.68) — carril CI
+
+Rama `ccr-91b06db8-ilbj88`, sobre `main` con #38 dentro. **Diagnóstico**
+(`docs/medidas/ci-lentitud-2026-10-02.md`): el servidor no es más lento que
+local (ledger, 689 s en CI y 666 s en local). El tick pasó de 0,78 a
+8,3 ms/semana entre el 16 sep y el 1 oct, con un ×2,3 en `6fa7fda1`
+(`walkingGround` tira todas las rutas con cada obra; A\* es el 54 % del tick
+bajo vitest). Y los ficheros de `fast` que juegan décadas pasaron de 15 a 58.
+**Hecho:** `npm test` sin aislar (249 → 180 s en local, en verde en tres
+órdenes); tope de 30 s × escala por fichero en `fast`, contando la recogida
+(`tests/helpers/fast-budget-reporter.ts`); `ledger` 677 → 161 s y `threat`
+1167 → 470 s jugando cada partida una vez; `tools/reports/tick-bench.ts`; el
+comentario de `ci.yml`. **El parche de rutas** (−31 % del tick, crónica,
+gente y edificios iguales a 40 años en 7/23/41; cambia `map.traffic` en dos
+semillas) **lo lleva la rama `claude/rutas-tick` (v5.71)**, aprobado por Vera.
+**Abierto:** (1) ~~`catchUp` en `save.test.ts` da 2,05–2,26 s contra 2 s en
+local a escala 1; se cierra con el parche de rutas.~~ Cerrado en v5.71 (arriba). (2) El mismo patrón de
+partida repetida en cada `it` está en unos ochenta ficheros más (la lista sale
+del guion de §6.2 del documento), casi todos baratos o con aldeas que la prueba
+modifica; si una jornada vuelve a pesar, se mira primero ahí.
 
 ## 2 oct 2026 · Dientes de sierra en la tablet (v5.65)
 

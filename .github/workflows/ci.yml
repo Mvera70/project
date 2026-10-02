@@ -16,9 +16,14 @@ jobs:
   # Los tres trabajos tenían un tope de 10 minutos y la suite rápida sola tarda
   # más: desde el 28 sep 2026 la CI se cortaba («cancelled») antes de decir
   # nada. Topes con margen, y las jornadas en su propio trabajo para que su
-  # resultado no tape el de la compilación y el lint. En el servidor todo va
-  # unas cinco veces más lento que en local: las jornadas (284 s en local) no
-  # cabían en 30 minutos y se cortaban igual (29 sep 2026).
+  # resultado no tape el de la compilación y el lint.
+  #
+  # **El servidor no es más lento que local por núcleo** (2 oct 2026, v5.68):
+  # `ledger.test.ts` tardaba 689 s aquí y 666 s en local, en un hilo. Lo que
+  # alargaba la CI era el motor —el tick costaba diez veces lo del 16 sep— y
+  # pruebas que juegan décadas; lo cuenta docs/medidas/ci-lentitud-2026-10-02.md.
+  # Ante una vuelta lenta, se mide el tick (`tools/reports/tick-bench.ts`)
+  # antes de subir un tope.
   fast:
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -30,9 +35,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
-      # El servidor mide los cronómetros del aparato del jugador unas tres veces
-      # más lentos que el portátil donde se fijaron (`tests/helpers/timing.ts`):
-      # `catchUp` 3,0–3,6 s contra 2 s el 30 sep 2026.
+      # Los cronómetros del aparato del jugador salen aquí unas tres veces más
+      # lentos que en el portátil donde se fijaron (`tests/helpers/timing.ts`):
+      # `catchUp` 3,0–3,6 s contra 2 s el 30 sep 2026. No es la máquina sino
+      # la carga: tres hilos compitiendo y el JIT en frío en cada fichero.
       - run: npm test
         env:
           VALLEY_TIMING_SCALE: 3
