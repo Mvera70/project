@@ -1,14 +1,14 @@
+// Lo lento de este fichero vive en `tests/journeys/marks-long.test.ts` (v5.56).
+//
 // M-33 · design.md §11.8 — el estandarte y el apagón.
 //
 // Lo que se protege: que un estandarte ondee los años que dice el catálogo y
 // ni uno más, que apagar un edificio le quite de verdad el humo y la luz, que
 // `who` apague la casa de esa persona y no otra, y que nada de esto escriba
 // en el estado ni gaste una tirada.
-import { standing } from '@engine/subsistence/building-counts';
-import type { BuildingKind } from '@engine/state';
-import { foundTwenty, villageWhere } from '../helpers/founding';
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
-import { MARKS, TIME } from '@engine/balance';
+import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import type { Catalogue } from '@engine/crossroads/schema';
 import { run } from '@engine/sim';
@@ -83,19 +83,6 @@ function bannerYears(): number {
 }
 
 describe('el estandarte · §11.8', () => {
-  it('sin decisiones no ondea ninguno', () => {
-    const state = village(20);
-    state.history = [];
-    expect(bannersAt(state, CATALOG)).toEqual([]);
-  });
-
-  it('una decisión lo iza', () => {
-    const state = village(20);
-    state.history = [];
-    record(state, 'banner');
-    expect(bannersAt(state, CATALOG).length).toBe(1);
-  });
-
   it('ondea los años que dice el catálogo, y ni uno más', () => {
     const state = village(20);
     state.history = [];
@@ -148,80 +135,11 @@ describe('el estandarte · §11.8', () => {
   });
 });
 
-/**
- * Una aldea con en pie **el tipo de edificio que apaga la opción que esta
- * prueba usa**, leído del propio catálogo y no escrito a mano: si mañana el
- * primer `douse` del catálogo apaga otra cosa, esto sigue midiendo lo mismo.
- *
- * Hace falta desde R-1 §2.6, porque el rayo quema y ninguna puerta lo impide:
- * la semilla 7 llegaba a los veinte años sin el edificio, `dousedAt` no tenía
- * nada que apagar y la prueba fallaba por la suerte de un valle. Ver
- * `villageWhere` (`tests/helpers/founding.ts`).
- */
-function dousedKind(): BuildingKind {
-  const { templateId, optionId } = optionWith('douse');
-  const option = CATALOG.find((t) => t.id === templateId)?.options.find((o) => o.id === optionId);
-  const effect = option?.visible.find((v) => v.k === 'douse');
-  return effect !== undefined && effect.k === 'douse' ? (effect.kind as BuildingKind) : 'house';
-}
-
-function doused(): GameState {
-  const kind = dousedKind();
-  const found = villageWhere(20, (s) => standing(s, kind).length > 0, undefined, WOODEN);
-  expect(found, `alguna semilla debe llegar a los 20 años con ${kind} en pie`).not.toBeNull();
-  return found as GameState;
-}
-
 describe('el apagón · §11.8', () => {
   it('sin decisiones no hay nada apagado', () => {
     const state = village(20);
     state.history = [];
     expect(dousedAt(state, CATALOG).size).toBe(0);
-  });
-
-  it('una decisión apaga un edificio', () => {
-    // El valle se elige por tener algo encendido que apagar, no por su número
-    // (R-1 §2.6: el rayo quema fraguas y capillas, y la semilla 7 se queda sin
-    // ninguna). La propiedad medida no cambia.
-    const state = doused();
-    state.history = [];
-    record(state, 'douse');
-    expect(dousedAt(state, CATALOG).size).toBeGreaterThan(0);
-  });
-
-  it('se vuelve a encender pasado su plazo', () => {
-    const state = doused();
-    state.history = [];
-    record(state, 'douse');
-
-    state.tick += MARKS.DOUSE_TICKS - 1;
-    expect(dousedAt(state, CATALOG).size, 'la última semana sigue a oscuras').toBeGreaterThan(0);
-
-    state.tick += 1;
-    expect(dousedAt(state, CATALOG).size, 'y a la siguiente ya no').toBe(0);
-  });
-
-  it('apagar le quita el humo y la luz a ese edificio', () => {
-    // Lo único que de verdad importa: que el apagón se note en la imagen.
-    //
-    // Sobre varias semillas y no sobre una: apagar «una casa» no quita nada si
-    // en esa aldea concreta las casas no tenían señal que quitar, y entonces la
-    // prueba no mide el apagón sino la suerte del escenario. Pasó en v3.61,
-    // cuando el carácter cambió las partidas.
-    let quieted = 0;
-    let tried = 0;
-    for (const seed of [7, 11, 23, 41, 97]) {
-      const state = village(20, seed);
-      state.history = [];
-      const before = tellsFor(state).length;
-      record(state, 'douse', 'house');
-      const after = tellsFor(state).length;
-      expect(after, `semilla ${seed}: apagar nunca añade señales`).toBeLessThanOrEqual(before);
-      if (after < before) quieted += 1;
-      tried += 1;
-    }
-    expect(quieted, `apagar se nota en la imagen (${quieted}/${tried} aldeas)`)
-      .toBeGreaterThan(0);
   });
 
   it('con `who`, apaga la casa de esa persona', () => {

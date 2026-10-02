@@ -77,6 +77,7 @@ Las herramientas que las produjeron están en `tools/reports/`.
 | `medidas/animacion-tomas-2026-09-29.md` | **El índice de las tomas de la ronda AN**: cada toma del observatorio con semilla, año, lead, fps, viewport, cámara y escenario, y las hojas de gestos |
 | `medidas/fusion-cuatro-ramas-2026-09-29.md` | **La fusión de las cuatro ramas del 29 sep** (animación AN-0…AN-5, modelos de animales, gráficos GV, sonido): esquema de qué trajo cada una, cómo combinan y los huecos entre ellas repartidos por dueño |
 | `medidas/ci-lentitud-2026-10-02.md` | **Por qué la CI tardaba 36 min**: el tick cuesta ~10× lo del 16 sep (×2,3 en `6fa7fda1`, que tira todas las rutas con cada obra) y la suite rápida pasó de 15 a 58 ficheros que juegan décadas; el servidor no es más lento que local. Qué cubre #38, el parche propuesto de las rutas (−31 % del tick, sin aplicar) y la regla del tope por fichero |
+| `medidas/dientes-de-sierra-tablet-2026-10-02.md` | **Los dientes de sierra en la tablet de Vera (v5.65)**: por qué Medium caía al 50 % sin ganar nada, la adaptativa que exige que una bajada pague, el suelo a un píxel por píxel CSS, las hojas antes/después y la lectura de MSAA pendiente en el aparato |
 | `medidas/findings-drama.md` | Los dos sistemas del motor que no se disparaban nunca (13 sep). **La medida sigue valiendo**; el plan de arreglarla, no |
 | `medidas/rey-medida.md` | Qué llegó y qué no de la fase del rey (K-6) |
 | `medidas/spatial-engine.md` | Cierre real, accesos y trazado en cuatro semillas; límites y reproducción |

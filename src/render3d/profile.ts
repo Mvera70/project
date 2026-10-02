@@ -48,9 +48,16 @@ export interface RenderProfile {
   readonly easySeconds: number;
 }
 
+// TUNE (v5.65, 2 oct 2026): el suelo de la adaptativa en High y Medium es
+// **un píxel dibujado por píxel CSS** (`pixelRatioCap · lowestScale = 1`).
+// Medium bajaba a 0,5 de 1,5: tres cuartos de píxel por píxel CSS, y en la
+// tablet de Vera (densidad 2) cada píxel dibujado tapaba 2,7 de la pantalla:
+// el ciervo pixelado y la hierba en escalera de su captura. Por debajo de eso
+// la imagen se deshace antes de que el fotograma se note; quien necesite
+// menos tiene Low, que es para eso.
 const LEVELS = {
   high: { pixelRatioCap: 2, antialias: true, shadows: true, shadowMapSize: 2048, shadowEvery: 2, lightGrass: false, lowestScale: 0.5 },
-  medium: { pixelRatioCap: 1.5, antialias: false, shadows: true, shadowMapSize: 1024, shadowEvery: 4, lightGrass: true, lowestScale: 0.5 },
+  medium: { pixelRatioCap: 1.5, antialias: false, shadows: true, shadowMapSize: 1024, shadowEvery: 4, lightGrass: true, lowestScale: 1 / 1.5 },
   low: { pixelRatioCap: 1, antialias: false, shadows: false, shadowMapSize: 512, shadowEvery: 8, lightGrass: true, lowestScale: 0.35 },
 } as const;
 
