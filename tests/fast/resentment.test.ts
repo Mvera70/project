@@ -27,14 +27,42 @@ function village(years: number, seed = 7): GameState {
 }
 
 const leaderOf = (s: GameState): Villager =>
-  s.people.villagers.find((v) => v.role === 'leader' && v.diedTick === null)!;
+  s.people.villagers.find((v) => v.role === 'leader' && v.diedTick === null && v.leftTick === null)!;
+
+/**
+ * K5 (v5.76) · **la primera aldea de veinte años con el líder en el valle.**
+ * Con la trayectoria de la sastrería el líder de la semilla 7 se ha ido del
+ * valle al año 20 (`leftTick`) y nadie lo sustituye todavía: sin líder no hay a
+ * quién culpar. Se busca entre candidatas por su precondición, no se fija.
+ */
+const LED_SEED = [7, 11, 23, 3, 41].find((seed) => {
+  const s = village(20, seed);
+  return s.people.villagers.some((v) => v.role === 'leader' && v.diedTick === null && v.leftTick === null)
+    && s.people.villagers.some((v) => v.named && v.diedTick === null && v.leftTick === null && v.role !== 'leader');
+}) ?? 7;
+const led = (): GameState => village(20, LED_SEED);
+
+/**
+ * K5 (v5.76, 2 oct 2026) · **una aldea sin el hambre de este año ya apuntada.**
+ * La regla cobra el hambre una vez por año (`alreadyThisYear`), y con la
+ * trayectoria de la sastrería la semilla 7 llega al año 20 con el hambre de ese
+ * año ya en la memoria: la prueba medía la biografía, no la regla. Lo mismo que
+ * `middle()` hace con la opinión, abajo.
+ */
+const unscarred = (s: GameState): GameState => {
+  const year = Math.floor(s.tick / TIME.WEEKS_PER_YEAR);
+  for (const v of s.people.villagers) {
+    v.memories = v.memories.filter((m) => !(m.kind === 'went_hungry' && Math.floor(m.tick / TIME.WEEKS_PER_YEAR) === year));
+  }
+  return s;
+};
 
 const othersOf = (s: GameState): Villager[] =>
-  s.people.villagers.filter((v) => v.named && v.diedTick === null && v.role !== 'leader');
+  s.people.villagers.filter((v) => v.named && v.diedTick === null && v.leftTick === null && v.role !== 'leader');
 
 describe('el hambre le pasa factura al que manda · §7.9', () => {
   it('un año malo baja la opinión del líder', () => {
-    const state = village(20);
+    const state = unscarred(led());
     const leader = leaderOf(state);
     const someone = othersOf(state)[0]!;
     const before = opinionOf(state, someone.id, leader.id);
@@ -76,10 +104,10 @@ describe('el hambre le pasa factura al que manda · §7.9', () => {
       const leader = leaderOf(s);
       for (const person of othersOf(s)) person.opinions[leader.id] = 0;
     };
-    const light = village(20);
+    const light = unscarred(led());
     middle(light);
     scarHunger(light, 0.2);
-    const heavy = village(20);
+    const heavy = unscarred(led());
     middle(heavy);
     scarHunger(heavy, 1);
 
@@ -114,18 +142,17 @@ describe('el hambre le pasa factura al que manda · §7.9', () => {
 describe('la desgracia compartida acerca · §7.9', () => {
   it('dos que pierden la misma casa se acercan', () => {
     const state = village(20);
-    const home = state.people.villagers.find(
-      (v) => v.named && v.diedTick === null && v.homeId !== null,
-    )!.homeId!;
-    const housemates = state.people.villagers.filter(
-      (v) => v.named && v.diedTick === null && v.homeId === home,
-    );
+    // K5 (v5.76) · sólo los que están en el valle: la regla junta a los que
+    // pierden la casa **estando** (`isHere`), y con la trayectoria de la
+    // sastrería el compañero que se juntaba aquí estaba fuera, en una misión.
+    const here = (v: Villager): boolean => v.named && v.diedTick === null && v.leftTick === null
+      && !state.expeditions.some((e) => e.who.includes(v.id));
+    const home = state.people.villagers.find((v) => here(v) && v.homeId !== null)!.homeId!;
+    const housemates = state.people.villagers.filter((v) => here(v) && v.homeId === home);
     if (housemates.length < 2) {
       // Si en esta semilla no comparten casa dos nombrados, se les junta: lo
       // que se prueba es la regla, no el reparto de camas de la semilla 7.
-      const spare = state.people.villagers.find(
-        (v) => v.named && v.diedTick === null && v.homeId !== home,
-      )!;
+      const spare = state.people.villagers.find((v) => here(v) && v.homeId !== home)!;
       spare.homeId = home;
       housemates.push(spare);
     }
