@@ -127,10 +127,9 @@ describe('F-0 · la arquería en sombra', () => {
     expect(shadowed.outcome).toEqual(plain.outcome);
     expect(shadowed.loosed).toEqual(plain.loosed);
     expect(shadowed.path).toEqual(plain.path);
-    // Algo tiene que haber dado, o la prueba no mide nada. Desde v5.81 una
-    // flecha ya no tumba (`wounds.ts`): lo que se mira es que haya aciertos.
-    expect(plain.outcome.some(([, , hits]) => (hits as number) > 0)).toBe(true);
-    // Una entrada por flecha, y la que dio a alguien dice quién para los dos jueces.
+    // Algo tiene que haber caído, o la prueba no mide nada.
+    expect(plain.outcome.some(([phase]) => phase === 'down')).toBe(true);
+    // Una entrada por flecha, y la que tumbó a alguien dice quién para los dos jueces.
     const log = shadowed.shadow!.arrows;
     expect(log).toHaveLength(shadowed.loosed.length);
     const decided = log.filter((entry) => entry.cylinder !== null);

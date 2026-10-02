@@ -428,11 +428,10 @@ export function stepArchery(
       if (tracked !== undefined) shadowHit(tracked.entry, physics, arrow, raider, step);
       raider.hits += 1;
       raider.arrowHits = (raider.arrowHits ?? 0) + 1;
-      // v5.81 · **Una flecha ya no basta.** Hasta aquí un flechazo tumbaba
-      // («la decisión honesta mientras no haya cuerpo a cuerpo ni ragdoll»);
-      // ahora quita vida (`wounds.ts`, el 15 % que dijo Vera) y lo que lleve
-      // puesto puede pararla o hacerla rebotar. El herido sigue subiendo, con
-      // el gesto de recibir el golpe.
+      // v5.81 · **Una flecha basta, a cuerpo descubierto.** Ahora pasa por la
+      // vida (`wounds.ts`): sin nada encima quita toda y tumba, como hasta hoy;
+      // lo que lleve puesto protege una parte o la hace rebotar, y entonces el
+      // herido sigue subiendo, con el gesto de recibir el golpe.
       const blow = strike(raider, raider.body.id, 'arrow', step);
       if (blow.ricocheted) raider.ricochets = (raider.ricochets ?? 0) + 1;
       if (!blow.felled) {

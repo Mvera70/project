@@ -19,7 +19,7 @@ ordena lo que viene. Esta skill es ese método en una página. Lee también
 |---|---|---|
 | Vuelo de la flecha, almenas, caída de los muertos, cascotes | **Rapier** | `life/physics.ts` (`launch`, `articulate`, `debris`) |
 | Si la flecha alcanza | **Cilindro** de 0,45 × 0,7 **desde y=0**, mirado al final del paso | `life/archery.ts`, `stepArchery` |
-| Qué hace un golpe | **Desde v5.81, la vida en porcentaje**: cada cuerpo tiene vida de 1 a 0, cada arma quita una parte (flecha 15 %, lanza 34 %, espada 55 %) y lo que lleva puesto deja pasar una parte o lo hace rebotar (tabla arma × pieza, con las cuatro piezas de la armadura). El rebote se tira con un hash del paso y del cuerpo, no con azar del motor | `life/wounds.ts`, `strike` |
+| Qué hace un golpe | **Desde v5.81, la vida en porcentaje**: cada cuerpo tiene vida de 1 a 0, cada arma quita una parte a cuerpo descubierto (flecha 100 %: sigue tumbando de un tiro; lanza 34 %; espada 55 %) y lo que lleva puesto **protege** una parte o lo hace rebotar (tabla pieza × arma con las cuatro piezas de la armadura; el cuero, un 15 % de la flecha). El rebote se tira con un hash del paso y del cuerpo, no con azar del motor | `life/wounds.ts`, `strike` |
 | Cuerpo a cuerpo | Distancia 0,9, un golpe cada 15 pasos; cae cuando se le acaba la vida (tres lanzazos sin nada, cuatro con peto). El peto decide aquí y el parte trae `spared` (los que siguen en pie gracias a él): el motor ya no los levanta otra vez | `life/melee.ts`, `stepMelee` |
 | Portón | Distancia 2,6, un golpe por segundo, 60 lo rompen | `life/raiders.ts` |
 | Movimiento y empujes | Integrador de la vida en rejilla, no Rapier | `life/body.ts`, `integrate`; `separate` |
