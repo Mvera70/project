@@ -25,7 +25,7 @@ describe('UI-W · el roble del valle', () => {
       const sides = [cell - 1, cell + 1, cell - map.width, cell + map.width].map((side) => map.terrain[side]);
       const byLake = sides.includes(TERRAIN_CODE.lake);
       expect(byLake || sides.includes(TERRAIN_CODE.water), `semilla ${seed}`).toBe(true);
-      if (!byLake) expect(inHeart(x, z), `semilla ${seed}: sin lago, fuera del corazón`).toBe(false);
+      if (!byLake) expect(inHeart(map, x, z), `semilla ${seed}: sin lago, fuera del corazón`).toBe(false);
     }
   });
 

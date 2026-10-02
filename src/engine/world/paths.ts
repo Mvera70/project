@@ -17,7 +17,7 @@ import { allocateLabour } from '../subsistence/labour';
 import { smithyWorking } from '../subsistence/building-counts';
 import { TERRAIN_CODE } from '../state';
 import type { GameState, PathEvent, Villager, VillagerId } from '../state';
-import { lastSearchBounds, route, stepCost } from './astar';
+import { lastSearchBounds, lastSearchExhausted, lastSearchSaw, route, stepCost } from './astar';
 import type { SearchBounds } from './astar';
 import { valleyRoadCells, wearValleyRoad } from './valley-road';
 import { plotAccess, solidKind, walkingBlocked, walkingMap } from './spatial';
@@ -267,10 +267,27 @@ function routeBetween(state: GameState, from: number, to: number, ground: number
   }))).sort((a, b) => a.distance - b.distance || a.a - b.a || a.b - b.b);
   let cells: number[] = [];
   let bounds = lastSearchBounds();
-  for (const pair of pairsToTry) {
+  // v5.73 · **Una búsqueda que no llega no se repite con cada pareja.** Si el
+  // destino no se alcanza —un pueblo que su propio cerco deja sin salida, una
+  // orilla sin vado—, cada pareja de entradas de las dos parcelas volvía a
+  // recorrer entera la misma zona, y con el valle de forma natural eso pasó a
+  // ser la mitad del tick (semilla 7: de 1 713 a 23 204 búsquedas fallidas en
+  // cuarenta años). La que falla ya dice qué se alcanza desde su salida: otra
+  // pareja que salga de esa zona hacia una celda que no miró, tampoco llega. Es
+  // exacto —la misma ruta, o ninguna, que probándolas todas— y la caché sólo
+  // guarda `bounds` para las rutas que llegan.
+  const hopeless = new Set<number>();
+  for (let i = 0; i < pairsToTry.length; i += 1) {
+    if (hopeless.has(i)) continue;
+    const pair = pairsToTry[i] as { a: number; b: number };
     cells = route(walking.map, pair.a, pair.b);
     bounds = lastSearchBounds();
     if (cells.length > 0) break;
+    if (!lastSearchExhausted()) continue;
+    for (let j = i + 1; j < pairsToTry.length; j += 1) {
+      const other = pairsToTry[j] as { a: number; b: number };
+      if (lastSearchSaw(other.a) && !lastSearchSaw(other.b)) hopeless.add(j);
+    }
   }
   // Un tope generoso: una aldea grande no llega a mil pares distintos, y sin
   // él una partida de dos siglos acumularía memoria sin necesidad.

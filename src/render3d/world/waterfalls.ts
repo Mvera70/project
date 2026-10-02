@@ -53,6 +53,27 @@ export interface Waterfalls {
 const LEAST_DROP = 1.5;
 /** A qué distancia del extremo del mapa baja la de cada garganta, en celdas. TUNE visual. */
 const GORGE_AT = 7;
+/**
+ * Dónde se busca la pared de cada garganta: a cuántas celdas del eje del río
+ * puede estar el borde de arriba de la caída, y a cuántas filas de `GORGE_AT`,
+ * hacia dentro y hacia fuera. TUNE visual.
+ *
+ * **Con el valle de forma natural (2 oct 2026, v5.73) la pared ya no está
+ * siempre a cinco u ocho celdas del río.** El contorno del valle llega hasta
+ * las gargantas (`valley-shape.ts`) y su falda de prado las ensancha: la roca
+ * arranca más lejos del río, y de cinco a ocho celdas sólo queda suelo llano o
+ * pinos al pie de la ladera. Medido en 60 valles (semillas 1 a 60) con la
+ * búsqueda de antes —alcance de 5 a 8, desvíos de hasta 4,5 filas—: en `main`
+ * las 120 gargantas tenían cascada; con el contorno, 109 (once valles sin la de
+ * una de sus gargantas), y las que había caían menos: mediana de 5,9 celdas
+ * frente a 8,6, y una de cada diez de menos de tres. Con esta búsqueda, más
+ * lejos y más a lo largo, y una puntuación que premia la pendiente —una pared
+ * lejana no puede ganar por tener un tramo largo de prado antes de caer—, son
+ * 120 de 120 con una caída mediana de 9,7 (una de cada diez, de menos de 8,8), y
+ * sobre los mapas de `main` da 120 de 120 y 9,6: no estropea el valle de antes.
+ */
+const FALL_REACH = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14] as const;
+const FALL_ROWS = [0, -1.5, 1.5, -3, 3, -4.5, 4.5, -6, 6, -7.5, 7.5] as const;
 /** Lo deprisa que bajan las vetas, en repeticiones de la textura por segundo.
  * TUNE visual: a 0,9 la cinta parecía quieta desde la cámara de reposo. */
 const FLOW = 1.5;
@@ -144,10 +165,11 @@ export function waterfallSites(map: ValleyMap, seed: number, heightAt: (x: numbe
     if (gorgeAt(map, z) < 0.3) continue;
     let best: Site | null = null;
     let bestScore = 0;
-    // Las dos paredes, a varias alturas: gana la que más cae de cara a la cámara.
+    // Las dos paredes, a varias alturas: gana la que más cae de cara a la
+    // cámara, y entre dos lejanas la que cae deprisa y no la que anda por prado.
     for (const side of [1, -1]) {
-      for (const offset of [0, -1.5, 1.5, -3, 3, -4.5, 4.5]) {
-        for (const reach of [5, 6, 7, 8]) {
+      for (const offset of FALL_ROWS) {
+        for (const reach of FALL_REACH) {
           const topZ = z + offset + (unit(seed, `fall:z:${end}`) - 0.5) * 2;
           const top = { x: valleyAxis(map, topZ) + side * reach, z: topZ };
           // El pie, en la orilla medida a su propia altura del valle: el eje
@@ -158,7 +180,8 @@ export function waterfallSites(map: ValleyMap, seed: number, heightAt: (x: numbe
           const candidate: Site = { kind: 'gorge', top, bottom };
           if (!clearOfTrees(candidate, trees)) continue;
           const drop = heightAt(top.x, top.z) - heightAt(bottom.x, bottom.z);
-          const value = drop < LEAST_DROP ? 0 : score(candidate, drop) / (1 + Math.abs(offset) * 0.04);
+          const slope = drop / Math.hypot(bottom.x - top.x, bottom.z - top.z);
+          const value = drop < LEAST_DROP ? 0 : score(candidate, drop) * slope / (1 + Math.abs(offset) * 0.04);
           if (value > bestScore) { bestScore = value; best = candidate; }
         }
       }

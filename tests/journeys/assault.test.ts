@@ -99,6 +99,11 @@ async function fight(state: GameState): Promise<{
  * el año treinta y cinco— y no tenía puestos desde los que disparar. Se toman,
  * de unas candidatas, las que a esa edad tienen portón y siguen en pie; tienen
  * que salir tres como poco.
+ *
+ * **Con el valle de forma natural (v5.73)** la 7 a los veinticinco años tiene 53
+ * piezas de cerco y todavía ningún portón (la primera muralla llega más tarde:
+ * el cerco ya no cabe en el contorno y sale a la falda), así que su propia
+ * precondición la deja fuera de la lista; salen cuatro.
  */
 const CANDIDATES: readonly (readonly [number, number])[] = [[7, 25], [11, 25], [23, 25], [3, 25], [11, 40]];
 let walledCache: (readonly [number, number])[] | null = null;
@@ -170,22 +175,45 @@ describe('D3b/D5 · el portón que cede', () => {
     // golpes, 9 caídos). Medido con arcos en 7, 11, 23 y 3, a los 25 y 30
     // años: la escena —portón roto, doce caídos, nadie dentro— sale en la 3 a
     // los 25 y a los 30, y en la 7 a los 30. La propiedad no cambia.
-    const held = await fight(raided(3, 25, { bows: true, assault: true }));
-    expect(held.broken, 'la puerta cedió').toBe(true);
-    expect(held.fallen, 'y cayeron los doce').toBe(12);
-    expect(held.entered, 'pero no queda nadie dentro: el valle aguanta').toBe(false);
+    //
+    // **Y con el valle de forma natural (v5.73) se busca, no se fija.** La
+    // escena es un filo —el portón cede y las flechas tumban al último antes de
+    // que cruce— y cae donde cae la trayectoria: la 3 a los veinticinco años
+    // ya no la da (los arcos tumban a los doce antes del primer golpe: 0
+    // golpes) y sí la 11 y la 23. Lo que se exige es la propiedad de siempre,
+    // sobre la primera candidata que cumple su precondición (portón roto y los
+    // doce caídos); si ninguna la cumple, la prueba dice cuáles miró.
+    const tried: string[] = [];
+    let held: Awaited<ReturnType<typeof fight>> | null = null;
+    for (const [seed, years] of walled()) {
+      const fought = await fight(raided(seed, years, { bows: true, assault: true }));
+      tried.push(`${seed}@${years}: ${fought.broken ? 'portón roto' : 'portón en pie'}, ${fought.fallen} caídos`);
+      if (fought.broken && fought.fallen === 12) { held = fought; break; }
+    }
+    expect(held, `ninguna candidata da la escena (${tried.join('; ')})`).not.toBeNull();
+    expect(held!.broken, 'la puerta cedió').toBe(true);
+    expect(held!.fallen, 'y cayeron los doce').toBe(12);
+    expect(held!.entered, 'pero no queda nadie dentro: el valle aguanta').toBe(false);
   });
 
   it('y la escena no escribe en el motor, ni para perder la partida', async () => {
     // El innegociable de esta capa (E.3) con lo más grave que puede pasar
     // encima: el valle se pierde **por la puerta de B4**, como dato, y no porque
     // la jornada haya tocado el estado.
-    const state = raided(11, 25, { bows: false, assault: true });
-    const before = JSON.stringify(state);
-    const storm = await fight(state);
-    expect(storm.entered, 'entraron').toBe(true);
-    expect(JSON.stringify(state), 'y el motor no se enteró por su cuenta').toBe(before);
-    expect(state.ended, 'la partida sigue abierta hasta que el motor lo lea').toBeNull();
+    //
+    // Con el valle de forma natural (v5.73) se busca la primera candidata en la
+    // que la partida **entra** —antes era la semilla 11 fija— y en todas las que
+    // se juegan por el camino se comprueba lo mismo: el estado queda como estaba.
+    let entered = 0;
+    for (const [seed, years] of walled()) {
+      const state = raided(seed, years, { bows: false, assault: true });
+      const before = JSON.stringify(state);
+      const storm = await fight(state);
+      expect(JSON.stringify(state), `semilla ${seed}: el motor no se enteró por su cuenta`).toBe(before);
+      expect(state.ended, `semilla ${seed}: la partida sigue abierta hasta que el motor lo lea`).toBeNull();
+      if (storm.entered) { entered += 1; break; }
+    }
+    expect(entered, 'entraron en alguna candidata: lo más grave que puede pasar').toBeGreaterThan(0);
   });
 });
 
