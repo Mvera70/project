@@ -1,5 +1,27 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · Tanda larga de modelos (dirección Sol 6)
+
+Base: `origin/main` en `aba7889b` (brief #55). Trabajo aislado de la copia local `art/astra-modelos`. Prioridad: Bloque 0 completo dentro de +30 llamadas y +60 000 triángulos en la villa grande. El motor queda fuera del alcance. Cada carril trae `main` antes de su PR y hace commit y push al acabar su bloque.
+
+| Carril / rama | Versión | Propiedad exclusiva | Integración y contrato |
+|---|---|---|---|
+| Astra 0 · `art/astra-b0-props` | v5.90 | `art/recipes/*-candidate/`, `artifacts/graphics/astra/` de IDs 0a–0o | Sol 6 integra por instancias en `render3d/world/`; estado existente, sin motor; límite conjunto de rendimiento |
+| Astra 1 · `art/astra-b1-boards` | v5.91 | Recetas y arte de IDs 1–7 | Sol 6 sustituye provisionales uno por uno; los anclajes de martillo siguen `hand_r` |
+| Astra 2 · `art/astra-b2-tailor` | v5.92 | Recetas y arte de IDs 8–11 | Sólo se integra tras K5 sastrería y lino en `main` |
+| Astra 3 · `art/astra-b3-armor` | v5.93 | Recetas y arte de IDs 12–15 | Sólo se modela metal; Sol 6 integra el peto de cuero existente |
+| Astra 4 · `art/astra-b4-mine` | v5.94 | Recetas y arte de IDs 16–19 | Sólo se modela; ruedas y carga con mallas y orígenes independientes |
+| Astra 5 · `art/astra-b5-visitors` | v5.95 | Recetas y arte de IDs 20–25 | Sol 6 integra sólo los accesorios con anclaje ya presente |
+| Astra 6 · `art/astra-b6-fauna` | v5.96 | Recetas y arte de IDs 26–29 | Sol 6 integra cigüeña, polluelo y mariposa si el coste cabe |
+| Astra 7 · `art/astra-b7-village` | v5.97 | Recetas y arte de IDs 30–33 | Sol 6 integra banco y carro donde ya exista sitio; resto, sólo modelo |
+| Astra 8 · `art/astra-b8-candidates` | v5.98 | Candidatos de IDs 34–35 | Sólo si los bloques 0–7 están terminados; requiere petición de Vera para mejorar el roble |
+| Dirección e informe · `art/astra-tanda-larga` | v5.99 | `docs/task-log.md`, mediciones, código de integración y PR en serie | `typecheck`, `lint`, pruebas afectadas, `npm run shot`; `gl-probe` y `scene-report` antes y después |
+
+Ficheros compartidos (`docs/changelog.md`, `docs/task-log.md`, `docs/plan-meta.md`, `tools/README.md`) los actualiza Sol 6 al integrar; Astra no toca código ni esos índices. Las recetas y arte de cada bloque tienen IDs exclusivos. No se toca `src/engine/`, ni se añaden sangre o fuego. Pendiente al cierre: informe de fusión, evidencia visual a escala móvil y medida en aparato real de Vera.
+
+decidido por Sol 6: se inicia en paralelo 0, 1 y 6 porque son independientes y el Bloque 0 conserva prioridad de revisión e integración.
+decidido por Sol 6: el Bloque 8 espera a que los bloques 0–7 estén completos; el roble no se modifica sin petición expresa de Vera, como indica el brief.
+
 ## 2 oct 2026 · La fauna por estaciones (v5.85)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
