@@ -1,0 +1,33 @@
+{
+  "id": "plate",
+  "triangles": 172,
+  "budget": 250,
+  "mount": {
+    "plate_spine": "spine"
+  },
+  "materials": 1,
+  "textures": 0,
+  "rigSha256": "cbc336551f462700a5ba04e94b76504718ee42a6a4b90864eebbeca6a6ef6d66",
+  "mountBoundsError": 2.9802322387695312e-08,
+  "mountedBoundsBlender": [
+    [
+      -0.15166667103767395,
+      -0.11916666477918625,
+      0.27000004053115845
+    ],
+    [
+      0.15166667103767395,
+      0.07666667550802231,
+      0.49166667461395264
+    ]
+  ],
+  "localUnits": "metres: use the bone scale, no extra scale",
+  "status": "candidate, metal model only",
+  "sha256": "7f96e30b227d4cf3e251ea3d0ac79ae2ad28a3973df7b25f24f5a0ddea062f6e",
+  "bytes": 14248,
+  "mountedSizeGltfCells": [
+    0.3033333420753479,
+    0.2216666340827942,
+    0.19583334028720856
+  ]
+}

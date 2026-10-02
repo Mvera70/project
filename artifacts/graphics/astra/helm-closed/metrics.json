@@ -1,0 +1,33 @@
+{
+  "id": "helm-closed",
+  "triangles": 102,
+  "budget": 150,
+  "mount": {
+    "helm-closed_head": "head"
+  },
+  "materials": 1,
+  "textures": 0,
+  "rigSha256": "cbc336551f462700a5ba04e94b76504718ee42a6a4b90864eebbeca6a6ef6d66",
+  "mountBoundsError": 1.1920928955078125e-07,
+  "mountedBoundsBlender": [
+    [
+      -0.09966667741537094,
+      -0.10583333671092987,
+      0.5100000500679016
+    ],
+    [
+      0.09966667741537094,
+      0.09733333438634872,
+      0.6850001811981201
+    ]
+  ],
+  "localUnits": "metres: use the bone scale, no extra scale",
+  "status": "candidate, metal model only",
+  "sha256": "d1224a3e4992263cf73ea8b836685f6cf9a7e64d741acd64e4067f5bc285a06a",
+  "bytes": 10740,
+  "mountedSizeGltfCells": [
+    0.19933335483074188,
+    0.1750001311302185,
+    0.2031666710972786
+  ]
+}

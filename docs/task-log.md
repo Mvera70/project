@@ -42,6 +42,11 @@ decidido por Sol 6: tras modelar los bloques 0–7 se mejoran los dos candidatos
 
 Bloque 1 antes/después contra Bloque 0 ya integrado, villa semilla 7/año 60/verano, misma consulta de `gl-probe` de 8 s: **522 → 494–499 llamadas (−23 a −28), 835 467 → 829 951–835 955 triángulos** (los personajes y animales cambian entre fotogramas), **48 → 48 programas**. `scene-report` tras el ajuste final de colocación: **503 → 490 mallas (−13), 207 → 188 sombras (−19), 796 668 → 797 180 triángulos (+512)**. SwiftShader sirve para comparar geometría y llamadas, no FPS. Capturas locales: `artifacts/graphics/astra-b1-integrated/village-rest.png` y `village-close-final.png`; siete hojas individuales en `artifacts/graphics/astra/<id>/sheet.png`.
 
+Bloque 1 integrado en `main` por PR #61; la puerta local pasó `typecheck`, `lint`, 23 pruebas rápidas pertinentes, 6 pruebas de jornada del reparto y `npm run shot`. La PR quedó en fusión automática con CI; verificar el último shard al cierre.
+
+decidido por Sol 6: el peto de cuero usa el GLB de Astra colgado directamente de `spine`, sin reducción adicional; el peto de cajas queda como respaldo si falta el recurso. Las diez mallas del banco de batalla dejan de proyectar sombra propia porque la silueta del aldeano ya la proyecta; se reducen diez pases de sombra sin perder la sombra del cuerpo.
+Bloque 3, sólo peto integrado en candidato; las seis armaduras metálicas siguen sólo como modelo. Banco de batalla `sandbox=battle`, semilla 7/año 60, diez defensores con peto frente a 24 asaltantes: `gl-probe` 8 s **710 → 707 llamadas, 905 307 → 905 413 triángulos, 53 → 52 programas** (combate variable). `scene-report`: **730 → 730 mallas, 198 → 188 sombras, 858 698 → 859 758 triángulos (+1 060)**. Prueba de ajuste con los GLB publicados: una malla, anchura 0,27–0,34 celdas y alto 0,17–0,22 sobre el hueso. Captura del banco: `artifacts/graphics/astra-b3-jerkin/battle.png`; hoja con aldeano, casa y silueta 20 px en `artifacts/graphics/astra/jerkin/sheet.png`.
+
 ## 2 oct 2026 · El cerco sin salida (v5.89)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
