@@ -1,5 +1,13 @@
 # Cuaderno de tareas — el rework
 
+## 2 oct 2026 · El 2D fuera del paquete del juego (v5.70)
+
+Rama `claude/sin-2d-en-el-paquete`, tanda nocturna. El Canvas 2D (`src/render/`)
+se queda para `?render=canvas` y como reserva, pero se pide con `import()`: el
+juego en 3D ya no lo descarga ni lo pinta detrás de la placa. Entrada de
+611,05 a 593,11 kB (gzip 194,96 → 188,07). Mientras carga, `data-render` dice
+`loading`. Nada abierto.
+
 ## 2 oct 2026 · Dientes de sierra en la tablet (v5.65)
 
 Rama `ccr-2befdb3e-qwp7lu`. La tablet de Vera es una **iPlay 70 mini Ultra**

@@ -393,10 +393,11 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   await page.locator('html[data-app-ready="true"]').waitFor();
   await answerAnyCrossroad(page);
   await test.expect(page.locator('.valley-date')).toContainText('Year 81');
-  // **El lienzo mide lo que mide el valle**, y desde el mapa grande son 72 × 112
-  // celdas: la ruta viva usa `cellFor`, que a 390 px de ancho da cinco píxeles
-  // por celda, así que el lienzo sigue cabiendo en la pantalla igual que antes.
-  await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
+  // Aquí se medía `#valley` a 360 px, y sólo era cierto porque el 2D pintaba
+  // escondido detrás de la placa de carga. Desde el 2 oct 2026 el juego en 3D
+  // no lo descarga: el tamaño del lienzo 2D lo guarda «la aplicación abre el
+  // valle…», que va con `?render=canvas`, y aquí se comprueba lo contrario
+  // después del relevo —que el 2D no ha pintado nunca—.
   // **Y se toca el centro del lienzo, no un punto fijo.** Era (180, 280) —el
   // centro del valle de 36 × 56 a diez píxeles— y con el mapa nuevo ese píxel
   // cayó en el cuadrante noroeste, donde no hay nada que abrir. El centro es
@@ -416,6 +417,9 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // `size()` lo estire. Medido así, el «centro» caía en (150, 75), o sea la
   // esquina de arriba, y ningún toque abría nada.
   await await3d(page, false);
+  // `sizeCanvas` es lo primero que hace el 2D al pintar: sin ancho escrito, no
+  // se ha descargado ni montado.
+  test.expect(await page.locator('#valley').evaluate((el) => (el as HTMLElement).style.width)).toBe('');
   const box = await canvas.boundingBox();
   // `force`, y con razón: contestar la encrucijada de arriba hace que el mapa
   // enfoque y **siga** a alguien de su reparto, y en Canvas eso es cambiar la

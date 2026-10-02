@@ -7230,6 +7230,15 @@ queda como puerta de vuelta en `?render=canvas` hasta que alguien abra el juego
 en un teléfono. Datos artificiales de estrés se etiquetan y no cuentan como
 evidencia de balance.
 
+**Y el 2D no viaja en el paquete del juego** (v5.70, 2 oct 2026). Hasta entonces
+`src/ui/backend.ts` lo importaba de entrada y lo montaba siempre: pintaba cada
+fotograma escondido detrás de la placa de carga mientras llegaba el 3D. Ahora
+el hueco de carga es un render vacío (`kind: 'loading'`, que es también lo que
+sella `data-render` hasta el relevo) y `src/render/` se pide con `import()`
+sólo con `?render=canvas` —lo que usan los recorridos de interfaz en un runner
+sin GPU— o si el 3D falla. La página de diagnóstico (`?debug=1` sin `live`)
+pinta su 2D desde `src/ui/debug-canvas.ts`, también bajo demanda.
+
 **Lo que los dos renders comparten vive en `src/derive/`** (v3.66), y esta
 frontera es tan normativa como las otras dos. Al migrar quedó que
 `src/render3d/` importaba ocho módulos de `src/render/` —paleta, animales,

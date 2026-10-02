@@ -1,5 +1,31 @@
 # The Valley — Registro de cambios
 
+## v5.70 · 2 oct 2026 · El 2D deja de viajar en el paquete del juego
+
+Vera, 2 oct: «si podemos evitar que se cargue [el 2D] mejor; si no se puede
+eliminar, no pasa nada». No se elimina —lo usan los recorridos de interfaz en
+un runner sin GPU (`?render=canvas`) y es la reserva si el 3D no llega—, pero
+el juego en 3D ya no lo descarga ni lo monta. Hasta hoy `src/ui/backend.ts` y
+`src/ui/debug.ts` lo importaban de entrada, y el 2D pintaba cada fotograma
+escondido detrás de la placa de carga.
+
+- **`backend.ts`:** `live` arranca como un render vacío `kind: 'loading'`
+  (`idleBackend`); `src/render/renderer` llega por `import()` sólo con
+  `?render=canvas` o en el `catch` del 3D. `data-render` dice `loading` hasta
+  el relevo, y en Canvas `onSwap` se llama también al llegar el 2D.
+- **`debug.ts`:** la pintura 2D de la página de diagnóstico y `auditSprites` se
+  mudan a `src/ui/debug-canvas.ts`, bajo demanda; `data-debug-ready` llega
+  después de pintar.
+- `src/render/crowd.ts` y `reactions.ts` se quedan en la entrada a propósito:
+  son lógica del inspector (`inspect.ts`), no dibujo.
+- **Medido** (`vite build`): el trozo de entrada baja de **611,05 a 593,11 kB**
+  (gzip 194,96 → 188,07). Los diez módulos de dibujo de `src/render/` y
+  `derive/palette` salen de él y viven en cinco trozos aparte (~19,7 kB) que el
+  juego en 3D no pide.
+- El recorrido «la ruta viva abre un valle maduro…» medía `#valley` a 360 px en
+  3D, cierto sólo porque el 2D pintaba escondido: ahora comprueba lo contrario,
+  que tras el relevo el 2D no ha pintado nunca.
+
 ## v5.65 · 2 oct 2026 · Dientes de sierra en la tablet: la resolución sólo baja si bajar sirve
 
 Vera, con su tablet (iPlay 70 mini Ultra, Adreno 725, Medium @60): «se ve muy
