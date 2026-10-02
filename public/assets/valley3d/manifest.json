@@ -1926,6 +1926,116 @@
         "source": "Astra, The Valley long model batch 2026-10-02; art/recipes/cart-candidate/cart.json",
         "license": "project-original"
       }
+    },
+    {
+      "id": "fiddle",
+      "file": "fiddle.glb",
+      "sha256": "0D7115F2F4B70B7D8144D3F5759145FC791D3BA8CFC5C613DFA16BB2F20F7A06",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "pilgrim-hat",
+      "file": "pilgrim-hat.glb",
+      "sha256": "04F1C3C3685B3C4CE92BB0ED738CBF86881194D126C23A9D150AE63BEDBEA849",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "pilgrim-staff",
+      "file": "pilgrim-staff.glb",
+      "sha256": "1141692090050540A7F6FBD5FFC7C9BC0F21A1CA0640D6DE2ADAE5D5441FA64A",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "grindstone-pack",
+      "file": "grindstone-pack.glb",
+      "sha256": "6C12F9F4D17706298A56A01307EFA3BD5EC75522E2C0949703DA008D0209F375",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "herb-basket",
+      "file": "herb-basket.glb",
+      "sha256": "5B00A816B4A18AB6BAE0FBE1B2BF990D0AA2E0143A659BE93B82566BB3830C8D",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "bundle-pack",
+      "file": "bundle-pack.glb",
+      "sha256": "59D4A7B48A544485E515CBF9E6AD3B919A8391F8AC08E9D379F9EF8D32647339",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "forage-basket",
+      "file": "forage-basket.glb",
+      "sha256": "513F5F10BE19AEA2A4B68E9E7B10EF5B4CF0FDB36CC14BE4F7E2A4A184093340",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "rope-pick",
+      "file": "rope-pick.glb",
+      "sha256": "5A5A5FDC8729308CFBD2782BFC75D6D9C29CCBEF53999CAB13E71AFBC84466BB",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "trade-pack",
+      "file": "trade-pack.glb",
+      "sha256": "5CF40250A3C69631B7817487EF0F810079D2B6018AC1E6B1026F091D8E060507",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      }
+    },
+    {
+      "id": "hide-bundle",
+      "file": "hide-bundle.glb",
+      "sha256": "D1E236DFE297C2A673501193711BCAABE14B9F20070268C864DF504F99788CE2",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Original The Valley model from the reproducible B5 recipe.",
+        "license": "project-original"
+      }
     }
   ]
 }
