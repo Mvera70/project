@@ -1,10 +1,12 @@
-// Admite los cinco GLB G-41 construidos por build-candidates.py. El constructor
+// Admite los cinco GLB de vivienda construidos por build-candidates.py. El constructor
 // genérico sólo entiende primitivas y omite candidateBuild (juntas y pivotes).
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 const catalogPath = 'art/catalog.json';
 const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
+const artRound = process.argv[2] ?? 'G-41';
+if (!/^G-\d+$/u.test(artRound)) throw new Error(`Ronda de arte inválida: ${artRound}`);
 const ids = ['house-twin-gable', 'house-hip-roof', 'stone-house-cross-gable', 'stone-house-tower-loft', 'stone-house'];
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex').toUpperCase();
 const round = (value) => Number(value.toFixed(6));
@@ -32,7 +34,7 @@ function inspect(bytes, id) {
 
 for (const id of ids) {
   const asset = catalog.assets.find((item) => item.id === id);
-  if (!asset || asset.artifactRound !== 'G-41') throw new Error(`${id}: falta la declaración G-41`);
+  if (!asset || !['G-41', artRound].includes(asset.artifactRound)) throw new Error(`${id}: falta la declaración de vivienda`);
   const source = `artifacts/graphics/astra/${id}`;
   const bytes = readFileSync(`${source}/${id}.glb`);
   const metrics = JSON.parse(readFileSync(`${source}/metrics.json`, 'utf8'));
@@ -50,7 +52,7 @@ for (const id of ids) {
     throw new Error(`${id}: materiales distintos de la receta`);
   }
   const digest = sha(bytes);
-  const directory = `artifacts/graphics/G-41/approved/${digest.slice(0, 16).toLowerCase()}`;
+  const directory = `artifacts/graphics/${artRound}/approved/${digest.slice(0, 16).toLowerCase()}`;
   mkdirSync(directory, { recursive: true });
   writeFileSync(`${directory}/${id}.glb`, bytes);
   const [minX, minY, minZ] = metrics.boundsBlenderCells.min;
@@ -58,6 +60,7 @@ for (const id of ids) {
   const min = [round(minX), round(minZ), round(-maxY)];
   const max = [round(maxX), round(maxZ), round(-minY)];
   asset.generator = 'art/recipes/house-variant-candidate/build-candidates.py';
+  asset.artifactRound = artRound;
   asset.approved = { runId: `astra-${digest.slice(0, 12).toLowerCase()}`, directory };
   asset.recipeSha256 = sha(recipeBytes);
   asset.bounds = { min, max, size: max.map((value, index) => round(value - min[index])) };

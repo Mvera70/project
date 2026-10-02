@@ -4896,3 +4896,24 @@ Capturas de la misma partida y cámara: `artifacts/graphics/astra-b2-tailor-base
 ## 2 oct 2026 · Decisiones de malla de viviendas V2
 
 decidido por Sol 6: diferenciar las cinco viviendas mediante dobles hastiales desiguales, pirámide de paja, cubierta transversal baja con porche, cruz elevada y altillo doméstico de 7,46 m; conservar literalmente las tres ventanas y todas las piezas de puerta, su bisagra y parcela 6×6 m. La altura del altillo se usa para que sobreviva la diferencia a escala de móvil; no añade ventanas ni almenas.
+
+## 2 oct 2026 · Corrección V3 de viviendas, tras rechazo de Vera (v5.102)
+
+Vera rechazó la V2 porque parecía inventada y pidió basarse en algo real. La
+V2 queda como antecedente del proceso, no como arte aprobado. Informe completo:
+`docs/historico/graphics-rounds/G-43.md`.
+Rama de integración `codex/house-variants-grounded`, desde `main` `2525e173`;
+ASTRA modeló en `7561abaa` y Sol 6 publicó y midió en esta rama.
+
+decidido por Sol 6: reemplazar las siluetas V2 por rasgos de cinco edificios documentados (Bayleaf, Boarhunt, Hangleton, Church Farmhouse y Sea Hill); los IDs técnicos heredados permanecen para no cambiar el selector de la escena.
+decidido por Sol 6: mantener la casa básica byte a byte, la parcela de 6×6 m y el acceso con el mismo pivote; permitir tres ventanas de tamaños y posiciones desiguales porque copiar los huecos V2 impedía representar las referencias.
+decidido por Sol 6: conservar la paja en las cuatro referencias que la muestran o la documentan, aunque el conjunto de piedra resulte menos variado por color; la diferencia se busca en masa y fachada sin introducir materiales ajenos a la paleta.
+decidido por Sol 6: admitir la cubierta sencilla de Hangleton como hipótesis de juego, explícitamente señalada como conjetural por el museo, y no presentar como medievales las partes reformadas de Church Farmhouse y Sea Hill.
+
+ASTRA reconstruyó cinco GLB con 884, 506, 734, 1090 y 842 triángulos; hojas
+individuales y comparación de cámara de reposo revisadas. La villa grande pasó
+de 549 a 553 llamadas y de 787 354 a 782 700 triángulos estables; aldea,
+430 a 426 llamadas y 723 528 a 720 382 triángulos estables. Mallas y sombras
+no subieron. Pasaron `typecheck`, `lint`, 15 pruebas rápidas, validador V3 y
+`npm run shot`. Capturas reales antes/después de caserío, aldea y villa en
+`artifacts/graphics/G-43/`.
