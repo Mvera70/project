@@ -6,7 +6,7 @@
 - La malla cuelga directamente de su hueso, con origen local cero.
 - Coordenadas locales de hueso en metros. **No aplicar otra escala 1/3**: ya la aporta el rig. La receta usa metros de Blender; `build.py` transforma con las matrices reales de `villager.glb`.
 - Paleta canónica (`palette.json`), sombreado facetado; metalness y roughness declarados en la receta.
-- Hoja: vistas tres cuartos desde arriba, frente y perfil sobre el aldeano publicado, en reposo; muestra adicional de silueta a unos 20 px. `metrics.json` incluye límites montados, hash del rig y error de reconstrucción del anclaje (1.2e-07 celdas).
+- Hoja: vistas tres cuartos desde arriba, frente y perfil sobre el aldeano publicado, en reposo; cuarta vista con `house.glb` junto al aldeano equipado a la misma escala física, y muestra adicional de silueta a unos 20 px. La casa conserva su escala publicada. `metrics.json` incluye límites montados, hash del rig y error de reconstrucción del anclaje (1.2e-07 celdas).
 
 ## Reconstrucción
 
@@ -15,6 +15,7 @@ Desde la raíz, PowerShell:
 ```powershell
 python art/recipes/jerkin-candidate/generate.py
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python art/recipes/jerkin-candidate/build.py
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python art/recipes/jerkin-candidate/context.py
 python art/recipes/jerkin-candidate/finish.py
 ```
 

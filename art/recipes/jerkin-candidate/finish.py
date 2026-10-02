@@ -16,11 +16,12 @@ for id in ids:
     stats['sha256']=hashlib.sha256(blob).hexdigest();stats['bytes']=len(blob)
     lo,hi=stats['mountedBoundsBlender'];stats['mountedSizeGltfCells']=[hi[0]-lo[0],hi[2]-lo[2],hi[1]-lo[1]]
     (out/'metrics.json').write_text(json.dumps(stats,indent=2)+'\n')
-    sheet=Image.new('RGB',(1800,870),'#ebe7dd');d=ImageDraw.Draw(sheet)
+    sheet=Image.new('RGB',(2400,870),'#ebe7dd');d=ImageDraw.Draw(sheet)
     d.text((20,15),f'{id} | {triangles} triangles | on published villager.glb',fill='#252920',font=font)
-    for index,name in enumerate(['quarter','front','profile']):
+    for index,name in enumerate(['quarter','front','profile','context']):
         image=Image.open(out/(name+'.png')).convert('RGB');sheet.paste(image,(index*600,55))
-        d.text((index*600+18,780),name,fill='#252920',font=font)
+        label='house.glb + villager.glb | shared scale' if name=='context' else name
+        d.text((index*600+18,780),label,fill='#252920',font=font)
     # Escala óptica: con ortho .9 y figura .65, el alto efectivo ronda 20 px.
     small=Image.open(out/'quarter.png').convert('RGB').resize((23,28),Image.Resampling.LANCZOS)
     sheet.paste(small,(20,824));sheet.paste(small.resize((138,168),Image.Resampling.NEAREST),(1650,695))
@@ -38,7 +39,7 @@ for id in ids:
 - {detail}
 - Coordenadas locales de hueso en metros. **No aplicar otra escala 1/3**: ya la aporta el rig. La receta usa metros de Blender; `build.py` transforma con las matrices reales de `villager.glb`.
 - Paleta canónica (`palette.json`), sombreado facetado; metalness y roughness declarados en la receta.
-- Hoja: vistas tres cuartos desde arriba, frente y perfil sobre el aldeano publicado, en reposo; muestra adicional de silueta a unos 20 px. `metrics.json` incluye límites montados, hash del rig y error de reconstrucción del anclaje ({stats['mountBoundsError']:.2g} celdas).
+- Hoja: vistas tres cuartos desde arriba, frente y perfil sobre el aldeano publicado, en reposo; cuarta vista con `house.glb` junto al aldeano equipado a la misma escala física, y muestra adicional de silueta a unos 20 px. La casa conserva su escala publicada. `metrics.json` incluye límites montados, hash del rig y error de reconstrucción del anclaje ({stats['mountBoundsError']:.2g} celdas).
 
 ## Reconstrucción
 
@@ -47,6 +48,7 @@ Desde la raíz, PowerShell:
 ```powershell
 python art/recipes/jerkin-candidate/generate.py
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python art/recipes/jerkin-candidate/build.py
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python art/recipes/jerkin-candidate/context.py
 python art/recipes/jerkin-candidate/finish.py
 ```
 
