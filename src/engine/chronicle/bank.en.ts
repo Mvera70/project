@@ -1065,21 +1065,24 @@ export const BANK: Record<string, string[]> = {
     'The smith turned to ploughshares that {season}. {wood} wood and {silver} silver for iron that bites the ground.',
   ],
   'smithy.ironware.ordered': [
-    'In the {season} of year {year} the forge burned {wood} wood into nails, hinges and pot-hooks, for whoever came up the road.',
+    'In the {season} of year {year} the forge burned {wood} wood into nails, hinges and pot-hooks for the road.',
     'Ironware for the road, year {year}: the smith worked for silver instead of for the valley.',
     'The charcoal went into hinges and nails that {season}. Someone would buy them.',
   ],
   'smithy.axes.done': [
     'The axes of year {year} had lost their edge by the {season}. The smith was free again.',
     'A year of good axes ended in the {season}.',
+    'By the {season} of year {year} the new axes were old ones. The woodcutters went back to plain iron.',
   ],
   'smithy.ploughshares.done': [
     'The ploughshares were worn back to plain iron by the {season} of year {year}.',
     'A year of easy furrows ended in the {season}.',
+    'The smith’s ploughshares had done their year by the {season}. The fields went back to the old iron.',
   ],
   'smithy.ironware.done': [
     'The last of the ironware went down the road in the {season} of year {year}. It had brought in {silver} silver.',
     'A year of nails and hinges sold: {silver} silver, by the {season} of year {year}.',
+    'The smith hung up the last hinge in the {season}. The road had paid {silver} silver for a year of them.',
   ],
   'rite.mass.held': [
     'The priest called them to mass in the {season} of year {year}. Nobody worked that day, and nobody minded.',
