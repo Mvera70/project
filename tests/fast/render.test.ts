@@ -12,6 +12,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { run } from '@engine/sim';
 import { advanceAccumulator } from '@ui/loop';
 import { roman } from '@ui/app';
+import { rectangleHeart } from '@engine/world/tiles';
 
 const SILHOUETTES = ['forest', 'meadow', 'field', 'water', 'path'] as const;
 
@@ -90,7 +91,7 @@ describe('M-16 · geometría y regiones', () => {
       width: WORLD.WIDTH, height: WORLD.HEIGHT,
       terrain: new Uint8Array(WORLD.WIDTH * WORLD.HEIGHT), traffic: new Uint16Array(WORLD.WIDTH * WORLD.HEIGHT),
       path: new Uint8Array(WORLD.WIDTH * WORLD.HEIGHT), ruins: new Uint8Array(WORLD.WIDTH * WORLD.HEIGHT),
-      forestAge: new Uint8Array(WORLD.WIDTH * WORLD.HEIGHT), forestStock: new Uint16Array(WORLD.WIDTH * WORLD.HEIGHT),
+      forestAge: new Uint8Array(WORLD.WIDTH * WORLD.HEIGHT), forestStock: new Uint16Array(WORLD.WIDTH * WORLD.HEIGHT), heart: rectangleHeart(),
     } satisfies ValleyMap;
     map.terrain[0] = TERRAIN_CODE.forest;
     map.terrain[1] = TERRAIN_CODE.forest;

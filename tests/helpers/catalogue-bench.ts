@@ -44,6 +44,7 @@ import { selectCrossroad } from '@engine/crossroads/select';
 import { applyOption } from '@engine/crossroads/resolve';
 import { fireSeeds } from '@engine/crossroads/seeds';
 import { fellForest } from '@engine/world/forest';
+import { rectangleHeart } from '@engine/world/tiles';
 
 const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 const YEAR = TIME.WEEKS_PER_YEAR;
@@ -71,7 +72,7 @@ function founded(seed: number): GameState {
       terrain: new Uint8Array(CELLS).fill(1, 0, Math.floor(CELLS * 0.45)),
       traffic: new Uint16Array(CELLS), path: new Uint8Array(CELLS),
       ruins: new Uint8Array(CELLS), forestAge: new Uint8Array(CELLS),
-      forestStock: new Uint16Array(CELLS),
+      forestStock: new Uint16Array(CELLS), heart: rectangleHeart(),
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,

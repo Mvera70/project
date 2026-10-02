@@ -1962,6 +1962,11 @@ export function boot(
       paint(0);
       if (lethargyFinished(progress)) {
         catchingUp = false;
+        // RD-2 · Por qué acabó la ausencia, para quien la mire desde fuera (el
+        // recorrido del parte de bienvenida): pagada entera, parada en el aviso
+        // de un asalto (`raid`) o en la semana que habría acabado la partida,
+        // que se deshace (`ending`).
+        document.documentElement.dataset.lethargy = progress.halted ?? (progress.ended ? 'ended' : 'paid');
         if (state.ended !== null) finish();
         else {
           // Commit the completed catch-up before the ordinary loop can mutate

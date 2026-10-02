@@ -174,32 +174,35 @@ describe('V-10 · sitios con vida', () => {
     // mirar la conectividad, tres de seis semillas no ofrecían plaza ni claro
     // en absoluto.
     //
-    // Cinco aquí y la sexta, la 37, aparte en la prueba de abajo.
-    for (const seed of [7, 11, 23, 31, 41]) expectCommons(seed);
+    // Cinco aquí y la sexta, la 7, aparte en la prueba de abajo.
+    //
+    // **La 37 sube a esta lista y la 7 baja** (valle de forma natural, 2 oct
+    // 2026, v5.73). La 37 estuvo aparte desde el 30 sep 2026: su aldea quedaba
+    // **encerrada** por una obra —su único portón (el 29, en 30,56) dejaba de
+    // tener camino desde la plaza en el tick 1067, cuando el motor abría la
+    // iglesia en (31,61), en la franja entre la muralla y el río—, y RD-3 (1 oct)
+    // la devolvió a verde sin tocar la regla de colocación, al mover la
+    // trayectoria. Ese defecto del motor —`placeBuilding` no comprueba que el
+    // portón se siga alcanzando— sigue intacto y le puede tocar a cualquier otra
+    // semilla; la 37 lleva verde desde entonces, y con el contorno nuevo también.
+    for (const seed of [11, 23, 31, 37, 41]) expectCommons(seed);
   });
 
-  // **La sexta, declarada en rojo con la propiedad intacta** (`CLAUDE.md`). No
-  // es el claro: es la aldea, que en la semilla 37 queda **encerrada**. Medido
-  // el 30 sep 2026: su único portón (el 29, en 30,56, puesto en el tick 266)
-  // deja de tener camino desde la plaza en el tick 1067, cuando el motor abre
-  // la obra de la iglesia en (31,61), en la franja entre la muralla y el río.
-  // Desde la plaza se llega a 299 celdas (a 3 650 un tick antes), y los dos
-  // prados con bosque alrededor se quedan fuera. `placeBuilding` comprueba que
-  // el edificio nuevo se alcance desde la plaza, pero no que el portón se siga
-  // alcanzando. Es un defecto del motor, sin arreglar en esta tanda porque
-  // cambiar la regla de colocación mueve todas las villas fijadas en las
-  // jornadas; cuando se arregle, esto se pone rojo y la 37 vuelve arriba.
-  //
-  // **Y vuelve a verde (RD-3, 1 oct 2026), sin que nadie toque la regla de
-  // colocación.** Retirar seis encrucijadas y reescribir ocho movió el flujo
-  // `crossroads` y con él la trayectoria de la 37: la iglesia ya no se abre en
-  // la franja que cierra el portón, y el `it.fails` de abajo pasa («Expect test
-  // to fail»; medido en la jornada completa del 1 oct). El defecto del motor
-  // —`placeBuilding` no comprueba que el portón se siga alcanzando— sigue
-  // intacto y le puede tocar a cualquier otra semilla: cuando vuelva, esto se
-  // pone de nuevo en `it.fails` con la semilla que lo muestre.
-  it('semilla 37 · la aldea no queda encerrada por una obra (desde RD-3)', () => {
-    expectCommons(37);
+  // **La sexta, declarada en rojo con la propiedad intacta** (`CLAUDE.md`).
+  // Con el valle de forma natural (2 oct 2026, v5.73) la aldea de la semilla 7 a
+  // los cuarenta años no tiene un claro a su alcance, y es **la trayectoria, no
+  // `detectGlade`**. Medido: con su cerco puesto el pueblo alcanza 1 039 celdas
+  // (3 876 sin muralla ni empalizada, y entonces el claro aparece); de ellas, 900
+  // son un único prado al que sólo se asoman 5 celdas de bosque —un claro pide
+  // 12—, y el prado con bosque alrededor (671 celdas, 54 de bosque) queda al otro
+  // lado del cerco. En `main` la misma semilla tiene su claro (1 421 celdas, 79
+  // de bosque, a su alcance). No es cosa de la 7: con cuarenta años de aldea hay
+  // claro en 23 de 24 valles en `main` (semillas 1 a 24; falta la 18) y en 20 con
+  // el contorno (faltan la 6, la 7, la 13 y la 17; en la 6, la 13 y la 17 el
+  // pueblo alcanza menos de 500 celdas). Cuando una jornada nueva la devuelva a
+  // verde («Expect test to fail»), sube a la lista de arriba.
+  it.fails('semilla 7 · la plaza, el vado y el claro se detectan y son alcanzables a los cuarenta años', () => {
+    expectCommons(7);
   });
 
   it('la plaza y el vado reciben visita en la mayoría de las jornadas', () => {

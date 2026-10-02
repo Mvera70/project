@@ -1,5 +1,5 @@
 import { BUILDINGS, BUILDING_RULES } from '../balance';
-import { HEART } from './tiles';
+import { heartBox, footprintInHeart } from './tiles';
 import { inPlaza, plazaCentre } from './plaza';
 import { TERRAIN_CODE } from '../state';
 import type { Building, BuildingKind, GameState } from '../state';
@@ -770,8 +770,12 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   // segundos —su presupuesto son 20— y la de balance de 18 minutos a más de
   // cincuenta. Acotar al corazón devuelve el coste que tenía.
   const defence = kind === 'palisade' || kind === 'wall' || kind === 'gate';
-  for (let y = defence ? 0 : HEART.y0; y <= (defence ? state.map.height : Math.min(HEART.y1, state.map.height)) - spec.h; y += 1) {
-    for (let x = defence ? 0 : HEART.x0; x <= (defence ? state.map.width : Math.min(HEART.x1, state.map.width)) - spec.w; x += 1) {
+  // El valle ya no es un rectángulo (2 oct 2026): se recorre la caja que lo
+  // contiene y se descarta lo que se sale del contorno.
+  const box = defence ? { x0: 0, y0: 0, x1: state.map.width, y1: state.map.height } : heartBox(state.map);
+  for (let y = box.y0; y <= box.y1 - spec.h; y += 1) {
+    for (let x = box.x0; x <= box.x1 - spec.w; x += 1) {
+    if (!defence && !footprintInHeart(state.map, x, y, spec.w, spec.h)) continue;
     // Primero el filtro barato: ampliar el cerco fuera del corazón no exige
     // comprobar reservas y edificios para las ocho mil celdas del mapa.
     if (kind === 'palisade' && (ring === null || !onRing({ x: x + 0.5, y: y + 0.5 }, centre, ring))) continue;

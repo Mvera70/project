@@ -23,6 +23,7 @@ import { applySpoilage, harvest, storageCapacity } from '@engine/subsistence/har
 import { isUnexplained, updateMood } from '@engine/subsistence/mood';
 import { rollWeather } from '@engine/subsistence/seasons';
 import { outbreakActive, rollFire, rollPlague } from '@engine/subsistence/disasters';
+import { rectangleHeart } from '@engine/world/tiles';
 
 const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 const CALM: TickContext = {
@@ -77,7 +78,7 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
       path: new Uint8Array(CELLS),
       ruins: new Uint8Array(CELLS),
       forestAge: new Uint8Array(CELLS),
-      forestStock: new Uint16Array(CELLS),
+      forestStock: new Uint16Array(CELLS), heart: rectangleHeart(),
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,

@@ -22,6 +22,7 @@ import { TERRAIN_CODE } from '@engine/state';
 import { PALETTES } from '@derive/palette';
 import { buildForest } from '../../src/render3d/world/forest';
 import { forestLooks } from '../../src/render3d/world/forest-state';
+import { sapling as isSapling } from '@engine/world/forest';
 import { planFor } from '../../src/render3d/world/plan';
 
 const grown = new Map<string, GameState>();
@@ -104,7 +105,11 @@ describe('G-10 · el bosque', () => {
     const felled = structuredClone(state);
     let cut = 0;
     for (let cell = 0; cell < felled.map.terrain.length && cut < 30; cell += 1) {
-      if (felled.map.terrain[cell] === TERRAIN_CODE.forest) {
+      // Árboles hechos: desde K2 el bosque brota, y un plantón se dibuja como
+      // plantón y no cuenta como árbol en pie. Con el valle de forma natural
+      // (v5.73) uno de los treinta primeros de esta aldea lo era, y la cuenta
+      // salía con uno de más.
+      if (felled.map.terrain[cell] === TERRAIN_CODE.forest && !isSapling(felled.map.forestAge[cell]!)) {
         felled.map.terrain[cell] = TERRAIN_CODE.cleared;
         cut += 1;
       }

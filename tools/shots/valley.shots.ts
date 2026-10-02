@@ -1077,11 +1077,17 @@ test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte d
   await test.expect.poll(async () => (await persistedCatchUp())?.savedAtMs ?? 0)
     .toBeGreaterThanOrEqual(returnAt);
   // RD-2 (30 sep 2026): la ausencia se paga entera **o se para en el aviso de
-  // un asalto**, que queda pendiente para que el jugador lo vea venir. Nunca
-  // se queda a medias sin motivo.
+  // un asalto**, que queda pendiente para que el jugador lo vea venir, **o en
+  // la semana que habría acabado la partida**, que se deshace: la aldea sigue
+  // viva, se guarda y se enseña el parte. Nunca se queda a medias sin motivo.
+  // La tercera salida faltaba aquí, y como el valle es el que salga en el menú
+  // (`rollSeed`), la prueba caía cada vez que tocaba uno que se habría muerto
+  // en esos dieciocho años (CI de #48, 2 oct 2026). La app dice cuál fue
+  // (`data-lethargy`).
   await test.expect.poll(async () => {
     const saved = await persistedCatchUp();
-    return (saved?.tick ?? 0) > 900 || saved?.warned === true;
+    const halt = await page.evaluate(() => document.documentElement.dataset.lethargy ?? '');
+    return (saved?.tick ?? 0) > 900 || saved?.warned === true || halt === 'ending';
   }).toBe(true);
   // Y eso **con el parte todavía en pantalla**, que es lo que la propiedad
   // pide: cerrar sobre la bienvenida no puede devolver el estado de antes.

@@ -20,7 +20,8 @@ import type { Era } from '@derive/era';
 import { GROUND_BIAS } from '../visual-config';
 import { liveWater, SHARED_WATER } from './water-surface';
 import { contactShade } from './contact-shade';
-import { gorgeAt, valleyAxis, valleyShoulder } from './valley-profile';
+import { gorgeAt, valleyAxis } from './valley-profile';
+import { distanceOutside } from '@engine/world/valley-shape';
 
 /**
  * How much a cell's colour varies from its neighbours of the same kind.
@@ -340,6 +341,13 @@ const GORGE_SLOPE = 1.8;
 const GORGE_RISE = 10;
 /** Lo ancha que es la orilla de la garganta a cada lado del eje del río, en celdas: el río y dos de ribera, como el mapa. */
 const GORGE_BANK = 3;
+/**
+ * TUNE visual (2 oct 2026): el hombro del valle, desde su borde. Llano hasta
+ * `SHOULDER_FLOOR` celdas fuera del contorno y sube en `SHOULDER_WALL`, la
+ * misma pared que tenía medida desde el río (0,27 del ancho del mapa).
+ */
+const SHOULDER_FLOOR = 0;
+const SHOULDER_WALL = 19.4;
 /** Cuántas celdas alrededor de un lago de montaña conservan la subida de siempre. TUNE visual. */
 const LAKE_CALM = 5;
 
@@ -396,6 +404,8 @@ function risesOf(map: ValleyMap): Float32Array {
     }
   }
 
+  // Lo lejos que queda cada celda del valle productivo: de ahí sube el hombro.
+  const outside = distanceOutside(map.heart);
   const rises = new Float32Array(cells);
   for (let cell = 0; cell < cells; cell += 1) {
     // Una montaña rodeada de montaña hasta el borde del mapa no tiene fondo
@@ -414,7 +424,13 @@ function risesOf(map: ValleyMap): Float32Array {
     // Y en la garganta el hombro del valle deja de aplastar la roca: el llano
     // ancho del centro no llega a los extremos, donde el mapa ya es un paso de
     // dos celdas de ribera a cada lado del río.
-    const open = valleyShoulder(map, cell % map.width + 0.5, Math.floor(cell / map.width) + 0.5);
+    // **Desde el borde del valle y no desde el eje del río** (2 oct 2026): con
+    // el hombro medido desde el río, la ladera subía en dos paredes paralelas a
+    // él estuviera donde estuviera el valle, y un contorno con lóbulos y
+    // espolones se leía igual que el rectángulo. Medida desde el contorno
+    // (`map.heart`), sube donde el valle acaba.
+    const lift = Math.max(0, Math.min(1, (outside[cell]! - SHOULDER_FLOOR) / SHOULDER_WALL));
+    const open = lift * lift * (3 - 2 * lift);
     const shoulder = open + (1 - open) * Math.min(1, inGorge * 2) * calm;
     // En la garganta de las entradas la roca sube más deprisa y más alto: son
     // las paredes del paso (`gorgeAt`, `valley-profile.ts`, 26 sep 2026).

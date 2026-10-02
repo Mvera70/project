@@ -466,7 +466,23 @@ describe('V-09 · trastos', () => {
   //
   // **Y con K1–K3 (v5.53) llega a tres** («Expect test to fail» en la CI del
   // 1 oct 2026): vuelve a `it`, sin tocar `PLAYED_OUT` ni la cota.
-  it('y tres veces seguidas, que es un peloteo largo', () => {
+  //
+  // **Y con el valle de forma natural (v5.73, 2 oct 2026) vuelve a no llegar:
+  // `it.fails`, con la propiedad intacta** («expected 2 to be greater than or
+  // equal to 3» en la CI). La villa de cuarenta años de cada semilla es otra y en
+  // las 36 jornadas la cadena más larga es de **dos**, en tres jornadas; la
+  // semilla 11 juega mucho (cinco jornadas con de 7 a 15 pases) y no pasa nunca
+  // de dos. Medido en las mismas 36 jornadas en `main`: una cadena de cuatro
+  // (semilla 3, día 14, ocho pases) y tres de dos. **Y no es el valle**: en 180
+  // jornadas (las 36 y otras 144 de las mismas seis semillas, en otros días) sale
+  // una cadena de tres o más en una con el contorno (semilla 23, día 22) y en dos
+  // en `main` (semilla 3, día 14, de cuatro; semilla 7, día 9, de tres), y un pase
+  // se devuelve en 27 jornadas con el contorno y en 26 en `main`. Es la
+  // alineación rara de siempre, una jornada de cada cien o doscientas, así que una
+  // ventana de 36 la da o no la da por suerte. Ni `PLAYED_OUT` ni la cota se
+  // tocan, y cuando otra trayectoria vuelva a darla saltará «Expect test to fail»
+  // y volverá a `it`.
+  it.fails('y tres veces seguidas, que es un peloteo largo', () => {
     // **Esto estaba declarado en rojo y con el mapa grande sale verde.** La
     // medida anterior, en los valles de 36 × 56, era de setenta y dos muestras
     // sin una sola cadena de tres, y quedó escrita con `it.fails` en vez de
