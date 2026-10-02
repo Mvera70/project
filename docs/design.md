@@ -84,7 +84,7 @@ Las de `valle.md` siguen todas en pie. Estas son las que se cierran aquí.
 | Presentación de datos | **Diegética primero** | El valle es el HUD; cifras solo al tocar |
 | Unidad de simulación | **La semana** | 48 semanas/año; barato de simular siglos |
 | Persistencia | IndexedDB, snapshot + registro de decisiones | Determinismo verificable |
-| Escala del mapa | **72 × 112**, con corazón productivo de 36 × 56 | v3.68: el valle es el centro de algo más amplio, y la economía sólo mide el corazón (§7) |
+| Escala del mapa | **72 × 112**, con un corazón productivo de la superficie de 36 × 56 y **forma natural** desde v5.73 | v3.68: el valle es el centro de algo más amplio, y la economía sólo mide el corazón (§7); v5.73: el corazón deja de ser un rectángulo (§7.1, paso 2b) |
 | Catálogo inicial | 16 plantillas de encrucijada | Suficiente para validar el hito 0 |
 | Fuente de letalidad | **La acumulación de lo que el jugador metió** (M-1, 17 sep 2026); antes: «las encrucijadas, no el mundo» | El jugador sigue siendo el cuello de botella, y ahora también por lo que **tiene**: más ganado, más lobos; más bosque talado, más riada; más grano y más plata, más ladrones y más señor |
 
@@ -1138,6 +1138,22 @@ centro.** El valle corre norte-sur y el río baja por él.
 > píxeles por celda en vez de diez: es una consecuencia declarada de esta
 > revisión, y la puerta de `?render=canvas` se queda por lo que dice §D.5.
 
+> **Revisión v5.73, 2 oct 2026 — el valle con forma natural.** Vera: «el
+> valle es muy cuadrado, debería tener una forma más natural, y hay zonas muy
+> desaprovechadas» (marcó las dos laderas grandes del norte, a los lados de la
+> garganta). Medido en `main` (`docs/medidas/valle-forma-2026-10-02.md`): no
+> faltaba sitio —la aldea usa el 31 % del corazón en sesenta años— y lo que
+> sobraba se veía: 1 823 celdas de prado alrededor del rectángulo que en el
+> 97 % no pisa nadie nunca. **El corazón deja de ser el rectángulo** y pasa a
+> ser un contorno que sigue al río (§7.1, paso 2b) **con la misma superficie**:
+> decidido por Vera con la propuesta delante, igual que el borde con falda de
+> prado alrededor. La economía no se entera: el bosque de partida y
+> `forestLeft` siguen midiéndose contra `HEART_WIDTH × HEART_HEIGHT`, y la
+> escalera en horas queda donde estaba (edad de piedra 61 h frente a 63, villa
+> cerrada 329 h frente a 331, en 24 semillas). El contorno lo guarda el mapa
+> (`map.heart`, esquema 13); una partida de antes lo recibe como el rectángulo
+> con el que se generó.
+
 > **Cambio respecto a `valle.md` §7.** El documento original decía 56 × 36, y
 > hasta v3.68 esto fueron 36 × 56 por la razón que sigue valiendo para el
 > corazón: con 390 px de ancho, 56 celdas de ancho dan celdas de 6,9 px, una
@@ -1145,14 +1161,31 @@ centro.** El valle corre norte-sur y el río baja por él.
 
 ### 7.1 Generación del mapa
 
-Determinista a partir del flujo `map`. **Ocho pasos** desde v3.68, en orden —los
-cinco de siempre dentro del corazón, y tres que llenan y abren el valle grande:
+Determinista a partir del flujo `map`. **Nueve pasos** desde v5.73, en orden —el
+contorno del valle detrás del río, los de siempre dentro de él, y tres que llenan
+y abren el valle grande:
 
 1. **Base.** Todo `meadow`.
 2. **Río.** Entra por el borde norte en `x ∈ [10, 26]` y baja hasta el borde sur
    mediante un paseo aleatorio con sesgo (65 % avanzar, 35 % desviarse), de 2
    celdas de ancho, ensanchando a 3 en el último tercio. Nunca se bifurca. El
    recorrido largo es el eje visual del valle.
+
+   **2b. El valle** (v5.73, `world/valley-shape.ts`). El contorno productivo,
+   que hasta v5.73 era el rectángulo de 36 × 56 del centro. Crece desde el claro
+   de fundación, celda a celda, por la vecina con más puntuación, hasta la
+   superficie del rectángulo: así sale de una pieza y con el área justa. La
+   puntuación es 1 sobre el río y 0 en la orilla de una media anchura que cambia
+   a lo largo del valle (`VALLEY_SHAPE.HALF`, `WAVER`), panzuda en el centro y
+   cerrándose hacia las dos gargantas; le suman **lóbulos** —dos al norte, a
+   los lados de la garganta, y uno o dos al sur— y le restan **espolones** que
+   bajan de la ladera, y un borde rugoso a dos escalas. Lo que queda cercado por
+   el valle se rellena. Medido en 200 valles: una pieza siempre, de 2 016 a
+   2 038 celdas, el borde con 308 a 406 aristas (el rectángulo, 184) y las dos
+   laderas del norte dentro en 161. Desde aquí «el corazón» es este contorno
+   (`inHeart(map, x, y)`, `tiles.ts`); el rectángulo de `HEART` sólo decide por
+   dónde entra el río y dónde puede caer el claro, y es el contorno de las
+   partidas de antes.
 3. **Bosque.** Ruido de valor de dos octavas (celdas de 8 y de 4), umbral tal que
    cubra el 20–26 % del mapa. Se sesga hacia las laderas este y oeste y hacia el
    extremo norte: la aldea nace en claro, en el tercio central, y el bosque es lo
@@ -1170,12 +1203,18 @@ cinco de siempre dentro del corazón, y tres que llenan y abren el valle grande:
    aldea sin ruta —medido, cuatro rutas para treinta y nueve personas—, mientras
    la ficción hablaba del vado en veinte líneas del banco.
 7. **Lago.** Una mancha de 40–80 celdas de agua quieta en la falda, fuera del
-   corazón y lejos del río. Antes que la montaña, para que la roca crezca
+   valle y lejos del río. Antes que la montaña, para que la roca crezca
    alrededor del agua y no al revés.
-8. **Montaña.** El cinturón que cierra el valle, fuera del corazón: probabilidad
-   creciente con la distancia al corazón —pie a 4 celdas, roca maciza a 14— con
-   ruido encima para que el borde no sea un rectángulo. Nunca dentro del corazón
-   ni sobre el claro reservado, y nunca sobre el cauce.
+8. **Montaña.** El cinturón que cierra el valle, fuera del contorno: probabilidad
+   creciente con la distancia **al contorno** (una distancia de chaflán,
+   `distanceOutside`) —pie a 4 celdas, roca maciza a 14— con ruido encima. Así
+   la montaña sigue al valle en vez de dibujar un marco, y alrededor queda la
+   falda de prado (en la primera celda de fuera, un 0,7 % de montaña en 200
+   valles). Nunca dentro del valle ni sobre el claro reservado, y nunca sobre el
+   cauce. **Y el relieve del 3D sube desde ese mismo borde** (`risesOf`,
+   `ground.ts`): hasta v5.73 el hombro se medía desde el eje del río, y la
+   ladera subía en dos paredes paralelas a él estuviera donde estuviera el
+   valle.
 
 **Sitio de fundación.** Se puntúa cada celda candidata por: distancia al río
 (óptimo 3–6 celdas), pradera contigua libre en 12×12, distancia al centro del
@@ -3373,8 +3412,9 @@ Con cielo claro están invisibles y no cuestan nada.
 
 **El rayo, con dos decisiones medidas en captura:**
 
-- **Cae en el corazón del valle** (§7.1, `HEART`) y no en cualquier punto del
-  mapa. El mapa son 72 × 112 celdas y la vista de reposo enseña unas 26: un rayo
+- **Cae en el corazón del valle** (§7.1; desde v5.73, dentro del contorno, con
+  una tirada en la caja que lo contiene que se repite mientras caiga fuera) y no
+  en cualquier punto del mapa. El mapa son 72 × 112 celdas y la vista de reposo enseña unas 26: un rayo
   repartido por todo el mapa caía fuera de cámara nueve de cada diez veces.
 - **Mide veinte celdas y son tres hebras.** Con cuarenta, la cámara isométrica
   lo proyectaba como una raya que cruzaba la pantalla de esquina a esquina y
@@ -4827,6 +4867,18 @@ export const WORLD = {
   TRAFFIC_DECAY: 0.005,         // por tick
   STONE_PER_BP: 0.5,
   VIRGIN_FOREST: 255,           // §9: marca de `forestAge` en el bosque viejo
+} as const;
+
+// v5.73 · el contorno del valle (§7.1, paso 2b). Geometría y no economía: deciden
+// dónde está el valle, no cuánto da. TUNE, mirados en planta y en captura.
+export const VALLEY_SHAPE = {
+  ENDS: 10,                     // filas de cada extremo que son garganta
+  HALF: 19, WAVER: 0.3, WAVE: 14, NARROW: 0.12, BELLY: 0.7,
+  NORTH_LOBE_ROWS: [26, 34], NORTH_LOBE_TILT: [0.15, 0.45],
+  LOBES: [1, 2], LOBE_ROWS: [50, 88], LOBE_SWING: 1,
+  LOBE_LENGTH: [11, 16], LOBE_RADIUS: [5.5, 8], LOBE_ROOT: 0.6,
+  SPURS: [1, 2], SPUR_ROWS: [25, 87], SPUR_DEPTH: [5, 9], SPUR_RADIUS: [3, 5], SPUR_CUT: 0.6,
+  ROUGH_SCALES: [5, 2.5], ROUGH: [0.18, 0.1],
 } as const;
 ```
 

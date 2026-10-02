@@ -1,5 +1,53 @@
 # The Valley — Registro de cambios
 
+## v5.73 · 2 oct 2026 · El valle con forma natural
+
+Vera: «el valle es muy cuadrado, debería tener una forma más natural, y hay
+zonas muy desaprovechadas» (marcó las dos laderas grandes del norte, a los lados
+de la garganta). **Medido antes en `main`** (`docs/medidas/valle-forma-2026-10-02.md`):
+no faltaba sitio —la aldea usa el 31 % del corazón en sesenta años— y lo que
+sobraba se veía: 1 823 celdas de prado alrededor del rectángulo que en el 97 %
+no pisa nadie nunca. Con la propuesta delante, en su ángulo (cenital), Vera
+decidió: **la misma superficie, con falda de prado**; y para el cinturón, pasto,
+bosque de ladera y cantera como vida, sin tocar el balance (eso va en v5.74).
+
+- **El contorno** (`world/valley-shape.ts`, §7.1 paso 2b). Crece desde el claro
+  de fundación por la vecina mejor puntuada hasta la superficie del rectángulo:
+  sigue al río, ancho en el centro y cerrándose hacia las gargantas, con
+  lóbulos —dos al norte, a los lados de la garganta— y espolones, y lo que queda
+  cercado se rellena. Las constantes, todas geometría, en `VALLEY_SHAPE`.
+- **Lo guarda el mapa** (`map.heart`, **esquema 13**), y con él cambia
+  `inHeart(map, x, y)`: el bosque, la roca y el brote del bosque, dentro; el
+  lago y la montaña, por la distancia al contorno (`distanceOutside`); los
+  solares, en la caja del contorno y con la huella entera dentro. **Migración**:
+  una partida del esquema 12 recibe el rectángulo, que es con lo que se generó
+  su mapa.
+- **La economía no se entera**: el bosque de partida y `forestLeft` siguen
+  midiéndose contra `HEART_WIDTH × HEART_HEIGHT`. Escalera (24 semillas, horas
+  a ×1): edad de piedra 63 → 61 h, villa cerrada 331 → 329 h, población final
+  52 → 56, las mismas dos partidas acabadas. Lo que se mueve es la primera
+  muralla (157 → 193 h): el cerco ya no cabe dentro del contorno y se levanta en
+  la falda.
+- **El relieve sube desde el borde del valle** (`risesOf`, `ground.ts`) y no
+  desde el eje del río, que levantaba dos paredes paralelas a él estuviera donde
+  estuviera el valle. Y el rayo cae dentro del contorno.
+- **Un fallo de verdad, destapado**: `reachableNear` (`life/terrain.ts`) se
+  quedaba en un rincón de una celda cuando el centro del pueblo caía en una
+  casa, y en esa aldea no nacía ninguna presa. Ahora se salta los rincones.
+- **Pruebas.** Nuevas: `valley-shape.test.ts` (una pieza, sin agujeros, la
+  superficie, el claro dentro, el terreno en su sitio, un borde que no es el
+  del rectángulo, las laderas del norte dentro en la mayoría, la falda de prado)
+  y la migración en `save.test.ts`. Las que se mueven, cada una con su causa:
+  los lobos, el albañil y el jabalí se miran en un valle que cumple su
+  condición, buscado entre varios (la semilla 7 ya no la cumplía); los trastos
+  del corral se suman en cinco valles; la tala corta árboles hechos y no
+  plantones; la prueba de rutas absorbe lo abaratado antes de medir; y
+  `module-graph` aprende los dos módulos nuevos del mapa. Suite rápida entera en
+  local: 213 ficheros, 2 107 pruebas.
+- **Abierto**: la cantera lejana (con la roca a más de catorce celdas, al
+  albañil se le acaba la jornada antes de cargar: 15 valles de 60 en `main`, 20
+  con el contorno; es de v5.74) y la muralla en la falda, si pide nivelado.
+
 ## v5.72 · 2 oct 2026 · K7: el epitafio dice por qué cayó el valle
 
 **Medido antes** (`docs/medidas/k7-caidas-2026-10-02.md`, informe nuevo
