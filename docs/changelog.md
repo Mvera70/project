@@ -67,6 +67,44 @@ bosque de ladera y cantera como vida, sin tocar el balance (eso va en v5.74).
   del portón, en su propia ronda); y la mitad de sitio para campos cerca de la
   plaza (unos 245 → 144 sitios de 3×2 a 18 celdas).
 
+## v5.81 · 2 oct 2026 · La vida en porcentaje, y lo que protege cada pieza
+
+**Por qué.** Vera, al ver los petos: «el cuero no debe proteger mucho»; la
+armadura «para unas cosas sí y para otras no» (el cuero, quizá para una
+flecha, no para una espada); y, más adelante, el metal con probabilidad de que
+la flecha rebote. Hasta aquí el combate contaba golpes —una flecha tumba, la
+mano necesita tres— y no había dónde poner una armadura.
+
+**Lo que cambia.** Cada cuerpo del asalto tiene vida de 1 a 0
+(`render3d/life/wounds.ts`). Cada arma quita una parte a cuerpo descubierto: la
+flecha, todo (sigue tumbando de un tiro); la lanza, el 34 %; la espada, el 55 %.
+Cada pieza protege una parte de cada arma y puede hacer rebotar el golpe: el
+peto, el 15 % de la flecha (Vera: «el cuero protege un 15 %, la flecha quita
+85») y el 10 % de la lanza. **La tabla ya trae las cuatro piezas de la
+escalera** (cuero, cota, placas, arnés) con su rebote, y qué zona cubre cada
+una, para que la llegada del metal y de las partes del cuerpo sea una fila y no
+un rediseño. El rebote se tira con un hash del paso, nunca con azar del motor.
+
+**El motor, una sola vez.** El peto decide ahora en la escena, así que el parte
+(`PlayerAct` `battle`) trae `spared`, los que siguen en pie gracias a él, y
+`settle` ya no levanta a la mitad otra vez: sólo los cuenta en la crónica. Un
+parte sin `spared` conserva la regla vieja. La suite rápida entera pasa en local.
+
+**Medido** (`docs/medidas/dano-por-arma-2026-10-02.md`, 20 asaltos × 4
+configuraciones con relieve): **sin peto, el asalto da exactamente lo mismo que
+antes**; con peto pesa lo que pesaba en el motor, unas décimas de caído por
+asalto, y en el cuerpo a cuerpo largo los del peto tumban un 57 % más. La
+primera lectura, la flecha «quita un 15 %», se midió y no vale: el cerco caía
+en 20 de 20 asaltos mirados.
+
+**Apuntado, sin hacer**, en `docs/plan-meta.md` (AR) y `docs/encargos-3d.md`:
+las cuatro edades de la armadura con sus hitos (Cuero: la herrería; Hierro: la
+primera mina; Acero: la villa cerrada de piedra; Caballeros: el castillo y el
+rey) y la minería, con la mina que Vera quiere ver. Las ideas, repartidas en
+`docs/ideas.md`. **Abierto, de Vera:** si el rey pasa a la Edad de los
+Caballeros (`design.md`, v4.66). Una línea de crónica retocada
+(`raid.held.jerkins`): no es nueva, no pide imagen.
+
 ## v5.80 · 2 oct 2026 · El peto se ve en la muralla, y la escena lo sabe
 
 **Por qué.** Desde v5.75 la herrería hace petos de cuero y el motor levanta a la

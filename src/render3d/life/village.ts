@@ -445,9 +445,15 @@ export interface Village {
     /** De `hits`, los de flecha (el resto son de lanza). */
     readonly arrowHits: number;
     readonly fallen: number;
+    /** v5.81 · Los del clan tocados que siguen en pie (`wounds.ts`). */
+    readonly wounded: number;
     /** D4 · Los de la aldea que han caído defendiendo su puesto. */
     readonly lost: number;
-    /** K5 · El peto en la pelea, en sombra (`jerkinTally`). No entra en el parte. */
+    /**
+     * K5/v5.81 · La armadura en la pelea (`jerkinTally`): decide con la tabla de
+     * `wounds.ts`, y `spared` —los que siguen en pie gracias a ella— entra en
+     * el parte para la crónica.
+     */
     readonly jerkins: JerkinTally;
     /**
      * D5 · Los golpes que lleva el portón y si ha cedido, cuando hay asalto.
@@ -537,12 +543,6 @@ export interface DayOptions {
   readonly battle?: {
     readonly raiders: number;
     readonly garrison: Garrison;
-    /**
-     * K5 · Golpes de más que aguanta un peto en la pelea (`stepMelee`). Sin
-     * esto, cero: en el juego **el peto no decide en la escena**, decide en el
-     * motor. Sólo el banco y el informe lo ponen, para medirlo.
-     */
-    readonly jerkinBlows?: number;
   };
   /**
    * F-0 · **La flecha que toca, en sombra** (29 sep 2026,
@@ -1685,6 +1685,9 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         hits: raiders.reduce((sum, raider) => sum + raider.hits, 0),
         arrowHits: raiders.reduce((sum, raider) => sum + (raider.arrowHits ?? 0), 0),
         fallen: raiders.filter((raider) => raider.phase === 'down').length,
+        // v5.81 · tocados y en pie: con la vida en porcentaje, una flecha ya no tumba.
+        wounded: raiders.filter((raider) => raider.phase !== 'down' && raider.phase !== 'gone'
+          && (raider.health ?? 1) < 1).length,
         // D4 · los nuestros que han caído defendiendo. Es el `lost` del parte
         // de B4, y es la primera vez que este número no es cero.
         lost: fallenDefenders([...wounded.values()]),
@@ -3039,12 +3042,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           if (there === undefined) continue;
           const already = wounded.get(there.villager);
           const defender: Defender = already ?? {
-            at: there.body, post, hits: 0, down: false, jerkin: post.jerkin,
+            at: there.body, post, hits: 0, down: false,
+            // v5.81 · el peto, si el encargo dura: ya decide (`wounds.ts`).
+            ...(post.jerkin ? { armour: 'jerkin' as const } : {}),
           };
           wounded.set(there.villager, defender);
           defenders.push(defender);
         }
-        stepMelee(raiders, defenders, steps, options.battle?.jerkinBlows ?? 0);
+        stepMelee(raiders, defenders, steps);
       }
 
       // Física nacida en la transición exacta a `down`, no al FPS al que el

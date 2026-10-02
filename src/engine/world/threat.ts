@@ -242,6 +242,8 @@ export interface Battle {
   slain: number;
   lost: number;
   breached: boolean;
+  /** v5.81 · Los que la armadura dejó en pie en la escena (ver `PlayerAct`). */
+  spared?: number;
 }
 
 /**
@@ -289,8 +291,17 @@ function settle(state: GameState, battle?: Battle): ThreatEvent {
   // K5 · **el peto**: de los que cayeron en la muralla, una parte se levanta.
   // Sin dados —un acto del jugador no puede desplazar la partida— y sólo si el
   // encargo de la herrería sigue en marcha la semana de la pelea.
-  const jerkins = orderLive(state, 'jerkins') ? Math.floor(ours * BOARDS.JERKIN_SAVE) : 0;
-  const buried = fall(state, ours - jerkins);
+  //
+  // v5.81 · **Y una sola vez.** Desde la vida en porcentaje la escena aplica la
+  // armadura golpe a golpe (`render3d/life/wounds.ts`) y el parte trae a los que
+  // dejó en pie (`spared`): esos ya no están en `lost`, así que levantar además
+  // la mitad sería contar el peto dos veces. Con `spared`, el motor sólo lo
+  // cuenta para la crónica; sin él —un parte que no sabe de armaduras—, aplica
+  // la suya.
+  const live = orderLive(state, 'jerkins');
+  const raised = live && battle?.spared === undefined ? Math.floor(ours * BOARDS.JERKIN_SAVE) : 0;
+  const jerkins = live ? (battle?.spared ?? raised) : 0;
+  const buried = fall(state, ours - raised);
 
   if (!breached) {
     // E4 · el cerco aguantó, pero desde fuera prendieron tejados.
