@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "id": "bundle-pack",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "clothaccent",
+      "role": "clothAccent",
+      "color": "#A96146",
+      "roughness": 0.94
+    },
+    {
+      "name": "neighborlinen",
+      "role": "neighborLinen",
+      "color": "#D3C1A0",
+      "roughness": 0.94
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "mount",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "connectors": [
+    "mount"
+  ],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "bundle-pack",
+    "footprint": [
+      1,
+      1
+    ],
+    "attachment": "spine",
+    "note": "Bloque 5. Metros fuente a celdas; frente +Z glTF. Origen en enganche, NO en base. Ajuste de montaje medido contra el nodo publicado en attachment.json; escala inversa del padre para evitar escala doble. Recurso est\u00e1tico preview-only."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0
+    ],
+    "orthoScale": 1,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "ClothBundle",
+      "location": [
+        0,
+        0.35,
+        0.23
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.61,
+        0.43,
+        0.74
+      ],
+      "segments": 7,
+      "rings": 3,
+      "material": "clothaccent",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Strap0",
+      "location": [
+        -0.2,
+        0.125,
+        0.23
+      ],
+      "dimensions": [
+        0.07,
+        0.03,
+        0.7
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Strap1",
+      "location": [
+        0.2,
+        0.125,
+        0.23
+      ],
+      "dimensions": [
+        0.07,
+        0.03,
+        0.7
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "CrossTie",
+      "location": [
+        0,
+        0.579,
+        0.26
+      ],
+      "dimensions": [
+        0.55,
+        0.03,
+        0.07
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "LongTie",
+      "location": [
+        0,
+        0.579,
+        0.25
+      ],
+      "dimensions": [
+        0.065,
+        0.03,
+        0.59
+      ],
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Knot",
+      "location": [
+        0,
+        0.61,
+        0.26
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.12,
+        0.085,
+        0.11
+      ],
+      "segments": 4,
+      "rings": 3,
+      "material": "neighborlinen",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

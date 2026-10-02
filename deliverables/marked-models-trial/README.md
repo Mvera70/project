@@ -168,3 +168,33 @@ contra el GLB publicado antes del cambio.
 
 La golondrina y la perdiz se quedan las de siempre: se probaron otras y Vera
 prefirió las suyas.
+
+## Los animales rehechos (2 oct 2026, v5.100)
+
+Vera: «los modelos de Astra de los animales no me gustan, los corregirás tú con
+el estilo que has ido usando con los últimos», y tras cinco vueltas dentro de
+los topes del encargo de Astra, «para y hazlos bien, con la calidad de los que
+tenemos ahora». Seis funciones en `build-models.py`, cada una **de la receta de
+su animal del valle, casi literal y con su densidad**:
+
+| ID | De qué receta | Triángulos | Esqueleto y clips |
+|---|---|---|---|
+| `horse` | `mule()` sin albarda, ×1,22 (`HORSE_SIZE`): pecho y cruz que funden el cuello, orejas cortas, crin y cola llenas, lucero, calzas | 2202 | Los de la mula; `walk` con el casco plantado (como el ciervo) e `idle` |
+| `stork` | `hen()`: remeras negras, cuello en S, pico largo, patas con dedos | 1838 | Los de la gallina; `walk` e `idle` |
+| `chick` | `hen()` en cría | 1454 | Los de la gallina; `walk` e `idle` |
+| `crane` | Cuerpo de la gallina y plumas de la perdiz, en vuelo | 832 | `bird_wing_l`/`bird_wing_r` en el hombro, como la golondrina |
+| `butterfly` | Dos pares de alas redondeadas, ocre y terracota | 182 | `wing_l`/`wing_r` en el eje del cuerpo |
+| `stork-nest` | Plataforma de ramas con rodete (`NEST_FLOOR`, donde pisa la cigüeña) | 192 | — (sólo modelo) |
+
+Reconstruir y publicar (con `pip install bpy==5.0.1`):
+
+```bash
+cd deliverables/marked-models-trial && python3 build-models.py -- horse stork stork-nest chick crane butterfly
+node tools/art/rigid-clips.mjs deliverables/marked-models-trial/horse.glb <salida> horse   # y stork, chick
+node tools/art/adopt-models.mjs <lista.json>     # ronda animales-rehechos
+npx tsx tools/graphics/publish-assets.ts --ids stork,chick,crane,butterfly
+```
+
+El caballo y el nido no se publican: no tienen sitio en el juego todavía. Las
+hojas de antes (Astra) y después están en `artifacts/graphics/animales-rehechos/`
+(`tools/art/fauna-sheet.py`).

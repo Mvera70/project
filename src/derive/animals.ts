@@ -20,7 +20,9 @@ import { TERRAIN_CODE } from '@engine/state';
 import { seasonOf, weekOf } from '@engine/time';
 
 export type AnimalKind = 'hen' | 'pig' | 'cow' | 'crow' | 'wolf' | 'fish'
-  | 'partridge' | 'rabbit' | 'deer' | 'boar' | 'bear' | 'dog' | 'fox' | 'duck' | 'mule';
+  | 'partridge' | 'rabbit' | 'deer' | 'boar' | 'bear' | 'dog' | 'fox' | 'duck' | 'mule'
+  // v5.100 · sólo como cría de primavera detrás de la gallina (`life/young.ts`).
+  | 'chick';
 
 export interface Animal {
   id: number;

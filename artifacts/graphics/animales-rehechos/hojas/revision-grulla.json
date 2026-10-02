@@ -1,0 +1,5 @@
+{"out":"artifacts/graphics/animales-rehechos/revision/grulla.png","title":"grulla","rows":[{"label":"","panels":[
+{"title":"reposo","kind":"detail","models":[{"glb":"deliverables/marked-models-trial/crane.glb"}]},
+{"title":"desde abajo (como se ve en el cielo)","kind":"detail","models":[{"glb":"deliverables/marked-models-trial/crane.glb","turn":180,"lift":0}]},
+{"title":"frente","kind":"front","models":[{"glb":"deliverables/marked-models-trial/crane.glb","turn":90}]},
+{"title":"junto a la golondrina","kind":"detail","models":[{"glb":"deliverables/marked-models-trial/crane.glb"},{"glb":"public/assets/valley3d/bird.glb","x":0.5}]}]}]}

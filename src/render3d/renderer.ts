@@ -206,7 +206,9 @@ const FORD = 'ford-stone';
 const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish',
   'partridge', 'rabbit', 'deer', 'boar', 'bear',
   // El valle más vivo (25 sep 2026): el perro, el zorro, los patos y la mula.
-  'dog', 'fox', 'duck', 'mule'] as const;
+  'dog', 'fox', 'duck', 'mule',
+  // v5.100 · el polluelo, que va detrás de la gallina en primavera (`life/young.ts`).
+  'chick'] as const;
 /** Todo lo que el valle sabe pintar hoy. Lo que no este aqui, no se descarga. */
 /**
  * Los recursos que este renderer pide al catalogo.
@@ -228,8 +230,9 @@ export const WANTED = [
   'gate-timber',
   // P-2 · la fuente publicada de la plaza.
   'fountain',
-  // La golondrina de Astra (26 sep 2026), para las bandadas del cielo.
-  'bird',
+  // La golondrina de Astra (26 sep 2026), para las bandadas del cielo; y desde
+  // v5.100 la grulla de la uve de otoño, la cigüeña y la mariposa.
+  'bird', 'crane', 'stork', 'butterfly',
   // Y el resto de sus modelos (27 sep 2026): los puestos de los que visitan,
   // la cara de la cantera en sus tres estados, los peñascos y el mojón.
   'stall-pedlar', 'stall-factor', 'stall-salter',
@@ -242,6 +245,8 @@ export const WANTED = [
   // publicadas, como el barril, para que aparezcan al llegar.
   ...MINE_ASSETS,
   'jerkin',
+  'fiddle', 'pilgrim-hat', 'pilgrim-staff', 'grindstone-pack', 'herb-basket',
+  'bundle-pack', 'forage-basket', 'rope-pick', 'trade-pack', 'hide-bundle',
   'notice-board', 'smithy-board', 'chapel-board', 'signpost', 'hide-rack', 'hammer',
   'burnt-house', 'great-oak',
   ...FAUNA,
@@ -606,7 +611,7 @@ export async function createGraphicsRenderer(
   const fires = createFires((id) => library.instance(id));
   const fauna = new Fauna((kind) => library.instance(kind), (kind) => library.get(kind));
   // v5.85 · Cigüeñas, mariposas y abejas, según la estación (`effects/seasonal-fauna.ts`).
-  const seasonalFauna = createSeasonalFauna();
+  const seasonalFauna = createSeasonalFauna({ stork: library.get('stork'), butterfly: library.get('butterfly')?.original });
   let seasonalGround: (x: number, z: number) => number = () => 0;
   const bubbles = new Bubbles();
   const props = new Props((id) => library.instance(id));
@@ -1333,7 +1338,7 @@ export async function createGraphicsRenderer(
       world.remove(ambience.group);
       ambience.dispose();
     }
-    ambience = createAmbience(state.map, library.get('bird')?.original);
+    ambience = createAmbience(state.map, library.get('bird')?.original, library.get('crane')?.original);
     world.add(ambience.group);
     if (puddles !== null) {
       world.remove(puddles.group);
@@ -1464,6 +1469,7 @@ export async function createGraphicsRenderer(
       // v5.85 · La fauna de la estación que se está viendo: crías, cigüeñas,
       // mariposas, abejas, golondrinas y grullas.
       seasonal: { young: life.young.length, ...seasonalFauna.visible,
+        storkLead: seasonalFauna.storkLead,
         swallows: ambience?.visible.birds ?? 0, cranes: ambience?.visible.cranes ?? 0,
         craneLead: ambience?.visible.craneLead ?? null },
       day: lifeDay,
@@ -2507,7 +2513,7 @@ export async function createGraphicsRenderer(
         if (defender !== undefined && post.jerkin) jerkins.add(defender.villager);
       }
       lastActors = castOf(life, frame.presentationSeconds, ages, named).map(actor => {
-        if (actor.id < 0) return { ...actor, weapon: 'spear' as const, shield: true };
+        if (actor.visualIdentity === 'neighbor') return { ...actor, weapon: 'spear' as const, shield: true };
         const weapon = arms.get(actor.id);
         return weapon === undefined ? actor
           : { ...actor, weapon, shield: weapon === 'spear', ...(jerkins.has(actor.id) ? { jerkin: true } : {}) };

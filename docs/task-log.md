@@ -26,6 +26,31 @@ Captura: `docs/medidas/k-img/k5-tablon-sastreria-390.png`.
   azul, las gavillas y el lienzo blanqueando (Astra); las seis ilustraciones y
   las dos tarjetas (Codex, `docs/encargos/ilustraciones-k5-lino.md`).
 
+## 2 oct 2026 · Los animales rehechos (v5.100)
+
+Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
+rama `claude/animales-rehechos`, PR #62, **versiones reservadas v5.100–v5.101**
+(usada v5.100). Los seis de Astra que a Vera no le gustaban —cigüeña, nido,
+polluelo, grulla, mariposa y caballo— rehechos **de la receta de su animal del
+valle y con su densidad** (`build-models.py`), tras cinco vueltas rechazadas
+dentro de los topes del encargo de Astra. Integrados la cigüeña, la mariposa,
+el polluelo y la grulla; el nido y el caballo, sólo modelo. Informe:
+`docs/medidas/animales-rehechos-2026-10-02.md`.
+
+**Lo que costó, para la próxima:** un tope de triángulos pensado para otro
+autor no es una razón para entregar menos calidad que los animales que ya hay;
+y **nada se enseña sin mirarlo antes de cerca en sus juntas, andando y junto a
+su vecino** (`tools/art/fauna-sheet.py` lo hace con `look` y `clip`).
+
+**Abierto:**
+
+- **De Vera:** que los vea. La PR no se fusiona hasta que diga.
+- **Sin captura en el juego:** la uve de grullas (el dibujo por software no
+  llega) y el polluelo de cerca si la semilla no lo pone en cuadro.
+- **La cigüeña queda tapada a medias** por la hierba alta en la semilla 11
+  (antes y después): es del sitio de `storkSpots`, no del modelo.
+- **Sin medir:** el coste en el aparato.
+
 ## 2 oct 2026 · AR-2, la minería (v5.86)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
@@ -111,6 +136,15 @@ Bloque 3 integrado en `main` por PR #63, con ocho checks de CI verdes. Las seis 
 decidido por Sol 6: del Bloque 7 se publican tres piezas estáticas con sitio en la aldea: hasta tres bancos junto a casas, hasta dos troncos en el anillo de la plaza y un carro junto a granero o molino. La selección conserva libres accesos y caminos; las plazas previas del Bloque 0 tienen prioridad. El gesto de sentarse no cambia hasta que exista la mecánica de altura de asiento.
 decidido por Sol 6: cerca y portillo quedan sólo como modelos a la espera de K12; el caballo no entra en esta PR porque Claude Code revisa los animales por indicación de Vera.
 Bloque 7 antes/después sobre `main` con el peto, villa semilla 7/año 60/verano: `gl-probe` 8 s **500 → 501 llamadas, 835 401 → 830 941 triángulos, 48 → 48 programas** (fotogramas variables); `scene-report` estable **490 → 495 mallas (+5), 188 → 191 sombras (+3), 797 272 → 798 004 triángulos (+732)**. Captura de reposo ampliada: `artifacts/graphics/astra-b7-integrated/village-close.png`; hojas de las cinco piezas no animales en `artifacts/graphics/astra/<id>/sheet.png`.
+
+decidido por Sol 6: los accesorios del Bloque 5 se cuelgan del conector ya indicado en cada `attachment.json` con escala local 3; no se aplica además el ajuste de `grip` del hacha. El fardo genérico se oculta cuando el expedicionario vuelve con su pieza específica.
+decidido por Sol 6: los dos primeros miembros adultos de la familia que huye llevan el hatillo a la espalda; el tercero queda sin él. `Visitor.member` es dato de presentación derivado del orden del grupo, no estado del motor.
+decidido por Sol 6: el equipo de los asaltantes se asigna por `visualIdentity: 'neighbor'`; usar todo identificador negativo armaba también a los visitantes civiles y tapaba sus accesorios. Se corrige en el render, sin alterar la vida ni el motor.
+Bloque 5 en candidato: diez GLB publicados y vinculados a los cinco sucesos de visitantes y a las cinco misiones de expedición. Prueba de anclaje de los diez sobre el rig real en reposo y dos fases de marcha: **10/10**. Las hojas están en `artifacts/graphics/astra/<id>/sheet.png`. Captura del suceso `pilgrims`, semilla 7/año 60, cámara del juego en `artifacts/graphics/astra-b5-integrated/pilgrims-current/before.png` y detalle en `pilgrims-detail/before.png`; `observe-life` registró cero errores. La primera toma apuntó por error al bundle por defecto y detectó el viejo armado de IDs negativos; las tomas citadas usan expresamente el bundle B5.
+
+Bloque 5, antes/después contra `main` con Bloque 7 ya integrado. Villa 7/año 60/verano sin visita activa: `gl-probe` **506 → 506 llamadas, 836 907 → 836 907 triángulos, 48 → 48 programas**; `scene-report` **495 → 495 mallas, 191 → 191 sombras, 798 080 → 798 004 triángulos** (la diferencia de 76 es estado animado). Aldea 11/año 21/verano sin visita activa: `gl-probe` **404 → 404 llamadas, 818 544 → 818 544 triángulos, 52 → 52 programas**; `scene-report` **422 → 422 mallas, 144 → 144 sombras, 710 242 → 710 242 triángulos**. Las piezas sólo aparecen durante visitas o retornos; cada GLB suma una malla de 92–148 triángulos por portador, sin sombra propia. SwiftShader no predice FPS en la tablet.
+
+`main` avanzó por AR-2 (#65) mientras corría CI de B5. B5 incorporó ese `main` sin conflictos y se repitió la puerta local. Base nueva `fd7a0dfe`, villa 7/60/verano sin visita: `gl-probe` **475 → 475 llamadas, 765 525 → 765 648 triángulos, 48 → 48 programas**; `scene-report` **457 → 457 mallas, 197 → 197 sombras, 729 528 → 729 528 triángulos**. Aldea 11/21/verano: `gl-probe` **402 → 402 llamadas, 815 897 → 815 897 triángulos, 52 → 52 programas**; `scene-report` **422 → 422 mallas, 140 → 140 sombras, 705 464 → 705 520 triángulos**. Las diferencias pequeñas de triángulos salen de la fase animada. `typecheck`, `lint`, 21 pruebas rápidas incluyendo mina, 8 de jornada y `npm run shot` pasaron tras fusionar la base. La nueva toma de peregrinos en `artifacts/graphics/astra-b5-integrated/pilgrims-ar2/before.png` registró dos visitantes en plaza, sin armas ajenas y sin errores de página.
 
 ## 2 oct 2026 · El cerco sin salida (v5.89)
 

@@ -26,7 +26,8 @@ export function paintAnimals(
   for (const animal of animals) {
     if (animal.kind === 'partridge' || animal.kind === 'rabbit'
       || animal.kind === 'deer' || animal.kind === 'boar' || animal.kind === 'bear'
-      || animal.kind === 'dog' || animal.kind === 'fox' || animal.kind === 'duck' || animal.kind === 'mule') continue; // Sólo en 3D.
+      || animal.kind === 'dog' || animal.kind === 'fox' || animal.kind === 'duck' || animal.kind === 'mule'
+      || animal.kind === 'chick') continue; // Sólo en 3D.
     SPRITES[animal.kind](ctx, animal.x, animal.y, cell, palette, 0);
   }
 }
