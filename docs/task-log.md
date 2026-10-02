@@ -25,6 +25,13 @@ decidido por Sol 6: las recetas toman los colores de `art/recipes/palette.json`;
 
 Línea base antes de integrar, `main` `aba7889b`, empaquetado local `artifacts/graphics/astra-baseline/game/valley.html`, sonda `gl-probe` 8 s con `debug=1&live=1`: villa 7/año 60/verano **494 llamadas, 798 955 triángulos, 46 programas**; aldea 11/año 21/verano **355 llamadas, 694 465 triángulos, 47 programas**. `scene-report` en las mismas escenas: villa 469 mallas visibles, 202 con sombra, 695 138 triángulos; aldea 409, 139, 601 034. Estas cifras sustituyen para esta tanda las referencias históricas de septiembre; SwiftShader sólo sirve para comparación, no para FPS en la tablet. CI de `main` `aba7889b`: verde.
 
+`main` avanzó a `24683e35` (PR #48, nueva forma del valle); se volvió a medir antes de la integración. Villa 7/año 60/verano: `gl-probe` **494 llamadas, 762 501 triángulos, 47 programas**; `scene-report` **464 mallas, 207 sombras, 726 974 triángulos**. Aldea 11/año 21/verano: **400 llamadas, 754 128 triángulos, 51 programas**; escena **410 mallas, 160 sombras, 644 468 triángulos**. Ambos empaquetados desde `main` limpio y CI verde.
+
+decidido por Sol 6: los 21 tipos del Bloque 0 usan una malla instanciada por tipo, tamaño 0,8/1/1,2 sólo en adornos pequeños y ninguna sombra nueva; los sólidos finos siguen la caja real de cada objeto para conservar pasos. La variedad ocupa casas, oficios, campos, plaza y linde y se deduce del estado. Las tiendas de visita y el espantapájaros son condicionales a su evento o estación; no se fuerzan a aparecer fuera de contexto.
+decidido por Sol 6: el modelo de lavado y el de bancal pueden convivir con los elementos procedurales anteriores cuando hay sitio libre; el mismo filtro de celdas libres impide tapar accesos.
+
+Bloque 0 candidato integrado, comparado contra `main` `24683e35` con la misma semilla/año/estación: villa `gl-probe` **511 llamadas (+17), 763 963 triángulos (+1 462), 48 programas (+1)**; `scene-report` **492 mallas (+28), 207 sombras (=), 730 672 triángulos (+3 698)**. Aldea `gl-probe` **411 llamadas (+11), 747 635 triángulos** (la diferencia bruta varía con animaciones); `scene-report` **425 mallas (+15), 160 sombras (=), 646 842 triángulos (+2 374)**. El Bloque 0 queda por debajo de +30 llamadas y +60 000 triángulos en villa. Captura a cámara de reposo de la zona de casas: `artifacts/graphics/astra-b0-integrated/village-close.png`, comparada con `artifacts/graphics/astra-baseline-main/village-close.png`.
+
 ## 2 oct 2026 · La fauna por estaciones (v5.85)
 
 Carril de la tanda del 2 oct (director `session_01EYvYxVxEhUmyBSSTytRT3u`),
