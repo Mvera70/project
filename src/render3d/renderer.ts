@@ -4,6 +4,8 @@ import { eraOf } from '@derive/era';
 import { PlazaFountain } from './world/plaza';
 import { createNoticeBoard } from './world/notice-board';
 import { noticeBoardOf } from '@derive/notice-board';
+import { buildingBoardsOf } from '@derive/building-boards';
+import { ritesOpen, smithyOrdersOpen } from '@engine/world/boards';
 import { missionsOpen } from '@engine/world/expeditions';
 // G-06 · The renderer. design.md D.5, D.6.
 //
@@ -129,6 +131,8 @@ import type { Physics } from './life/physics';
    medido el 27 sep 2026) **lo dice desde el 29 sep el perfil** (`profile.ts`):
    lo que el jugador elige en «Graphics», o `auto`, que reproduce esas cifras. */
 /** La señal de caza flota esta altura sobre la presa, en celdas. TUNE visual. */
+/** K8 · el tablón de la herrería y el de la capilla, a esta escala del de la plaza: va clavado en una fachada. TUNE visual. */
+const BUILDING_BOARD_SCALE = 0.72;
 const HUNT_SIGN_LIFT = 0.9;
 /** Radio de la presa al preguntar si el bosque la tapa: poco, para que el borde del bosque no la esconda. */
 const HUNT_SIGN_COVER = 0.2;
@@ -608,6 +612,16 @@ export async function createGraphicsRenderer(
   const noticeBoard = createNoticeBoard();
   /** Cuántas misiones anuncia esta semana: tantos papeles clavados. */
   let boardNotes = 0;
+  // K8 · y los tablones de la herrería y de la capilla, clavados en su fachada
+  // (`derive/building-boards.ts`): la misma pieza provisional, más pequeña.
+  const buildingBoards = { smithy: createNoticeBoard(), church: createNoticeBoard() } as const;
+  for (const [which, mesh] of Object.entries(buildingBoards)) {
+    mesh.group.name = `Valley_NoticeBoard_${which}`;
+    mesh.group.userData['board'] = which;
+    mesh.group.scale.setScalar(BUILDING_BOARD_SCALE);
+  }
+  /** Cuántos avisos se pueden atender en cada uno: tantos papeles. */
+  const buildingNotes = { smithy: 0, church: 0 };
   // El valle más vivo · la ropa tendida y el huerto de cada casa.
   const yards = createYards();
   // Y el ladrido del perro, que se dibuja porque no hay sonido.
@@ -623,7 +637,7 @@ export async function createGraphicsRenderer(
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, quarry.group, coins.mesh, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group, noticeBoard.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, cast.stains.group, cast.waters.group, tells.group, fires.group, hearth.group, festoon.group, yards.group, barks.group, stalls.group, quarry.group, coins.mesh, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group, noticeBoard.group, buildingBoards.smithy.group, buildingBoards.church.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1663,9 +1677,10 @@ export async function createGraphicsRenderer(
   window.__valleyTrampleAt = (x: number, z: number) => trample?.at(x, z) ?? null;
   // §7.15 · dónde cae el tablón en la pantalla, en píxeles CSS del lienzo, para
   // que un recorrido lo toque de verdad (`shot.mjs --open board`).
-  window.__valleyBoardScreen = () => {
-    if (!noticeBoard.group.visible) return null;
-    const at = new Vector3(0, 0.85, 0).applyMatrix4(noticeBoard.group.matrixWorld).project(camera);
+  window.__valleyBoardScreen = (which?: 'smithy' | 'church') => {
+    const mesh = which === undefined ? noticeBoard : buildingBoards[which];
+    if (!mesh.group.visible) return null;
+    const at = new Vector3(0, 0.85, 0).applyMatrix4(mesh.group.matrixWorld).project(camera);
     return { x: (at.x + 1) / 2 * viewport.widthCss, y: (1 - at.y) / 2 * viewport.heightCss };
   };
   window.__valleyShadowStats = () => ({ ...shadowStats });
@@ -2163,6 +2178,8 @@ export async function createGraphicsRenderer(
       if (shown.tick !== grassTick || change.cleared) {
         grassTick = shown.tick;
         boardNotes = missionsOpen(shown).filter((m) => m.refusal === null).length;
+        buildingNotes.smithy = smithyOrdersOpen(shown).filter((o) => o.refusal === null).length;
+        buildingNotes.church = ritesOpen(shown).filter((r) => r.refusal === null).length;
         grass.plant(shown, groundFloor, plazaOf(shown), roadWear ?? undefined);
         grass.season(appearancePalette ?? paletteFor(live.season, live.seasonWeek),
           snowCover(live.season, live.seasonWeek));
@@ -2487,6 +2504,13 @@ export async function createGraphicsRenderer(
       plaza.show(plazaOf(shown), groundFloor);
       const board = noticeBoardOf(shown);
       noticeBoard.place(board.x, groundFloor(board.x, board.z), board.z, board.yaw, boardNotes);
+      // K8 · los de la herrería y la capilla, sólo si el edificio está en pie.
+      const onFacades = buildingBoardsOf(shown);
+      for (const which of ['smithy', 'church'] as const) {
+        const spot = onFacades.find((one) => one.which === which);
+        if (spot === undefined) { buildingBoards[which].group.visible = false; continue; }
+        buildingBoards[which].place(spot.x, groundFloor(spot.x, spot.z), spot.z, spot.yaw, buildingNotes[which]);
+      }
       hearth.place(plazaOf(shown), groundFloor);
       hearth.step(phase, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       cameraRight.setFromMatrixColumn(camera.matrixWorld, 0);
@@ -2764,11 +2788,14 @@ export async function createGraphicsRenderer(
         const id = idOf(hit.object, 'villagerId');
         if (id !== undefined) return { kind: 'villager', id };
       }
-      // §7.15 · y el tablón de la plaza, que abre su propia ventana.
+      // §7.15 · y el tablón de la plaza, que abre su propia ventana; K8 · y
+      // los de la herrería y la capilla, que dicen cuál son (`userData.board`).
       for (const hit of hits) {
         let node: Object3D | null = hit.object;
         while (node !== null && node.userData['noticeBoard'] !== true) node = node.parent;
-        if (node !== null) return { kind: 'board' };
+        if (node === null) continue;
+        const which = node.userData['board'] as 'smithy' | 'church' | undefined;
+        return which === undefined ? { kind: 'board' } : { kind: 'board', which };
       }
       for (const hit of hits) {
         const id = idOf(hit.object, 'buildingId');
@@ -2799,7 +2826,8 @@ export async function createGraphicsRenderer(
           at = new Vector3(cx, groundFloor(cx, cz) + 1.5, cz);
         }
       } else if (target.kind === 'board') {
-        at = new Vector3(0, 1.2, 0).applyMatrix4(noticeBoard.group.matrixWorld);
+        const mesh = target.which === 'smithy' || target.which === 'church' ? buildingBoards[target.which] : noticeBoard;
+        at = new Vector3(0, 1.2, 0).applyMatrix4(mesh.group.matrixWorld);
       }
       if (at === null) return null;
       const point = at.project(camera);
@@ -3228,7 +3256,7 @@ declare global {
     __valleyContactShade?: (tune: { ambient?: number; direct?: number; reach?: number }) => void;
     __valleySceneReport?: () => { group: string; meshes: number; shadow: number; instanced: number; triangles: number }[];
     __valleyTrampleAt?: (x: number, z: number) => { grass: number; snow: number } | null;
-    __valleyBoardScreen?: () => { x: number; y: number } | null;
+    __valleyBoardScreen?: (which?: 'smithy' | 'church') => { x: number; y: number } | null;
     __valleyShadowStats?: () => { moves: number; redraws: number; frames: number };
   }
 }

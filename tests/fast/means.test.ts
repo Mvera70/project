@@ -76,9 +76,21 @@ function walled(): GameState {
   return state;
 }
 
+/**
+ * K8 (2 oct 2026) · **El hacha y el arado del carro son de antes de la
+ * fragua**: con herrería se encargan allí (`world/boards.ts`) y el carro dice
+ * por qué no (`'smithy'`). La aldea de cuatro años de `rich()` ya tiene
+ * herrería desde K1–K3 (llega a las 40 h a ×1), así que para medir el precio
+ * de esos dos se le quita: es la aldea a la que el carro se los vende.
+ */
+function forgeless(state: GameState): GameState {
+  state.buildings = state.buildings.filter((b) => b.kind !== 'smithy');
+  return state;
+}
+
 /** La aldea que cada medio necesita para que lo único que estorbe sea el precio. */
 function payer(id: MeansId): GameState {
-  return id === 'gate' ? walled() : rich();
+  return id === 'gate' ? walled() : id === 'axe' || id === 'plough' ? forgeless(rich()) : rich();
 }
 
 describe('dar un medio', () => {
@@ -108,7 +120,7 @@ describe('dar un medio', () => {
   });
 
   it('el arado no se da dos veces: es un rasgo del valle', () => {
-    const state = rich();
+    const state = forgeless(rich());
     expect(canGive(state, 'plough')).toBe(true);
     giveMeans(state, 'plough', 'spring', 4);
     expect(state.traits).toContain('plough');
@@ -136,7 +148,7 @@ describe('dar un medio', () => {
   });
 
   it('queda en el registro, con lo que se hizo y lo que no', () => {
-    const state = rich();
+    const state = forgeless(rich());
     tick(state, CATALOG, undefined, give('plough'));
     expect(state.acts.at(-1)).toMatchObject({ act: { kind: 'means', means: 'plough' }, done: true });
     state.village.silver = 0;
@@ -149,8 +161,8 @@ describe('cada medio abre algo, y cierra algo', () => {
   it('el arado libera brazos, y no sube la cosecha', () => {
     // Es la diferencia entre un medio y un número mejor: lo que cambia es
     // **quién queda libre**, y a dónde van esos brazos lo decide la aldea.
-    const plain = rich();
-    const ploughed = rich();
+    const plain = forgeless(rich());
+    const ploughed = forgeless(rich());
     giveMeans(ploughed, 'plough', 'spring', 4);
     // Mismo estado salvo el rasgo y lo que costó: se igualan las existencias
     // para que lo único que se mida sea el reparto.

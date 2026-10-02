@@ -354,6 +354,8 @@ export function boot(
       cart.update(snapshot());
     } else if (route.kind === 'board') {
       // §7.15 · la ventana del tablón, encima del valle y fuera de la bandeja.
+      // K8 · el mismo tablón para la plaza, la herrería y la capilla.
+      board.show(route.which ?? 'plaza');
       shell.element.append(board.element);
       board.update(snapshot());
     }
@@ -405,6 +407,16 @@ export function boot(
       // que el envío ya es la respuesta: suena al tocar.
       sound.tap('ui_action_success', Date.now());
       pendingActs.push({ kind: 'expedition', mission, count });
+    },
+    // K8 · los tablones de la herrería y de la capilla: la misma cola de actos.
+    // El tablón sólo deja pedir lo que se puede (`board.ts`), así que suena al tocar.
+    smithy(order): void {
+      sound.tap('ui_action_success', Date.now());
+      pendingActs.push({ kind: 'smithy', order });
+    },
+    rite(rite): void {
+      sound.tap('ui_action_success', Date.now());
+      pendingActs.push({ kind: 'rite', rite });
     },
     setSpeed(value): void {
       // El jugador, y sólo él: la caza y el final también cambian la
@@ -1524,7 +1536,7 @@ export function boot(
       // hacía que la selección no tuviera salida.
       if (target === null || target.kind === 'terrain') actions.navigate({ kind: 'valley' });
       // §7.15 · el tablón de la plaza abre su propia ventana, no una ficha.
-      else if (target.kind === 'board') actions.navigate({ kind: 'board' });
+      else if (target.kind === 'board') actions.navigate(target.which === undefined ? { kind: 'board' } : { kind: 'board', which: target.which });
       else {
         actions.navigate({ kind: 'inspect', target, from: 'valley' });
         if (gesture === 'hold' && target.kind === 'villager') actions.track(target.id);
