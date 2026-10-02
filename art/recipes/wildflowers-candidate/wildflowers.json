@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "id": "wildflowers",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "foliage",
+      "role": "foliage",
+      "color": "#62864F",
+      "roughness": 0.92
+    },
+    {
+      "name": "grain",
+      "role": "grain",
+      "color": "#D8B25E",
+      "roughness": 0.92
+    },
+    {
+      "name": "saltwhite",
+      "role": "saltWhite",
+      "color": "#F4F2EC",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "wildflowers",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Stem0",
+      "location": [
+        -0.24,
+        -0.11,
+        0.11
+      ],
+      "dimensions": [
+        0.022,
+        0.022,
+        0.22
+      ],
+      "material": "foliage",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Blossom0",
+      "location": [
+        -0.24,
+        -0.11,
+        0.22
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.16,
+        0.16,
+        0.09
+      ],
+      "segments": 4,
+      "rings": 3,
+      "material": "grain",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stem1",
+      "location": [
+        0,
+        0.13,
+        0.16
+      ],
+      "dimensions": [
+        0.022,
+        0.022,
+        0.32
+      ],
+      "material": "foliage",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Blossom1",
+      "location": [
+        0,
+        0.13,
+        0.32
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.16,
+        0.16,
+        0.09
+      ],
+      "segments": 4,
+      "rings": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stem2",
+      "location": [
+        0.23,
+        -0.07,
+        0.135
+      ],
+      "dimensions": [
+        0.022,
+        0.022,
+        0.27
+      ],
+      "material": "foliage",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Blossom2",
+      "location": [
+        0.23,
+        -0.07,
+        0.27
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.16,
+        0.16,
+        0.09
+      ],
+      "segments": 4,
+      "rings": 3,
+      "material": "grain",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stem3",
+      "location": [
+        -0.17,
+        0.19,
+        0.1
+      ],
+      "dimensions": [
+        0.022,
+        0.022,
+        0.2
+      ],
+      "material": "foliage",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Blossom3",
+      "location": [
+        -0.17,
+        0.19,
+        0.2
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.16,
+        0.16,
+        0.09
+      ],
+      "segments": 4,
+      "rings": 3,
+      "material": "saltwhite",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stem4",
+      "location": [
+        0.15,
+        0.2,
+        0.09
+      ],
+      "dimensions": [
+        0.022,
+        0.022,
+        0.18
+      ],
+      "material": "foliage",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "sphere",
+      "name": "Blossom4",
+      "location": [
+        0.15,
+        0.2,
+        0.18
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.16,
+        0.16,
+        0.09
+      ],
+      "segments": 4,
+      "rings": 3,
+      "material": "grain",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

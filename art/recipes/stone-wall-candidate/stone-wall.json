@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "id": "stone-wall",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "color": "#9B958A",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "stone-wall",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Stone00",
+      "location": [
+        -1.125,
+        0,
+        0.095
+      ],
+      "dimensions": [
+        0.735,
+        0.29,
+        0.19
+      ],
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        3
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stone01",
+      "location": [
+        -0.375,
+        0,
+        0.095
+      ],
+      "dimensions": [
+        0.735,
+        0.29,
+        0.19
+      ],
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        -3
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stone02",
+      "location": [
+        0.375,
+        0,
+        0.095
+      ],
+      "dimensions": [
+        0.735,
+        0.29,
+        0.19
+      ],
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        3
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stone03",
+      "location": [
+        1.125,
+        0,
+        0.095
+      ],
+      "dimensions": [
+        0.735,
+        0.29,
+        0.19
+      ],
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        -3
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stone10",
+      "location": [
+        -1.125,
+        0,
+        0.265
+      ],
+      "dimensions": [
+        0.735,
+        0.22,
+        0.19
+      ],
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        3
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stone11",
+      "location": [
+        -0.375,
+        0,
+        0.265
+      ],
+      "dimensions": [
+        0.735,
+        0.22,
+        0.19
+      ],
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        -3
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stone12",
+      "location": [
+        0.375,
+        0,
+        0.265
+      ],
+      "dimensions": [
+        0.735,
+        0.22,
+        0.19
+      ],
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        3
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Stone13",
+      "location": [
+        1.125,
+        0,
+        0.265
+      ],
+      "dimensions": [
+        0.735,
+        0.22,
+        0.19
+      ],
+      "material": "stone",
+      "rotationDegrees": [
+        0,
+        0,
+        -3
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

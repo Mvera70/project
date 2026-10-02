@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "id": "trough",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "riverblue",
+      "role": "riverBlue",
+      "color": "#496E79",
+      "roughness": 0.92
+    },
+    {
+      "name": "timber",
+      "role": "timber",
+      "color": "#9A744C",
+      "roughness": 0.92
+    },
+    {
+      "name": "timberdark",
+      "role": "timberDark",
+      "color": "#6B4C32",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "trough",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Bottom",
+      "location": [
+        0,
+        0,
+        0.1
+      ],
+      "dimensions": [
+        0.95,
+        0.4,
+        0.11
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Side0",
+      "location": [
+        0,
+        -0.2,
+        0.24
+      ],
+      "dimensions": [
+        1,
+        0.065,
+        0.29
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Side1",
+      "location": [
+        0,
+        0.2,
+        0.24
+      ],
+      "dimensions": [
+        1,
+        0.065,
+        0.29
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "End0",
+      "location": [
+        -0.47,
+        0,
+        0.24
+      ],
+      "dimensions": [
+        0.065,
+        0.4,
+        0.29
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "End1",
+      "location": [
+        0.47,
+        0,
+        0.24
+      ],
+      "dimensions": [
+        0.065,
+        0.4,
+        0.29
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Water",
+      "location": [
+        0,
+        0,
+        0.22
+      ],
+      "dimensions": [
+        0.87,
+        0.33,
+        0.016
+      ],
+      "material": "riverblue",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}

@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 1,
+  "id": "beehive",
+  "scale": 0.3333333333333333,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "mergeByMaterial": true,
+  "materials": [
+    {
+      "name": "grain",
+      "role": "grain",
+      "color": "#D8B25E",
+      "roughness": 0.92
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "color": "#C7984A",
+      "roughness": 0.92
+    },
+    {
+      "name": "timber",
+      "role": "timber",
+      "color": "#9A744C",
+      "roughness": 0.92
+    },
+    {
+      "name": "timberdark",
+      "role": "timberDark",
+      "color": "#6B4C32",
+      "roughness": 0.92
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "connectors": [],
+  "clips": [],
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "beehive",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Bloque 0: geometr\u00eda est\u00e1tica facetada, +Z al frente en glTF. Fuente en celdas; paleta can\u00f3nica art/recipes/palette.json."
+  },
+  "referenceRender": {
+    "width": 400,
+    "height": 400,
+    "cameraLocation": [
+      2,
+      -3,
+      2.5
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.2,
+    "worldColor": "#DDE3C4",
+    "worldRole": "sky"
+  },
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Board",
+      "location": [
+        0,
+        0,
+        0.06
+      ],
+      "dimensions": [
+        0.61,
+        0.57,
+        0.12
+      ],
+      "material": "timber",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Skep",
+      "location": [
+        0,
+        0,
+        0.31
+      ],
+      "radius": 0.25,
+      "depth": 0.4,
+      "vertices": 8,
+      "material": "roof",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Dome",
+      "location": [
+        0,
+        0,
+        0.61
+      ],
+      "radius": 0.25,
+      "depth": 0.23,
+      "vertices": 8,
+      "material": "roof",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Wicker0",
+      "location": [
+        0,
+        0,
+        0.2
+      ],
+      "radius": 0.256,
+      "depth": 0.028,
+      "vertices": 8,
+      "material": "grain",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Wicker1",
+      "location": [
+        0,
+        0,
+        0.32
+      ],
+      "radius": 0.256,
+      "depth": 0.028,
+      "vertices": 8,
+      "material": "grain",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Wicker2",
+      "location": [
+        0,
+        0,
+        0.44
+      ],
+      "radius": 0.256,
+      "depth": 0.028,
+      "vertices": 8,
+      "material": "grain",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Entrance",
+      "location": [
+        0,
+        -0.25,
+        0.15
+      ],
+      "dimensions": [
+        0.095,
+        0.02,
+        0.065
+      ],
+      "material": "timberdark",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root",
+      "bevel": 0,
+      "smooth": false
+    }
+  ]
+}
