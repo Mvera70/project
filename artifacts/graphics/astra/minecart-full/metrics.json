@@ -1,0 +1,45 @@
+{
+  "triangles": 280,
+  "limit": 300,
+  "meshCount": 6,
+  "primitives": 6,
+  "dimensionsCells": [
+    0.47999998927116394,
+    0.503333330154419,
+    0.573333352804184
+  ],
+  "pivotsMetres": {
+    "cart_body": [
+      0,
+      0,
+      0
+    ],
+    "wheel_l_front": [
+      -0.6,
+      0.23,
+      0.5
+    ],
+    "wheel_l_rear": [
+      -0.6,
+      0.23,
+      -0.5
+    ],
+    "wheel_r_front": [
+      0.6,
+      0.23,
+      0.5
+    ],
+    "wheel_r_rear": [
+      0.6,
+      0.23,
+      -0.5
+    ],
+    "ore_load": [
+      0,
+      0.82,
+      0
+    ]
+  },
+  "vertexColors": true,
+  "textures": 0
+}

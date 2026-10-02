@@ -1,0 +1,20 @@
+{
+  "triangles": 544,
+  "limit": 1200,
+  "meshCount": 1,
+  "primitives": 1,
+  "dimensionsCells": [
+    3.3061004877090454,
+    2.261562630534172,
+    2.889289140701294
+  ],
+  "pivotsMetres": {
+    "mine_mouth": [
+      0,
+      0,
+      0
+    ]
+  },
+  "vertexColors": true,
+  "textures": 0
+}

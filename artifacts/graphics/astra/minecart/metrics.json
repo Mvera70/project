@@ -1,0 +1,40 @@
+{
+  "triangles": 232,
+  "limit": 300,
+  "meshCount": 5,
+  "primitives": 5,
+  "dimensionsCells": [
+    0.47999998927116394,
+    0.36000001430511475,
+    0.573333352804184
+  ],
+  "pivotsMetres": {
+    "cart_body": [
+      0,
+      0,
+      0
+    ],
+    "wheel_l_front": [
+      -0.6,
+      0.23,
+      0.5
+    ],
+    "wheel_l_rear": [
+      -0.6,
+      0.23,
+      -0.5
+    ],
+    "wheel_r_front": [
+      0.6,
+      0.23,
+      0.5
+    ],
+    "wheel_r_rear": [
+      0.6,
+      0.23,
+      -0.5
+    ]
+  },
+  "vertexColors": true,
+  "textures": 0
+}
